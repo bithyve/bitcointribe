@@ -768,15 +768,8 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accountShells: updateAccountShells( action.payload.services, [] ),
         }
 
-      case REFRESH_ACCOUNT_SHELL:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.shell.id
-        ).isSyncInProgress = true
-        return {
-          ...state,
-        }
-
       case ACCOUNT_SHELL_REFRESH_STARTED:
+        console.log( 'ACCOUNT_SHELL_REFRESH_STARTED' )
         state.accountShells.find(
           ( shell ) => shell.id == action.payload.id
         ).syncStatus = SyncStatus.IN_PROGRESS
@@ -784,10 +777,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
         }
       case ACCOUNT_SHELL_REFRESH_COMPLETED:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).isSyncInProgress = false
-
+        console.log( 'ACCOUNT_SHELL_REFRESH_COMPLETED' )
         // Updating Account Sync State to shell data model
         // This will be used to display sync icon on Home Screen
         state.accountShells.find(
@@ -798,6 +788,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case CLEAR_ACCOUNT_SYNC_CACHE:
+        console.log( 'CLEAR_ACCOUNT_SYNC_CACHE' )
         // This will clear the sync state at the start of each login session
         // This is required in order to ensure sync icon is shown again for each session
         state.accountShells.map(

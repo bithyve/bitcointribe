@@ -96,8 +96,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     : null
 
   const isRefreshing = useMemo( () => {
-    return accountShell.isSyncInProgress
-  }, [ accountShell.isSyncInProgress ] )
+    return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
+  }, [ accountShell.syncStatus ] )
 
   const isShowingDonationButton = useMemo( () => {
     return primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT
