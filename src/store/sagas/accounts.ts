@@ -1385,74 +1385,68 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
 
+function* createServiceSubAccount ( secondarySubAccount: ExternalServiceSubAccountDescribing, parentShell: AccountShell ) {
+  const service = yield select(
+    ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
+  )
+
+  let res
+  switch( secondarySubAccount.serviceAccountKind ){
+      case ServiceAccountKind.FAST_BITCOINS:
+        const fastBitcoinsDetails = {
+          accountName: secondarySubAccount.customDisplayName,
+          accountDescription: secondarySubAccount.customDescription,
+        }
+        res = yield call(
+          ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
+          DerivativeAccountTypes.FAST_BITCOINS,
+          fastBitcoinsDetails
+        )
+        break
+  }
+
+  if ( res && res.status === 200 ) {
+    const secondarySubAccountId = res.data.accountId
+    const secondarySubAccountInstanceNum = res.data.accountNumber
+
+    secondarySubAccount.id = secondarySubAccountId
+    secondarySubAccount.balances = {
+      confirmed: 0,
+      unconfirmed: 0,
+    }
+    secondarySubAccount.transactions = []
+
+    AccountShell.addSecondarySubAccount(
+      parentShell,
+      secondarySubAccountId,
+      secondarySubAccount,
+    )
+
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      [ parentShell.primarySubAccount.sourceKind ]: JSON.stringify( service ),
+    }
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+  } else {
+    throw new Error( 'Failed to generate secondary sub-account(service)' )
+  }
+}
+
 
 function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell}} ) {
   const { secondarySubAccount, parentShell } = payload
 
-  let secondarySubAccountId: string
-  let secondarySubAccountInstanceNum: number
-
-  const service = yield select(
-    ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
-  )
-
   switch ( secondarySubAccount.kind ) {
       case SubAccountKind.SERVICE:
-        switch( ( secondarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
-            case ServiceAccountKind.FAST_BITCOINS:
-              const fastBitcoinsDetails = {
-                accountName: secondarySubAccount.customDisplayName,
-                accountDescription: secondarySubAccount.customDescription,
-              }
-              const fbtcRes = yield call(
-                ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
-                DerivativeAccountTypes.FAST_BITCOINS,
-                fastBitcoinsDetails
-              )
-
-              if ( fbtcRes.status === 200 ) {
-                secondarySubAccountId = fbtcRes.data.accountId
-                secondarySubAccountInstanceNum = fbtcRes.data.accountNumber
-
-                secondarySubAccount.id = secondarySubAccountId
-                secondarySubAccount.balances = {
-                  confirmed: 0,
-                  unconfirmed: 0,
-                }
-                secondarySubAccount.transactions = []
-
-                AccountShell.addSecondarySubAccount(
-                  parentShell,
-                  secondarySubAccountId,
-                  secondarySubAccount,
-                )
-
-                const { SERVICES } = yield select( ( state ) => state.storage.database )
-                const updatedSERVICES = {
-                  ...SERVICES,
-                  [ parentShell.primarySubAccount.sourceKind ]: JSON.stringify( service ),
-                }
-                yield call( insertDBWorker, {
-                  payload: {
-                    SERVICES: updatedSERVICES
-                  }
-                } )
-
-              } else {
-                console.log( {
-                  err: fbtcRes.err
-                } )
-              }
-              break
-        }
+        yield call( createServiceSubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
         break
   }
-
-  if ( secondarySubAccountId ) return {
-    secondarySubAccountId, secondarySubAccountInstanceNum
-  }
-  else throw new Error( 'Failed to generate secondary sub-account; secondarySubAccountId missing' )
 }
 
 export const addNewSecondarySubAccountWatcher = createWatcher(
