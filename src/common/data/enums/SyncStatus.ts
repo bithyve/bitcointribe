@@ -1,19 +1,19 @@
 enum SyncStatus {
 
   /**
-   * The shell sub acount balances and transactions have not been refreshed since login.
+   * The shell sub account balances and transactions have not been refreshed since login.
    */
-  PENDING,
+  PENDING = 'PENDING',
 
   /**
-   * The shell sub acount balances and transactions are being refreshed now.
+   * The shell sub account balances and transactions are being refreshed now.
    */
-  IN_PROGRESS,
+  IN_PROGRESS = 'IN_PROGRESS',
 
   /**
-   * The shell sub acount balances and transactions have been refreshed since login.
+   * The shell sub account balances and transactions have been refreshed since login.
    */
-  COMPLETED,
+  COMPLETED = 'COMPLETED',
 }
 
 export default SyncStatus

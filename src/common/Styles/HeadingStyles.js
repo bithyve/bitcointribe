@@ -30,7 +30,14 @@ const HeadingStyles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-  }
+  },
+
+  sectionSubHeadingText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontWeight: 'normal',
+    fontFamily: Fonts.FiraSansRegular
+  },
 } )
 
 export default HeadingStyles
