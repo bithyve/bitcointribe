@@ -160,7 +160,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 301, err: err.message, message: ErrMap[ 301 ] 
+        status: 301, err: err.message, message: ErrMap[ 301 ]
       }
     }
   };
@@ -176,7 +176,7 @@ export default class SecureAccount {
   } | {
       status: number;
       err: any;
-      message: string;  
+      message: string;
       data?: undefined;
   }> => {
     try {
@@ -186,7 +186,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 301, err: err.message, message: ErrMap[ 301 ] 
+        status: 301, err: err.message, message: ErrMap[ 301 ]
       }
     }
   };
@@ -230,12 +230,12 @@ export default class SecureAccount {
       }
       return {
         status: config.STATUS.SUCCESS, data: {
-          imported: true 
-        } 
+          imported: true
+        }
       }
     } catch ( err ) {
       return {
-        status: 302, err: err.message, message: ErrMap[ 302 ] 
+        status: 302, err: err.message, message: ErrMap[ 302 ]
       }
     }
   };
@@ -264,7 +264,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 303, err: err.message, message: ErrMap[ 303 ] 
+        status: 303, err: err.message, message: ErrMap[ 303 ]
       }
     }
   };
@@ -295,7 +295,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 304, err: err.message, message: ErrMap[ 304 ] 
+        status: 304, err: err.message, message: ErrMap[ 304 ]
       }
     }
   };
@@ -323,7 +323,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 305, err: err.message, message: ErrMap[ 305 ] 
+        status: 305, err: err.message, message: ErrMap[ 305 ]
       }
     }
   };
@@ -354,7 +354,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 306, err: err.message, message: ErrMap[ 306 ] 
+        status: 306, err: err.message, message: ErrMap[ 306 ]
       }
     }
   };
@@ -396,7 +396,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 308, err: err.message, message: ErrMap[ 308 ] 
+        status: 308, err: err.message, message: ErrMap[ 308 ]
       }
     }
   };
@@ -488,7 +488,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 0o3, err: err.message, message: ErrMap[ 0o3 ] 
+        status: 0o3, err: err.message, message: ErrMap[ 0o3 ]
       }
     }
   };
@@ -565,7 +565,7 @@ export default class SecureAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ):
     | {
         status: number;
@@ -754,7 +754,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 0o4, err: err.message, message: ErrMap[ 0o4 ] 
+        status: 0o4, err: err.message, message: ErrMap[ 0o4 ]
       }
     }
   };
@@ -767,12 +767,12 @@ export default class SecureAccount {
         secondaryMnemonic,
       )
       return {
-        generated 
+        generated
       }
     } catch ( err ) {
       // console.log({ err });
       return {
-        generated: false 
+        generated: false
       }
     }
   };
@@ -862,7 +862,7 @@ export default class SecureAccount {
         return {
           status: config.STATUS.SUCCESS,
           data: {
-            txPrerequisites 
+            txPrerequisites
           },
         }
       } else {
@@ -876,7 +876,7 @@ export default class SecureAccount {
       // }
     } catch ( err ) {
       return {
-        status: 106, err: err.message, message: ErrMap[ 106 ] 
+        status: 106, err: err.message, message: ErrMap[ 106 ]
       }
     }
   };
@@ -940,12 +940,12 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: {
-          txHex, childIndexArray 
+          txHex, childIndexArray
         },
       }
     } catch ( err ) {
       return {
-        status: 310, err: err.message, message: ErrMap[ 310 ] 
+        status: 310, err: err.message, message: ErrMap[ 310 ]
       }
     }
   };
@@ -987,7 +987,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 311, err: err.message, message: ErrMap[ 311 ] 
+        status: 311, err: err.message, message: ErrMap[ 311 ]
       }
     }
   };
@@ -1045,8 +1045,8 @@ export default class SecureAccount {
 
       return {
         status: config.STATUS.SUCCESS, data: {
-          txid 
-        } 
+          txid
+        }
       }
     } catch ( err ) {
       return {

@@ -311,7 +311,7 @@ export default class BaseAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
     contactName?: string
   ):
     | {
