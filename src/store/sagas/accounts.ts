@@ -1,8 +1,6 @@
 import { call, put, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
-  FETCH_TRANSACTIONS,
-  transactionsFetched,
   switchLoader,
   TRANSFER_ST1,
   TRANSFER_ST2,
@@ -26,7 +24,6 @@ import {
   alternateTransferST2Executed,
   RESET_TWO_FA,
   twoFAResetted,
-  FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
   STARTUP_SYNC,
   REMOVE_TWO_FA,
@@ -71,6 +68,7 @@ import config from '../../bitcoin/HexaConfig'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import {
   DerivativeAccountTypes,
+  EphemeralDataElements,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -83,84 +81,7 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
-
-function* fetchDerivativeAccXpubWorker( { payload } ) {
-  const { accountType, accountNumber } = payload
-  const serivceType = REGULAR_ACCOUNT
-  const service: RegularAccount = yield select(
-    ( state ) => state.accounts[ serivceType ].service
-  )
-
-  const { derivativeAccounts } = service.hdWallet
-  if ( derivativeAccounts[ accountType ][ accountNumber ] ) return // xpub already exists
-
-  const res = yield call(
-    service.getDerivativeAccXpub,
-    accountType,
-    accountNumber
-  )
-
-  if ( res.status === 200 ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ serivceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( 'Failed to generate derivative acc xpub' )
-  }
-}
-
-export const fetchDerivativeAccXpubWatcher = createWatcher(
-  fetchDerivativeAccXpubWorker,
-  FETCH_DERIVATIVE_ACC_XPUB
-)
-
-function* fetchTransactionsWorker( { payload } ) {
-  yield put( switchLoader( payload.serviceType, 'transactions' ) )
-  const service = payload.service
-    ? payload.service
-    : yield select( ( state ) => state.accounts[ payload.serviceType ].service )
-
-  const preFetchTransactions =
-    payload.serviceType === SECURE_ACCOUNT
-      ? service.secureHDWallet.transactions
-      : service.hdWallet.transactions
-  const res = yield call( service.getTransactions )
-  const postFetchTransactions =
-    res.status === 200 ? res.data.transactions : preFetchTransactions
-
-  if (
-    res.status === 200 &&
-    JSON.stringify( preFetchTransactions ) !==
-      JSON.stringify( postFetchTransactions )
-  ) {
-    yield put( transactionsFetched( payload.serviceType, postFetchTransactions ) )
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ payload.serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    yield put( switchLoader( payload.serviceType, 'transactions' ) )
-  }
-}
-
-export const fetchTransactionsWatcher = createWatcher(
-  fetchTransactionsWorker,
-  FETCH_TRANSACTIONS
-)
+import { updateEphemeralChannel } from '../actions/trustedContacts'
 
 function* fetchBalanceTxWorker( { payload } ) {
   if ( payload.options.loader )
@@ -1385,6 +1306,70 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
 
+function* createTrustedContactSubAccount ( contactInfo: {  contactName: string, info: string} ) {
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
+  const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
+  const FCM = yield select ( state => state.preferences.fcmTokenValue )
+  const { contactName, info } = contactInfo
+
+  const { walletId } = regularAccount.hdWallet.getWalletId()
+  console.log( {
+    walletId, contactName, info, FCM
+  } )
+
+  let accountNumber =
+    regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+  if ( !accountNumber ) {
+    // initialize a trusted derivative account against the following account
+    const res = regularAccount.setupDerivativeAccount(
+      TRUSTED_CONTACTS,
+      null,
+      contactName,
+    )
+    if ( res.status !== 200 ) {
+      throw new Error( `${res.err}` )
+    } else {
+      // refresh the account number
+      accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[ contactName ]
+    }
+  }
+
+  const trustedReceivingAddress = ( regularAccount.hdWallet
+    .derivativeAccounts[ TRUSTED_CONTACTS ][
+      accountNumber
+    ] as TrustedContactDerivativeAccountElements ).receivingAddress
+
+  const data: EphemeralDataElements = {
+    walletID: walletId,
+    FCM,
+    trustedAddress: trustedReceivingAddress,
+    trustedTestAddress: testAccount.hdWallet.receivingAddress,
+  }
+  const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+
+  if ( !trustedContact ) {
+    yield put( updateEphemeralChannel( contactInfo, data ) )
+  } else if (
+    !trustedContact.symmetricKey &&
+    trustedContact.ephemeralChannel &&
+    trustedContact.ephemeralChannel.initiatedAt &&
+    Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+    config.TC_REQUEST_EXPIRY
+  ) {
+    // re-initiating expired EC
+    yield put(
+      updateEphemeralChannel(
+        contactInfo,
+        trustedContact.ephemeralChannel.data[ 0 ],
+      ),
+    )
+  }
+}
+
 function* createServiceSubAccount ( secondarySubAccount: ExternalServiceSubAccountDescribing, parentShell: AccountShell ) {
   const service = yield select(
     ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
@@ -1437,12 +1422,14 @@ function* createServiceSubAccount ( secondarySubAccount: ExternalServiceSubAccou
   }
 }
 
-
 function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell}} ) {
   const { secondarySubAccount, parentShell } = payload
 
   switch ( secondarySubAccount.kind ) {
+      case SubAccountKind.TRUSTED_CONTACTS:
+        break
+
       case SubAccountKind.SERVICE:
         yield call( createServiceSubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
         break
