@@ -41,7 +41,6 @@ import {
 } from './sagas/setupAndAuth'
 
 import {
-  fetchTransactionsWatcher,
   transferST1Watcher,
   transferST2Watcher,
   testcoinsWatcher,
@@ -52,7 +51,6 @@ import {
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
-  fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   startupSyncWatcher,
   validateTwoFAWatcher,
@@ -146,7 +144,6 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
     transferST1Watcher,
     transferST2Watcher,
@@ -159,7 +156,6 @@ const rootSaga = function* () {
     resetTwoFAWatcher,
     validateTwoFAWatcher,
     removeTwoFAWatcher,
-    fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,

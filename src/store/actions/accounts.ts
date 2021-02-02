@@ -3,7 +3,6 @@ import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 // types and action creators: dispatched by components and sagas
-export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS'
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
 export const TRANSFER_ST1 = 'TRANSFER_ST1'
 export const TRANSFER_ST2 = 'TRANSFER_ST2'
@@ -22,7 +21,6 @@ export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
 export const RUN_TEST = 'RUN_TEST'
-export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB'
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX'
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA'
@@ -48,14 +46,6 @@ export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL'
 export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
-
-export const fetchTransactions = ( serviceType, service? ) => {
-  return {
-    type: FETCH_TRANSACTIONS, payload: {
-      serviceType, service
-    }
-  }
-}
 
 export const fetchBalanceTx = (
   serviceType,
@@ -258,15 +248,6 @@ export const resetTwoFA = ( secondaryMnemonic ) => {
 export const runTest = () => {
   return {
     type: RUN_TEST
-  }
-}
-
-export const fetchDerivativeAccXpub = ( accountType, accountNumber? ) => {
-  return {
-    type: FETCH_DERIVATIVE_ACC_XPUB,
-    payload: {
-      accountType, accountNumber
-    },
   }
 }
 
@@ -514,7 +495,6 @@ export const accountShellOrderedToFront = (
 
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
-export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
 export const TRANSFER_ST1_EXECUTED = 'TRANSFER_ST1_EXECUTED'
 export const TRANSFER_ST1_FAILED = 'TRANSFER_ST1_FAILED'
 export const TRANSFER_ST2_EXECUTED = 'TRANSFER_ST2_EXECUTED'
@@ -546,14 +526,6 @@ export const testcoinsReceived = ( serviceType, service ) => {
   return {
     type: TESTCOINS_RECEIVED, payload: {
       serviceType, service
-    }
-  }
-}
-
-export const transactionsFetched = ( serviceType, transactions ) => {
-  return {
-    type: TRANSACTIONS_FETCHED, payload: {
-      serviceType, transactions
     }
   }
 }
