@@ -366,7 +366,7 @@ export const addNewAccountShell = (
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,
-  contactInfo?: { contactName: string; info: string;}
+  contactInfo?: { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, changeContact?: boolean}
 ) => {
   return {
     type: ADD_NEW_SECONDARY_SUBACCOUNT,
