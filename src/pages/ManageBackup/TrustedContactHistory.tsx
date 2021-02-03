@@ -823,7 +823,7 @@ const TrustedContactHistory = ( props ) => {
 
     const contactInfo = {
       contactName,
-      info: info.trim(),
+      info: info? info.trim(): info,
       isGuardian: true,
       shareIndex: index,
       changeContact,
