@@ -47,6 +47,10 @@ import {
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import AccountShell from '../../common/data/models/AccountShell'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -67,9 +71,11 @@ export default function AddContactSendRequest( props ) {
 
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
-  const fcmTokenValue = useSelector( ( state ) => state.preferences.fcmTokenValue )
   const trustedContactsInfo = useSelector(
     ( state ) => state.trustedContacts.trustedContactsInfo,
+  )
+  const accountShells: AccountShell[] = useSelector(
+    ( state ) => state.accounts.accountShells,
   )
 
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
@@ -155,65 +161,29 @@ export default function AddContactSendRequest( props ) {
         info = Contact.emails[ 0 ].email
       }
 
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
       const contactInfo = {
         contactName,
         info: info.trim(),
       }
 
-      const walletID = await AsyncStorage.getItem( 'walletID' )
-      const FCM = fcmTokenValue
-      //await AsyncStorage.getItem('fcmToken');
-
-      let accountNumber =
-        regularAccount.hdWallet.trustedContactToDA[ contactName ]
-      if ( !accountNumber ) {
-        // initialize a trusted derivative account against the following account
-        const res = regularAccount.getDerivativeAccXpub(
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        )
-        if ( res.status !== 200 ) {
-          console.log( 'Err occurred while generating derivative account' )
-        } else {
-          // refresh the account number
-          accountNumber =
-            regularAccount.hdWallet.trustedContactToDA[ contactName ]
+      let parentShell: AccountShell
+      accountShells.forEach( ( shell: AccountShell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){
+          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
         }
-      }
-
-      const trustedReceivingAddress = ( regularAccount.hdWallet
-        .derivativeAccounts[ TRUSTED_CONTACTS ][
-          accountNumber
-        ] as TrustedContactDerivativeAccountElements ).receivingAddress
-
-      const data: EphemeralDataElements = {
-        walletID,
-        FCM,
-        trustedAddress: trustedReceivingAddress,
-        trustedTestAddress: testAccount.hdWallet.receivingAddress,
-      }
-
-      if ( !trustedContact ) {
-        dispatch( updateEphemeralChannel( contactInfo, data ) )
-      } else if (
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY
-      ) {
-        // re-initiating expired EC
-        dispatch(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
-      }
+      } )
+      const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+        accountShellID: parentShell.id,
+        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+      } )
+      console.log( {
+        newSecondarySubAccount, parentShell, contactInfo
+      } )
+      dispatch(
+        addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
+      )
     }
-  }, [ Contact, trustedContacts ] )
+  }, [ Contact ] )
 
   useEffect( () => {
     if ( updateEphemeralChannelLoader ) {

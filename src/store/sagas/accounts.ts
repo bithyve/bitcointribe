@@ -1320,11 +1320,12 @@ function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsS
     walletId, contactName, info, FCM
   } )
 
+  // check whether a derivative account already exist for this contact
   let accountNumber =
     regularAccount.hdWallet.trustedContactToDA[ contactName ]
 
   if ( !accountNumber ) {
-    // initialize a trusted derivative account against the following account
+    // initialize a trusted derivative account against the following contact
     const res = regularAccount.setupDerivativeAccount(
       TRUSTED_CONTACTS,
       null,
@@ -1339,6 +1340,7 @@ function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsS
 
       const secondarySubAccountId = res.data.accountId
       secondarySubAccount.id = secondarySubAccountId
+      secondarySubAccount.instanceNumber = accountNumber
       secondarySubAccount.balances = {
         confirmed: 0,
         unconfirmed: 0,
@@ -1367,6 +1369,7 @@ function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsS
   const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
 
   if ( !trustedContact ) {
+    // creating emphemeral channel(initiating TC)
     yield put( updateEphemeralChannel( contactInfo, data ) )
   } else if (
     !trustedContact.symmetricKey &&

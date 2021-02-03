@@ -365,12 +365,13 @@ export const addNewAccountShell = (
 
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
-  parentShell: AccountShell
+  parentShell: AccountShell,
+  contactInfo?: { contactName: string; info: string;}
 ) => {
   return {
     type: ADD_NEW_SECONDARY_SUBACCOUNT,
     payload: {
-      secondarySubAccount, parentShell
+      secondarySubAccount, parentShell, contactInfo
     },
   }
 }
