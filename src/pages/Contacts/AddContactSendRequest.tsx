@@ -29,23 +29,14 @@ import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  updateEphemeralChannel,
   updateTrustedContactInfoLocally,
 } from '../../store/actions/trustedContacts'
-import {
-  EphemeralDataElements,
-  TrustedContactDerivativeAccountElements,
-} from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import {
-  TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
 } from '../../common/constants/serviceTypes'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -81,7 +72,7 @@ export default function AddContactSendRequest( props ) {
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
-  console.log( 'SelectedContact', SelectedContact )
+
   const [ Contact ] = useState(
     SelectedContact ? SelectedContact[ 0 ] : {
     },
@@ -92,14 +83,6 @@ export default function AddContactSendRequest( props ) {
   )
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
-  )
-
-  const regularAccount: RegularAccount = useSelector(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-
-  const testAccount: TestAccount = useSelector(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service,
   )
 
   const updateEphemeralChannelLoader = useSelector(
@@ -176,9 +159,7 @@ export default function AddContactSendRequest( props ) {
         accountShellID: parentShell.id,
         isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
       } )
-      console.log( {
-        newSecondarySubAccount, parentShell, contactInfo
-      } )
+
       dispatch(
         addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
       )
