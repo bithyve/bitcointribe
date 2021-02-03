@@ -1021,9 +1021,6 @@ export default class HDSegwitWallet extends Bitcoin {
           accountNumber = this.trustedContactToDA[ contactName ]
           if ( accountNumber ) {
             console.log( `Derivative account already exist against contact: ${contactName}` )
-            const derivativeInstance: TrustedContactDerivativeAccountElements = this
-              .derivativeAccounts[ accountType ][ accountNumber ]
-            accountId = derivativeInstance.xpubId
           } else {
             accountNumber = trustedAccounts.instance.using + 1
             this.generateDerivativeXpub( accountType, accountNumber )

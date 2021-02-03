@@ -82,6 +82,7 @@ import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import { updateEphemeralChannel } from '../actions/trustedContacts'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 
 function* fetchBalanceTxWorker( { payload } ) {
   if ( payload.options.loader )
@@ -1306,7 +1307,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
 
-function* createTrustedContactSubAccount ( contactInfo: {  contactName: string, info: string} ) {
+function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: {  contactName: string, info: string} ) {
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
@@ -1335,6 +1336,20 @@ function* createTrustedContactSubAccount ( contactInfo: {  contactName: string, 
       // refresh the account number
       accountNumber =
         regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+      const secondarySubAccountId = res.data.accountId
+      secondarySubAccount.id = secondarySubAccountId
+      secondarySubAccount.balances = {
+        confirmed: 0,
+        unconfirmed: 0,
+      }
+      secondarySubAccount.transactions = []
+
+      AccountShell.addSecondarySubAccount(
+        parentShell,
+        secondarySubAccountId,
+        secondarySubAccount,
+      )
     }
   }
 
@@ -1423,11 +1438,12 @@ function* createServiceSubAccount ( secondarySubAccount: ExternalServiceSubAccou
 }
 
 function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
-  parentShell: AccountShell}} ) {
-  const { secondarySubAccount, parentShell } = payload
+  parentShell: AccountShell, contactInfo?: { contactName: string; info: string;}}} ) {
 
+  const { secondarySubAccount, parentShell, contactInfo } = payload
   switch ( secondarySubAccount.kind ) {
       case SubAccountKind.TRUSTED_CONTACTS:
+        yield call( createTrustedContactSubAccount, ( secondarySubAccount as TrustedContactsSubAccountInfo ), parentShell, contactInfo )
         break
 
       case SubAccountKind.SERVICE:
