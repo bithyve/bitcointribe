@@ -1386,8 +1386,8 @@ function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsS
 
     if ( changeContact ) {
       let previousGuardianName: string
-      // find previous TC
-      if ( trustedContactsInfo ) {
+      // find previous TC (except keeper: shareIndex 0)
+      if ( trustedContactsInfo && shareIndex ) {
         const previousGuardian = trustedContactsInfo[ shareIndex ]
         if ( previousGuardian ) {
           previousGuardianName = `${previousGuardian.firstName} ${
