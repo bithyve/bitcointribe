@@ -58,6 +58,7 @@ import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountIn
 import AccountShell from '../../common/data/models/AccountShell'
 import config from '../../bitcoin/HexaConfig'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -83,9 +84,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const { contactName } = contactInfo
 
   const { walletId } = regularAccount.hdWallet.getWalletId()
-  console.log( {
-    walletId, contactInfo
-  } )
 
   // check whether a derivative account already exist for this contact
   let accountNumber =
@@ -601,28 +599,73 @@ function* updateEphemeralChannelWorker( { payload } ) {
 
     if ( payload.uploadXpub ) {
       console.log( 'Uploading xpub for: ', contactInfo.contactName )
-      const res = yield call(
-        regularService.getDerivativeAccXpub,
-        TRUSTED_CONTACTS,
-        null,
-        contactInfo.contactName,
-      )
 
-      if ( res.status === 200 ) {
+      let accountNumber =
+      regularService.hdWallet.trustedContactToDA[ contactInfo.contactName ]
+      if ( !accountNumber ) {
+        // initialize a trusted derivative account against the following contact (will get triggered during approval flow)
+        const res = regularService.setupDerivativeAccount(
+          TRUSTED_CONTACTS,
+          null,
+          contactInfo.contactName,
+        )
+        if ( res.status !== 200 ) {
+          throw new Error( `${res.err}` )
+        } else {
+          // refresh the account number and add trusted contact sub acc to acc-shell
+          accountNumber =
+          regularService.hdWallet.trustedContactToDA[ contactInfo.contactName ]
+          const secondarySubAccountId = res.data.accountId
+
+          const accountShells: AccountShell[] = yield select(
+            ( state ) => state.accounts.accountShells,
+          )
+          let parentShell: AccountShell
+          accountShells.forEach( ( shell: AccountShell ) => {
+            if( !shell.primarySubAccount.instanceNumber ){
+              if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+            }
+          } )
+          const secondarySubAccount = new TrustedContactsSubAccountInfo( {
+            accountShellID: parentShell.id,
+            isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+          } )
+
+          secondarySubAccount.id = secondarySubAccountId
+          secondarySubAccount.instanceNumber = accountNumber
+          secondarySubAccount.balances = {
+            confirmed: 0,
+            unconfirmed: 0,
+          }
+          secondarySubAccount.transactions = []
+
+          AccountShell.addSecondarySubAccount(
+            parentShell,
+            secondarySubAccountId,
+            secondarySubAccount,
+          )
+        }
+      }
+
+      const xpub = ( regularService.hdWallet
+        .derivativeAccounts[ TRUSTED_CONTACTS ][
+          accountNumber
+        ] as TrustedContactDerivativeAccountElements ).xpub
+
+      if ( xpub ) {
         // send acceptance notification
         const { walletName } = yield select(
           ( state ) => state.storage.database.WALLET_SETUP,
         )
 
-        const xpub = res.data
         const tpub = testService.getTestXpub()
-        const walletID = yield call( AsyncStorage.getItem, 'walletID' )
-        const FCM = yield call( AsyncStorage.getItem, 'fcmToken' )
+        const { walletId } = regularService.hdWallet.getWalletId()
+        const FCM = yield select ( state => state.preferences.fcmTokenValue )
 
         const data: TrustedDataElements = {
           xpub,
           tpub,
-          walletID,
+          walletID: walletId,
           FCM,
           walletName,
           version: DeviceInfo.getVersion(),
@@ -1427,7 +1470,7 @@ function* postRecoveryChannelSyncWorker( {} ) {
   )
 
   const trustedData: TrustedDataElements = {
-    FCM: yield call( AsyncStorage.getItem, 'fcmToken' ),
+    FCM: yield select ( state => state.preferences.fcmTokenValue ),
     version: DeviceInfo.getVersion(),
   }
   for ( const contactName of Object.keys( trustedContacts.tc.trustedContacts ) ) {

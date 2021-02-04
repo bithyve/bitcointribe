@@ -40,28 +40,19 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS,
-  DONATION_ACCOUNT,
 } from '../../common/constants/serviceTypes'
 import {
-  updateEphemeralChannel,
   updateTrustedContactInfoLocally,
 } from '../../store/actions/trustedContacts'
-import {
-  EphemeralDataElements,
-  TrustedContactDerivativeAccountElements,
-} from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 import idx from 'idx'
 import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { getAccountIcon, getAccountTitle } from './Send/utils'
@@ -105,9 +96,7 @@ export default function Receive( props ) {
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
   )
-  const fcmTokenValue = useSelector( ( state ) =>
-    idx( state, ( _ ) => _.preferences.fcmTokenValue ),
-  )
+
   const isReceiveHelperDoneValue = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
   )
@@ -127,12 +116,6 @@ export default function Receive( props ) {
   )
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
-  )
-  const regularAccount: RegularAccount = useSelector(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-  const testAccount: TestAccount = useSelector(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service,
   )
 
   useEffect( () => {
