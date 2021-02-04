@@ -14,40 +14,75 @@ import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
+import DeviceInfo from 'react-native-device-info'
+import { useDispatch, useSelector } from 'react-redux'
+import moment from 'moment'
+import idx from 'idx'
+import { isEmpty } from '../common/CommonFunctions'
+import { setVersions } from '../store/actions/versionHistory'
 
 
-export default function VersionHistoryScreen( props ) {
+export default function VersionHistoryScreen(props) {
+  const versionHistory = useSelector((state) => idx(state, (_) => _.versionHistory.versions))
+  const [versionsArray, setVersionsArray] = useState([]);
+  const [SelectedOption, setSelectedOption] = useState(0)
+  const dispatch = useDispatch()
 
-  const [ SelectedOption, setSelectedOption ] = useState( 0 )
-  const SelectOption = ( Id ) => {
-    if ( Id == SelectedOption ) {
-      setSelectedOption( 0 )
+  const SelectOption = (Id) => {
+    if (Id == SelectedOption) {
+      setSelectedOption(0)
     } else {
-      setSelectedOption( Id )
+      setSelectedOption(Id)
     }
   }
-  const [ data, setData ] = useState( [
+  const [data, setData] = useState([
     {
-      'id': 1,
-      'versionName': '1.0.8',
+      'id': '',
+      'version': '',
+      'buildNumber': '',
+      'versionName': '',
       'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-      'date': '19 May ‘19, 11:00am'
+      'date': ''
     }
-  ] )
+  ])
 
-  useEffect( () => {
-    const dummyData = []
-    for( let a=0;a<=12; a++ ){
-      const data = {
-        'id': a,
-        'versionName': '1.0.' + a,
-        'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-        'date': '19 May ‘19, 11:00am'
-      }
-      dummyData.push( data )
+  useEffect(() => {
+    if (versionHistory) {
+      setVersionsArray(versionHistory)
     }
-    setData( dummyData )
-  }, [] )
+  }, [versionHistory])
+
+  useEffect(() => {
+    let versionData = [];
+    console.log("versionsArray", typeof versionsArray);
+    console.log("versionsArray", versionsArray);
+
+    let data = {
+      'id': "1",
+      'version': DeviceInfo.getVersion(),
+      'buildNumber': DeviceInfo.getBuildNumber(),
+      'versionName': `Version ${DeviceInfo.getVersion()} (${DeviceInfo.getBuildNumber()})`,
+      'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
+      date: moment(new Date())
+        .utc()
+        .local()
+        .format('DD MMMM YYYY HH:mm')
+    }
+    if (!isEmpty(versionsArray)) {  
+      versionData = versionsArray;
+      const id = versionData && versionData.length ? versionData.length + 1 : 1;
+      if (versionData.filter(version => version.version == DeviceInfo.getVersion() && version.buildNumber == DeviceInfo.getBuildNumber()).length != 0) {
+          data = {
+          ...data,
+          'id': id.toString()
+        }
+      }
+    }
+    versionData.push(data);
+    setData(versionData);
+    dispatch(setVersions(versionData));
+  }, [])
+
   return (
     <SafeAreaView style={{
       flex: 1
@@ -59,23 +94,23 @@ export default function VersionHistoryScreen( props ) {
           }}>
             <ScrollView style={{
             }}>
-              {data.map( ( value ) => {
-                if ( SelectedOption == value.id ) {
+              {data.map((value) => {
+                if (SelectedOption == parseInt(value.id)) {
                   return (
                     <TouchableOpacity
                       key={value.id}
-                      onPress={() => SelectOption( value.id )}
+                      onPress={() => SelectOption(value.id)}
                       style={styles.selection}
                     >
                       <Text style={styles.versionText}>
-                        {'Version ' + value.versionName}
+                        {value.versionName}
                       </Text>
 
                       <Text style={styles.text}>
                         {value.title}
                       </Text>
                       <Text style={{
-                        ...styles.text, fontSize: RFValue( 9 ),
+                        ...styles.text, fontSize: RFValue(9),
                       }}>
                         {value.date}
                       </Text>
@@ -85,19 +120,19 @@ export default function VersionHistoryScreen( props ) {
                 return (
                   <TouchableOpacity
                     key={value.id}
-                    onPress={() => SelectOption( value.id )}
+                    onPress={() => SelectOption(value.id)}
                     style={{
-                      ...styles.selection, height: wp( '15%' ),
-                      width: wp( '85%' ),
+                      ...styles.selection, height: wp('15%'),
+                      width: wp('85%'),
                     }}>
                     <View style={{
                       flexDirection: 'row', alignItems: 'center'
                     }}>
                       <Text style={{
                         ...styles.versionText, color: Colors.textColorGrey,
-                        fontSize: RFValue( 10 ),
+                        fontSize: RFValue(10),
                       }}>
-                        {'Version ' + value.versionName}
+                        {value.versionName}
                       </Text>
                       <Text
                         style={styles.date}
@@ -110,44 +145,44 @@ export default function VersionHistoryScreen( props ) {
                     </Text>
                   </TouchableOpacity>
                 )
-              } )}
+              })}
             </ScrollView>
-          </View> )}
+          </View>)}
       </View>
     </SafeAreaView>
   )
 }
-const styles = StyleSheet.create( {
+const styles = StyleSheet.create({
   rootContainer: {
     flex: 1, backgroundColor: Colors.backgroundColor1
   },
   selection: {
-    margin: wp( '3%' ),
+    margin: wp('3%'),
     backgroundColor: Colors.white,
     borderRadius: 10,
-    height: wp( '20%' ),
-    width: wp( '90%' ),
+    height: wp('20%'),
+    width: wp('90%'),
     justifyContent: 'center',
-    paddingLeft: wp( '3%' ),
-    paddingRight: wp( '3%' ),
+    paddingLeft: wp('3%'),
+    paddingRight: wp('3%'),
     alignSelf: 'center',
   },
   versionText: {
     color: Colors.blue,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue(13),
     fontFamily: Fonts.FiraSansRegular,
   },
   text: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 10 ),
+    fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: hp( '0.4%' ),
+    marginTop: hp('0.4%'),
   },
   date: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 9 ),
+    fontSize: RFValue(9),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 'auto',
   }
-} )
+})
 

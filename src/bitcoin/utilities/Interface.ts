@@ -403,3 +403,12 @@ export interface EncryptedImage {
   ASYNC_DATA?: string;
   STATE_DATA?: string;
 }
+//VersionHistory
+export interface VersionHistory {
+  id: string;
+  version: string;
+  buildNumber: string;
+  versionName: string;
+  title: string;
+  date: Date;
+}
