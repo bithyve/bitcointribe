@@ -53,6 +53,7 @@ import {
   VALIDATE_TWO_FA,
   twoFAValid,
   ADD_NEW_SECONDARY_SUBACCOUNT,
+  ContactInfo,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -1360,7 +1361,7 @@ function* createServiceSubAccount ( secondarySubAccount: ExternalServiceSubAccou
 }
 
 function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
-  parentShell: AccountShell, contactInfo?: { contactName: string; info: string;}}} ) {
+  parentShell: AccountShell, contactInfo?: ContactInfo }} ) {
 
   const { secondarySubAccount, parentShell, contactInfo } = payload
   switch ( secondarySubAccount.kind ) {

@@ -65,6 +65,10 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { getAccountIcon, getAccountTitle } from './Send/utils'
+import AccountShell from '../../common/data/models/AccountShell'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/accounts'
 
 export default function Receive( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -113,6 +117,9 @@ export default function Receive( props ) {
 
   const trustedContactsInfo = useSelector(
     ( state ) => state.trustedContacts.trustedContactsInfo,
+  )
+  const accountShells: AccountShell[] = useSelector(
+    ( state ) => state.accounts.accountShells,
   )
 
   const WALLET_SETUP = useSelector(
@@ -348,118 +355,33 @@ export default function Receive( props ) {
         info = selectedContact.emails[ 0 ].email
       }
 
-      const contactInfo = {
-        contactName,
-        info: info.trim(),
-      }
-
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
       const receivingAddress = service.getReceivingAddress(
         derivativeAccountDetails ? derivativeAccountDetails.type : null,
         derivativeAccountDetails ? derivativeAccountDetails.number : null,
       )
 
-      let paymentURI
-      if ( amount ) {
-        paymentURI = service.getPaymentURI( receivingAddress, {
-          amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-        } ).paymentURI
+      const contactInfo: ContactInfo = {
+        contactName,
+        info: info? info.trim(): info,
+        paymentDetails: amount? {
+          amount, address: receivingAddress
+        }: null
       }
-      let accountNumber =
-        regularAccount.hdWallet.trustedContactToDA[ contactName ]
-      if ( !accountNumber ) {
-        // initialize a trusted derivative account against the following account
-        const res = regularAccount.getDerivativeAccXpub(
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        )
-        if ( res.status !== 200 ) {
-          // console.log('Err occurred while generating derivative account');
-        } else {
-          // refresh the account number
-          accountNumber =
-            regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+      let parentShell: AccountShell
+      accountShells.forEach( ( shell: AccountShell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){
+          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
         }
-      }
+      } )
+      const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+        accountShellID: parentShell.id,
+        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+      } )
 
-      const trustedReceivingAddress = ( regularAccount.hdWallet
-        .derivativeAccounts[ TRUSTED_CONTACTS ][
-          accountNumber
-        ] as TrustedContactDerivativeAccountElements ).receivingAddress
-
-      let trustedPaymentURI
-      if ( amount ) {
-        trustedPaymentURI = service.getPaymentURI( trustedReceivingAddress, {
-          amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-        } ).paymentURI
-      }
-
-      if ( !trustedContact ) {
-        ( async () => {
-          const walletID = await AsyncStorage.getItem( 'walletID' )
-          const FCM = fcmTokenValue
-          //await AsyncStorage.getItem('fcmToken');
-
-          const data: EphemeralDataElements = {
-            walletID,
-            FCM,
-            paymentDetails: {
-              trusted: {
-                address: trustedReceivingAddress,
-                paymentURI: trustedPaymentURI,
-              },
-              alternate: {
-                address: receivingAddress,
-                paymentURI,
-              },
-            },
-            trustedAddress: trustedReceivingAddress,
-            trustedTestAddress: testAccount.hdWallet.receivingAddress,
-          }
-          dispatch( updateEphemeralChannel( contactInfo, data ) )
-        } )()
-      } else if (
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        // re-initiating expired EC
-        dispatch(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
-      } else if (
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel
-      ) {
-        if (
-          trustedContact.ephemeralChannel.data &&
-          trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
-          trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-            .address === receivingAddress &&
-          trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-            .paymentURI === paymentURI
-        )
-          return
-        const data: EphemeralDataElements = {
-          paymentDetails: {
-            trusted: {
-              address: trustedReceivingAddress,
-              paymentURI: trustedPaymentURI,
-            },
-            alternate: {
-              address: receivingAddress,
-              paymentURI,
-            },
-          },
-        }
-        dispatch( updateEphemeralChannel( contactInfo, data ) )
-      }
+      dispatch(
+        addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
+      )
     }
   }, [
     selectedContact,

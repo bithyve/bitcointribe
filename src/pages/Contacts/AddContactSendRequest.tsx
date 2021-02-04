@@ -38,7 +38,7 @@ import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/serviceTypes'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
@@ -144,7 +144,7 @@ export default function AddContactSendRequest( props ) {
         info = Contact.emails[ 0 ].email
       }
 
-      const contactInfo = {
+      const contactInfo: ContactInfo = {
         contactName,
         info: info? info.trim(): info,
       }
