@@ -13,7 +13,7 @@ import {
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccountElements,
-  SubPrimaryDerivativeAccount,
+  DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
 } from '../Interface'
@@ -269,6 +269,7 @@ export default class SecureHDWallet extends Bitcoin {
     let receivingAddress
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
+        case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
           if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
@@ -281,7 +282,6 @@ export default class SecureHDWallet extends Bitcoin {
           receivingAddress = this.receivingAddress
     }
 
-    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
@@ -1009,23 +1009,25 @@ export default class SecureHDWallet extends Bitcoin {
     let accountId: string
     let accountNumber: number
     switch ( accountType ) {
+        case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
-          const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
+        case WYRE:
+          const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
-          const inUse = subPrimaryAccounts.instance.using
+          const inUse = derivativeAcc.instance.using
           accountNumber = inUse + 1
           this.generateDerivativeXpub( accountType, accountNumber )
-          const subPrimInstance: SubPrimaryDerivativeAccountElements = this
+          const derivativeInstance: DerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
-          const updatedSubPrimInstance = {
-            ...subPrimInstance,
+          const updatedDervInstance = {
+            ...derivativeInstance,
             accountName: accountDetails.accountName,
             accountDescription: accountDetails.accountDescription,
           }
           this.derivativeAccounts[ accountType ][
             accountNumber
-          ] = updatedSubPrimInstance
-          accountId = updatedSubPrimInstance.xpubId
+          ] = updatedDervInstance
+          accountId = updatedDervInstance.xpubId
           break
     }
 

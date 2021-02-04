@@ -1,4 +1,4 @@
-import { call, fork, put, select, spawn } from 'redux-saga/effects'
+import { call, put, select, spawn } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
   FETCH_TRANSACTIONS,
@@ -27,7 +27,6 @@ import {
   twoFAResetted,
   FETCH_DERIVATIVE_ACC_XPUB,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
-  FETCH_DERIVATIVE_ACC_ADDRESS,
   REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
@@ -56,6 +55,7 @@ import {
   setAverageTxFee,
   VALIDATE_TWO_FA,
   twoFAValid,
+  ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
 } from '../actions/accounts'
 import {
@@ -76,15 +76,15 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setAutoAccountSync } from '../actions/loaders'
-import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
+import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { AccountsState } from '../reducers/accounts'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import SyncStatus from '../../common/data/enums/SyncStatus'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
+import SyncStatus from '../../common/data/enums/SyncStatus'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -124,45 +124,6 @@ function* fetchDerivativeAccXpubWorker( { payload } ) {
 export const fetchDerivativeAccXpubWatcher = createWatcher(
   fetchDerivativeAccXpubWorker,
   FETCH_DERIVATIVE_ACC_XPUB
-)
-
-function* fetchDerivativeAccAddressWorker( { payload } ) {
-  const { serviceType, accountType, accountNumber, accountName } = payload
-  const service = yield select( ( state ) => state.accounts[ serviceType ].service )
-
-  const { derivativeAccounts } =
-    serviceType === SECURE_ACCOUNT ? service.secureHDWallet : service.hdWallet
-
-  // console.log( { derivativeAccounts } )
-  const res = yield call(
-    service.getDerivativeAccAddress,
-    accountType,
-    accountNumber,
-    null, // contanct name is null(non-TC)
-    accountName
-  )
-  // console.log( { res } )
-
-  if ( res.status === 200 ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( 'Failed to generate derivative acc address' )
-  }
-}
-
-export const fetchDerivativeAccAddressWatcher = createWatcher(
-  fetchDerivativeAccAddressWorker,
-  FETCH_DERIVATIVE_ACC_ADDRESS
 )
 
 function* fetchTransactionsWorker( { payload } ) {
@@ -1231,7 +1192,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
         const donationInstance = yield call( setupDonationAccountWorker, {
           payload: {
             serviceType: subAccountInfo.sourceKind,
-            donee: subAccountInfo.doneeName,
+            donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
             subject: subAccountInfo.customDisplayName,
             description: subAccountInfo.customDescription,
             configuration: {
@@ -1319,6 +1280,81 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   }
   else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
+
+
+function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
+  parentShell: AccountShell}} ) {
+  const { secondarySubAccount, parentShell } = payload
+
+  let secondarySubAccountId: string
+  let secondarySubAccountInstanceNum: number
+
+  const service = yield select(
+    ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
+  )
+
+  switch ( secondarySubAccount.kind ) {
+      case SubAccountKind.SERVICE:
+        switch( ( secondarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+            case ServiceAccountKind.FAST_BITCOINS:
+              const fastBitcoinsDetails = {
+                accountName: secondarySubAccount.customDisplayName,
+                accountDescription: secondarySubAccount.customDescription,
+              }
+              const fbtcRes = yield call(
+                ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
+                DerivativeAccountTypes.FAST_BITCOINS,
+                fastBitcoinsDetails
+              )
+
+              if ( fbtcRes.status === 200 ) {
+                secondarySubAccountId = fbtcRes.data.accountId
+                secondarySubAccountInstanceNum = fbtcRes.data.accountNumber
+
+                secondarySubAccount.id = secondarySubAccountId
+                secondarySubAccount.balances = {
+                  confirmed: 0,
+                  unconfirmed: 0,
+                }
+                secondarySubAccount.transactions = []
+
+                AccountShell.addSecondarySubAccount(
+                  parentShell,
+                  secondarySubAccountId,
+                  secondarySubAccount,
+                )
+
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ parentShell.primarySubAccount.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+              } else {
+                console.log( {
+                  err: fbtcRes.err
+                } )
+              }
+              break
+        }
+        break
+  }
+
+  if ( secondarySubAccountId ) return {
+    secondarySubAccountId, secondarySubAccountInstanceNum
+  }
+  else throw new Error( 'Failed to generate secondary sub-account; secondarySubAccountId missing' )
+}
+
+export const addNewSecondarySubAccountWatcher = createWatcher(
+  addNewSecondarySubAccount,
+  ADD_NEW_SECONDARY_SUBACCOUNT
+)
 
 function* addNewAccountShell( { payload: subAccountInfo, }: {
   payload: SubAccountDescribing;

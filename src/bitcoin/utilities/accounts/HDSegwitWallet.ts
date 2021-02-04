@@ -14,10 +14,9 @@ import {
   TrustedContactDerivativeAccountElements,
   DonationDerivativeAccount,
   DonationDerivativeAccountElements,
-  SubPrimaryDerivativeAccount,
   SubPrimaryDerivativeAccountElements,
-  WyreDerivativeAccount,
   WyreDerivativeAccountElements,
+  DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
 } from '../Interface'
@@ -29,6 +28,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   WYRE,
+  FAST_BITCOINS,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -250,6 +250,7 @@ export default class HDSegwitWallet extends Bitcoin {
     let receivingAddress
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
+        case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
           if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
@@ -262,7 +263,6 @@ export default class HDSegwitWallet extends Bitcoin {
           receivingAddress = this.receivingAddress
     }
 
-    if( !receivingAddress ) throw new Error( 'Failed to generate receiving address' )
     return receivingAddress
   };
 
@@ -837,41 +837,26 @@ export default class HDSegwitWallet extends Bitcoin {
     let accountId: string
     let accountNumber: number
     switch ( accountType ) {
+        case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
-          const subPrimaryAccounts: SubPrimaryDerivativeAccount = this
+        case WYRE:
+
+          const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
-          const inUse = subPrimaryAccounts.instance.using
+          const inUse = derivativeAcc.instance.using
           accountNumber = inUse + 1
           this.generateDerivativeXpub( accountType, accountNumber )
-          const subPrimInstance: SubPrimaryDerivativeAccountElements = this
+          const derivativeInstance: DerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
-          const updatedSubPrimInstance = {
-            ...subPrimInstance,
+          const updatedDervInstance = {
+            ...derivativeInstance,
             accountName: accountDetails.accountName,
             accountDescription: accountDetails.accountDescription,
           }
           this.derivativeAccounts[ accountType ][
             accountNumber
-          ] = updatedSubPrimInstance
-          accountId = updatedSubPrimInstance.xpubId
-          break
-
-        case WYRE:
-          const wyreAccounts: WyreDerivativeAccount = this
-            .derivativeAccounts[ accountType ]
-          accountNumber = wyreAccounts.instance.using + 1
-          this.generateDerivativeXpub( accountType, accountNumber )
-          const wyreInstance: WyreDerivativeAccountElements = this
-            .derivativeAccounts[ accountType ][ accountNumber ]
-          const updatedWyreInstance = {
-            ...wyreInstance,
-            accountName: accountDetails.accountName,
-            accountDescription: accountDetails.accountDescription,
-          }
-          this.derivativeAccounts[ accountType ][
-            accountNumber
-          ] = updatedWyreInstance
-          accountId = updatedWyreInstance.xpubId
+          ] = updatedDervInstance
+          accountId = updatedDervInstance.xpubId
           break
     }
 

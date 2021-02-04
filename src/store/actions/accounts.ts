@@ -22,7 +22,6 @@ export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
 export const RUN_TEST = 'RUN_TEST'
 export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB'
-export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS'
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX'
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA'
@@ -31,6 +30,7 @@ export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
 export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL'
+export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
 export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS'
@@ -262,20 +262,6 @@ export const fetchDerivativeAccXpub = ( accountType, accountNumber? ) => {
   }
 }
 
-export const fetchDerivativeAccAddress = (
-  serviceType,
-  accountType,
-  accountNumber?,
-  accountName?
-) => {
-  return {
-    type: FETCH_DERIVATIVE_ACC_ADDRESS,
-    payload: {
-      serviceType, accountType, accountNumber, accountName
-    },
-  }
-}
-
 export const fetchDerivativeAccBalTx = (
   serviceType: string,
   accountType: string,
@@ -395,6 +381,19 @@ export const addNewAccountShell = (
     payload,
   }
 }
+
+export const addNewSecondarySubAccount = (
+  secondarySubAccount: SubAccountDescribing,
+  parentShell: AccountShell
+) => {
+  return {
+    type: ADD_NEW_SECONDARY_SUBACCOUNT,
+    payload: {
+      secondarySubAccount, parentShell
+    },
+  }
+}
+
 export interface AddNewAccountShellCompletionAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_SHELL_COMPLETED;
 }
