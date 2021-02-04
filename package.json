@@ -111,6 +111,7 @@
     "react-native-mail": "4.1.0",
     "react-native-os": "^1.2.6",
     "react-native-print": "^0.6.0",
+    "react-native-progress": "^4.1.2",
     "react-native-progress-circle": "^2.1.0",
     "react-native-push-notification": "^7.0.0",
     "react-native-qrcode-svg": "^6.0.6",
