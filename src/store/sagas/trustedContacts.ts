@@ -1063,15 +1063,58 @@ export function* trustedChannelsSetupSyncWorker() {
       }
     } else {
       // generate a corresponding derivative acc and assign xpub(uploading info to trusted channel)
-      const res = yield call(
-        regularService.getDerivativeAccXpub,
-        TRUSTED_CONTACTS,
-        null,
-        contactName,
-      )
+      let accountNumber =
+      regularService.hdWallet.trustedContactToDA[ contactName ]
+      if ( !accountNumber ) {
+        // initialize a trusted derivative account against the following contact
+        const res = regularService.setupDerivativeAccount(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        )
+        if ( res.status !== 200 ) {
+          throw new Error( `${res.err}` )
+        } else {
+          // refresh the account number and add trusted contact sub acc to acc-shell
+          accountNumber =
+          regularService.hdWallet.trustedContactToDA[ contactName ]
+          const secondarySubAccountId = res.data.accountId
 
-      if ( res.status === 200 ) {
-        const xpub = res.data
+          const accountShells: AccountShell[] = yield select(
+            ( state ) => state.accounts.accountShells,
+          )
+          let parentShell: AccountShell
+          accountShells.forEach( ( shell: AccountShell ) => {
+            if( !shell.primarySubAccount.instanceNumber ){
+              if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+            }
+          } )
+          const secondarySubAccount = new TrustedContactsSubAccountInfo( {
+            accountShellID: parentShell.id,
+            isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+          } )
+
+          secondarySubAccount.id = secondarySubAccountId
+          secondarySubAccount.instanceNumber = accountNumber
+          secondarySubAccount.balances = {
+            confirmed: 0,
+            unconfirmed: 0,
+          }
+          secondarySubAccount.transactions = []
+          AccountShell.addSecondarySubAccount(
+            parentShell,
+            secondarySubAccountId,
+            secondarySubAccount,
+          )
+        }
+      }
+
+      const xpub = ( regularService.hdWallet
+        .derivativeAccounts[ TRUSTED_CONTACTS ][
+          accountNumber
+        ] as TrustedContactDerivativeAccountElements ).xpub
+
+      if ( xpub ) {
         const tpub = testService.getTestXpub()
         const data: TrustedDataElements = {
           xpub,
