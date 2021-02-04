@@ -52,11 +52,12 @@ import Toast from '../../components/Toast'
 import { downloadMetaShareWorker } from './sss'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import { ContactInfo, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import AccountShell from '../../common/data/models/AccountShell'
 import config from '../../bitcoin/HexaConfig'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -70,7 +71,7 @@ const sendNotification = ( recipient, notification ) => {
     RelayServices.sendNotifications( receivers, notification ).then( console.log )
 }
 
-export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: {  contactName: string, info: string, isGuardian?: boolean, shareIndex?: number, changeContact?: boolean} ) {
+export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
@@ -190,27 +191,78 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
     }
   } else{
+
+    // update ephemeral data (if payment details are available)
+    const { paymentDetails } = contactInfo
+    let paymentURI, trustedPaymentURI
+    if( paymentDetails ){
+      const { amount, address }  = paymentDetails
+      paymentURI = regularAccount.getPaymentURI( address, {
+        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+      } ).paymentURI
+      trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
+        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+      } ).paymentURI
+
+      data.paymentDetails =  {
+        trusted: {
+          address: trustedReceivingAddress,
+          paymentURI: trustedPaymentURI,
+        },
+        alternate: {
+          address: address,
+          paymentURI,
+        },
+      }
+    }
+
     if ( !trustedContact ) {
       // create emphemeral channel(initiating TC)
       yield put( updateEphemeralChannel( contactInfo, data ) )
     } else {
-      // re-initiating expired Ephemeral Channel
       const hasTrustedChannel = trustedContact.symmetricKey ? true : false
       const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
       trustedContact.ephemeralChannel.initiatedAt &&
       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
       config.TC_REQUEST_EXPIRY? true: false
 
-      if (
-        !hasTrustedChannel &&
-        isEphemeralChannelExpired
-      ){
-        yield put(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
+      if ( !hasTrustedChannel ){
+        if( isEphemeralChannelExpired ){
+          // re-initiating expired Ephemeral Channel
+          yield put(
+            updateEphemeralChannel(
+              contactInfo,
+              trustedContact.ephemeralChannel.data[ 0 ],
+            ),
+          )
+        }
+        else{
+          // if payment details are changed(on receive); re-upload the data
+          if( paymentDetails && trustedContact.ephemeralChannel ) {
+            const { address }  = paymentDetails
+            const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
+            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
+            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+              .address === address &&
+            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+              .paymentURI === paymentURI ? true: false
+
+            if ( !isPaymentDetailsSame ){
+              const updatedPaymentDetails = {
+                trusted: {
+                  address: trustedReceivingAddress,
+                  paymentURI: trustedPaymentURI,
+                },
+                alternate: {
+                  address: paymentDetails.address,
+                  paymentURI,
+                },
+              }
+              trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
+              yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
+            }
+          }
+        }
       }
     }
   }
