@@ -21,7 +21,7 @@ export type Props = {
 const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const { wyreHostedUrl } = useWyreIntegrationState()
-  const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | null>()
+  const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
@@ -29,8 +29,8 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const wyreAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
 
   function handleProceedButtonPress() {
+    if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation() )}
     setHasButtonBeenPressed( true )
-    dispatch( fetchWyreReservation() )
   }
 
   useEffect( () => {
@@ -41,6 +41,9 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   useWyreReservationFetchEffect( {
     onSuccess: () => {
       openLink( wyreHostedUrl )
+    },
+    onFailure: () => {
+      setHasButtonBeenPressed( true )
     }
   } )
 
