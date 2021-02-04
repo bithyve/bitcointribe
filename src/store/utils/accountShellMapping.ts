@@ -190,7 +190,7 @@ const updatePrimarySubAccounts = (
 
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
-              accountDescription = subPrimInstance.accountDescription  
+              accountDescription = subPrimInstance.accountDescription
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -222,7 +222,7 @@ const updatePrimarySubAccounts = (
 
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
-              accountDescription = subPrimInstance.accountDescription  
+              accountDescription = subPrimInstance.accountDescription
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -251,7 +251,7 @@ const updatePrimarySubAccounts = (
 
           if ( donationInstance && donationInstance.balances ) {
             accountName = donationInstance.subject
-            accountDescription = donationInstance.description 
+            accountDescription = donationInstance.description
             balances = {
               confirmed: donationInstance.balances.balance,
               unconfirmed: donationInstance.balances.unconfirmedBalance,
@@ -269,7 +269,7 @@ const updatePrimarySubAccounts = (
                     case SourceAccountKind.REGULAR_ACCOUNT:
                       derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
                       break
-      
+
                     case SourceAccountKind.SECURE_ACCOUNT:
                       derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
                       break
@@ -277,7 +277,7 @@ const updatePrimarySubAccounts = (
                 const wyreAccounts: WyreDerivativeAccount =
                 derivativeAccounts[ DerivativeAccountTypes.WYRE ]
                 const wyreInstance: WyreDerivativeAccountElements = wyreAccounts[ instanceNumber ]
-      
+
                 if ( wyreInstance && wyreInstance.balances ) {
                   accountName = wyreInstance.accountName
                   accountDescription = wyreInstance.accountDescription
@@ -386,6 +386,7 @@ const updateSecondarySubAccounts = (
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
+                    isTFAEnabled: shell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
                     balances: dervBalances,
                     transactions: dervTransactions,
                   } )

@@ -37,6 +37,7 @@ import {
   ACCOUNT_SHELLS_ORDER_UPDATED,
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
   ACCOUNT_SHELL_REFRESH_COMPLETED,
+  ACCOUNT_SHELL_REFRESH_STARTED,
   REFRESH_ACCOUNT_SHELL,
   CLEAR_ACCOUNT_SYNC_CACHE,
   RESTORED_ACCOUNT_SHELLS,
@@ -56,6 +57,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SyncStatus from '../../common/data/enums/SyncStatus'
 
 export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
@@ -766,34 +768,31 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accountShells: updateAccountShells( action.payload.services, [] ),
         }
 
-      case REFRESH_ACCOUNT_SHELL:
+      case ACCOUNT_SHELL_REFRESH_STARTED:
+        console.log( 'ACCOUNT_SHELL_REFRESH_STARTED' )
         state.accountShells.find(
-          ( shell ) => shell.id == action.payload.shell.id
-        ).isSyncInProgress = true
-
+          ( shell ) => shell.id == action.payload.id
+        ).syncStatus = SyncStatus.IN_PROGRESS
         return {
           ...state,
         }
-
       case ACCOUNT_SHELL_REFRESH_COMPLETED:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.id
-        ).isSyncInProgress = false
-
+        console.log( 'ACCOUNT_SHELL_REFRESH_COMPLETED' )
         // Updating Account Sync State to shell data model
         // This will be used to display sync icon on Home Screen
         state.accountShells.find(
           ( shell ) => shell.id == action.payload.id
-        ).hasAccountSyncCompleted = true
+        ).syncStatus = SyncStatus.COMPLETED
         return {
           ...state,
         }
 
       case CLEAR_ACCOUNT_SYNC_CACHE:
+        console.log( 'CLEAR_ACCOUNT_SYNC_CACHE' )
         // This will clear the sync state at the start of each login session
         // This is required in order to ensure sync icon is shown again for each session
         state.accountShells.map(
-          ( shell ) => shell.hasAccountSyncCompleted = false )
+          ( shell ) => shell.syncStatus = SyncStatus.PENDING )
         return {
           ...state,
         }
