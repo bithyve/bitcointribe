@@ -6,6 +6,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  InputUTXOs,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -26,7 +27,10 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -51,6 +55,7 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -58,6 +63,14 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -82,7 +95,10 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -113,6 +129,7 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -120,6 +137,14 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -443,9 +468,7 @@ export default class SecureAccount {
       accountNumber,
     );
 
-  public getBalanceTransactions = async ( options?: {
-    restore?;
-  } ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -484,7 +507,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalanceTransaction( options ),
+        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh ),
       }
     } catch ( err ) {
       return {
@@ -495,6 +518,7 @@ export default class SecureAccount {
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
+    hardRefresh?: boolean,
   ): Promise<
     | {
         status: number;
@@ -516,6 +540,7 @@ export default class SecureAccount {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
+          hardRefresh
         ),
       }
     } catch ( err ) {
@@ -731,34 +756,6 @@ export default class SecureAccount {
     }
   };
 
-  public getTransactionDetails = async (
-    txHash: string,
-  ): Promise<
-    | {
-        status: number;
-        data: any;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchTransactionDetails( txHash ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o4, err: err.message, message: ErrMap[ 0o4 ]
-      }
-    }
-  };
-
   public generateSecondaryXpriv = (
     secondaryMnemonic: string,
   ): { generated: boolean } => {
@@ -899,6 +896,8 @@ export default class SecureAccount {
               vout: number;
             };
           }>;
+          inputs: InputUTXOs[],
+          derivativeAccountDetails?: { type: string; number: number },
         };
         err?: undefined;
         message?: undefined;
@@ -919,7 +918,7 @@ export default class SecureAccount {
         nSequence,
       )
 
-      let inputs
+      let inputs: InputUTXOs[]
       if ( txnPriority === 'custom' && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
       } else {
@@ -940,7 +939,7 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: {
-          txHex, childIndexArray
+          txHex, childIndexArray, inputs, derivativeAccountDetails
         },
       }
     } catch ( err ) {
@@ -960,6 +959,8 @@ export default class SecureAccount {
         vout: number;
       };
     }>,
+    inputs: InputUTXOs[],
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -977,13 +978,21 @@ export default class SecureAccount {
       }
   > => {
     try {
+      const { txid } =  await this.secureHDWallet.serverSigningAndBroadcast(
+        token,
+        txHex,
+        childIndexArray,
+      )
+      if( txid ){
+        // chip consumed utxos
+        this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
+      }
+
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.serverSigningAndBroadcast(
-          token,
-          txHex,
-          childIndexArray,
-        ),
+        data: {
+          txid
+        }
       }
     } catch ( err ) {
       return {
@@ -1037,6 +1046,10 @@ export default class SecureAccount {
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
       const { txid } = await this.secureHDWallet.broadcastTransaction( txHex )
+      if( txid ){
+        // chip consumed utxos
+        this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
+      }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
@@ -1096,50 +1109,34 @@ export default class SecureAccount {
   };
 
   public getDerivativeAccBalanceTransactions = async (
-    accountType: string,
-    accountNumber?: number,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
+    accountInfo: {
+      accountType: string,
+      accountNumber: number,
+      contactName?: string,
+    }[],
+    hardRefresh?: boolean,
+  ):  Promise<
+  | {
+      status: number;
+      data: {
+        synched: boolean
+      };
+      err?: undefined;
+      message?: undefined;
+    }
+  | {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
+  >=> {
     try {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.fetchDerivativeAccBalanceTxs(
-          accountType,
-          accountNumber,
+          accountInfo,
+          hardRefresh,
         ),
       }
     } catch ( err ) {

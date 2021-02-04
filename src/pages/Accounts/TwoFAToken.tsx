@@ -79,14 +79,16 @@ export default function TwoFAToken( props ) {
       isSuccess={true}
       onPressViewAccount={() => {
         dispatch( clearTransfer( serviceType ) )
+        // dispatch(fetchTransactions(serviceType));
+        const fetchOptions =  {
+          loader: true,
+          syncTrustedDerivative:
+            serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+              ? true
+              : false,
+        }
         dispatch(
-          fetchBalanceTx( serviceType, {
-            loader: true,
-            syncTrustedDerivative:
-              serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
-                ? true
-                : false,
-          } ),
+          fetchBalanceTx( serviceType, fetchOptions ),
         )
         props.navigation.navigate( 'AccountDetails' )
       }}

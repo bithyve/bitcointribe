@@ -27,6 +27,7 @@ export default class BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -34,6 +35,14 @@ export default class BaseAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -186,33 +195,17 @@ export default class BaseAccount {
   };
 
   public getDerivativeAccBalanceTransactions = async (
-    accountType: string,
-    accountNumber?: number,
+    accountInfo: {
+      accountType: string,
+      accountNumber: number,
+      contactName?: string,
+    }[],
+    hardRefresh?: boolean,
   ): Promise<
     | {
         status: number;
         data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
+          synched: boolean
         };
         err?: undefined;
         message?: undefined;
@@ -228,8 +221,8 @@ export default class BaseAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.fetchDerivativeAccBalanceTxs(
-          accountType,
-          accountNumber,
+          accountInfo,
+          hardRefresh,
         ),
       }
     } catch ( err ) {
@@ -244,6 +237,7 @@ export default class BaseAccount {
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
+    hardRefresh?: boolean
   ): Promise<
     | {
         status: number;
@@ -265,6 +259,7 @@ export default class BaseAccount {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
+          hardRefresh
         ),
       }
     } catch ( err ) {
@@ -510,9 +505,7 @@ export default class BaseAccount {
   public isValidAddress = ( recipientAddress: string ): boolean =>
     this.hdWallet.isValidAddress( recipientAddress );
 
-  public getBalanceTransactions = async ( options?: {
-    restore?;
-  } ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -551,39 +544,11 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalanceTransaction( options ),
+        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh ),
       }
     } catch ( err ) {
       return {
         status: 0o3, err: err.message, message: ErrMap[ 0o3 ]
-      }
-    }
-  };
-
-  public getTransactionDetails = async (
-    txHash: string,
-  ): Promise<
-    | {
-        status: number;
-        data: any;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchTransactionDetails( txHash ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o4, err: err.message, message: ErrMap[ 0o4 ]
       }
     }
   };
@@ -769,6 +734,10 @@ export default class BaseAccount {
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
       const { txid } = await this.hdWallet.broadcastTransaction( txHex )
+      if( txid ){
+        // chip consumed utxos
+        this.hdWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
+      }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
