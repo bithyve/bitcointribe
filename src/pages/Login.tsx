@@ -151,7 +151,11 @@ export default function Login( props ) {
             ? 'Your device is Jail Broken'
             : 'Your device is Rooted',
         )
-        setJailBrokenInfo( '' )
+        setJailBrokenInfo(
+          Platform.OS == 'ios'
+            ? 'You are using a jailbroken device hence in built security features of the app as well as the phone will not work as intended. We recommend you use a non jailbroken device with the latest iOS updates installed to ensure the security of your app data'
+            : 'You are using a rooted device hence in built security features of the app as well as the phone will not work as intended. We recommend you use a non rooted device with the latest Android updates installed to ensure the security of your app data'
+        )
         setElevation( 0 )
       }, 2 )
     }

@@ -25,7 +25,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   transferST3,
   clearTransfer,
-  fetchTransactions,
   fetchBalanceTx,
 } from '../../store/actions/accounts'
 import SendStatusModalContents from '../../components/SendStatusModalContents'
@@ -81,14 +80,15 @@ export default function TwoFAToken( props ) {
       onPressViewAccount={() => {
         dispatch( clearTransfer( serviceType ) )
         // dispatch(fetchTransactions(serviceType));
+        const fetchOptions =  {
+          loader: true,
+          syncTrustedDerivative:
+            serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
+              ? true
+              : false,
+        }
         dispatch(
-          fetchBalanceTx( serviceType, {
-            loader: true,
-            syncTrustedDerivative:
-              serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
-                ? true
-                : false,
-          } ),
+          fetchBalanceTx( serviceType, fetchOptions ),
         )
         props.navigation.navigate( 'AccountDetails' )
       }}
@@ -210,7 +210,7 @@ export default function TwoFAToken( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={commonStyle.headerContainer}>
@@ -220,7 +220,7 @@ export default function TwoFAToken( props ) {
             props.navigation.goBack()
           }}
           hitSlop={{
-            top: 20, left: 20, bottom: 20, right: 20 
+            top: 20, left: 20, bottom: 20, right: 20
           }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
@@ -229,7 +229,7 @@ export default function TwoFAToken( props ) {
         </TouchableOpacity>
       </View>
       <View style={{
-        ...styles.modalContentContainer, height: '100%' 
+        ...styles.modalContentContainer, height: '100%'
       }}>
         <View
           style={{
@@ -238,13 +238,13 @@ export default function TwoFAToken( props ) {
           }}
         >
           <View style={{
-            ...styles.otpRequestHeaderView 
+            ...styles.otpRequestHeaderView
           }}>
             <Text style={styles.modalTitleText}>
               {'Enter OTP to authenticate'}
             </Text>
             <Text style={{
-              ...styles.modalInfoText, marginTop: hp( '1.5%' ) 
+              ...styles.modalInfoText, marginTop: hp( '1.5%' )
             }}>
               {
                 'Please enter the OTP from the authenticator that you have set up'
@@ -252,7 +252,7 @@ export default function TwoFAToken( props ) {
             </Text>
           </View>
           <View style={{
-            marginBottom: hp( '2%' ) 
+            marginBottom: hp( '2%' )
           }}>
             <View style={styles.passcodeTextInputView}>
               <TextInput
@@ -418,7 +418,7 @@ export default function TwoFAToken( props ) {
             }}
           >
             <Text style={{
-              ...styles.modalInfoText 
+              ...styles.modalInfoText
             }}>
               {
                 'If you have not set up the authenticator yet, please see our FAQ section to see how to do it'
@@ -426,7 +426,7 @@ export default function TwoFAToken( props ) {
             </Text>
           </View>
           <View style={{
-            flexDirection: 'row', marginTop: 'auto' 
+            flexDirection: 'row', marginTop: 'auto'
           }}>
             <TouchableOpacity
               disabled={isConfirmDisabled}
@@ -533,7 +533,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 0.35,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     borderColor: Colors.borderColor,
     alignItems: 'center',
@@ -580,7 +580,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',

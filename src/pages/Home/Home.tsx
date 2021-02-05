@@ -9,7 +9,8 @@ import {
   Linking,
   Alert,
   Image,
-  AppState
+  AppState,
+  InteractionManager
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
@@ -60,7 +61,7 @@ import CustomBottomTabs, {
 } from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
-  fetchDerivativeAccBalTx,
+  autoSyncShells
 } from '../../store/actions/accounts'
 import { trustedChannelActions } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -163,7 +164,7 @@ interface HomePropsTypes {
   uploadRequestedShare: any;
   s3Service: any;
   overallHealth: any;
-  fetchDerivativeAccBalTx: any;
+  autoSyncShells: any;
   addTransferDetails: any;
   paymentDetails: any;
   clearPaymentDetails: any;
@@ -781,6 +782,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
       this.handleDeepLinking( unhandledDeepLinkURL )
     }
+    InteractionManager.runAfterInteractions( () => {
+      // This will sync balances and transactions for all account shells
+      this.props.autoSyncShells()
+    } )
   };
 
   getNewTransactionNotifications = async () => {
@@ -788,7 +793,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    console.log( ':regularAccount', regularAccount )
+    // console.log( ':regularAccount', regularAccount )
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
@@ -796,7 +801,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    console.log( ':newTransactionsRegular', newTransactionsRegular )
+    // console.log( ':newTransactionsRegular', newTransactionsRegular )
     if ( newTransactionsRegular && newTransactionsRegular.length )
       newTransactions.push( ...newTransactionsRegular )
     if ( newTransactionsSecure && newTransactionsSecure.length )
@@ -2055,7 +2060,7 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
-    fetchDerivativeAccBalTx,
+    autoSyncShells,
     addTransferDetails,
     clearPaymentDetails,
     notificationsUpdated,
