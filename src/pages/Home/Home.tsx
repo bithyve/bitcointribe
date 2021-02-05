@@ -747,7 +747,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidMount = () => {
     const { navigation, versionHistory } = this.props
-    let versionData = [];
+    let versionData = []
     this.closeBottomSheet()
     this.calculateNetBalance()
 
@@ -779,11 +779,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.autoSyncShells()
     } )
 
-    if (versionHistory && !isEmpty(versionHistory)) {  
-      versionData = versionHistory;
-    if (isExistBuildVersion(versionData)) {
-      this.props.setVersion('Upgraded');
-    }
+    if ( versionHistory && !isEmpty( versionHistory ) ) {
+      versionData = versionHistory
+      if ( isExistBuildVersion( versionData ) ) {
+        this.props.setVersion( 'Upgraded' )
+      }
     }
   };
 
@@ -2014,7 +2014,7 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    versionHistory: idx(state, (_) => _.versionHistory.versions),
+    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
   }
 }
 
