@@ -2,9 +2,10 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback, useMemo } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert } from 'react-native'
 import { ListItem } from 'react-native-elements'
+import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import ListStyles from '../../../common/Styles/ListStyles'
-import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-details/sub-account-settings/AccountShellRescanningBottomSheet'
+import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 export type Props = {
@@ -122,11 +123,21 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     )
   }
 
+  function handleTransactionItemSelectionFromRescan( transaction: TransactionDetails ) {
+    dismissBottomSheet()
+
+    navigation.navigate( 'TransactionDetails', {
+      transaction,
+      accountShellID: accountShell.id,
+    } )
+  }
+
   const showSubAccountRescanningBottomSheet = useCallback( () => {
     presentBottomSheet(
       <AccountShellRescanningBottomSheet
         accountShell={accountShell}
         onDismiss={dismissBottomSheet}
+        onTransactionSelected={handleTransactionItemSelectionFromRescan}
       />,
       {
         ...defaultBottomSheetConfigs,

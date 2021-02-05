@@ -1,30 +1,33 @@
 import React, { useEffect, useMemo } from 'react'
 import { View, Text, StyleSheet, ImageBackground, Image, ActivityIndicator } from 'react-native'
 import { useDispatch } from 'react-redux'
-import Colors from '../../../../common/Colors'
-import SyncStatus from '../../../../common/data/enums/SyncStatus'
-import AccountShell from '../../../../common/data/models/AccountShell'
-import BottomSheetStyles from '../../../../common/Styles/BottomSheetStyles'
-import ListStyles from '../../../../common/Styles/ListStyles'
-import HeadingStyles from '../../../../common/Styles/HeadingStyles'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
-import usePrimarySubAccountForShell from '../../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useSyncStatusForAccountShell from '../../../../utils/hooks/account-utils/UseSyncStatusForAccountShell'
+import Colors from '../../../common/Colors'
+import SyncStatus from '../../../common/data/enums/SyncStatus'
+import AccountShell from '../../../common/data/models/AccountShell'
+import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
+import ListStyles from '../../../common/Styles/ListStyles'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
+import ButtonStyles from '../../../common/Styles/ButtonStyles'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import useSyncStatusForAccountShell from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShell'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { refreshAccountShell } from '../../../../store/actions/accounts'
+import { refreshAccountShell } from '../../../store/actions/accounts'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
+import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
+import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
 
 export type Props = {
   accountShell: AccountShell;
   onDismiss: () => void;
+  onTransactionSelected: ( transaction: TransactionDetails ) => void;
 };
 
 type ProgressTextProps = {
   accountShell: AccountShell;
 }
 
-
 const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: ProgressTextProps ) => {
-  const dipatch = useDispatch()
+  const dispatch = useDispatch()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
   const displayedTitle = useMemo( () => {
@@ -34,7 +37,7 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
   const syncStatus = useSyncStatusForAccountShell( accountShell )
 
   useEffect( () => {
-    dipatch( refreshAccountShell( accountShell, {
+    dispatch( refreshAccountShell( accountShell, {
       autoSync: false,
       hardRefresh: true,
     } ) )
@@ -65,9 +68,48 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
 const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   accountShell,
   onDismiss,
+  onTransactionSelected,
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const syncStatus = useSyncStatusForAccountShell( accountShell )
+
+  // const foundTransactions = useFoundTransactionsFromReScan()
+  const foundTransactions: TransactionDetails[] = [
+    {
+      txid: '1',
+      status: '',
+      confirmations: 9,
+      fee: '21',
+      date: '1612486255674',
+      transactionType: 'Sent',
+      amount: 9,
+      accountType: '',
+      primaryAccType: '',
+      contactName: 'Test Account',
+      recipientAddresses: [ '08230af1991e01bec21108a08cu' ],
+      // senderAddresses: [ '08230af1991e01bec21108a08cu' ],
+      blockTime: 9,
+      message: '',
+      address: '08230af1991e01bec21108a08cu',
+    },
+    {
+      txid: '2',
+      status: '',
+      confirmations: 9,
+      fee: '21',
+      date: '1612486255674',
+      transactionType: 'Received',
+      amount: 9,
+      accountType: '',
+      primaryAccType: '',
+      contactName: 'Checking Account',
+      recipientAddresses: [ '08230af1991e01bec21108a08cu' ],
+      // senderAddresses: [ '08230af1991e01bec21108a08cu' ],
+      blockTime: 9,
+      message: '',
+      address: '08230af1991e01bec21108a08cu',
+    }
+  ]
 
   function handleFullRescanButtonPress() {
     // TODO: How do we send an action for a "Full" rescan as opposed to a standard re-scan?
@@ -81,7 +123,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
         <Image
-          source={require( '../../../../assets/images/loader.gif' )}
+          source={require( '../../../assets/images/loader.gif' )}
           style={{
             width: 103,
             height: 128,
@@ -112,22 +154,37 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
 
         <ScanningProgressText accountShell={accountShell} />
 
-        <View style={styles.sectionDivider} />
+        {syncStatus == SyncStatus.COMPLETED && (
+          <>
+            <View style={styles.sectionDivider} />
+            <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
 
-        <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
+            <TransactionsFoundDuringRescanList
+              containerStyle={{
+                marginTop: 18,
+                maxHeight: heightPercentageToDP( 30 ),
+              }}
+              transactions={foundTransactions}
+              onTransactionSelected={onTransactionSelected}
+            />
 
-        <Text>List of transactions</Text>
+            <View style={{
+              marginTop: 'auto'
+            }} />
 
-        <View style={{
-          marginTop: 'auto'
-        }} />
+            <View style={styles.footerSectionContainer}>
+              {/* <Text style={HeadingStyles.sectionSubHeadingText}>Did you find the transactions you were looking for?</Text>
+              <Text style={HeadingStyles.sectionSubHeadingText}>If you didn't, we recommend doing a full re-scan</Text> */}
 
-        <View style={styles.footerSectionContainer}>
-          <Text style={HeadingStyles.sectionSubHeadingText}>Did you find the transactions you were looking for?</Text>
-          <Text style={HeadingStyles.sectionSubHeadingText}>If you didn't, we recommend doing a full re-scan</Text>
+              <View style={styles.actionButtonContainer}>
+                <TouchableOpacity
+                  onPress={onDismiss}
+                  style={ButtonStyles.primaryActionButton}
+                >
+                  <Text style={ButtonStyles.actionButtonText}>OK</Text>
+                </TouchableOpacity>
 
-          <View style={styles.actionButtonContainer}>
-            <TouchableOpacity
+                {/* <TouchableOpacity
               onPress={handleFullRescanButtonPress}
               style={ButtonStyles.primaryActionButton}
             >
@@ -146,9 +203,11 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
                 ...ButtonStyles.actionButtonText,
                 color: Colors.blue,
               }}>Back</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            </TouchableOpacity> */}
+              </View>
+            </View>
+          </>
+        )}
       </View>
     </View>
   )
