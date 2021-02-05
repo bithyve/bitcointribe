@@ -29,11 +29,12 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
-
+  const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const canProceed = useMemo( () => {
     return (
       accountName.length > 0 &&
-      accountDescription.length > 0
+      accountDescription.length > 0 &&
+      !hasButtonBeenPressed
     )
   }, [ accountName, accountDescription, ] )
 
@@ -42,7 +43,8 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.customDescription = accountDescription
 
-    dispatch( addNewAccountShell( currentSubAccount ) )
+    if( !hasButtonBeenPressed ){dispatch( addNewAccountShell( currentSubAccount ) )}
+    setHasButtonBeenPressed( true )
   }
 
   useAccountShellCreationCompletionEffect( () => {
