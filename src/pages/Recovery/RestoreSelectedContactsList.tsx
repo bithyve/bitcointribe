@@ -974,7 +974,7 @@ export default function RestoreSelectedContactsList( props ) {
                   setElevation( 0 )
                 }, 2 )
                 dispatch( recoverWallet() );
-                dispatch(setVersion('Restore'));
+                dispatch(setVersion('Restored'));
               }}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>

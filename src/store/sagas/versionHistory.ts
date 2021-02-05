@@ -29,7 +29,7 @@ function* versionHistoryWorker( { payload } ) {
     if (versionHistory && !isEmpty(versionHistory)) {  
       versionData = versionHistory;
       const id = versionData && versionData.length ? versionData.length + 1 : 1;
-      if ((versionType && versionType == 'Restore') || isExistBuildVersion(versionData)) {
+      if ((versionType && versionType == 'Restored') || isExistBuildVersion(versionData)) {
           data = {
           ...data,
           'id': id.toString()

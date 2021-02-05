@@ -782,7 +782,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (versionHistory && !isEmpty(versionHistory)) {  
       versionData = versionHistory;
     if (isExistBuildVersion(versionData)) {
-      this.props.setVersion('Upgrade');
+      this.props.setVersion('Upgraded');
     }
     }
   };
