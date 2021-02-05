@@ -164,9 +164,6 @@ export default class Bitcoin {
         const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
         const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
         const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
-        console.log( {
-          externalArray, internalArray
-        } )
 
         accountToAddressMapping[ accountId ] = {
           External: externalArray,
