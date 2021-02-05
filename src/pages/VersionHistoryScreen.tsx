@@ -20,19 +20,19 @@ import moment from 'moment'
 import idx from 'idx'
 
 
-export default function VersionHistoryScreen(props) {
-  const versionHistory = useSelector((state) => idx(state, (_) => _.versionHistory.versions))
-  const [SelectedOption, setSelectedOption] = useState(0)
+export default function VersionHistoryScreen( props ) {
+  const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
+  const [ SelectedOption, setSelectedOption ] = useState( 0 )
   const dispatch = useDispatch()
 
-  const SelectOption = (Id) => {
-    if (Id == SelectedOption) {
-      setSelectedOption(0)
+  const SelectOption = ( Id ) => {
+    if ( Id == SelectedOption ) {
+      setSelectedOption( 0 )
     } else {
-      setSelectedOption(Id)
+      setSelectedOption( Id )
     }
   }
-  const [data, setData] = useState([
+  const [ data, setData ] = useState( [
     {
       'id': '',
       'version': '',
@@ -41,13 +41,14 @@ export default function VersionHistoryScreen(props) {
       'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
       'date': ''
     }
-  ])
+  ] )
 
-  useEffect(() => {
-    if (versionHistory) {
-      setData(versionHistory)
+  useEffect( () => {
+    if ( versionHistory ) {
+      setData( versionHistory )
+      SelectOption( versionHistory.length )
     }
-  }, [versionHistory])
+  }, [ versionHistory ] )
 
   return (
     <SafeAreaView style={{
@@ -60,23 +61,19 @@ export default function VersionHistoryScreen(props) {
           }}>
             <ScrollView style={{
             }}>
-              {data.map((value) => {
-                if (SelectedOption == parseInt(value.id)) {
+              {data.map( ( value ) => {
+                if ( SelectedOption == parseInt( value.id ) ) {
                   return (
                     <TouchableOpacity
                       key={value.id}
-                      onPress={() => SelectOption(value.id)}
+                      // onPress={() => SelectOption( value.id )}
                       style={styles.selection}
                     >
                       <Text style={styles.versionText}>
                         {value.versionName}
                       </Text>
-
-                      <Text style={styles.text}>
-                        {value.title}
-                      </Text>
                       <Text style={{
-                        ...styles.text, fontSize: RFValue(9),
+                        ...styles.text, fontSize: RFValue( 9 ),
                       }}>
                         {value.date}
                       </Text>
@@ -86,17 +83,17 @@ export default function VersionHistoryScreen(props) {
                 return (
                   <TouchableOpacity
                     key={value.id}
-                    onPress={() => SelectOption(value.id)}
+                    // onPress={() => SelectOption( value.id )}
                     style={{
-                      ...styles.selection, height: wp('15%'),
-                      width: wp('85%'),
+                      ...styles.selection, height: wp( '15%' ),
+                      width: wp( '85%' ),
                     }}>
                     <View style={{
                       flexDirection: 'row', alignItems: 'center'
                     }}>
                       <Text style={{
                         ...styles.versionText, color: Colors.textColorGrey,
-                        fontSize: RFValue(10),
+                        fontSize: RFValue( 10 ),
                       }}>
                         {value.versionName}
                       </Text>
@@ -106,49 +103,49 @@ export default function VersionHistoryScreen(props) {
                         {value.date}
                       </Text>
                     </View>
-                    <Text style={styles.text}>
+                    {/* <Text style={styles.text}>
                       {value.title}
-                    </Text>
+                    </Text> */}
                   </TouchableOpacity>
                 )
-              })}
+              } )}
             </ScrollView>
-          </View>)}
+          </View> )}
       </View>
     </SafeAreaView>
   )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1, backgroundColor: Colors.backgroundColor1
   },
   selection: {
-    margin: wp('3%'),
+    margin: wp( '3%' ),
     backgroundColor: Colors.white,
     borderRadius: 10,
-    height: wp('20%'),
-    width: wp('90%'),
+    height: wp( '20%' ),
+    width: wp( '90%' ),
     justifyContent: 'center',
-    paddingLeft: wp('3%'),
-    paddingRight: wp('3%'),
+    paddingLeft: wp( '3%' ),
+    paddingRight: wp( '3%' ),
     alignSelf: 'center',
   },
   versionText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   text: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: hp('0.4%'),
+    marginTop: hp( '0.4%' ),
   },
   date: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 'auto',
   }
-})
+} )
 
