@@ -1002,12 +1002,11 @@ class SendConfirmation extends Component<
                 backgroundColor: Colors.white,
                 borderColor: Colors.backgroundColor,
                 borderWidth: 2,
-                opacity: this.isSendMax ? 0.5 : 1,
+                opacity: 1,
               }}
               onPress={() => {
                 ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 1 )
               }}
-              disabled={this.isSendMax}
             >
               <View
                 style={{
