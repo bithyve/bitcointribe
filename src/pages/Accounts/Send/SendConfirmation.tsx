@@ -70,6 +70,7 @@ import { processRecipients } from '../../../store/sagas/accounts'
 import { AccountsState } from '../../../store/reducers/accounts'
 import { NodeSettingsState } from '../../../store/reducers/nodeSettings'
 import { getAccountIcon, getAccountTitle } from './utils'
+import config from '../../../bitcoin/HexaConfig'
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -1217,12 +1218,18 @@ class SendConfirmation extends Component<
           enabledInnerScrolling={true}
           ref={'CustomPriorityBottomSheet'}
           snapPoints={[ -50, hp( '75%' ) ]}
-          renderContent={() => (
-            <CustomPriorityContent
+          renderContent={() => {
+            const network =
+                config.APP_STAGE !== 'dev' &&
+                [ REGULAR_ACCOUNT, SECURE_ACCOUNT ].includes( this.serviceType )
+                  ? 'MAINNET'
+                  : 'TESTNET'
+
+            return <CustomPriorityContent
               title={'Custom Priority'}
               info={'Enter the fee rate in sats per byte.'}
               err={this.state.customFeePerByteErr}
-              service={this.props.accounts[ this.serviceType ].service}
+              network={network}
               okButtonText={'Confirm'}
               cancelButtonText={'Back'}
               isCancel={true}
@@ -1236,7 +1243,7 @@ class SendConfirmation extends Component<
                   ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
               }}
             />
-          )}
+          }}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
