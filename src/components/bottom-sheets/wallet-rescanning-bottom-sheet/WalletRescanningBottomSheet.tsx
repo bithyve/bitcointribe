@@ -15,9 +15,9 @@ import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
 import sampleRescannedTransactionDetails from './sample-rescanned-transaction-details'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
+import useWalletRescanningState from '../../../utils/hooks/state-selectors/wallet-rescanning/UseWalletRescanningState'
 
 export type Props = {
-  accountShell: AccountShell;
   onDismiss: () => void;
   onTransactionDataSelected: ( transactionData: RescannedTransactionData ) => void;
 };
@@ -65,24 +65,14 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
   )
 }
 
-const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
-  accountShell,
+const WalletRescanningBottomSheet: React.FC<Props> = ( {
   onDismiss,
   onTransactionDataSelected,
 }: Props ) => {
-  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const syncStatus = useSyncStatusForAccountShell( accountShell )
 
   // const foundTransactions = useFoundTransactionsFromReScan()
   const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
-
-  function handleFullRescanButtonPress() {
-    // TODO: How do we send an action for a "Full" rescan as opposed to a standard re-scan?
-  }
-
-  function handleBackButtonPress() {
-    onDismiss()
-  }
+  const walletRescanningState = useWalletRescanningState()
 
   return (
     <View style={styles.rootContainer}>
@@ -107,7 +97,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
           Re-scanning your account may take some time
         </Text>
 
-        {syncStatus == SyncStatus.IN_PROGRESS && (
+        {walletRescanningState.isScanInProgress && (
           <ActivityIndicator
             style={{
               marginBottom: 18
@@ -117,9 +107,9 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
           />
         )}
 
-        <ScanningProgressText accountShell={accountShell} />
+        <ScanningProgressText accountShell={walletRescanningState.accountShellBeingScanned} />
 
-        {syncStatus == SyncStatus.COMPLETED && (
+        {walletRescanningState.hasScanSucceeded && (
           <>
             <View style={styles.sectionDivider} />
             <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
@@ -211,4 +201,4 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default AccountShellRescanningBottomSheet
+export default WalletRescanningBottomSheet

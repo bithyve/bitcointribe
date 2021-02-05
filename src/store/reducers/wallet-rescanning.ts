@@ -10,6 +10,7 @@ export type RescannedTransactionData = {
   primaryTitleText: string;
   subtitleText: string;
   avatarImage: ImageSourcePropType;
+  accountShell?: AccountShell;
 }
 
 export type WalletRescanningState = {
@@ -31,7 +32,7 @@ const INITIAL_STATE: WalletRescanningState = {
 }
 
 
-const reducer = ( state = INITIAL_STATE, action ): WalletRescanningState => {
+const walletRescanningReducer = ( state = INITIAL_STATE, action ): WalletRescanningState => {
   switch ( action.type ) {
       case REFRESH_ACCOUNT_SHELL:
         return {
@@ -66,4 +67,4 @@ const reducer = ( state = INITIAL_STATE, action ): WalletRescanningState => {
   return state
 }
 
-export default reducer
+export default walletRescanningReducer

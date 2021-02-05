@@ -6,6 +6,7 @@ import ChangeCurrencyScreen from '../../../pages/ChangeCurrencyScreen'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 
 
 const WalletSettingsStack = createStackNavigator(
@@ -36,6 +37,12 @@ const WalletSettingsStack = createStackNavigator(
         title: 'Version History',
       },
     },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
+      navigationOptions: {
+        title: 'Transaction Details',
+      },
+    }
   },
   {
     defaultNavigationOptions: ( { navigation } ) => {

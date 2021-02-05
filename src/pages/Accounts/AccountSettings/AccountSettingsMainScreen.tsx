@@ -6,6 +6,7 @@ import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import ListStyles from '../../../common/Styles/ListStyles'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
+import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 export type Props = {
@@ -116,28 +117,28 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         },
         {
           text: 'Continue',
-          onPress: showSubAccountRescanningBottomSheet,
+          onPress: showRescanningBottomSheet,
           style: 'default',
         },
       ]
     )
   }
 
-  function handleTransactionItemSelectionFromRescan( transaction: TransactionDetails ) {
+  function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
     dismissBottomSheet()
 
     navigation.navigate( 'TransactionDetails', {
-      transaction,
+      transactionData: transactionData.details,
       accountShellID: accountShell.id,
     } )
   }
 
-  const showSubAccountRescanningBottomSheet = useCallback( () => {
+  const showRescanningBottomSheet = useCallback( () => {
     presentBottomSheet(
       <AccountShellRescanningBottomSheet
         accountShell={accountShell}
         onDismiss={dismissBottomSheet}
-        onTransactionSelected={handleTransactionItemSelectionFromRescan}
+        onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
       />,
       {
         ...defaultBottomSheetConfigs,
