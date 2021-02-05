@@ -42,7 +42,7 @@ import {
   notificationsUpdated,
 } from '../../store/actions/notifications'
 import { setCurrencyCode } from '../../store/actions/preferences'
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index'
+import { getCurrencyImageByRegion, isEmpty, isExistBuildVersion } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
 import PushNotification from 'react-native-push-notification'
@@ -97,6 +97,7 @@ import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { setVersion } from '../../store/actions/versionHistory'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -175,6 +176,8 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
+  setVersion: any;
+  versionHistory: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -743,8 +746,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const { navigation } = this.props
-
+    const { navigation, versionHistory } = this.props
+    let versionData = []
     this.closeBottomSheet()
     this.calculateNetBalance()
 
@@ -775,6 +778,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // This will sync balances and transactions for all account shells
       this.props.autoSyncShells()
     } )
+
+    if ( versionHistory && !isEmpty( versionHistory ) ) {
+      versionData = versionHistory
+      if ( isExistBuildVersion( versionData ) ) {
+        this.props.setVersion( 'Upgraded' )
+      }
+    }
   };
 
   getNewTransactionNotifications = async () => {
@@ -2004,6 +2014,7 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
+    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
   }
 }
 
@@ -2025,6 +2036,7 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
+    setVersion
   } )( Home ),
 )
 
