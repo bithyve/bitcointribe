@@ -6,7 +6,6 @@ import SyncStatus from '../../../common/data/enums/SyncStatus'
 import AccountShell from '../../../common/data/models/AccountShell'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
-import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useSyncStatusForAccountShell from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShell'
@@ -15,6 +14,8 @@ import { refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
 import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
+import sampleRescannedTransactionDetails from './sample-rescanned-transaction-details'
+import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 
 export type Props = {
   accountShell: AccountShell;
@@ -74,42 +75,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   const syncStatus = useSyncStatusForAccountShell( accountShell )
 
   // const foundTransactions = useFoundTransactionsFromReScan()
-  const foundTransactions: TransactionDetails[] = [
-    {
-      txid: '1',
-      status: '',
-      confirmations: 9,
-      fee: '21',
-      date: '1612486255674',
-      transactionType: 'Sent',
-      amount: 9,
-      accountType: '',
-      primaryAccType: '',
-      contactName: 'Test Account',
-      recipientAddresses: [ '08230af1991e01bec21108a08cu' ],
-      // senderAddresses: [ '08230af1991e01bec21108a08cu' ],
-      blockTime: 9,
-      message: '',
-      address: '08230af1991e01bec21108a08cu',
-    },
-    {
-      txid: '2',
-      status: '',
-      confirmations: 9,
-      fee: '21',
-      date: '1612486255674',
-      transactionType: 'Received',
-      amount: 9,
-      accountType: '',
-      primaryAccType: '',
-      contactName: 'Checking Account',
-      recipientAddresses: [ '08230af1991e01bec21108a08cu' ],
-      // senderAddresses: [ '08230af1991e01bec21108a08cu' ],
-      blockTime: 9,
-      message: '',
-      address: '08230af1991e01bec21108a08cu',
-    }
-  ]
+  const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
 
   function handleFullRescanButtonPress() {
     // TODO: How do we send an action for a "Full" rescan as opposed to a standard re-scan?
@@ -164,7 +130,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
                 marginTop: 18,
                 maxHeight: heightPercentageToDP( 30 ),
               }}
-              transactions={foundTransactions}
+              transactionsDetailItems={foundTransactions}
               onTransactionSelected={onTransactionSelected}
             />
 
