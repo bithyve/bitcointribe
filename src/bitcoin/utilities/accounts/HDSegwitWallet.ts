@@ -434,7 +434,8 @@ export default class HDSegwitWallet extends Bitcoin {
     }[],
     hardRefresh?: boolean,
   ): Promise<{
-    synched: boolean
+    synched: boolean,
+    txsFound: TransactionDetails[]
     }> => {
 
     const accounts = {
@@ -604,12 +605,13 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
+    const txsFound: TransactionDetails[] = []
     for( let { accountType, accountNumber, contactName } of accountsInfo ){
       if ( accountType === TRUSTED_CONTACTS ) {
         contactName = contactName.toLowerCase().trim()
         accountNumber = this.trustedContactToDA[ contactName ]
       }
-      const { xpubId }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      const { xpubId, txIdMap }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
       const res = synchedAccounts[ xpubId ]
       const { internalAddresses } = accountsTemp[ xpubId ]
 
@@ -648,6 +650,12 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }
 
+      // find tx delta(missing txs): hard vs soft refresh
+      if( hardRefresh ){
+        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+      }
+
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
         ...this.derivativeAccounts[ accountType ][ accountNumber ],
         lastBalTxSync: latestSyncTime,
@@ -669,7 +677,8 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      synched: true
+      synched: true,
+      txsFound,
     }
   };
 
@@ -678,6 +687,7 @@ export default class HDSegwitWallet extends Bitcoin {
     hardRefresh?: boolean
   ): Promise<{
     synched: boolean;
+    txsFound: TransactionDetails[];
   }> => {
     const accountsInfo :  {
       accountType: string,

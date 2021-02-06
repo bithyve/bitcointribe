@@ -514,6 +514,7 @@ export default class SecureAccount {
         status: number;
         data: {
           synched: boolean;
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -1109,7 +1110,8 @@ export default class SecureAccount {
   | {
       status: number;
       data: {
-        synched: boolean
+        synched: boolean;
+        txsFound: TransactionDetails[];
       };
       err?: undefined;
       message?: undefined;
