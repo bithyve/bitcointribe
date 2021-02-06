@@ -64,6 +64,7 @@ import {
   INotification,
   notificationType,
   notificationTag,
+  VersionHistory,
 } from '../../bitcoin/utilities/Interface'
 import generatePDF from '../utils/generatePDF'
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
@@ -93,6 +94,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import {  restorePersonalNodeConfiguration } from '../actions/nodeSettings'
+import { restoredVersionHistory } from '../actions/versionHistory'
+import versionHistory from '../reducers/versionHistory'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -1804,7 +1807,9 @@ function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
-
+  const versionHistory = yield select(
+    ((state) => idx(state, (_) => _.versionHistory.versions))
+  ); 
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
@@ -1812,6 +1817,9 @@ function* stateDataToBackup() {
 
   if( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
+  if ( versionHistory && versionHistory.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
 
   return STATE_DATA
 }
@@ -2002,6 +2010,13 @@ function* fetchWalletImageWorker( { payload } ) {
               yield put( restorePersonalNodeConfiguration( 
                 activePersonalNode
               ) )
+              break
+
+              case 'versionHistory': 
+              const versions: VersionHistory[] = JSON.parse( STATE_DATA[ key ] )
+              yield put( restoredVersionHistory( {
+                versions
+              } ) )
               break
         }
       }

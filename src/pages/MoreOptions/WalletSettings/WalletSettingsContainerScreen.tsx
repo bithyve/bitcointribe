@@ -34,15 +34,14 @@ const menuOptions: MenuOption[] = [
     imageSource: require( '../../../assets/images/icons/country.png' ),
     screenName: 'ChangeCurrency',
   },
-  /*
-  Commenting this option as this is not fully built yet
+
+ // Commenting this option as this is not fully built yet
   {
     title: 'Version History',
     subtitle: 'Version History',
     imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
     screenName: 'VersionHistory',
   },
-  */
   {
     title: 'Hexa Release',
     subtitle: versionString,

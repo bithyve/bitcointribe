@@ -14,11 +14,17 @@ import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
+import DeviceInfo from 'react-native-device-info'
+import { useDispatch, useSelector } from 'react-redux'
+import moment from 'moment'
+import idx from 'idx'
 
 
 export default function VersionHistoryScreen( props ) {
-
+  const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
   const [ SelectedOption, setSelectedOption ] = useState( 0 )
+  const dispatch = useDispatch()
+
   const SelectOption = ( Id ) => {
     if ( Id == SelectedOption ) {
       setSelectedOption( 0 )
@@ -28,26 +34,22 @@ export default function VersionHistoryScreen( props ) {
   }
   const [ data, setData ] = useState( [
     {
-      'id': 1,
-      'versionName': '1.0.8',
+      'id': '',
+      'version': '',
+      'buildNumber': '',
+      'versionName': '',
       'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-      'date': '19 May ‘19, 11:00am'
+      'date': ''
     }
   ] )
 
   useEffect( () => {
-    const dummyData = []
-    for( let a=0;a<=12; a++ ){
-      const data = {
-        'id': a,
-        'versionName': '1.0.' + a,
-        'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-        'date': '19 May ‘19, 11:00am'
-      }
-      dummyData.push( data )
+    if ( versionHistory ) {
+      setData( versionHistory )
+      SelectOption( versionHistory.length )
     }
-    setData( dummyData )
-  }, [] )
+  }, [ versionHistory ] )
+
   return (
     <SafeAreaView style={{
       flex: 1
@@ -60,19 +62,15 @@ export default function VersionHistoryScreen( props ) {
             <ScrollView style={{
             }}>
               {data.map( ( value ) => {
-                if ( SelectedOption == value.id ) {
+                if ( SelectedOption == parseInt( value.id ) ) {
                   return (
                     <TouchableOpacity
                       key={value.id}
-                      onPress={() => SelectOption( value.id )}
+                      // onPress={() => SelectOption( value.id )}
                       style={styles.selection}
                     >
                       <Text style={styles.versionText}>
-                        {'Version ' + value.versionName}
-                      </Text>
-
-                      <Text style={styles.text}>
-                        {value.title}
+                        {value.versionName}
                       </Text>
                       <Text style={{
                         ...styles.text, fontSize: RFValue( 9 ),
@@ -85,7 +83,7 @@ export default function VersionHistoryScreen( props ) {
                 return (
                   <TouchableOpacity
                     key={value.id}
-                    onPress={() => SelectOption( value.id )}
+                    // onPress={() => SelectOption( value.id )}
                     style={{
                       ...styles.selection, height: wp( '15%' ),
                       width: wp( '85%' ),
@@ -97,7 +95,7 @@ export default function VersionHistoryScreen( props ) {
                         ...styles.versionText, color: Colors.textColorGrey,
                         fontSize: RFValue( 10 ),
                       }}>
-                        {'Version ' + value.versionName}
+                        {value.versionName}
                       </Text>
                       <Text
                         style={styles.date}
@@ -105,9 +103,9 @@ export default function VersionHistoryScreen( props ) {
                         {value.date}
                       </Text>
                     </View>
-                    <Text style={styles.text}>
+                    {/* <Text style={styles.text}>
                       {value.title}
-                    </Text>
+                    </Text> */}
                   </TouchableOpacity>
                 )
               } )}
