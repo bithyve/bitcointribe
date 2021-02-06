@@ -7,10 +7,10 @@ import { WALLET_RESCAN_COMPLETED, WALLET_RESCAN_FAILED, WALLET_RESCAN_SUCCEEDED 
 
 export type RescannedTransactionData = {
   details: TransactionDetails;
-  primaryTitleText: string;
-  subtitleText: string;
-  avatarImage: ImageSourcePropType;
-  accountShell?: AccountShell;
+  primaryTitleText?: string;
+  subtitleText?: string;
+  avatarImage?: ImageSourcePropType;
+  accountShell: AccountShell;
 }
 
 export type WalletRescanningState = {

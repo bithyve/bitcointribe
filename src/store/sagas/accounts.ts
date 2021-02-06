@@ -87,6 +87,7 @@ import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
+import { RescannedTransactionData } from '../reducers/wallet-rescanning'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -1144,7 +1145,14 @@ function* refreshAccountShellWorker( { payload } ) {
         payload
       } )
 
-      if( options.hardRefresh &&  deltaTxs.length ) yield put( rescanSucceeded( deltaTxs ) )
+      const rescanTxs : RescannedTransactionData[]= []
+      deltaTxs.forEach( ( deltaTx )=>{
+        rescanTxs.push( {
+          details: deltaTx,
+          accountShell: shell,
+        } )
+      } )
+      yield put( rescanSucceeded( rescanTxs ) )
     }
 
     yield put(
@@ -1165,7 +1173,14 @@ function* refreshAccountShellWorker( { payload } ) {
       payload
     } )
 
-    if( options.hardRefresh &&  deltaTxs.length ) yield put( rescanSucceeded( deltaTxs ) )
+    const rescanTxs : RescannedTransactionData[]= []
+    deltaTxs.forEach( ( deltaTx )=>{
+      rescanTxs.push( {
+        details: deltaTx,
+        accountShell: shell,
+      } )
+    } )
+    yield put( rescanSucceeded( rescanTxs ) )
 
     yield put(
       setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
