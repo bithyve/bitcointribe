@@ -234,8 +234,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
         }
       } )
 
-      if( payload.options.hardRefresh &&  txsFound.length ) yield put( rescanSucceeded( txsFound ) )
-      return
+      return txsFound
     }
   } else if ( res.status !== 200 ) {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -269,7 +268,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
     yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   }
 
-  if( payload.options.hardRefresh &&  txsFound.length ) yield put( rescanSucceeded( txsFound ) )
+  return txsFound
 }
 
 export const fetchBalanceTxWatcher = createWatcher(
@@ -331,7 +330,7 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
     throw new Error( 'Failed to fetch balance/transactions from the indexer' )
   }
 
-  if( hardRefresh && dervTxsFound.length ) yield put( rescanSucceeded( dervTxsFound ) )
+  return dervTxsFound
 }
 
 export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
@@ -1141,9 +1140,11 @@ function* refreshAccountShellWorker( { payload } ) {
         accountNumber: primarySubAccount.instanceNumber,
         hardRefresh: options.hardRefresh
       }
-      yield call( fetchDerivativeAccBalanceTxWorker, {
+      const deltaTxs: TransactionDescribing[] = yield call( fetchDerivativeAccBalanceTxWorker, {
         payload
       } )
+
+      if( options.hardRefresh &&  deltaTxs.length ) yield put( rescanSucceeded( deltaTxs ) )
     }
 
     yield put(
@@ -1160,9 +1161,11 @@ function* refreshAccountShellWorker( { payload } ) {
       },
     }
 
-    yield call( fetchBalanceTxWorker, {
+    const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
+
+    if( options.hardRefresh &&  deltaTxs.length ) yield put( rescanSucceeded( deltaTxs ) )
 
     yield put(
       setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
