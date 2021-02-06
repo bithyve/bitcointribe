@@ -357,13 +357,14 @@ class SendConfirmation extends Component<
   };
 
   handleCustomFee = async ( feePerByte, customEstimatedBlock ) => {
-    // if ( parseInt( feePerByte ) < 1 ) {
-    //   this.setState( {
-    //     customFee: '',
-    //     customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
-    //   } )
-    //   return
-    // }
+    // feerate > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
+    if ( parseInt( feePerByte ) < 1 ) {
+      this.setState( {
+        customFee: '',
+        customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
+      } )
+      return
+    }
 
     const service : RegularAccount | SecureAccount  =this.props.accounts[ this.serviceType ].service
     const transfer = this.props.accounts[ this.serviceType ].transfer
@@ -399,7 +400,7 @@ class SendConfirmation extends Component<
       if( fee > transfer.stage1.txPrerequisites[ 'low' ].fee ){
         this.setState( {
           customFee: '',
-          customFeePerByteErr: `Custom fee(${fee}) cannot be greater than the default low priority fee(${transfer.stage1.txPrerequisites[ 'low' ].fee})`,
+          customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
         } )
         return
       }
