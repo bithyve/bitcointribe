@@ -13,8 +13,8 @@ import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
-import sampleRescannedTransactionDetails from './sample-rescanned-transaction-details'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
+import useFoundTransactionsFromReScan from '../../../utils/hooks/state-selectors/wallet-rescanning/UseFoundTransactionsFromRescan'
 
 export type Props = {
   accountShell: AccountShell;
@@ -73,8 +73,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const syncStatus = useSyncStatusForAccountShell( accountShell )
 
-  // const foundTransactions = useFoundTransactionsFromReScan()
-  const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
+  const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
 
   function handleFullRescanButtonPress() {
     // TODO: How do we send an action for a "Full" rescan as opposed to a standard re-scan?

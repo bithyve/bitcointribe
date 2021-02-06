@@ -369,9 +369,11 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
     )
 
     if ( res.status === 200 ) {
-      // accumulate delta txs(during hard refresh)
-      const { txsFound } = res.data
-      if( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
+      // accumulate delta txs(during hard refresh) from derivative accounts(if present)
+      if( res.data ){
+        const { txsFound } = res.data
+        if( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
+      }
 
       if (
         postFetchDerivativeAccounts !== preFetchDerivativeAccounts ||
