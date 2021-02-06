@@ -619,13 +619,13 @@ export default class BaseAccount {
   };
 
   public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
+    numberOfRecipients: number,
+    feePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
   ) =>
     this.hdWallet.calculateSendMaxFee(
       numberOfRecipients,
-      averageTxFees,
+      feePerByte,
       derivativeAccountDetails,
     );
 
