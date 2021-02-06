@@ -14,6 +14,6 @@ export default function getAccountSyncIcon(
       case SyncStatus.COMPLETED:
         return require( '../../assets/images/icons/icon_account_sync_done.png' )
       default:
-        return require( '../../assets/images/icons/icon_account_sync_pending.png' )
+        return require( '../../assets/images/icons/icon_account_sync_done.png' )
   }
 }

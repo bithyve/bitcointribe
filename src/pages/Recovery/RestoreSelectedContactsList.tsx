@@ -45,6 +45,7 @@ import RestoreByCloudQRCodeContents from './RestoreByCloudQRCodeContents'
 import LoaderModal from '../../components/LoaderModal'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import { walletCheckIn } from '../../store/actions/trustedContacts'
+import { setVersion } from '../../store/actions/versionHistory'
 
 export default function RestoreSelectedContactsList( props ) {
   const [ SecondaryDeviceRS, setSecondaryDeviceRS ] = useState( null )
@@ -972,7 +973,8 @@ export default function RestoreSelectedContactsList( props ) {
                 setTimeout( () => {
                   setElevation( 0 )
                 }, 2 )
-                dispatch( recoverWallet() )
+                dispatch( recoverWallet() );
+                dispatch(setVersion('Restored'));
               }}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>

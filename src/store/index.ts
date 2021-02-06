@@ -17,6 +17,7 @@ import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import VersionHistoryReducer from './reducers/versionHistory'
 
 
 const config = {
@@ -126,6 +127,7 @@ import {
 import {
   fetchWyreReservationWatcher
 } from './sagas/WyreIntegration'
+import { versionHistoryWatcher } from './sagas/versionHistory'
 
 const rootSaga = function* () {
   const sagas = [
@@ -222,7 +224,10 @@ const rootSaga = function* () {
     fetchSwanAuthenticationUrlWatcher,
 
     // Wyre Integration
-    fetchWyreReservationWatcher
+    fetchWyreReservationWatcher,
+
+    //VersionHistory integration
+    versionHistoryWatcher,
   ]
 
   yield all(
@@ -254,6 +259,7 @@ const rootReducer = combineReducers( {
   loaders,
   swanIntegration: swanIntegrationReducer,
   wyreIntegration: wyreIntegrationReducer,
+  versionHistory: VersionHistoryReducer,
 } )
 
 export default function makeStore() {

@@ -1211,10 +1211,6 @@ export default class HDSegwitWallet extends Bitcoin {
       if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
     }
 
-    console.log( {
-      startingExtIndex, closingExtIndex, nextFreeAddressIndex: this.nextFreeAddressIndex, externalAddressSet
-    } )
-
     const internalAddresses :{[address: string]: number}  = {
     }// all internal addresses(till closingIntIndex)
     const internalAddressSet :{[address: string]: number}= {
@@ -1225,10 +1221,6 @@ export default class HDSegwitWallet extends Bitcoin {
       ownedAddresses.push( address )
       if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
     }
-
-    console.log( {
-      startingIntIndex, closingIntIndex, nextFreeChangeAddressIndex: this.nextFreeChangeAddressIndex, internalAddressSet
-    } )
 
     const batchedDerivativeAddresses = []
     if ( !this.isTest ) {
