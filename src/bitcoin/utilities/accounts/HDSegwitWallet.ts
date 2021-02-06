@@ -20,7 +20,7 @@ import {
   DerivativeAccountElements,
   InputUTXOs,
 } from '../Interface'
-import axios, { AxiosResponse } from 'axios'
+import  { AxiosResponse } from 'axios'
 import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
@@ -32,6 +32,7 @@ import {
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import _ from 'lodash'
 const { HEXA_ID } = config
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -1182,6 +1183,23 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
+    // return new/found transactions(delta b/w hard and soft refresh)
+    const txsFound: TransactionDetails[] = []
+    const newTxIds: string[] = _.difference( Object.keys( currentTxIdMap ),  Object.keys( previousTxidMap ) )
+    const newTxIdMap = {
+    }
+    newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
+
+    if( newTxIds.length ){
+      transactions.transactionDetails.forEach( tx => {
+        if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
+      } )
+    }
+
+    return txsFound
+  }
+
   public setNewTransactions = ( transactions: Transactions ) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync
@@ -1206,6 +1224,7 @@ export default class HDSegwitWallet extends Bitcoin {
       unconfirmedBalance: number;
     };
     transactions: Transactions;
+    txsFound: TransactionDetails[]
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
@@ -1351,19 +1370,19 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
+    this.balances = balances
     this.addressQueryList = addressQueryList
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
     this.receivingAddress = this.getAddress( false, this.nextFreeAddressIndex )
 
-    this.setNewTransactions( transactions )
-
-    this.balances = balances
+    const txsFound: TransactionDetails[] = hardRefresh? this.findTxDelta( this.txIdMap, txIdMap, transactions ) : []
     this.transactions = transactions
     this.txIdMap = txIdMap
+    this.setNewTransactions( transactions )
 
     return {
-      balances, transactions
+      balances, transactions, txsFound
     }
   };
 

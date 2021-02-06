@@ -551,19 +551,9 @@ export default class BaseAccount {
             totalTransactions: number;
             confirmedTransactions: number;
             unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
+            transactionDetails: TransactionDetails[]
           };
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
