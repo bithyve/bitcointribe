@@ -11,77 +11,83 @@ import LabeledBalanceDisplay from '../../LabeledBalanceDisplay'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
+import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 
 export type Props = {
-  transaction: TransactionDetails;
+  transactionData: RescannedTransactionData;
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind | null;
 };
 
 const RescannedTransactionListItem: React.FC<Props> = ( {
-  transaction,
+  transactionData,
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
 }: Props ) => {
+
+  const transactionDetails = useMemo( () => {
+    return transactionData.details
+  }, [ transactionData.details ] )
+
   const transactionKindIconName = useMemo( () => {
-    switch ( transaction.transactionType ) {
+    switch ( transactionDetails.transactionType ) {
         case TransactionKind.RECEIVE:
           return 'long-arrow-down'
         case TransactionKind.SEND:
           return 'long-arrow-up'
     }
-  }, [ transaction.transactionType ] )
+  }, [ transactionDetails.transactionType ] )
 
   const transactionKindIconColor = useMemo( () => {
-    switch ( transaction.transactionType ) {
+    switch ( transactionDetails.transactionType ) {
         case TransactionKind.RECEIVE:
           return Colors.green
         case TransactionKind.SEND:
           return Colors.red
     }
-  }, [ transaction.transactionType ] )
+  }, [ transactionDetails.transactionType ] )
 
   const amountTextStyle = useMemo( () => {
     return {
       ...styles.amountText,
       color: transactionKindIconColor,
     }
-  }, [ transaction.transactionType ] )
+  }, [ transactionDetails.transactionType ] )
 
   const formattedTitleText = useMemo( () => {
-    switch ( transaction.transactionType ) {
+    switch ( transactionDetails.transactionType ) {
         case 'Received':
-          return transaction.senderAddresses[ 0 ]
+          return transactionDetails.senderAddresses[ 0 ]
         case 'Sent':
-          return transaction.recipientAddresses[ 0 ]
+          return transactionDetails.recipientAddresses[ 0 ]
         default:
           return 'Unknown target address'
     }
-  }, [ transaction.transactionType ] )
+  }, [ transactionDetails.transactionType ] )
 
   const formattedSubtitleText = useMemo( () => {
-    switch ( transaction.transactionType ) {
+    switch ( transactionDetails.transactionType ) {
         case 'Received':
-          return `From: ${transaction.senderAddresses[ 0 ] ?? ''}`
+          return `From: ${transactionDetails.senderAddresses[ 0 ] ?? ''}`
         case 'Sent':
-          return `To: ${transaction.recipientAddresses[ 0 ] ?? ''}`
+          return `To: ${transactionDetails.recipientAddresses[ 0 ] ?? ''}`
         default:
           return 'Unknown target address'
     }
-  }, [ transaction.transactionType ] )
+  }, [ transactionDetails.transactionType ] )
 
   const formattedDateText = useMemo( () => {
-    return moment( transaction.date ).format( 'DD MMMM YYYY' )
-  }, [ transaction.transactionType ] )
+    return moment( transactionDetails.date ).format( 'DD MMMM YYYY' )
+  }, [ transactionDetails.transactionType ] )
 
   const confirmationsText = useMemo( () => {
-    return transaction.confirmations > 6 ?
+    return transactionDetails.confirmations > 6 ?
       '6+'
-      : `${transaction.confirmations}`
-  }, [ transaction.confirmations ] )
+      : `${transactionDetails.confirmations}`
+  }, [ transactionDetails.confirmations ] )
 
   return (
-    <>
+    <ListItem>
       <Icon
         style={styles.transactionKindIcon}
         name={transactionKindIconName}
@@ -94,14 +100,14 @@ const RescannedTransactionListItem: React.FC<Props> = ( {
         <ListItem.Title style={styles.titleText} numberOfLines={1}>
           {formattedTitleText}
         </ListItem.Title>
-        <ListItem.Subtitle style={styles.subtitleText}>
+        <ListItem.Subtitle style={styles.subtitleText} numberOfLines={1}>
           {formattedSubtitleText}
         </ListItem.Subtitle>
       </ListItem.Content>
 
       <ListItem.Content style={styles.amountSection}>
         <LabeledBalanceDisplay
-          balance={transaction.amount}
+          balance={transactionDetails.amount}
           bitcoinUnit={bitcoinUnit}
           currencyKind={currencyKind}
           amountTextStyle={amountTextStyle}
@@ -117,7 +123,9 @@ const RescannedTransactionListItem: React.FC<Props> = ( {
           {confirmationsText}
         </ListItem.Subtitle>
       </ListItem.Content>
-    </>
+
+      <ListItem.Chevron />
+    </ListItem>
   )
 }
 

@@ -25,12 +25,12 @@ const sampleRescannedTransactionDetails: RescannedTransactionData[] = [
   },
   {
     details: {
-      txid: '1',
+      txid: '2',
       status: '',
       confirmations: 9,
       fee: '21',
       date: 'January 1, 2021',
-      transactionType: 'Sent',
+      transactionType: 'Received',
       amount: 9,
       accountType: '',
       primaryAccType: '',

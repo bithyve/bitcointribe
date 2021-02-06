@@ -12,10 +12,10 @@ import useSyncStatusForAccountShell from '../../../utils/hooks/account-utils/Use
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
-import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
-import sampleRescannedTransactionDetails from './sample-rescanned-transaction-details'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import useWalletRescanningState from '../../../utils/hooks/state-selectors/wallet-rescanning/UseWalletRescanningState'
+import sampleRescannedTransactionDetails from '../account-shell-rescanning-bottom-sheet/sample-rescanned-transaction-details'
+import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
 
 export type Props = {
   onDismiss: () => void;

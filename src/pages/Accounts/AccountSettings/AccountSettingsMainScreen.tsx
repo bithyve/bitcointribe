@@ -128,7 +128,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     dismissBottomSheet()
 
     navigation.navigate( 'TransactionDetails', {
-      transactionData: transactionData.details,
+      transaction: transactionData.details,
       accountShellID: accountShell.id,
     } )
   }
