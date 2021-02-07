@@ -43,13 +43,13 @@ export const isExistBuildVersion = (versionData) =>{
 
 export const APP_LIST = {
   'WhatsApp': {
-    pkgName: 'com.whatsapp', urlScheme: 'whatsapp', urlParams: 'app' 
+    pkgName: 'com.whatsapp', urlScheme: 'whatsapp', urlParams: 'app'
   }, // fa
   'Telegram': {
-    pkgName: 'org.telegram.messenger', urlScheme: 't.me', urlParams: 'share/url?url=' 
+    pkgName: 'org.telegram.messenger', urlScheme: 't.me', urlParams: 'share/url?url='
   }, // fa
   'Messenger': {
-    pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}' 
+    pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}'
   }, // fa: facebook
 }
 
