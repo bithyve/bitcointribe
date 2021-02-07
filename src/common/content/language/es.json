@@ -1,0 +1,15 @@
+{
+    "common": {
+        "ok": "okay",
+        "proceed": "Continuar",
+        "continue": "Seguir",
+        "done": "Hecho",
+        "cancel": "Cancelar"
+    },
+    "login": {
+        "welcome": "¡Dar una buena acogida!",
+        "enter_passcode": "Por favor ingrese su contraseña",
+        "tos": "Términos de servicio",
+        "tos_agreed": "Al continuar con el siguiente paso, acepta nuestros "
+    }
+}
