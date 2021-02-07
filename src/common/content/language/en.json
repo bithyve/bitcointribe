@@ -8,9 +8,10 @@
     },
     "login": {
         "welcome": "Welcome back!",
-        "enter_passcode": "Please enter your passcode",
+        "enter_your": "Please enter your ",
+        "passcode": "passcode",
         "tos": "Terms of Service",
-        "tos_agreed": "By proceeding to the next step, you agree to our "
+        "tos_agree": "By proceeding to the next step, you agree to our "
     },
     "home": {
         "the_wallet_backup": "The wallet backup is ",

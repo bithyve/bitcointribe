@@ -8,9 +8,10 @@
     },
     "login": {
         "welcome": "¡Dar una buena acogida!",
-        "enter_passcode": "Por favor ingrese su contraseña",
+        "enter_your": "Por favor ingrese su ",
+        "passcode": "contraseña",
         "tos": "Términos de servicio",
-        "tos_agreed": "Al continuar con el siguiente paso, acepta nuestros "
+        "tos_agree": "Al continuar con el siguiente paso, acepta nuestros "
     },
     "home": {
         "the_wallet_backup": "La copia de seguridad de la billetera ",
