@@ -9,6 +9,6 @@ const setDisplayLanguage = async ( language ) => {
   if( language ) content.setLanguage( language )
 }
 
-setDisplayLanguage( 'es' )
+setDisplayLanguage( 'en' )
 
 export default content
