@@ -80,6 +80,11 @@ export interface TransactionDetails {
    * Note/message attached w/ the transaction(Donation acc specific)
    */
   message?: string;
+
+   /**
+   * Address corresponding to which this tx has been fetched
+   */
+  address?: string
 }
 
 export interface Balances {
@@ -150,11 +155,20 @@ export interface DerivativeAccountElements {
     address: string;
     status?: any;
   }[];
+  unconfirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[];
   balances?: {
     balance: number;
     unconfirmedBalance: number;
   };
   transactions?: Transactions;
+  txIdMap?: {[txid: string]: string[]};
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
 }
@@ -402,4 +416,13 @@ export interface EncryptedImage {
   SERVICES?: string;
   ASYNC_DATA?: string;
   STATE_DATA?: string;
+}
+//VersionHistory
+export interface VersionHistory {
+  id: string;
+  version: string;
+  buildNumber: string;
+  versionName: string;
+  title: string;
+  date: Date;
 }

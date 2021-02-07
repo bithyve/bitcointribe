@@ -17,6 +17,7 @@ import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import VersionHistoryReducer from './reducers/versionHistory'
 
 
 const config = {
@@ -47,15 +48,12 @@ import {
   testcoinsWatcher,
   transferST3Watcher,
   accumulativeTxAndBalWatcher,
-  accountsSyncWatcher,
   fetchBalanceTxWatcher,
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  fetchDerivativeAccAddressWatcher,
-  startupSyncWatcher,
   validateTwoFAWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
@@ -67,6 +65,8 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
+  addNewSecondarySubAccountWatcher,
+  autoSyncShellsWatcher
 } from './sagas/accounts'
 
 import {
@@ -129,6 +129,7 @@ import {
 import {
   fetchWyreReservationWatcher
 } from './sagas/WyreIntegration'
+import { versionHistoryWatcher } from './sagas/versionHistory'
 
 const rootSaga = function* () {
   const sagas = [
@@ -154,24 +155,23 @@ const rootSaga = function* () {
     transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
-    accountsSyncWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
     validateTwoFAWatcher,
     removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
-    fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
-    startupSyncWatcher,
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
     addNewAccountShellWatcher,
+    addNewSecondarySubAccountWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
+    autoSyncShellsWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -228,7 +228,10 @@ const rootSaga = function* () {
     fetchSwanAuthenticationUrlWatcher,
 
     // Wyre Integration
-    fetchWyreReservationWatcher
+    fetchWyreReservationWatcher,
+
+    //VersionHistory integration
+    versionHistoryWatcher,
   ]
 
   yield all(
@@ -260,6 +263,7 @@ const rootReducer = combineReducers( {
   loaders,
   swanIntegration: swanIntegrationReducer,
   wyreIntegration: wyreIntegrationReducer,
+  versionHistory: VersionHistoryReducer,
 } )
 
 export default function makeStore() {
