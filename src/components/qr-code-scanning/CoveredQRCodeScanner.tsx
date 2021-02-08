@@ -30,7 +30,7 @@ const CameraFrameIndicators: React.FC = () => {
 const CoveredQRCodeScanner: React.FC<Props> = ( {
   containerStyle = {
   },
-  coverImageSource = require( '../../assets/images/icons/iPhone-QR.jpg' ),
+  coverImageSource = require( '../../assets/images/icons/iPhone-QR.png' ),
   onCodeScanned,
 }: Props ) => {
   const [ isCameraOpen, setIsCameraOpen ] = useState( false )
