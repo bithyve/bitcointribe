@@ -1,3 +1,5 @@
+import DeviceInfo from 'react-native-device-info'
+
 export const nameToInitials = fullName => {
   const namesArray = fullName.split( ' ' )
   if ( namesArray.length === 1 ) return `${namesArray[ 0 ].charAt( 0 )}`
@@ -34,16 +36,20 @@ export const getCurrencyImageName = ( currencyCodeValue ) => {
 export const isEmpty = ( obj ) => {
   return Object.keys( obj ).every( ( k ) => !Object.keys( obj[ k ] ).length )
 }
+export const isExistBuildVersion = (versionData) =>{
+  if(versionData.filter(version => version.buildNumber == DeviceInfo.getBuildNumber()).length == 0) return true;
+  return versionData.filter(version => version.version == DeviceInfo.getVersion()).length == 0;
+}
 
 export const APP_LIST = {
   'WhatsApp': {
-    pkgName: 'com.whatsapp', urlScheme: 'whatsapp', urlParams: 'app' 
+    pkgName: 'com.whatsapp', urlScheme: 'whatsapp', urlParams: 'app'
   }, // fa
   'Telegram': {
-    pkgName: 'org.telegram.messenger', urlScheme: 't.me', urlParams: 'share/url?url=' 
+    pkgName: 'org.telegram.messenger', urlScheme: 't.me', urlParams: 'share/url?url='
   }, // fa
   'Messenger': {
-    pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}' 
+    pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}'
   }, // fa: facebook
 }
 
