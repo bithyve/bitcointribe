@@ -37,9 +37,12 @@ import {
   ACCOUNT_SHELLS_ORDER_UPDATED,
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
   ACCOUNT_SHELL_REFRESH_COMPLETED,
+  ACCOUNT_SHELL_REFRESH_STARTED,
   REFRESH_ACCOUNT_SHELL,
+  CLEAR_ACCOUNT_SYNC_CACHE,
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
+  TWO_FA_VALID,
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -52,9 +55,11 @@ import {
 } from '../../common/constants/serviceTypes'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SyncStatus from '../../common/data/enums/SyncStatus'
 
-// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
-const ACCOUNT_VARS: {
+export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
   receivingAddress: string;
   balances: {
@@ -83,7 +88,10 @@ const ACCOUNT_VARS: {
     settedup: boolean;
     loading: boolean;
   };
-} = {
+}
+
+// TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
+const ACCOUNT_VARS: AccountVars  = {
   service: null,
   receivingAddress: '',
   balances: {
@@ -141,7 +149,11 @@ export type AccountsState = {
   additional?: {
     regular?: any;
     test?: any;
-    secure?: any;
+    secure?: {
+      xprivGenerated?: boolean;
+      twoFAValid?: boolean;
+      twoFAResetted?: boolean;
+    };
   };
 
   isGeneratingNewAccountShell: boolean;
@@ -162,6 +174,8 @@ export type AccountsState = {
   hasAccountShellMergeFailed: boolean;
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
+
+  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
 };
 
 const initialState: AccountsState = {
@@ -195,6 +209,8 @@ const initialState: AccountsState = {
   hasAccountShellMergeFailed: false,
   accountShellMergeSource: null,
   accountShellMergeDestination: null,
+
+  currentWyreSubAccount: null,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -231,7 +247,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             transfer: {
               ...state[ accountType ].transfer,
               stage1: {
-                ...action.payload.result 
+                ...action.payload.result
               },
               executed: 'ST1',
             },
@@ -279,7 +295,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
 
-      
+
       case REMOVE_TRANSFER_DETAILS:
         return {
           ...state,
@@ -378,7 +394,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
                   transfer: {
                     ...state[ accountType ].transfer,
                     stage2: {
-                      ...action.payload.result 
+                      ...action.payload.result
                     },
                     executed: 'ST2',
                   },
@@ -526,6 +542,16 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           },
         }
 
+      case TWO_FA_VALID:
+        return {
+          ...state,
+          additional: {
+            secure: {
+              twoFAValid: action.payload.isValid,
+            },
+          },
+        }
+
       case TWO_FA_RESETTED:
         return {
           ...state,
@@ -577,11 +603,26 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case NEW_ACCOUNT_SHELL_ADDED:
+        // using temperory variable to assign wyre account
+        // need to add the default wyre account to account state
+        // for now there is only one wyre account created so the first one is added as default
+        // this will need to be modified later elsewhere to add default wyre account to state
+        let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
+        if (
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
+        ) {
+          currentWyreSubAccount = action.payload.primarySubAccount
+        }
+
         return {
           ...state,
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
           accountShells: state.accountShells.concat( action.payload ),
+          ...currentWyreSubAccount && {
+            currentWyreSubAccount
+          }
         }
 
       case NEW_ACCOUNT_ADD_FAILED:
@@ -727,24 +768,34 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accountShells: updateAccountShells( action.payload.services, [] ),
         }
 
-      case REFRESH_ACCOUNT_SHELL:
-        state.accountShells.find(
-          ( shell ) => shell.id == action.payload.shell.id
-        ).isSyncInProgress = true
-
-        return {
-          ...state,
-        }
-
-      case ACCOUNT_SHELL_REFRESH_COMPLETED:
+      case ACCOUNT_SHELL_REFRESH_STARTED:
+        console.log( 'ACCOUNT_SHELL_REFRESH_STARTED' )
         state.accountShells.find(
           ( shell ) => shell.id == action.payload.id
-        ).isSyncInProgress = false
-
+        ).syncStatus = SyncStatus.IN_PROGRESS
+        return {
+          ...state,
+        }
+      case ACCOUNT_SHELL_REFRESH_COMPLETED:
+        console.log( 'ACCOUNT_SHELL_REFRESH_COMPLETED' )
+        // Updating Account Sync State to shell data model
+        // This will be used to display sync icon on Home Screen
+        state.accountShells.find(
+          ( shell ) => shell.id == action.payload.id
+        ).syncStatus = SyncStatus.COMPLETED
         return {
           ...state,
         }
 
+      case CLEAR_ACCOUNT_SYNC_CACHE:
+        console.log( 'CLEAR_ACCOUNT_SYNC_CACHE' )
+        // This will clear the sync state at the start of each login session
+        // This is required in order to ensure sync icon is shown again for each session
+        state.accountShells.map(
+          ( shell ) => shell.syncStatus = SyncStatus.PENDING )
+        return {
+          ...state,
+        }
       default:
         return state
   }

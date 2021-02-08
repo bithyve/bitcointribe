@@ -1,24 +1,24 @@
-import React from 'react';
-import { createStackNavigator } from 'react-navigation-stack';
-import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton';
-import AccountManagementContainerScreen from '../../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen';
-import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen';
-import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton';
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
+import React from 'react'
+import { createStackNavigator } from 'react-navigation-stack'
+import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import AccountManagementContainerScreen from '../../../pages/MoreOptions/AccountManagement/AccountManagementContainerScreen'
+import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/PanAccountSettingsContainerScreen'
+import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 
 
 const PanAccountSettingsStack = createStackNavigator(
   {
     PanAccountSettingsRoot: {
       screen: PanAccountSettingsContainerScreen,
-      navigationOptions: ({ navigation }) => {
+      navigationOptions: ( { navigation } ) => {
         return {
-          title: "Account Settings",
+          title: 'Account Settings',
           headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />;
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
-        };
+        }
       },
     },
   },
@@ -26,30 +26,35 @@ const PanAccountSettingsStack = createStackNavigator(
     defaultNavigationOptions: () => {
       return {
         ...defaultStackScreenNavigationOptions,
-      };
+      }
     },
   },
-);
+)
 
 
 const AccountManagementStack = createStackNavigator(
   {
     AccountManagementRoot: {
       screen: AccountManagementContainerScreen,
-      navigationOptions: ({ navigation }) => {
+      navigationOptions: ( { navigation } ) => {
         return {
-          title: "Account Management",
+          title: 'Account Management',
           headerLeft: () => {
-            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />;
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
           },
           headerRight: () => {
-            return (
-              <NavHeaderSettingsButton
-                onPress={() => { navigation.navigate('PanAccountSettings'); }}
-              />
-            );
+            //
+            // 📝 Hiding this button for now until we have supporting functionality.
+            // (See: https://github.com/bithyve/hexa/issues/2454)
+            //
+
+            // return (
+            //   <NavHeaderSettingsButton
+            //     onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+            //   />
+            // )
           },
-        };
+        }
       },
     },
     PanAccountSettings: {
@@ -64,9 +69,9 @@ const AccountManagementStack = createStackNavigator(
     defaultNavigationOptions: () => {
       return {
         ...defaultStackScreenNavigationOptions,
-      };
+      }
     },
   },
-);
+)
 
-export default AccountManagementStack;
+export default AccountManagementStack

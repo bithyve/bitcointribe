@@ -1,11 +1,3 @@
-// firebase
-#import <Firebase.h>
-#import "RNFirebaseNotifications.h"
-#import "RNFirebaseMessaging.h"
-#import <Fabric/Fabric.h>
-#import <Crashlytics/Crashlytics.h>
-
-
 #import "AppDelegate.h"
 #import <React/RCTBridge.h>
 #import <React/RCTBundleURLProvider.h>
@@ -18,27 +10,10 @@
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
 #import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
 
-//#ifdef FB_SONARKIT_ENABLED
-//#import <FlipperKit/FlipperClient.h>
-//#import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
-//#import <FlipperKitUserDefaultsPlugin/FKUserDefaultsPlugin.h>
-//#import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
-//#import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
-//#import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-
-
-
-//static void InitializeFlipper(UIApplication *application) {
-//  FlipperClient *client = [FlipperClient sharedClient];
-//  SKDescriptorMapper *layoutDescriptorMapper = [[SKDescriptorMapper alloc] initWithDefaults];
-//  [client addPlugin:[[FlipperKitLayoutPlugin alloc] initWithRootNode:application withDescriptorMapper:layoutDescriptorMapper]];
-//  [client addPlugin:[[FKUserDefaultsPlugin alloc] initWithSuiteName:nil]];
-//  [client addPlugin:[FlipperKitReactPlugin new]];
-//  [client addPlugin:[[FlipperKitNetworkPlugin alloc] initWithNetworkAdapter:[SKIOSNetworkAdapter new]]];
-//  [client start];
-//}
-//#endif
-
+// react-native-push-notification-ios
+#import <Firebase.h>
+#import <UserNotifications/UserNotifications.h>
+#import <RNCPushNotificationIOS.h>
 
 
 @interface AppDelegate () <RCTBridgeDelegate>
@@ -67,10 +42,17 @@
 - (BOOL)application:(UIApplication *)application 
   didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+  if ([FIRApp defaultApp] == nil) {
+    [FIRApp configure];
+  }
+   // Define UNUserNotificationCenter
+  UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
   
-  [FIRApp configure];
-  [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
-  [RNFirebaseNotifications configure];
+  [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge)completionHandler:^(BOOL granted, NSError * _Nullable error) {
+    if (granted) {
+      center.delegate = self; 
+    }
+  }];
   
 //  #ifdef FB_SONARKIT_ENABLED
 //    InitializeFlipper(application);
@@ -97,6 +79,42 @@
   return YES;
 }
 
+//Called when a notification is delivered to a foreground app.
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
+{
+  completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
+}
+
+// Required for the register event.
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+ [RNCPushNotificationIOS didRegisterForRemoteNotificationsWithDeviceToken:deviceToken];
+}
+// Required for the notification event. You must call the completion handler after handling the remote notification.
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  [RNCPushNotificationIOS didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+}
+// Required for the registrationError event.
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
+{
+ [RNCPushNotificationIOS didFailToRegisterForRemoteNotificationsWithError:error];
+}
+// IOS 10+ Required for localNotification event
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void (^)(void))completionHandler
+{
+  [RNCPushNotificationIOS didReceiveNotificationResponse:response];
+  completionHandler();
+}
+
+// IOS 4-10 Required for the localNotification event.
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+ [RNCPushNotificationIOS didReceiveLocalNotification:notification];
+}
 
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
@@ -105,10 +123,6 @@
     return extraModules;
 }
 
-
-
-
-
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
 #if DEBUG
@@ -116,25 +130,6 @@
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
 #endif
-}
-
-- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-  [[RNFirebaseNotifications instance] didReceiveLocalNotification:notification];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
-fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
-  [[RNFirebaseNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
-}
-
-- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
-  [[RNFirebaseMessaging instance] didRegisterUserNotificationSettings:notificationSettings];
-}
-
--(void) userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-
-  [[RNFirebaseMessaging instance] didReceiveRemoteNotification:response.notification.request.content.userInfo];
-  completionHandler();
 }
 
 @end

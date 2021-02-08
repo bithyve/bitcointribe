@@ -38,7 +38,7 @@ const NewTwoFASecret = props => {
               </Text>
               <AppBottomSheetTouchableWrapper
                 style={{
-                  backgroundColor: '#77B9EB',
+                  backgroundColor: Colors.blue,
                   marginLeft: 'auto',
                   borderRadius: 5,
                   justifyContent: 'center',

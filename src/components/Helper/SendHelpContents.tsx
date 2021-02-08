@@ -1,24 +1,25 @@
-import React, { useRef } from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
+import React, { useRef } from 'react'
+import { View, Image, Text, StyleSheet } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import openLink from '../../utils/OpenLink';
-import { ScrollView } from 'react-native-gesture-handler';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export default function SendHelpContents(props) {
-  const scrollViewRef = useRef<ScrollView>();
+  const scrollViewRef = useRef<ScrollView>()
 
   return (
     <View style={styles.modalContainer}>
       <AppBottomSheetTouchableWrapper
-        style={{ justifyContent: 'center', alignItems: 'center' }}
+        style={{
+          justifyContent: 'center', alignItems: 'center'
+        }}
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
@@ -41,10 +42,11 @@ export default function SendHelpContents(props) {
               marginTop: wp('5%'),
             }}
           >
-            You don’t have to worry about a single bitcoin jargon or technical
-            term when you want to send sats.
+            You don’t have to worry about a single bitcoin jargon or technical term when you want to send sats
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{
+            justifyContent: 'center', alignItems: 'center'
+          }}>
             <Image
               source={require('../../assets/images/icons/bitcoin_send_info_1.png')}
               style={styles.helperImage}
@@ -56,17 +58,18 @@ export default function SendHelpContents(props) {
               marginBottom: wp('15%'),
             }}
           >
-            Decide who you want to send it to, choose how much you want to send.
-            Hit send. That’s it.
+            Decide who you want to send it to, choose how much you want to send. Hit send. That’s it
           </Text>
           <AppBottomSheetTouchableWrapper
-            style={{ alignItems: 'center' }}
+            style={{
+              alignItems: 'center'
+            }}
             onPress={() => {
               scrollViewRef.current?.scrollTo({
                 x: 0,
                 y: hp('80%'),
                 animated: true,
-              });
+              })
             }}
           >
             <FontAwesome
@@ -75,15 +78,7 @@ export default function SendHelpContents(props) {
               size={40}
             />
           </AppBottomSheetTouchableWrapper>
-          <View
-            style={{
-              borderStyle: 'dotted',
-              borderWidth: 1,
-              borderRadius: 1,
-              borderColor: Colors.white,
-              ...styles.separatorView,
-            }}
-          />
+          <View style={styles.separatorView}/>
         </View>
         <View style={styles.ElementView}>
           <Text
@@ -92,40 +87,70 @@ export default function SendHelpContents(props) {
               marginTop: wp('10%'),
             }}
           >
-            Once you hit “Send”, the transaction is relayed to the Bitcoin
-            ecosystem. There are lots of technicalities here, if you wish, you
-            can read up about Bitcoin Mainnet, running full nodes, UTXOs, etc.
+            Once you hit “Send”, the transaction is relayed to the Bitcoin ecosystem. There are lots of technicalities here, if you wish, you can read up about Bitcoin Mainnet, running full nodes, UTXOs, etc.
           </Text>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{
+            justifyContent: 'center', alignItems: 'center'
+          }}>
             <Image
               source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
               style={styles.helperImage}
             />
           </View>
-          <View style={styles.bottomLinkView}>
-            <Text style={{ ...styles.infoText, marginLeft: 0, marginRight: 0 }}>
-              A miner is someone who helps you with your transaction, while
-              doing other things in the Bitcoin ecosystem. For this they charge
-              a fee. This is why Hexa requests a fee when processing your
-              transaction.
+          <Text style={{
+              ...styles.infoText, marginBottom: wp('15%'),
+            }}>
+              A miner is someone who helps you with your transaction, while doing other things in the Bitcoin ecosystem. For this they charge a fee and the same shows during your transaction
             </Text>
-            {/* <View style={{ ...styles.linkView, marginTop: wp('7%') }}>
-              <Text style={styles.toKnowMoreText}>To know more,</Text>
-              <AppBottomSheetTouchableWrapper
-                style={{ marginLeft: 5 }}
-                onPress={() =>
-                  openLink('https://en.bitcoin.it/wiki/Miner_fees')
-                }
-              >
-                <Text style={styles.clickHereText}>click here</Text>
-              </AppBottomSheetTouchableWrapper>
-            </View> */}
-          </View>
-          <View style={styles.separatorView} />
+          <AppBottomSheetTouchableWrapper
+            style={{
+              alignItems: 'center'
+            }}
+            onPress={() => {
+              scrollViewRef.current?.scrollTo({
+                x: 0,
+                y: hp('160%'),
+                animated: true,
+              })
+            }}
+          >
+            <FontAwesome
+              name="angle-double-down"
+              color={Colors.white}
+              size={40}
+            />
+          </AppBottomSheetTouchableWrapper>
+          <View style={styles.separatorView}/>
         </View>
+
+          <View style={styles.ElementView}>
+            <Text
+              style={{
+                ...styles.infoText,
+                marginTop: wp('10%'),
+              }}
+            >
+              Hexa has a unique Batch Send feature using which you can combine multiple transactions in one. This helps you save on some of the fee
+          </Text>
+            <View style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}>
+              <Image
+                source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+                style={styles.helperImage}
+              />
+            </View>
+            <View style={styles.bottomLinkView}>
+              <Text style={{
+                ...styles.infoText, marginLeft: 0, marginRight: 0
+              }}>
+                You can send to your Friends & Family, an address or another account all in one go
+            </Text>
+            </View>
+          </View>
       </ScrollView>
     </View>
-  );
+  )
 }
 const styles = StyleSheet.create({
   modalContainer: {
@@ -136,7 +161,9 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0, height: 2
+    },
   },
   headerText: {
     color: Colors.white,
@@ -188,6 +215,10 @@ const styles = StyleSheet.create({
     height: 0,
     alignSelf: 'center',
     marginBottom: wp('1%'),
+    borderStyle: 'dotted',
+    borderWidth: 1,
+    borderRadius: 1,
+    borderColor: Colors.white,
   },
   helperImage: {
     width: wp('80%'),
@@ -199,4 +230,4 @@ const styles = StyleSheet.create({
     marginRight: wp('10%'),
     marginBottom: wp('15%'),
   },
-});
+})

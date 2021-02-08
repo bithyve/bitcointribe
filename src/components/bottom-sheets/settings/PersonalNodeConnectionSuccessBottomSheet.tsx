@@ -1,19 +1,17 @@
 import React from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
-import { Button } from 'react-native-elements'
 import Colors from '../../../common/Colors'
-import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
-import { RFValue } from 'react-native-responsive-fontsize'
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 
 
 export type Props = {
-  onViewNodeDetailsPressed: () => void;
+  onConfirmPressed: () => void;
 };
 
-const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onViewNodeDetailsPressed, }: Props ) => {
+const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }: Props ) => {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
@@ -48,13 +46,12 @@ const PersonalNodeConnectionSuccessBottomSheet: React.FC<Props> = ( { onViewNode
 
 
         <View style={styles.actionButtonContainer}>
-          <Button
-            raised
-            buttonStyle={ButtonStyles.primaryActionButton}
-            title="View Node Details"
-            titleStyle={ButtonStyles.actionButtonText}
-            onPress={onViewNodeDetailsPressed}
-          />
+          <TouchableOpacity
+            onPress={onConfirmPressed}
+            style={ButtonStyles.primaryActionButton}
+          >
+            <Text style={ButtonStyles.actionButtonText}>OK</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -91,7 +88,6 @@ const styles = StyleSheet.create( {
   },
 
   actionButtonContainer: {
-    marginTop: 'auto',
     flexDirection: 'row',
     justifyContent: 'flex-start',
   },

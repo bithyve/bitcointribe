@@ -43,6 +43,7 @@ import {
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
+  WYRE,
 } from '../../../common/constants/serviceTypes'
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
@@ -73,6 +74,9 @@ import Loader from '../../../components/loader'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { UsNumberFormat } from '../../../common/utilities'
 import config from '../../../bitcoin/HexaConfig'
+import { getAccountIcon, getAccountTitle } from './utils'
+import BaseAccount from '../../../bitcoin/utilities/accounts/BaseAccount'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -208,7 +212,7 @@ class SendToContact extends Component<
       },
       () => {
         if ( bitcoinAmount ) {
-          const currency = this.state.exchangeRates
+          const currency = this.state.exchangeRates && this.state.exchangeRates[ this.state.CurrencyCode ]
             ? (
               ( parseInt( bitcoinAmount ) / SATOSHIS_IN_BTC ) *
                 this.state.exchangeRates[ this.state.CurrencyCode ].last
@@ -237,9 +241,7 @@ class SendToContact extends Component<
 
     this.updateSpendableBalance()
     this.amountCalculation()
-    console.log( {
-      averageTxFees
-    } )
+    // console.log( { averageTxFees } )
   };
 
   updateSpendableBalance = () => {
@@ -490,7 +492,7 @@ class SendToContact extends Component<
 
     const temp = value
     if ( prefersBitcoin ) {
-      const result = exchangeRates
+      const result = exchangeRates && exchangeRates[ CurrencyCode ]
         ? (
           ( value / SATOSHIS_IN_BTC ) *
             exchangeRates[ CurrencyCode ].last
@@ -500,7 +502,7 @@ class SendToContact extends Component<
         bitcoinAmount: temp, currencyAmount: result.toString()
       } )
     } else {
-      let currency = exchangeRates
+      let currency = exchangeRates && exchangeRates[ CurrencyCode ]
         ? value / exchangeRates[ CurrencyCode ].last
         : 0
       currency = currency < 1 ? currency * SATOSHIS_IN_BTC : currency
@@ -636,11 +638,12 @@ class SendToContact extends Component<
       }
     } )
 
-    const { fee } = this.props.accountsState[
+    const service: BaseAccount | SecureAccount = this.props.accountsState[
       serviceType
-    ].service.calculateSendMaxFee(
+    ].service
+    const { fee } = service.calculateSendMaxFee(
       recipientsList.length + 1, // +1 for the current instance
-      averageTxFees,
+      averageTxFees[ 'low' ].feePerByte,
       this.state.derivativeAccountDetails,
     )
 
@@ -862,7 +865,7 @@ class SendToContact extends Component<
       ? UsNumberFormat( spendableBalance )
       : prefersBitcoin
         ? UsNumberFormat( spendableBalance )
-        : exchangeRates
+        : exchangeRates && exchangeRates[ CurrencyCode ]
           ? (
             ( spendableBalance / SATOSHIS_IN_BTC ) *
           exchangeRates[ CurrencyCode ].last
@@ -909,6 +912,9 @@ class SendToContact extends Component<
       clearTransfer,
       addTransferDetails,
     } = this.props
+
+
+
     return (
       <View style={{
         flex: 1, backgroundColor: Colors.white
@@ -937,16 +943,7 @@ class SendToContact extends Component<
               />
             </TouchableOpacity>
             <Image
-              source={
-                this.state.derivativeAccountDetails &&
-                this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
-                  ? require( '../../../assets/images/icons/icon_donation_hexa.png' )
-                  : serviceType == TEST_ACCOUNT
-                    ? require( '../../../assets/images/icons/icon_test.png' )
-                    : serviceType == REGULAR_ACCOUNT
-                      ? require( '../../../assets/images/icons/icon_regular.png' )
-                      : require( '../../../assets/images/icons/icon_secureaccount.png' )
-              }
+              source={ getAccountIcon( serviceType, this.state.derivativeAccountDetails ) }
               style={{
                 width: wp( '10%' ), height: wp( '10%' )
               }}
@@ -978,16 +975,7 @@ class SendToContact extends Component<
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
-              {this.state.derivativeAccountDetails &&
-              this.state.derivativeAccountDetails.type === DONATION_ACCOUNT
-                ? 'Donation Account'
-                : serviceType == 'TEST_ACCOUNT'
-                  ? 'Test Account'
-                  : serviceType == 'SECURE_ACCOUNT'
-                    ? 'Savings Account'
-                    : serviceType == 'REGULAR_ACCOUNT'
-                      ? 'Checking Account'
-                      : ''}
+              {getAccountTitle( serviceType, this.state.derivativeAccountDetails )}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -1049,6 +1037,7 @@ class SendToContact extends Component<
                 'Savings Account': SECURE_ACCOUNT,
                 'Test Account': TEST_ACCOUNT,
                 'Donation Account': DONATION_ACCOUNT,
+                'Wyre': WYRE,
               }[ item.selectedContact.account_name || 'Checking Account' ]
 
               // 🔑 This seems to be the way the backend is distinguishing between
@@ -1060,6 +1049,7 @@ class SendToContact extends Component<
                   'Savings Account': SECURE_ACCOUNT,
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
+                  'Wyre': WYRE,
                 }[ item.selectedContact.account_name || 'Checking Account' ]
 
                 recipient = makeSubAccountRecipientDescription(

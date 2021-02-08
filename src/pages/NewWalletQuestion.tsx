@@ -36,8 +36,9 @@ import LoaderModal from '../components/LoaderModal';
 import { getTestcoins } from '../store/actions/accounts';
 import { TEST_ACCOUNT } from '../common/constants/serviceTypes';
 
-import DeviceInfo from 'react-native-device-info';
-import { walletCheckIn } from '../store/actions/trustedContacts';
+import DeviceInfo from 'react-native-device-info'
+import { walletCheckIn } from '../store/actions/trustedContacts'
+import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup';
 
 // only admit lowercase letters and digits
@@ -103,16 +104,16 @@ export default function NewWalletQuestion( props ) {
         const security = {
           question: dropdownBoxValue.question,
           answer,
-        };
-        dispatch(initializeSetup(walletName, security));
-        const current = Date.now();
+        }
+        dispatch( initializeSetup( walletName, security ) )
+        dispatch(setVersion('Current'));
+        const current = Date.now()
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
           JSON.stringify( current ),
         )
         const securityQuestionHistory = {
           created: current,
-          confirmed: current,
         }
         await AsyncStorage.setItem(
           'securityQuestionHistory',

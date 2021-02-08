@@ -4,7 +4,7 @@ import Fonts from '../Fonts'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 
-export default StyleSheet.create({
+export default StyleSheet.create( {
   headerContainer: {
     flexDirection: 'row',
     marginTop: 10,
@@ -28,14 +28,14 @@ export default StyleSheet.create({
 
   headerTitles: {
     color: Colors.blue,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
 
   headerTitlesInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginLeft: 20,
     fontWeight: 'normal',
     marginRight: 20,
@@ -45,21 +45,21 @@ export default StyleSheet.create({
 
   homepageAmountText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21),
+    fontSize: RFValue( 21 ),
     marginRight: 5
   },
 
   homepageAmountUnitText: {
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     marginBottom: 3
   },
 
   homepageAmountImage: {
-    width: widthPercentageToDP(3),
-    height: widthPercentageToDP(3),
+    width: widthPercentageToDP( 3 ),
+    height: widthPercentageToDP( 3 ),
     marginRight: 5,
-    marginBottom: widthPercentageToDP(1),
+    marginBottom: widthPercentageToDP( 1 ),
     resizeMode: 'contain'
   },
 
@@ -74,4 +74,4 @@ export default StyleSheet.create({
     resizeMode: 'contain',
     marginLeft: 'auto',
   },
-})
+} )

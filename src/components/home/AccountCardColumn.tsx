@@ -1,9 +1,9 @@
-import React, { memo } from 'react';
+import React, { memo } from 'react'
 import {
   View,
   TouchableOpacity,
   StyleSheet,
-} from 'react-native';
+} from 'react-native'
 
 import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
 import HomeAccountsListCard from './HomeAccountsListCard';
@@ -13,13 +13,13 @@ import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
 export type Props = {
   cardData: AccountShell[];
   prependsAddButton: boolean;
-  onAccountCardSelected: (accountShell: AccountShell) => void;
+  onAccountCardSelected: ( accountShell: AccountShell ) => void;
   onAddNewAccountPressed: () => void;
   currentLevel: number;
   onCardLongPressed: (accountShell: AccountShell) => void;
 };
 
-const AccountCardColumn: React.FC<Props> = ({
+const AccountCardColumn: React.FC<Props> = ( {
   cardData,
   prependsAddButton,
   onAccountCardSelected,
@@ -44,21 +44,21 @@ const AccountCardColumn: React.FC<Props> = ({
             key={accountShell.id}
             disabled={disabled}
             style={styles.cardContainer}
-            onPress={() => onAccountCardSelected(accountShell)}
-            onLongPress={() => onCardLongPressed(accountShell)}
+            onPress={() => onAccountCardSelected( accountShell )}
+            onLongPress={() => onCardLongPressed( accountShell )}
           >
             <HomeAccountsListCard
               accountShell={accountShell}
               cardDisabled={disabled}
             />
           </TouchableOpacity>
-        );
-      })}
+        )
+      } )}
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     marginRight: 14,
   },
@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
   cardContainer: {
     marginBottom: 14,
   },
-})
+} )
 
-export default memo(AccountCardColumn);
+export default memo( AccountCardColumn )

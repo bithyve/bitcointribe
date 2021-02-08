@@ -29,7 +29,7 @@ implements ImportedWalletSubAccountDescribing {
   isTFAEnabled: boolean;
 
   defaultTitle: string;
-  defaultDescription = 'View a non-Hexa wallet as an account.';
+  defaultDescription = 'View a non-Hexa wallet as an account';
   customDisplayName: string | null;
   customDescription: string | null;
 

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent } from 'react'
 import {
   View,
   Text,
@@ -8,48 +8,49 @@ import {
   ScrollView,
   Platform,
   RefreshControl,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { connect } from 'react-redux';
-import idx from 'idx';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native-responsive-screen'
+import { connect } from 'react-redux'
+import idx from 'idx'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
+  clearTrustedContactsCache,
   trustedChannelsSetupSync,
   removeTrustedContact,
   updateAddressBookLocally,
-} from '../../store/actions/trustedContacts';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
+} from '../../store/actions/trustedContacts'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes';
-import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import AddContactAddressBook from '../Contacts/AddContactAddressBook';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ModalHeader from '../../components/ModalHeader';
-import config from '../../bitcoin/HexaConfig';
-import KnowMoreButton from '../../components/KnowMoreButton';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents';
-import { NavigationScreenConfig } from 'react-navigation';
-import { NavigationStackOptions } from 'react-navigation-stack';
-import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions';
-import { ListItem } from 'react-native-elements';
-import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent';
+} from '../../common/constants/serviceTypes'
+import { TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import AddContactAddressBook from '../Contacts/AddContactAddressBook'
+import BottomSheet from 'reanimated-bottom-sheet'
+import DeviceInfo from 'react-native-device-info'
+import ModalHeader from '../../components/ModalHeader'
+import config from '../../bitcoin/HexaConfig'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
+import { NavigationScreenConfig } from 'react-navigation'
+import { NavigationStackOptions } from 'react-navigation-stack'
+import defaultStackScreenNavigationOptions from '../../navigation/options/DefaultStackScreenNavigationOptions'
+import { ListItem } from 'react-native-elements'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import {
   ContactRecipientDescribing,
   makeContactRecipientDescription,
-} from '../../common/data/models/interfaces/RecipientDescribing';
-import ContactTrustKind from '../../common/data/enums/ContactTrustKind';
-import Loader from '../../components/loader';
+} from '../../common/data/models/interfaces/RecipientDescribing'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import Loader from '../../components/loader'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -62,6 +63,7 @@ interface FriendsAndFamilyPropTypes {
   addressBookData: any;
   trustedContactsInfo: any;
   removeTrustedContact: any;
+  clearTrustedContactsCache: any;
 }
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
@@ -86,125 +88,127 @@ class FriendsAndFamilyScreen extends PureComponent<
   helpBottomSheetRef: React.RefObject<BottomSheet>;
   focusListener: any;
 
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
 
-    this.focusListener = null;
-    this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>();
-    this.helpBottomSheetRef = React.createRef<BottomSheet>();
+    this.focusListener = null
+    this.addContactAddressBookBottomSheetRef = React.createRef<BottomSheet>()
+    this.helpBottomSheetRef = React.createRef<BottomSheet>()
 
     this.state = {
       onRefresh: false,
       isLoadContacts: false,
       selectedContact: [],
       loading: true,
-      trustedContact: idx(props, (_) => _.addressBookData.trustedContact) || [],
-      MyKeeper: idx(props, (_) => _.addressBookData.MyKeeper) || [],
-      IMKeeper: idx(props, (_) => _.addressBookData.IMKeeper) || [],
+      trustedContact: idx( props, ( _ ) => _.addressBookData.trustedContact ) || [],
+      MyKeeper: idx( props, ( _ ) => _.addressBookData.MyKeeper ) || [],
+      IMKeeper: idx( props, ( _ ) => _.addressBookData.IMKeeper ) || [],
       OtherTrustedContact:
-        idx(props, (_) => _.addressBookData.OtherTrustedContact) || [],
+        idx( props, ( _ ) => _.addressBookData.OtherTrustedContact ) || [],
       isShowingKnowMoreSheet: false,
       showLoader: false
-    };
+    }
   }
 
   componentDidMount() {
-    this.focusListener = this.props.navigation.addListener('didFocus', () => {
-      this.props.trustedChannelsSetupSync();
-      this.updateAddressBook();
-    });
-
-    this.props.navigation.setParams({
+    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+      this.props.trustedChannelsSetupSync()
+      this.updateAddressBook()
+    } )
+    this.props.clearTrustedContactsCache()
+    this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
-    });
+    } )
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate( prevProps, prevState ) {
     const oldDerivativeAccounts = idx(
       prevProps,
-      (_) => _.regularAccount.hdWallet.derivativeAccounts,
-    );
+      ( _ ) => _.regularAccount.hdWallet.derivativeAccounts,
+    )
     const newDerivativeAccounts = idx(
       this.props,
-      (_) => _.regularAccount.hdWallet.derivativeAccounts,
-    );
+      ( _ ) => _.regularAccount.hdWallet.derivativeAccounts,
+    )
     if (
       oldDerivativeAccounts !== newDerivativeAccounts ||
       prevProps.trustedContactsService != this.props.trustedContactsService
     ) {
-      this.updateAddressBook();
+      this.updateAddressBook()
     }
-    if (this.state.trustedContact) {
-      this.setState({
+    if ( this.state.trustedContact ) {
+      this.setState( {
         loading: false,
-      });
+      } )
     }
     if (
       prevProps.trustedChannelsSetupSyncing !==
       this.props.trustedChannelsSetupSyncing
     ) {
-      this.setState({
+      this.setState( {
         loading: this.props.trustedChannelsSetupSyncing,
-      });
-      this.setState({
+      } )
+      this.setState( {
         showLoader: this.props.trustedChannelsSetupSyncing,
-      });
+      } )
     }
   }
 
   componentWillUnmount() {
-    this.focusListener.remove();
+    this.focusListener.remove()
   }
 
   toggleKnowMoreSheet = () => {
-    const shouldShow = !this.state.isShowingKnowMoreSheet;
+    const shouldShow = !this.state.isShowingKnowMoreSheet
 
-    this.setState({ isShowingKnowMoreSheet: shouldShow }, () => {
-      if (shouldShow) {
-        this.helpBottomSheetRef.current?.snapTo(1);
+    this.setState( {
+      isShowingKnowMoreSheet: shouldShow
+    }, () => {
+      if ( shouldShow ) {
+        this.helpBottomSheetRef.current?.snapTo( 1 )
       } else {
-        this.helpBottomSheetRef.current?.snapTo(0);
+        this.helpBottomSheetRef.current?.snapTo( 0 )
       }
-    });
+    } )
   };
 
   updateAddressBook = async () => {
-    const { regularAccount, trustedContactsService } = this.props;
-    let { trustedContactsInfo } = this.props;
-    let myKeepers = [];
-    let imKeepers = [];
-    let otherTrustedContact = [];
-    if (trustedContactsInfo) {
-      if (trustedContactsInfo.length) {
-        const trustedContacts = [];
-        for (let index = 0; index < trustedContactsInfo.length; index++) {
-          const contactInfo = trustedContactsInfo[index];
-          if (!contactInfo) continue;
+    const { regularAccount, trustedContactsService } = this.props
+    const { trustedContactsInfo } = this.props
+    const myKeepers = []
+    const imKeepers = []
+    const otherTrustedContact = []
+    if ( trustedContactsInfo ) {
+      if ( trustedContactsInfo.length ) {
+        const trustedContacts = []
+        for ( let index = 0; index < trustedContactsInfo.length; index++ ) {
+          const contactInfo = trustedContactsInfo[ index ]
+          if ( !contactInfo ) continue
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-          }`;
-          let connectedVia;
-          if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
-            connectedVia = contactInfo.phoneNumbers[0].number;
-          } else if (contactInfo.emails && contactInfo.emails.length) {
-            connectedVia = contactInfo.emails[0].email;
+          }`
+          let connectedVia
+          if ( contactInfo.phoneNumbers && contactInfo.phoneNumbers.length ) {
+            connectedVia = contactInfo.phoneNumbers[ 0 ].number
+          } else if ( contactInfo.emails && contactInfo.emails.length ) {
+            connectedVia = contactInfo.emails[ 0 ].email
           }
 
-          let hasXpub = false;
+          let hasXpub = false
           const {
             trustedContactToDA,
             derivativeAccounts,
-          } = regularAccount.hdWallet;
+          } = regularAccount.hdWallet
           const accountNumber =
-            trustedContactToDA[contactName.toLowerCase().trim()];
-          if (accountNumber) {
+            trustedContactToDA[ contactName.toLowerCase().trim() ]
+          if ( accountNumber ) {
             const trustedContact: TrustedContactDerivativeAccountElements =
-              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
+              derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ]
             if (
               trustedContact.contactDetails &&
               trustedContact.contactDetails.xpub
             ) {
-              hasXpub = true;
+              hasXpub = true
             }
           }
 
@@ -216,32 +220,32 @@ class FriendsAndFamilyScreen extends PureComponent<
             lastSeen,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-          ];
+          ]
 
-          let usesOTP = false;
-          if (!connectedVia && otp) {
-            usesOTP = true;
-            connectedVia = otp;
+          let usesOTP = false
+          if ( !connectedVia && otp ) {
+            usesOTP = true
+            connectedVia = otp
           }
 
-          const hasTrustedAddress = !!trustedAddress;
+          const hasTrustedAddress = !!trustedAddress
 
-          const isGuardian = index < 3 ? true : false;
-          let shareIndex;
-          if (isGuardian) {
-            shareIndex = index;
+          const isGuardian = index < 3 ? true : false
+          let shareIndex
+          if ( isGuardian ) {
+            shareIndex = index
           }
 
           const initiatedAt =
             trustedContactsService.tc.trustedContacts[
               contactName.toLowerCase().trim()
-            ].ephemeralChannel.initiatedAt;
+            ].ephemeralChannel.initiatedAt
 
           const hasTrustedChannel = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
           ].symmetricKey
             ? true
-            : false;
+            : false
 
           const element = {
             contactName:
@@ -260,17 +264,21 @@ class FriendsAndFamilyScreen extends PureComponent<
             contactsWalletName,
             lastSeen,
             ...contactInfo,
-          };
-          trustedContacts.push(element);
-          if (element.isGuardian) {
-            const isRemovable = !element.hasTrustedChannel ? true : false; // un-confirmed guardians are removable
-            myKeepers.push({ ...element, isRemovable });
           }
-          if (element.isWard) {
-            imKeepers.push(element);
+          trustedContacts.push( element )
+          if ( element.isGuardian ) {
+            const isRemovable = !element.hasTrustedChannel ? true : false // un-confirmed guardians are removable
+            myKeepers.push( {
+              ...element, isRemovable
+            } )
           }
-          if (!element.isWard && !element.isGuardian) {
-            otherTrustedContact.push({ ...element, isRemovable: true });
+          if ( element.isWard ) {
+            imKeepers.push( element )
+          }
+          if ( !element.isWard && !element.isGuardian ) {
+            otherTrustedContact.push( {
+              ...element, isRemovable: true
+            } )
           }
         }
         this.setState(
@@ -281,13 +289,13 @@ class FriendsAndFamilyScreen extends PureComponent<
             trustedContact: trustedContacts,
           },
           () =>
-            this.props.updateAddressBookLocally({
+            this.props.updateAddressBookLocally( {
               MyKeeper: myKeepers,
               IMKeeper: imKeepers,
               OtherTrustedContact: otherTrustedContact,
               trustedContact: trustedContacts,
-            }),
-        );
+            } ),
+        )
       }
     }
   };
@@ -298,20 +306,20 @@ class FriendsAndFamilyScreen extends PureComponent<
         borderColor={Colors.blue}
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          this.helpBottomSheetRef.current?.snapTo(0);
+          this.helpBottomSheetRef.current?.snapTo( 0 )
         }}
       />
-    );
+    )
   };
 
   renderHelpContent = () => {
     return (
       <AddressBookHelpContents
         titleClicked={() => {
-          this.helpBottomSheetRef.current?.snapTo(0);
+          this.helpBottomSheetRef.current?.snapTo( 0 )
         }}
       />
-    );
+    )
   };
 
   handleContactSelection(
@@ -319,17 +327,17 @@ class FriendsAndFamilyScreen extends PureComponent<
     index: number,
     contactType: string,
   ) {
-    this.props.navigation.navigate('ContactDetails', {
+    this.props.navigation.navigate( 'ContactDetails', {
       contact: backendContactInfo,
       index,
       contactsType: contactType,
 
       // TODO: Figure out what this is
       shareIndex: backendContactInfo.shareIndex,
-    });
+    } )
   }
 
-  renderContactListItem = ({
+  renderContactListItem = ( {
     backendContactInfo,
     contactDescription,
     index,
@@ -339,77 +347,77 @@ class FriendsAndFamilyScreen extends PureComponent<
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
-  }) => {
+  } ) => {
     return (
       <ListItem
-        key={String(index)}
+        key={String( index )}
         bottomDivider
         onPress={() =>
-          this.handleContactSelection(backendContactInfo, index, contactsType)
+          this.handleContactSelection( backendContactInfo, index, contactsType )
         }
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
       </ListItem>
-    );
+    )
   };
 
   renderAddContactFriendsAndFamily = () => {
-    const { navigation } = this.props;
-    const { isLoadContacts, selectedContact } = this.state;
-    if(!isLoadContacts) return;
+    const { navigation } = this.props
+    const { isLoadContacts, selectedContact } = this.state
+    if( !isLoadContacts ) return
     return (
       <AddContactAddressBook
         isLoadContacts={isLoadContacts}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
-          if (selectedContact && selectedContact.length) {
-          navigation.navigate('AddContactSendRequest', {
-            SelectedContact: selectedContact,
-          });
-          this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
-        }
+          if ( selectedContact && selectedContact.length ) {
+            navigation.navigate( 'AddContactSendRequest', {
+              SelectedContact: selectedContact,
+            } )
+            this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+          }
         }}
-        onSelectContact={(selectedData) => {
-          this.setState({
+        onSelectContact={( selectedData ) => {
+          this.setState( {
             selectedContact: selectedData,
-          });
+          } )
         }}
         onPressBack={() => {
-          this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
         }}
         onSkipContinue={() => {
-          let { skippedContactsCount } = this.props.trustedContactsService.tc;
-          let data;
-          if (!skippedContactsCount) {
-            skippedContactsCount = 1;
+          let { skippedContactsCount } = this.props.trustedContactsService.tc
+          let data
+          if ( !skippedContactsCount ) {
+            skippedContactsCount = 1
             data = {
               firstName: 'F&F request',
               lastName: `awaiting ${skippedContactsCount}`,
               name: `F&F request awaiting ${skippedContactsCount}`,
-            };
+            }
           } else {
             data = {
               firstName: 'F&F request',
               lastName: `awaiting ${skippedContactsCount + 1}`,
               name: `F&F request awaiting ${skippedContactsCount + 1}`,
-            };
+            }
           }
 
-          navigation.navigate('AddContactSendRequest', {
-            SelectedContact: [data],
-          });
-          this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+          navigation.navigate( 'AddContactSendRequest', {
+            SelectedContact: [ data ],
+          } )
+          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
         }}
       />
-    );
+    )
   };
 
   renderAddContactAddressBookHeader = () => {
-    return <ModalHeader />;
+    return <ModalHeader />
   };
 
   render() {
-    const { trustedChannelsSetupSync } = this.props;
+    const { trustedChannelsSetupSync } = this.props
 
     const {
       MyKeeper: contactsKeepingUser,
@@ -417,32 +425,40 @@ class FriendsAndFamilyScreen extends PureComponent<
       OtherTrustedContact: otherTrustedContacts,
       onRefresh,
       showLoader
-    } = this.state;
+    } = this.state
 
     return (
       <>
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={onRefresh}
+              refreshing={showLoader}
               onRefresh={() => {
-                trustedChannelsSetupSync();
+                trustedChannelsSetupSync()
               }}
             />
           }
-          style={{ flex: 1, marginBottom: hp('6%') }}
+          style={{
+            flex: 1, marginBottom: hp( '6%' )
+          }}
         >
-          <View style={{ marginTop: wp('2%') }}>
+          <View style={{
+            marginTop: wp( '2%' )
+          }}>
             <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
             </Text>
 
-            <View style={{ marginBottom: 15 }}>
-              <View style={{ height: 'auto' }}>
-                {(contactsKeepingUser.length > 0 &&
-                  contactsKeepingUser.map((item, index) => {
-                    return this.renderContactListItem({
+            <View style={{
+              marginBottom: 15
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {( contactsKeepingUser.length > 0 &&
+                  contactsKeepingUser.map( ( item, index ) => {
+                    return this.renderContactListItem( {
                       backendContactInfo: item,
                       contactDescription: makeContactRecipientDescription(
                         item,
@@ -450,47 +466,63 @@ class FriendsAndFamilyScreen extends PureComponent<
                       ),
                       index,
                       contactsType: 'My Keepers',
-                    });
-                  })) || <View style={{ height: wp('22%') + 30 }} />}
+                    } )
+                  } ) ) || <View style={{
+                  height: wp( '22%' ) + 30
+                }} />}
               </View>
             </View>
           </View>
 
-          <View style={{ marginTop: wp('5%') }}>
+          <View style={{
+            marginTop: wp( '5%' )
+          }}>
             <Text style={styles.pageTitle}>I am the Keeper of</Text>
             <Text style={styles.pageInfoText}>
               Contacts whose wallets I can help restore
             </Text>
 
-            <View style={{ marginBottom: 15 }}>
-              <View style={{ height: 'auto' }}>
-                {(contactsKeptByUser.length > 0 &&
-                  contactsKeptByUser.map((item, index) => {
-                    return this.renderContactListItem({
+            <View style={{
+              marginBottom: 15
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {( contactsKeptByUser.length > 0 &&
+                  contactsKeptByUser.map( ( item, index ) => {
+                    return this.renderContactListItem( {
                       backendContactInfo: item,
                       contactDescription: makeContactRecipientDescription(
                         item,
                         ContactTrustKind.USER_IS_KEEPING,
                       ),
                       index,
-                      contactsType: "I'm Keeper of",
-                    });
-                  })) || <View style={{ height: wp('22%') + 30 }} />}
+                      contactsType: 'I\'m Keeper of',
+                    } )
+                  } ) ) || <View style={{
+                  height: wp( '22%' ) + 30
+                }} />}
               </View>
             </View>
           </View>
 
-          <View style={{ marginTop: wp('5%') }}>
+          <View style={{
+            marginTop: wp( '5%' )
+          }}>
             <Text style={styles.pageTitle}>Other Contacts</Text>
             <Text style={styles.pageInfoText}>
               Contacts who I can pay directly
             </Text>
 
-            <View style={{ marginBottom: 15 }}>
-              <View style={{ height: 'auto' }}>
-                {(otherTrustedContacts.length > 0 &&
-                  otherTrustedContacts.map((item, index) => {
-                    return this.renderContactListItem({
+            <View style={{
+              marginBottom: 15
+            }}>
+              <View style={{
+                height: 'auto'
+              }}>
+                {( otherTrustedContacts.length > 0 &&
+                  otherTrustedContacts.map( ( item, index ) => {
+                    return this.renderContactListItem( {
                       backendContactInfo: item,
                       contactDescription: makeContactRecipientDescription(
                         item,
@@ -498,15 +530,17 @@ class FriendsAndFamilyScreen extends PureComponent<
                       ),
                       index,
                       contactsType: 'Other Contacts',
-                    });
-                  })) || <View style={{ height: wp('22%') + 30 }} />}
+                    } )
+                  } ) ) || <View style={{
+                  height: wp( '22%' ) + 30
+                }} />}
 
                 <TouchableOpacity
                   onPress={() => {
-                    this.setState({
-                        isLoadContacts: true,
-                      });
-                    this.addContactAddressBookBottomSheetRef.current.snapTo(1);
+                    this.setState( {
+                      isLoadContacts: true,
+                    } )
+                    this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
                   }}
                   style={{
                     ...styles.selectedContactsView,
@@ -517,7 +551,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                 >
                   <Image
                     style={styles.addGrayImage}
-                    source={require('../../assets/images/icons/icon_add_grey.png')}
+                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
                   />
                   <View>
                     <Text style={styles.contactText}>Add a Contact</Text>
@@ -529,13 +563,13 @@ class FriendsAndFamilyScreen extends PureComponent<
           {otherTrustedContacts.length == 0 &&
             contactsKeepingUser.length == 0 &&
             contactsKeptByUser.length == 0 && (
-              <BottomInfoBox
-                title={'Note'}
-                infoText={
-                  'All your contacts appear here when added to Hexa wallet'
-                }
-              />
-            )}
+            <BottomInfoBox
+              title={'Note'}
+              infoText={
+                'All your contacts appear here when added to Hexa wallet'
+              }
+            />
+          )}
         </ScrollView>
         {showLoader ? <Loader /> : null}
 
@@ -546,8 +580,8 @@ class FriendsAndFamilyScreen extends PureComponent<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('82%')
-              : hp('82%'),
+              ? hp( '82%' )
+              : hp( '82%' ),
           ]}
           renderContent={this.renderAddContactFriendsAndFamily}
           renderHeader={this.renderAddContactAddressBookHeader}
@@ -559,54 +593,57 @@ class FriendsAndFamilyScreen extends PureComponent<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('87%')
-              : hp('89%'),
+              ? hp( '87%' )
+              : hp( '89%' ),
           ]}
           renderContent={this.renderHelpContent}
           renderHeader={this.renderHelpHeader}
           onCloseEnd={() => {
-            this.setState({ isShowingKnowMoreSheet: false });
+            this.setState( {
+              isShowingKnowMoreSheet: false
+            } )
           }}
         />
       </>
-    );
+    )
   }
 }
 
-const mapStateToProps = (state) => {
-  let addressBookData = idx(state, (_) => _.trustedContacts.addressBook);
-  let trustedContactsInfo = idx(
+const mapStateToProps = ( state ) => {
+  const addressBookData = idx( state, ( _ ) => _.trustedContacts.addressBook )
+  const trustedContactsInfo = idx(
     state,
-    (_) => _.trustedContacts.trustedContactsInfo,
-  );
+    ( _ ) => _.trustedContacts.trustedContactsInfo,
+  )
   return {
-    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
-    trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
+    trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
     trustedChannelsSetupSyncing: idx(
       state,
-      (_) => _.trustedContacts.loading.trustedChannelsSetupSync,
+      ( _ ) => _.trustedContacts.loading.trustedChannelsSetupSync,
     ),
     addressBookData,
     trustedContactsInfo,
-  };
-};
-export default connect(mapStateToProps, {
+  }
+}
+export default connect( mapStateToProps, {
   trustedChannelsSetupSync,
   updateAddressBookLocally,
   removeTrustedContact,
-})(FriendsAndFamilyScreen);
+  clearTrustedContactsCache
+} )( FriendsAndFamilyScreen )
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   contactText: {
     marginLeft: 10,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
   phoneText: {
     marginTop: 3,
     marginLeft: 10,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
@@ -624,29 +661,29 @@ const styles = StyleSheet.create({
   pageTitle: {
     marginLeft: 30,
     color: Colors.blue,
-    fontSize: RFValue(14),
+    fontSize: RFValue( 14 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   pageInfoText: {
     marginLeft: 30,
     color: Colors.textColorGrey,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
   },
   imageIconStyle: {
-    width: wp('12%'),
-    height: wp('12%'),
-    borderRadius: wp('12%') / 2,
+    width: wp( '12%' ),
+    height: wp( '12%' ),
+    borderRadius: wp( '12%' ) / 2,
     resizeMode: 'contain',
   },
   imageIconViewStyle: {
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.shadowBlue,
-    width: wp('12%'),
-    height: wp('12%'),
-    borderRadius: wp('12%') / 2,
+    width: wp( '12%' ),
+    height: wp( '12%' ),
+    borderRadius: wp( '12%' ) / 2,
   },
   imageIconText: {
     textAlign: 'center',
@@ -667,15 +704,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   addGrayImage: {
-    width: wp('10%'),
-    height: wp('10%'),
+    width: wp( '10%' ),
+    height: wp( '10%' ),
     marginLeft: 5,
   },
-});
+} )
 
-function makeNavigationOptions({
-  navigation,
-}): NavigationScreenConfig<NavigationStackOptions, any> {
+function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {
   return {
     ...defaultStackScreenNavigationOptions,
 
@@ -683,8 +718,8 @@ function makeNavigationOptions({
 
     headerRight: () => {
       return (
-        <KnowMoreButton onpress={navigation.getParam('toggleKnowMoreSheet')} />
-      );
+        <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
+      )
     },
-  };
+  }
 }

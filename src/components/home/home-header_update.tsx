@@ -37,6 +37,7 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind';
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
 import { currencyKindSet } from '../../store/actions/preferences';
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
@@ -59,8 +60,8 @@ const HomeHeader = ({
   onPressNotifications,
   notificationData,
   walletName,
+  netBalance,
   getCurrencyImageByRegion,
-  balances,
   exchangeRates,
   CurrencyCode,
   navigation,
@@ -181,14 +182,14 @@ const HomeHeader = ({
               />
             )}
             <Text style={styles.homeHeaderAmountText}>
-              {prefersBitcoin
-                ? UsNumberFormat(balances.accumulativeBalance)
-                : exchangeRates
-                ? (
-                    (balances.accumulativeBalance / 1e8) *
-                    exchangeRates[CurrencyCode].last
-                  ).toFixed(2)
-                : 0}
+            {prefersBitcoin
+                  ? UsNumberFormat( netBalance )
+                  : exchangeRates && exchangeRates[ CurrencyCode ]
+                    ? (
+                      ( netBalance / SATOSHIS_IN_BTC ) *
+                      exchangeRates[ CurrencyCode ].last
+                    ).toFixed( 2 )
+                    : 0}
             </Text>
             <Text style={styles.homeHeaderAmountUnitText}>
               {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}

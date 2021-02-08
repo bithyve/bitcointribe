@@ -15,21 +15,22 @@ export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
 export const CLEAR_TRANSFER = 'CLEAR_TRANSFER'
 export const ACCUMULATIVE_BAL_AND_TX = 'ACCUMULATIVE_BAL_AND_TX'
 export const FETCH_FEE_AND_EXCHANGE_RATES = 'FETCH_FEE_AND_EXCHANGE_RATES'
-export const STARTUP_SYNC = 'STARTUP_SYNC'
-export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
+export const CLEAR_ACCOUNT_SYNC_CACHE = 'CLEAR_ACCOUNT_SYNC_CACHE'
+export const AUTO_SYNC_SHELLS = 'AUTO_SYNC_SHELLS'
 export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
 export const RUN_TEST = 'RUN_TEST'
 export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB'
-export const FETCH_DERIVATIVE_ACC_ADDRESS = 'FETCH_DERIVATIVE_ACC_ADDRESS'
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX'
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA'
+export const VALIDATE_TWO_FA = 'VALIDATE_TWO_FA'
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
 export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL'
+export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
 export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS'
@@ -45,31 +46,32 @@ export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT'
 export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL'
 export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED'
+export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
 
 export const fetchTransactions = ( serviceType, service? ) => {
   return {
     type: FETCH_TRANSACTIONS, payload: {
-      serviceType, service 
-    } 
+      serviceType, service
+    }
   }
 }
 
 export const fetchBalanceTx = (
-  serviceType,
+  serviceType: string,
   options: {
     service?;
-    loader?;
-    restore?;
-    shouldNotInsert?;
-    syncTrustedDerivative?;
+    loader?: boolean;
+    hardRefresh?: boolean;
+    shouldNotInsert?: boolean;
+    syncTrustedDerivative?: boolean;
   } = {
   }
 ) => {
   return {
     type: FETCH_BALANCE_TX, payload: {
-      serviceType, options 
-    } 
+      serviceType, options
+    }
   }
 }
 
@@ -132,8 +134,8 @@ export const transferST3 = ( serviceType, token ) => {
   //Secure account specific
   return {
     type: TRANSFER_ST3, payload: {
-      serviceType, token 
-    } 
+      serviceType, token
+    }
   }
 }
 
@@ -142,8 +144,8 @@ export const getTestcoins = ( serviceType ) => {
   // console.log("Called getTestcoins", new Date())
   return {
     type: GET_TESTCOINS, payload: {
-      serviceType 
-    } 
+      serviceType
+    }
   }
 }
 
@@ -151,7 +153,7 @@ export const addTransferDetails = ( serviceType, recipientData ) => {
   return {
     type: ADD_TRANSFER_DETAILS,
     payload: {
-      serviceType, recipientData 
+      serviceType, recipientData
     },
   }
 }
@@ -160,7 +162,7 @@ export const removeTransferDetails = ( serviceType, recipientData ) => {
   return {
     type: REMOVE_TRANSFER_DETAILS,
     payload: {
-      serviceType, recipientData 
+      serviceType, recipientData
     },
   }
 }
@@ -168,30 +170,29 @@ export const removeTransferDetails = ( serviceType, recipientData ) => {
 export const clearTransfer = ( serviceType, stage? ) => {
   return {
     type: CLEAR_TRANSFER, payload: {
-      serviceType, stage 
-    } 
+      serviceType, stage
+    }
   }
 }
 
 export const accumulativeBalAndTx = () => {
   return {
-    type: ACCUMULATIVE_BAL_AND_TX 
+    type: ACCUMULATIVE_BAL_AND_TX
   }
 }
 
-export const startupSync = ( restore? ) => {
+// To reset shell account sync status of all shells
+export const clearAccountSyncCache = () => {
   return {
-    type: STARTUP_SYNC, payload: {
-      restore 
-    } 
+    type: CLEAR_ACCOUNT_SYNC_CACHE
   }
 }
 
-export const syncAccounts = ( restore? ) => {
+// This is called once per login to automatically sync balances and
+// transactions of all shells
+export const autoSyncShells = () => {
   return {
-    type: SYNC_ACCOUNTS, payload: {
-      restore 
-    } 
+    type: AUTO_SYNC_SHELLS
   }
 }
 
@@ -203,8 +204,17 @@ export const syncViaXpubAgent = (
   return {
     type: SYNC_VIA_XPUB_AGENT,
     payload: {
-      serviceType, derivativeAccountType, accountNumber 
+      serviceType, derivativeAccountType, accountNumber
     },
+  }
+}
+
+export const validateTwoFA = ( token: number ) => {
+  return {
+    type: VALIDATE_TWO_FA,
+    payload: {
+      token
+    }
   }
 }
 
@@ -219,7 +229,7 @@ export const removeTwoFA = () => {
 // };
 export const fetchFeeAndExchangeRates = () => {
   return {
-    type: FETCH_FEE_AND_EXCHANGE_RATES 
+    type: FETCH_FEE_AND_EXCHANGE_RATES
   }
 }
 
@@ -227,7 +237,7 @@ export const generateSecondaryXpriv = ( serviceType, secondaryMnemonic ) => {
   return {
     type: GENERATE_SECONDARY_XPRIV,
     payload: {
-      serviceType, secondaryMnemonic 
+      serviceType, secondaryMnemonic
     },
   }
 }
@@ -241,7 +251,7 @@ export const resetTwoFA = (secondaryMnemonic) => {
 
 export const runTest = () => {
   return {
-    type: RUN_TEST 
+    type: RUN_TEST
   }
 }
 
@@ -249,34 +259,21 @@ export const fetchDerivativeAccXpub = ( accountType, accountNumber? ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_XPUB,
     payload: {
-      accountType, accountNumber 
-    },
-  }
-}
-
-export const fetchDerivativeAccAddress = (
-  serviceType,
-  accountType,
-  accountNumber?,
-  accountName?
-) => {
-  return {
-    type: FETCH_DERIVATIVE_ACC_ADDRESS,
-    payload: {
-      serviceType, accountType, accountNumber, accountName 
+      accountType, accountNumber
     },
   }
 }
 
 export const fetchDerivativeAccBalTx = (
-  serviceType,
-  accountType,
-  accountNumber?
+  serviceType: string,
+  accountType: string,
+  accountNumber?: number,
+  hardRefresh?: boolean
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: {
-      serviceType, accountType, accountNumber 
+      serviceType, accountType, accountNumber, hardRefresh
     },
   }
 }
@@ -285,7 +282,7 @@ export const setAverageTxFee = ( averageTxFees ) => {
   return {
     type: AVERAGE_TX_FEE,
     payload: {
-      averageTxFees 
+      averageTxFees
     },
   }
 }
@@ -335,7 +332,7 @@ export const updateDonationPreferences = (
   return {
     type: UPDATE_DONATION_PREFERENCES,
     payload: {
-      serviceType, accountNumber, preferences 
+      serviceType, accountNumber, preferences
     },
   }
 }
@@ -343,25 +340,32 @@ export const updateDonationPreferences = (
 export const remapAccountShells = ( services ) => {
   return {
     type: REMAP_ACCOUNT_SHELLS, payload: {
-      services 
-    } 
+      services
+    }
   }
 }
 
 export const refreshAccountShell = (
   shell: AccountShell,
-  options?: { autoSync?: boolean }
+  options: { autoSync?: boolean, hardRefresh?: boolean }
 ) => {
   return {
     type: REFRESH_ACCOUNT_SHELL, payload: {
-      shell, options 
-    } 
+      shell, options
+    }
   }
 }
 
 export const accountShellRefreshCompleted = ( payload: AccountShell ) => {
   return {
     type: ACCOUNT_SHELL_REFRESH_COMPLETED,
+    payload,
+  }
+}
+
+export const accountShellRefreshStarted = ( payload: AccountShell ) => {
+  return {
+    type: ACCOUNT_SHELL_REFRESH_STARTED,
     payload,
   }
 }
@@ -379,13 +383,26 @@ export const addNewAccountShell = (
     payload,
   }
 }
+
+export const addNewSecondarySubAccount = (
+  secondarySubAccount: SubAccountDescribing,
+  parentShell: AccountShell
+) => {
+  return {
+    type: ADD_NEW_SECONDARY_SUBACCOUNT,
+    payload: {
+      secondarySubAccount, parentShell
+    },
+  }
+}
+
 export interface AddNewAccountShellCompletionAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_SHELL_COMPLETED;
 }
 
 export const newAccountShellCreationCompleted = (): AddNewAccountShellCompletionAction => {
   return {
-    type: ADD_NEW_ACCOUNT_SHELL_COMPLETED 
+    type: ADD_NEW_ACCOUNT_SHELL_COMPLETED
   }
 }
 
@@ -398,7 +415,7 @@ export const updateSubAccountSettings = (
   payload: SubAccountDescribing
 ): UpdateSubAccountSettingsAction => {
   return {
-    type: UPDATE_SUB_ACCOUNT_SETTINGS, payload 
+    type: UPDATE_SUB_ACCOUNT_SETTINGS, payload
   }
 }
 
@@ -408,7 +425,7 @@ export interface UpdateSubAccountSettingsCompletionAction extends Action {
 
 export const subAccountSettingsUpdateCompleted = (): UpdateSubAccountSettingsCompletionAction => {
   return {
-    type: SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED 
+    type: SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED
   }
 }
 
@@ -427,7 +444,7 @@ export const reassignTransactions = (
   payload: ReassignTransactionsActionPayload
 ): ReassignTransactionsAction => {
   return {
-    type: REASSIGN_TRANSACTIONS, payload 
+    type: REASSIGN_TRANSACTIONS, payload
   }
 }
 
@@ -437,7 +454,7 @@ export interface TransactionReassignmentCompletionAction extends Action {
 
 export const transactionReassignmentCompleted = (): TransactionReassignmentCompletionAction => {
   return {
-    type: TRANSACTION_REASSIGNMENT_COMPLETED 
+    type: TRANSACTION_REASSIGNMENT_COMPLETED
   }
 }
 
@@ -455,7 +472,7 @@ export const mergeAccountShells = (
   payload: MergeAccountShellsActionPayload
 ): MergeAccountShellsAction => {
   return {
-    type: MERGE_ACCOUNT_SHELLS, payload 
+    type: MERGE_ACCOUNT_SHELLS, payload
   }
 }
 
@@ -465,7 +482,7 @@ export interface AccountShellMergeCompletionAction extends Action {
 
 export const accountShellMergeCompleted = (): AccountShellMergeCompletionAction => {
   return {
-    type: ACCOUNT_SHELL_MERGE_COMPLETED 
+    type: ACCOUNT_SHELL_MERGE_COMPLETED
   }
 }
 
@@ -512,6 +529,7 @@ export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED'
 export const ALTERNATE_TRANSFER_ST2_EXECUTED =
   'ALTERNATE_TRANSFER_ST2_EXECUTED'
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
+export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
 export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED'
@@ -529,48 +547,48 @@ export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 export const testcoinsReceived = ( serviceType, service ) => {
   return {
     type: TESTCOINS_RECEIVED, payload: {
-      serviceType, service 
-    } 
+      serviceType, service
+    }
   }
 }
 
 export const transactionsFetched = ( serviceType, transactions ) => {
   return {
     type: TRANSACTIONS_FETCHED, payload: {
-      serviceType, transactions 
-    } 
+      serviceType, transactions
+    }
   }
 }
 
 export const executedST1 = ( serviceType, result ) => {
   return {
     type: TRANSFER_ST1_EXECUTED, payload: {
-      serviceType, result 
-    } 
+      serviceType, result
+    }
   }
 }
 
 export const failedST1 = ( serviceType, errorDetails ) => {
   return {
     type: TRANSFER_ST1_FAILED, payload: {
-      serviceType, errorDetails 
-    } 
+      serviceType, errorDetails
+    }
   }
 }
 
 export const executedST2 = ( serviceType, result ) => {
   return {
     type: TRANSFER_ST2_EXECUTED, payload: {
-      serviceType, result 
-    } 
+      serviceType, result
+    }
   }
 }
 
 export const failedST2 = ( serviceType, errorDetails ) => {
   return {
     type: TRANSFER_ST2_FAILED, payload: {
-      serviceType, errorDetails 
-    } 
+      serviceType, errorDetails
+    }
   }
 }
 
@@ -578,40 +596,40 @@ export const executedST3 = ( serviceType, result ) => {
   // Secure account specific
   return {
     type: TRANSFER_ST3_EXECUTED, payload: {
-      serviceType, result 
-    } 
+      serviceType, result
+    }
   }
 }
 
 export const failedST3 = ( serviceType, errorDetails ) => {
   return {
     type: TRANSFER_ST3_FAILED, payload: {
-      serviceType, errorDetails 
-    } 
+      serviceType, errorDetails
+    }
   }
 }
 
 export const switchLoader = ( serviceType, beingLoaded ) => {
   return {
     type: ACCOUNTS_LOADING, payload: {
-      serviceType, beingLoaded 
-    } 
+      serviceType, beingLoaded
+    }
   }
 }
 
 export const accountsSynched = ( synched ) => {
   return {
     type: ACCOUNTS_SYNCHED, payload: {
-      synched 
-    } 
+      synched
+    }
   }
 }
 
 export const exchangeRatesCalculated = ( exchangeRates ) => {
   return {
     type: EXCHANGE_RATE_CALCULATED, payload: {
-      exchangeRates 
-    } 
+      exchangeRates
+    }
   }
 }
 
@@ -619,7 +637,7 @@ export const alternateTransferST2Executed = ( serviceType, result ) => {
   return {
     type: ALTERNATE_TRANSFER_ST2_EXECUTED,
     payload: {
-      serviceType, result 
+      serviceType, result
     },
   }
 }
@@ -627,20 +645,31 @@ export const alternateTransferST2Executed = ( serviceType, result ) => {
 export const secondaryXprivGenerated = ( generated ) => {
   return {
     type: SECONDARY_XPRIV_GENERATED, payload: {
-      generated 
-    } 
+      generated
+    }
   }
 }
-
-export const twoFAResetted = (resetted) => {
-  return { type: TWO_FA_RESETTED, payload: { resetted } };
-};
+export const twoFAValid = ( isValid: boolean ) => {
+  return {
+    type: TWO_FA_VALID,
+    payload: {
+      isValid
+    }
+  }
+}
+export const twoFAResetted = ( resetted ) => {
+  return {
+    type: TWO_FA_RESETTED, payload: {
+      resetted
+    }
+  }
+}
 
 export const settedDonationAccount = ( serviceType, successful ) => {
   return {
     type: SETTED_DONATION_ACC, payload: {
-      serviceType, successful 
-    } 
+      serviceType, successful
+    }
   }
 }
 
@@ -653,8 +682,8 @@ export const newAccountShellAddFailed = ( {
 } ) => {
   return {
     type: NEW_ACCOUNT_ADD_FAILED, payload: {
-      accountShell, error 
-    } 
+      accountShell, error
+    }
   }
 }
 
@@ -662,7 +691,8 @@ export const newAccountShellAdded = ( { accountShell, }: {
   accountShell: AccountShell;
 } ) => {
   return {
-    type: NEW_ACCOUNT_SHELL_ADDED, payload: accountShell 
+    type: NEW_ACCOUNT_SHELL_ADDED,
+    payload: accountShell
   }
 }
 
@@ -671,8 +701,8 @@ export const restoredAccountShells = ( { accountShells, }: {
 } ) => {
   return {
     type: RESTORED_ACCOUNT_SHELLS, payload: {
-      accountShells 
-    } 
+      accountShells
+    }
   }
 }
 
@@ -685,8 +715,8 @@ export const accountSettingsUpdateFailed = ( {
 } ) => {
   return {
     type: ACCOUNT_SETTINGS_UPDATE_FAILED, payload: {
-      account, error 
-    } 
+      account, error
+    }
   }
 }
 
@@ -694,7 +724,7 @@ export const accountSettingsUpdated = ( { account, }: {
   account: SubAccountDescribing;
 } ) => {
   return {
-    type: ACCOUNT_SETTINGS_UPDATED, payload: account 
+    type: ACCOUNT_SETTINGS_UPDATED, payload: account
   }
 }
 
@@ -711,7 +741,7 @@ export const transactionReassignmentSucceeded = (
   payload: ReassignTransactionsActionPayload
 ) => {
   return {
-    type: TRANSACTION_REASSIGNMENT_SUCCEEDED, payload 
+    type: TRANSACTION_REASSIGNMENT_SUCCEEDED, payload
   }
 }
 
@@ -728,6 +758,6 @@ export const accountShellMergeSucceeded = (
   payload: MergeAccountShellsActionPayload
 ) => {
   return {
-    type: ACCOUNT_SHELL_MERGE_SUCCEEDED, payload 
+    type: ACCOUNT_SHELL_MERGE_SUCCEEDED, payload
   }
 }

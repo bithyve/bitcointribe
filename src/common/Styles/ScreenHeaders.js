@@ -4,7 +4,7 @@ import Fonts from '../Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 
-const ScreenHeaderStyles = StyleSheet.create({
+const ScreenHeaderStyles = StyleSheet.create( {
   smallHeaderContainer: {
     height: 59,
     paddingHorizontal: 24,
@@ -13,10 +13,10 @@ const ScreenHeaderStyles = StyleSheet.create({
 
   smallHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
   },
-})
+} )
 
 export default ScreenHeaderStyles

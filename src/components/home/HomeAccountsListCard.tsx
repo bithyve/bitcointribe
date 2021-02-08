@@ -13,7 +13,7 @@ import useSecondarySubAccountsForShell from '../../utils/hooks/account-utils/Use
 import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/accounts/UseTotalBalanceForAccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-
+import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
 
 export type Props = {
   accountShell: AccountShell;
@@ -35,6 +35,10 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled}: He
 
   return (
     <View style={styles.headerSectionContainer}>
+      <Image
+        style={styles.headerAccountSync}
+        source={getAccountSyncIcon( accountShell.syncStatus )}
+      />
       <Image
         style={styles.headerAccountImage}
         source={getAvatarForSubAccount( primarySubAccount )}
@@ -63,13 +67,13 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled}: He
 const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled}: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
-  const totalBalance = useTotalBalanceForAccountShell( accountShell )
+  const totalBalance = AccountShell.getTotalBalance( accountShell )
 
   const balanceTextStyle = useMemo( () => {
     return {
       color: accountsState.accountsSynched ? Colors.black : Colors.textColorGrey,
     }
-  }, [ accountsState.accountsSynced ] )
+  }, [ accountsState.accountsSynched ] )
 
   const isTestAccount = useMemo( () => {
     return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
@@ -108,13 +112,14 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled}: P
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    width: widthPercentageToDP( '42.6%' ),
-    height: heightPercentageToDP( '20.1%' ),
+    width: widthPercentageToDP( 42.6 ),
+    height: heightPercentageToDP( 20.1 ),
     borderColor: Colors.borderColor,
     borderWidth: 1,
     paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingVertical: widthPercentageToDP( 2.5 ),
     backgroundColor: Colors.white,
+    justifyContent: 'space-between',
   },
 
   headerSectionContainer: {
@@ -122,9 +127,20 @@ const styles = StyleSheet.create( {
     alignItems: 'flex-start',
   },
 
+  headerAccountSync: {
+    width: widthPercentageToDP( 4 ),
+    height: widthPercentageToDP( 4 ),
+    marginRight: widthPercentageToDP( -2 ),
+    marginBottom: widthPercentageToDP( -2 ),
+    marginLeft: widthPercentageToDP( -2 ),
+    marginTop: widthPercentageToDP( -1.7 )
+  },
+
   headerAccountImage: {
-    width: 44,
-    height: 44,
+    width: widthPercentageToDP( 10 ),
+    height: widthPercentageToDP( 10 ),
+    marginTop: 0
+
   },
 
   headerBadgeContainer: {
@@ -157,14 +173,14 @@ const styles = StyleSheet.create( {
   },
 
   subtitleText: {
-    marginTop: 5,
+    marginTop: widthPercentageToDP( 0.5 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
   },
 
   balanceRow: {
-    marginTop: 10,
+    marginTop: widthPercentageToDP( 1 ),
   },
 } )
 

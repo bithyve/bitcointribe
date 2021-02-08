@@ -11,10 +11,14 @@ import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
+  WYRE
 } from '../common/constants/serviceTypes'
 import PersonalNode from '../common/data/models/PersonalNode'
-
+import _ from 'lodash'
 class HexaConfig {
+  //SWAN details
+  public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'demo-web-client'
+  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'https://dev-api.swanbitcoin.com'
   public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://testapi.bithyve.com'
   public MAINNET_BASE_URL: string = Config.BIT_MAINNET_BASE_URL ? Config.BIT_MAINNET_BASE_URL.trim() : 'https://api.bithyve.com'
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -107,7 +111,7 @@ class HexaConfig {
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
   public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt(Config.KP_REQUEST_EXPIRY.trim(), 10) : 86400000;
 
-  public ESPLORA_API_ENDPOINTS = {
+  public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
       MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
@@ -128,7 +132,9 @@ class HexaConfig {
       TXNDETAILS: this.MAINNET_BASE_URL + '/tx',
       BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
     },
-  };
+  }
+  public ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINTS ) // current API-endpoints being used
+  public USE_ESPLORA_FALLBACK = false; // BITHYVE_ESPLORA_API_ENDPOINT acts as the fallback(when true)
 
   public RELAY: string;
   public SIGNING_SERVER: string;
@@ -161,6 +167,14 @@ class HexaConfig {
     },
   };
 
+  public WYRE: DerivativeAccount = {
+    series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
+    instance: {
+      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 10,
+      using: 0,
+    },
+  };
+
   public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
@@ -178,14 +192,16 @@ class HexaConfig {
     },
   };
 
+
   public DERIVATIVE_ACC: DerivativeAccounts = {
     SUB_PRIMARY_ACCOUNT: this.SUB_PRIMARY_ACCOUNT,
     FAST_BITCOINS: this.FAST_BITCOINS,
+    WYRE: this.WYRE,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT ];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys( this.DERIVATIVE_ACC ).filter(
     ( account ) => !this.EJECTED_ACCOUNTS.includes( account ),
@@ -265,32 +281,14 @@ class HexaConfig {
           ...this.ESPLORA_API_ENDPOINTS,
           TESTNET: personalNodeEPs,
         }
+
+      this.USE_ESPLORA_FALLBACK = personalNode.useFallback
     }
   }
 
   public connectToBitHyveNode =  async () => {
-    this.ESPLORA_API_ENDPOINTS = {
-      TESTNET: {
-        MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
-        MULTIUTXO: this.TESTNET_BASE_URL + '/utxos',
-        MULTITXN: this.TESTNET_BASE_URL + '/data',
-        MULTIBALANCETXN: this.TESTNET_BASE_URL + '/baltxs',
-        NEWMULTIUTXOTXN: this.TESTNET_BASE_URL + '/nutxotxs',
-        TXN_FEE: this.TESTNET_BASE_URL + '/fee-estimates',
-        TXNDETAILS: this.TESTNET_BASE_URL + '/tx',
-        BROADCAST_TX: this.TESTNET_BASE_URL + '/tx',
-      },
-      MAINNET: {
-        MULTIBALANCE: this.MAINNET_BASE_URL + '/balances',
-        MULTIUTXO: this.MAINNET_BASE_URL + '/utxos',
-        MULTITXN: this.MAINNET_BASE_URL + '/data',
-        MULTIBALANCETXN: this.MAINNET_BASE_URL + '/baltxs',
-        NEWMULTIUTXOTXN: this.MAINNET_BASE_URL + '/nutxotxs',
-        TXN_FEE: this.MAINNET_BASE_URL + '/fee-estimates',
-        TXNDETAILS: this.MAINNET_BASE_URL + '/tx',
-        BROADCAST_TX: this.MAINNET_BASE_URL + '/tx',
-      },
-    }
+    this.ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINTS )
+    this.USE_ESPLORA_FALLBACK = false
   }
 }
 

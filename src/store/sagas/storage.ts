@@ -9,22 +9,20 @@ import {
   dbInserted,
   ENRICH_SERVICES,
   servicesEnriched,
-} from '../actions/storage';
-import dataManager from '../../storage/database-manager';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import TestAccount from '../../bitcoin/services/accounts/TestAccount';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import { AsyncStorage } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import semver from 'semver';
-import { updateWalletImageHealth } from '../actions/health';
-//import { updateWalletImage } from '../actions/sss';
+} from '../actions/storage'
+import dataManager from '../../storage/database-manager'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { AsyncStorage } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import semver from 'semver'
+import { updateWalletImage } from '../actions/sss'
+import { walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService';
-import { startupSync } from '../actions/accounts';
-import { walletCheckIn } from '../actions/trustedContacts';
-// import { timer } from '../../utils'
+import { updateWalletImageHealth } from '../actions/health'
 
 function* initDBWorker() {
   try {
@@ -46,8 +44,8 @@ function* fetchDBWorker() {
     if ( key && database ) {
       yield call( servicesEnricherWorker, {
         payload: {
-          database 
-        } 
+          database
+        }
       } )
       yield put( dbFetched( database ) )
 
@@ -56,7 +54,6 @@ function* fetchDBWorker() {
         yield put( walletCheckIn() )
         yield put( updateWalletImageHealth() )
         //yield put( updateWalletImage() )
-        yield put( startupSync() )
       }
     } else {
       // DB would be absent during wallet setup
@@ -98,8 +95,8 @@ export function* insertDBWorker( { payload } ) {
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
     yield call( servicesEnricherWorker, {
       payload: {
-        database: updatedDB 
-      } 
+        database: updatedDB
+      }
     } )
   } catch ( err ) {
     console.log( err )

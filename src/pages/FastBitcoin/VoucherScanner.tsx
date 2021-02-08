@@ -13,23 +13,19 @@ import {
   Linking,
   TextInput,
   KeyboardAvoidingView,
-  Keyboard,
 } from 'react-native'
 import Fonts from '../../common/Fonts'
 import DeviceInfo from 'react-native-device-info'
 import NavStyles from '../../common/Styles/NavStyles'
-import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   FAST_BITCOINS,
-  TRUSTED_CONTACTS,
 } from '../../common/constants/serviceTypes'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Entypo from 'react-native-vector-icons/Entypo'
@@ -56,19 +52,19 @@ import {
   getQuoteFail,
   executeOrderFail,
   storeFbtcData,
-  storeFbtcVoucher,
   clearFbtcVoucher,
 } from '../../store/actions/fbtc'
-import { fetchDerivativeAccAddress } from '../../store/actions/accounts'
 import Config from 'react-native-config'
 import Loader from '../../components/loader'
-import config from '../../bitcoin/HexaConfig'
 import Toast from '../../components/Toast'
 import moment from 'moment'
 import { isEmpty } from '../../common/CommonFunctions'
 import AccountShell from '../../common/data/models/AccountShell'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const VoucherScanner = ( props ) => {
   //const FBTCVoucher = useSelector((state) => state.fbtc.FBTCVoucher);
@@ -81,17 +77,15 @@ const VoucherScanner = ( props ) => {
     : ''
   const [ bitcoinAddress, setBitcoinAddress ] = useState( '' )
   const QuoteDetails = useSelector( ( state ) => state.fbtc.getQuoteDetails )
-  const currencyCode = useSelector( ( state ) => state.preferences.currencyCode )
+
   const executeOrderDetails = useSelector(
     ( state ) => state.fbtc.executeOrderDetails,
   )
   const [ hideShow, setHideShow ] = useState( false )
-  const [ temp, setTemp ] = useState( true )
   const [ isUserRegistered, setIsUserRegistered ] = useState( false )
   const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
   const [ voucherCode, setVoucherCode ] = useState( '' )
   const [ userKey, setUserKey ] = useState( userKey1 )
-  const accounts1 = useSelector( ( state ) => state.accounts )
   const accountsSyncFail = useSelector( ( state ) => state.fbtc.accountSyncFail )
   const accountSyncFailMessage = useSelector(
     ( state ) => state.fbtc.accountSyncFailMessage,
@@ -104,7 +98,6 @@ const VoucherScanner = ( props ) => {
   const executeOrderFailMessage = useSelector(
     ( state ) => state.fbtc.accountSyncFailMessage,
   )
-  const [ exchangeRates, setExchangeRates ] = useState( accounts1.exchangeRates )
   const dispatch = useDispatch()
   const accountSyncDetails = useSelector(
     ( state ) => state.fbtc.accountSyncDetails,
@@ -119,9 +112,6 @@ const VoucherScanner = ( props ) => {
     ( state ) => state.accounts.accountShells,
   )
 
-  useEffect( () => {
-    if ( accounts1.exchangeRates ) setExchangeRates( accounts1.exchangeRates )
-  }, [ accounts1.exchangeRates ] )
   const [ balances, setBalances ] = useState( {
     regularBalance: 0,
     secureBalance: 0,
@@ -174,7 +164,7 @@ const VoucherScanner = ( props ) => {
     image: require( '../../assets/images/icons/icon_regular.png' ),
   } )
   const service = useSelector(
-    ( state ) => state.accounts[ selectedAccount && selectedAccount.accountType ],
+    ( state ) => state.accounts[ selectedAccount && selectedAccount.accountType ].service,
   )
 
   useEffect( () => {
@@ -193,7 +183,7 @@ const VoucherScanner = ( props ) => {
     return ref.current
   }
   const prevFBTCAccount_Data = usePrevious( {
-    FBTCAccount_Data 
+    FBTCAccount_Data
   } )
 
   useEffect( () => {
@@ -228,104 +218,71 @@ const VoucherScanner = ( props ) => {
     }
   }
 
-  useEffect( () => {
-    if ( service ) {
-      const accountNumber = 1
-      const { derivativeAccounts } =
-        selectedAccount && selectedAccount.accountType === SECURE_ACCOUNT
-          ? service.service.secureHDWallet
-          : service.service.hdWallet
-
-      if (
-        derivativeAccounts[ FAST_BITCOINS ][ accountNumber ] &&
-        derivativeAccounts[ FAST_BITCOINS ][ accountNumber ].receivingAddress
-      ) {
-        setBitcoinAddress(
-          derivativeAccounts[ FAST_BITCOINS ][ accountNumber ].receivingAddress,
+  const getFastBitcoinsAccount = () => {
+    const accountNumber = 1
+    const receivingAddress = service.getReceivingAddress(
+      FAST_BITCOINS,
+      accountNumber,
+    )
+    if( receivingAddress ){
+      setBitcoinAddress(
+        receivingAddress,
+      )
+    }
+    else{
+      let parentShell: AccountShell
+      accountShells.forEach( ( shell: AccountShell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){ // out of box checking/savings acc
+          if( shell.primarySubAccount.sourceKind === selectedAccount.accountType ) parentShell = shell
+        }
+      } )
+      if( parentShell ){
+        const newSecondarySubAccount = new ExternalServiceSubAccountInfo( {
+          instanceNumber: accountNumber,
+          defaultTitle: 'FastBitcoins.com',
+          defaultDescription: 'Use FastBitcoin vouchers',
+          accountShellID: parentShell.id,
+          serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
+          isTFAEnabled: selectedAccount.accountType === SourceAccountKind.SECURE_ACCOUNT? true: false
+        } )
+        dispatch(
+          addNewSecondarySubAccount( newSecondarySubAccount, parentShell ),
         )
-      }
+      } else console.log( 'Unable to find the parent shell' )
+    }
+  }
+
+  useEffect( () => {
+    if ( selectedAccount && service ) {
+      getFastBitcoinsAccount()
     }
   }, [ selectedAccount, service ] )
 
   useEffect( () => {
-    if ( selectedAccount ) {
-      dispatch(
-        fetchDerivativeAccAddress( selectedAccount.accountType, FAST_BITCOINS ),
-      )
-    }
-  }, [ selectedAccount ] )
+    if( accountShells ){
+      let regularBalance = 0
+      let secureBalance = 0
+      accountShells.forEach( ( shell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){ // out of box checking/savings acc
+          switch( shell.primarySubAccount.kind ){
+              case SubAccountKind.REGULAR_ACCOUNT:
+                regularBalance += AccountShell.getTotalBalance( shell )
+                break
 
-  useEffect( () => {
-    let regularBalance = accounts1[ REGULAR_ACCOUNT ].service
-      ? accounts1[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
-        accounts1[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
-      : 0
-
-    // regular derivative accounts
-    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
-      const derivativeAccount =
-        accounts1[ REGULAR_ACCOUNT ].service.hdWallet.derivativeAccounts[
-          dAccountType
-        ]
-      if ( derivativeAccount.instance.using ) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
-          if ( derivativeAccount[ accountNumber ].balances ) {
-            regularBalance +=
-              derivativeAccount[ accountNumber ].balances.balance +
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance
+              case SubAccountKind.SECURE_ACCOUNT:
+                secureBalance += AccountShell.getTotalBalance( shell )
+                break
           }
         }
-      }
+      } )
+
+      setBalances( {
+        regularBalance,
+        secureBalance,
+      } )
     }
 
-    let secureBalance = accounts1[ SECURE_ACCOUNT ].service
-      ? accounts1[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
-        accounts1[ SECURE_ACCOUNT ].service.secureHDWallet.balances
-          .unconfirmedBalance
-      : 0
-
-    // secure derivative accounts
-    for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
-      if ( dAccountType === TRUSTED_CONTACTS ) continue
-
-      const derivativeAccount =
-        accounts1[ SECURE_ACCOUNT ].service.secureHDWallet.derivativeAccounts[
-          dAccountType
-        ]
-      if ( derivativeAccount.instance.using ) {
-        for (
-          let accountNumber = 1;
-          accountNumber <= derivativeAccount.instance.using;
-          accountNumber++
-        ) {
-          // console.log({
-          //   accountNumber,
-          //   balances: trustedAccounts[accountNumber].balances,
-          //   transactions: trustedAccounts[accountNumber].transactions,
-          // });
-          if ( derivativeAccount[ accountNumber ].balances ) {
-            secureBalance +=
-              derivativeAccount[ accountNumber ].balances.balance +
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance
-          }
-        }
-      }
-    }
-
-    setBalances( {
-      regularBalance,
-      secureBalance,
-    } )
-  }, [ accounts1 ] )
+  }, [ accountShells ] )
 
   useEffect( () => {
     if ( voucherCode ) {
@@ -532,7 +489,7 @@ const VoucherScanner = ( props ) => {
             setShowLoader( false )
           }, 2 );
           ( RegistrationSuccessBottomSheet as any ).current.snapTo( 1 )
-          
+
           dispatch( ClearAccountSyncData() )
         }
       } )()
@@ -949,22 +906,22 @@ const VoucherScanner = ( props ) => {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalHeaderTitleView}>
         <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center' 
+          flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack()
             }}
             hitSlop={{
-              top: 20, left: 20, bottom: 20, right: 20 
+              top: 20, left: 20, bottom: 20, right: 20
             }}
             style={styles.backArrowView}
           >
@@ -977,16 +934,16 @@ const VoucherScanner = ( props ) => {
       </View>
       <KeyboardAvoidingView
         style={{
-          flex: 1, paddingTop: wp( '5%' ), position: 'relative' 
+          flex: 1, paddingTop: wp( '5%' ), position: 'relative'
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
         <ScrollView style={{
-          flex: 1 
+          flex: 1
         }}>
           <View style={{
-            height: '100%' 
+            height: '100%'
           }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
@@ -997,7 +954,7 @@ const VoucherScanner = ( props ) => {
                   captureAudio={false}
                 >
                   <View style={{
-                    flex: 1 
+                    flex: 1
                   }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />
@@ -1014,15 +971,15 @@ const VoucherScanner = ( props ) => {
               <TouchableOpacity
                 onPress={() => setOpenCameraFlag( true )}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               >
                 <ImageBackground
-                  source={require( '../../assets/images/icons/iPhone-QR.png' )}
+                  source={require( '../../assets/images/icons/iPhone-QR.jpg' )}
                   style={styles.cameraImage}
                 >
                   <View style={{
-                    flex: 1 
+                    flex: 1
                   }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />
@@ -1074,12 +1031,12 @@ const VoucherScanner = ( props ) => {
                     <Image
                       source={value.image}
                       style={{
-                        width: wp( '8%' ), height: wp( '8%' ) 
+                        width: wp( '8%' ), height: wp( '8%' )
                       }}
                     />
                   )}
                   <View style={{
-                    flex: 1, marginLeft: 10 
+                    flex: 1, marginLeft: 10
                   }}>
                     <Text style={styles.dropDownElementTitleText}>
                       {value.accountName}
@@ -1151,7 +1108,7 @@ const VoucherScanner = ( props ) => {
                 {'Already registered with FastBitcoins?'}
               </Text>
               <View style={{
-                flexDirection: 'row' 
+                flexDirection: 'row'
               }}>
                 <Text
                   style={{
@@ -1204,12 +1161,12 @@ const VoucherScanner = ( props ) => {
             <Image
               source={selectedAccount.image}
               style={{
-                width: wp( '8%' ), height: wp( '8%' ) 
+                width: wp( '8%' ), height: wp( '8%' )
               }}
             />
           )}
           <View style={{
-            flex: 1, marginLeft: 10 
+            flex: 1, marginLeft: 10
           }}>
             <Text style={styles.dropDownElementTitleText}>
               {selectedAccount && selectedAccount.accountName
@@ -1238,7 +1195,7 @@ const VoucherScanner = ( props ) => {
             )}
           </View>
           <View style={{
-            justifyContent: 'center', alignItems: 'center' 
+            justifyContent: 'center', alignItems: 'center'
           }}>
             <Entypo
               name={'dots-three-horizontal'}

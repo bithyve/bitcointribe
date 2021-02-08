@@ -39,10 +39,10 @@ import {
   TEST_ACCOUNT,
 } from '../common/constants/serviceTypes';
 
-import DeviceInfo from 'react-native-device-info';
-import { walletCheckIn } from '../store/actions/trustedContacts';
+import DeviceInfo from 'react-native-device-info'
+import { walletCheckIn } from '../store/actions/trustedContacts'
+import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup';
-
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -106,17 +106,17 @@ export default function NewOwnQuestions( props ) {
         const security = {
           question: question,
           answer,
-        };
+        }
         dispatch(initializeSetup(walletName, security));
         // if (security.answer) dispatch(initializeHealthSetup());
-        const current = Date.now();
+        dispatch(setVersion('Current'));
+        const current = Date.now()
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
           JSON.stringify( current ),
         )
         const securityQuestionHistory = {
           created: current,
-          confirmed: current,
         }
         await AsyncStorage.setItem(
           'securityQuestionHistory',

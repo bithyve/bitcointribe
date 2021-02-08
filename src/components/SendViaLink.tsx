@@ -272,7 +272,7 @@ function isAppInstalledIOS(key) {
                 width: wp('18%'),
                 flexDirection: 'row',
                 alignItems: 'center',
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: Colors.blue,
                 justifyContent: 'center',
                 borderRadius: 8,
                 alignSelf: 'center',

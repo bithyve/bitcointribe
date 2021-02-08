@@ -1,46 +1,48 @@
-import { call, put, select } from 'redux-saga/effects';
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
-import { createWatcher } from '../utils/utilities';
+import { call, put, select } from 'redux-saga/effects'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes'
+import { createWatcher } from '../utils/utilities'
 import {
   UPDATE_FCM_TOKENS,
   SEND_NOTIFICATION,
   FETCH_NOTIFICATIONS,
   notificationsFetched,
-} from '../actions/notifications';
-import { INotification, Contacts } from '../../bitcoin/utilities/Interface';
-import { AsyncStorage, Alert } from 'react-native';
-import RelayServices from '../../bitcoin/services/RelayService';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+} from '../actions/notifications'
+import { INotification, Contacts } from '../../bitcoin/utilities/Interface'
+import { AsyncStorage, Alert } from 'react-native'
+import RelayServices from '../../bitcoin/services/RelayService'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
-function* updateFCMTokensWorker({ payload }) {
-  const { FCMs } = payload;
-  if (FCMs.length === 0) {
-    throw new Error('No FCM token found');
+function* updateFCMTokensWorker( { payload } ) {
+  const { FCMs } = payload
+  if ( FCMs.length === 0 ) {
+    throw new Error( 'No FCM token found' )
   }
 
   const service: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  const { data } = yield call(service.getWalletId);
+    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  )
+  const { data } = yield call( service.getWalletId )
 
   const res = yield call(
     RelayServices.updateFCMTokens,
     data.walletId,
     payload.FCMs,
-  );
-  if (res.status === 200) {
-    const { updated } = res.data;
-    console.log({ updated });
+  )
+  if ( res.status === 200 ) {
+    const { updated } = res.data
+    console.log( {
+      updated 
+    } )
   } else {
-    console.log('Failed to update FCMs on the server');
+    console.log( 'Failed to update FCMs on the server' )
   }
 }
 
 export const updateFCMTokensWatcher = createWatcher(
   updateFCMTokensWorker,
   UPDATE_FCM_TOKENS,
-);
+)
 
 // function* sendNotificationWorker({ payload }) {
 //   const { contactName, notificationType, title, body, data, tag } = payload;
@@ -90,21 +92,21 @@ export const updateFCMTokensWatcher = createWatcher(
 
 export function* fetchNotificationsWorker() {
   const service: RegularAccount = yield select(
-    (state) => state.accounts[REGULAR_ACCOUNT].service,
-  );
-  const { data } = yield call(service.getWalletId);
+    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  )
+  const { data } = yield call( service.getWalletId )
 
-  const res = yield call(RelayServices.fetchNotifications, data.walletId);
-  if (res.status === 200) {
-    const { notifications, DHInfos } = res.data;
-    yield call(AsyncStorage.setItem, 'DHInfos', JSON.stringify(DHInfos));
-    yield put(notificationsFetched(notifications));
+  const res = yield call( RelayServices.fetchNotifications, data.walletId )
+  if ( res.status === 200 ) {
+    const { notifications, DHInfos } = res.data
+    yield call( AsyncStorage.setItem, 'DHInfos', JSON.stringify( DHInfos ) )
+    yield put( notificationsFetched( notifications ) )
   } else {
-    console.log('Failed to fetch notification');
+    console.log( 'Failed to fetch notification' )
   }
 }
 
 export const fetchNotificationsWatcher = createWatcher(
   fetchNotificationsWorker,
   FETCH_NOTIFICATIONS,
-);
+)
