@@ -703,9 +703,15 @@ export default class HDSegwitWallet extends Bitcoin {
         accountNumber <= derivativeAccounts.instance.using;
         accountNumber++
       ) {
-        accountsInfo.push( {
+        const info: {
+          accountType: string;
+          accountNumber: number;
+          contactName?: string;
+        } = {
           accountType: dAccountType, accountNumber
-        } )
+        }
+        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+        accountsInfo.push( info )
       }
     }
 
