@@ -1341,8 +1341,8 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
+    numberOfRecipients: number,
+    feePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
   ): { fee: number } => {
     let inputUTXOs
@@ -1396,7 +1396,7 @@ export default class HDSegwitWallet extends Bitcoin {
     const { fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
-      averageTxFees[ 'low' ].feePerByte,
+      feePerByte,
     )
     // console.log({ inputUTXOs, outputUTXOs, fee });
 

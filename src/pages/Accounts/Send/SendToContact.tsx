@@ -75,6 +75,8 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { UsNumberFormat } from '../../../common/utilities'
 import config from '../../../bitcoin/HexaConfig'
 import { getAccountIcon, getAccountTitle } from './utils'
+import BaseAccount from '../../../bitcoin/utilities/accounts/BaseAccount'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -635,11 +637,12 @@ class SendToContact extends Component<
       }
     } )
 
-    const { fee } = this.props.accountsState[
+    const service: BaseAccount | SecureAccount = this.props.accountsState[
       serviceType
-    ].service.calculateSendMaxFee(
+    ].service
+    const { fee } = service.calculateSendMaxFee(
       recipientsList.length + 1, // +1 for the current instance
-      averageTxFees,
+      averageTxFees[ 'low' ].feePerByte,
       this.state.derivativeAccountDetails,
     )
 

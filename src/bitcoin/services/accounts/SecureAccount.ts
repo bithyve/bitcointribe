@@ -775,13 +775,13 @@ export default class SecureAccount {
   };
 
   public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
+    numberOfRecipients: number,
+    feePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
   ) =>
     this.secureHDWallet.calculateSendMaxFee(
       numberOfRecipients,
-      averageTxFees,
+      feePerByte,
       derivativeAccountDetails,
     );
 

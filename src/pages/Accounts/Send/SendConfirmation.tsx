@@ -71,6 +71,8 @@ import { AccountsState } from '../../../store/reducers/accounts'
 import { NodeSettingsState } from '../../../store/reducers/nodeSettings'
 import { getAccountIcon, getAccountTitle } from './utils'
 import config from '../../../bitcoin/HexaConfig'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
+import RegularAccount from '../../../bitcoin/services/accounts/RegularAccount'
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -82,7 +84,7 @@ interface SendConfirmationStateTypes {
   transfer: any;
   loading: any;
   isConfirmDisabled: boolean;
-  customFeePerByte: string;
+  customFee: string;
   customEstimatedBlock: number;
   customFeePerByteErr: string;
   customTxPrerequisites: any;
@@ -155,7 +157,7 @@ class SendConfirmation extends Component<
       loading: {
       },
       isConfirmDisabled: false,
-      customFeePerByte: '',
+      customFee: '',
       customFeePerByteErr: '',
       customEstimatedBlock: 0,
       customTxPrerequisites: null,
@@ -354,16 +356,18 @@ class SendConfirmation extends Component<
     }
   };
 
-  handleCustomFee = async ( amount, customEstimatedBlock ) => {
-    if ( parseInt( amount ) < 1 ) {
+  handleCustomFee = async ( feePerByte, customEstimatedBlock ) => {
+    // feerate > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
+    if ( parseInt( feePerByte ) < 1 ) {
       this.setState( {
-        customFeePerByte: '',
+        customFee: '',
         customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
       } )
       return
     }
 
-    const { service, transfer } = this.props.accounts[ this.serviceType ]
+    const service : RegularAccount | SecureAccount  =this.props.accounts[ this.serviceType ].service
+    const transfer = this.props.accounts[ this.serviceType ].transfer
 
     let outputs
     if( this.feeIntelAbsent ){
@@ -383,11 +387,53 @@ class SendConfirmation extends Component<
       )
     }
 
+    const selectedRecipients = this.state.selectedRecipients
+    if( !this.feeIntelAbsent && this.isSendMax ){
+      // custom fee w/ send max
+      const { fee } = service.calculateSendMaxFee(
+        this.recipients.length,
+        parseInt( feePerByte ),
+        this.state.derivativeAccountDetails,
+      )
+
+      // upper bound: default low
+      if( fee > transfer.stage1.txPrerequisites[ 'low' ].fee ){
+        this.setState( {
+          customFee: '',
+          customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
+        } )
+        return
+      }
+
+      const recipientToBeModified = this.recipients[ this.recipients.length - 1 ]
+
+      // deduct the previous(default low) fee and add the custom fee
+      if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
+      else recipientToBeModified.amount += transfer.stage1.txPrerequisites[ 'low' ].fee
+      recipientToBeModified.amount -= fee
+      this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
+
+      outputs.forEach( ( output )=>{
+        if( output.address === recipientToBeModified.address )
+          output.value = recipientToBeModified.amount
+      } )
+
+      selectedRecipients.forEach( ( recipient: any ) => {
+        if( recipient.selectedContact.id === recipientToBeModified.address ) recipient.bitcoinAmount = recipientToBeModified.amount
+      } )
+    }
+
     const customTxPrerequisites = service.calculateCustomFee(
       outputs,
-      parseInt( amount ),
+      parseInt( feePerByte ),
       this.state.derivativeAccountDetails,
     )
+
+    if( !this.feeIntelAbsent && this.isSendMax )
+      this.setState( {
+        totalAmount: this.spendableBalance - customTxPrerequisites.fee,
+        selectedRecipients,
+      } )
 
     if ( customTxPrerequisites.inputs ) {
       if ( this.refs.CustomPriorityBottomSheet as any )
@@ -396,7 +442,7 @@ class SendConfirmation extends Component<
       setTimeout( () => {
         this.setState( {
           customTxPrerequisites: customTxPrerequisites,
-          customFeePerByte: customTxPrerequisites.fee,
+          customFee: customTxPrerequisites.fee,
           customFeePerByteErr: '',
           customEstimatedBlock,
         } )
@@ -404,7 +450,7 @@ class SendConfirmation extends Component<
     } else {
       // display err message
       this.setState( {
-        customFeePerByte: '',
+        customFee: '',
         customFeePerByteErr: `Insufficient balance to pay: amount ${this.state.totalAmount} + fee(${customTxPrerequisites.fee}) at ${amount} sats/byte`,
       } )
     }
@@ -893,10 +939,10 @@ class SendConfirmation extends Component<
                 </View>
               ) : null}
 
-              <View
+              {this.isSendMax && this.state.customFee? null : ( <View
                 style={{
                   ...styles.priorityTableContainer,
-                  borderBottomWidth: this.state.customFeePerByte !== '' ? 0.5 : 0,
+                  borderBottomWidth: this.state.customFee !== '' ? 0.5 : 0,
                 }}
               >
                 <View
@@ -919,25 +965,19 @@ class SendConfirmation extends Component<
                   </Text>
                 </View>
                 <View style={styles.priorityValueContainer}>
-                  {!this.isSendMax ? (
-                    transfer &&
+                  { transfer &&
                   transfer.stage1 &&
                   transfer.stage1.txPrerequisites ? (
-                        <Text style={styles.priorityTableText}>
+                      <Text style={styles.priorityTableText}>
                       ~
-                          {timeConvertNear30(
-                            ( transfer.stage1.txPrerequisites[ 'low' ]
-                              .estimatedBlocks +
+                        {timeConvertNear30(
+                          ( transfer.stage1.txPrerequisites[ 'low' ]
+                            .estimatedBlocks +
                           1 ) *
                           10,
-                          )}
-                        </Text>
-                      ) : null
-                  ) : (
-                    <View style={[ styles.priorityValueContainer ]}>
-                      <Text style={styles.priorityTableText}>~6.5 hours</Text>
-                    </View>
-                  )}
+                        )}
+                      </Text>
+                    ) : null}
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
@@ -950,9 +990,10 @@ class SendConfirmation extends Component<
                   </Text>
                 </View>
               </View>
-            </View>}
+              )}
+            </View> }
 
-            {this.state.customFeePerByte !== '' && (
+            {this.state.customFee !== '' && (
               <View
                 style={{
                   ...styles.priorityTableContainer,
@@ -988,7 +1029,7 @@ class SendConfirmation extends Component<
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
-                    {this.convertBitCoinToCurrency( this.state.customFeePerByte )}
+                    {this.convertBitCoinToCurrency( this.state.customFee )}
                     {' ' + this.getCorrectCurrencySymbol()}
                   </Text>
                 </View>
@@ -1002,12 +1043,11 @@ class SendConfirmation extends Component<
                 backgroundColor: Colors.white,
                 borderColor: Colors.backgroundColor,
                 borderWidth: 2,
-                opacity: this.isSendMax ? 0.5 : 1,
+                opacity: 1,
               }}
               onPress={() => {
                 ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 1 )
               }}
-              disabled={this.isSendMax}
             >
               <View
                 style={{
