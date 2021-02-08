@@ -8,13 +8,13 @@ import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useSyncStatusForAccountShell from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShell'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import TransactionsFoundDuringRescanList from './TransactionsFoundDuringRescanList'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import useFoundTransactionsFromReScan from '../../../utils/hooks/state-selectors/wallet-rescanning/UseFoundTransactionsFromRescan'
+import useSyncStatusForAccountShellID from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShellID'
 
 export type Props = {
   accountShell: AccountShell;
@@ -27,21 +27,13 @@ type ProgressTextProps = {
 }
 
 const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: ProgressTextProps ) => {
-  const dispatch = useDispatch()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
   const displayedTitle = useMemo( () => {
     return primarySubAccount.customDisplayName ?? primarySubAccount.defaultTitle
   }, [ primarySubAccount ] )
 
-  const syncStatus = useSyncStatusForAccountShell( accountShell )
-
-  useEffect( () => {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: false,
-      hardRefresh: true,
-    } ) )
-  }, [] )
+  const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
   return (
     <View style={{
@@ -70,8 +62,9 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   onDismiss,
   onTransactionDataSelected,
 }: Props ) => {
+  const dispatch = useDispatch()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const syncStatus = useSyncStatusForAccountShell( accountShell )
+  const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
 
@@ -82,6 +75,14 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   function handleBackButtonPress() {
     onDismiss()
   }
+
+
+  useEffect( () => {
+    dispatch( refreshAccountShell( accountShell, {
+      autoSync: false,
+      hardRefresh: true,
+    } ) )
+  }, [] )
 
   return (
     <View style={styles.rootContainer}>

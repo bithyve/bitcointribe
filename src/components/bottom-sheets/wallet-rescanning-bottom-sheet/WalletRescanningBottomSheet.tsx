@@ -8,7 +8,6 @@ import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
-import useSyncStatusForAccountShell from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShell'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
@@ -16,6 +15,7 @@ import { RescannedTransactionData } from '../../../store/reducers/wallet-rescann
 import useWalletRescanningState from '../../../utils/hooks/state-selectors/wallet-rescanning/UseWalletRescanningState'
 import sampleRescannedTransactionDetails from '../account-shell-rescanning-bottom-sheet/sample-rescanned-transaction-details'
 import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
+import useSyncStatusForAccountShellID from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShellID'
 
 export type Props = {
   onDismiss: () => void;
@@ -34,7 +34,7 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
     return primarySubAccount.customDisplayName ?? primarySubAccount.defaultTitle
   }, [ primarySubAccount ] )
 
-  const syncStatus = useSyncStatusForAccountShell( accountShell )
+  const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
   useEffect( () => {
     dispatch( refreshAccountShell( accountShell, {

@@ -143,8 +143,6 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [ 0, '67%' ],
-        dismissOnScrollDown: false,
-        dismissOnOverlayPress: false,
       },
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
