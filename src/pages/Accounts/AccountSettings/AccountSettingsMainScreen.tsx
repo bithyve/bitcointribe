@@ -6,6 +6,7 @@ import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import ListStyles from '../../../common/Styles/ListStyles'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
+import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
@@ -107,21 +108,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }
 
   function handleRescanListItemSelection() {
-    Alert.alert(
-      'Re-scan your Account',
-      'The re-scan may take some time.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Continue',
-          onPress: showRescanningBottomSheet,
-          style: 'default',
-        },
-      ]
-    )
+    showRescanningPromptBottomSheet()
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
@@ -132,6 +119,25 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       accountShellID: accountShell.id,
     } )
   }
+
+  const showRescanningPromptBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <AccountShellRescanningPromptBottomSheet
+        onContinue={() => {
+          dismissBottomSheet()
+          setTimeout( () => {
+            showRescanningBottomSheet()
+          }, 800 )
+        }}
+        onDismiss={dismissBottomSheet}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '33%' ],
+      },
+    )
+  }, [ presentBottomSheet, dismissBottomSheet ] )
+
 
   const showRescanningBottomSheet = useCallback( () => {
     presentBottomSheet(

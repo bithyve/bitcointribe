@@ -63,19 +63,9 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
   onTransactionDataSelected,
 }: Props ) => {
   const dispatch = useDispatch()
-  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
-
-  function handleFullRescanButtonPress() {
-    // TODO: How do we send an action for a "Full" rescan as opposed to a standard re-scan?
-  }
-
-  function handleBackButtonPress() {
-    onDismiss()
-  }
-
 
   useEffect( () => {
     dispatch( refreshAccountShell( accountShell, {
