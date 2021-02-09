@@ -112,25 +112,28 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
         {syncStatus == SyncStatus.COMPLETED && (
           <>
             <View style={styles.sectionDivider} />
-            <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
 
-            <TransactionsFoundDuringRescanList
-              containerStyle={{
-                marginTop: 18,
-                maxHeight: heightPercentageToDP( 30 ),
-              }}
-              transactionsDetailItems={foundTransactions}
-              onTransactionDataSelected={onTransactionDataSelected}
-            />
-
-            <View style={{
-              marginTop: 'auto'
-            }} />
+            {foundTransactions.length > 0 && (
+              <>
+                <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
+                <TransactionsFoundDuringRescanList
+                  containerStyle={{
+                    marginTop: 18,
+                    maxHeight: heightPercentageToDP( 30 ),
+                  }}
+                  transactionsDetailItems={foundTransactions}
+                  onTransactionDataSelected={onTransactionDataSelected}
+                />
+              </>
+            ) || (
+              <Text
+                style={ListStyles.listItemTitle}
+              >
+                No transactions were found during the re-scan.
+              </Text>
+            )}
 
             <View style={styles.footerSectionContainer}>
-              {/* <Text style={HeadingStyles.sectionSubHeadingText}>Did you find the transactions you were looking for?</Text>
-              <Text style={HeadingStyles.sectionSubHeadingText}>If you didn't, we recommend doing a full re-scan</Text> */}
-
               <View style={styles.actionButtonContainer}>
                 <TouchableOpacity
                   onPress={onDismiss}
@@ -138,27 +141,6 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
                 >
                   <Text style={ButtonStyles.actionButtonText}>OK</Text>
                 </TouchableOpacity>
-
-                {/* <TouchableOpacity
-              onPress={handleFullRescanButtonPress}
-              style={ButtonStyles.primaryActionButton}
-            >
-              <Text style={ButtonStyles.actionButtonText}>Full Rescan</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleBackButtonPress}
-              style={{
-                ...ButtonStyles.primaryActionButton,
-                marginRight: 8,
-                backgroundColor: 'transparent',
-              }}
-            >
-              <Text style={{
-                ...ButtonStyles.actionButtonText,
-                color: Colors.blue,
-              }}>Back</Text>
-            </TouchableOpacity> */}
               </View>
             </View>
           </>
