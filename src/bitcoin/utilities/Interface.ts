@@ -426,3 +426,12 @@ export interface VersionHistory {
   title: string;
   date: Date;
 }
+
+
+export interface AverageTxFees {
+  [priority: string]: {
+    averageTxFee: number,
+    feePerByte: number,
+    estimatedBlocks: number,
+  },
+}
