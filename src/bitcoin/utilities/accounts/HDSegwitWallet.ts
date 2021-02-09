@@ -33,6 +33,7 @@ import {
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import _ from 'lodash'
 const { HEXA_ID } = config
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -434,7 +435,8 @@ export default class HDSegwitWallet extends Bitcoin {
     }[],
     hardRefresh?: boolean,
   ): Promise<{
-    synched: boolean
+    synched: boolean,
+    txsFound: TransactionDetails[]
     }> => {
 
     const accounts = {
@@ -604,12 +606,13 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
+    const txsFound: TransactionDetails[] = []
     for( let { accountType, accountNumber, contactName } of accountsInfo ){
       if ( accountType === TRUSTED_CONTACTS ) {
         contactName = contactName.toLowerCase().trim()
         accountNumber = this.trustedContactToDA[ contactName ]
       }
-      const { xpubId }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      const { xpubId, txIdMap }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
       const res = synchedAccounts[ xpubId ]
       const { internalAddresses } = accountsTemp[ xpubId ]
 
@@ -648,6 +651,12 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }
 
+      // find tx delta(missing txs): hard vs soft refresh
+      if( hardRefresh ){
+        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+      }
+
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
         ...this.derivativeAccounts[ accountType ][ accountNumber ],
         lastBalTxSync: latestSyncTime,
@@ -669,7 +678,8 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      synched: true
+      synched: true,
+      txsFound,
     }
   };
 
@@ -678,6 +688,7 @@ export default class HDSegwitWallet extends Bitcoin {
     hardRefresh?: boolean
   ): Promise<{
     synched: boolean;
+    txsFound: TransactionDetails[];
   }> => {
     const accountsInfo :  {
       accountType: string,
@@ -693,9 +704,15 @@ export default class HDSegwitWallet extends Bitcoin {
         accountNumber <= derivativeAccounts.instance.using;
         accountNumber++
       ) {
-        accountsInfo.push( {
+        const info: {
+          accountType: string;
+          accountNumber: number;
+          contactName?: string;
+        } = {
           accountType: dAccountType, accountNumber
-        } )
+        }
+        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+        accountsInfo.push( info )
       }
     }
 
@@ -1183,6 +1200,23 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
+    // return new/found transactions(delta b/w hard and soft refresh)
+    const txsFound: TransactionDetails[] = []
+    const newTxIds: string[] = _.difference( Object.keys( currentTxIdMap ),  Object.keys( previousTxidMap ) )
+    const newTxIdMap = {
+    }
+    newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
+
+    if( newTxIds.length ){
+      transactions.transactionDetails.forEach( tx => {
+        if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
+      } )
+    }
+
+    return txsFound
+  }
+
   public setNewTransactions = ( transactions: Transactions ) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync
@@ -1207,6 +1241,7 @@ export default class HDSegwitWallet extends Bitcoin {
       unconfirmedBalance: number;
     };
     transactions: Transactions;
+    txsFound: TransactionDetails[]
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
@@ -1352,19 +1387,19 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
+    this.balances = balances
     this.addressQueryList = addressQueryList
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
     this.receivingAddress = this.getAddress( false, this.nextFreeAddressIndex )
 
-    this.setNewTransactions( transactions )
-
-    this.balances = balances
+    const txsFound: TransactionDetails[] = hardRefresh? this.findTxDelta( this.txIdMap, txIdMap, transactions ) : []
     this.transactions = transactions
     this.txIdMap = txIdMap
+    this.setNewTransactions( transactions )
 
     return {
-      balances, transactions
+      balances, transactions, txsFound
     }
   };
 

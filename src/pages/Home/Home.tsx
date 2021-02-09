@@ -42,7 +42,7 @@ import {
   notificationsUpdated,
 } from '../../store/actions/notifications'
 import { setCurrencyCode } from '../../store/actions/preferences'
-import { getCurrencyImageByRegion, isEmpty, isExistBuildVersion } from '../../common/CommonFunctions/index'
+import { getCurrencyImageByRegion, isEmpty,  buildVersionExists } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
 import PushNotification from 'react-native-push-notification'
@@ -747,7 +747,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidMount = () => {
     const { navigation, versionHistory } = this.props
-    let versionData = []
+    const versionData = []
     this.closeBottomSheet()
     this.calculateNetBalance()
 
@@ -777,14 +777,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       this.props.autoSyncShells()
+      this.props.setVersion()
     } )
-
-    if ( versionHistory && !isEmpty( versionHistory ) ) {
-      versionData = versionHistory
-      if ( isExistBuildVersion( versionData ) ) {
-        this.props.setVersion( 'Upgraded' )
-      }
-    }
   };
 
   getNewTransactionNotifications = async () => {

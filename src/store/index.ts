@@ -130,6 +130,7 @@ import {
   fetchWyreReservationWatcher
 } from './sagas/WyreIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
+import walletRescanningReducer from './reducers/wallet-rescanning'
 
 const rootSaga = function* () {
   const sagas = [
@@ -262,6 +263,7 @@ const rootReducer = combineReducers( {
   preferences: preferencesReducer,
   loaders,
   swanIntegration: swanIntegrationReducer,
+  walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
   versionHistory: VersionHistoryReducer,
 } )

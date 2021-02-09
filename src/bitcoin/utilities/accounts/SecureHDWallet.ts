@@ -28,6 +28,7 @@ import {
   WYRE,
 } from '../../../common/constants/serviceTypes'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
+import _ from 'lodash'
 const {  HEXA_ID } = config
 
 
@@ -403,6 +404,23 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
+    // return new/found transactions(delta b/w hard and soft refresh)
+    const txsFound: TransactionDetails[] = []
+    const newTxIds: string[] = _.difference( Object.keys( currentTxIdMap ),  Object.keys( previousTxidMap ) )
+    const newTxIdMap = {
+    }
+    newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
+
+    if( newTxIds.length ){
+      transactions.transactionDetails.forEach( tx => {
+        if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
+      } )
+    }
+
+    return txsFound
+  }
+
   public setNewTransactions = ( transactions: Transactions ) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync
@@ -427,6 +445,7 @@ export default class SecureHDWallet extends Bitcoin {
       unconfirmedBalance: number;
     };
     transactions: Transactions;
+    txsFound: TransactionDetails[];
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
@@ -568,6 +587,7 @@ export default class SecureHDWallet extends Bitcoin {
 
     this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
+    this.balances = balances
     this.addressQueryList = addressQueryList
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
@@ -575,14 +595,13 @@ export default class SecureHDWallet extends Bitcoin {
       this.nextFreeAddressIndex,
     ).address
 
-    this.setNewTransactions( transactions )
-
-    this.balances = balances
+    const txsFound: TransactionDetails[] = hardRefresh? this.findTxDelta( this.txIdMap, txIdMap, transactions ) : []
     this.transactions = transactions
     this.txIdMap = txIdMap
+    this.setNewTransactions( transactions )
 
     return {
-      balances, transactions
+      balances, transactions, txsFound
     }
   };
 
@@ -630,6 +649,7 @@ export default class SecureHDWallet extends Bitcoin {
     hardRefresh?: boolean,
   ): Promise<{
     synched: boolean
+    txsFound: TransactionDetails[]
     }> => {
     const accounts = {
     }
@@ -782,8 +802,9 @@ export default class SecureHDWallet extends Bitcoin {
 
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
+    const txsFound: TransactionDetails[] = []
     for( const { accountType, accountNumber } of accountsInfo ){
-      const { xpubId }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      const { xpubId, txIdMap }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
       const res = synchedAccounts[ xpubId ]
       const { internalAddresses } = accountsTemp[ xpubId ]
 
@@ -823,6 +844,12 @@ export default class SecureHDWallet extends Bitcoin {
         }
       }
 
+      // find tx delta(missing txs): hard vs soft refresh
+      if( hardRefresh ){
+        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+      }
+
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
         ...this.derivativeAccounts[ accountType ][ accountNumber ],
         lastBalTxSync: latestSyncTime,
@@ -844,7 +871,8 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      synched: true
+      synched: true,
+      txsFound,
     }
   };
 
@@ -853,6 +881,7 @@ export default class SecureHDWallet extends Bitcoin {
     hardRefresh?: boolean
   ): Promise<{
     synched: boolean;
+    txsFound: TransactionDetails[]
   }> => {
     const accountsInfo :  {
       accountType: string,
