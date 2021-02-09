@@ -47,13 +47,13 @@ const menuOptions: MenuOption[] = [
   //   imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
   //   onOptionPressed: handleRescanListItemSelection,
   // },
-  // Commenting this option as this is not fully built yet
-  // {
-  //   title: 'Version History',
-  //   subtitle: 'Version History',
-  //   imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
-  //   screenName: 'VersionHistory',
-  // },
+  //
+  {
+    title: 'Version History',
+    subtitle: 'Version History',
+    imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
+    screenName: 'VersionHistory',
+  },
   {
     title: 'Hexa Release',
     subtitle: versionString,
