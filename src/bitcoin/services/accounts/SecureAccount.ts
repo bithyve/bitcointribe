@@ -7,6 +7,7 @@ import {
   TransactionDetails,
   TransactionPrerequisite,
   InputUTXOs,
+  AverageTxFees,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -804,7 +805,7 @@ export default class SecureAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -830,7 +831,7 @@ export default class SecureAccount {
         return recipient
       } )
 
-      const {
+      let {
         fee,
         balance,
         txPrerequisites,
@@ -846,16 +847,31 @@ export default class SecureAccount {
       } )
 
       if ( balance < netAmount + fee ) {
-        return {
-          status: 0o6,
-          err: 'Insufficient balance',
-          fee,
-          netAmount,
-          message: ErrMap[ 0o6 ],
+        // check w/ the lowest fee possible for this transaction
+        const minTxFeePerByte = 1 // default minimum relay fee
+        const minAvgTxFee = {
+          ...averageTxFees
         }
+        minAvgTxFee[ 'low' ].feePerByte = minTxFeePerByte
+
+        const minTxPrerequisites  = this.secureHDWallet.transactionPrerequisites(
+          recipients,
+          minAvgTxFee,
+          derivativeAccountDetails,
+        )
+
+        if( minTxPrerequisites.balance < netAmount + minTxPrerequisites.fee )
+          return {
+            status: 0o6,
+            err: 'Insufficient balance',
+            fee,
+            netAmount,
+            message: ErrMap[ 0o6 ],
+          }
+        else txPrerequisites = minTxPrerequisites.txPrerequisites
       }
 
-      if ( txPrerequisites ) {
+      if ( Object.keys( txPrerequisites ).length ) {
         return {
           status: config.STATUS.SUCCESS,
           data: {
