@@ -480,19 +480,9 @@ export default class SecureAccount {
             totalTransactions: number;
             confirmedTransactions: number;
             unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
+            transactionDetails: TransactionDetails[]
           };
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -524,6 +514,7 @@ export default class SecureAccount {
         status: number;
         data: {
           synched: boolean;
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -1119,7 +1110,8 @@ export default class SecureAccount {
   | {
       status: number;
       data: {
-        synched: boolean
+        synched: boolean;
+        txsFound: TransactionDetails[];
       };
       err?: undefined;
       message?: undefined;

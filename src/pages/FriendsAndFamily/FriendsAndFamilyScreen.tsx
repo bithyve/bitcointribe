@@ -68,7 +68,6 @@ interface FriendsAndFamilyPropTypes {
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   selectedContact: any[];
-  loading: boolean;
   MyKeeper: any[];
   IMKeeper: any[];
   trustedContact: any[];
@@ -99,7 +98,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       onRefresh: false,
       isLoadContacts: false,
       selectedContact: [],
-      loading: true,
       trustedContact: idx( props, ( _ ) => _.addressBookData.trustedContact ) || [],
       MyKeeper: idx( props, ( _ ) => _.addressBookData.MyKeeper ) || [],
       IMKeeper: idx( props, ( _ ) => _.addressBookData.IMKeeper ) || [],
@@ -136,18 +134,11 @@ class FriendsAndFamilyScreen extends PureComponent<
     ) {
       this.updateAddressBook()
     }
-    if ( this.state.trustedContact ) {
-      this.setState( {
-        loading: false,
-      } )
-    }
+   
     if (
       prevProps.trustedChannelsSetupSyncing !==
       this.props.trustedChannelsSetupSyncing
     ) {
-      this.setState( {
-        loading: this.props.trustedChannelsSetupSyncing,
-      } )
       this.setState( {
         showLoader: this.props.trustedChannelsSetupSyncing,
       } )
@@ -426,7 +417,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       onRefresh,
       showLoader
     } = this.state
-
     return (
       <>
         <ScrollView
