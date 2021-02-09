@@ -10,6 +10,7 @@ export default class CloudBackup {
   public recoveryCallback;
   public isNotReading = true;
   public googlePermissionCall = false;
+  public googleCloudLoginCallback;
 
   constructor(stateVars?: {
     dataObject?: any;
@@ -17,14 +18,15 @@ export default class CloudBackup {
     share?: any;
     recoveryCallback?: any;
     googlePermissionCall?: any;
+    googleCloudLoginCallback?: any;
   }) {
-    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall } = stateVars;
+    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback } = stateVars;
     if (dataObject) this.dataObject = dataObject;
     if (callBack) this.callBack = callBack;
     if (share) this.share = share;
     if (recoveryCallback) this.recoveryCallback = recoveryCallback;
     if (googlePermissionCall) this.googlePermissionCall = googlePermissionCall;
-
+    if (googleCloudLoginCallback) this.googleCloudLoginCallback = googleCloudLoginCallback;
   }
 
   // check storage permission
@@ -34,6 +36,7 @@ export default class CloudBackup {
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       ]);
+      console.log("userResponse",userResponse);
       return userResponse;
     } catch (err) {
       console.log(err);
@@ -85,9 +88,11 @@ export default class CloudBackup {
   public GoogleDriveLogin = (params: {
     checkDataIsBackedup?: boolean;
     share?: any;
-    googlePermissionCall? : any
+    googlePermissionCall? : any,
+    googleCloudLoginCallback? : any,
   }) => {
-    let { checkDataIsBackedup, share, googlePermissionCall } = params;
+    let { checkDataIsBackedup, share, googlePermissionCall, googleCloudLoginCallback } = params;
+    this.googleCloudLoginCallback = googleCloudLoginCallback;
     GoogleDrive.setup()
       .then(() => {
         GoogleDrive.login(async (err, data) => {
@@ -98,10 +103,22 @@ export default class CloudBackup {
             console.log('GOOGLE ReSULT', data);
             console.log('Error', err);
             if (result.eventName == 'onLogin') {
-              if (!(await this.checkPermission())) {
-                throw new Error('Storage Permission Denied');
-              }
-            }
+              // if (!(await this.checkPermission())) {
+              //  console.log('Storage Permission Denied');
+              // }
+              this.googleCloudLoginCallback('success');
+            //   let usersPermissions = await this.checkPermission();
+            //   if (usersPermissions['android.permission.READ_EXTERNAL_STORAGE']
+            //   && usersPermissions['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted') {
+            //     console.log("INSIDE dsfsd");
+            //     this.googleCloudLoginCallback('success');
+            //     //throw new Error('Storage Permission Denied');
+            //   } else {
+            //     console.log("INSIDE Elese");
+            //     this.googleCloudLoginCallback('fail');
+
+            // }
+          }
           }
         });
       })
@@ -123,9 +140,9 @@ export default class CloudBackup {
     console.log('GOOGLE ReSULT', data);
     // console.log('Error', e);
     if (result.eventName == 'onLogin') {
-      if (!(await this.checkPermission())) {
-        throw new Error('Storage Permission Denied');
-      }
+      // if (!(await this.checkPermission())) {
+      //   throw new Error('Storage Permission Denied');
+      // }
       //this.createFile();
       this.checkFileIsAvailable({
         checkDataIsBackedup: params.checkDataIsBackedup,
