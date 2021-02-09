@@ -40,7 +40,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
         bitcoinUnit: accountShell.unit
       } )
 
-    return `${transaction.fee} ${unitText}`
+    return `${transaction.fee || ''} ${unitText}`
   }, [ primarySubAccount.kind, transaction.fee ] )
 
 
@@ -101,7 +101,7 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
               ...ListStyles.listItemSubtitle, marginBottom: -3, marginLeft: -2
             }}
             currencyImageStyle={{
-              ...ListStyles.listItemSubtitle, marginBottom: -3
+              marginBottom: -3
             }}
           />
         </View>

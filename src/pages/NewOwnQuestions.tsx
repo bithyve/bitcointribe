@@ -499,6 +499,7 @@ export default function NewOwnQuestions( props ) {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
         <View style={{
           ...styles.bottomButtonView
         }}>
@@ -537,7 +538,7 @@ export default function NewOwnQuestions( props ) {
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
         />
-      </KeyboardAvoidingView>
+      
     </View>
   )
 }
