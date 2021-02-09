@@ -86,7 +86,6 @@ export default function TestAccountKnowMoreSheetContents(props) {
             }}
           >
             This account is loaded with test sats that you can send to your friend's Test Accounts. This helps you learn to transact using real sats, without sending real money!
-            sats.
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
