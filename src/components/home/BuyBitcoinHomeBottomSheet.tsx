@@ -26,6 +26,13 @@ export type BuyBitcoinBottomSheetMenuItem = {
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
+    title: 'Buy using ApplePay or Debit Card',
+    subtitle: 'Powered by Wyre',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    disabled: false
+  },
+  {
     title: 'Scan a Voucher',
     subtitle: 'From select retail stores with FastBitcoins',
     kind: BuyMenuItemKind.FAST_BITCOINS,
@@ -38,13 +45,6 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     kind: BuyMenuItemKind.SWAN,
     imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
     disabled: true
-  },
-  {
-    title: 'Buy using ApplePay or Debit Card',
-    subtitle: 'Powered by Wyre',
-    kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-    disabled: false
   },
 ]
 
