@@ -244,7 +244,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"4964b1d02e7c45107be6d21c","publicKey":"458a035b2b6b54b614bcedacddbbc3607a64d58c4d5d254c6fec39637490d909","ephemeralAddress":"2c6c11f4a2131c577bde75bdb639c1923868c89feb38c98049a5e29afaf2e6c9","walletName":"Primary"}' : '{"uuid":"061bc0d417b7c4ccd506e702","publicKey":"1ed9f7699b24eafde5b26766dd4627a15d3fd590037159ca2576c82ad4306abe","ephemeralAddress":"6e2a6b9c3f559a4d5350983f04d0784e39c6bd5f9741f6280eecc8d904a66b69","walletName":"macpro"}';
+            ? '{"uuid":"fff5ed617359653fc97010ca","publicKey":"12e993945cbe697e87bf310b0ed91eb71860f972f49c383afc5f998731195e20","ephemeralAddress":"2c41b47cdb4d465585d1360b15f27f755c9b7bc66eb28c62fc51d3af29f265e5","walletName":"Mac One"}' : '{"uuid":"7bdf0579d7b4ede50e461d3f","publicKey":"14138a338a762d4c59fa400ee2cafcd0ddc7427a2c4d1e118e26e0399c08f4f7","ephemeralAddress":"33163d8a710b103e95f94f9bd2d93bcf55c5adff4c17f06120619927820c0b87","walletName":"Mac two"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,

@@ -981,7 +981,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   componentDidUpdate = (prevProps, prevState) => {
-    console.log('this.props.LEVELHEALTH OUT', this.props.levelHealth)
     if (
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
@@ -991,7 +990,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.props.levelHealth.length == 1 &&
         prevProps.levelHealth.length == 0
       ) {
-        console.log('this.props.LEVELHEALTH IN', this.props.levelHealth)
         this.cloudData();
       }
     }

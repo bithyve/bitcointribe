@@ -367,7 +367,6 @@ class ManageBackup extends Component<
 
   componentDidUpdate = (prevProps, prevState) => {
     const { healthLoading, trustedChannelsSetupSyncing, isBackupProcessing } = this.props;
-    console.log("trustedChannelsSetupSyncing",trustedChannelsSetupSyncing, healthLoading,isBackupProcessing.status);
     if (prevProps.healthLoading !== this.props.healthLoading || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status) {
       if (healthLoading || isBackupProcessing.status) {
         this.setState({ refreshControlLoader: true })
@@ -380,7 +379,7 @@ class ManageBackup extends Component<
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
     ) {
-      if(this.props.levelHealth.findIndex(value=>value.levelInfo.findIndex(item=>item.shareType=='contact')) > -1){
+      if(this.props.levelHealth.findIndex(value=>value.levelInfo.findIndex(item=>item.shareType=='contact') > -1) > -1){
         this.props.trustedChannelsSetupSync();
       }
       this.modifyLevelData();
@@ -484,7 +483,6 @@ class ManageBackup extends Component<
           contactLevelInfo.push(obj);
         }
       }
-      console.log("contactLevelInfo", contactLevelInfo);
       if (deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
       if (contactLevelInfo.length) autoShareContact(contactLevelInfo);
     }
@@ -524,7 +522,6 @@ class ManageBackup extends Component<
       else {
         index = selectedKeeper.data.index;
       }
-      console.log("navigation to contact index", index);
       this.props.navigation.navigate("TrustedContactHistoryKeeper", {
         ...navigationParams,
         index,
@@ -559,7 +556,6 @@ class ManageBackup extends Component<
         : notificationType.approveKeeper
     );
     if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
-      console.log('sendApprovalRequestToPK type', type, shareId)
       onApprovalStatusChange(
         false,
         moment(new Date()).valueOf(),
