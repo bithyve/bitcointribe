@@ -349,14 +349,14 @@ class ManageBackup extends Component<
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, accountShells, activePersonalNode } = this.props;
+    const { walletName, regularAccount, database, accountShells, activePersonalNode } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(this.props.database, accountShells, activePersonalNode);
+    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -819,7 +819,7 @@ class ManageBackup extends Component<
         <View style={styles.modalHeaderTitleView}>
           <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={() => navigation.replace('Home')}
               style={styles.headerBackArrowView}
             >
               <FontAwesome
@@ -830,7 +830,7 @@ class ManageBackup extends Component<
             </TouchableOpacity>
           </View>
           <TouchableOpacity
-            onPress={() => navigation.goBack()}
+            onPress={() => navigation.replace('Home')}
             style={styles.headerSettingImageView}
           >
             <Image

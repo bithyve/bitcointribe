@@ -218,6 +218,7 @@ interface HomePropsTypes {
   activePersonalNode: PersonalNode;
   setVersion: any;
   versionHistory: any;
+  isNewHealthSystemSet: Boolean;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -803,27 +804,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.bootStrapNotifications();
     this.setUpFocusListener();
     this.getNewTransactionNotifications();
-
-    // health check
-    // const { healthCheckInitialized } = s3Service.sss;
-    // console.log("healthCheckInitialized", healthCheckInitialized);
-    // if (!healthCheckInitialized) {
-    //   initHealthCheck();
-    // }
-
-    const { healthCheckInitializedKeeper } = s3Service.levelhealth;
     console.log("s3Service", s3Service);
-
-    console.log("healthCheckInitializedKeeper", healthCheckInitializedKeeper);
-    if (!healthCheckInitializedKeeper) {
-      initializeHealthSetup();
+    if(this.props.isNewHealthSystemSet){
+      const { healthCheckInitializedKeeper } = s3Service.levelhealth;      
+      if (!healthCheckInitializedKeeper) {
+        initializeHealthSetup();
+      }
+    } else if(!s3Service.levelhealth.healthCheckInitializedKeeper && this.props.isNewHealthSystemSet){
+      const { healthCheckInitialized } = s3Service.sss;
+      console.log("healthCheckInitialized", healthCheckInitialized);
+      if (!healthCheckInitialized) {
+        initHealthCheck();
+      }
     }
-
-    // const { healthCheckInitializedKeeper } = s3Service.levelhealth;
-    // console.log("healthCheckInitializedKeeper", healthCheckInitializedKeeper);
-    // if (!healthCheckInitializedKeeper) {
-    //   initializeHealthSetup();
-    // }
 
     Linking.addEventListener("url", this.handleDeepLinkEvent);
     Linking.getInitialURL().then(this.handleDeepLinking);
@@ -854,14 +847,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, s3Service, accountShells, activePersonalNode } = this.props;
+    const { walletName, regularAccount, database, accountShells, activePersonalNode } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(this.props.database, accountShells,activePersonalNode);
+    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -983,6 +976,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   componentDidUpdate = (prevProps, prevState) => {
+    console.log('this.props.LEVELHEALTH OUT', this.props.levelHealth)
     if (
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
@@ -992,6 +986,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.props.levelHealth.length == 1 &&
         prevProps.levelHealth.length == 0
       ) {
+        console.log('this.props.LEVELHEALTH IN', this.props.levelHealth)
         this.cloudData();
       }
     }
@@ -2325,6 +2320,7 @@ const mapStateToProps = (state) => {
     accountShells: idx(state, (_) => _.accounts.accountShells),
     activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
     versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
+    isNewHealthSystemSet: idx( state, ( _ ) => _.setupAndAuth.isNewHealthSystemSet ),
   }
 }
 

@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-} from "react-native";
+import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
@@ -70,19 +66,25 @@ export default function RestoreFromICloud(props) {
       </View>
       <View style={styles.bottomButtonsView}>
         <AppBottomSheetTouchableWrapper
+          disabled={props.isLoading ? props.isLoading : false}
           onPress={() => props.onPressProceed()}
           style={styles.successModalButtonView}
         >
-          <Text
-            style={{
-              ...styles.proceedButtonText,
-              color: Colors.white,
-            }}
-          >
-            {props.proceedButtonText}
-          </Text>
+          {props.isLoading ? (
+            <ActivityIndicator size={"small"} color={Colors.white} />
+          ) : (
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.white,
+              }}
+            >
+              {props.proceedButtonText}
+            </Text>
+          )}
         </AppBottomSheetTouchableWrapper>
         <AppBottomSheetTouchableWrapper
+          disabled={props.isLoading ? props.isLoading : false}
           onPress={() => props.onPressBack()}
           style={styles.transparentButtonView}
         >

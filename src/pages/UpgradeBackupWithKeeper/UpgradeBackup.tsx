@@ -53,7 +53,9 @@ import { CloudData } from "../../common/CommonFunctions";
 import CloudBackup from "../../common/CommonFunctions/CloudBackup";
 import { setCloudBackupStatus } from "../../store/actions/preferences";
 import { LevelHealthInterface } from "../../bitcoin/utilities/Interface";
-
+import AccountShell from "../../common/data/models/AccountShell";
+import PersonalNode from "../../common/data/models/PersonalNode";
+import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth';
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
   listData: {
@@ -66,6 +68,7 @@ interface UpgradeBackupStateTypes {
   }[];
   selectedContact: any[];
   encryptedCloudDataJson: any;
+  isCloudBackupProcessing: Boolean;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -83,6 +86,10 @@ interface UpgradeBackupPropsTypes {
   isLevel2Initialized: Boolean;
   isLevel3Initialized: Boolean;
   updateMSharesHealth: any;
+  accountShells: AccountShell[];
+  activePersonalNode: PersonalNode;
+  isBackupProcessing: any;
+  setIsNewHealthSystemSet: any;
 }
 
 class UpgradeBackup extends Component<
@@ -92,6 +99,7 @@ class UpgradeBackup extends Component<
   constructor(props) {
     super(props);
     this.state = {
+      isCloudBackupProcessing: false,
       selectedIds: [],
       encryptedCloudDataJson: [],
       listData: [
@@ -220,7 +228,8 @@ class UpgradeBackup extends Component<
     let { listData } = this.state;
     if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[0].status == 'accessible') {
       listData[0].status = 'accessible';
-      this.props.navigation.navigate('ManageBackupKeeper');
+      this.props.setIsNewHealthSystemSet(true);
+      this.props.navigation.replace('ManageBackupKeeper');
     }
     else{
       (this.refs.RestoreFromICloud as any).snapTo(1);
@@ -242,20 +251,25 @@ class UpgradeBackup extends Component<
     }
     if(JSON.stringify(prevProps.levelHealth) != JSON.stringify(this.props.levelHealth)){
       if(this.props.levelHealth[0] && this.props.levelHealth[0].levelInfo[0] && this.props.levelHealth[0].levelInfo[0].status == 'accessible') {
-        this.props.navigation.navigate('ManageBackupKeeper');
+        this.props.navigation.replace('ManageBackupKeeper');
       }
     }
+
+    if(prevProps.isBackupProcessing.status != this.props.isBackupProcessing.status && !this.props.isBackupProcessing.status){
+      (this.refs.RestoreFromICloud as any).snapTo(0);
+    }
+
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, s3Service, database } = this.props;
+    const { walletName, regularAccount, database, accountShells, activePersonalNode } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(database);
+    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode);
     console.log("encryptedCloudDataJson", encryptedCloudDataJson);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -340,7 +354,7 @@ class UpgradeBackup extends Component<
   };
 
   render() {
-    const { listData, selectedIds, selectedContact } = this.state;
+    const { listData, selectedIds, selectedContact, isCloudBackupProcessing } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -516,6 +530,7 @@ class UpgradeBackup extends Component<
             else name = "GDrive";
             return (
               <RestoreFromICloud
+                isLoading={isCloudBackupProcessing}
                 title={"Keeper on " + name}
                 subText={
                   "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
@@ -530,7 +545,7 @@ class UpgradeBackup extends Component<
                 backButtonText={"Back"}
                 modalRef={this.refs.RestoreFromICloud}
                 onPressProceed={() => {
-                  (this.refs.RestoreFromICloud as any).snapTo(0);
+                  this.setState({isCloudBackupProcessing: true})
                   this.cloudBackup();
                   // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
                 }}
@@ -710,6 +725,9 @@ const mapStateToProps = (state) => {
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
     isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
     isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
+    accountShells: idx(state, (_) => _.accounts.accountShells),
+    activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
+    isBackupProcessing: idx(state, (_) => _.preferences.isBackupProcessing) || false,
   };
 };
 
@@ -719,6 +737,7 @@ export default withNavigationFocus(
     initializeHealthSetup,
     setCloudBackupStatus,
     updateMSharesHealth,
+    setIsNewHealthSystemSet,
   })(UpgradeBackup)
 );
 

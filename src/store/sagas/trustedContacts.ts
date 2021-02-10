@@ -38,8 +38,9 @@ import {
 import {
   calculateOverallHealth,
   updateWalletImage,
+  downloadMShare as downloadMShareSSS 
 } from '../actions/sss';
-import { downloadMShare } from "../actions/health";
+import { downloadMShare as downloadMShareHealth} from "../actions/health";
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
@@ -531,6 +532,7 @@ function* fetchEphemeralChannelWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
+  const isNewHealthSystemSet = yield select( ( state ) => state.setupAndAuth.isNewHealthSystemSet )
 
   const { contactInfo, approveTC, publicKey } = payload // if publicKey: fetching just the payment details
   const encKey = SSS.strechKey( contactInfo.info )
@@ -557,7 +559,8 @@ function* fetchEphemeralChannelWorker( { payload } ) {
 
     if (data && data.shareTransferDetails) {
       const { otp, encryptedKey } = data.shareTransferDetails;
-      downloadMShare({encryptedKey, otp});
+      if(isNewHealthSystemSet) downloadMShareHealth({encryptedKey, otp});
+        else downloadMShareSSS({encryptedKey, otp});
     }
 
     yield put( ephemeralChannelFetched( contactInfo.contactName, data ) )
@@ -653,6 +656,7 @@ function* fetchTrustedChannelWorker( { payload } ) {
     const data: TrustedDataElements = res.data.data
     yield put( trustedChannelFetched( contactInfo.contactName, data ) )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const isNewHealthSystemSet = yield select( ( state ) => state.setupAndAuth.isNewHealthSystemSet )
     const updatedSERVICES = {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
@@ -668,7 +672,8 @@ function* fetchTrustedChannelWorker( { payload } ) {
         Toast( 'You have been successfully added as a Keeper' )
         const { otp, encryptedKey } = data.shareTransferDetails
         // yield delay(1000); // introducing delay in order to evade database insertion collision
-        yield put(downloadMShare({encryptedKey, otp, walletName: contactsWalletName}));
+        if(isNewHealthSystemSet) yield put(downloadMShareHealth({encryptedKey, otp, walletName: contactsWalletName}));
+        else yield put(downloadMShareSSS({encryptedKey, otp, walletName: contactsWalletName}));
       }
     }
   } else {

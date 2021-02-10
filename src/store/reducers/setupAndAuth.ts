@@ -7,7 +7,8 @@ import {
   RE_LOGIN,
   AUTH_CRED_CHANGED,
   SWITCH_CREDS_CHANGED,
-  PIN_CHANGED_FAILED
+  PIN_CHANGED_FAILED,
+  IS_NEW_HEALTH_SYSTEM
 } from '../actions/setupAndAuth'
 
 const initialState: {
@@ -23,6 +24,7 @@ const initialState: {
   };
   credsChanged: string;
   pinChangedFailed: Boolean;
+  isNewHealthSystemSet: Boolean;
 } = {
   isInitialized: false,
   hasCreds: false,
@@ -35,7 +37,8 @@ const initialState: {
     authenticating: false,
   },
   credsChanged: '',
-  pinChangedFailed: false
+  pinChangedFailed: false,
+  isNewHealthSystemSet: false,
 }
 
 export default ( state = initialState, action ) => {
@@ -100,6 +103,12 @@ export default ( state = initialState, action ) => {
 
       case PIN_CHANGED_FAILED:
         return chain( state ).setIn( [ 'pinChangedFailed' ], action.payload.isFailed ).value()
+
+      case IS_NEW_HEALTH_SYSTEM:
+        return {
+          ...state,
+          isNewHealthSystemSet: action.payload.isNewHealthSystemSet,
+        };
   }
 
   return state
