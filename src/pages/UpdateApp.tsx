@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Image,
@@ -11,42 +11,43 @@ import {
   Linking,
   BackHandler,
   AsyncStorage,
-} from 'react-native';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Octicons from 'react-native-vector-icons/Octicons';
-import DeviceInfo from 'react-native-device-info';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useDispatch, useSelector } from 'react-redux';
-import { setReleaseCases } from '../store/actions/preferences';
+} from 'react-native-responsive-screen'
+import Octicons from 'react-native-vector-icons/Octicons'
+import DeviceInfo from 'react-native-device-info'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { useDispatch, useSelector } from 'react-redux'
+import { setReleaseCases } from '../store/actions/preferences'
 
-export default function UpdateApp(props) {
-  const dispatch = useDispatch();
+export default function UpdateApp( props ) {
+  const dispatch = useDispatch()
 
   const releaseDataObj = props.navigation.state.params.releaseData
     ? props.navigation.state.params.releaseData
-    : [];
+    : []
   const isOpenFromNotificationList = props.navigation.state.params
     .isOpenFromNotificationList
     ? props.navigation.state.params.isOpenFromNotificationList
-    : false;
+    : false
   const releaseNumber = props.navigation.state.params.releaseNumber
     ? props.navigation.state.params.releaseNumber
-    : '';
+    : ''
 
-    const [releaseNotes, setReleaseNotes] = useState([]);
-  const [isUpdateMandotary, setIsUpdateMandotary] = useState(false);
-  const [releaseData, setReleaseData] = useState({});
-  const [isUpdateInValid, setIsUpdateInValid] = useState(false);
+  const [ releaseNotes, setReleaseNotes ] = useState( [] )
+  const [ isUpdateMandotary, setIsUpdateMandotary ] = useState( false )
+  const [ releaseData, setReleaseData ] = useState( {
+  } )
+  const [ isUpdateInValid, setIsUpdateInValid ] = useState( false )
   const releaseCasesValue = useSelector(
-    (state) => state.preferences.releaseCasesValue,
-  );
-  useEffect(() => {
+    ( state ) => state.preferences.releaseCasesValue,
+  )
+  useEffect( () => {
     /**
      * Following if condition is for when this page is open from Home page Notification list
      */
@@ -54,79 +55,79 @@ export default function UpdateApp(props) {
       isOpenFromNotificationList &&
       releaseNumber
     ) {
-      if (DeviceInfo.getBuildNumber() >= releaseNumber) {
-        setIsUpdateInValid(true);
+      if ( DeviceInfo.getBuildNumber() >= releaseNumber ) {
+        setIsUpdateInValid( true )
       } else {
-        setIsUpdateInValid(false);
+        setIsUpdateInValid( false )
       }
 
-      if (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) {
-        setIsUpdateMandotary(true);
+      if ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit == 0 ) {
+        setIsUpdateMandotary( true )
       }
 
-      setReleaseData(releaseDataObj[0]);
+      setReleaseData( releaseDataObj[ 0 ] )
     }
 
     /**
     * Following code is for when this page is open from Login and check for update
     */
-    (async () => {
-      if (!isOpenFromNotificationList) {
-        dispatch(setReleaseCases(null))
-        await AsyncStorage.setItem('releaseCases', '');
-        let releaseData;
-        let releaseDataOld = releaseCasesValue;
+    ( async () => {
+      if ( !isOpenFromNotificationList ) {
+        dispatch( setReleaseCases( null ) )
+        await AsyncStorage.setItem( 'releaseCases', '' )
+        let releaseData
+        const releaseDataOld = releaseCasesValue
 
-        if (releaseDataObj[0] && releaseDataObj[0].reminderLimit > 0) {
-          if (!releaseDataOld) {
+        if ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit > 0 ) {
+          if ( !releaseDataOld ) {
             releaseData = {
-              reminderLimit: releaseDataObj[0].reminderLimit - 1,
-              build: releaseDataObj[0].build,
-            };
+              reminderLimit: releaseDataObj[ 0 ].reminderLimit - 1,
+              build: releaseDataObj[ 0 ].build,
+            }
           } else {
             releaseData = {
               reminderLimit: releaseDataOld.reminderLimit - 1,
               build: releaseDataOld.build,
-            };
+            }
           }
           await AsyncStorage.setItem(
             'releaseData',
-            JSON.stringify(releaseData),
-          );
+            JSON.stringify( releaseData ),
+          )
         }
 
-        let releaseNotes = releaseDataObj.length
-          ? releaseDataObj.find((el) => {
-            return el.reminderLimit === 0;
-          })
-          : '';
+        const releaseNotes = releaseDataObj.length
+          ? releaseDataObj.find( ( el ) => {
+            return el.reminderLimit === 0
+          } )
+          : ''
         // console.log('RELEASENOTE', releaseNotes);
         if (
           releaseNotes ||
-          (releaseDataObj[0] && releaseDataObj[0].reminderLimit == 0) ||
-          (releaseDataOld && releaseDataOld.reminderLimit == 0)
+          ( releaseDataObj[ 0 ] && releaseDataObj[ 0 ].reminderLimit == 0 ) ||
+          ( releaseDataOld && releaseDataOld.reminderLimit == 0 )
         ) {
-          setIsUpdateMandotary(true);
+          setIsUpdateMandotary( true )
         }
-        setReleaseData(releaseDataObj[0]);
+        setReleaseData( releaseDataObj[ 0 ] )
 
-        if (releaseDataOld && releaseDataOld.reminderLimit == 0) {
-          await AsyncStorage.setItem('releaseData', '');
+        if ( releaseDataOld && releaseDataOld.reminderLimit == 0 ) {
+          await AsyncStorage.setItem( 'releaseData', '' )
         }
 
-        BackHandler.addEventListener('hardwareBackPress', hardwareBackHandler);
+        BackHandler.addEventListener( 'hardwareBackPress', hardwareBackHandler )
         return () =>
           BackHandler.removeEventListener(
             'hardwareBackPress',
             hardwareBackHandler,
-          );
+          )
       }
-    })();
-  }, []);
+    } )()
+  }, [] )
 
-  useEffect(() => {
-    if (releaseData) {
-      let tempReleaseNote = releaseData.releaseNotes
+  useEffect( () => {
+    if ( releaseData ) {
+      const tempReleaseNote = releaseData.releaseNotes
         ? Platform.OS == 'ios'
           ? releaseData.releaseNotes.ios
           : releaseData.releaseNotes.android
@@ -134,51 +135,55 @@ export default function UpdateApp(props) {
           ? Platform.OS == 'ios'
             ? releaseData.notes.ios
             : releaseData.notes.android
-          : '';
-      setReleaseNotes(tempReleaseNote.split('-'));
+          : ''
+      setReleaseNotes( tempReleaseNote.split( '-' ) )
     }
-  }, [releaseData]);
+  }, [ releaseData ] )
 
   const hardwareBackHandler = () => {
-    return true;
-  }; // returning true disables the hardware back button
+    return true
+  } // returning true disables the hardware back button
 
   const upgradeNow = () => {
     const url =
       Platform.OS == 'ios'
         ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
-        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en';
-    Linking.canOpenURL(url).then((supported) => {
-      if (supported) {
-        Linking.openURL(url);
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en'
+    Linking.canOpenURL( url ).then( ( supported ) => {
+      if ( supported ) {
+        Linking.openURL( url )
       } else {
         // console.log("Don't know how to open URI: " + url);
       }
-    });
-  };
+    } )
+  }
 
-  const onClick = async (_ignoreClick, _remindMeLaterClick) => {
-    let releaseCasesData;
+  const onClick = async ( _ignoreClick, _remindMeLaterClick ) => {
+    let releaseCasesData
     //JSON.parse(await AsyncStorage.getItem('releaseCases'));
     // console.log('releaseCases', releaseCases);
     releaseCasesData = {
       ...releaseData,
       ignoreClick: _ignoreClick,
       remindMeLaterClick: _remindMeLaterClick,
-    };
-    dispatch(setReleaseCases(releaseCasesData));
+    }
+    dispatch( setReleaseCases( releaseCasesData ) )
     await AsyncStorage.setItem(
       'releaseCases',
-      JSON.stringify(releaseCasesData),
-    );
-    props.navigation.goBack();
-  };
+      JSON.stringify( releaseCasesData ),
+    )
+    props.navigation.goBack()
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1 
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
 
-      <View style={{ ...styles.modalContentContainer }}>
+      <View style={{
+        ...styles.modalContentContainer 
+      }}>
         <View
           style={{
             ...styles.successModalHeaderView,
@@ -186,21 +191,25 @@ export default function UpdateApp(props) {
           }}
         >
           <View style={{
-            flexDirection: 'row', alignItems: 'center', marginRight: wp('4%'),
-            marginLeft: wp('4%'),
+            flexDirection: 'row', alignItems: 'center', marginRight: wp( '4%' ),
+            marginLeft: wp( '4%' ),
           }}>
             {isOpenFromNotificationList ? (
               <TouchableOpacity
                 onPress={() => props.navigation.goBack()}
-                hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-                style={{ height: 30, width: 30, justifyContent: 'center' }}
+                hitSlop={{
+                  top: 20, left: 20, bottom: 20, right: 20 
+                }}
+                style={{
+                  height: 30, width: 30, justifyContent: 'center' 
+                }}
               >
                 <FontAwesome
                   name="long-arrow-left"
                   color={Colors.blue}
                   size={17}
                 />
-              </TouchableOpacity>) : null}
+              </TouchableOpacity> ) : null}
             <Text style={styles.modalTitleText}>
               {isUpdateInValid ? 'Your app is already updated' :
                 'We’re better than ever\nTime to update'}
@@ -208,8 +217,8 @@ export default function UpdateApp(props) {
             {!isUpdateMandotary && !isUpdateInValid ? (
               <TouchableOpacity
                 style={{
-                  height: wp('8%'),
-                  width: wp('20%'),
+                  height: wp( '8%' ),
+                  width: wp( '20%' ),
                   backgroundColor: Colors.lightBlue,
                   borderWidth: 1,
                   borderColor: Colors.borderColor,
@@ -220,20 +229,20 @@ export default function UpdateApp(props) {
                   flexDirection: 'row',
                 }}
                 onPress={() => {
-                  if (isOpenFromNotificationList) props.navigation.goBack();
+                  if ( isOpenFromNotificationList ) props.navigation.goBack()
                   else
-                    onClick(true, false);
+                    onClick( true, false )
                 }}
               >
                 <Text
                   onPress={() => {
-                    if (isOpenFromNotificationList) props.navigation.goBack();
+                    if ( isOpenFromNotificationList ) props.navigation.goBack()
                     else
-                      onClick(true, false);
+                      onClick( true, false )
                   }}
                   style={{
                     color: Colors.white,
-                    fontSize: RFValue(12),
+                    fontSize: RFValue( 12 ),
                     fontFamily: Fonts.FiraSansRegular,
                   }}
                 >
@@ -246,48 +255,50 @@ export default function UpdateApp(props) {
                     resizeMode: 'contain',
                     marginLeft: 5,
                   }}
-                  source={require('../assets/images/icons/icon_remove.png')}
+                  source={require( '../assets/images/icons/icon_remove.png' )}
                 />
               </TouchableOpacity>
             ) : null}
           </View>
 
         </View>
-        {releaseNotes.map((value) => {
+        {releaseNotes.map( ( value ) => {
           return (
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginLeft: wp('8%'),
+                marginLeft: wp( '8%' ),
               }}
             >
               <Octicons
                 name={'primitive-dot'}
-                size={RFValue(10)}
+                size={RFValue( 10 )}
                 color={Colors.blue}
               />
               <Text
                 style={{
-                  marginLeft: wp('2%'),
+                  marginLeft: wp( '2%' ),
                   color: Colors.blue,
-                  fontSize: RFValue(13),
+                  fontSize: RFValue( 13 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
                 {value}
               </Text>
             </View>
-          );
-        })}
+          )
+        } )}
         <View
           style={{
             marginTop: 'auto',
-            marginBottom: hp('5%'),
-            marginLeft: wp('8%'),
+            marginBottom: hp( '5%' ),
+            marginLeft: wp( '8%' ),
           }}
         >
-          <Text style={{ ...styles.modalInfoText, marginBottom: hp('3%') }}>
+          <Text style={{
+            ...styles.modalInfoText, marginBottom: hp( '3%' ) 
+          }}>
             For updating you will be taken to the App Store/ Play Store
           </Text>
 
@@ -302,23 +313,25 @@ export default function UpdateApp(props) {
               <TouchableOpacity
                 disabled={false}
                 onPress={() => {
-                  upgradeNow();
+                  upgradeNow()
                 }}
-                style={{ ...styles.successModalButtonView }}
+                style={{
+                  ...styles.successModalButtonView 
+                }}
               >
                 <Text style={styles.proceedButtonText}>Update Now</Text>
-              </TouchableOpacity>) : null}
+              </TouchableOpacity> ) : null}
 
             {!isUpdateMandotary && !isUpdateInValid ? (
               <TouchableOpacity
                 onPress={() => {
-                  if (isOpenFromNotificationList) props.navigation.goBack();
+                  if ( isOpenFromNotificationList ) props.navigation.goBack()
                   else
-                    onClick(false, true);
+                    onClick( false, true )
                 }}
                 style={{
-                  height: wp('13%'),
-                  width: wp('35%'),
+                  height: wp( '13%' ),
+                  width: wp( '35%' ),
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginLeft: 15,
@@ -326,11 +339,13 @@ export default function UpdateApp(props) {
               >
                 <Text
                   onPress={() => {
-                    if (isOpenFromNotificationList) props.navigation.goBack();
+                    if ( isOpenFromNotificationList ) props.navigation.goBack()
                     else
-                      onClick(false, true);
+                      onClick( false, true )
                   }}
-                  style={{ ...styles.proceedButtonText, color: Colors.blue }}
+                  style={{
+                    ...styles.proceedButtonText, color: Colors.blue 
+                  }}
                 >
                   Remind me Later
                 </Text>
@@ -340,94 +355,96 @@ export default function UpdateApp(props) {
         </View>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
   },
   box: {
     backgroundColor: Colors.backgroundColor1,
-    marginRight: wp('5%'),
-    marginLeft: wp('5%'),
-    paddingTop: hp('2%'),
-    paddingBottom: hp('2%'),
-    marginBottom: hp('3%'),
+    marginRight: wp( '5%' ),
+    marginLeft: wp( '5%' ),
+    paddingTop: hp( '2%' ),
+    paddingBottom: hp( '2%' ),
+    marginBottom: hp( '3%' ),
     borderRadius: 10,
     justifyContent: 'center',
   },
   successModalHeaderView: {
-    marginTop: hp('4%'),
-    marginBottom: hp('3%'),
+    marginTop: hp( '4%' ),
+    marginBottom: hp( '3%' ),
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   successModalAmountView: {
-    marginRight: wp('10%'),
-    marginLeft: wp('10%'),
+    marginRight: wp( '10%' ),
+    marginLeft: wp( '10%' ),
   },
   successModalWalletNameText: {
     color: Colors.black,
-    fontSize: RFValue(25),
+    fontSize: RFValue( 25 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
   },
   successModalAmountImage: {
-    width: wp('15%'),
-    height: wp('15%'),
+    width: wp( '15%' ),
+    height: wp( '15%' ),
     marginRight: 15,
     marginLeft: 10,
-    marginBottom: wp('1%'),
+    marginBottom: wp( '1%' ),
     resizeMode: 'contain',
   },
   successModalAmountText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(21),
+    fontSize: RFValue( 21 ),
     marginLeft: 5,
   },
   successModalAmountUnitText: {
     color: Colors.borderColor,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
   successModalAmountInfoView: {
     flex: 0.4,
-    marginRight: wp('10%'),
-    marginLeft: wp('10%'),
+    marginRight: wp( '10%' ),
+    marginLeft: wp( '10%' ),
   },
   successModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15 
+    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   separator: {
     height: 2,
-    marginLeft: wp('2%'),
-    marginRight: wp('2%'),
+    marginLeft: wp( '2%' ),
+    marginRight: wp( '2%' ),
     backgroundColor: Colors.borderColor,
   },
-});
+} )

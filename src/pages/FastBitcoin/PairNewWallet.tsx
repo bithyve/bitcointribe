@@ -297,15 +297,15 @@ const PairNewWallet = ( props ) => {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalHeaderTitleView}>
         <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center' 
+          flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
           <TouchableOpacity
             onPress={() => {
@@ -322,16 +322,16 @@ const PairNewWallet = ( props ) => {
       </View>
       <KeyboardAvoidingView
         style={{
-          flex: 1, paddingTop: wp( '5%' ), position: 'relative' 
+          flex: 1, paddingTop: wp( '5%' ), position: 'relative'
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
         <ScrollView style={{
-          flex: 1 
+          flex: 1
         }}>
           <View style={{
-            height: '100%' 
+            height: '100%'
           }}>
             {openCameraFlag ? (
               <View style={styles.cameraView}>
@@ -344,7 +344,7 @@ const PairNewWallet = ( props ) => {
                   captureAudio={false}
                 >
                   <View style={{
-                    flex: 1 
+                    flex: 1
                   }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />
@@ -361,7 +361,7 @@ const PairNewWallet = ( props ) => {
               <TouchableOpacity
                 onPress={() => setOpenCameraFlag( true )}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               >
                 <ImageBackground
@@ -369,7 +369,7 @@ const PairNewWallet = ( props ) => {
                   style={styles.cameraImage}
                 >
                   <View style={{
-                    flex: 1 
+                    flex: 1
                   }}>
                     <View style={styles.topCornerView}>
                       <View style={styles.topLeftCornerView} />

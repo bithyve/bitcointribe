@@ -80,6 +80,11 @@ export interface TransactionDetails {
    * Note/message attached w/ the transaction(Donation acc specific)
    */
   message?: string;
+
+   /**
+   * Address corresponding to which this tx has been fetched
+   */
+  address?: string
 }
 
 export interface Balances {
@@ -139,7 +144,6 @@ export interface DerivativeAccountElements {
   xpub: string;
   xpubId: string;
   xpriv: string;
-  accountName?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   nextFreeChangeAddressIndex?: number;
@@ -151,11 +155,20 @@ export interface DerivativeAccountElements {
     address: string;
     status?: any;
   }[];
+  unconfirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[];
   balances?: {
     balance: number;
     unconfirmedBalance: number;
   };
   transactions?: Transactions;
+  txIdMap?: {[txid: string]: string[]};
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
 }
@@ -165,6 +178,7 @@ export enum DerivativeAccountTypes {
   FAST_BITCOINS = 'FAST_BITCOINS',
   TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+  WYRE = 'WYRE'
 }
 
 // Base Dervative Account
@@ -238,6 +252,22 @@ export interface SubPrimaryDerivativeAccount {
   };
   [accounts: number]: SubPrimaryDerivativeAccountElements;
 }
+
+export interface WyreDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface WyreDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: WyreDerivativeAccountElements;
+}
+
 export interface DerivativeAccounts {
   [accountType: string]:
     | DerivativeAccount
@@ -470,3 +500,12 @@ export interface LevelInfo {
   reshareVersion?: number;
   name?: string;
 };
+//VersionHistory
+export interface VersionHistory {
+  id: string;
+  version: string;
+  buildNumber: string;
+  versionName: string;
+  title: string;
+  date: Date;
+}

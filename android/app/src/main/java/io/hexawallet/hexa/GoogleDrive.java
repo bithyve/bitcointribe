@@ -233,7 +233,11 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     @ReactMethod
     public void uploadFile(String metaData, Callback callBack) {
         uploadFileCallback = callBack;
+        Log.d(TAG, "mDriveServiceHelper " + mDriveServiceHelper);
         if (mDriveServiceHelper == null) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            uploadFileCallback.invoke(map, null);
             return;
         }
         final Activity activity = getCurrentActivity();
@@ -260,6 +264,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     public  List<GoogleDriveFileHolder>  checkIfFileExist(String metaData, Callback callBack) {
         listOfFilesAvailable = callBack;
         if (mDriveServiceHelper == null) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            listOfFilesAvailable.invoke(map, null);
             return null;
         }
         JSONObject jsonObj = null;
@@ -305,6 +312,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         }
         catch (Exception e) {
             Log.d(TAG, " checkIfFileExist Exception: " + e.getMessage());
+            WritableMap map = Arguments.createMap();
+                            map.putString(EVENT_KEY, ON_FAILURE);
+                            listOfFilesAvailable.invoke(map, null);
         }
         return googleDriveFileHolders;
     }
@@ -313,6 +323,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     public void updateFile(String metaData, Callback callBack) {
         updateFileCallback = callBack;
         if (mDriveServiceHelper == null) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            updateFileCallback.invoke(map, null);
             return;
         }
         mDriveServiceHelper.saveFile(getReactApplicationContext(), metaData)
@@ -338,6 +351,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     public void readFile(String metaData, Callback callBack) {
         readFileCallback = callBack;
         if (mDriveServiceHelper == null) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            readFileCallback.invoke(map, null);
             return;
         }
         JSONObject jsonObj = null;
@@ -361,6 +377,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     }
                 });
         } catch (Exception e) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            readFileCallback.invoke(map, null);
             Log.d(TAG, " readFile Exception: " + e.getMessage());
         }
     }

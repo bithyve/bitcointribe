@@ -1,28 +1,28 @@
 
-import { useMemo } from 'react';
-import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit';
-import CurrencyKind from '../../../common/data/enums/CurrencyKind';
-import useCurrencyCode from '../state-selectors/UseCurrencyCode';
-import useCurrencyKind from '../state-selectors/UseCurrencyKind';
+import { useMemo } from 'react'
+import BitcoinUnit, { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
+import CurrencyKind from '../../../common/data/enums/CurrencyKind'
+import useCurrencyCode from '../state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../state-selectors/UseCurrencyKind'
 
 export type Props = {
   bitcoinUnit?: BitcoinUnit;
   currencyKind?: CurrencyKind;
 };
 
-export default function useFormattedUnitText({
+export default function useFormattedUnitText( {
   bitcoinUnit = BitcoinUnit.SATS,
   currencyKind = useCurrencyKind(),
-}: Props): string {
-  const fiatCurrencyCode = useCurrencyCode();
+}: Props ): string {
+  const fiatCurrencyCode = useCurrencyCode()
 
-  const prefersBitcoin: boolean = useMemo(() => {
-    return currencyKind === CurrencyKind.BITCOIN;
-  }, [currencyKind]);
+  const prefersBitcoin: boolean = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
-  if (prefersBitcoin) {
-    return displayNameForBitcoinUnit(bitcoinUnit);
+  if ( prefersBitcoin ) {
+    return displayNameForBitcoinUnit( bitcoinUnit )
   } else {
-    return fiatCurrencyCode.toLocaleLowerCase();
+    return fiatCurrencyCode.toLocaleLowerCase()
   }
 }

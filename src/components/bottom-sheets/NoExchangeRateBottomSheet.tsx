@@ -23,7 +23,7 @@ export default function NoExchangeRateBottomSheet( props ) {
         <Text style={styles.modalTitleText}>Currency Converter Not Available</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
-        }}>There seems to be a problem fetching {'\n'}bitcoin exchange rates</Text>
+        }}>There seems to be a problem fetching {'\n'}bitcoin exchange rates or we dont have the exchange rate for the selected currency.</Text>
         <Text style={{
           ...styles.modalInfoText, marginBottom: hp( '3%' ) 
         }}>{'\n'}Balance and transaction amounts will be displayed in sats while this problem persists. Please check your internet connection or try after sometime</Text>

@@ -8,6 +8,7 @@ import {
   ImageSourcePropType,
 } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import Fonts from '../../../common/Fonts'
@@ -49,7 +50,7 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
 
       <View style={styles.buttonTextContainer}>
         <Text style={styles.buttonTitleText}>{title}</Text>
-        <Text style={styles.buttonSubtitleText}>{subtitle}</Text>
+        {subtitle ? <Text style={styles.buttonSubtitleText}>{subtitle}</Text> : null}
       </View>
     </TouchableOpacity>
   )
@@ -62,7 +63,11 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
   network,
 } ) => {
   return (
-    <View style={styles.rootContainer}>
+    <View style={{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignSelf: 'center'
+    }}>
       <FooterButton
         style={{
           marginRight: 8
@@ -91,12 +96,14 @@ const styles = StyleSheet.create( {
   },
 
   buttonContainer: {
-    width: 165,
+    minWidth: 150,
+    width: widthPercentageToDP( 42 ),
+    maxWidth: 400,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 18,
-    paddingHorizontal: 24,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderRadius: 15,
     borderColor: '#E3E3E3',
     borderWidth: 1,

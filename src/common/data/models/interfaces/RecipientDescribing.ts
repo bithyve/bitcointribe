@@ -28,14 +28,10 @@ export interface ContactRecipientDescribing extends RecipientDescribing {
   trustKind: ContactTrustKind;
   hasXPub: boolean;
   hasTrustedAddress: boolean;
-
-  /**
-   * Whether or not a symmetric key exists between this user and the contact.
-   */
-  hasTrustedChannelWithUser: boolean;
+  isPendingRequestAcceptance: boolean;
 }
 
-export interface AccountRecipientDescribing extends RecipientDescribing {}
+export type AccountRecipientDescribing = RecipientDescribing
 
 export function makeSubAccountRecipientDescription(
   data: unknown,
@@ -45,7 +41,7 @@ export function makeSubAccountRecipientDescription(
     id: data.id,
     kind: RecipientKind.SUB_ACCOUNT,
     displayedName: data.account_name || data.id,
-    avatarImageSource: getAvatarForDeprecatedSubAccountKind(accountKind),
+    avatarImageSource: getAvatarForDeprecatedSubAccountKind( accountKind ),
     availableBalance: data.bitcoinAmount || data.amount || 0,
     initiatedAt: data.initiatedAt,
   }
@@ -67,7 +63,7 @@ export function makeContactRecipientDescription(
       'f&f request awaiting',
       'f & f request',
       'f & f request awaiting',
-    ].some((placeholder) => displayedName.startsWith(placeholder))
+    ].some( ( placeholder ) => displayedName.startsWith( placeholder ) )
   ) {
     displayedName = null
   }
@@ -75,7 +71,7 @@ export function makeContactRecipientDescription(
   displayedName = displayedName || data.contactsWalletName || data.walletName
 
   // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
-  if (!displayedName) {
+  if ( !displayedName ) {
     recipientKind = RecipientKind.ADDRESS
     displayedName = data.id
   }
@@ -92,7 +88,6 @@ export function makeContactRecipientDescription(
     trustKind,
     hasXPub: data.hasXpub,
     hasTrustedAddress: data.hasTrustedAddress,
-    hasTrustedChannelWithUser:
-      data.hasTrustedChannel || data.hasTrustedChannelWithUser,
+    isPendingRequestAcceptance: !data.hasTrustedChannel
   }
 }

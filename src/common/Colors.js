@@ -25,6 +25,8 @@ const Colors = {
   deepBlue: '#04578B',
   babyGray: '#BCB6B6',
   greyTextColor: '#656565',
+  coral: '#D35400',
+
   // Grayscale
   gray1: '#d0d0d0',
   gray2: '#A3A3A3',

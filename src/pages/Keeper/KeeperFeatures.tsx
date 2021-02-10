@@ -98,10 +98,11 @@ class KeeperFeatures extends Component<
       this.setState({ setUpLoader: false });
     }
 
-    if ((prevProp.isLevel2Initialized != this.props.isLevel2Initialized && this.props.isLevel2Initialized) ||
-      (this.props.isLevel2Initialized &&
-      prevState.setupKeeperClicked != this.state.setupKeeperClicked &&
-      this.state.setupKeeperClicked)
+    if (
+      (prevProp.isLevel2Initialized !== this.props.isLevel2Initialized && this.props.isLevel2Initialized) ||
+      ((this.props.isLevel2Initialized || this.props.isLevel3Initialized) &&
+      prevState.setupKeeperClicked !== this.state.setupKeeperClicked &&
+      this.state.setupKeeperClicked) || (prevProp.isLevel3Initialized !== this.props.isLevel3Initialized && this.props.isLevel3Initialized)
     ) {
       this.uploadDataOnEFChannel();
     }
@@ -179,7 +180,7 @@ class KeeperFeatures extends Component<
         share,
         'device',
         navigation.getParam('isReshare'),
-        this.props.navigation.state.params.selectedLevelId,
+        navigation.state.params.selectedLevelId,
         navigation.getParam('isChange') ? navigation.getParam('isChange') : false,
       );
     }

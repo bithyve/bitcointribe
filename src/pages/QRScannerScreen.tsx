@@ -1,53 +1,55 @@
-import React, { useState, createRef } from 'react';
+import React, { useState, createRef } from 'react'
 import {
   View,
   TouchableOpacity,
   Text,
   SafeAreaView,
   StatusBar,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { RNCamera } from 'react-native-camera';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import BottomInfoBox from '../components/BottomInfoBox';
-import getFormattedStringFromQRString from '../utils/qr-codes/GetFormattedStringFromQRData';
+} from 'react-native-responsive-screen'
+import { RNCamera } from 'react-native-camera'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import BottomInfoBox from '../components/BottomInfoBox'
+import getFormattedStringFromQRString from '../utils/qr-codes/GetFormattedStringFromQRData'
 
 export type Props = {
   navigation: any;
 };
 
-const QRScannerScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const title = navigation.getParam('title');
-  const cameraRef = createRef<RNCamera>();
-  const [isCameraOpen, setIsCameraOpen] = useState(true)
-  const [scanQRFlag, setScanQRFlag] = useState([RNCamera.Constants.BarCodeType.qr])
+const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const title = navigation.getParam( 'title' )
+  const cameraRef = createRef<RNCamera>()
+  const [ isCameraOpen, setIsCameraOpen ] = useState( true )
+  const [ scanQRFlag, setScanQRFlag ] = useState( [ RNCamera.Constants.BarCodeType.qr ] )
 
   const barcodeRecognized = async barcodes => {
-    if (barcodes.data) {
-      setScanQRFlag([]);
-      setIsCameraOpen(false);
+    if ( barcodes.data ) {
+      setScanQRFlag( [] )
+      setIsCameraOpen( false )
 
       navigation.state.params.onCodeScanned(
-        getFormattedStringFromQRString(barcodes.data),
-      );
+        getFormattedStringFromQRString( barcodes.data ),
+      )
 
-      navigation.goBack();
+      navigation.goBack()
     }
-  };
+  }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1 
+    }}>
       <StatusBar barStyle="dark-content" />
 
-      <View style={{ flex: 1 }}>
+      <View style={{
+        flex: 1 
+      }}>
         <View
           style={{
             borderBottomWidth: 1,
@@ -62,11 +64,17 @@ const QRScannerScreen: React.FC<Props> = ({
           }}
         >
 
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center' 
+          }}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
-              style={{ height: 30, width: 30, justifyContent: 'center' }}
+              hitSlop={{
+                top: 20, left: 20, bottom: 20, right: 20 
+              }}
+              style={{
+                height: 30, width: 30, justifyContent: 'center' 
+              }}
             >
               <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
             </TouchableOpacity>
@@ -74,7 +82,7 @@ const QRScannerScreen: React.FC<Props> = ({
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(18),
+                fontSize: RFValue( 18 ),
                 fontFamily: Fonts.FiraSansMedium,
               }}
             >
@@ -85,11 +93,11 @@ const QRScannerScreen: React.FC<Props> = ({
 
         <View
           style={{
-            width: wp('100%'),
-            height: wp('100%'),
+            width: wp( '100%' ),
+            height: wp( '100%' ),
             overflow: 'hidden',
             borderRadius: 20,
-            marginTop: hp('3%'),
+            marginTop: hp( '3%' ),
           }}
         >
           {isCameraOpen && (
@@ -97,10 +105,10 @@ const QRScannerScreen: React.FC<Props> = ({
               ref={cameraRef}
               barCodeTypes={scanQRFlag}
               style={{
-                width: wp('100%'),
-                height: wp('100%'),
+                width: wp( '100%' ),
+                height: wp( '100%' ),
               }}
-              onBarCodeRead={barcode => barcodeRecognized(barcode)}
+              onBarCodeRead={barcode => barcodeRecognized( barcode )}
               captureAudio={false}
             >
               {/* ---- Scanner frame indicators ---- */}
@@ -118,8 +126,8 @@ const QRScannerScreen: React.FC<Props> = ({
                     borderLeftWidth: 1,
                     borderTopColor: 'white',
                     borderLeftColor: 'white',
-                    height: hp('5%'),
-                    width: hp('5%'),
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
                     borderTopWidth: 1,
                   }}
                 />
@@ -129,8 +137,8 @@ const QRScannerScreen: React.FC<Props> = ({
                     borderRightWidth: 1,
                     borderRightColor: 'white',
                     borderTopColor: 'white',
-                    height: hp('5%'),
-                    width: hp('5%'),
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
                     marginLeft: 'auto',
                   }}
                 />
@@ -150,8 +158,8 @@ const QRScannerScreen: React.FC<Props> = ({
                     borderLeftWidth: 1,
                     borderBottomColor: 'white',
                     borderLeftColor: 'white',
-                    height: hp('5%'),
-                    width: hp('5%'),
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
                     borderBottomWidth: 1,
                   }}
                 />
@@ -161,8 +169,8 @@ const QRScannerScreen: React.FC<Props> = ({
                     borderRightWidth: 1,
                     borderRightColor: 'white',
                     borderBottomColor: 'white',
-                    height: hp('5%'),
-                    width: hp('5%'),
+                    height: hp( '5%' ),
+                    width: hp( '5%' ),
                     marginLeft: 'auto',
                   }}
                 />
@@ -171,20 +179,22 @@ const QRScannerScreen: React.FC<Props> = ({
           )}
         </View>
 
-        <View style={{ marginTop: 'auto' }} />
+        <View style={{
+          marginTop: 'auto' 
+        }} />
 
         {/* TODO: Ideally, this shouldn't be a concern here. We should probably have a separate screen for "Scan Exit Key" that uses a QR Scanning component alongside a component for this info box */}
         {title == 'Scan Exit Key' ?
           <BottomInfoBox
-            title={"Note"}
+            title={'Note'}
             infoText={
-              "Exit Key This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA"
+              'Exit Key This can be found on page of your pdf Recovery Key. Please scan it to reset your 2FA'
             }
           /> : null}
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
 
-export default QRScannerScreen;
+export default QRScannerScreen

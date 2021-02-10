@@ -1344,6 +1344,38 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
+        data: await this.sss.updateWalletImage(walletImage),
+      };
+    } catch (err) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update Wallet Image',
+      }
+    }
+  };
+
+  public updateWalletImageKeeper = async (
+    walletImage: WalletImage,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
         data: await this.levelhealth.updateWalletImage(walletImage),
       };
     } catch (err) {
@@ -1356,6 +1388,36 @@ export default class S3Service {
   };
 
   public fetchWalletImage = async (): Promise<
+  | {
+      status: number;
+      data: {
+        walletImage: WalletImage;
+      };
+      err?: undefined;
+      message?: undefined;
+    }
+  | {
+      status: number;
+      err: any;
+      message: string;
+      data?: undefined;
+    }
+> => {
+  try {
+    return {
+      status: config.STATUS.SUCCESS,
+      data: await this.sss.fetchWalletImage(),
+    };
+  } catch (err) {
+    return {
+      status: 0o1,
+      err: err.message,
+      message: 'Failed to fetch Wallet Image',
+    }
+  }
+};
+
+  public fetchWalletImageKeeper = async (): Promise<
     | {
         status: number;
         data: {

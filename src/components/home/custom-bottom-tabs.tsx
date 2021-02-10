@@ -9,15 +9,16 @@ import {
 
 export enum BottomTab {
   Transactions,
-  Add,
+  FriendsAndFamily,
   QR,
   More,
 }
 
 export interface Props {
+  isEnabled: boolean;
   tabBarZIndex?: number;
+  selectedTab?: BottomTab | null;
   onSelect: ( tab: BottomTab ) => void;
-  selectedTab: BottomTab | null;
 }
 
 type TabItem = {
@@ -33,9 +34,9 @@ const tabItems: TabItem[] = [
     inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_transactions.png' ),
   },
   {
-    tab: BottomTab.Add,
-    activeImageSource: require( '../../assets/images/HomePageIcons/icon_add_active.png' ),
-    inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_add.png' ),
+    tab: BottomTab.FriendsAndFamily,
+    activeImageSource: require( '../../assets/images/icons/icon_contact.png' ),
+    inactiveImageSource: require( '../../assets/images/icons/icon_contact.png' ),
   },
   {
     tab: BottomTab.QR,
@@ -82,6 +83,7 @@ const Tab: React.FC<TabViewProps> = ( {
 }
 
 const CustomBottomTabs: React.FC<Props> = ( {
+  isEnabled,
   tabBarZIndex = 1,
   onSelect,
   selectedTab,
@@ -96,7 +98,11 @@ const CustomBottomTabs: React.FC<Props> = ( {
             key={index}
             tabItem={tabItem}
             isActive={selectedTab == tabItem.tab}
-            onPress={() => onSelect( tabItem.tab )}
+            onPress={() => {
+              if ( isEnabled ) {
+                onSelect( tabItem.tab )
+              }
+            }}
           />
         )
       } )}

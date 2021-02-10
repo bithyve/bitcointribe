@@ -1,13 +1,13 @@
-import React, { useState, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native';
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen';
-import { RNCamera } from 'react-native-camera';
-import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
+import React, { useState, useRef } from 'react'
+import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import { RNCamera } from 'react-native-camera'
+import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
   coverImageSource?: ImageSourcePropType;
-  onCodeScanned: (scanEvent) => void;
+  onCodeScanned: ( scanEvent ) => void;
 };
 
 // TODO: Make the styling here a bit more readable 🙂.
@@ -24,15 +24,16 @@ const CameraFrameIndicators: React.FC = () => {
         <View style={styles.view6} />
       </View>
     </>
-  );
-};
+  )
+}
 
-const CoveredQRCodeScanner: React.FC<Props> = ({
-  containerStyle = {},
-  coverImageSource = require('../../assets/images/icons/iPhone-QR.png'),
+const CoveredQRCodeScanner: React.FC<Props> = ( {
+  containerStyle = {
+  },
+  coverImageSource = require( '../../assets/images/icons/iPhone-QR.png' ),
   onCodeScanned,
-}: Props) => {
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
+}: Props ) => {
+  const [ isCameraOpen, setIsCameraOpen ] = useState( false )
 
   const CameraCover: React.FC = () => {
     return (
@@ -46,52 +47,56 @@ const CoveredQRCodeScanner: React.FC<Props> = ({
         }} >
         <ImageBackground
           source={coverImageSource}
-          style={{ ...styles.rootContainer, ...containerStyle }}
+          style={{
+            ...styles.rootContainer, ...containerStyle
+          }}
         >
           <CameraFrameIndicators />
         </ImageBackground>
       </AppBottomSheetTouchableWrapper>
-    );
-  };
+    )
+  }
 
   // TODO: It would probably be good to abstract this into its own component file
   // so we can use it independently of the toggleable cover overlay.
   const Scanner: React.FC = () => {
-    const cameraRef = useRef<RNCamera>();
+    const cameraRef = useRef<RNCamera>()
 
     return (
-      <View style={{ ...styles.rootContainer, ...containerStyle }}>
+      <View style={{
+        ...styles.rootContainer, ...containerStyle
+      }}>
         <RNCamera
           ref={cameraRef}
           style={{
             flex: 1,
           }}
-          onBarCodeRead={(data) => {
-            onCodeScanned(data)
-            setIsCameraOpen(false)
+          onBarCodeRead={( data ) => {
+            onCodeScanned( data )
+            setIsCameraOpen( false )
           }}
           captureAudio={false}
         >
           <CameraFrameIndicators />
         </RNCamera>
       </View >
-    );
-  };
-
-  if (isCameraOpen) {
-    return <Scanner />;
-  } else {
-    return <CameraCover />;
+    )
   }
-};
 
-const styles = StyleSheet.create({
+  if ( isCameraOpen ) {
+    return <Scanner />
+  } else {
+    return <CameraCover />
+  }
+}
+
+const styles = StyleSheet.create( {
   rootContainer: {
     overflow: 'hidden',
     borderRadius: 20,
     alignSelf: 'center',
-    width: widthPercentageToDP(90),
-    height: widthPercentageToDP(90),
+    width: widthPercentageToDP( 90 ),
+    height: widthPercentageToDP( 90 ),
   },
   view1:{ flexDirection: 'row', 
   paddingTop: 12, 
@@ -142,4 +147,4 @@ view6: {
 }
 });
 
-export default CoveredQRCodeScanner;
+export default CoveredQRCodeScanner

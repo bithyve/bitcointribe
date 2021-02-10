@@ -1,7 +1,8 @@
 // types and action creators: dispatched by components and sagas
 
 import { share } from "secrets.js-grempe";
-import { EphemeralDataElements } from "../../bitcoin/utilities/Interface";
+import S3Service from "../../bitcoin/services/sss/S3Service";
+import { EphemeralDataElements, WalletImage } from "../../bitcoin/utilities/Interface";
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP';
 export const HEALTH_UPDATE = 'HEALTH_UPDATE';
@@ -62,6 +63,7 @@ export const CONFIRM_PDF_SHARED = 'CONFIRM_PDF_SHARED';
 export const DOWNLOAD_PDFSHARE_HEALTH = 'DOWNLOAD_PDFSHARE_HEALTH';
 export const DOWNLOADED_PDFSHARE_HEALTH = 'DOWNLOADED_PDFSHARE_HEALTH';
 export const UPLOAD_SM_SHARE = 'UPLOAD_SM_SHARE';
+export const UPDATE_WALLET_IMAGE_HEALTH = 'UPDATE_WALLET_IMAGE_HEALTH';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -121,6 +123,10 @@ export const ErrorSending = (isFailed) => {
 
 export const updateMSharesHealth = (shares) => {
   return { type: UPDATE_SHARES_HEALTH, payload: { shares } };
+};
+
+export const updateWalletImageHealth = () => {
+  return { type: UPDATE_WALLET_IMAGE_HEALTH };
 };
 
 export const walletImageChecked = (checked) => {
@@ -244,10 +250,9 @@ export const recoverWallet = (level?, keeperData?, decryptedCloudDataJson?) => {
   return { type: RECOVER_WALLET_HEALTH, payload: {level, keeperData, decryptedCloudDataJson} };
 };
 
-export const fetchWalletImage = () => {
-  return { type: FETCH_WALLET_IMAGE_HEALTH };
+export const fetchWalletImage = (walletImage: WalletImage) => {
+  return { type: FETCH_WALLET_IMAGE_HEALTH, payload: { walletImage } };
 };
-
 export const updateCloudMShare = (metaShare, replaceIndex?) => {
   return { type: CLOUD_MSHARE, payload: { metaShare, replaceIndex } };
 };

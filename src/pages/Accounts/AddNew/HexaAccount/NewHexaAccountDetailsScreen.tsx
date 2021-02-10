@@ -1,14 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import FormStyles from '../../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
-import { Input, Button } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
+import Loader from '../../../../components/loader'
+import ButtonBlue from '../../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -31,15 +32,17 @@ const HeaderSection: React.FC<HeaderSectionProps> = ( { subAccountInfo, } ) => {
   )
 }
 
-const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
 
-  const currentSubAccountInfo: HexaSubAccountDescribing = useMemo( () => {
-    return navigation.getParam( 'currentSubAccountInfo' )
+  const currentSubAccount: HexaSubAccountDescribing = useMemo( () => {
+    return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
+  const [ showLoader, setShowLoader ] = useState( false )
+  const [ buttonPressed, setButtonPressed ] = useState ( false )
 
-  const [ accountName, setAccountName ] = useState( currentSubAccountInfo.defaultTitle )
+  const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( '' )
 
   const canProceed = useMemo( () => {
@@ -53,22 +56,23 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
     nameInputRef.current?.focus()
   }, [] )
 
-  // TODO: We need a bit more design clarity about what to do after new
-  // account creation succeeds or fails.
+  // TODO: We need a bit more design clarity about what to do if
+  // account creation fails here.
   useAccountShellCreationCompletionEffect( () => {
     console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )
   } )
 
   function handleProceedButtonPress() {
-    currentSubAccountInfo.customDisplayName = accountName
-    currentSubAccountInfo.customDescription = accountDescription
+    setShowLoader( true )
+    setButtonPressed( true )
+    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.customDescription = accountDescription
     console.log( 'dispatching addNewAccountShell' )
-    dispatch( addNewAccountShell( currentSubAccountInfo ) )
+    buttonPressed ? null : dispatch( addNewAccountShell( currentSubAccount ) )
   }
 
   return (
-    // <View style={styles.rootContainer}>
     <KeyboardAvoidingView
       style={styles.rootContainer}
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -78,7 +82,7 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
       }}>
         <View style={styles.rootContentContainer}>
 
-          <HeaderSection subAccountInfo={currentSubAccountInfo} />
+          <HeaderSection subAccountInfo={currentSubAccount} />
 
           <View style={styles.formContainer}>
             <Input
@@ -108,18 +112,16 @@ const AddNewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props
           </View>
 
           <View style={styles.footerSection}>
-            <Button
-              raised
-              buttonStyle={ButtonStyles.primaryActionButton}
-              title="Proceed"
-              titleStyle={ButtonStyles.actionButtonText}
-              onPress={handleProceedButtonPress}
-              disabled={canProceed === false}
+            <ButtonBlue
+              buttonText="Proceed"
+              handleButtonPress={handleProceedButtonPress}
+              buttonDisable={ canProceed === false }
             />
           </View>
         </View>
 
       </ScrollView>
+      {showLoader ? <Loader isLoading={true} /> : null}
     </KeyboardAvoidingView>
   )
 }
@@ -150,4 +152,4 @@ const styles = StyleSheet.create( {
 } )
 
 
-export default AddNewHexaAccountDetailsScreen
+export default NewHexaAccountDetailsScreen

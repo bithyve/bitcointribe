@@ -61,10 +61,16 @@ import {
 import { modifyLevelStatus } from "./ManageBackupFunction";
 import ApproveSetup from "./ApproveSetup";
 import { MetaShare, notificationType } from "../../bitcoin/utilities/Interface";
-import firebase from "react-native-firebase";
+import PushNotification from 'react-native-push-notification';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
 import { nameToInitials } from "../../common/CommonFunctions";
 import S3Service from '../../bitcoin/services/sss/S3Service';
+import ModalHeader from "../../components/ModalHeader";
+import ErrorModalContents from "../../components/ErrorModalContents";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import AccountShell from "../../common/data/models/AccountShell";
+import PersonalNode from "../../common/data/models/PersonalNode";
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -84,6 +90,9 @@ interface ManageBackupStateTypes {
   selectedLevelId: number;
   selectedKeeperType: string;
   selectedKeeperName: string;
+  errorTitle: string;
+  errorInfo: string;
+  refreshControlLoader: boolean;
 }
 
 interface ManageBackupPropsTypes {
@@ -95,7 +104,6 @@ interface ManageBackupPropsTypes {
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
-  overallHealth: any;
   levelHealth: any[];
   currentLevel: any;
   healthLoading: any;
@@ -112,7 +120,7 @@ interface ManageBackupPropsTypes {
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
   onApprovalStatusChange: any;
-  secureAccount: any;
+  secureAccount: SecureAccount;
   fetchKeeperTrustedChannel: any;
   keeperApproveStatus: any;
   metaShares: MetaShare[];
@@ -120,6 +128,8 @@ interface ManageBackupPropsTypes {
   autoShareContact: any;
   trustedChannelsSetupSync: any;
   trustedChannelsSetupSyncing: any;
+  accountShells: AccountShell[];
+  activePersonalNode: PersonalNode;
 }
 
 class ManageBackup extends Component<
@@ -187,15 +197,57 @@ class ManageBackup extends Component<
       selectedLevelId: 0,
       selectedKeeperType: "",
       selectedKeeperName: "",
+      errorTitle: "",
+      errorInfo: "",
+      refreshControlLoader: false,
     };
   }
 
   createNotificationListeners = async () => {
-    this.firebaseNotificationListener = firebase
-      .notifications()
-      .onNotification((notification) => {
-        this.onNotificationArrives(notification);
-      });
+    PushNotification.configure( {
+      onNotification: ( notification ) => {
+        console.log( 'NOTIFICATION:', notification )
+        // process the notification
+        if( notification.data ){
+          this.onNotificationArrives( notification )
+          // (required) Called when a remote is received or opened, or local notification is opened
+          notification.finish( PushNotificationIOS.FetchResult.NoData )
+        }
+      },
+
+      // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
+      onAction: ( notification ) => {
+        console.log( 'ACTION:', notification.action )
+        console.log( 'NOTIFICATION:', notification )
+
+        // process the action
+      },
+
+      // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
+      onRegistrationError: ( err ) => {
+        console.error( err.message, err )
+      },
+
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true,
+      },
+
+      // Should the initial notification be popped automatically
+      // default: true
+      popInitialNotification: true,
+
+      /**
+       * (optional) default: true
+       * - Specified if permissions (ios) and token (android and ios) will requested or not,
+       * - if not, you must call PushNotificationsHandler.requestPermissions() later
+       * - if you are not using remote notification or do not have Firebase installed, use this:
+       *     requestPermissions: Platform.OS === 'ios'
+       */
+      requestPermissions: true,
+    } )
   };
 
   onNotificationArrives = async (notification) => {
@@ -233,7 +285,10 @@ class ManageBackup extends Component<
   };
 
   componentDidMount = async () => {
-    console.log("keeperInfo", this.props.keeperInfo);
+    // console.log("keeperInfo", this.props.keeperInfo);
+    // console.log("isLevel2Initialized",this.props.isLevel2Initialized);
+    // console.log("isLevelTwoMetaShareCreated",this.props.isLevelTwoMetaShareCreated);
+
     await this.onRefresh();
     this.createNotificationListeners();
     this.modifyLevelData();
@@ -294,14 +349,14 @@ class ManageBackup extends Component<
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount } = this.props;
+    const { walletName, regularAccount, accountShells, activePersonalNode } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(this.props.database);
+    encryptedCloudDataJson = await CloudData(this.props.database, accountShells, activePersonalNode);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -319,7 +374,6 @@ class ManageBackup extends Component<
       regularAccount: regularAccount,
       keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };
-    // this.props.setCloudBackupStatus({ status: false });
     if (!this.props.isBackupProcessing.status) {
       this.props.setIsBackupProcessing({ status: true });
       let cloudObject = new CloudBackup({
@@ -361,11 +415,9 @@ class ManageBackup extends Component<
       }
       // health update for 1st upload to cloud
       if (
-        this.props.cloudBackupStatus &&
         levelHealth.length &&
         levelHealthVar.status != "accessible"
       ) {
-        console.log("cloudBackupStatus inside if", levelHealthVar);
         if (levelHealthVar.shareType == "cloud") {
           levelHealthVar.updatedAt = moment(new Date()).valueOf();
           levelHealthVar.status == "accessible";
@@ -390,18 +442,20 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.levelHealth != this.props.levelHealth) {
-      this.modifyLevelData();
+    const {healthLoading, trustedChannelsSetupSyncing, isBackupProcessing} = this.props;
+    if(prevProps.healthLoading !== this.props.healthLoading || prevProps.trustedChannelsSetupSyncing !== this.props.trustedChannelsSetupSyncing || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status){
+      if(healthLoading || trustedChannelsSetupSyncing || isBackupProcessing.status){
+        this.setState({refreshControlLoader: true})
+      } else if(!healthLoading && !trustedChannelsSetupSyncing && !isBackupProcessing.status){
+        this.setState({refreshControlLoader: false})
+      }
     }
 
-    // if (
-    //   JSON.stringify(prevProps.levelHealth) !==
-    //   JSON.stringify(this.props.levelHealth)
-    // ) {
-      if (
-        prevProps.levelHealth !==
-        this.props.levelHealth
-      ) {
+    if (
+      JSON.stringify(prevProps.levelHealth) !==
+      JSON.stringify(this.props.levelHealth)
+    ) {
+      this.modifyLevelData();
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -439,6 +493,7 @@ class ManageBackup extends Component<
     let secretShare = {};
     if (levelHealth.length > 0) {
       let levelInfo = getLevelInfo(levelHealth, currentLevel);
+
       if (levelInfo) {
         if (
           levelInfo[2] &&
@@ -448,9 +503,12 @@ class ManageBackup extends Component<
         ) {
           for (let i = 0; i < s3Service.levelhealth.metaSharesKeeper.length; i++) {
             const element = s3Service.levelhealth.metaSharesKeeper[i];
+
             if (levelInfo[0].shareId == element.shareId) {
               secretShare = element;
+              break;
             }
+
           }
         }
       }
@@ -584,6 +642,45 @@ class ManageBackup extends Component<
   };
 
   onPressKeeper = (value, number) => {
+    let { currentLevel, isLevelThreeMetaShareCreated, isLevel3Initialized, isLevelTwoMetaShareCreated, isLevel2Initialized, secureAccount } = this.props;
+    if (
+      currentLevel == 1 &&
+      value.id == 3 && !isLevelThreeMetaShareCreated &&
+      !isLevel3Initialized
+    ) {
+      this.setState({
+        errorTitle: 'Please first complete Level 2',
+        errorInfo: 'Please check if you have completed above levels first and try to complete levels',
+      });
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+      return;
+    }
+    else if (
+      currentLevel == 1 && number == 2 && 
+      value.id == 2 && !isLevelTwoMetaShareCreated &&
+      !isLevel2Initialized
+    ) {
+      this.setState({
+        errorTitle: 'Please first complete Primary Keeper Setup',
+        errorInfo: 'Please check if you have completed Primary Keeper Setup first and try to complete Primary Keeper Setup',
+      });
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+      return;
+    }
+    else if (
+      currentLevel == 1 && number == 2 && 
+      value.id == 2 && !secureAccount.secureHDWallet.xpubs.secondary && !secureAccount.secureHDWallet.xpubs.bh
+    ) {
+      this.setState({
+        errorTitle: 'Please make sure Primary Keeper setup completed.',
+        errorInfo: 'Please check if you have completed Primary Keeper Setup and check notifications for xPubs.',
+      });
+      (this.refs.ErrorBottomSheet as any).snapTo(1);
+      return;
+    }
+    else{
+      this.setState({errorTitle: '', errorInfo: ''});
+    }
     let keeper = number == 1 ? value.keeper1 : value.keeper2;
     this.setState({
       selectedKeeper: keeper,
@@ -604,9 +701,17 @@ class ManageBackup extends Component<
       this.goToHistory(obj);
       return;
     } else {
-      if (value.id === 2 && number == 1)
-        (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
-      else (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+      if (value.id === 2 && number == 1) {
+        if(this.props.currentLevel == 1) {
+          (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+        } else {
+          this.setState({
+            errorTitle: 'Please first complete Level 1',
+            errorInfo: 'Please check if you have completed Level 1 first and try to complete Level 1.',
+          });
+          (this.refs.ErrorBottomSheet as any).snapTo(1);
+        }
+      } else (this.refs.keeperTypeBottomSheet as any).snapTo(1);
     }
   };
 
@@ -666,6 +771,33 @@ class ManageBackup extends Component<
     );
   };
 
+  renderErrorModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={(this.refs.ErrorBottomSheet as any)}
+        title={this.state.errorTitle}
+        info={this.state.errorInfo}
+        proceedButtonText={'Got it'}
+        isIgnoreButton={false}
+        onPressProceed={() => this.closeErrorModal()}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }
+
+  closeErrorModal = () => {
+    (this.refs.ErrorBottomSheet as any).snapTo(0)
+  }
+
+  renderErrorModalHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => this.closeErrorModal()}
+      />
+    )
+  }
+
   render() {
     const {
       levelData,
@@ -673,13 +805,12 @@ class ManageBackup extends Component<
       isError,
       selectedLevelId,
       selectedKeeperType,
+      refreshControlLoader
     } = this.state;
     const {
       navigation,
-      healthLoading,
       keeperApproveStatus,
       currentLevel,
-      trustedChannelsSetupSyncing,
     } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: "white" }}>
@@ -711,7 +842,7 @@ class ManageBackup extends Component<
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={healthLoading || trustedChannelsSetupSyncing}
+              refreshing={refreshControlLoader}
               onRefresh={() => this.onRefresh()}
             />
           }
@@ -743,7 +874,7 @@ class ManageBackup extends Component<
             <View>
               <Text style={styles.backupText}>Backup</Text>
               <Text style={styles.backupInfoText}>Security is</Text>
-              <Text style={styles.backupInfoText}>at level {currentLevel}</Text>
+              <Text style={styles.backupInfoText}>at level {currentLevel ? currentLevel : ''}</Text>
             </View>
           </View>
           <View style={{ flex: 1, alignItems: "center", position: "relative", paddingBottom: wp('7%') }}>
@@ -945,7 +1076,7 @@ class ManageBackup extends Component<
                                 }}
                                 onPress={() => {
                                   if (!this.props.cloudBackupStatus.status) {
-                                    this.cloudData();
+                                    this.updateCloudData();
                                   }
                                 }}
                               >
@@ -1230,11 +1361,6 @@ class ManageBackup extends Component<
                 ) { 
                   getApproval = false;
                   await this.props.generateMetaShare(selectedLevelId);
-                } else if (
-                  this.props.currentLevel == 1 &&
-                  selectedLevelId == 3
-                ) {
-                  alert("Please complete Level 2");
                 }
                 if (getApproval) {
                   this.sendApprovalRequestToPK(type);
@@ -1370,6 +1496,16 @@ class ManageBackup extends Component<
             />
           )}
         />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'ErrorBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '30%' ) : hp( '35%' ),
+          ]}
+          renderContent={this.renderErrorModalContent}
+          renderHeader={this.renderErrorModalHeader}
+        />
       </View>
     );
   }
@@ -1382,7 +1518,6 @@ const mapStateToProps = (state) => {
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || "",
     metaShares: idx(state, (_) => _.health.service.levelhealth.metaShares),
     s3Service: idx(state, (_) => _.health.service),
-    overallHealth: idx(state, (_) => _.sss.overallHealth),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     cloudBackupStatus:
       idx(state, (_) => _.preferences.cloudBackupStatus) || false,
@@ -1412,6 +1547,8 @@ const mapStateToProps = (state) => {
       state,
       (_) => _.trustedContacts.loading.trustedChannelsSetupSync
     ),
+    accountShells: idx(state, (_) => _.accounts.accountShells),
+    activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
   };
 };
 

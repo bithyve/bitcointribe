@@ -813,13 +813,32 @@ export default function ManageBackup(props) {
     }
   };
 
-  useEffect(() => {
-    setAutoHighlightFlagsFromAsync();
-  }, []);
+  useEffect( () => {
+    setAutoHighlightFlagsFromAsync()
+    setSecurityQuestionCreatedData()
+  }, [] )
 
-  useEffect(() => {
-    if (autoHighlightFlags) {
-      autoHighlight();
+  const setSecurityQuestionCreatedData = async() =>{
+    const updatedPageData = [ ...pageData ]
+    const securityQuestionHistory = JSON.parse(
+      await AsyncStorage.getItem( 'securityQuestionHistory' ),
+    )
+    updatedPageData.forEach( ( data ) => {
+      switch ( data.title ) {
+          case 'Security Questions':
+            data.time = securityQuestionHistory ? securityQuestionHistory.created : 'never'
+            break
+
+          default:
+            break
+      }
+    } )
+    setPageData( updatedPageData )
+  }
+
+  useEffect( () => {
+    if ( autoHighlightFlags ) {
+      autoHighlight()
       AsyncStorage.setItem(
         "AutoHighlightFlags",
         JSON.stringify(autoHighlightFlags)
@@ -905,56 +924,69 @@ export default function ManageBackup(props) {
         }
       })();
     }
-  }, [health]);
+  }, [ health ] )
 
-  useEffect(() => {
-    if (overallHealth) {
-      setIsNextStepDisable(false);
-      const updatedPageData = [...pageData];
-      updatedPageData.forEach((data) => {
-        switch (data.title) {
-          case "Secondary Device":
-            if (overallHealth.sharesInfo[0]) {
-              data.status = overallHealth.sharesInfo[0].shareStage;
-              data.time = overallHealth.sharesInfo[0].updatedAt;
-            }
-            break;
+  useEffect( () => {
+    if ( overallHealth ) {
+      setIsNextStepDisable( false )
+      const updatedPageData = [ ...pageData ]
+      updatedPageData.forEach( async( data ) => {
+        switch ( data.title ) {
+            case 'Secondary Device':
+              if ( overallHealth.sharesInfo[ 0 ] ) {
+                data.status = overallHealth.sharesInfo[ 0 ].shareStage
+                data.time = overallHealth.sharesInfo[ 0 ].updatedAt
+              }
+              break
 
-          case "Trusted Contact 1":
-            if (overallHealth.sharesInfo[1]) {
-              data.status = overallHealth.sharesInfo[1].shareStage;
-              data.time = overallHealth.sharesInfo[1].updatedAt;
-            }
-            break;
+            case 'Trusted Contact 1':
+              if ( overallHealth.sharesInfo[ 1 ] ) {
+                data.status = overallHealth.sharesInfo[ 1 ].shareStage
+                data.time = overallHealth.sharesInfo[ 1 ].updatedAt
+              }
+              break
 
-          case "Trusted Contact 2":
-            if (overallHealth.sharesInfo[2]) {
-              data.status = overallHealth.sharesInfo[2].shareStage;
-              data.time = overallHealth.sharesInfo[2].updatedAt;
-            }
-            break;
+            case 'Trusted Contact 2':
+              if ( overallHealth.sharesInfo[ 2 ] ) {
+                data.status = overallHealth.sharesInfo[ 2 ].shareStage
+                data.time = overallHealth.sharesInfo[ 2 ].updatedAt
+              }
+              break
 
-          case "Personal Copy 1":
-            if (overallHealth.sharesInfo[3]) {
-              data.status = overallHealth.sharesInfo[3].shareStage;
-              data.time = overallHealth.sharesInfo[3].updatedAt;
-            }
-            break;
+            case 'Personal Copy 1':
+              if ( overallHealth.sharesInfo[ 3 ] ) {
+                data.status = overallHealth.sharesInfo[ 3 ].shareStage
+                data.time = overallHealth.sharesInfo[ 3 ].updatedAt
+              }
+              break
 
-          case "Personal Copy 2":
-            if (overallHealth.sharesInfo[4]) {
-              data.status = overallHealth.sharesInfo[4].shareStage;
-              data.time = overallHealth.sharesInfo[4].updatedAt;
-            }
-            break;
+            case 'Personal Copy 2':
+              if ( overallHealth.sharesInfo[ 4 ] ) {
+                data.status = overallHealth.sharesInfo[ 4 ].shareStage
+                data.time = overallHealth.sharesInfo[ 4 ].updatedAt
+              }
+              break
 
-          case "Security Questions":
-            data.status = overallHealth.qaStatus.stage;
-            data.time = overallHealth.qaStatus.updatedAt;
-            break;
+            case 'Security Questions':
+              data.status = overallHealth.qaStatus.stage
+              data.time = overallHealth.qaStatus.updatedAt
+              const securityQuestionHistory = JSON.parse(
+                await AsyncStorage.getItem( 'securityQuestionHistory' ),
+              )
+              if( overallHealth.qaStatus.updatedAt ){
+                const securityQuestionHistoryUpdated = {
+                  ...securityQuestionHistory,
+                  confirmed: overallHealth.qaStatus.updatedAt,
+                }
+                await AsyncStorage.setItem(
+                  'securityQuestionHistory',
+                  JSON.stringify( securityQuestionHistoryUpdated ),
+                )
+              }
+              break
 
-          default:
-            break;
+            default:
+              break
         }
       });
       setPageData(updatedPageData);
@@ -1285,12 +1317,17 @@ export default function ManageBackup(props) {
     }
   };
 
-  const getTime = (item) => {
-    return (item.toString() && item.toString() == "0") ||
-      item.toString() == "never"
-      ? "never"
-      : timeFormatter(moment(new Date()), item);
-  };
+  const getTime = ( item ) => {
+    try{
+      return ( item.toString() && item.toString() == '0' ) ||
+      item.toString() == 'never'
+        ? 'never'
+        : timeFormatter( moment( new Date() ), item )
+
+    }catch( err ){
+      return 'never'
+    }
+  }
 
   useEffect(() => {
     // HC init and down-streaming
@@ -1607,15 +1644,15 @@ export default function ManageBackup(props) {
         return "Secure your Recovery Key as a file (pdf)";
       }
     }
-    if (item.type == "security") {
-      if (autoHighlightFlags.securityAns) {
-        return item.status == "Ugly"
-          ? "Confirm the Security Question and Answer"
-          : item.status == "Bad"
-          ? "Confirm the Security Question and Answer"
-          : item.status == "Good"
-          ? "Security Question and Answer confirmed"
-          : "Last Backup";
+    if ( item.type == 'security' ) {
+      if ( autoHighlightFlags.securityAns ) {
+        return item.status == 'Ugly'
+          ? 'Confirm the Security Question and Answer created'
+          : item.status == 'Bad'
+            ? 'Confirm the Security Question and Answer'
+            : item.status == 'Good'
+              ? 'Security Question and Answer confirmed'
+              : 'Last Backup'
       } else {
         return "Last Backup";
       }

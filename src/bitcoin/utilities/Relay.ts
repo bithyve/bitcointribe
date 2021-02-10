@@ -18,14 +18,14 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('checkCompatibility', {
+      res = await BH_AXIOS.post( 'checkCompatibility', {
         HEXA_ID,
         method,
         version,
-      })
-    } catch (err) {
-      if (err.response) console.log(err.response.data.err)
-      if (err.code) console.log(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) console.log( err.response.data.err )
+      if ( err.code ) console.log( err.code )
     }
     const { compatible, alternatives } = res.data
     return {
@@ -40,15 +40,15 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('fetchReleases', {
+      res = await BH_AXIOS.post( 'fetchReleases', {
         HEXA_ID,
         build,
-      })
-    } catch (err) {
-      if (err.response) console.log(err.response.data.err)
-      if (err.code) console.log(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) console.log( err.response.data.err )
+      if ( err.code ) console.log( err.code )
     }
-    const { releases = [] } = idx(res, (_) => _.data) || {
+    const { releases = [] } = idx( res, ( _ ) => _.data ) || {
     }
     return {
       releases 
@@ -64,21 +64,21 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post('updateFCMTokens', {
+        res = await BH_AXIOS.post( 'updateFCMTokens', {
           HEXA_ID,
           walletID,
           FCMs,
-        })
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err)
-        if (err.code) throw new Error(err.code)
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
       const { updated } = res.data
       return {
         updated 
       }
-    } catch (err) {
-      throw new Error('Failed to fetch GetBittr Details')
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch GetBittr Details' )
     }
   };
 
@@ -90,16 +90,16 @@ export default class Relay {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('fetchNotifications', {
+      res = await BH_AXIOS.post( 'fetchNotifications', {
         HEXA_ID,
         walletID,
-      })
-    } catch (err) {
-      console.log({
+      } )
+    } catch ( err ) {
+      console.log( {
         err 
-      })
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     const { notifications, DHInfos } = res.data
@@ -109,7 +109,7 @@ export default class Relay {
   };
 
   public static sendNotifications = async (
-    receivers: { walletId: string; FCMs: string[] }[],
+    receivers: { walletId: string; FCMs?: string[] }[],
     notification: INotification
   ): Promise<{
     sent: boolean;
@@ -117,29 +117,29 @@ export default class Relay {
     try {
       let res: AxiosResponse
 
-      if (!receivers.length)
-        throw new Error('Failed to deliver notification: receivers missing')
+      if ( !receivers.length )
+        throw new Error( 'Failed to deliver notification: receivers missing' )
 
       try {
-        res = await BH_AXIOS.post('sendNotifications', {
+        res = await BH_AXIOS.post( 'sendNotifications', {
           HEXA_ID,
           receivers,
           notification,
-        })
+        } )
         // console.log({ res });
-      } catch (err) {
+      } catch ( err ) {
         // console.log({ err });
-        if (err.response) throw new Error(err.response.data.err)
-        if (err.code) throw new Error(err.code)
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
       const { sent } = res.data
-      if (!sent) throw new Error()
+      if ( !sent ) throw new Error()
 
       return {
         sent 
       }
-    } catch (err) {
-      throw new Error('Failed to deliver notification')
+    } catch ( err ) {
+      throw new Error( 'Failed to deliver notification' )
     }
   };
 
@@ -152,29 +152,29 @@ export default class Relay {
     try {
       let res: AxiosResponse
 
-      if (!txNote || !txNote.txId || !txNote.note)
-        throw new Error('Failed to send donation note: txid|note missing')
+      if ( !txNote || !txNote.txId || !txNote.note )
+        throw new Error( 'Failed to send donation note: txid|note missing' )
 
       try {
-        res = await BH_AXIOS.post('addDonationTxNote', {
+        res = await BH_AXIOS.post( 'addDonationTxNote', {
           HEXA_ID,
           donationId,
           txNote,
-        })
+        } )
         // console.log({ res });
-      } catch (err) {
+      } catch ( err ) {
         // console.log({ err });
-        if (err.response) throw new Error(err.response.data.err)
-        if (err.code) throw new Error(err.code)
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
       const { added } = res.data
-      if (!added) throw new Error()
+      if ( !added ) throw new Error()
 
       return {
         added 
       }
-    } catch (err) {
-      throw new Error('Failed to deliver donation note')
+    } catch ( err ) {
+      throw new Error( 'Failed to deliver donation note' )
     }
   };
 
@@ -185,22 +185,22 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post('fetchFeeAndExchangeRates', {
+        res = await BH_AXIOS.post( 'fetchFeeAndExchangeRates', {
           HEXA_ID,
-        })
+        } )
         // console.log({ res });
-      } catch (err) {
+      } catch ( err ) {
         // console.log({ err });
-        if (err.response) throw new Error(err.response.data.err)
-        if (err.code) throw new Error(err.code)
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
       const { exchangeRates, averageTxFees } = res.data
 
       return {
         exchangeRates, averageTxFees 
       }
-    } catch (err) {
-      throw new Error('Failed fetch fee and exchange rates')
+    } catch ( err ) {
+      throw new Error( 'Failed fetch fee and exchange rates' )
     }
   };
 

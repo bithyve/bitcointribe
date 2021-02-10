@@ -10,6 +10,7 @@ export default class CloudBackup {
   public recoveryCallback;
   public isNotReading = true;
   public googlePermissionCall = false;
+  public googleCloudLoginCallback;
 
   constructor(stateVars?: {
     dataObject?: any;
@@ -17,14 +18,15 @@ export default class CloudBackup {
     share?: any;
     recoveryCallback?: any;
     googlePermissionCall?: any;
+    googleCloudLoginCallback?: any;
   }) {
-    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall } = stateVars;
+    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback } = stateVars;
     if (dataObject) this.dataObject = dataObject;
     if (callBack) this.callBack = callBack;
     if (share) this.share = share;
     if (recoveryCallback) this.recoveryCallback = recoveryCallback;
     if (googlePermissionCall) this.googlePermissionCall = googlePermissionCall;
-
+    if (googleCloudLoginCallback) this.googleCloudLoginCallback = googleCloudLoginCallback;
   }
 
   // check storage permission
@@ -34,9 +36,10 @@ export default class CloudBackup {
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
       ]);
+      console.log("userResponse",userResponse);
       return userResponse;
     } catch (err) {
-      // console.log(err);
+      console.log(err);
     }
     return null;
   };
@@ -64,7 +67,7 @@ export default class CloudBackup {
     this.share = share ? share : {};
     if (Platform.OS == 'ios') {
       iCloud.downloadBackup().then((backedJson) => {
-        // console.log('BackedUp JSON: DONE', backedJson);
+        console.log('BackedUp JSON: DONE', backedJson);
         if (backedJson) {
           this.updateData({
             result1: backedJson,
@@ -72,7 +75,7 @@ export default class CloudBackup {
             share: this.share,
           });
         } else {
-          // console.log('createFile');
+          console.log('createFile');
           this.createFile({});
         }
       });
@@ -85,9 +88,11 @@ export default class CloudBackup {
   public GoogleDriveLogin = (params: {
     checkDataIsBackedup?: boolean;
     share?: any;
-    googlePermissionCall? : any
+    googlePermissionCall? : any,
+    googleCloudLoginCallback? : any,
   }) => {
-    let { checkDataIsBackedup, share, googlePermissionCall } = params;
+    let { checkDataIsBackedup, share, googlePermissionCall, googleCloudLoginCallback } = params;
+    this.googleCloudLoginCallback = googleCloudLoginCallback;
     GoogleDrive.setup()
       .then(() => {
         GoogleDrive.login(async (err, data) => {
@@ -96,12 +101,24 @@ export default class CloudBackup {
           else{
             const result = err || data;
             console.log('GOOGLE ReSULT', data);
-            // console.log('Error', e);
+            console.log('Error', err);
             if (result.eventName == 'onLogin') {
-              if (!(await this.checkPermission())) {
-                throw new Error('Storage Permission Denied');
-              }
-            }
+              // if (!(await this.checkPermission())) {
+              //  console.log('Storage Permission Denied');
+              // }
+              this.googleCloudLoginCallback('success');
+            //   let usersPermissions = await this.checkPermission();
+            //   if (usersPermissions['android.permission.READ_EXTERNAL_STORAGE']
+            //   && usersPermissions['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted') {
+            //     console.log("INSIDE dsfsd");
+            //     this.googleCloudLoginCallback('success');
+            //     //throw new Error('Storage Permission Denied');
+            //   } else {
+            //     console.log("INSIDE Elese");
+            //     this.googleCloudLoginCallback('fail');
+
+            // }
+          }
           }
         });
       })
@@ -119,12 +136,13 @@ export default class CloudBackup {
     console.log('isNotReading handleLogin', this.isNotReading);
     let { err, data, checkDataIsBackedup, share } = params;
     const result = err || data;
+    console.log('handleLogin err', err);
     console.log('GOOGLE ReSULT', data);
     // console.log('Error', e);
     if (result.eventName == 'onLogin') {
-      if (!(await this.checkPermission())) {
-        throw new Error('Storage Permission Denied');
-      }
+      // if (!(await this.checkPermission())) {
+      //   throw new Error('Storage Permission Denied');
+      // }
       //this.createFile();
       this.checkFileIsAvailable({
         checkDataIsBackedup: params.checkDataIsBackedup,
@@ -148,20 +166,22 @@ export default class CloudBackup {
       description: 'Backup data for my app',
       mimeType: 'application/json',
     };
+    console.log('checkFileIsAvailable err', share);
     await GoogleDrive.checkIfFileExist(
       JSON.stringify(metaData),
       (err, data) => {
         // console.log('err, data', data, err);
         const result = err || data;
-        // console.log('checkFileIsAvailable', result);
+        console.log('checkFileIsAvailable', result);
         if (!checkDataIsBackedup) {
           if (result && result.eventName == 'listEmpty') {
+            console.log('createFile');
             this.createFile({ share });
           } else if (result.eventName == 'failure') {
             console.log('FAILURE');
           } else {
             console.log(
-              'isNotReading checkFileIsAvailable if',
+              'readFile isNotReading checkFileIsAvailable if',
               this.isNotReading,
             );
             this.readFile({ result, share });
@@ -205,7 +225,7 @@ export default class CloudBackup {
 
       try {
         GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
-          // console.log('DATA', data);
+          console.log('DATA', data);
           const result = err || data;
           if (result.eventName == 'successFullyUpload') {
             this.callBack(share);
@@ -214,7 +234,7 @@ export default class CloudBackup {
         });
         // uploadFile(JSON.stringify(content))
       } catch (error) {
-        //console.log('error', error);
+        console.log('error', error);
       }
     }
   };
@@ -223,8 +243,8 @@ export default class CloudBackup {
     let { metaData, share } = params;
     try {
       GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) => {
-        // console.log('DATA updateFile', data);
-        // console.log('ERROR updateFile', err);
+        console.log('DATA updateFile', data);
+        console.log('ERROR updateFile', err);
         const result = err || data;
         if (result.eventName == 'successFullyUpdate') {
           this.callBack(share);
@@ -248,8 +268,8 @@ export default class CloudBackup {
       if (this.isNotReading) {
         this.isNotReading = false;
         GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) => {
-          console.log('isNotReading readFile data1', this.isNotReading, data1);
-          console.log('isNotReading readFile err', this.isNotReading, err);
+          console.log('isNotReading readFile data1', data1);
+          console.log('isNotReading readFile err', err);
           const result1 = err || data1.data;
           if (checkDataIsBackedup) {
             this.recoveryCallback(result1);
@@ -260,7 +280,7 @@ export default class CloudBackup {
         });
       }
     } catch (error) {
-      //console.log('error', error);
+      console.log('error', error);
     }
   };
 
@@ -270,7 +290,7 @@ export default class CloudBackup {
     share?: any;
   }) => {
     let { result1, googleData, share } = params;
-    // console.log('updateData share', share);
+    console.log('updateData share', share);
     const { data } = this.dataObject.regularAccount.getWalletId();
     var arr = [];
     var newArray = [];

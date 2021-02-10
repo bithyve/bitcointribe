@@ -37,16 +37,16 @@ import {
 
 const KeeperDeviceHistory = (props) => {
   const dispatch = useDispatch();
-  const ErrorBottomSheet = React.createRef();
-  const HelpBottomSheet = React.createRef();
+  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
+  const [HelpBottomSheet, setHelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageHeader, setErrorMessageHeader] = useState("");
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const ApproveSetupBottomSheet = React.createRef();
-  const ApprovePrimaryKeeperBottomSheet = React.createRef();
-  const keeperTypeBottomSheet = React.createRef();
-  const ReshareBottomSheet = React.createRef();
+  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(React.createRef());
+  const [ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet] = useState(React.createRef());
+  const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(React.createRef());
+  const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
 
   const [qrScannedData, setQrScannedData] = useState("");
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
@@ -77,7 +77,7 @@ const KeeperDeviceHistory = (props) => {
     },
   ]);
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
-    props.navigation.state.params.isPrimaryKeeper
+    props.navigation.state.params.selectedKeeper && props.navigation.state.params.selectedKeeper.shareType && props.navigation.state.params.selectedKeeper.shareType == 'primaryKeeper' ? true : false
   );
   const [selectedLevelId, setSelectedLevelId] = useState(
     props.navigation.state.params.selectedLevelId
@@ -218,12 +218,13 @@ const KeeperDeviceHistory = (props) => {
             setQrScannedData(qrData);
             if (qrData) {
               props.navigation.navigate("KeeperFeatures", {
-                isReshare,
-                qrScannedData: qrData,
-                isPrimaryKeeper: isPrimaryKeeper,
-                selectedShareId: selectedKeeper.shareId,
-                selectedLevelId,
-              });
+                    isReshare,
+                    qrScannedData : qrData,
+                    isPrimaryKeeper: isPrimaryKeeper,
+                    selectedShareId: selectedKeeper.shareId,
+                    selectedLevelId: selectedLevelId,
+                    isChange,
+                  });
               (QrBottomSheet as any).current.snapTo(0);
             }
           } catch (err) {
@@ -243,8 +244,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"3010ed2f1363b4c020103e35","publicKey":"32c8757c4ba3d448bbcb9d7dc9f9fc2a281d639912bd2285d37ab03535839b1a","ephemeralAddress":"0272f2cbed4fce911c66167524005a5eb4a22a2392cc54d33d8a5c5baedad89d","walletName":"Mac"}'
-            : '{"uuid":"d96f3cfd52592346a0475246","publicKey":"3d440d5eed70d84d163cfdb79abcc3d31489de90462158dba95316582277629b","ephemeralAddress":"9e784c8b9af2c5f4e48d0dc3cfbc12007071656ea7c3eae8d28349088e3e4dd1","walletName":"Mac Pro"}';
+            ? '{"uuid":"4964b1d02e7c45107be6d21c","publicKey":"458a035b2b6b54b614bcedacddbbc3607a64d58c4d5d254c6fec39637490d909","ephemeralAddress":"2c6c11f4a2131c577bde75bdb639c1923868c89feb38c98049a5e29afaf2e6c9","walletName":"Primary"}' : '{"uuid":"061bc0d417b7c4ccd506e702","publicKey":"1ed9f7699b24eafde5b26766dd4627a15d3fd590037159ca2576c82ad4306abe","ephemeralAddress":"6e2a6b9c3f559a4d5350983f04d0784e39c6bd5f9741f6280eecc8d904a66b69","walletName":"macpro"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
@@ -305,12 +305,12 @@ const KeeperDeviceHistory = (props) => {
       sendApprovalRequest(
         selectedKeeper.shareId,
         PKShareId,
-        type == "pdf"
+        type == "pdf" || type == "contact"
           ? notificationType.uploadSecondaryShare
           : notificationType.approveKeeper
       )
     );
-    if (type == "pdf" && !keeperApproveStatus.shareId) {
+    if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       dispatch(
         onApprovalStatusChange(
           false,
@@ -344,7 +344,7 @@ const KeeperDeviceHistory = (props) => {
               isPrimaryKeeper ? "primaryKeeper" : "device"
             );
           }
-          // onPressReshare();
+          (ReshareBottomSheet as any).current.snapTo(0);
         }}
         onPressIgnore={() => {
           (ReshareBottomSheet as any).current.snapTo(0);
@@ -516,7 +516,7 @@ const KeeperDeviceHistory = (props) => {
         renderContent={() => (
           <ApproveSetup
             isContinueDisabled={
-              selectedKeeperType == "pdf"
+              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
                 ? !keeperApproveStatus.status
                 : false
             }

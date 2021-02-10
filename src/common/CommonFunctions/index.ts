@@ -1,7 +1,9 @@
 import { AsyncStorage } from "react-native";
 import { LevelHealthInterface, LevelInfo } from "../../bitcoin/utilities/Interface";
 import SSS from "../../bitcoin/utilities/sss/SSS";
+import AccountShell from "../data/models/AccountShell";
 import { encrypt } from "../encryption";
+import DeviceInfo from 'react-native-device-info'
 
 export const nameToInitials = fullName => {
   const namesArray = fullName.split( ' ' )
@@ -39,16 +41,20 @@ export const getCurrencyImageName = ( currencyCodeValue ) => {
 export const isEmpty = ( obj ) => {
   return Object.keys( obj ).every( ( k ) => !Object.keys( obj[ k ] ).length )
 }
+export const isExistBuildVersion = (versionData) =>{
+  if(versionData.filter(version => version.buildNumber == DeviceInfo.getBuildNumber()).length == 0) return true;
+  return versionData.filter(version => version.version == DeviceInfo.getVersion()).length == 0;
+}
 
 export const APP_LIST = {
   'WhatsApp': {
-    pkgName: 'com.whatsapp', urlScheme: 'whatsapp', urlParams: 'app' 
+    pkgName: 'com.whatsapp', urlScheme: 'whatsapp', urlParams: 'app'
   }, // fa
   'Telegram': {
-    pkgName: 'org.telegram.messenger', urlScheme: 't.me', urlParams: 'share/url?url=' 
+    pkgName: 'org.telegram.messenger', urlScheme: 't.me', urlParams: 'share/url?url='
   }, // fa
   'Messenger': {
-    pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}' 
+    pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}'
   }, // fa: facebook
 }
 export const getFormattedString = (qrString: string) => {
@@ -76,31 +82,48 @@ export const generateRandomString = (length: number): string => {
 
 const asyncDataToBackup = async () => {
   const [
-    [, TrustedContactsInfo],
-    [, personalCopyDetails],
-    [, FBTCAccount],
-  ] = await AsyncStorage.multiGet([
+    [ , TrustedContactsInfo ],
+    [ , personalCopyDetails ],
+    [ , FBTCAccount ],
+    [ , PersonalNode ]
+  ] = await AsyncStorage.multiGet( [
     'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
-  ]);
-  const ASYNC_DATA = {};
-  if (TrustedContactsInfo)
-    ASYNC_DATA['TrustedContactsInfo'] = TrustedContactsInfo;
-  if (personalCopyDetails)
-    ASYNC_DATA['personalCopyDetails'] = personalCopyDetails;
-  if (FBTCAccount) ASYNC_DATA['FBTCAccount'] = FBTCAccount;
+    'PersonalNode'
+  ] )
+  const ASYNC_DATA = {
+  }
+  if ( TrustedContactsInfo )
+    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+  if ( personalCopyDetails )
+    ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
+  if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
+  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
 
-  return ASYNC_DATA;
-};
+  return ASYNC_DATA
+}
 
-export const CloudData = async (database) => {
+function* stateDataToBackup(accountShells, activePersonalNode) {
+  // state data to backup
+  const STATE_DATA = {
+  }
+  if ( accountShells && accountShells.length )
+    STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
+
+  if( activePersonalNode )
+    STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
+  return STATE_DATA
+}
+export const CloudData = async (database, accountShells, activePersonalNode) => {
   let encryptedCloudDataJson;
     let walletImage = {
       SERVICES: {},
       DECENTRALIZED_BACKUP: {},
       ASYNC_DATA: {},
       WALLET_SETUP: {},
+      STATE_DATA: {},
     };
    // console.log("DATABASE", database);
     let CloudDataJson = {};
@@ -112,6 +135,7 @@ export const CloudData = async (database) => {
       if (database.WALLET_SETUP)
         walletImage.WALLET_SETUP = database.WALLET_SETUP;
       walletImage.ASYNC_DATA = await asyncDataToBackup();
+      walletImage.STATE_DATA = stateDataToBackup(accountShells,activePersonalNode);
       let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
       CloudDataJson = {
         walletImage,

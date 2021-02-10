@@ -64,6 +64,7 @@ import {
   INotification,
   notificationType,
   notificationTag,
+  VersionHistory,
 } from '../../bitcoin/utilities/Interface'
 import generatePDF from '../utils/generatePDF'
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
@@ -93,11 +94,13 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { personalNodeConfigurationSet } from '../actions/nodeSettings'
+import {  restorePersonalNodeConfiguration } from '../actions/nodeSettings'
+import { restoredVersionHistory } from '../actions/versionHistory'
+import versionHistory from '../reducers/versionHistory'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
-  if ( recipient.walletID && recipient.FCMs.length )
+  if ( recipient.walletID )
     receivers.push( {
       walletId: recipient.walletID,
       FCMs: recipient.FCMs,
@@ -1819,7 +1822,9 @@ function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
-
+  const versionHistory = yield select(
+    ((state) => idx(state, (_) => _.versionHistory.versions))
+  ); 
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
@@ -1827,6 +1832,9 @@ function* stateDataToBackup() {
 
   if( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
+  if ( versionHistory && versionHistory.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
 
   return STATE_DATA
 }
@@ -1881,6 +1889,7 @@ function* updateWalletImageWorker() {
     }
 
     const STATE_DATA = yield call( stateDataToBackup )
+
     if ( Object.keys( STATE_DATA ).length ) {
       const currentStateHash = hash( STATE_DATA )
       if ( !hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA ) {
@@ -1913,7 +1922,9 @@ function* updateWalletImageWorker() {
     }
   }
 
-  // console.log({ walletImage });
+  // console.log( {
+  //   walletImage 
+  // } )
 
   if ( Object.keys( walletImage ).length === 0 ) {
     console.log( 'WI: nothing to update' )
@@ -1959,6 +1970,32 @@ function* fetchWalletImageWorker( { payload } ) {
       STATE_DATA,
     } = walletImage
 
+    const payload = {
+      SERVICES, DECENTRALIZED_BACKUP
+    }
+    yield call( insertDBWorker, {
+      payload
+    } ) // synchronously update db
+
+    // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
+    const {
+      REGULAR_ACCOUNT,
+      TEST_ACCOUNT,
+      SECURE_ACCOUNT,
+      S3_SERVICE,
+      TRUSTED_CONTACTS,
+    } = SERVICES
+    const services = {
+      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
+      TRUSTED_CONTACTS: TRUSTED_CONTACTS
+        ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
+        : new TrustedContactsService(),
+    }
+    yield put( remapAccountShells( services ) )
+
     if ( ASYNC_DATA ) {
       for ( const key of Object.keys( ASYNC_DATA ) ) {
         console.log( 'restoring to async: ', key )
@@ -1985,39 +2022,20 @@ function* fetchWalletImageWorker( { payload } ) {
 
             case 'activePersonalNode':
               const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
-              yield put( personalNodeConfigurationSet( 
+              yield put( restorePersonalNodeConfiguration( 
                 activePersonalNode
               ) )
+              break
+
+              case 'versionHistory': 
+              const versions: VersionHistory[] = JSON.parse( STATE_DATA[ key ] )
+              yield put( restoredVersionHistory( {
+                versions
+              } ) )
               break
         }
       }
     }
-
-    const payload = {
-      SERVICES, DECENTRALIZED_BACKUP
-    }
-    yield call( insertDBWorker, {
-      payload
-    } ) // synchronously update db
-
-    // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
-    const {
-      REGULAR_ACCOUNT,
-      TEST_ACCOUNT,
-      SECURE_ACCOUNT,
-      S3_SERVICE,
-      TRUSTED_CONTACTS,
-    } = SERVICES
-    const services = {
-      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
-      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
-      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
-      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
-      TRUSTED_CONTACTS: TRUSTED_CONTACTS
-        ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
-        : new TrustedContactsService(),
-    }
-    yield put( remapAccountShells( services ) )
 
     // update hashes
     const hashesWI = {

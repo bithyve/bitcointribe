@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -10,32 +10,32 @@ import {
   StatusBar,
   AsyncStorage,
   Platform
-} from 'react-native';
-import Colors from '../../common/Colors';
-import QuestionList from '../../common/QuestionList';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../../common/Colors'
+import QuestionList from '../../common/QuestionList'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import KnowMoreButton from '../../components/KnowMoreButton';
-import { useDispatch, useSelector } from 'react-redux';
-import { initializeRecovery } from '../../store/actions/setupAndAuth';
-import commonStyle from '../../common/Styles/Styles';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+} from 'react-native-responsive-screen'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import { useDispatch, useSelector } from 'react-redux'
+import { initializeRecovery } from '../../store/actions/setupAndAuth'
+import commonStyle from '../../common/Styles/Styles'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
-export default function RecoveryQuestionScreen(props) {
-  const walletName = props.navigation.getParam('walletName');
-  const dispatch = useDispatch();
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxValue, setDropdownBoxValue] = useState({
+export default function RecoveryQuestionScreen( props ) {
+  const walletName = props.navigation.getParam( 'walletName' )
+  const dispatch = useDispatch()
+  const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
+  const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: '',
     question: '',
-  });
-  const [answer, setAnswer] = useState('');
-  const [dropdownBoxList] = useState(QuestionList);
+  } )
+  const [ answer, setAnswer ] = useState( '' )
+  const [ dropdownBoxList ] = useState( QuestionList )
 
   const { insertedIntoDB } = useSelector(state => state.storage);
   useEffect(() => {
@@ -45,19 +45,23 @@ export default function RecoveryQuestionScreen(props) {
         props.navigation.navigate('RestoreWithICloud');
         //props.navigation.navigate('RestoreSelectedContactsList');
       }
-    })();
-  }, [insertedIntoDB]);
+    } )()
+  }, [ insertedIntoDB ] )
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1 
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={commonStyle.headerContainer}>
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.goBack()
           }}
-          hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+          hitSlop={{ 
+            top: 20, left: 20, bottom: 20, right: 20 
+          }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -66,25 +70,38 @@ export default function RecoveryQuestionScreen(props) {
       </View>
       <View style={styles.modalContentContainer}>
         <View>
-          <View style={{ flexDirection: 'row', padding: wp('7%') }}>
-            <View style={{ flex: 3, justifyContent: 'center' }}>
+          <View style={{
+            flexDirection: 'row', padding: wp( '7%' ) 
+          }}>
+            <View style={{
+              flex: 3, justifyContent: 'center' 
+            }}>
               <Text style={styles.modalTitleText}>
                 Enter Security Question{'\n'}and Answer
               </Text>
-              <Text style={{ ...styles.modalInfoText, marginTop: wp('1.5%') }}>
+              <Text style={{
+                ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
+              }}>
                 To recover your wallet you have to select the security question
                 and enter its answer
               </Text>
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={{
+              flex: 1 
+            }}>
               <KnowMoreButton
                 onpress={() => {}}
-                containerStyle={{ marginLeft: 'auto', marginTop: 10 }}
-                textStyle={{}}
+                containerStyle={{
+                  marginLeft: 'auto', marginTop: 10 
+                }}
+                textStyle={{
+                }}
               />
             </View>
           </View>
-          <View style={{ paddingLeft: wp('6%'), paddingRight: wp('6%') }}>
+          <View style={{
+            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' ) 
+          }}>
             <TouchableOpacity
               activeOpacity={10}
               style={
@@ -93,7 +110,7 @@ export default function RecoveryQuestionScreen(props) {
                   : styles.dropdownBox
               }
               onPress={() => {
-                setDropdownBoxOpenClose(!dropdownBoxOpenClose);
+                setDropdownBoxOpenClose( !dropdownBoxOpenClose )
               }}
             >
               <Text
@@ -109,21 +126,25 @@ export default function RecoveryQuestionScreen(props) {
                   : 'Select Security Question'}
               </Text>
               <Ionicons
-                style={{ marginLeft: 'auto' }}
+                style={{
+                  marginLeft: 'auto' 
+                }}
                 name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
                 size={15}
                 color={Colors.borderColor}
               />
             </TouchableOpacity>
-            <View style={{ position: 'relative' }}>
+            <View style={{
+              position: 'relative' 
+            }}>
               {dropdownBoxOpenClose && (
                 <View style={styles.dropdownBoxModal}>
                   <ScrollView>
-                    {dropdownBoxList.map((value, index) => (
+                    {dropdownBoxList.map( ( value, index ) => (
                       <TouchableOpacity
                         onPress={() => {
-                          setDropdownBoxValue(value);
-                          setDropdownBoxOpenClose(false);
+                          setDropdownBoxValue( value )
+                          setDropdownBoxOpenClose( false )
                         }}
                         style={{
                           ...styles.dropdownBoxModalElementView,
@@ -147,13 +168,13 @@ export default function RecoveryQuestionScreen(props) {
                                 ? Colors.blue
                                 : Colors.black,
                             fontFamily: Fonts.FiraSansRegular,
-                            fontSize: RFValue(12),
+                            fontSize: RFValue( 12 ),
                           }}
                         >
                           {value.question}
                         </Text>
                       </TouchableOpacity>
-                    ))}
+                    ) )}
                   </ScrollView>
                 </View>
               )}
@@ -162,7 +183,7 @@ export default function RecoveryQuestionScreen(props) {
                   ...styles.inputBox,
                   width: '100%',
                   marginTop: 15,
-                  marginBottom: hp('3%'),
+                  marginBottom: hp( '3%' ),
                 }}
                 keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
                 textContentType="none"
@@ -173,41 +194,41 @@ export default function RecoveryQuestionScreen(props) {
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 onChangeText={text => {
-                  setAnswer(text);
+                  setAnswer( text )
                 }}
                 onFocus={() => {
-                  setDropdownBoxOpenClose(false);
+                  setDropdownBoxOpenClose( false )
                 }}
                 onBlur={() => {
-                  setDropdownBoxOpenClose(false);
+                  setDropdownBoxOpenClose( false )
                 }}
               />
               <TouchableOpacity style={{
-              flexDirection: 'row',
-               marginLeft: wp('6%'),
-               marginRight: wp('6%'),
-               paddingBottom: 10,
-               paddingTop: 10,
-               marginBottom: 25
-            }}
-            onPress={()=> props.navigation.navigate('NewRecoveryOwnQuestions',{
-              walletName,
-            })}>
-              <Text
-                style={{
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontWeight: 'bold',
-                  fontStyle: 'italic',
-                  fontSize: RFValue(12),
-                  color: Colors.blue,
-                }}
-                onPress={()=> props.navigation.navigate('NewRecoveryOwnQuestions',{
-                  walletName,
-                })}
-              >
+                flexDirection: 'row',
+                marginLeft: wp( '6%' ),
+                marginRight: wp( '6%' ),
+                paddingBottom: 10,
+                paddingTop: 10,
+                marginBottom: 25
+              }}
+              onPress={()=> props.navigation.navigate( 'NewRecoveryOwnQuestions', {
+                walletName,
+              } )}>
+                <Text
+                  style={{
+                    fontFamily: Fonts.FiraSansMediumItalic,
+                    fontWeight: 'bold',
+                    fontStyle: 'italic',
+                    fontSize: RFValue( 12 ),
+                    color: Colors.blue,
+                  }}
+                  onPress={()=> props.navigation.navigate( 'NewRecoveryOwnQuestions', {
+                    walletName,
+                  } )}
+                >
                 Or choose your own question
-              </Text>
-            </TouchableOpacity>
+                </Text>
+              </TouchableOpacity>
 
               <Text style={styles.modalInfoText}>
                 The Security Answer is case sensitive, make sure you{'\n'}enter
@@ -220,8 +241,8 @@ export default function RecoveryQuestionScreen(props) {
                 const security = {
                   question: dropdownBoxValue.question,
                   answer,
-                };
-                dispatch(initializeRecovery(walletName, security));
+                }
+                dispatch( initializeRecovery( walletName, security ) )
               }}
               style={styles.questionConfirmButton}
             >
@@ -231,41 +252,43 @@ export default function RecoveryQuestionScreen(props) {
         </View>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     marginRight: 15,
   },
   dropdownBoxModal: {
     borderRadius: 10,
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
-    marginTop: hp('1%'),
+    marginTop: hp( '1%' ),
     width: '100%',
     height: '110%',
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0, height: 10 
+    },
     backgroundColor: Colors.white,
     position: 'absolute',
     zIndex: 9999,
@@ -278,7 +301,7 @@ const styles = StyleSheet.create({
     paddingRight: 15,
   },
   dropdownBox: {
-    marginTop: hp('2%'),
+    marginTop: hp( '2%' ),
     flexDirection: 'row',
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
@@ -290,8 +313,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   dropdownBoxOpened: {
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
+    marginTop: hp( '1%' ),
+    marginBottom: hp( '1%' ),
     flexDirection: 'row',
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
@@ -302,31 +325,35 @@ const styles = StyleSheet.create({
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: {
+      width: 2, height: 2 
+    },
     backgroundColor: Colors.white,
     alignItems: 'center',
   },
   questionConfirmButton: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     borderRadius: 8,
     alignItems: 'center',
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15 
+    },
     backgroundColor: Colors.blue,
-    marginTop: hp('6%'),
+    marginTop: hp( '6%' ),
   },
   inputBox: {
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    width: wp('85%'),
+    width: wp( '85%' ),
     height: 50,
     paddingLeft: 15,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
   },
@@ -334,21 +361,23 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    width: wp('85%'),
+    width: wp( '85%' ),
     height: 50,
     paddingLeft: 15,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: {
+      width: 2, height: 2 
+    },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
-});
+} )

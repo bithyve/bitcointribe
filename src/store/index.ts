@@ -19,6 +19,11 @@ import loaders from './reducers/loaders';
 import keeper from './reducers/keeper';
 
 
+import swanIntegrationReducer from './reducers/SwanIntegration'
+import wyreIntegrationReducer from './reducers/WyreIntegration'
+import VersionHistoryReducer from './reducers/versionHistory'
+
+
 const config = {
   key: 'root', // key is required
   storage, // storage is now required
@@ -47,15 +52,13 @@ import {
   testcoinsWatcher,
   transferST3Watcher,
   accumulativeTxAndBalWatcher,
-  accountsSyncWatcher,
   fetchBalanceTxWatcher,
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  fetchDerivativeAccAddressWatcher,
-  startupSyncWatcher,
+  validateTwoFAWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
@@ -66,6 +69,8 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
+  addNewSecondarySubAccountWatcher,
+  autoSyncShellsWatcher
 } from './sagas/accounts'
 
 import {
@@ -118,7 +123,16 @@ import {
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
-import { connectToBitHyveNodeWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+
+import {
+  fetchSwanAuthenticationUrlWatcher,
+} from './sagas/SwanIntegration'
+
+import {
+  fetchWyreReservationWatcher
+} from './sagas/WyreIntegration'
+import { versionHistoryWatcher } from './sagas/versionHistory'
 
 import {
   initHealthWatcher,
@@ -145,7 +159,8 @@ import {
   confirmPDFSharedWatcher,
   downloadPdfShareHealthWatcher,
   updatedKeeperInfoWatcher,
-  uploadSMShareWatcher
+  uploadSMShareWatcher,
+  updateWalletImageHealthWatcher
 } from './sagas/health';
 
 import {
@@ -179,24 +194,23 @@ const rootSaga = function* () {
     transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
-    accountsSyncWatcher,
-    //exchangeRateWatcher,
-   generateSecondaryXprivWatcher,
+    generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
+    validateTwoFAWatcher,
     removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
-    fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
-    startupSyncWatcher,
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
     addNewAccountShellWatcher,
+    addNewSecondarySubAccountWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
+    autoSyncShellsWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -229,6 +243,7 @@ const rootSaga = function* () {
     // Node Settings
     savePersonalNodeConfigurationWatcher,
     connectToBitHyveNodeWatcher,
+    restorePersonalNodeConfigurationWatcher,
 
     // Notifications
     updateFCMTokensWatcher,
@@ -260,6 +275,7 @@ const rootSaga = function* () {
     downloadMetaShareHealthWatcher,
     cloudMetaShareHealthWatcher,
     fetchWalletImageHealthWatcher,
+    updateWalletImageHealthWatcher,
     uploadEncMetaShareKeeperWatcher,
     sendApprovalRequestWatcher,
     recoverMnemonicHealthWatcher,
@@ -274,7 +290,16 @@ const rootSaga = function* () {
     updatedKeeperInfoWatcher,
     uploadSMShareWatcher,
     // Keeper saga
-    fetchKeeperTrustedChannelWatcher
+    fetchKeeperTrustedChannelWatcher,
+
+    // Swan Integration
+    fetchSwanAuthenticationUrlWatcher,
+
+    // Wyre Integration
+    fetchWyreReservationWatcher,
+
+    //VersionHistory integration
+    versionHistoryWatcher,
   ];
 
   yield all(
@@ -306,6 +331,9 @@ const rootReducer = combineReducers( {
   preferences: preferencesReducer,
   loaders,
   keeper,
+  swanIntegration: swanIntegrationReducer,
+  wyreIntegration: wyreIntegrationReducer,
+  versionHistory: VersionHistoryReducer,
 });
 
 export default function makeStore() {

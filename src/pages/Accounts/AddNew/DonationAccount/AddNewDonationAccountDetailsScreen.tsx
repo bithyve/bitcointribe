@@ -1,11 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { View, StyleSheet, Text, KeyboardAvoidingView, ScrollView, Platform } from 'react-native'
 import FormStyles from '../../../../common/Styles/FormStyles'
-import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
 import ListStyles from '../../../../common/Styles/ListStyles'
-import { Input, Button, CheckBox } from 'react-native-elements'
+import { Input, CheckBox } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
@@ -17,6 +16,8 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import { RFValue } from 'react-native-responsive-fontsize'
 import openLink from '../../../../utils/OpenLink'
 import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
+import Loader from '../../../../components/loader'
+import ButtonBlue from '../../../../components/ButtonBlue'
 
 export type Props = {
   navigation: any;
@@ -26,16 +27,17 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   const dispatch = useDispatch()
   const nameInputRef = useRef<Input>( null )
 
-  const currentSubAccountInfo: DonationSubAccountDescribing = useMemo( () => {
-    return navigation.getParam( 'currentSubAccountInfo' )
+  const currentSubAccount: DonationSubAccountDescribing = useMemo( () => {
+    return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
 
   const [ accountName, setAccountName ] = useState( '' )
-  const [ doneeName, setDoneeName ] = useState( currentSubAccountInfo.doneeName )
+  const [ doneeName, setDoneeName ] = useState( currentSubAccount.doneeName )
   const [ accountDescription, setAccountDescription ] = useState( '' )
   const [ isTFAEnabled, setIsTFAEnabled ] = useState(
-    currentSubAccountInfo.isTFAEnabled,
+    currentSubAccount.isTFAEnabled,
   )
+  const [ showLoader, setShowLoader ] = useState( false )
 
   const canProceed = useMemo( () => {
     return accountName.length > 0 && accountDescription.length > 0
@@ -46,19 +48,21 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
   }, [] )
 
   useAccountShellCreationCompletionEffect( () => {
+    console.log( 'dispatching resetToHomeAction' )
     navigation.dispatch( resetToHomeAction() )
   } )
 
   function handleProceedButtonPress() {
-    currentSubAccountInfo.customDisplayName = accountName
-    currentSubAccountInfo.doneeName = doneeName
-    currentSubAccountInfo.customDescription = accountDescription
-    currentSubAccountInfo.isTFAEnabled = isTFAEnabled
-    currentSubAccountInfo.sourceKind = currentSubAccountInfo.isTFAEnabled
+    setShowLoader( true )
+    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.doneeName = doneeName
+    currentSubAccount.customDescription = accountDescription
+    currentSubAccount.isTFAEnabled = isTFAEnabled
+    currentSubAccount.sourceKind = currentSubAccount.isTFAEnabled
       ? SourceAccountKind.SECURE_ACCOUNT
       : SourceAccountKind.REGULAR_ACCOUNT
 
-    dispatch( addNewAccountShell( currentSubAccountInfo ) )
+    dispatch( addNewAccountShell( currentSubAccount ) )
   }
 
   async function openTermsAndConditions() {
@@ -148,7 +152,7 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
                   checkedColor={Colors.darkGreen}
                   uncheckedColor={Colors.white}
                   checked={isTFAEnabled}
-                  onIconPress={() => setIsTFAEnabled( !isTFAEnabled )}
+                  disabled
                 />
               </View>
             </TouchableOpacity>
@@ -166,18 +170,15 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
           </View>
 
           <View style={styles.footerSection}>
-            <Button
-              raised
-              buttonStyle={ButtonStyles.primaryActionButton}
-              title="Proceed"
-              titleStyle={ButtonStyles.actionButtonText}
-              onPress={handleProceedButtonPress}
-              disabled={canProceed === false}
+            <ButtonBlue
+              buttonText="Proceed"
+              handleButtonPress={handleProceedButtonPress}
+              buttonDisable={canProceed === false}
             />
           </View>
         </View>
-
       </ScrollView>
+      {showLoader ? <Loader isLoading={true} /> : null}
     </KeyboardAvoidingView>
   )
 }

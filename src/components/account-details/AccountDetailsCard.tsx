@@ -37,6 +37,8 @@ function backgroundImageForAccountKind(
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
       case SubAccountKind.DONATION_ACCOUNT:
         return require( '../../assets/images/carouselImages/donation_account_background.png' )
+      case SubAccountKind.SERVICE:
+        return require( '../../assets/images/carouselImages/wyre_account_background.png' )
       default:
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
   }
@@ -52,6 +54,8 @@ function shadowColorForAccountKind( accountKind: SubAccountKind ): string {
         return Colors.green
       case SubAccountKind.DONATION_ACCOUNT:
         return Colors.borderColor
+      case SubAccountKind.SERVICE:
+        return Colors.coral
       default:
         return Colors.borderColor
   }
@@ -75,9 +79,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const AccountKindDetailsSection: React.FC = () => {
     return (
       <View style={styles.accountKindDetailsSection}>
-
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start'
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          marginBottom: 8,
         }}>
           <Image
             source={getAvatarForSubAccount( primarySubAccount )}
@@ -91,26 +96,27 @@ const AccountDetailsCard: React.FC<Props> = ( {
           </View>
         </View>
 
-
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          marginBottom: 8,
         }}>
-          <View>
-            <Text style={styles.title1Text}>
-              {primarySubAccount.customDisplayName ||
+          <Text style={styles.title1Text}>
+            {primarySubAccount.customDisplayName ||
               primarySubAccount.defaultTitle}
-            </Text>
-
-            <Text style={styles.title2Text}>
-              {primarySubAccount.customDescription ||
-              primarySubAccount.defaultDescription}
-            </Text>
-          </View>
-
-          {primarySubAccount.isTFAEnabled && (
-            <Text style={styles.title1Text}>2FA</Text>
-          )}
+          </Text>
+          <Text style={styles.title1Text}>2FA</Text>
         </View>
+
+        <Text
+          style={styles.title2Text}
+          numberOfLines={2}
+          ellipsizeMode={'tail'}
+        >
+          {primarySubAccount.customDescription ||
+              primarySubAccount.defaultDescription}
+        </Text>
       </View>
     )
   }
@@ -191,7 +197,8 @@ const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
     maxWidth: 440,
-    height: 222,
+    maxHeight: 440 * 0.7,
+    minHeight: 210,
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,

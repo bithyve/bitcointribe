@@ -1,9 +1,8 @@
 import React from 'react'
 import { View, Text, StyleSheet, ImageBackground, Image } from 'react-native'
-import { Avatar, Button, ListItem } from 'react-native-elements'
+import { ListItem } from 'react-native-elements'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import BottomSheetStyles from '../../../common/Styles/BottomSheetStyles'
@@ -11,6 +10,7 @@ import AccountShell from '../../../common/data/models/AccountShell'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { RFValue } from 'react-native-responsive-fontsize'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
+import ButtonBlue from '../../ButtonBlue'
 
 
 export type Props = {
@@ -96,13 +96,10 @@ const AccountShellMergeSuccessBottomSheet: React.FC<Props> = ( {
         </View>
 
         <View style={styles.actionButtonContainer}>
-          <Button
-            raised
-            buttonStyle={ButtonStyles.primaryActionButton}
-            title="View Account"
-            titleStyle={ButtonStyles.actionButtonText}
-            onPress={onViewAccountDetailsPressed}
-          />
+        <ButtonBlue
+          buttonText="View Account"
+          handleButtonPress={onViewAccountDetailsPressed}
+        />
         </View>
       </View>
     </View>

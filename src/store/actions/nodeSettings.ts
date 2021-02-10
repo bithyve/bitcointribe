@@ -5,12 +5,17 @@ export const PERSONAL_NODE_PREFERENCE_TOGGLED = 'PERSONAL_NODE_PREFERENCE_TOGGLE
 
 export const SAVE_PERSONAL_NODE_CONFIGURATION = 'SAVE_PERSONAL_NODE_CONFIGURATION'
 export const PERSONAL_NODE_CONFIGURATION_SET = 'PERSONAL_NODE_CONFIGURATION_SET'
+export const RESTORE_PERSONAL_NODE_CONFIGURATION = 'RESTORE_PERSONAL_NODE_CONFIGURATION'
 
 export const CONNECT_TO_PERSONAL_NODE = 'CONNECT_TO_PERSONAL_NODE'
-export const CONNECT_TO_BITHYVE_NODE = 'CONNECT_TO_BITHYVE_NODE'
 export const PERSONAL_NODE_CONNECTING_FAILED = 'PERSONAL_NODE_CONNECTING_FAILED'
 export const PERSONAL_NODE_CONNECTING_SUCCEEDED = 'PERSONAL_NODE_CONNECTING_SUCCEEDED'
 export const PERSONAL_NODE_CONNECTING_COMPLETED = 'PERSONAL_NODE_CONNECTING_COMPLETED'
+
+export const CONNECT_TO_BIT_HYVE_NODE = 'CONNECT_TO_BIT_HYVE_NODE'
+export const BIT_HYVE_NODE_CONNECTING_FAILED = 'BIT_HYVE_NODE_CONNECTING_FAILED'
+export const BIT_HYVE_NODE_CONNECTING_SUCCEEDED = 'BIT_HYVE_NODE_CONNECTING_SUCCEEDED'
+export const BIT_HYVE_NODE_CONNECTING_COMPLETED = 'BIT_HYVE_NODE_CONNECTING_COMPLETED'
 
 
 export interface PersonalNodePreferenceToggledAction extends Action {
@@ -37,6 +42,14 @@ export const savePersonalNodeConfiguration = ( payload: PersonalNode ): Personal
     payload,
   }
 }
+
+export const restorePersonalNodeConfiguration = ( payload: PersonalNode ) => {
+  return {
+    type: RESTORE_PERSONAL_NODE_CONFIGURATION,
+    payload,
+  }
+}
+
 
 
 export interface PersonalNodeConfigurationSetAction extends Action {
@@ -65,18 +78,6 @@ export const connectToPersonalNode = (
     payload,
   }
 }
-
-export interface BitHyveNodeConnectionAction extends Action {
-  type: typeof CONNECT_TO_BITHYVE_NODE;
-}
-
-export const connectToBitHyveNode = (
-): BitHyveNodeConnectionAction => {
-  return {
-    type: CONNECT_TO_BITHYVE_NODE,
-  }
-}
-
 
 
 export interface PersonalNodeConnectionSuccessAction extends Action {
@@ -115,5 +116,54 @@ export interface PersonalNodeConnectionCompletionAction extends Action {
 export const personalNodeConnectionCompleted = (): PersonalNodeConnectionCompletionAction => {
   return {
     type: PERSONAL_NODE_CONNECTING_COMPLETED
+  }
+}
+
+
+export interface BitHyveNodeConnectionAction extends Action {
+  type: typeof CONNECT_TO_BIT_HYVE_NODE;
+}
+
+export const connectToBitHyveNode = (
+): BitHyveNodeConnectionAction => {
+  return {
+    type: CONNECT_TO_BIT_HYVE_NODE,
+  }
+}
+
+
+export interface BitHyveNodeConnectionSuccessAction extends Action {
+  type: typeof BIT_HYVE_NODE_CONNECTING_SUCCEEDED;
+}
+
+export const bitHyveNodeConnectionSucceeded = (
+): BitHyveNodeConnectionSuccessAction => {
+  return {
+    type: BIT_HYVE_NODE_CONNECTING_SUCCEEDED,
+  }
+}
+
+
+export interface BitHyveNodeConnectionFailureAction extends Action {
+  type: typeof BIT_HYVE_NODE_CONNECTING_FAILED;
+  payload: string;
+}
+
+export const bitHyveNodeConnectionFailed = (
+  errorMessage: string
+): BitHyveNodeConnectionFailureAction => {
+  return {
+    type: BIT_HYVE_NODE_CONNECTING_FAILED,
+    payload: errorMessage,
+  }
+}
+
+export interface BitHyveNodeConnectionCompletionAction extends Action {
+  type: typeof BIT_HYVE_NODE_CONNECTING_COMPLETED;
+}
+
+export const bitHyveNodeConnectionCompleted = (): BitHyveNodeConnectionCompletionAction => {
+  return {
+    type: BIT_HYVE_NODE_CONNECTING_COMPLETED
   }
 }

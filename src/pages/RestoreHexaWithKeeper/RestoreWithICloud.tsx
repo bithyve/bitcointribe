@@ -41,7 +41,7 @@ import { requestTimedout } from '../../store/utils/utilities';
 import RestoreWallet from './RestoreWallet';
 import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import { CloudData, isEmpty } from '../../common/CommonFunctions';
+import { isEmpty } from '../../common/CommonFunctions';
 import CloudBackup from '../../common/CommonFunctions/CloudBackup';
 import { setCloudBackupStatus } from '../../store/actions/preferences';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -249,6 +249,7 @@ class RestoreWithICloud extends Component<
     let key = SSS.strechKey(this.props.security.answer);
     let KeeperData = JSON.parse(selectedBackup.keeperData);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
+    //console.log('decryptedCloudDataJson checkForRecoverWallet', decryptedCloudDataJson);
 
     if (shares.length === 2 && selectedBackup.levelStatus === 2) {
       //console.log("INSIDE IF SHARES", shares.length, selectedBackup.levelStatus);
@@ -544,7 +545,7 @@ class RestoreWithICloud extends Component<
           }}
         >
           <TouchableOpacity
-            onPress={() => (this.refs.RestoreWallet as any).snapTo(1)}
+            onPress={() =>{}}
             style={styles.buttonInnerView}
           >
             <Image

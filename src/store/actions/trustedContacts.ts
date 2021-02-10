@@ -4,34 +4,43 @@ import {
   EphemeralDataElements,
   trustedChannelActions,
   ShareUploadables,
-} from '../../bitcoin/utilities/Interface';
+} from '../../bitcoin/utilities/Interface'
 
-import { createAction } from 'redux-actions';
-import { UPDATE_ADDRESS_BOOK_LOCALLY } from '../constants';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+import { createAction } from 'redux-actions'
+import { UPDATE_ADDRESS_BOOK_LOCALLY } from '../constants'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
-export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT';
-export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT';
-export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT';
-export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL';
-export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL';
-export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL';
-export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL';
-export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC';
-export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO';
-export const WALLET_CHECK_IN = 'WALLET_CHECK_IN';
-export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS';
-export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC';
+export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
+export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
+export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
+export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
+export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
+export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
+export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
+export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
+export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO'
+export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
+export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
+export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
+export const CLEAR_TRUSTED_CONTACTS_CACHE = 'CLEAR_TRUSTED_CONTACTS_CACHE'
 
-export const initializeTrustedContact = (contactInfo: {
+export const clearTrustedContactsCache = () => {
+  return {
+    type: CLEAR_TRUSTED_CONTACTS_CACHE
+  }
+}
+
+export const initializeTrustedContact = ( contactInfo: {
   contactName: string;
   info: string;
-}) => {
+} ) => {
   return {
     type: INITIALIZE_TRUSTED_CONTACT,
-    payload: { contactInfo },
-  };
-};
+    payload: {
+      contactInfo
+    },
+  }
+}
 
 export const approveTrustedContact = (
   contactInfo: { contactName: string; info: string },
@@ -51,18 +60,18 @@ export const approveTrustedContact = (
       isGuardian,
       isFromKeeper,
     },
-  };
-};
+  }
+}
 
-export const removeTrustedContact = (contactName, shareIndex?) => {
+export const removeTrustedContact = ( contactName, shareIndex? ) => {
   return {
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
       contactName,
       shareIndex,
     },
-  };
-};
+  }
+}
 
 export const updateEphemeralChannel = (
   contactInfo: { contactName: string; info: string, walletName?: string; },
@@ -86,8 +95,8 @@ export const updateEphemeralChannel = (
       updatedDB,
       isFromKeeper,
     },
-  };
-};
+  }
+}
 
 export const fetchEphemeralChannel = (
   contactInfo: { contactName: string; info: string },
@@ -96,9 +105,11 @@ export const fetchEphemeralChannel = (
 ) => {
   return {
     type: FETCH_EPHEMERAL_CHANNEL,
-    payload: { contactInfo, approveTC, publicKey },
-  };
-};
+    payload: {
+      contactInfo, approveTC, publicKey
+    },
+  }
+}
 
 export const updateTrustedChannel = (
   contactInfo: { contactName: string; info: string },
@@ -109,9 +120,11 @@ export const updateTrustedChannel = (
 ) => {
   return {
     type: UPDATE_TRUSTED_CHANNEL,
-    payload: { contactInfo, data, fetch, shareUploadables, updatedDB },
-  };
-};
+    payload: {
+      contactInfo, data, fetch, shareUploadables, updatedDB
+    },
+  }
+}
 
 export const fetchTrustedChannel = (
   contactInfo: {
@@ -123,53 +136,61 @@ export const fetchTrustedChannel = (
 ) => {
   return {
     type: FETCH_TRUSTED_CHANNEL,
-    payload: { contactInfo, action, contactsWalletName },
-  };
-};
+    payload: {
+      contactInfo, action, contactsWalletName
+    },
+  }
+}
 
 export const trustedChannelsSetupSync = () => {
   return {
     type: TRUSTED_CHANNELS_SETUP_SYNC,
-  };
-};
+  }
+}
 
-export const walletCheckIn = (synchingContacts?: Boolean) => {
+export const walletCheckIn = ( synchingContacts?: Boolean ) => {
   return {
     type: WALLET_CHECK_IN,
-    payload: { synchingContacts },
-  };
-};
+    payload: {
+      synchingContacts
+    },
+  }
+}
 
-export const syncTrustedChannels = (contacts?) => {
+export const syncTrustedChannels = ( contacts? ) => {
   return {
     type: SYNC_TRUSTED_CHANNELS,
-    payload: { contacts },
-  };
-};
+    payload: {
+      contacts
+    },
+  }
+}
 
 export const postRecoveryChannelSync = () => {
   return {
     type: POST_RECOVERY_CHANNEL_SYNC,
-  };
-};
+  }
+}
 
-export const updateTrustedContactInfoLocally = (trustedContactInfo) => {
+export const updateTrustedContactInfoLocally = ( trustedContactInfo ) => {
   return {
     type: UPDATE_TRUSTED_CONTACT_INFO,
-    payload: { trustedContactInfo },
-  };
-};
+    payload: {
+      trustedContactInfo
+    },
+  }
+}
 
 // types and action creators: dispatched by sagas
-export const TRUSTED_CONTACT_INITIALIZED = 'TRUSTED_CONTACT_INITIALIZED';
-export const TRUSTED_CONTACT_APPROVED = 'TRUSTED_CONTACT_APPROVED';
-export const EPHEMERAL_CHANNEL_UPDATED = 'EPHEMERAL_CHANNEL_UPDATED';
-export const EPHEMERAL_CHANNEL_FETCHED = 'EPHEMERAL_CHANNEL_FETCHED';
-export const TRUSTED_CHANNEL_UPDATED = 'TRUSTED_CHANNEL_UPDATED';
-export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED';
-export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED';
-export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS';
-export const SWITCH_TC_LOADING = 'SWITCH_TC_LOADING';
+export const TRUSTED_CONTACT_INITIALIZED = 'TRUSTED_CONTACT_INITIALIZED'
+export const TRUSTED_CONTACT_APPROVED = 'TRUSTED_CONTACT_APPROVED'
+export const EPHEMERAL_CHANNEL_UPDATED = 'EPHEMERAL_CHANNEL_UPDATED'
+export const EPHEMERAL_CHANNEL_FETCHED = 'EPHEMERAL_CHANNEL_FETCHED'
+export const TRUSTED_CHANNEL_UPDATED = 'TRUSTED_CHANNEL_UPDATED'
+export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED'
+export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED'
+export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS'
+export const SWITCH_TC_LOADING = 'SWITCH_TC_LOADING'
 
 export const trustedContactInitialized = (
   contactName: string,
@@ -177,9 +198,11 @@ export const trustedContactInitialized = (
 ) => {
   return {
     type: TRUSTED_CONTACT_INITIALIZED,
-    payload: { contactName, publicKey },
-  };
-};
+    payload: {
+      contactName, publicKey
+    },
+  }
+}
 
 export const trustedContactApproved = (
   contactName: string,
@@ -187,9 +210,11 @@ export const trustedContactApproved = (
 ) => {
   return {
     type: TRUSTED_CONTACT_APPROVED,
-    payload: { contactName, approved },
-  };
-};
+    payload: {
+      contactName, approved
+    },
+  }
+}
 
 export const ephemeralChannelUpdated = (
   contactName: string,
@@ -198,16 +223,20 @@ export const ephemeralChannelUpdated = (
 ) => {
   return {
     type: EPHEMERAL_CHANNEL_UPDATED,
-    payload: { contactName, updated, data },
-  };
-};
+    payload: {
+      contactName, updated, data
+    },
+  }
+}
 
-export const ephemeralChannelFetched = (contactName: string, data: any) => {
+export const ephemeralChannelFetched = ( contactName: string, data: any ) => {
   return {
     type: EPHEMERAL_CHANNEL_FETCHED,
-    payload: { contactName, data },
-  };
-};
+    payload: {
+      contactName, data
+    },
+  }
+}
 
 export const trustedChannelUpdated = (
   contactName: string,
@@ -216,39 +245,47 @@ export const trustedChannelUpdated = (
 ) => {
   return {
     type: TRUSTED_CHANNEL_UPDATED,
-    payload: { contactName, updated, data },
-  };
-};
+    payload: {
+      contactName, updated, data
+    },
+  }
+}
 
-export const trustedChannelFetched = (contactName: string, data: any) => {
+export const trustedChannelFetched = ( contactName: string, data: any ) => {
   return {
     type: TRUSTED_CHANNEL_FETCHED,
-    payload: { contactName, data },
-  };
-};
+    payload: {
+      contactName, data
+    },
+  }
+}
 
-export const paymentDetailsFetched = (paymentDetails) => {
+export const paymentDetailsFetched = ( paymentDetails ) => {
   return {
     type: PAYMENT_DETAILS_FETCHED,
-    payload: { paymentDetails },
-  };
-};
+    payload: {
+      paymentDetails
+    },
+  }
+}
 
 export const clearPaymentDetails = () => {
   return {
     type: CLEAR_PAYMENT_DETAILS,
-  };
-};
+  }
+}
 
-export const switchTCLoading = (beingLoaded) => {
+export const switchTCLoading = ( beingLoaded ) => {
   return {
     type: SWITCH_TC_LOADING,
-    payload: { beingLoaded },
-  };
-};
+    payload: {
+      beingLoaded
+    },
+  }
+}
 
 const updateAddressBookLocallyRequest = createAction(
   UPDATE_ADDRESS_BOOK_LOCALLY,
-);
-export const updateAddressBookLocally = (payload) => (dispatch) =>
-  dispatch(updateAddressBookLocallyRequest(payload));
+)
+export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
+  dispatch( updateAddressBookLocallyRequest( payload ) )

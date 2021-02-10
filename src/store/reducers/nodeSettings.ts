@@ -1,5 +1,5 @@
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED } from '../actions/nodeSettings'
+import { CONNECT_TO_PERSONAL_NODE, PERSONAL_NODE_CONNECTING_FAILED, PERSONAL_NODE_CONNECTING_SUCCEEDED, PERSONAL_NODE_PREFERENCE_TOGGLED, PERSONAL_NODE_CONFIGURATION_SET, PERSONAL_NODE_CONNECTING_COMPLETED, BIT_HYVE_NODE_CONNECTING_SUCCEEDED, BIT_HYVE_NODE_CONNECTING_COMPLETED } from '../actions/nodeSettings'
 
 export type NodeSettingsState = {
   isConnectionActive: boolean;
@@ -9,9 +9,14 @@ export type NodeSettingsState = {
   personalNodes: PersonalNode[];
 
   isConnectionInProgress: boolean;
-  hasConnectionSucceeded: boolean;
-  hasConnectionFailed: boolean;
-  connectionFailureErrorMessage: string | null;
+
+  hasPersonalNodeConnectionSucceeded: boolean;
+  hasPersonalNodeConnectionFailed: boolean;
+  personalNodeConnectionErrorMessage: string | null;
+
+  hasBitHyveNodeConnectionSucceeded: boolean;
+  hasBitHyveNodeConnectionFailed: boolean;
+  bitHyveNodeConnectionErrorMessage: string | null;
 };
 
 const INITIAL_STATE: NodeSettingsState = {
@@ -22,9 +27,14 @@ const INITIAL_STATE: NodeSettingsState = {
   personalNodes: [],
 
   isConnectionInProgress: false,
-  hasConnectionSucceeded: false,
-  hasConnectionFailed: false,
-  connectionFailureErrorMessage: null,
+
+  hasPersonalNodeConnectionSucceeded: false,
+  hasPersonalNodeConnectionFailed: false,
+  personalNodeConnectionErrorMessage: null,
+
+  hasBitHyveNodeConnectionSucceeded: false,
+  hasBitHyveNodeConnectionFailed: false,
+  bitHyveNodeConnectionErrorMessage: null,
 }
 
 
@@ -46,16 +56,16 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
         return {
           ...state,
           isConnectionInProgress: true,
-          hasConnectionSucceeded: false,
-          hasConnectionFailed: false,
+          hasPersonalNodeConnectionSucceeded: false,
+          hasPersonalNodeConnectionFailed: false,
         }
 
       case PERSONAL_NODE_CONNECTING_SUCCEEDED:
         return {
           ...state,
           isConnectionInProgress: false,
-          hasConnectionSucceeded: true,
-          hasConnectionFailed: false,
+          hasPersonalNodeConnectionSucceeded: true,
+          hasPersonalNodeConnectionFailed: false,
           activePersonalNode: action.payload
         }
 
@@ -64,18 +74,37 @@ const nodeSettingsReducer = ( state: NodeSettingsState = INITIAL_STATE, action )
           ...state,
           isConnectionInProgress: false,
           activePersonalNode: null,
-          hasConnectionSucceeded: false,
-          hasConnectionFailed: true,
-          connectionFailureErrorMessage: action.payload,
+          hasPersonalNodeConnectionSucceeded: false,
+          hasPersonalNodeConnectionFailed: true,
+          personalNodeConnectionErrorMessage: action.payload,
         }
 
       case PERSONAL_NODE_CONNECTING_COMPLETED:
         return {
           ...state,
           isConnectionInProgress: false,
-          hasConnectionSucceeded: false,
-          hasConnectionFailed: false,
-          connectionFailureErrorMessage: null,
+          hasPersonalNodeConnectionSucceeded: false,
+          hasPersonalNodeConnectionFailed: false,
+          personalNodeConnectionErrorMessage: null,
+        }
+
+
+      case BIT_HYVE_NODE_CONNECTING_SUCCEEDED:
+        return {
+          ...state,
+          isConnectionInProgress: false,
+          hasBitHyveNodeConnectionSucceeded: true,
+          hasBitHyveNodeConnectionFailed: false,
+          activePersonalNode: null,
+        }
+
+      case BIT_HYVE_NODE_CONNECTING_COMPLETED:
+        return {
+          ...state,
+          isConnectionInProgress: false,
+          hasBitHyveNodeConnectionSucceeded: false,
+          hasBitHyveNodeConnectionFailed: false,
+          bitHyveNodeConnectionErrorMessage: null,
         }
       default:
         return state

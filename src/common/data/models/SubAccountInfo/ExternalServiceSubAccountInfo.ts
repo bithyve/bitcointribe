@@ -7,7 +7,6 @@ import {
   ExternalServiceSubAccountDescribing,
   SubAccountDescribingConstructorProps,
 } from './Interfaces'
-import { ImageSourcePropType } from 'react-native'
 import {
   Balances,
   TransactionDetails,
@@ -40,7 +39,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
-  constructor({
+  constructor( {
     id = uuid(),
     accountShellID = null,
     instanceNumber = null,
@@ -48,7 +47,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     defaultDescription,
     serviceAccountKind,
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
@@ -56,7 +55,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = id
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
@@ -67,6 +66,9 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     this.customDisplayName = customDisplayName
     this.customDescription = customDescription
     this.isTFAEnabled = isTFAEnabled
+    this.sourceKind = isTFAEnabled
+      ? SourceAccountKind.SECURE_ACCOUNT
+      : SourceAccountKind.REGULAR_ACCOUNT
     this.visibility = visibility
     this.transactions = transactions
     this.utxoCompatibilityGroup = utxoCompatibilityGroup

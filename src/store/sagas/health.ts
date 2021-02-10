@@ -54,6 +54,7 @@ import {
   downloadedPdfShare,
   KEEPER_INFO,
   putKeeperInfo,
+  UPDATE_WALLET_IMAGE_HEALTH,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -97,7 +98,7 @@ import {
 } from "../actions/trustedContacts";
 import crypto from "crypto";
 import { Alert } from "react-native";
-import { ErrorSending } from "../actions/sss";
+import { ErrorSending } from "../actions/health";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import RelayServices from "../../bitcoin/services/RelayService";
 import generatePDFKeeper from "../utils/generatePDFKeeper";
@@ -110,6 +111,11 @@ import Share from "react-native-share";
 import RNPrint from "react-native-print";
 import idx from "idx";
 import { DecentralizedBackup } from "../../common/interfaces/Interfaces";
+import AccountShell from "../../common/data/models/AccountShell";
+import { remapAccountShells, restoredAccountShells } from "../actions/accounts";
+import PersonalNode from "../../common/data/models/PersonalNode";
+import { personalNodeConfigurationSet } from "../actions/nodeSettings";
+import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -726,12 +732,15 @@ export function* downloadMetaShareWorker({ payload }) {
 
   let pkShare = {}
   let result;
-  if (DECENTRALIZED_BACKUP && !DECENTRALIZED_BACKUP.PK_SHARE) {
+  if (DECENTRALIZED_BACKUP && !DECENTRALIZED_BACKUP.PK_SHARE && payload.downloadType !== "recovery") {
     result = yield call(S3Service.downloadSMShare, encryptedKey, otp);
+    console.log("result",result);
+    if (result && result.data) {
+      pkShare = result.data.metaShare;
+    } 
   }
-  if (result) {
-    pkShare = result.data.metaShare;
-  }
+  
+
   if (res.status === 200) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
@@ -782,7 +791,7 @@ export function* downloadMetaShareWorker({ payload }) {
       //yield put(updateMSharesHealth());
     } else {
       let updatedRecoveryShares = {};
-      let updated = false;
+      //let updated = false;
       if (payload.replaceIndex === 0 || payload.replaceIndex) {
         // replacing stored key w/ scanned from Guardian's help-restore
         updatedRecoveryShares = {
@@ -808,7 +817,7 @@ export function* downloadMetaShareWorker({ payload }) {
                 META_SHARE: metaShare,
                 ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
               };
-              updated = true;
+             // updated = true;
             } else {
               updatedRecoveryShares[objectKey] = recoveryShare;
             }
@@ -998,13 +1007,7 @@ function* recoverWalletWorker({ payload }) {
           mappedMetaShares[META_SHARE.meta.walletId] = shares;
         }
       }
-      // if (!encDynamicNonPMDD) { // retired due to wallet image
-      //   encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
-      // } else {
-      //   if (encDynamicNonPMDD.updatedAt < ENC_DYNAMIC_NONPMDD.updatedAt) {
-      //     encDynamicNonPMDD = ENC_DYNAMIC_NONPMDD;
-      //   }
-      // }
+     
     });
 
     console.log({ mappedMetaShares });
@@ -1035,59 +1038,66 @@ function* recoverWalletWorker({ payload }) {
     if (res.status === 200) {
       const { mnemonic } = res.data;
       console.log("mnemonic", mnemonic);
-      const {
-        regularAcc,
-        testAcc,
-        secureAcc,
-        s3Service,
-        trustedContacts,
-        keepersInfo,
-      } = yield call(
+      // const {
+      //   regularAcc,
+      //   testAcc,
+      //   secureAcc,
+      //   s3Service,
+      //   trustedContacts,
+      //   keepersInfo,
+      // } = yield call(
+      //   serviceGenerator2,
+      //   security.answer,
+      //   mnemonic,
+      //   restorationShares,
+      //   decryptedCloudDataJson
+      // );
+      const { s3Service, } = yield call(
         serviceGenerator2,
         security.answer,
         mnemonic,
         restorationShares,
         decryptedCloudDataJson
-      );
+      )
+      console.log("s3Service",s3Service);
+      // const UNDER_CUSTODY = {};
+      // let DYNAMIC_NONPMDD = {};
+      // if (encDynamicNonPMDD) {
+      //   // decentralized restoration of Wards
+      //   const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
 
-      const UNDER_CUSTODY = {};
-      let DYNAMIC_NONPMDD = {};
-      if (encDynamicNonPMDD) {
-        // decentralized restoration of Wards
-        const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
+      //   if (res.status !== 200)
+      //     console.log("Failed to decrypt dynamic nonPMDD");
+      //   const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
+      //   dynamicNonPMDD.META_SHARES.forEach((metaShare) => {
+      //     UNDER_CUSTODY[metaShare.meta.tag] = {
+      //       META_SHARE: metaShare,
+      //     };
+      //   });
+      //   DYNAMIC_NONPMDD = dynamicNonPMDD;
+      // }
 
-        if (res.status !== 200)
-          console.log("Failed to decrypt dynamic nonPMDD");
-        const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
-        dynamicNonPMDD.META_SHARES.forEach((metaShare) => {
-          UNDER_CUSTODY[metaShare.meta.tag] = {
-            META_SHARE: metaShare,
-          };
-        });
-        DYNAMIC_NONPMDD = dynamicNonPMDD;
-      }
+      // const DECENTRALIZED_BACKUP = {
+      //   RECOVERY_SHARES: {},
+      //   SHARES_TRANSFER_DETAILS: {},
+      //   UNDER_CUSTODY: {},
+      //   DYNAMIC_NONPMDD: {},
+      //   PK_SHARE: {},
+      // };
+      // console.log({ DECENTRALIZED_BACKUP });
 
-      const DECENTRALIZED_BACKUP = {
-        RECOVERY_SHARES: {},
-        SHARES_TRANSFER_DETAILS: {},
-        UNDER_CUSTODY: {},
-        DYNAMIC_NONPMDD: {},
-        PK_SHARE: {},
-      };
-      console.log({ DECENTRALIZED_BACKUP });
-
-      const SERVICES = {
-        REGULAR_ACCOUNT: JSON.stringify(regularAcc),
-        TEST_ACCOUNT: JSON.stringify(testAcc),
-        SECURE_ACCOUNT: JSON.stringify(secureAcc),
-        S3_SERVICE: JSON.stringify(s3Service),
-        TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-        KEEPERS_INFO: JSON.stringify(keepersInfo),
-      };
-      const payload = { SERVICES, DECENTRALIZED_BACKUP };
-      yield call(insertDBWorker, { payload });
+      // const SERVICES = {
+      //   REGULAR_ACCOUNT: JSON.stringify(regularAcc),
+      //   TEST_ACCOUNT: JSON.stringify(testAcc),
+      //   SECURE_ACCOUNT: JSON.stringify(secureAcc),
+      //   S3_SERVICE: JSON.stringify(s3Service),
+      //   TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
+      //   KEEPERS_INFO: JSON.stringify(keepersInfo),
+      // };
+      // const payload = { SERVICES, DECENTRALIZED_BACKUP };
+      // yield call(insertDBWorker, { payload });
       //yield delay(2000); // seconds delay prior to Wallet Image check
-      yield put(fetchWalletImage());
+      yield put( fetchWalletImage( decryptedCloudDataJson.walletImage ) )
 
       yield call(
         AsyncStorage.setItem,
@@ -1105,44 +1115,7 @@ function* recoverWalletWorker({ payload }) {
       );
       yield put(putKeeperInfo(keeperData));
       // yield put(updatedKeeperInfo(keeperData));
-      // personal copy health restoration
-      // let updatedPDFHealth = {};
-      // for (const share of restorationShares) {
-      //   if (share.meta.index > 2) {
-      //     updatedPDFHealth = {
-      //       ...updatedPDFHealth,
-      //       [share.meta.index]: {
-      //         shareId: `placeHolderID${share.meta.index}`,
-      //         updatedAt: Date.now(),
-      //       },
-      //     };
-      //   }
-      // }
-
-      // if (!updatedPDFHealth[3]) {
-      //   updatedPDFHealth = {
-      //     ...updatedPDFHealth,
-      //     [3]: {
-      //       shareId: 'placeHolderID3',
-      //       updatedAt: 0,
-      //     },
-      //   };
-      // }
-      // if (!updatedPDFHealth[4]) {
-      //   updatedPDFHealth = {
-      //     ...updatedPDFHealth,
-      //     [4]: {
-      //       shareId: 'placeHolderID4',
-      //       updatedAt: 0,
-      //     },
-      //   };
-      // }
-      // if (Object.keys(updatedPDFHealth).length)
-      //   yield call(
-      //     AsyncStorage.setItem,
-      //     'PDF Health',
-      //     JSON.stringify(updatedPDFHealth),
-      //   );
+     
     } else {
       throw new Error(res.err);
     }
@@ -1213,47 +1186,252 @@ export const cloudMetaShareHealthWatcher = createWatcher(
   CLOUD_MSHARE
 );
 
-function* fetchWalletImageWorker({ payload }) {
-  const s3Service: S3Service = yield select((state) => state.health.service);
 
-  const res = yield call(s3Service.fetchWalletImage);
-  console.log({ res });
-  if (res.status === 200) {
-    const walletImage: WalletImage = res.data.walletImage;
+function* stateDataToBackup() {
+  // state data to backup
+  const accountShells = yield select( ( state ) => state.accounts.accountShells )
+  const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+
+  const STATE_DATA = {
+  }
+  if ( accountShells && accountShells.length )
+    STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
+
+  if( activePersonalNode )
+    STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
+  return STATE_DATA
+}
+
+const asyncDataToBackup = async () => {
+  const [
+    [ , TrustedContactsInfo ],
+    [ , personalCopyDetails ],
+    [ , FBTCAccount ],
+    [ , PersonalNode ]
+  ] = await AsyncStorage.multiGet( [
+    'TrustedContactsInfo',
+    'personalCopyDetails',
+    'FBTCAccount',
+    'PersonalNode'
+  ] )
+  const ASYNC_DATA = {
+  }
+  if ( TrustedContactsInfo )
+    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+  if ( personalCopyDetails )
+    ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
+  if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
+  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
+
+  return ASYNC_DATA
+}
+
+function* updateWalletImageWorker() {
+  const s3Service: S3Service = yield select( ( state ) => state.health.service)
+  console.log("s3SERVICE",s3Service)
+  let walletImage: WalletImage = {
+  }
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+    ( state ) => state.storage.database,
+  )
+
+  const walletImageHashes = yield call( AsyncStorage.getItem, 'WI_HASHES' )
+  let hashesWI = JSON.parse( walletImageHashes )
+
+  if ( walletImageHashes ) {
+    const currentDBHash = hash( DECENTRALIZED_BACKUP )
+    console.log( {
+      previousDBHash: hashesWI.DECENTRALIZED_BACKUP,
+      currentDBHash,
+    } )
+    if (
+      !hashesWI.DECENTRALIZED_BACKUP ||
+      currentDBHash !== hashesWI.DECENTRALIZED_BACKUP
+    ) {
+      walletImage[ 'DECENTRALIZED_BACKUP' ] = DECENTRALIZED_BACKUP
+      hashesWI.DECENTRALIZED_BACKUP = currentDBHash
+    }
+
+    const currentSHash = hash( SERVICES )
+    console.log( {
+      previousSHash: hashesWI.SERVICES,
+      currentSHash,
+    } )
+    if ( !hashesWI.SERVICES || currentSHash !== hashesWI.SERVICES ) {
+      walletImage[ 'SERVICES' ] = SERVICES
+      hashesWI.SERVICES = currentSHash
+    }
+
+    const ASYNC_DATA = yield call( asyncDataToBackup )
+    if ( Object.keys( ASYNC_DATA ).length ) {
+      const currentAsyncHash = hash( ASYNC_DATA )
+      console.log( {
+        previousAsyncHash: hashesWI.ASYNC_DATA,
+        currentAsyncHash,
+      } )
+      if ( !hashesWI.ASYNC_DATA || currentAsyncHash !== hashesWI.ASYNC_DATA ) {
+        walletImage[ 'ASYNC_DATA' ] = ASYNC_DATA
+        hashesWI.ASYNC_DATA = currentAsyncHash
+      }
+    }
+
+    const STATE_DATA = yield call( stateDataToBackup )
+    if ( Object.keys( STATE_DATA ).length ) {
+      const currentStateHash = hash( STATE_DATA )
+      if ( !hashesWI.STATE_DATA || currentStateHash !== hashesWI.STATE_DATA ) {
+        walletImage[ 'STATE_DATA' ] = STATE_DATA
+        hashesWI.STATE_DATA = currentStateHash
+      }
+    }
+  } else {
+    walletImage = {
+      DECENTRALIZED_BACKUP,
+      SERVICES,
+    }
+
+    hashesWI = {
+      DECENTRALIZED_BACKUP: hash( DECENTRALIZED_BACKUP ),
+      SERVICES: hash( SERVICES ),
+    }
+
+    const ASYNC_DATA = yield call( asyncDataToBackup )
+    if ( Object.keys( ASYNC_DATA ).length ) {
+      walletImage[ 'ASYNC_DATA' ] = ASYNC_DATA
+      hashesWI[ 'ASYNC_DATA' ] = hash( ASYNC_DATA )
+    }
+
+    const STATE_DATA = yield call( stateDataToBackup )
+
+    if ( Object.keys( STATE_DATA ).length ) {
+      walletImage[ 'STATE_DATA' ] = STATE_DATA
+      hashesWI[ 'STATE_DATA' ] = hash( STATE_DATA )
+    }
+  }
+
+  // console.log({ walletImage });
+
+  if ( Object.keys( walletImage ).length === 0 ) {
+    console.log( 'WI: nothing to update' )
+    return
+  }
+  console.log("walletImage",walletImage)
+
+  const res = yield call( s3Service.updateWalletImageKeeper, walletImage )
+  if ( res.status === 200 ) {
+    if ( res.data.updated ) console.log( 'Wallet Image updated' )
+    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
+  } else {
+    console.log( {
+      err: res.err
+    } )
+    throw new Error( 'Failed to update Wallet Image' )
+  }
+}
+
+export const updateWalletImageHealthWatcher = createWatcher(
+  updateWalletImageWorker,
+  UPDATE_WALLET_IMAGE_HEALTH,
+)
+
+function* fetchWalletImageWorker({ payload }) {
+  // const s3Service: S3Service = payload.s3Service
+
+  // const res = yield call( s3Service.fetchWalletImageKeeper )
+  // console.log( {
+  //   res
+  // } )
+  const { walletImage } = payload;
+
+  if ( walletImage ) {
+    //const walletImage: WalletImage = res.data.walletImage
     console.log({ walletImage });
 
-    if (!Object.keys(walletImage).length)
-      console.log("Failed fetch: Empty Wallet Image");
+    if ( !Object.keys( walletImage ).length )
+      console.log( 'Failed fetch: Empty Wallet Image' )
 
-    // update DB and Async
-    const { DECENTRALIZED_BACKUP, SERVICES, ASYNC_DATA } = walletImage;
+    // restore DB, Async and State data
+    const {
+      DECENTRALIZED_BACKUP,
+      SERVICES,
+      ASYNC_DATA,
+      STATE_DATA,
+    } = walletImage
 
-    if (ASYNC_DATA) {
-      for (const key of Object.keys(ASYNC_DATA)) {
-        console.log("restoring to async: ", key);
-        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+    if ( ASYNC_DATA ) {
+      for ( const key of Object.keys( ASYNC_DATA ) ) {
+        console.log( 'restoring to async: ', key )
+        yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
 
-        if (key === "TrustedContactsInfo" && ASYNC_DATA[key]) {
-          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
-          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
+          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
+          yield put( updateTrustedContactInfoLocally( trustedContactsInfo ) )
         }
       }
     }
 
-    const payload = { SERVICES, DECENTRALIZED_BACKUP };
-    yield call(insertDBWorker, { payload }); // synchronously update db
+    if ( STATE_DATA ) {
+      for ( const key of Object.keys( STATE_DATA ) ) {
+        if( !STATE_DATA[ key ] ) continue
+
+        switch( key ){
+            case 'accountShells': 
+              const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
+              yield put( restoredAccountShells( {
+                accountShells
+              } ) )
+              break
+
+            case 'activePersonalNode':
+              const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
+              yield put( personalNodeConfigurationSet( 
+                activePersonalNode
+              ) )
+              break
+        }
+      }
+    }
+
+    const payload = {
+      SERVICES, DECENTRALIZED_BACKUP
+    }
+    yield call( insertDBWorker, {
+      payload
+    } ) // synchronously update db
+
+    // re-mapping account shells (supports restoration of an app(via WI) < 1.4.0)
+    const {
+      REGULAR_ACCOUNT,
+      TEST_ACCOUNT,
+      SECURE_ACCOUNT,
+      S3_SERVICE,
+      TRUSTED_CONTACTS,
+      KEEPERS_INFO
+    } = SERVICES
+    const services = {
+      REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+      TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+      SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+      S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
+      TRUSTED_CONTACTS: TRUSTED_CONTACTS
+        ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
+        : new TrustedContactsService(),
+      KEEPERS_INFO: KeeperService.fromJSON(KEEPERS_INFO) 
+    }
+    yield put( remapAccountShells( services ) )
+    console.log( 'services',services );
 
     // update hashes
-    const hashesWI = {};
-    Object.keys(walletImage).forEach((key) => {
-      hashesWI[key] = hash(walletImage[key]);
-    });
-    yield call(AsyncStorage.setItem, "WI_HASHES", JSON.stringify(hashesWI));
+    const hashesWI = {
+    }
+    Object.keys( walletImage ).forEach( ( key ) => {
+      hashesWI[ key ] = hash( walletImage[ key ] )
+    } )
+    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
-    console.log({ err: res.err });
-    console.log("Failed to fetch Wallet Image");
+    console.log( 'Failed to fetch Wallet Image' )
   }
-  yield put(walletImageChecked(true));
+  yield put( walletImageChecked( true ) )
 }
 
 export const fetchWalletImageHealthWatcher = createWatcher(
@@ -1452,7 +1630,7 @@ function* sendApprovalRequestWorker({ payload }) {
   if (keeperTCData && keeperTCData.keeperUUID) {
     let title =
       notificationType == "uploadSecondaryShare"
-        ? "Approval Request for PDF Keeper"
+        ? "Approval Request for Keeper"
         : "Approval Request for Keeper";
     const notification: INotification = {
       notificationType: notificationType,
@@ -2104,11 +2282,11 @@ function* autoDownloadShareContactWorker({ payload }) {
     let { DECENTRALIZED_BACKUP } = yield select(
       (state) => state.storage.database
     );
-    let UNDER_CUSTODY = DECENTRALIZED_BACKUP.UNDER_CUSTODY;
+    let { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+    
     let existingShares: MetaShare[];
     if (Object.keys(UNDER_CUSTODY).length) {
       existingShares = Object.keys(UNDER_CUSTODY).map((tag) => {
-        console.log(tag);
         return UNDER_CUSTODY[tag].META_SHARE;
       });
     }
@@ -2122,6 +2300,7 @@ function* autoDownloadShareContactWorker({ payload }) {
         }
       }
     }
+    
     if (metaShare) {
       let index;
       const trustedContactsService: TrustedContactsService = yield select(
@@ -2149,24 +2328,25 @@ function* autoDownloadShareContactWorker({ payload }) {
         TContacts[index].trustedChannel &&
         TContacts[index].trustedChannel.address
       ) {
+       
         let res = yield call(
           trustedContactsService.fetchTrustedChannel,
           contactNameArr[index],
           TContacts[index].contactsWalletName
         );
-        let underCustody = { ...UNDER_CUSTODY };
-        console.log("data", res.data.data.metaShare);
-        underCustody[TContacts[index].contactsWalletName].META_SHARE =
-          res.data.data.metaShare;
-        UNDER_CUSTODY = underCustody;
-        console.log(
-          "UNDER_CUSTODY",
-          UNDER_CUSTODY[TContacts[index].contactsWalletName]
-        );
+        // console.log("data", res.data.data.metaShare);
+        // console.log("underCustody[TContacts[index].contactsWalletName].META_SHARE", UNDER_CUSTODY[TContacts[index].contactsWalletName].META_SHARE);
+       
         const updatedBackup = {
           ...DECENTRALIZED_BACKUP,
-          UNDER_CUSTODY,
-        };
+          UNDER_CUSTODY: {
+            ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+            [ TContacts[index].contactsWalletName ]: {
+              META_SHARE: res.data.data.metaShare,
+            },
+          },
+        }
+     
         console.log("updatedBackup", updatedBackup);
         yield call(insertDBWorker, {
           payload: {
