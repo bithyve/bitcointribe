@@ -238,24 +238,22 @@ public class DriveServiceHelper {
                     Log.d(TAG, " uploadFile fileMeta 2: " + fileMeta);
                     googleDriveFileHolder.setId(fileMeta.getId());
                     googleDriveFileHolder.setName(fileMeta.getName());
+                    return googleDriveFileHolder;
                 }
                 catch (UserRecoverableAuthIOException e) {
                     Log.d(TAG, " UserRecoverableAuthIOException  " + e.getIntent());
-                    activity.startActivityForResult(e.getIntent(), REQUEST_AUTHORIZATION);
+                    throw e;
                 }
                 catch (Exception e){
-                    Log.e("shjdgfkjsdgfkjdsgjkfsdghf", " EXCEPTION", e);
-                    Log.d(TAG, " uploadFile EROROROROROOROROR: " + e.getMessage());
+                    throw e;
                 }
-                Log.d(TAG, " uploadFile googleDriveFileHolder: " + googleDriveFileHolder);
-                return googleDriveFileHolder;
             }
         });
     }
 
     private static final String TAG = "DriveServiceHelper";
 
-    public Task<List<GoogleDriveFileHolder>> searchFile(final String fileName, final String mimeType) {
+    public Task<List<GoogleDriveFileHolder>> searchFile(Activity activity,final String fileName, final String mimeType) {
         Log.d(TAG, "inside searchFile " + fileName + mimeType);
         try {
             return Tasks.call(mExecutor, new Callable<List<GoogleDriveFileHolder>>() {
@@ -287,7 +285,12 @@ public class DriveServiceHelper {
                     }
                     Log.d(TAG, "searchFile sdgdgdg" + googleDriveFileHolderList);
                     return googleDriveFileHolderList;
-                    } catch (Exception e){
+                    }
+                    catch (UserRecoverableAuthIOException e) {
+                       Log.d(TAG, " searchFile UserRecoverableAuthIOException: " + e);
+                       throw e;
+                    } 
+                    catch (Exception e){
                         Log.d(TAG, "searchFile e" + e);
                     }
                     return Collections.EMPTY_LIST;

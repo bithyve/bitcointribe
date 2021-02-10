@@ -82,6 +82,7 @@ import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
+  setIsBackupProcessing,
 } from '../../store/actions/preferences'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
@@ -219,6 +220,7 @@ interface HomePropsTypes {
   setVersion: any;
   versionHistory: any;
   isNewHealthSystemSet: Boolean;
+  setIsBackupProcessing: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -724,8 +726,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       asyncNotificationList = []
     }
     let readStatus = true
-    if ( content.notificationType == releaseNotificationTopic ||
-      content.notificationType == "secureXpub") {
+    if ( content.notificationType == releaseNotificationTopic) {
       const releaseCases = this.props.releaseCasesValue
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if ( releaseCases.ignoreClick ) {
@@ -875,9 +876,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     let cloudObject = new CloudBackup({
       dataObject: data,
       callBack: this.setCloudBackupStatus,
+      failureCallBack: this.setFailureCallback,
       share,
     });
-    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
+    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus,this.setFailureCallback, share);
   };
 
   setCloudBackupStatus = (share?) => {
@@ -890,7 +892,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.updateHealthForCloud(share);
     }
-    
+  };
+
+  setFailureCallback = () => {
+    this.props.setIsBackupProcessing({ status: false });
   };
 
   getNewTransactionNotifications = async () => {
@@ -1721,15 +1726,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if (value.type == "contact") {
       this.closeBottomSheet();
     }
-    if (
-      value.type == "secureXpub" &&
-      !this.props.secureAccount.secureHDWallet.xpubs.secondary
-    ) {
-      this.bottomSheetRef.current?.close();
-      let shareId = s3Service.levelhealth.metaSharesKeeper[1].shareId;
-      let share = getKeeperInfoFromShareId(levelHealth, shareId);
-      fetchKeeperTrustedChannel(shareId, value.type, share.name);
-    }
+    // if (
+    //   value.type == "secureXpub" &&
+    //   !this.props.secureAccount.secureHDWallet.xpubs.secondary
+    // ) {
+    //   this.bottomSheetRef.current?.close();
+    //   let shareId = s3Service.levelhealth.metaSharesKeeper[1].shareId;
+    //   let share = getKeeperInfoFromShareId(levelHealth, shareId);
+    //   fetchKeeperTrustedChannel(shareId, value.type, share.name);
+    // }
   };
 
   updateHealthForCloud = (share?) => {
@@ -2350,7 +2355,8 @@ export default withNavigationFocus(
     fetchKeeperTrustedChannel,
     onApprovalStatusChange,
     autoDownloadShareContact,
-    setVersion
+    setVersion,
+    setIsBackupProcessing,
   })(Home)
 );
 
