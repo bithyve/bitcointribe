@@ -118,6 +118,7 @@ export default class KeeperService {
         ),
       };
     } catch (err) {
+      console.log("err",err);
       return {
         status: 0o1,
         err: err.message,

@@ -60,9 +60,7 @@ import {
 } from "../../store/actions/health";
 import { modifyLevelStatus } from "./ManageBackupFunction";
 import ApproveSetup from "./ApproveSetup";
-import { MetaShare, notificationType } from "../../bitcoin/utilities/Interface";
-import PushNotification from 'react-native-push-notification';
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import { LevelHealthInterface, MetaShare, notificationType } from "../../bitcoin/utilities/Interface";
 import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
 import { nameToInitials } from "../../common/CommonFunctions";
 import S3Service from '../../bitcoin/services/sss/S3Service';
@@ -104,7 +102,7 @@ interface ManageBackupPropsTypes {
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
-  levelHealth: any[];
+  levelHealth: LevelHealthInterface[];
   currentLevel: any;
   healthLoading: any;
   generateMetaShare: any;
@@ -203,94 +201,12 @@ class ManageBackup extends Component<
     };
   }
 
-  createNotificationListeners = async () => {
-    PushNotification.configure( {
-      onNotification: ( notification ) => {
-        console.log( 'NOTIFICATION:', notification )
-        // process the notification
-        if( notification.data ){
-          this.onNotificationArrives( notification )
-          // (required) Called when a remote is received or opened, or local notification is opened
-          notification.finish( PushNotificationIOS.FetchResult.NoData )
-        }
-      },
-
-      // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
-      onAction: ( notification ) => {
-        console.log( 'ACTION:', notification.action )
-        console.log( 'NOTIFICATION:', notification )
-
-        // process the action
-      },
-
-      // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
-      onRegistrationError: ( err ) => {
-        console.error( err.message, err )
-      },
-
-      // IOS ONLY (optional): default: all - Permissions to register.
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-
-      // Should the initial notification be popped automatically
-      // default: true
-      popInitialNotification: true,
-
-      /**
-       * (optional) default: true
-       * - Specified if permissions (ios) and token (android and ios) will requested or not,
-       * - if not, you must call PushNotificationsHandler.requestPermissions() later
-       * - if you are not using remote notification or do not have Firebase installed, use this:
-       *     requestPermissions: Platform.OS === 'ios'
-       */
-      requestPermissions: true,
-    } )
-  };
-
-  onNotificationArrives = async (notification) => {
-    let {
-      s3Service,
-      secureAccount,
-      levelHealth,
-      keeperApproveStatus,
-      fetchKeeperTrustedChannel,
-    } = this.props;
-    let data = JSON.parse(notification.data.content);
-    if (
-      data.notificationType == "secureXpub" &&
-      !secureAccount.secureHDWallet.xpubs.secondary
-    ) {
-      let share = getKeeperInfoFromShareId(
-        levelHealth,
-        s3Service.levelhealth.metaSharesKeeper[1].shareId
-      );
-      fetchKeeperTrustedChannel(
-        s3Service.levelhealth.metaSharesKeeper[1].shareId,
-        data.notificationType,
-        share.name
-      );
-    }
-    if (data.notificationType == "uploadSecondaryShare") {
-      if (data.shareID == keeperApproveStatus.shareId) {
-        onApprovalStatusChange(
-          true,
-          moment(new Date()).valueOf(),
-          data.shareID
-        );
-      }
-    }
-  };
-
   componentDidMount = async () => {
     // console.log("keeperInfo", this.props.keeperInfo);
     // console.log("isLevel2Initialized",this.props.isLevel2Initialized);
     // console.log("isLevelTwoMetaShareCreated",this.props.isLevelTwoMetaShareCreated);
 
     await this.onRefresh();
-    this.createNotificationListeners();
     this.modifyLevelData();
   };
 
@@ -353,7 +269,7 @@ class ManageBackup extends Component<
     let encryptedCloudDataJson;
     let shares =
       share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object)
+        !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
     encryptedCloudDataJson = await CloudData(this.props.database, accountShells, activePersonalNode);
@@ -379,9 +295,10 @@ class ManageBackup extends Component<
       let cloudObject = new CloudBackup({
         dataObject: data,
         callBack: this.setCloudBackupStatus,
+        failureCallBack: this.setFailureCallback,
         share,
       });
-      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
+      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, this.setFailureCallback, share);
     }
   };
 
@@ -402,39 +319,46 @@ class ManageBackup extends Component<
     }
   };
 
+  setFailureCallback = () => {
+    this.props.setIsBackupProcessing({ status: false });
+  };
+
+
   updateHealthForCloud = (share?) => {
     try {
       let levelHealth = this.props.levelHealth;
-      let levelHealthVar = levelHealth[0].levelInfo[0];
-      if (
-        share &&
-        !(Object.keys(share).length === 0 && share.constructor === Object) &&
-        levelHealth.length > 0
-      ) {
-        levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
-      }
-      // health update for 1st upload to cloud
-      if (
-        levelHealth.length &&
-        levelHealthVar.status != "accessible"
-      ) {
-        if (levelHealthVar.shareType == "cloud") {
-          levelHealthVar.updatedAt = moment(new Date()).valueOf();
-          levelHealthVar.status == "accessible";
-          levelHealthVar.reshareVersion = 0;
-          levelHealthVar.guardian = "cloud";
+      if (levelHealth) {
+        let levelHealthVar = levelHealth[0].levelInfo[0];
+        if (
+          share &&
+          !(Object.keys(share).length === 0 && share.constructor === Object) &&
+          levelHealth.length > 0
+        ) {
+          levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
         }
-        let shareArray = [
-          {
-            walletId: this.props.s3Service.getWalletId().data.walletId,
-            shareId: levelHealthVar.shareId,
-            reshareVersion: levelHealthVar.reshareVersion,
-            updatedAt: moment(new Date()).valueOf(),
-            status: "accessible",
-            shareType: "cloud",
-          },
-        ];
-        this.props.updateMSharesHealth(shareArray);
+        // health update for 1st upload to cloud
+        if (
+          levelHealth.length &&
+          levelHealthVar.status != "accessible"
+        ) {
+          if (levelHealthVar.shareType == "cloud") {
+            levelHealthVar.updatedAt = moment(new Date()).valueOf();
+            levelHealthVar.status == "accessible";
+            levelHealthVar.reshareVersion = 0;
+            levelHealthVar.guardian = "cloud";
+          }
+          let shareArray = [
+            {
+              walletId: this.props.s3Service.getWalletId().data.walletId,
+              shareId: levelHealthVar.shareId,
+              reshareVersion: levelHealthVar.reshareVersion,
+              updatedAt: moment(new Date()).valueOf(),
+              status: "accessible",
+              shareType: "cloud",
+            },
+          ];
+          this.props.updateMSharesHealth(shareArray);
+        }
       }
     } catch (error) {
       console.log("jasdjhERROR", error);
@@ -442,12 +366,13 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    const {healthLoading, trustedChannelsSetupSyncing, isBackupProcessing} = this.props;
-    if(prevProps.healthLoading !== this.props.healthLoading || prevProps.trustedChannelsSetupSyncing !== this.props.trustedChannelsSetupSyncing || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status){
-      if(healthLoading || trustedChannelsSetupSyncing || isBackupProcessing.status){
-        this.setState({refreshControlLoader: true})
-      } else if(!healthLoading && !trustedChannelsSetupSyncing && !isBackupProcessing.status){
-        this.setState({refreshControlLoader: false})
+    const { healthLoading, trustedChannelsSetupSyncing, isBackupProcessing } = this.props;
+    console.log("trustedChannelsSetupSyncing",trustedChannelsSetupSyncing, healthLoading,isBackupProcessing.status);
+    if (prevProps.healthLoading !== this.props.healthLoading || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status) {
+      if (healthLoading || isBackupProcessing.status) {
+        this.setState({ refreshControlLoader: true })
+      } else if (!healthLoading && !isBackupProcessing.status) {
+        this.setState({ refreshControlLoader: false })
       }
     }
 
@@ -455,6 +380,9 @@ class ManageBackup extends Component<
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
     ) {
+      if(this.props.levelHealth.findIndex(value=>value.levelInfo.findIndex(item=>item.shareType=='contact')) > -1){
+        this.props.trustedChannelsSetupSync();
+      }
       this.modifyLevelData();
       if (
         this.props.levelHealth.length > 0 &&
@@ -468,8 +396,8 @@ class ManageBackup extends Component<
       }
     }
 
-    if(JSON.stringify(prevProps.metaShares) != JSON.stringify(this.props.metaShares)){
-      if(this.props.metaShares.length == 5){
+    if (JSON.stringify(prevProps.metaShares) != JSON.stringify(this.props.metaShares)) {
+      if (this.props.metaShares.length == 5) {
         let obj = {
           shareType: this.state.selectedKeeperType,
           name: this.state.selectedKeeperName,
@@ -621,8 +549,8 @@ class ManageBackup extends Component<
       currentLevel == 2 || currentLevel == 1
         ? levelHealth[1].levelInfo[2].shareId
         : currentLevel == 3
-        ? levelHealth[2].levelInfo[2].shareId
-        : levelHealth[1].levelInfo[2].shareId;
+          ? levelHealth[2].levelInfo[2].shareId
+          : levelHealth[1].levelInfo[2].shareId;
     sendApprovalRequest(
       this.state.selectedKeeper.shareId,
       PKShareId,
@@ -656,7 +584,7 @@ class ManageBackup extends Component<
       return;
     }
     else if (
-      currentLevel == 1 && number == 2 && 
+      currentLevel == 1 && number == 2 &&
       value.id == 2 && !isLevelTwoMetaShareCreated &&
       !isLevel2Initialized
     ) {
@@ -668,7 +596,7 @@ class ManageBackup extends Component<
       return;
     }
     else if (
-      currentLevel == 1 && number == 2 && 
+      currentLevel == 1 && number == 2 &&
       value.id == 2 && !secureAccount.secureHDWallet.xpubs.secondary && !secureAccount.secureHDWallet.xpubs.bh
     ) {
       this.setState({
@@ -678,8 +606,8 @@ class ManageBackup extends Component<
       (this.refs.ErrorBottomSheet as any).snapTo(1);
       return;
     }
-    else{
-      this.setState({errorTitle: '', errorInfo: ''});
+    else {
+      this.setState({ errorTitle: '', errorInfo: '' });
     }
     let keeper = number == 1 ? value.keeper1 : value.keeper2;
     this.setState({
@@ -702,7 +630,7 @@ class ManageBackup extends Component<
       return;
     } else {
       if (value.id === 2 && number == 1) {
-        if(this.props.currentLevel == 1) {
+        if (this.props.currentLevel == 1) {
           (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
         } else {
           this.setState({
@@ -717,7 +645,7 @@ class ManageBackup extends Component<
 
   onRefresh = async () => {
     this.props.checkMSharesHealth();
-    this.props.trustedChannelsSetupSync();
+    
   };
 
   getImageIcon = (chosenContact) => {
@@ -741,23 +669,23 @@ class ManageBackup extends Component<
               }}
             >
               {chosenContact &&
-              chosenContact.firstName === "F&F request" &&
-              chosenContact.contactsWalletName !== undefined &&
-              chosenContact.contactsWalletName !== ""
+                chosenContact.firstName === "F&F request" &&
+                chosenContact.contactsWalletName !== undefined &&
+                chosenContact.contactsWalletName !== ""
                 ? nameToInitials(`${chosenContact.contactsWalletName}'s wallet`)
                 : chosenContact && chosenContact.name
-                ? nameToInitials(
+                  ? nameToInitials(
                     chosenContact &&
                       chosenContact.firstName &&
                       chosenContact.lastName
                       ? chosenContact.firstName + " " + chosenContact.lastName
                       : chosenContact.firstName && !chosenContact.lastName
-                      ? chosenContact.firstName
-                      : !chosenContact.firstName && chosenContact.lastName
-                      ? chosenContact.lastName
-                      : ""
+                        ? chosenContact.firstName
+                        : !chosenContact.firstName && chosenContact.lastName
+                          ? chosenContact.lastName
+                          : ""
                   )
-                : ""}
+                  : ""}
             </Text>
           </View>
         );
@@ -781,7 +709,7 @@ class ManageBackup extends Component<
         isIgnoreButton={false}
         onPressProceed={() => this.closeErrorModal()}
         isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+        bottomImage={require('../../assets/images/icons/errorImage.png')}
       />
     )
   }
@@ -988,17 +916,17 @@ class ManageBackup extends Component<
                             }}
                           >
                             {value.keeper1.status == "notAccessible" &&
-                            value.keeper2.status == "notAccessible" &&
-                            value.keeper1.updatedAt == 0 &&
-                            value.keeper2.updatedAt == 0
+                              value.keeper2.status == "notAccessible" &&
+                              value.keeper1.updatedAt == 0 &&
+                              value.keeper2.updatedAt == 0
                               ? value.infoGray
                               : value.keeper1.status == "accessible" &&
                                 value.keeper2.status == "accessible"
-                              ? value.infoGreen
-                              : value.keeper1.status == "accessible" ||
-                                value.keeper2.status == "accessible"
-                              ? value.infoRed
-                              : value.infoRed}
+                                ? value.infoGreen
+                                : value.keeper1.status == "accessible" ||
+                                  value.keeper2.status == "accessible"
+                                  ? value.infoRed
+                                  : value.infoRed}
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -1183,13 +1111,13 @@ class ManageBackup extends Component<
                                 onPress={() => this.onPressKeeper(value, 1)}
                               >
                                 {value.keeper1.status == "accessible" &&
-                                (value.keeper1.shareType == "device" ||
-                                  value.keeper1.shareType ==
+                                  (value.keeper1.shareType == "device" ||
+                                    value.keeper1.shareType ==
                                     "primaryKeeper") ? (
                                   <Image
                                     source={
                                       value.keeper1.shareType == "device" ||
-                                      value.keeper1.shareType == "primaryKeeper"
+                                        value.keeper1.shareType == "primaryKeeper"
                                         ? require("../../assets/images/icons/icon_ipad_blue.png")
                                         : require("../../assets/images/icons/pexels-photo.png")
                                     }
@@ -1235,11 +1163,11 @@ class ManageBackup extends Component<
                                   }}
                                 >
                                   {value.status == "good" ||
-                                  (value.status == "bad" && value.keeper1.name)
+                                    (value.status == "bad" && value.keeper1.name)
                                     ? value.keeper1.name
                                     : value.id == 2
-                                    ? "Add Primary Keeper"
-                                    : "Add Keeper"}
+                                      ? "Add Primary Keeper"
+                                      : "Add Keeper"}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
@@ -1267,13 +1195,13 @@ class ManageBackup extends Component<
                                 onPress={() => this.onPressKeeper(value, 2)}
                               >
                                 {value.keeper2.status == "accessible" &&
-                                (value.keeper2.shareType == "device" ||
-                                  value.keeper2.shareType ==
+                                  (value.keeper2.shareType == "device" ||
+                                    value.keeper2.shareType ==
                                     "primaryKeeper") ? (
                                   <Image
                                     source={
                                       value.keeper2.shareType == "device" ||
-                                      value.keeper2.shareType == "primaryKeeper"
+                                        value.keeper2.shareType == "primaryKeeper"
                                         ? require("../../assets/images/icons/icon_ipad_blue.png")
                                         : require("../../assets/images/icons/pexels-photo.png")
                                     }
@@ -1320,7 +1248,7 @@ class ManageBackup extends Component<
                                 >
                                   {(value.status == "bad" ||
                                     value.status == "good") &&
-                                  value.keeper2.name
+                                    value.keeper2.name
                                     ? value.keeper2.name
                                     : "Add Keeper"}
                                 </Text>
@@ -1358,7 +1286,7 @@ class ManageBackup extends Component<
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2
-                ) { 
+                ) {
                   getApproval = false;
                   await this.props.generateMetaShare(selectedLevelId);
                 }
@@ -1451,7 +1379,7 @@ class ManageBackup extends Component<
           ]}
           renderContent={() => (
             <ApproveSetup
-              currentTime ={moment(new Date()).valueOf()}
+              currentTime={moment(new Date()).valueOf()}
               isContinueDisabled={
                 selectedKeeperType == "pdf" || selectedKeeperType == "contact"
                   ? !keeperApproveStatus.status
@@ -1501,7 +1429,7 @@ class ManageBackup extends Component<
           ref={'ErrorBottomSheet'}
           snapPoints={[
             -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '30%' ) : hp( '35%' ),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('30%') : hp('35%'),
           ]}
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}

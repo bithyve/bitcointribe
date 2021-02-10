@@ -417,6 +417,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     let secureXpub = s3ServiceSecure.getXpubsForAccount();
 
     let ScannedData = JSON.parse(scannedData);
+    console.log("ScannedData", ScannedData);
 
     let encKey;
     if (ScannedData.uuid) encKey = LevelHealth.strechKey(ScannedData.uuid);
@@ -439,6 +440,8 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       ScannedData.walletName,
       EfChannelAddress
     );
+    console.log("result finalizeKeeper", result);
+
     if (result.status === 200) {
       hexaPublicKey = result.data.publicKey;
       trustedChannelAddress = result.data.channelAddress;

@@ -27,6 +27,7 @@ import android.util.Pair;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeArray;
+import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -77,7 +78,8 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     private final String SUCCESSFULLY_UPDATE = "successFullyUpdate";
     private final String SUCCESSFULLY_UPLOAD = "successFullyUpload";
     private final String ON_FAILURE = "failure";
-
+    private String ifExistFileMetaData = null;
+    private String currentCallBack = null;
 
     public GoogleDrive(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
@@ -221,10 +223,27 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         @Override
         public void onActivityResult(Activity activity, final int requestCode, final int resultCode, final Intent intent) {
             Log.d(TAG, "onActivityResult : " + requestCode);
-            if (requestCode == REQUEST_CODE_SIGN_IN) {
+            
+            switch (requestCode) {
+                case REQUEST_CODE_SIGN_IN: 
                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(intent);
                 handleSignInResult(result, false);
-            }
+                break;
+
+            case REQUEST_AUTHORIZATION:
+           // Log.d(TAG, "ifExistFileMetaData : " + ifExistFileMetaData);
+            //   Log.d(TAG, "listOfFilesAvailable " + listOfFilesAvailable);
+               if(currentCallBack.equals("listOfFilesAvailable")) {
+                   WritableMap map = Arguments.createMap();
+                   map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
+                   listOfFilesAvailable.invoke(null, map);
+               } else if(currentCallBack.equals("uploadFileCallback")) {
+                   WritableMap map = Arguments.createMap();
+                   map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
+                   uploadFileCallback.invoke(null, map);
+               }
+           break;
+        }
         }
     }
 
@@ -233,11 +252,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     @ReactMethod
     public void uploadFile(String metaData, Callback callBack) {
         uploadFileCallback = callBack;
+        currentCallBack = "uploadFileCallback";
         Log.d(TAG, "mDriveServiceHelper " + mDriveServiceHelper);
         if (mDriveServiceHelper == null) {
-            WritableMap map = Arguments.createMap();
-            map.putString(EVENT_KEY, ON_FAILURE);
-            uploadFileCallback.invoke(map, null);
             return;
         }
         final Activity activity = getCurrentActivity();
@@ -254,8 +271,18 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "onFailure uploadFile: " + e.getMessage());
-                            uploadFileCallback.invoke(null, e.getMessage());
+                          //  Log.d(TAG, "onFailure uploadFile: " + e.getMessage());
+                            if(e instanceof UserRecoverableAuthIOException){
+                               // Log.d(TAG, " onFailure UseUserRecoverableAuthIOException: " + e.getMessage());
+                                // map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
+                                activity.startActivityForResult(((UserRecoverableAuthIOException) e).getIntent(), REQUEST_AUTHORIZATION);
+                            }   else{
+                                WritableMap map = Arguments.createMap();
+                                map.putString(EVENT_KEY, ON_FAILURE);
+                                uploadFileCallback.invoke(null, map);
+                            }
+
+
                         }
                     });
     }
@@ -263,10 +290,10 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     @ReactMethod
     public  List<GoogleDriveFileHolder>  checkIfFileExist(String metaData, Callback callBack) {
         listOfFilesAvailable = callBack;
+        currentCallBack = "listOfFilesAvailable";
+
+        ifExistFileMetaData = metaData;
         if (mDriveServiceHelper == null) {
-            WritableMap map = Arguments.createMap();
-            map.putString(EVENT_KEY, ON_FAILURE);
-            listOfFilesAvailable.invoke(map, null);
             return null;
         }
         JSONObject jsonObj = null;
@@ -275,7 +302,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         try {
             jsonObj = new JSONObject(metaData);
             Log.d(TAG, "jsonObj: " + jsonObj.getString("name") + jsonObj.getString("mimeType"));
-            mDriveServiceHelper.searchFile(jsonObj.getString("name"),jsonObj.getString("mimeType"))
+            mDriveServiceHelper.searchFile(activity, jsonObj.getString("name"),jsonObj.getString("mimeType"))
                     .addOnSuccessListener(new OnSuccessListener<List<GoogleDriveFileHolder>>() {
                         @Override
                         public void onSuccess(List<GoogleDriveFileHolder> googleDriveFileHolders) {
@@ -303,9 +330,18 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.d(TAG, "onFailure sdfdfdsaf: " + e.getMessage());
-                            WritableMap map = Arguments.createMap();
-                            map.putString(EVENT_KEY, ON_FAILURE);
-                            listOfFilesAvailable.invoke(map, null);
+
+                            if(e instanceof UserRecoverableAuthIOException){
+                                Log.d(TAG, " onFailure UseUserRecoverableAuthIOException: " + e.getMessage());
+                               // map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
+                                activity.startActivityForResult(((UserRecoverableAuthIOException) e).getIntent(), REQUEST_AUTHORIZATION);
+                            }   else{
+                                WritableMap map = Arguments.createMap();
+                                map.putString(EVENT_KEY, ON_FAILURE);
+                                listOfFilesAvailable.invoke(null, map);
+                            }
+
+
                         }
                     });
 
@@ -323,9 +359,6 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     public void updateFile(String metaData, Callback callBack) {
         updateFileCallback = callBack;
         if (mDriveServiceHelper == null) {
-            WritableMap map = Arguments.createMap();
-            map.putString(EVENT_KEY, ON_FAILURE);
-            updateFileCallback.invoke(map, null);
             return;
         }
         mDriveServiceHelper.saveFile(getReactApplicationContext(), metaData)
@@ -342,7 +375,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.d(TAG, "onFailure updateFile: " + e.getMessage());
-                       updateFileCallback.invoke(null, e.getMessage());
+                        WritableMap map = Arguments.createMap();
+                        map.putString(EVENT_KEY, ON_FAILURE);
+                        updateFileCallback.invoke(null, map);
                     }
                 });
     }
@@ -351,9 +386,6 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     public void readFile(String metaData, Callback callBack) {
         readFileCallback = callBack;
         if (mDriveServiceHelper == null) {
-            WritableMap map = Arguments.createMap();
-            map.putString(EVENT_KEY, ON_FAILURE);
-            readFileCallback.invoke(map, null);
             return;
         }
         JSONObject jsonObj = null;

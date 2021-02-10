@@ -11,6 +11,7 @@ export default class CloudBackup {
   public isNotReading = true;
   public googlePermissionCall = false;
   public googleCloudLoginCallback;
+  public failureCallBack;
 
   constructor(stateVars?: {
     dataObject?: any;
@@ -19,14 +20,17 @@ export default class CloudBackup {
     recoveryCallback?: any;
     googlePermissionCall?: any;
     googleCloudLoginCallback?: any;
+    failureCallBack?: any;
   }) {
-    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback } = stateVars;
+    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback, failureCallBack } = stateVars;
     if (dataObject) this.dataObject = dataObject;
     if (callBack) this.callBack = callBack;
     if (share) this.share = share;
     if (recoveryCallback) this.recoveryCallback = recoveryCallback;
     if (googlePermissionCall) this.googlePermissionCall = googlePermissionCall;
     if (googleCloudLoginCallback) this.googleCloudLoginCallback = googleCloudLoginCallback;
+    if (failureCallBack) this.failureCallBack = failureCallBack;
+
   }
 
   // check storage permission
@@ -60,11 +64,12 @@ export default class CloudBackup {
     }
   };
 
-  public CloudDataBackup = (data, callback, share?) => {
+  public CloudDataBackup = (data, callback, failureCallBack?, share?) => {
     // console.log('share inside cloud', share);
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};
+    this.failureCallBack = failureCallBack;
     if (Platform.OS == 'ios') {
       iCloud.downloadBackup().then((backedJson) => {
         console.log('BackedUp JSON: DONE', backedJson);
@@ -179,6 +184,10 @@ export default class CloudBackup {
             this.createFile({ share });
           } else if (result.eventName == 'failure') {
             console.log('FAILURE');
+          } else if(result.eventName === 'UseUserRecoverableAuthIOException')
+          {
+            this.checkFileIsAvailable({ share: this.share });
+           // console.log('UseUserRecoverableAuthIOException Failure');
           } else {
             console.log(
               'readFile isNotReading checkFileIsAvailable if',
@@ -225,12 +234,14 @@ export default class CloudBackup {
 
       try {
         GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
-          console.log('DATA', data);
+          console.log('DATA', data, err);
           const result = err || data;
-          if (result.eventName == 'successFullyUpload') {
+          if(!result) this.failureCallBack();
+          if (result && result.eventName == 'successFullyUpload') {
             this.callBack(share);
-            //dataObject.onPressSetStatus();
-          }
+          } else if (result && result.eventName === 'UseUserRecoverableAuthIOException') {
+            this.checkFileIsAvailable({ share: this.share });
+          } 
         });
         // uploadFile(JSON.stringify(content))
       } catch (error) {
