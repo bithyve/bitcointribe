@@ -31,6 +31,7 @@ import { initMigration } from '../store/actions/preferences'
 import { clearAccountSyncCache } from '../store/actions/accounts'
 import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
+import content from '../common/content'
 
 const LOADER_MESSAGE_TIME = 2500
 const loaderMessages = [
@@ -151,7 +152,11 @@ export default function Login( props ) {
             ? 'Your device is Jail Broken'
             : 'Your device is Rooted',
         )
-        setJailBrokenInfo( '' )
+        setJailBrokenInfo(
+          Platform.OS == 'ios'
+            ? 'You are using a jailbroken device hence in built security features of the app as well as the phone will not work as intended. We recommend you use a non jailbroken device with the latest iOS updates installed to ensure the security of your app data'
+            : 'You are using a rooted device hence in built security features of the app as well as the phone will not work as intended. We recommend you use a non rooted device with the latest Android updates installed to ensure the security of your app data'
+        )
         setElevation( 0 )
       }, 2 )
     }
@@ -328,11 +333,11 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>Welcome back!</Text>
+          <Text style={styles.headerTitleText}>{content.login.welcome}</Text>
           <View>
             <Text style={styles.headerInfoText}>
-              Please enter your{' '}
-              <Text style={styles.boldItalicText}>passcode</Text>
+              {content.login.enter_your}{' '}
+              <Text style={styles.boldItalicText}>{content.login.passcode}</Text>
             </Text>
             <View style={{
               alignSelf: 'baseline'
@@ -638,11 +643,9 @@ export default function Login( props ) {
           </View>
 
           <BottomInfoBox
-            title={'Terms of Service'}
-            infoText={
-              'By proceeding to the next step, you agree to our '
-            }
-            linkText={'Terms of Service'}
+            title={content.login.tos}
+            infoText={content.login.tos_agree}
+            linkText={content.login.tos}
             onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
           />
         </View>
