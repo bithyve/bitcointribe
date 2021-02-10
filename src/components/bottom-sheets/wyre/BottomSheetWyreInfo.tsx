@@ -23,10 +23,10 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, onClickSet
       wyreDeepLinkContent
     }
   } )
-  let wyreMessage = 'Your order has been successful the purchased bitcoin will be transferred to your Wyre account shortly'
+  let wyreMessage = 'Your order has been successful, the purchased bitcoin will be transferred to your Wyre account shortly'
   let wyreTitle = 'Order successful'
   if( wyreDeepLinkContent.search( 'fail' )>=0 ) {
-    wyreMessage = 'Wyre was not able to process your payment. Please use a different payment payment'
+    wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment payment'
     wyreTitle = 'Wyre order failed'
   }
   return ( <View style={{
