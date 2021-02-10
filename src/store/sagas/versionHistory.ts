@@ -8,17 +8,14 @@ import { isEmpty,  buildVersionExists } from '../../common/CommonFunctions'
 import { setVersionHistory, SET_VERSION } from '../actions/versionHistory'
 
 function* versionHistoryWorker( { payload } ) {
-  console.log( 'version history saga called with payload', payload )
   const versionHistory = yield select(
     ( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
   )
-  console.log( 'version history retreived ', versionHistory )
+
   let versionType = payload.versionType
 
   const id = versionHistory && versionHistory.length ? versionHistory.length + 1 : 1
-  console.log( {
-    id
-  } )
+
   if( !( versionType==='Restored' ) ) {
     if( id==1 ) {
       versionType = 'Current'

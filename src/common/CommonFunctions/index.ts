@@ -39,7 +39,7 @@ export const isEmpty = ( obj ) => {
 export const  buildVersionExists = ( versionData ) =>{
   return (
     ( versionData.filter( version => version.buildNumber == DeviceInfo.getBuildNumber() ).length > 0 )
-    ||
+    &&
     ( versionData.filter( version => version.version == DeviceInfo.getVersion() ).length > 0 )
   )
 }
