@@ -509,6 +509,7 @@ export default class SecureAccount {
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
     hardRefresh?: boolean,
+    syncGapLimit?: boolean,
   ): Promise<
     | {
         status: number;
@@ -531,7 +532,8 @@ export default class SecureAccount {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
-          hardRefresh
+          hardRefresh,
+          syncGapLimit
         ),
       }
     } catch ( err ) {
@@ -1106,6 +1108,7 @@ export default class SecureAccount {
       contactName?: string,
     }[],
     hardRefresh?: boolean,
+    syncGapLimit?: boolean,
   ):  Promise<
   | {
       status: number;
@@ -1129,6 +1132,7 @@ export default class SecureAccount {
         data: await this.secureHDWallet.fetchDerivativeAccBalanceTxs(
           accountInfo,
           hardRefresh,
+          syncGapLimit,
         ),
       }
     } catch ( err ) {
