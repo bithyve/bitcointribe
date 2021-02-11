@@ -96,6 +96,7 @@ import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
 
@@ -113,6 +114,7 @@ export enum BottomSheetKind {
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
+  WYRE_STATUS_INFO,
   ERROR,
 }
 
@@ -138,6 +140,7 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
+  wyreDeepLinkContent: string | null;
 }
 
 interface HomePropsTypes {
@@ -178,6 +181,7 @@ interface HomePropsTypes {
   releaseCasesValue: any;
   setVersion: any;
   versionHistory: any;
+  wyreDeepLinkContent: string | null;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -219,6 +223,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
+      wyreDeepLinkContent: null
     }
   }
 
@@ -1023,6 +1028,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const splits = url.split( '/' )
 
+    if ( splits.includes( 'wyre' ) ) {
+      this.setState( {
+        wyreDeepLinkContent:url
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
+      } )
+    }
     if ( splits[ 5 ] === 'sss' ) {
       const requester = splits[ 4 ]
 
@@ -1680,7 +1692,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return [ 0, '35%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return [ 0, '36%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints
@@ -1723,6 +1738,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="Buy bitcoin with Wyre" onPress={this.closeBottomSheet} />
+              <BottomSheetWyreInfo
+                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
               />
             </>
           )
