@@ -848,14 +848,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, database, accountShells, activePersonalNode } = this.props;
+    const { walletName, regularAccount, database, accountShells, activePersonalNode, versionHistory } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode);
+    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode, versionHistory);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -1876,6 +1876,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             share.name
           );
         }
+        console.log('element.notificationType HOME', element)
         if (element.notificationType == "reShare") {
           // console.log('element.notificationType', element.notificationType)
           // console.log('UNDER_CUSTODY', UNDER_CUSTODY)
@@ -1887,8 +1888,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               return UNDER_CUSTODY[tag].META_SHARE;
             });
           }
+          console.log('existingShares.length HOME', existingShares.length)
+
           if(existingShares.length){
-            //console.log('existingShares.length', existingShares.length, existingShares)
+            console.log('existingShares.length', existingShares.length, existingShares)
             if (
               existingShares.findIndex(
                 (value) =>

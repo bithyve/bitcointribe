@@ -298,11 +298,11 @@ class RestoreWithICloud extends Component<
   restoreWallet = () => {
     let listDataArray = [];
     const { selectedBackup } = this.state;
-    //console.log("selectedBackup", selectedBackup);
+    console.log("selectedBackup", selectedBackup);
     const { recoverWalletUsingIcloud, accounts } = this.props;
     let key = SSS.strechKey(this.props.security.answer);
     const decryptedCloudDataJson = decrypt(selectedBackup.data, key);
-    //console.log('decryptedCloudDataJson', decryptedCloudDataJson);
+    console.log('decryptedCloudDataJson', decryptedCloudDataJson);
 
     if (decryptedCloudDataJson && selectedBackup.shares && selectedBackup.keeperData) {
       this.setState({ cloudBackup: true });

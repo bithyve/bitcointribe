@@ -128,6 +128,8 @@ interface ManageBackupPropsTypes {
   trustedChannelsSetupSyncing: any;
   accountShells: AccountShell[];
   activePersonalNode: PersonalNode;
+  versionHistory: any;
+
 }
 
 class ManageBackup extends Component<
@@ -265,14 +267,14 @@ class ManageBackup extends Component<
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, database, accountShells, activePersonalNode } = this.props;
+    const { walletName, regularAccount, accountShells, activePersonalNode, versionHistory } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
         !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode);
+    encryptedCloudDataJson = await CloudData(this.props.database, accountShells, activePersonalNode, versionHistory);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
       {
@@ -295,10 +297,9 @@ class ManageBackup extends Component<
       let cloudObject = new CloudBackup({
         dataObject: data,
         callBack: this.setCloudBackupStatus,
-        failureCallBack: this.setFailureCallback,
         share,
       });
-      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, this.setFailureCallback, share);
+      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
     }
   };
 
@@ -319,9 +320,6 @@ class ManageBackup extends Component<
     }
   };
 
-  setFailureCallback = () => {
-    this.props.setIsBackupProcessing({ status: false });
-  };
 
 
   updateHealthForCloud = (share?) => {
@@ -1473,6 +1471,8 @@ const mapStateToProps = (state) => {
     ),
     accountShells: idx(state, (_) => _.accounts.accountShells),
     activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
+    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
+
   };
 };
 
