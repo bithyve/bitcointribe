@@ -1695,7 +1695,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.WYRE_STATUS_INFO:
           return [ 0, '35%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return [ 0, '42%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints

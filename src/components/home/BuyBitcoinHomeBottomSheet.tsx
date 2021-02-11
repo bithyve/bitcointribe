@@ -33,10 +33,17 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false
   },
   {
-    title: 'More Buying Options Coming Soon',
-    subtitle: 'Apple Pay/Debit Card/Bank Transfer',
+    title: 'Buy using ApplePay or Debit Card',
+    subtitle: 'Powered by Ramp',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/ramp_logo_notext.gif' ),
+    disabled: false
+  },
+  {
+    title: 'Set up automatic buys   (COMING SOON)',
+    subtitle: 'Stack sats with SwanBitcoin',
     kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/icon_bitcoin_gray.png' ),
+    imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
     disabled: true
   },
   // {
