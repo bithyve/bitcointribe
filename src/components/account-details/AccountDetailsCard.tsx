@@ -106,7 +106,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
             {primarySubAccount.customDisplayName ||
               primarySubAccount.defaultTitle}
           </Text>
-          <Text style={styles.title1Text}>2FA</Text>
+          {primarySubAccount.isTFAEnabled && (
+            <Text style={styles.title1Text}>2FA</Text>
+          )}
         </View>
 
         <Text
