@@ -297,10 +297,9 @@ class ManageBackup extends Component<
       let cloudObject = new CloudBackup({
         dataObject: data,
         callBack: this.setCloudBackupStatus,
-        failureCallBack: this.setFailureCallback,
         share,
       });
-      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, this.setFailureCallback, share);
+      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
     }
   };
 
@@ -321,9 +320,6 @@ class ManageBackup extends Component<
     }
   };
 
-  setFailureCallback = () => {
-    this.props.setIsBackupProcessing({ status: false });
-  };
 
 
   updateHealthForCloud = (share?) => {

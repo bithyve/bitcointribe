@@ -20,7 +20,6 @@ export default class CloudBackup {
     recoveryCallback?: any;
     googlePermissionCall?: any;
     googleCloudLoginCallback?: any;
-    failureCallBack?: any;
   }) {
     let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback, failureCallBack } = stateVars;
     if (dataObject) this.dataObject = dataObject;
@@ -29,8 +28,6 @@ export default class CloudBackup {
     if (recoveryCallback) this.recoveryCallback = recoveryCallback;
     if (googlePermissionCall) this.googlePermissionCall = googlePermissionCall;
     if (googleCloudLoginCallback) this.googleCloudLoginCallback = googleCloudLoginCallback;
-    if (failureCallBack) this.failureCallBack = failureCallBack;
-
   }
 
   // check storage permission
@@ -69,7 +66,6 @@ export default class CloudBackup {
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};
-    this.failureCallBack = failureCallBack;
     if (Platform.OS == 'ios') {
       iCloud.downloadBackup().then((backedJson) => {
         console.log('BackedUp JSON: DONE', backedJson);
@@ -236,7 +232,6 @@ export default class CloudBackup {
         GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
           console.log('DATA', data, err);
           const result = err || data;
-          if(!result) this.failureCallBack();
           if (result && result.eventName == 'successFullyUpload') {
             this.callBack(share);
           } else if (result && result.eventName === 'UseUserRecoverableAuthIOException') {
