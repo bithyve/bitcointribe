@@ -256,7 +256,8 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
         payload: {
           serviceTypes: [ payload.serviceType ],
           parentSynched,
-          hardRefresh: payload.options.hardRefresh
+          hardRefresh: payload.options.hardRefresh,
+          syncGapLimit: payload.options.syncGapLimit,
         },
       } )
       if( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
@@ -281,7 +282,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
-  let { serviceType, accountNumber, accountType, hardRefresh } = payload
+  let { serviceType, accountNumber, accountType, hardRefresh, syncGapLimit } = payload
   const dervTxsFound : TransactionDescribing[] = []
 
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
@@ -307,7 +308,8 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   const res = yield call(
     ( service as BaseAccount | SecureAccount ).getDerivativeAccBalanceTransactions,
     accountsInfo,
-    hardRefresh
+    hardRefresh,
+    syncGapLimit,
   )
 
   if (
@@ -342,7 +344,7 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean} } ) {
+function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean, syncGapLimit?: boolean} } ) {
   const dervTxsFound : TransactionDescribing[] = []
 
   for ( const serviceType of payload.serviceTypes ) {
