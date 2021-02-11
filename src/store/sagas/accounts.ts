@@ -177,6 +177,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
     service?;
     loader?: boolean;
     hardRefresh?: boolean;
+    syncGapLimit?: boolean;
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   }}} ) {
@@ -201,7 +202,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
       : service.hdWallet.transactions
   )
 
-  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh )
+  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh, payload.options.syncGapLimit )
   console.log( {
     res
   } )
@@ -1235,7 +1236,8 @@ function* blindRefreshWorker() {
         loader: true,
         syncTrustedDerivative:
         accountKind === TEST_ACCOUNT ? false : true,
-        hardRefresh: true
+        hardRefresh: true,
+        syncGapLimit: true,
       },
     }
 

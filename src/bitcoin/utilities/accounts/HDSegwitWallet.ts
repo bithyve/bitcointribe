@@ -1199,6 +1199,36 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+
+  private syncGapLimit = async () => {
+    // synching nextFreeAddressIndex and nextFreeChangeAddressIndex(typically during blind refresh)
+    let tryAgain = false
+    const hardGapLimit = 10
+    const externalAddress = this.getAddress( false,
+      this.nextFreeAddressIndex + hardGapLimit - 1,
+    )
+
+    const internalAddress = this.getAddress( true,
+      this.nextFreeChangeAddressIndex + hardGapLimit - 1,
+    )
+
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
+
+    if ( txCounts[ externalAddress ] > 0 ) {
+      this.nextFreeAddressIndex += this.gapLimit
+      tryAgain = true
+    }
+
+    if ( txCounts[ internalAddress ] > 0 ) {
+      this.nextFreeChangeAddressIndex += this.gapLimit
+      tryAgain = true
+    }
+
+    if ( tryAgain ) {
+      return this.syncGapLimit()
+    }
+  };
+
   public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
     // return new/found transactions(delta b/w hard and soft refresh)
     const txsFound: TransactionDetails[] = []
@@ -1234,7 +1264,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( hardRefresh?: boolean  ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean, syncGapLimit?: boolean  ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
@@ -1244,6 +1274,8 @@ export default class HDSegwitWallet extends Bitcoin {
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
+
+    if( syncGapLimit ) this.syncGapLimit()
 
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number

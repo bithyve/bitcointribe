@@ -468,7 +468,7 @@ export default class SecureAccount {
       accountNumber,
     );
 
-  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean, syncGapLimit?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -497,7 +497,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh ),
+        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh, syncGapLimit ),
       }
     } catch ( err ) {
       return {

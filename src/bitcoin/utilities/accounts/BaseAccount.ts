@@ -541,7 +541,7 @@ export default class BaseAccount {
   public isValidAddress = ( recipientAddress: string ): boolean =>
     this.hdWallet.isValidAddress( recipientAddress );
 
-  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean, syncGapLimit?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -570,7 +570,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh ),
+        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh, syncGapLimit ),
       }
     } catch ( err ) {
       return {
