@@ -57,6 +57,7 @@ import {
   twoFAValid,
   ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
+  BLIND_REFRESH,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -88,6 +89,7 @@ import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
 import { RescannedTransactionData } from '../reducers/wallet-rescanning'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -1222,6 +1224,32 @@ function* autoSyncShellsWorker( { payload } ) {
 export const autoSyncShellsWatcher = createWatcher(
   autoSyncShellsWorker,
   AUTO_SYNC_SHELLS
+)
+
+function* blindRefreshWorker() {
+  const netDeltaTxs: TransactionDescribing[] = []
+  for( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ){
+    const payload = {
+      serviceType: accountKind,
+      options: {
+        loader: true,
+        syncTrustedDerivative:
+        accountKind === TEST_ACCOUNT ? false : true,
+        hardRefresh: true
+      },
+    }
+
+    const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
+      payload
+    } )
+    if( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
+  }
+  return netDeltaTxs
+}
+
+export const blindRefreshWatcher = createWatcher(
+  blindRefreshWorker,
+  BLIND_REFRESH
 )
 
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
