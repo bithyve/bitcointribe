@@ -316,11 +316,10 @@ class ManageBackup extends Component<
       }
       this.props.setIsBackupProcessing({ status: false });
     } catch (error) {
+      this.props.setIsBackupProcessing({ status: false });
       console.log("ERRORsf", error);
     }
   };
-
-
 
   updateHealthForCloud = (share?) => {
     try {
@@ -359,12 +358,11 @@ class ManageBackup extends Component<
         }
       }
     } catch (error) {
-      console.log("jasdjhERROR", error);
+      throw error;
     }
   };
 
   componentDidUpdate = (prevProps, prevState) => {
-    // this.props.setIsBackupProcessing({ status: false });
     const { healthLoading, trustedChannelsSetupSyncing, isBackupProcessing } = this.props;
     console.log('healthLoading || isBackupProcessing.status', healthLoading, isBackupProcessing.status)
     if (prevProps.healthLoading !== this.props.healthLoading || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status) {
