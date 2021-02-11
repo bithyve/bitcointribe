@@ -104,7 +104,7 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-function* stateDataToBackup(accountShells, activePersonalNode) {
+function* stateDataToBackup(accountShells, activePersonalNode, versionHistory) {
   // state data to backup
   const STATE_DATA = {
   }
@@ -114,9 +114,12 @@ function* stateDataToBackup(accountShells, activePersonalNode) {
   if( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
+  if ( versionHistory && versionHistory.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+
   return STATE_DATA
 }
-export const CloudData = async (database, accountShells, activePersonalNode) => {
+export const CloudData = async (database, accountShells, activePersonalNode,versionHistory) => {
   let encryptedCloudDataJson;
     let walletImage = {
       SERVICES: {},

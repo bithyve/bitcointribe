@@ -1190,7 +1190,10 @@ function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
-
+  const versionHistory = yield select(
+    ((state) => idx(state, (_) => _.versionHistory.versions))
+  ); 
+  
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
@@ -1199,6 +1202,8 @@ function* stateDataToBackup() {
   if( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
+  if ( versionHistory && versionHistory.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
   return STATE_DATA
 }
 
@@ -2290,6 +2295,8 @@ function* autoDownloadShareContactWorker({ payload }) {
       });
     }
     let metaShare: MetaShare;
+    console.log("existingShares autoDownloadShareContactWorker", existingShares);
+
     if (existingShares) {
       for (let i = 0; i < existingShares.length; i++) {
         const element = existingShares[i];
