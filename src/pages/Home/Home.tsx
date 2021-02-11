@@ -876,10 +876,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     let cloudObject = new CloudBackup({
       dataObject: data,
       callBack: this.setCloudBackupStatus,
-      failureCallBack: this.setFailureCallback,
       share,
     });
-    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus,this.setFailureCallback, share);
+    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
   };
 
   setCloudBackupStatus = (share?) => {
@@ -892,10 +891,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.updateHealthForCloud(share);
     }
-  };
-
-  setFailureCallback = () => {
-    this.props.setIsBackupProcessing({ status: false });
   };
 
   getNewTransactionNotifications = async () => {

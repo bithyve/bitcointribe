@@ -11,7 +11,6 @@ export default class CloudBackup {
   public isNotReading = true;
   public googlePermissionCall = false;
   public googleCloudLoginCallback;
-  public failureCallBack;
 
   constructor(stateVars?: {
     dataObject?: any;
@@ -21,7 +20,7 @@ export default class CloudBackup {
     googlePermissionCall?: any;
     googleCloudLoginCallback?: any;
   }) {
-    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback, failureCallBack } = stateVars;
+    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback } = stateVars;
     if (dataObject) this.dataObject = dataObject;
     if (callBack) this.callBack = callBack;
     if (share) this.share = share;
@@ -61,7 +60,7 @@ export default class CloudBackup {
     }
   };
 
-  public CloudDataBackup = (data, callback, failureCallBack?, share?) => {
+  public CloudDataBackup = (data, callback, share?) => {
     // console.log('share inside cloud', share);
     this.dataObject = data;
     this.callBack = callback;
