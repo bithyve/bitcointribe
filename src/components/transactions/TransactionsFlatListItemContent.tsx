@@ -5,9 +5,12 @@ import moment from 'moment'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { TransactionDetails } from '../../bitcoin/utilities/Interface'
-import { FAST_BITCOINS, SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UsNumberFormat } from '../../common/utilities'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import TransactionKind from '../../common/data/enums/TransactionKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 
 export type Props = {
   transaction: TransactionDescribing;

@@ -61,11 +61,13 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     dispatch( addRecipientForSending( recipient ) )
     dispatch( recipientSelectedForAmountSetting( recipient ) )
 
-    navigateToSendDetails()
+    navigateToSendDetails( recipient )
   }
 
-  function navigateToSendDetails() {
-    navigation.navigate( 'SentAmountForContactForm' )
+  function navigateToSendDetails( selectedRecipient: RecipientDescribing ) {
+    navigation.navigate( 'SentAmountForContactForm', {
+      selectedRecipientID: selectedRecipient.id,
+    } )
   }
 
   function handlePaymentURIEntry( uri: string ) {
