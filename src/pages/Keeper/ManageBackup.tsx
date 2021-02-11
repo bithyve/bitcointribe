@@ -343,7 +343,7 @@ class ManageBackup extends Component<
             levelHealthVar.updatedAt = moment(new Date()).valueOf();
             levelHealthVar.status == "accessible";
             levelHealthVar.reshareVersion = 0;
-            levelHealthVar.guardian = "cloud";
+            levelHealthVar.name = "cloud";
           }
           let shareArray = [
             {
@@ -364,8 +364,11 @@ class ManageBackup extends Component<
   };
 
   componentDidUpdate = (prevProps, prevState) => {
+    // this.props.setIsBackupProcessing({ status: false });
     const { healthLoading, trustedChannelsSetupSyncing, isBackupProcessing } = this.props;
+    console.log('healthLoading || isBackupProcessing.status', healthLoading, isBackupProcessing.status)
     if (prevProps.healthLoading !== this.props.healthLoading || prevProps.isBackupProcessing.status !== this.props.isBackupProcessing.status) {
+
       if (healthLoading || isBackupProcessing.status) {
         this.setState({ refreshControlLoader: true })
       } else if (!healthLoading && !isBackupProcessing.status) {
@@ -377,6 +380,10 @@ class ManageBackup extends Component<
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
     ) {
+      // if (
+      //  prevProps.levelHealth !==
+      //   this.props.levelHealth
+      // ) {
       if(this.props.levelHealth.findIndex(value=>value.levelInfo.findIndex(item=>item.shareType=='contact') > -1) > -1){
         this.props.trustedChannelsSetupSync();
       }

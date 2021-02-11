@@ -9,6 +9,7 @@ import {
 } from "react-native-responsive-screen";
 import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
 export default function RestoreFromICloud(props) {
   return (
@@ -17,50 +18,48 @@ export default function RestoreFromICloud(props) {
         <Text style={styles.headerTitleText}>{props.title}</Text>
         <Text style={styles.headerInfoText}>{props.subText}</Text>
       </View>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
+      <AppBottomSheetTouchableWrapper
+        activeOpacity={10}
+        onPress={() => props.onPressCard()}
+        style={{ justifyContent: "center", alignItems: "center" }}
       >
-        <View
-          style={{
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <View style={styles.greyBox}>
-            <View style={styles.greyBoxImage}>
-              <MaterialCommunityIcons
-                name={"restore"}
-                size={RFValue(25)}
-                color={Colors.blue}
-              />
-            </View>
-            <View style={{ marginLeft: 10 }}>
-              <Text style={styles.greyBoxText}>{props.cardInfo}</Text>
-              <Text
-                style={{
-                  ...styles.greyBoxText,
-                  fontSize: RFValue(20),
-                  marginTop: 5,
-                }}
-              >
-                {props.cardTitle}
-              </Text>
-              <Text
-                style={{
-                  ...styles.greyBoxText,
-                  fontSize: RFValue(10),
-                }}
-              >
-                {props.cardSubInfo}
-              </Text>
-            </View>
+        <View style={styles.greyBox}>
+          <View style={styles.greyBoxImage}>
+            <MaterialCommunityIcons
+              name={"restore"}
+              size={RFValue(25)}
+              color={Colors.blue}
+            />
+          </View>
+          <View style={{ marginLeft: 10 }}>
+            <Text style={styles.greyBoxText}>{props.cardInfo}</Text>
+            <Text
+              style={{
+                ...styles.greyBoxText,
+                fontSize: RFValue(20),
+              }}
+            >
+              {props.cardTitle}
+            </Text>
+            <Text
+              style={{
+                ...styles.greyBoxText,
+                fontSize: RFValue(10),
+              }}
+            >
+              {props.levelStatus ? props.levelStatus : ""}
+            </Text>
+          </View>
+          <View style={styles.arrowIconView}>
+            <Ionicons
+              name="ios-arrow-down"
+              color={Colors.textColorGrey}
+              size={15}
+              style={{ alignSelf: "center" }}
+            />
           </View>
         </View>
-      </View>
+      </AppBottomSheetTouchableWrapper>
       <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>{props.info}</Text>
       </View>
@@ -196,5 +195,11 @@ const styles = StyleSheet.create({
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(11),
+  },
+  arrowIconView: {
+    marginLeft: "auto",
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
