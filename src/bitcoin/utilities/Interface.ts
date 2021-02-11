@@ -281,6 +281,7 @@ export enum notificationType {
   approveKeeper = 'approveKeeper',
   uploadSecondaryShare = 'uploadSecondaryShare',
   reShare = 'reShare',
+  reShareResponse = 'reShareResponse',
 }
 export enum notificationTag {
   IMP = 'IMP',

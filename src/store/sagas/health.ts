@@ -2358,7 +2358,7 @@ function* autoDownloadShareContactWorker({ payload }) {
         });
       }
       const notification: INotification = {
-        notificationType: notificationType.reShare,
+        notificationType: notificationType.reShareResponse,
         title: "New share downloaded",
         body: "New share downloaded.",
         data: JSON.stringify({ selectedShareId: shareId }),
