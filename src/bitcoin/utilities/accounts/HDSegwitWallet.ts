@@ -19,8 +19,9 @@ import {
   DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
+  AverageTxFees,
 } from '../Interface'
-import  { AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
@@ -1524,15 +1525,14 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public transactionPrerequisites = async (
+  public transactionPrerequisites = (
     recipients: {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
-  ): Promise<
-    | {
+  ): {
         fee: number;
         balance: number;
         txPrerequisites?: undefined;
@@ -1541,8 +1541,7 @@ export default class HDSegwitWallet extends Bitcoin {
         txPrerequisites: TransactionPrerequisite;
         fee?: undefined;
         balance?: undefined;
-      }
-  > => {
+      } => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
