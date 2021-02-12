@@ -1,0 +1,58 @@
+import { call, put, select } from 'redux-saga/effects'
+
+import {
+  FETCH_RAMP_RESERVATION,
+  fetchRampReservationSucceeded,
+} from '../actions/RampIntegration'
+
+import {
+  fetchRampReservation
+} from '../../services/ramp'
+
+import { createWatcher } from '../utils/utilities'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import { RAMP } from '../../common/constants/serviceTypes'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+
+export const fetchRampReservationWatcher = createWatcher(
+  fetchRampReservationWorker,
+  FETCH_RAMP_RESERVATION
+)
+
+function* fetchRampReservationWorker( { payload } ) {
+  const { amount, currencyCode, country, instance, sourceKind } = payload
+
+  let service: RegularAccount| SecureAccount
+  switch ( sourceKind ) {
+      case SourceAccountKind.SECURE_ACCOUNT:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
+        )
+        break
+      default:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
+        )
+  }
+  const receiveAddress =  service.getReceivingAddress( RAMP, instance? instance: 1 )
+
+  const rampResponse = yield call( fetchRampReservation, amount, receiveAddress, currencyCode, country )
+  console.log( {
+    rampResponse
+  } )
+  const { reservation, url, error } = rampResponse
+  console.log( {
+    reservation
+  } )
+  if( error ) {
+    yield put( fetchRampReservationSucceeded( {
+      rampReservationCode: null,
+      rampHostedUrl: null,
+    } ) )
+  }
+  yield put( fetchRampReservationSucceeded( {
+    rampReservationCode: reservation,
+    rampHostedUrl: url
+  } ) )
+}

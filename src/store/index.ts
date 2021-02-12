@@ -17,6 +17,7 @@ import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 
 
@@ -129,6 +130,9 @@ import {
 import {
   fetchWyreReservationWatcher
 } from './sagas/WyreIntegration'
+import {
+  fetchRampReservationWatcher
+} from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
 
@@ -231,6 +235,9 @@ const rootSaga = function* () {
     // Wyre Integration
     fetchWyreReservationWatcher,
 
+    // Ramp Integration
+    fetchRampReservationWatcher,
+
     //VersionHistory integration
     versionHistoryWatcher,
   ]
@@ -265,6 +272,7 @@ const rootReducer = combineReducers( {
   swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
+  rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
 } )
 
