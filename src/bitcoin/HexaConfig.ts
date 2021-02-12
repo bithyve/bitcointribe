@@ -11,7 +11,8 @@ import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
-  WYRE
+  WYRE,
+  RAMP
 } from '../common/constants/serviceTypes'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
@@ -170,6 +171,14 @@ class HexaConfig {
     },
   };
 
+  public RAMP: DerivativeAccount = {
+    series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 21,
+    instance: {
+      max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 10,
+      using: 0,
+    },
+  };
+
   public TRUSTED_CONTACTS: TrustedContactDerivativeAccount = {
     // corresponds to trusted channels
     series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
@@ -192,11 +201,12 @@ class HexaConfig {
     SUB_PRIMARY_ACCOUNT: this.SUB_PRIMARY_ACCOUNT,
     FAST_BITCOINS: this.FAST_BITCOINS,
     WYRE: this.WYRE,
+    RAMP: this.RAMP,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE ];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys( this.DERIVATIVE_ACC ).filter(
     ( account ) => !this.EJECTED_ACCOUNTS.includes( account ),
