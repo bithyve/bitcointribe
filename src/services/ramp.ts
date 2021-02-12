@@ -9,7 +9,7 @@ export const fetchRampReservation = ( { receiveAddress } ) => {
     const url =`${config.RAMP_BASE_URL}?\
 hostAppName=${'Hexa Wallet'}&\
 userAddress=${receiveAddress}&\
-hostLogoUrl=${'https://hexawallet.io/wp-content/uploads/2019/07/hexa-logo-footer.png'}&\
+hostLogoUrl=${'https://hexa-public-assets.s3.eu-west-2.amazonaws.com/hexa_wallet_ramp_logo.png'}&\
 swapAsset=BTC&\
 hostApiKey=${config.RAMP_REFERRAL_CODE}&\
 finalUrl=${finalURL}
