@@ -20,7 +20,7 @@ export default function getAvatarForDeprecatedSubAccountKind( accountKind: strin
   } else if ( [ 'Wyre', 'WYRE' ].includes( accountKind ) ) {
     return require( '../../assets/images/icons/wyre_notext_small.png' )
   } else if ( [ 'Ramp', 'RAMP' ].includes( accountKind ) ) {
-    return require( '../../assets/images/icons/ramp_logo_notext.gif' )
+    return require( '../../assets/images/icons/ramp_logo_notext.png' )
   }
 }
 

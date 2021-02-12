@@ -12,7 +12,7 @@ export default function getAvatarForServiceAccountKind(
       case ServiceAccountKind.WYRE:
         return require( '../../assets/images/icons/wyre_notext_small.png' )
       case ServiceAccountKind.RAMP:
-        return require( '../../assets/images/icons/ramp_logo_notext.gif' )
+        return require( '../../assets/images/icons/ramp_logo_notext.png' )
       default:
         return require( '../../assets/images/icons/icon_hexa.png' )
   }

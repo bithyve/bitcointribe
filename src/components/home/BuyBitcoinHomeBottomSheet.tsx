@@ -37,7 +37,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     title: 'Buy using ApplePay or Debit Card',
     subtitle: 'Powered by Ramp',
     kind: BuyMenuItemKind.RAMP,
-    imageSource: require( '../../assets/images/icons/ramp_logo_notext.gif' ),
+    imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false
   },
   {
