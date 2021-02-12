@@ -25,6 +25,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   SECURE_ACCOUNT,
   WYRE,
+  RAMP
 } from '../../../common/constants/serviceTypes'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
@@ -278,7 +279,12 @@ export default class SecureHDWallet extends Bitcoin {
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
-
+        case RAMP:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const rampAccount = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
+          receivingAddress = rampAccount ? rampAccount.receivingAddress : ''
+          break
         default:
           receivingAddress = this.receivingAddress
     }
@@ -1057,6 +1063,24 @@ export default class SecureHDWallet extends Bitcoin {
             accountNumber
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
+          break
+        case RAMP:
+          const rampDerivativeAcc: DerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          const rampInUse = rampDerivativeAcc.instance.using
+          accountNumber = rampInUse + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const rampDerivativeInstance: DerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const rampUpdatedDervInstance = {
+            ...rampDerivativeInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = rampUpdatedDervInstance
+          accountId = rampUpdatedDervInstance.xpubId
           break
     }
 

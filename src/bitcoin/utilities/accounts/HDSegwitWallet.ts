@@ -16,6 +16,7 @@ import {
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccountElements,
   WyreDerivativeAccountElements,
+  RampDerivativeAccountElements,
   DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
@@ -28,6 +29,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   WYRE,
+  RAMP,
   FAST_BITCOINS,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
@@ -249,17 +251,23 @@ export default class HDSegwitWallet extends Bitcoin {
     accountNumber?: number,
   ): string => {
     let receivingAddress
+    let account = null
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
           if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
-          const account = this
+          account = this
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
-
+        case RAMP:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          account = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
+          receivingAddress = account ? account.receivingAddress : ''
+          break
         default:
           receivingAddress = this.receivingAddress
     }
@@ -857,7 +865,6 @@ export default class HDSegwitWallet extends Bitcoin {
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
-
           const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
           const inUse = derivativeAcc.instance.using
@@ -874,6 +881,24 @@ export default class HDSegwitWallet extends Bitcoin {
             accountNumber
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
+          break
+        case RAMP:
+          const RampDerivativeAcc: DerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          const RampInUse = RampDerivativeAcc.instance.using
+          accountNumber = RampInUse + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const RampDerivativeInstance: DerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const RampUpdatedDervInstance = {
+            ...RampDerivativeInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = RampUpdatedDervInstance
+          accountId = RampUpdatedDervInstance.xpubId
           break
     }
 
@@ -924,6 +949,13 @@ export default class HDSegwitWallet extends Bitcoin {
 
           wyreInstance.accountName = account.customDisplayName
           wyreInstance.accountDescription = account.customDescription
+          break
+        case RAMP:
+          const rampInstance: RampDerivativeAccountElements =
+              this.derivativeAccounts[ RAMP ][ account.instanceNumber ]
+
+          rampInstance.accountName = account.customDisplayName
+          rampInstance.accountDescription = account.customDescription
           break
     }
 
