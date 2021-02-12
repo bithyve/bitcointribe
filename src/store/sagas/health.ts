@@ -55,6 +55,9 @@ import {
   KEEPER_INFO,
   putKeeperInfo,
   UPDATE_WALLET_IMAGE_HEALTH,
+  EMPTY_SHARE_TRANSFER_DETAILS,
+  removeUnwantedUnderCustodyShares,
+  REMOVE_UNWANTED_UNDER_CUSTODY,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -260,21 +263,7 @@ export const checkSharesHealthWatcher = createWatcher(
 function* updateSharesHealthWorker({ payload }) {
   // // set a timelapse for auto update and enable instantaneous manual update
   try {
-    yield put(updateMSharesLoader(true));
-
-    const trustedContactsService: TrustedContactsService = yield select(
-      (state) => state.trustedContacts.service
-    );
-
-    let DECENTRALIZED_BACKUP = payload.DECENTRALIZED_BACKUP;
-    if (!DECENTRALIZED_BACKUP) {
-      DECENTRALIZED_BACKUP = yield select(
-        (state) => state.storage.database.DECENTRALIZED_BACKUP
-      );
-    }
-
-    const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP;
-
+    yield put(updateMSharesLoader(true));   
     const res = yield call(S3Service.updateHealthKeeper, payload.shares);
     if (res.status === 200) {
       if (res.data.updationResult) {
@@ -294,55 +283,6 @@ function* updateSharesHealthWorker({ payload }) {
           }
         }
       }
-      // TODO: Use during selective updation
-      const { updationInfo } = res.data;
-      Object.keys(UNDER_CUSTODY).forEach((tag) => {
-        for (let info of updationInfo) {
-          if (info.updated) {
-            if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-              // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-              if (info.encryptedDynamicNonPMDD)
-                UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-                  info.encryptedDynamicNonPMDD;
-            }
-          } else {
-            if (info.removeShare) {
-              if (
-                info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId
-              ) {
-                delete UNDER_CUSTODY[tag];
-
-                for (const contactName of Object.keys(
-                  trustedContactsService.tc.trustedContacts
-                )) {
-                  const contact =
-                    trustedContactsService.tc.trustedContacts[contactName];
-                  if (contact.walletID === info.walletId) {
-                    contact.isWard = false;
-                  }
-                }
-              }
-            }
-          }
-        }
-      });
-
-      const SERVICES = yield select((state) => state.storage.database.SERVICES);
-      const updatedSERVICES = {
-        ...SERVICES,
-        TRUSTED_CONTACTS: JSON.stringify(trustedContactsService),
-      };
-
-      const updatedBackup = {
-        ...DECENTRALIZED_BACKUP,
-        UNDER_CUSTODY,
-      };
-      yield call(insertDBWorker, {
-        payload: {
-          DECENTRALIZED_BACKUP: updatedBackup,
-          SERVICES: updatedSERVICES,
-        },
-      });
     } else {
       if (res.err === "ECONNABORTED") requestTimedout();
     }
@@ -918,6 +858,7 @@ export function* downloadPdfShareWorker({ payload }) {
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put(downloadedPdfShare(otp, true));
       //yield put(updateMSharesHealth());
+      yield put(removeUnwantedUnderCustodyShares());
     } else {
       let updatedRecoveryShares = {};
       let updated = false;
@@ -2778,4 +2719,110 @@ function* uploadSMShareWorker({ payload }) {
   export const uploadSMShareWatcher = createWatcher(
     uploadSMShareWorker,
     UPLOAD_PDF_SHARE
+  );
+
+  function* emptyShareTransferDetailsForContactChangeWorker({ payload }) {
+    let { index } = payload;
+    let { DECENTRALIZED_BACKUP } = yield select((state) => state.storage.database);
+    const shareTransferDetails = {
+      ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+    }
+    delete shareTransferDetails[ index ];
+    const updatedBackup = {
+      ...DECENTRALIZED_BACKUP,
+      SHARES_TRANSFER_DETAILS: shareTransferDetails,
+    }
+    yield call(insertDBWorker, {
+      payload: {
+        DECENTRALIZED_BACKUP: updatedBackup,
+      },
+    });
+  }
+
+  export const emptyShareTransferDetailsForContactChangeWatcher = createWatcher(
+    emptyShareTransferDetailsForContactChangeWorker,
+    EMPTY_SHARE_TRANSFER_DETAILS
+  );
+
+  function* removeUnwantedUnderCustodySharesWorker({ payload }) {
+    // set a timelapse for auto update and enable instantaneous manual update
+    yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
+
+    const trustedContactsService: TrustedContactsService = yield select(
+      ( state ) => state.trustedContacts.service,
+    )
+  
+    const DECENTRALIZED_BACKUP = yield select(
+      ( state ) => state.storage.database.DECENTRALIZED_BACKUP,
+    )
+  
+    const SERVICES = yield select( ( state ) => state.storage.database.SERVICES )
+  
+    const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+    const metaShares = Object.keys( UNDER_CUSTODY ).map(
+      ( tag ) => UNDER_CUSTODY[ tag ].META_SHARE,
+    )
+  
+    if ( !metaShares.length ) return
+    const res = yield call( S3Service.removeUnwantedUnderCustody, metaShares )
+    if ( res.status === 200 ) {
+      // TODO: Use during selective updation
+      const { updationInfo } = res.data
+      console.log( {
+        updationInfo
+      } )
+  
+      let removed = false
+      Object.keys( UNDER_CUSTODY ).forEach( ( tag ) => {
+        for ( const info of updationInfo ) {
+          if ( info.removeShare ) {
+            if ( info.removeShare ) {
+              if ( info.walletId === UNDER_CUSTODY[ tag ].META_SHARE.meta.walletId ) {
+                delete UNDER_CUSTODY[ tag ]
+                removed = true
+                for ( const contactName of Object.keys(
+                  trustedContactsService.tc.trustedContacts,
+                ) ) {
+                  const contact =
+                    trustedContactsService.tc.trustedContacts[ contactName ]
+                  if ( contact.walletID === info.walletId ) {
+                    contact.isWard = false
+                  }
+                }
+              }
+            }
+          }
+        }
+      } )
+  
+      if ( removed ) {
+        // update db post share removal
+        const updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify( trustedContactsService ),
+        }
+  
+        const updatedBackup = {
+          ...DECENTRALIZED_BACKUP,
+          UNDER_CUSTODY,
+        }
+        yield call( insertDBWorker, {
+          payload: {
+            DECENTRALIZED_BACKUP: updatedBackup,
+            SERVICES: updatedSERVICES,
+          },
+        } )
+      }
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      console.log( {
+        err: res.err
+      } )
+    }
+    yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
+  }
+
+  export const removeUnwantedUnderCustodySharesWatcher = createWatcher(
+    removeUnwantedUnderCustodySharesWorker,
+    REMOVE_UNWANTED_UNDER_CUSTODY
   );

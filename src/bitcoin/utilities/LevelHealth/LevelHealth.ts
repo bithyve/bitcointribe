@@ -1589,4 +1589,50 @@ export default class LevelHealth {
     console.log('uploadPDFSecondaryShare res', res)
     return res.data;
   };
+
+  public static removeUnwantedUnderCustody = async (
+    metaShares: MetaShare[],
+  ): Promise<{
+    updationInfo: Array<{
+      walletId: string;
+      shareId: string;
+      updated: boolean;
+      updatedAt?: number;
+      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+      err?: string;
+    }>;
+  }> => {
+    if (metaShares.length === 0) {
+      throw new Error('No metaShare supplied')
+    }
+
+    const toUpdate: Array<{
+      walletId: string;
+      shareId: string;
+      reshareVersion: number;
+    }> = []
+    for (const metaShare of metaShares) {
+      toUpdate.push({
+        walletId: metaShare.meta.walletId,
+        shareId: metaShare.shareId,
+        reshareVersion: metaShare.meta.reshareVersion,
+      })
+    }
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post('removeUnwantedUnderCustody', {
+        HEXA_ID,
+        toUpdate,
+      })
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err)
+      if (err.code) throw new Error(err.code)
+    }
+
+    const { updationInfo } = res.data
+    return {
+      updationInfo 
+    }
+  };
 }

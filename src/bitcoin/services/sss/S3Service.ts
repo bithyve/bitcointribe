@@ -1508,4 +1508,41 @@ export default class S3Service {
       return { status: 502, err: err.message, message: ErrMap[502] };
     }
   };
+
+  public static removeUnwantedUnderCustody = async (
+    metaShares: MetaShare[],
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updationInfo: Array<{
+            walletId: string;
+            shareId: string;
+            updated: boolean;
+            updatedAt?: number;
+            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
+            err?: string;
+          }>;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await LevelHealth.removeUnwantedUnderCustody(metaShares),
+      }
+    } catch (err) {
+      return {
+        status: 506, err: err.message, message: ErrMap[ 506 ] 
+      }
+    }
+  };
 }

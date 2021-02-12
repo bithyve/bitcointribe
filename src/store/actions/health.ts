@@ -64,6 +64,8 @@ export const DOWNLOAD_PDFSHARE_HEALTH = 'DOWNLOAD_PDFSHARE_HEALTH';
 export const DOWNLOADED_PDFSHARE_HEALTH = 'DOWNLOADED_PDFSHARE_HEALTH';
 export const UPLOAD_SM_SHARE = 'UPLOAD_SM_SHARE';
 export const UPDATE_WALLET_IMAGE_HEALTH = 'UPDATE_WALLET_IMAGE_HEALTH';
+export const EMPTY_SHARE_TRANSFER_DETAILS = 'EMPTY_SHARE_TRANSFER_DETAILS';
+export const REMOVE_UNWANTED_UNDER_CUSTODY = 'REMOVE_UNWANTED_UNDER_CUSTODY';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -416,3 +418,11 @@ export const uploadSMShare = (
     payload: { encryptedKey, otp },
   };
 };
+
+export const emptyShareTransferDetailsForContactChange = (index) => {
+  return { type: EMPTY_SHARE_TRANSFER_DETAILS, payload: { index } };
+};
+
+export const removeUnwantedUnderCustodyShares = () => {
+  return { type: REMOVE_UNWANTED_UNDER_CUSTODY };
+}

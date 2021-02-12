@@ -26,6 +26,7 @@ import {
   updateMSharesHealth,
   generateMetaShare,
   initLevelTwo,
+  emptyShareTransferDetailsForContactChange,
 } from '../../store/actions/health';
 import { MetaShare } from '../../bitcoin/utilities/Interface';
 import Loader from '../../components/loader';
@@ -54,6 +55,7 @@ interface KeeperFeaturesPropsTypes {
   metaShare: MetaShare[];
   keeperInfo: any[];
   keeperSetupStatus: Boolean;
+  emptyShareTransferDetailsForContactChange: any;
 }
 
 class KeeperFeatures extends Component<
@@ -90,26 +92,27 @@ class KeeperFeatures extends Component<
   }
 
   componentDidUpdate = (prevProp, prevState) => {
-    if (
-      prevProp.updateMSharesHealthStatus !=
-        this.props.updateMSharesHealthStatus &&
-      !this.props.updateMSharesHealthStatus
-    ) {
+    let { updateMSharesHealthStatus, isLevel2Initialized, isLevel3Initialized, keeperSetupStatus, navigation, emptyShareTransferDetailsForContactChange } = this.props;
+
+    if (prevProp.updateMSharesHealthStatus != updateMSharesHealthStatus && !updateMSharesHealthStatus) {
       this.setState({ setUpLoader: false });
     }
 
     if (
-      (prevProp.isLevel2Initialized !== this.props.isLevel2Initialized && this.props.isLevel2Initialized) ||
-      ((this.props.isLevel2Initialized || this.props.isLevel3Initialized) &&
+      (prevProp.isLevel2Initialized !== isLevel2Initialized && isLevel2Initialized) ||
+      ((isLevel2Initialized || isLevel3Initialized) &&
       prevState.setupKeeperClicked !== this.state.setupKeeperClicked &&
-      this.state.setupKeeperClicked) || (prevProp.isLevel3Initialized !== this.props.isLevel3Initialized && this.props.isLevel3Initialized)
+      this.state.setupKeeperClicked) || (prevProp.isLevel3Initialized !== isLevel3Initialized && isLevel3Initialized)
     ) {
       this.uploadDataOnEFChannel();
     }
-    if(prevProp.keeperSetupStatus != this.props.keeperSetupStatus && !this.props.keeperSetupStatus && this.state.setUpLoader) {
+    if(prevProp.keeperSetupStatus != keeperSetupStatus && !keeperSetupStatus && this.state.setUpLoader) {
+      if(navigation.getParam('prevKeeperType') == 'contact' && navigation.getParam('isChange') && navigation.getParam('contactIndex')){
+        emptyShareTransferDetailsForContactChange(navigation.getParam('contactIndex'))
+      }
       const popAction = StackActions.pop({ n: 2 });
-      this.props.navigation.dispatch(popAction);
-      this.props.navigation.replace('ManageBackupKeeper');
+      navigation.dispatch(popAction);
+      navigation.replace('ManageBackupKeeper');
     }
   };
 
@@ -433,6 +436,7 @@ export default withNavigationFocus(
     updateMSharesHealth,
     generateMetaShare,
     initLevelTwo,
+    emptyShareTransferDetailsForContactChange
   })(KeeperFeatures),
 );
 

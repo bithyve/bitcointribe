@@ -41,6 +41,7 @@ import {
   confirmPDFShared,
   sendApprovalRequest,
   onApprovalStatusChange,
+  emptyShareTransferDetailsForContactChange,
 } from "../../store/actions/health";
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
 import {
@@ -124,12 +125,18 @@ const PersonalCopyHistory = (props) => {
   const keeperApproveStatus = useSelector(
     (state) => state.health.keeperApproveStatus
   );
+  const [isChange, setIsChange] = useState(false);
   useEffect(() => {
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
       props.navigation.state.params.selectedTitle == "Pdf Keeper" ? false : true
+    );
+    setIsChange(
+      props.navigation.state.params.isChangeKeeperType
+        ? props.navigation.state.params.isChangeKeeperType
+        : false
     );
   }, [
     props.navigation.state.params.selectedLevelId,
@@ -241,8 +248,21 @@ const PersonalCopyHistory = (props) => {
           try {
             dispatch(confirmPDFShared(selectedKeeper.shareId));
             (PersonalCopyShareBottomSheet as any).current.snapTo(0);
-            const popAction = StackActions.pop({ n: 1 });
-            props.navigation.dispatch(popAction);            
+            if (
+              props.navigation.getParam("prevKeeperType") &&
+              props.navigation.getParam("isChange") &&
+              props.navigation.getParam("contactIndex") &&
+              props.navigation.getParam("prevKeeperType") == "contact" &&
+              props.navigation.getParam("contactIndex") != null
+            ) {
+              dispatch(
+                emptyShareTransferDetailsForContactChange(
+                  props.navigation.getParam("contactIndex")
+                )
+              );
+            }
+            const popAction = StackActions.pop({ n: isChange ? 2 : 1 });
+            props.navigation.dispatch(popAction);
           } catch (err) {
             console.log("error", err);
           }
@@ -493,8 +513,9 @@ const PersonalCopyHistory = (props) => {
         renderContent={() => (
           <ApproveSetup
             isContinueDisabled={
-              selectedKeeperType == "pdf"  || selectedKeeperType == "contact" 
-              ? !keeperApproveStatus.status : false
+              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
+                ? !keeperApproveStatus.status
+                : false
             }
             onPressContinue={() => {
               onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);

@@ -160,7 +160,9 @@ import {
   downloadPdfShareHealthWatcher,
   updatedKeeperInfoWatcher,
   uploadSMShareWatcher,
-  updateWalletImageHealthWatcher
+  updateWalletImageHealthWatcher,
+  emptyShareTransferDetailsForContactChangeWatcher,
+  removeUnwantedUnderCustodySharesWatcher
 } from './sagas/health';
 
 import {
@@ -289,6 +291,8 @@ const rootSaga = function* () {
     downloadPdfShareHealthWatcher,
     updatedKeeperInfoWatcher,
     uploadSMShareWatcher,
+    emptyShareTransferDetailsForContactChangeWatcher,
+    removeUnwantedUnderCustodySharesWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
 

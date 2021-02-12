@@ -224,6 +224,8 @@ const KeeperDeviceHistory = (props) => {
                     selectedShareId: selectedKeeper.shareId,
                     selectedLevelId: selectedLevelId,
                     isChange,
+                    prevKeeperType: props.navigation.getParam('prevKeeperType') ? props.navigation.getParam('prevKeeperType') : null,
+                    contactIndex: props.navigation.getParam('contactIndex') ? props.navigation.getParam('contactIndex') : null,
                   });
               (QrBottomSheet as any).current.snapTo(0);
             }
@@ -244,7 +246,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"65c0f98ef0c620ed30883a43","publicKey":"3a9d309ae7ab91991d7079fc3963527be0e6432a87e8e6da16a65cb37606684e","ephemeralAddress":"3d420858b267b9c4ab32e016380cb853289528604b5f34c3e65dedf145ab7db9","walletName":"Mac1"}' : '{"uuid":"f5df11a5cf957b9064c6348a","publicKey":"322d242ecedbc46db72cfaa460259f1e3b1a7e6b65fd86a55276c016dfb42ae1","ephemeralAddress":"9c1382883c289245e65880d4363b563aac928ac95c6a96ca94b929c66656ca2d","walletName":"Mac2"}';
+            ? '{"uuid":"0817c9eb6dde106222e3df78","publicKey":"4ee6fa8ceb617e3af97d1b711f7551c493b8a58324c2a08ad7569aba2d2d5bc3","ephemeralAddress":"36f7d6fcbfb13295b98cbae353e2d879a8293e6544f8a5eb07e6d9d724b7917d","walletName":"gh"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
@@ -252,6 +254,8 @@ const KeeperDeviceHistory = (props) => {
             selectedShareId: selectedKeeper.shareId,
             selectedLevelId: selectedLevelId,
             isChange,
+            prevKeeperType: props.navigation.getParam('prevKeeperType') ? props.navigation.getParam('prevKeeperType') : null,
+            contactIndex: props.navigation.getParam('contactIndex') ? props.navigation.getParam('contactIndex') : null,
           });
         }}
       />
