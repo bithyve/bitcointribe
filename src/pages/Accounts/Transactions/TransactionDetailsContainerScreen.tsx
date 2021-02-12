@@ -11,6 +11,9 @@ import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/Use
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import TransactionDetailsHeader from './TransactionDetailsHeader'
+import openLink from '../../../utils/OpenLink'
+import config from '../../../bitcoin/HexaConfig'
+import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 
 export type Props = {
   navigation: any;
@@ -68,6 +71,13 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   }, [ transaction.transactionType ] )
 
 
+  async function openExplorer( txid ) {
+    let explorerTarget: string
+    if( config.ENVIRONMENT !== 'DEV' &&  primarySubAccount.sourceKind !== SourceAccountKind.TEST_ACCOUNT ) explorerTarget = `https://live.blockcypher.com/btc/tx/${txiid}`
+    else explorerTarget = `https://live.blockcypher.com/btc-testnet/tx/${txid}`
+    await openLink( explorerTarget )
+  }
+
   return (
     <View style={styles.rootContainer}>
 
@@ -108,7 +118,9 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitle}>Transaction ID</Text>
-          <Text style={ListStyles.listItemSubtitle}>{transaction.txid}</Text>
+          <Text style={ListStyles.listItemSubtitle} onPress={()=>{
+            openExplorer( transaction.txid )
+          }}>{transaction.txid}</Text>
         </View>
 
         <View style={styles.lineItem}>
