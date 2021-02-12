@@ -37,6 +37,9 @@ function backgroundImageForAccountKind(
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
       case SubAccountKind.DONATION_ACCOUNT:
         return require( '../../assets/images/carouselImages/donation_account_background.png' )
+
+      // TODO:RAMP: Add additional service types here
+      // action.payload.primarySubAccount as ExternalServiceSubAccountInfo
       case SubAccountKind.SERVICE:
         return require( '../../assets/images/carouselImages/wyre_account_background.png' )
       default:
