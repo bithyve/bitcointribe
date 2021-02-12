@@ -172,7 +172,7 @@ class HexaConfig {
   };
 
   public RAMP: DerivativeAccount = {
-    series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 21,
+    series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 31,
     instance: {
       max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 10,
       using: 0,
