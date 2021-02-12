@@ -14,6 +14,7 @@ export enum BuyMenuItemKind {
   FAST_BITCOINS = 'FAST_BITCOINS',
   SWAN = 'SWAN',
   WYRE = 'WYRE',
+  RAMP = 'RAMP'
 }
 
 export type BuyBitcoinBottomSheetMenuItem = {
@@ -35,8 +36,15 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
     title: 'Buy using ApplePay or Debit Card',
     subtitle: 'Powered by Ramp',
-    kind: BuyMenuItemKind.WYRE,
+    kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.gif' ),
+    disabled: false
+  },
+  {
+    title: 'Buy using ApplePay or Debit Card',
+    subtitle: 'Powered by Wyre',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
     disabled: false
   },
   {
@@ -45,14 +53,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     kind: BuyMenuItemKind.SWAN,
     imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
     disabled: true
-  },
-  // {
-  //   title: 'Buy using ApplePay or Debit Card',
-  //   subtitle: 'Powered by Wyre',
-  //   kind: BuyMenuItemKind.WYRE,
-  //   imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-  //   disabled: false
-  // },
+  }
 ]
 
 const listItemKeyExtractor = ( item: BuyBitcoinBottomSheetMenuItem ) => item.title
