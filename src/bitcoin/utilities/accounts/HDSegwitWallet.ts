@@ -265,7 +265,6 @@ export default class HDSegwitWallet extends Bitcoin {
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
         case RAMP:
-          console.log( 'inside switch case ' )
           if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
           account = this
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]

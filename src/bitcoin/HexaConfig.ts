@@ -214,10 +214,6 @@ class HexaConfig {
 
   constructor( env: string ) {
     this.ENVIRONMENT = env || 'MAIN'
-    // console.log({ env });
-
-    // console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
-
     this.RELAY = this.BH_SERVERS.RELAY
     this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER
     this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = parseInt(

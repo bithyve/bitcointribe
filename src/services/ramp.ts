@@ -1,11 +1,13 @@
 import config from '../bitcoin/HexaConfig'
 const { HEXA_ID } = config
 import { BH_AXIOS } from './api'
-import { getDeepLinkEnv } from '../utils/deeplink/getDeepLinkEnv'
+import { getEnvDeepLinkPrefix } from '../utils/geEnvSpecificParams'
+
 const ramp_auth_url = 'https://buy.ramp.network/'
 const ramp_referral_code = 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
-const deepLinkEnv = getDeepLinkEnv()
+const deepLinkEnv = getEnvDeepLinkPrefix()
 const finalURL = `https://hexawallet.io${deepLinkEnv}/ramp`
+
 export const fetchRampReservation = ( amount, receiveAddress, currencyCode, country ) => {
   try {
     const body = {
