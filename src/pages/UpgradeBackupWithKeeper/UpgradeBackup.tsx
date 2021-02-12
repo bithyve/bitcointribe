@@ -90,6 +90,8 @@ interface UpgradeBackupPropsTypes {
   activePersonalNode: PersonalNode;
   isBackupProcessing: any;
   setIsNewHealthSystemSet: any;
+  versionHistory: any;
+
 }
 
 class UpgradeBackup extends Component<
@@ -145,76 +147,76 @@ class UpgradeBackup extends Component<
         },
       ],
       selectedContact: [
-        {
-          checked: true,
-          contactType: "person",
-          emails: [
-            {
-              email: "floresjoyner@digifad.com",
-              id: "826F07EC-4B52-4703-907F-8AEE4F360EA2",
-            },
-            {
-              email: "francinefranks@fossiel.com",
-              id: "A3FD9B00-C732-4EEE-96E5-CD0040C6AB19",
-            },
-          ],
-          firstName: "Jessica",
-          id: "5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson",
-          imageAvailable: false,
-          lastName: "Pearson",
-          name: "Jessica Pearson",
-          phoneNumbers: [
-            {
-              countryCode: "in",
-              id: "BF2490FA-C3B3-4F97-925E-6E07C4B7DB41",
-              number: "98247 52009",
-              digits: "9824752009",
-              label: "home",
-            },
-            {
-              countryCode: "in",
-              id: "7F31DFEF-BCFD-457C-A82A-6B88A28DA285",
-              number: "(811) 554-3283",
-              digits: "8115543283",
-              label: "home",
-            },
-          ],
-        },
-        {
-          checked: true,
-          contactType: "person",
-          emails: [
-            {
-              email: "floresjoyner@digifad.com",
-              id: "826F07EC-4B52-4703-907F-8AEE4F360EA2",
-            },
-            {
-              email: "francinefranks@fossiel.com",
-              id: "A3FD9B00-C732-4EEE-96E5-CD0040C6AB19",
-            },
-          ],
-          firstName: "Rachel",
-          id: "5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson",
-          imageAvailable: false,
-          lastName: "Zane",
-          name: "Rachel Zane",
-          phoneNumbers: [
-            {
-              countryCode: "in",
-              id: "BF2490FA-C3B3-4F97-925E-6E07C4B7DB41",
-              number: "98247 52009",
-              digits: "9824752009",
-              label: "home",
-            },
-            {
-              countryCode: "in",
-              id: "7F31DFEF-BCFD-457C-A82A-6B88A28DA285",
-              number: "(811) 554-3283",
-              digits: "8115543283",
-              label: "home",
-            },
-          ],
-        },
+        // {
+        //   checked: true,
+        //   contactType: "person",
+        //   emails: [
+        //     {
+        //       email: "floresjoyner@digifad.com",
+        //       id: "826F07EC-4B52-4703-907F-8AEE4F360EA2",
+        //     },
+        //     {
+        //       email: "francinefranks@fossiel.com",
+        //       id: "A3FD9B00-C732-4EEE-96E5-CD0040C6AB19",
+        //     },
+        //   ],
+        //   firstName: "Jessica",
+        //   id: "5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson",
+        //   imageAvailable: false,
+        //   lastName: "Pearson",
+        //   name: "Jessica Pearson",
+        //   phoneNumbers: [
+        //     {
+        //       countryCode: "in",
+        //       id: "BF2490FA-C3B3-4F97-925E-6E07C4B7DB41",
+        //       number: "98247 52009",
+        //       digits: "9824752009",
+        //       label: "home",
+        //     },
+        //     {
+        //       countryCode: "in",
+        //       id: "7F31DFEF-BCFD-457C-A82A-6B88A28DA285",
+        //       number: "(811) 554-3283",
+        //       digits: "8115543283",
+        //       label: "home",
+        //     },
+        //   ],
+        // },
+        // {
+        //   checked: true,
+        //   contactType: "person",
+        //   emails: [
+        //     {
+        //       email: "floresjoyner@digifad.com",
+        //       id: "826F07EC-4B52-4703-907F-8AEE4F360EA2",
+        //     },
+        //     {
+        //       email: "francinefranks@fossiel.com",
+        //       id: "A3FD9B00-C732-4EEE-96E5-CD0040C6AB19",
+        //     },
+        //   ],
+        //   firstName: "Rachel",
+        //   id: "5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson",
+        //   imageAvailable: false,
+        //   lastName: "Zane",
+        //   name: "Rachel Zane",
+        //   phoneNumbers: [
+        //     {
+        //       countryCode: "in",
+        //       id: "BF2490FA-C3B3-4F97-925E-6E07C4B7DB41",
+        //       number: "98247 52009",
+        //       digits: "9824752009",
+        //       label: "home",
+        //     },
+        //     {
+        //       countryCode: "in",
+        //       id: "7F31DFEF-BCFD-457C-A82A-6B88A28DA285",
+        //       number: "(811) 554-3283",
+        //       digits: "8115543283",
+        //       label: "home",
+        //     },
+        //   ],
+        // },
       ],
     };
   }
@@ -262,14 +264,14 @@ class UpgradeBackup extends Component<
   };
 
   cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, database, accountShells, activePersonalNode } = this.props;
+    const { walletName, regularAccount, database, accountShells, activePersonalNode, versionHistory } = this.props;
     let encryptedCloudDataJson;
     let shares =
       share &&
       !(Object.keys(share).length === 0 && share.constructor === Object)
         ? JSON.stringify(share)
         : "";
-    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode);
+    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode,versionHistory);
     console.log("encryptedCloudDataJson", encryptedCloudDataJson);
     this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
     let keeperData = [
@@ -642,8 +644,9 @@ class UpgradeBackup extends Component<
               ? hp("70%")
               : hp("80%"),
           ]}
-          renderContent={() => (
-            <UpgradingKeeperContact
+          renderContent={() => {
+            if(selectedContact.length){
+              return (<UpgradingKeeperContact
               title={"Upgrading Keeper Contacts"}
               subText={
                 "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
@@ -657,8 +660,8 @@ class UpgradeBackup extends Component<
                 (this.refs.UpgradingKeeperContact as any).snapTo(0);
                 (this.refs.UpgradePdfKeeper as any).snapTo(1);
               }}
-            />
-          )}
+            />)
+          }}}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
@@ -728,6 +731,8 @@ const mapStateToProps = (state) => {
     accountShells: idx(state, (_) => _.accounts.accountShells),
     activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
     isBackupProcessing: idx(state, (_) => _.preferences.isBackupProcessing) || false,
+    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
+
   };
 };
 

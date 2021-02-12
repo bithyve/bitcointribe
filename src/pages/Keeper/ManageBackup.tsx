@@ -121,7 +121,7 @@ interface ManageBackupPropsTypes {
   secureAccount: SecureAccount;
   fetchKeeperTrustedChannel: any;
   keeperApproveStatus: any;
-  metaShares: MetaShare[];
+  metaSharesKeeper: MetaShare[];
   reShareWithSameKeeper: any;
   autoShareContact: any;
   trustedChannelsSetupSync: any;
@@ -397,9 +397,9 @@ class ManageBackup extends Component<
         this.autoUploadShare();
       }
     }
-
-    if (JSON.stringify(prevProps.metaShares) != JSON.stringify(this.props.metaShares)) {
-      if (this.props.metaShares.length == 5) {
+    
+    if (JSON.stringify(prevProps.metaSharesKeeper) !== JSON.stringify(this.props.metaSharesKeeper)) {
+      if (this.props.metaSharesKeeper.length == 5) {
         let obj = {
           shareType: this.state.selectedKeeperType,
           name: this.state.selectedKeeperName,
@@ -409,6 +409,7 @@ class ManageBackup extends Component<
           shareId: this.props.s3Service.levelhealth.metaSharesKeeper[3].shareId,
           data: {},
         };
+        
         this.setState({
           selectedKeeper: obj,
         });
@@ -1287,12 +1288,14 @@ class ManageBackup extends Component<
                   this.props.currentLevel == 2
                 ) {
                   getApproval = false;
-                  await this.props.generateMetaShare(selectedLevelId);
+                  this.props.generateMetaShare(selectedLevelId);
                 }
-                if (getApproval) {
+                
+               if (getApproval) {
+                 /** other than ThirdLevel first position */
                   this.sendApprovalRequestToPK(type);
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
-                }
+               }
               }}
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
@@ -1443,7 +1446,7 @@ const mapStateToProps = (state) => {
     accounts: state.accounts || [],
     walletName:
       idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || "",
-    metaShares: idx(state, (_) => _.health.service.levelhealth.metaShares),
+      metaSharesKeeper: idx(state, (_) => _.health.service.levelhealth.metaSharesKeeper),
     s3Service: idx(state, (_) => _.health.service),
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     cloudBackupStatus:
