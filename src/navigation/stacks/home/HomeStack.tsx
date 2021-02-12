@@ -10,6 +10,8 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import AddNewAccountStack from '../accounts/AddNewAccountStack'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
 import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
+import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
+import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 
 
 const MODAL_ROUTES = [
@@ -18,6 +20,7 @@ const MODAL_ROUTES = [
   'FriendsAndFamily',
   'MoreOptions',
   'PlaceWyreOrder',
+  'PlaceRampOrder'
 ]
 
 const HomeStack = createStackNavigator(
@@ -40,10 +43,22 @@ const HomeStack = createStackNavigator(
         title: 'Account Details'
       }
     },
+    NewRampAccountDetails: {
+      screen: NewRampAccountDetailsScreen,
+      navigationOptions: {
+        title: 'Account Details'
+      }
+    },
     PlaceWyreOrder: {
       screen: WyreOrderFormScreen,
       navigationOptions: {
         title: 'Buy with Wyre'
+      }
+    },
+    PlaceRampOrder: {
+      screen: RampOrderFormScreen,
+      navigationOptions: {
+        title: 'Buy with Ramp'
       }
     },
     AllTransactions: {
