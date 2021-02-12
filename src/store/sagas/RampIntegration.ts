@@ -21,7 +21,7 @@ export const fetchRampReservationWatcher = createWatcher(
 )
 
 function* fetchRampReservationWorker( { payload } ) {
-  const { amount, currencyCode, country, instance, sourceKind } = payload
+  const { instance, sourceKind } = payload
 
   let service: RegularAccount| SecureAccount
   switch ( sourceKind ) {
@@ -37,14 +37,14 @@ function* fetchRampReservationWorker( { payload } ) {
   }
   const receiveAddress =  service.getReceivingAddress( RAMP, instance? instance: 1 )
 
-  const rampResponse = yield call( fetchRampReservation, amount, receiveAddress, currencyCode, country )
-  console.log( {
-    rampResponse
-  } )
+  const rampResponse = yield call(
+    fetchRampReservation,
+    {
+      receiveAddress
+    } )
+
   const { reservation, url, error } = rampResponse
-  console.log( {
-    reservation
-  } )
+
   if( error ) {
     yield put( fetchRampReservationSucceeded( {
       rampReservationCode: null,

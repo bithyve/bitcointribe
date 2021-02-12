@@ -17,6 +17,9 @@ import {
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
 class HexaConfig {
+  //RAMP details
+  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL || 'https://buy.ramp.network/'
+  public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE || 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'demo-web-client'
   public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'https://dev-api.swanbitcoin.com'
