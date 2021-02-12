@@ -117,7 +117,7 @@ export default function KeeperTypeModalContents(props) {
 
   useEffect(() => {
     restrictChangeToContactType();
-  }, []);
+  }, [levelHealth]);
 
   const [selectedLevelId, setSelectedLevelId] = useState(
     props.selectedLevelId ? props.selectedLevelId : false
