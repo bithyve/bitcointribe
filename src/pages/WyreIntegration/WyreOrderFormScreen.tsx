@@ -100,7 +100,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                   Powered by
             </Text>
             <Image
-              source={require( '../../assets/images/icons/wyre_large.png' )}
+              source={require( '../../assets/images/icons/wyre_logo_large.png' )}
               style={{
                 marginLeft: 2,
                 width: 50,
