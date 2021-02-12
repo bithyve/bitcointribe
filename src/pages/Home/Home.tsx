@@ -84,8 +84,7 @@ import BottomSheet from '@gorhom/bottom-sheet'
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { getReleaseTopic } from '../../utils/notifications/getReleaseTopic'
-const releaseNotificationTopic = getReleaseTopic()
+import { getEnvReleaseTopic } from '../../utils/geEnvSpecificParams'
 import { AccountsState } from '../../store/reducers/accounts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -189,6 +188,8 @@ interface HomePropsTypes {
   rampDeepLinkContent: string | null;
 
 }
+
+const releaseNotificationTopic = getEnvReleaseTopic()
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
