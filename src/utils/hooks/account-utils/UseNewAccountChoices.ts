@@ -93,12 +93,18 @@ export default function useNewAccountChoices() {
       ].sort( sortHexaAccountChoices ),
 
       serviceAccounts: [
-        // new ExternalServiceSubAccountInfo( {
-        //   instanceNumber: 1,
-        //   defaultTitle: 'Wyre Account',
-        //   defaultDescription: 'Buy using ApplePay/Debit card',
-        //   serviceAccountKind: ServiceAccountKind.WYRE,
-        // } ),
+        new ExternalServiceSubAccountInfo( {
+          instanceNumber: 1,
+          defaultTitle: 'Ramp Account',
+          defaultDescription: 'Buy using ApplePay/Debit card',
+          serviceAccountKind: ServiceAccountKind.RAMP,
+        } ),
+        new ExternalServiceSubAccountInfo( {
+          instanceNumber: 1,
+          defaultTitle: 'Wyre Account',
+          defaultDescription: 'Buy using ApplePay/Debit card',
+          serviceAccountKind: ServiceAccountKind.WYRE,
+        } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Swan Bitcoin',
