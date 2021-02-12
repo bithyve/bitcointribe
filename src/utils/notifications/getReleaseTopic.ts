@@ -19,3 +19,4 @@ const getEnvSpecificReleaseTopic = () => {
   }
   return releaseTopic
 }
+
