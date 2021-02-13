@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, StyleSheet, Text, ScrollView, Image } from 'react-native'
 import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import ListStyles from '../../common/Styles/ListStyles'
 import { Button, ListItem } from 'react-native-elements'
@@ -8,10 +9,11 @@ import { useDispatch } from 'react-redux'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useRampIntegrationState from '../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
 import openLink from '../../utils/OpenLink'
-import { clearRampCache, fetchRampReservation } from '../../store/actions/RampIntegration'
+import { clearRampCache, fetchRampReservation, fetchRampReceiveAddress } from '../../store/actions/RampIntegration'
 import useRampReservationFetchEffect from '../../utils/hooks/ramp-integration/UseRampReservationFetchEffect'
 import DepositSubAccountShellListItem from '../Accounts/AddNew/RampAccount/DepositAccountShellListItem'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 
 export type Props = {
@@ -20,7 +22,7 @@ export type Props = {
 
 const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
-  const { rampHostedUrl } = useRampIntegrationState()
+  const { rampHostedUrl, rampReceiveAddress } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
     return navigation.getParam( 'currentSubAccount' )
@@ -35,6 +37,7 @@ const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   useEffect( () => {
     dispatch( clearRampCache() )
+    dispatch( fetchRampReceiveAddress() )
   }, [] )
 
 
@@ -70,14 +73,35 @@ const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           >
             <DepositSubAccountShellListItem accountShell={rampAccountShell} />
           </ListItem>
+          <Text style={{
+            ...ListStyles.infoHeaderTitleText, marginBottom: 10, marginTop: 10
+          }}>
+            Bitcoin receving address:
+          </Text>
+          <ListItem
+            containerStyle={{
+              backgroundColor: Colors.secondaryBackgroundColor,
+              borderRadius: 12,
+            }}
+            disabled
+          >
+
+            <Text style={{
+              ...styles.bottomNoteInfoText
+            }}>
+              {rampReceiveAddress}
+            </Text>
+          </ListItem>
         </View>
 
         <View style={{
           paddingHorizontal: ListStyles.infoHeaderSection.paddingHorizontal,
           marginBottom: ListStyles.infoHeaderSection.paddingVertical,
         }}>
-          <Text style={ListStyles.infoHeaderSubtitleText}>
-            {'Hexa Ramp Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to the Hexa Ramp account.'}
+          <Text style={{
+            textAlign: 'justify', ...ListStyles.infoHeaderSubtitleText
+          }}>
+            {'Hexa Ramp Account enables purchases of BTC using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to the Hexa Ramp account address displayed above.'}
           </Text>
         </View>
 
@@ -103,8 +127,9 @@ const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               source={require( '../../assets/images/icons/ramp_logo_large.png' )}
               style={{
                 marginLeft: 5,
-                width: 100,
-                height: 40,
+                width: 62,
+                height: 27,
+
               }}
             />
           </View>
@@ -138,6 +163,11 @@ const styles = StyleSheet.create( {
   textInputContainer: {
     marginBottom: 12,
   },
+  bottomNoteInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+  }
 } )
 
 

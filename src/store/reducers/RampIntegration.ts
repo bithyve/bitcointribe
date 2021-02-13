@@ -2,7 +2,7 @@ import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import {
   FETCH_RAMP_RESERVATION_SUCCEEDED,
   CLEAR_RAMP_CACHE,
-  FETCH_RAMP_RESERVATION_COMPLETED
+  FETCH_RAMP_RECEIVE_ADDRESS_SUCCEEDED,
 
 } from '../actions/RampIntegration'
 
@@ -18,6 +18,9 @@ export type RampIntegrationState = {
   hasRampReservationFetchSucceeded: boolean;
   hasRampReservationFetchFailed: boolean;
   fetchRampReservationFailedMessage: string | null;
+
+  rampReceiveAddress: string | null;
+  hasRampReceiveAddressSucceeded: boolean;
 
   pendingRampOrder: RampOrder | null;
   isProcessingRampOrder: boolean;
@@ -35,6 +38,8 @@ const INITIAL_STATE: RampIntegrationState = {
   hasRampReservationFetchSucceeded: false,
   hasRampReservationFetchFailed: false,
   fetchRampReservationFailedMessage: null,
+  rampReceiveAddress: null,
+  hasRampReceiveAddressSucceeded: false,
 
   pendingRampOrder: null,
   isProcessingRampOrder: false,
@@ -55,11 +60,11 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasRampReservationFetchSucceeded: true,
           isProcessingRampOrder: false,
         }
-      case FETCH_RAMP_RESERVATION_COMPLETED:
+      case FETCH_RAMP_RECEIVE_ADDRESS_SUCCEEDED:
         return {
           ...state,
-          hasRampReservationFetchSucceeded: false,
-          hasRampReservationFetchFailed: false,
+          rampReceiveAddress: action.payload.data.rampReceiveAddress,
+          hasRampReceiveAddressSucceeded: true
         }
       case CLEAR_RAMP_CACHE:
         return {

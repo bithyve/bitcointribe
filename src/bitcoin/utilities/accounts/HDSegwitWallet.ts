@@ -253,13 +253,6 @@ export default class HDSegwitWallet extends Bitcoin {
   ): string => {
     let receivingAddress
     let account = null
-
-    for ( const key in this
-      .derivativeAccounts ){
-      console.log( key, this
-        .derivativeAccounts[ key ] )
-    }
-
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
         case FAST_BITCOINS:
