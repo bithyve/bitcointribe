@@ -44,6 +44,7 @@ import {
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
   WYRE,
+  RAMP
 } from '../../../common/constants/serviceTypes'
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
@@ -75,6 +76,8 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { UsNumberFormat } from '../../../common/utilities'
 import config from '../../../bitcoin/HexaConfig'
 import { getAccountIcon, getAccountTitle } from './utils'
+import BaseAccount from '../../../bitcoin/utilities/accounts/BaseAccount'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
 
 interface SendToContactPropsTypes {
   navigation: any;
@@ -635,11 +638,12 @@ class SendToContact extends Component<
       }
     } )
 
-    const { fee } = this.props.accountsState[
+    const service: BaseAccount | SecureAccount = this.props.accountsState[
       serviceType
-    ].service.calculateSendMaxFee(
+    ].service
+    const { fee } = service.calculateSendMaxFee(
       recipientsList.length + 1, // +1 for the current instance
-      averageTxFees,
+      averageTxFees[ 'low' ].feePerByte,
       this.state.derivativeAccountDetails,
     )
 
@@ -1034,6 +1038,7 @@ class SendToContact extends Component<
                 'Test Account': TEST_ACCOUNT,
                 'Donation Account': DONATION_ACCOUNT,
                 'Wyre': WYRE,
+                'Ramp': RAMP
               }[ item.selectedContact.account_name || 'Checking Account' ]
 
               // 🔑 This seems to be the way the backend is distinguishing between
@@ -1046,6 +1051,7 @@ class SendToContact extends Component<
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
                   'Wyre': WYRE,
+                  'Ramp': RAMP
                 }[ item.selectedContact.account_name || 'Checking Account' ]
 
                 recipient = makeSubAccountRecipientDescription(

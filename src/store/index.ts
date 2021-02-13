@@ -17,6 +17,8 @@ import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import rampIntegrationReducer from './reducers/RampIntegration'
+import VersionHistoryReducer from './reducers/versionHistory'
 
 
 const config = {
@@ -127,8 +129,15 @@ import {
 } from './sagas/SwanIntegration'
 
 import {
-  fetchWyreReservationWatcher
+  fetchWyreReservationWatcher,
+  fetchWyreReceiveAddressWatcher
 } from './sagas/WyreIntegration'
+import {
+  fetchRampReservationWatcher,
+  fetchRampReceiveAddressWatcher
+} from './sagas/RampIntegration'
+import { versionHistoryWatcher } from './sagas/versionHistory'
+import walletRescanningReducer from './reducers/wallet-rescanning'
 
 const rootSaga = function* () {
   const sagas = [
@@ -228,7 +237,15 @@ const rootSaga = function* () {
     redeemSwanCodeForTokenWatcher,
 
     // Wyre Integration
-    fetchWyreReservationWatcher
+    fetchWyreReservationWatcher,
+    fetchWyreReceiveAddressWatcher,
+
+    // Ramp Integration
+    fetchRampReservationWatcher,
+    fetchRampReceiveAddressWatcher,
+
+    //VersionHistory integration
+    versionHistoryWatcher,
   ]
 
   yield all(
@@ -259,7 +276,10 @@ const rootReducer = combineReducers( {
   preferences: preferencesReducer,
   loaders,
   swanIntegration: swanIntegrationReducer,
+  walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
+  rampIntegration: rampIntegrationReducer,
+  versionHistory: VersionHistoryReducer,
 } )
 
 export default function makeStore() {

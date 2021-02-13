@@ -25,6 +25,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 }: Props ) => {
 
   const { currentWyreSubAccount } = useAccountsState()
+  const { currentRampSubAccount } = useAccountsState()
   /**
    * Helper to determine whether or not adding a new sub-account kind
    * from the "Add New" screen is currently supported.
@@ -62,6 +63,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
           return false
         case ServiceAccountKind.WYRE:
           return currentWyreSubAccount == null
+        case ServiceAccountKind.RAMP:
+          return currentRampSubAccount == null
         default:
           return false
     }
@@ -103,6 +106,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.SWAN:
           return 'COMING SOON'
         case ServiceAccountKind.WYRE:
+          return 'NEW'
+        case ServiceAccountKind.RAMP:
           return 'NEW'
         default:
           return 'COMING SOON'

@@ -21,6 +21,7 @@ const Colors = {
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
   coral: '#D35400',
+  pink: '#FF82CE',
 
   // Grayscale
   gray1: '#d0d0d0',

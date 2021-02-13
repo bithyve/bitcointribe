@@ -10,6 +10,8 @@ import {
   SubPrimaryDerivativeAccountElements,
   WyreDerivativeAccount,
   WyreDerivativeAccountElements,
+  RampDerivativeAccount,
+  RampDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
@@ -286,6 +288,35 @@ const updatePrimarySubAccounts = (
                     unconfirmed: wyreInstance.balances.unconfirmedBalance,
                   }
                   transactions = wyreInstance.transactions.transactionDetails
+                }
+                break
+              case ServiceAccountKind.RAMP:
+                //const { sourceKind, instanceNumber } = shell.primarySubAccount
+                const rampSourceKind = shell.primarySubAccount.sourceKind
+                const rampInstanceNumber = shell.primarySubAccount.instanceNumber
+
+                let rampDerivativeAccounts
+                switch ( rampSourceKind ) {
+                    case SourceAccountKind.REGULAR_ACCOUNT:
+                      rampDerivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+                      break
+
+                    case SourceAccountKind.SECURE_ACCOUNT:
+                      rampDerivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+                      break
+                }
+                const rampAccounts: RampDerivativeAccount =
+                rampDerivativeAccounts[ DerivativeAccountTypes.RAMP ]
+                const rampInstance: RampDerivativeAccountElements = rampAccounts[ rampInstanceNumber ]
+
+                if ( rampInstance && rampInstance.balances ) {
+                  accountName = rampInstance.accountName
+                  accountDescription = rampInstance.accountDescription
+                  balances = {
+                    confirmed: rampInstance.balances.balance,
+                    unconfirmed: rampInstance.balances.unconfirmedBalance,
+                  }
+                  transactions = rampInstance.transactions.transactionDetails
                 }
                 break
           }

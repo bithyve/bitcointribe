@@ -36,6 +36,7 @@ import { TEST_ACCOUNT } from '../common/constants/serviceTypes'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
+import { setVersion } from '../store/actions/versionHistory'
 
 
 // only admit lowercase letters and digits
@@ -101,7 +102,8 @@ export default function NewOwnQuestions( props ) {
           question: question,
           answer,
         }
-        dispatch( initializeSetup( walletName, security ) )
+        dispatch( initializeSetup( walletName, security ) );
+        dispatch(setVersion('Current'));
         const current = Date.now()
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
@@ -497,6 +499,7 @@ export default function NewOwnQuestions( props ) {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
         <View style={{
           ...styles.bottomButtonView
         }}>
@@ -535,7 +538,7 @@ export default function NewOwnQuestions( props ) {
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
         />
-      </KeyboardAvoidingView>
+      
     </View>
   )
 }

@@ -7,6 +7,7 @@ import {
   TransactionDetails,
   TransactionPrerequisite,
   InputUTXOs,
+  AverageTxFees,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -480,19 +481,9 @@ export default class SecureAccount {
             totalTransactions: number;
             confirmedTransactions: number;
             unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
+            transactionDetails: TransactionDetails[]
           };
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -524,6 +515,7 @@ export default class SecureAccount {
         status: number;
         data: {
           synched: boolean;
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -775,13 +767,13 @@ export default class SecureAccount {
   };
 
   public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
+    numberOfRecipients: number,
+    feePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
   ) =>
     this.secureHDWallet.calculateSendMaxFee(
       numberOfRecipients,
-      averageTxFees,
+      feePerByte,
       derivativeAccountDetails,
     );
 
@@ -804,7 +796,7 @@ export default class SecureAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -830,7 +822,7 @@ export default class SecureAccount {
         return recipient
       } )
 
-      const {
+      let {
         fee,
         balance,
         txPrerequisites,
@@ -846,16 +838,31 @@ export default class SecureAccount {
       } )
 
       if ( balance < netAmount + fee ) {
-        return {
-          status: 0o6,
-          err: 'Insufficient balance',
-          fee,
-          netAmount,
-          message: ErrMap[ 0o6 ],
+        // check w/ the lowest fee possible for this transaction
+        const minTxFeePerByte = 1 // default minimum relay fee
+        const minAvgTxFee = {
+          ...averageTxFees
         }
+        minAvgTxFee[ 'low' ].feePerByte = minTxFeePerByte
+
+        const minTxPrerequisites  = this.secureHDWallet.transactionPrerequisites(
+          recipients,
+          minAvgTxFee,
+          derivativeAccountDetails,
+        )
+
+        if( minTxPrerequisites.balance < netAmount + minTxPrerequisites.fee )
+          return {
+            status: 0o6,
+            err: 'Insufficient balance',
+            fee,
+            netAmount,
+            message: ErrMap[ 0o6 ],
+          }
+        else txPrerequisites = minTxPrerequisites.txPrerequisites
       }
 
-      if ( txPrerequisites ) {
+      if ( Object.keys( txPrerequisites ).length ) {
         return {
           status: config.STATUS.SUCCESS,
           data: {
@@ -1119,7 +1126,8 @@ export default class SecureAccount {
   | {
       status: number;
       data: {
-        synched: boolean
+        synched: boolean;
+        txsFound: TransactionDetails[];
       };
       err?: undefined;
       message?: undefined;

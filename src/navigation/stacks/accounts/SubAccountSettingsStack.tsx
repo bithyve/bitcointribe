@@ -12,12 +12,13 @@ import ReassignSubAccountSourcesSelectSourcesScreen from '../../../pages/Account
 import ReassignTransactionsMainOptionsScreen from '../../../pages/Accounts/AccountSettings/ReassignTransactions/MainOptionsScreen'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 
 const SubAccountSettingsStack = createStackNavigator(
   {
     AccountSettingsMain: {
       screen: AccountSettingsMainScreen,
-      navigationOptions: ({ navigation }) => {
+      navigationOptions: ( { navigation } ) => {
         return {
           title: 'Account Settings',
           headerLeft: () => {
@@ -52,8 +53,8 @@ const SubAccountSettingsStack = createStackNavigator(
     },
     ReassignTransactionsSelectDestination: {
       screen: ReassignTransactionsSelectDestinationScreen,
-      navigationOptions: ({ navigation }) => {
-        const reassignmentKind = navigation.getParam('reassignmentKind')
+      navigationOptions: ( { navigation } ) => {
+        const reassignmentKind = navigation.getParam( 'reassignmentKind' )
         const nameText = reassignmentKind === XPubSourceKind.DESIGNATED ? 'Sources' : 'Transactions'
 
         return {
@@ -73,10 +74,16 @@ const SubAccountSettingsStack = createStackNavigator(
         title: 'Merge Accounts',
       },
     },
+    TransactionDetails: {
+      screen: TransactionDetailsContainerScreen,
+      navigationOptions: {
+        title: 'Transaction Details',
+      },
+    }
   },
   {
     initialRouteName: 'AccountSettingsMain',
-    defaultNavigationOptions: ({ navigation }) => {
+    defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
