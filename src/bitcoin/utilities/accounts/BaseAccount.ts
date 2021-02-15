@@ -237,7 +237,7 @@ export default class BaseAccount {
       contactName?: string,
     }[],
     hardRefresh?: boolean,
-    syncGapLimit?: boolean,
+    blindRefresh?: boolean,
   ): Promise<
     | {
         status: number;
@@ -261,7 +261,7 @@ export default class BaseAccount {
         data: await this.hdWallet.fetchDerivativeAccBalanceTxs(
           accountInfo,
           hardRefresh,
-          syncGapLimit,
+          blindRefresh,
         ),
       }
     } catch ( err ) {
@@ -277,7 +277,7 @@ export default class BaseAccount {
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
     hardRefresh?: boolean,
-    syncGapLimit?: boolean,
+    blindRefresh?: boolean,
   ): Promise<
     | {
         status: number;
@@ -301,7 +301,7 @@ export default class BaseAccount {
         data: await this.hdWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
           hardRefresh,
-          syncGapLimit
+          blindRefresh
         ),
       }
     } catch ( err ) {
@@ -546,7 +546,7 @@ export default class BaseAccount {
   public isValidAddress = ( recipientAddress: string ): boolean =>
     this.hdWallet.isValidAddress( recipientAddress );
 
-  public getBalanceTransactions = async ( hardRefresh?: boolean, syncGapLimit?: boolean ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean, blindRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -575,7 +575,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh, syncGapLimit ),
+        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh, blindRefresh ),
       }
     } catch ( err ) {
       return {

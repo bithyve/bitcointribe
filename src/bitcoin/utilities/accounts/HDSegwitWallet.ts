@@ -483,7 +483,7 @@ export default class HDSegwitWallet extends Bitcoin {
       contactName?: string,
     }[],
     hardRefresh?: boolean,
-    syncGapLimit?: boolean
+    blindRefresh?: boolean
   ): Promise<{
     synched: boolean,
     txsFound: TransactionDetails[]
@@ -498,26 +498,13 @@ export default class HDSegwitWallet extends Bitcoin {
     } = {
     }
 
-    for( let { accountType, accountNumber, contactName } of accountsInfo ){
-      // preliminary checks
-      if ( !this.derivativeAccounts[ accountType ] )
-        throw new Error( `${accountType} does not exists` )
+    for( const { accountType, accountNumber, contactName } of accountsInfo ){
 
-      if ( accountType === TRUSTED_CONTACTS && !accountNumber ) {
-        if ( !contactName )
-          throw new Error( `Required param: contactName for ${accountType}` )
-
-        contactName = contactName.toLowerCase().trim()
-        accountNumber = this.trustedContactToDA[ contactName ]
-
-        if ( !accountNumber ) {
-          throw new Error(
-            `No contact derivative account exists for: ${contactName}`,
-          )
-        }
+      if( blindRefresh ){
+        if( !this.derivativeAccounts[ accountType ][ accountNumber ] )
+          this.getDerivativeAccXpub( accountType, accountNumber, contactName )
+        await this.syncDerivativeAccGapLimit( accountType, accountNumber )
       }
-
-      if( syncGapLimit ) await this.syncDerivativeAccGapLimit( accountType, accountNumber )
 
       let {
         nextFreeAddressIndex,
@@ -738,7 +725,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
     hardRefresh?: boolean,
-    syncGapLimit?: boolean,
+    blindRefresh?: boolean,
   ): Promise<{
     synched: boolean;
     txsFound: TransactionDetails[];
@@ -746,15 +733,16 @@ export default class HDSegwitWallet extends Bitcoin {
     const accountsInfo :  {
       accountType: string,
       accountNumber: number,
+      contactName?: string
     }[] = []
 
     for ( const dAccountType of accountTypes ) {
       const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
-      if ( !derivativeAccounts.instance.using ) continue
+      const instanceToIterate = blindRefresh? derivativeAccounts.instance.max: derivativeAccounts.instance.using
       for (
         let accountNumber = 1;
-        accountNumber <= derivativeAccounts.instance.using;
+        accountNumber <= instanceToIterate;
         accountNumber++
       ) {
         const info: {
@@ -764,13 +752,13 @@ export default class HDSegwitWallet extends Bitcoin {
         } = {
           accountType: dAccountType, accountNumber
         }
-        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = blindRefresh? `contact ${accountNumber}`: derivativeAccounts[ accountNumber ].contactName
         accountsInfo.push( info )
       }
     }
 
     if( accountsInfo.length )
-      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh, syncGapLimit )
+      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh, blindRefresh )
   }
 
   public syncViaXpubAgent = async (
@@ -1342,7 +1330,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( hardRefresh?: boolean, syncGapLimit?: boolean  ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
@@ -1353,7 +1341,7 @@ export default class HDSegwitWallet extends Bitcoin {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
-    if( syncGapLimit ) await this.syncGapLimit()
+    if( blindRefresh ) await this.syncGapLimit()
 
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number

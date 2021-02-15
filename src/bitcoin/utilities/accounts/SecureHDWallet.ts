@@ -469,7 +469,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( hardRefresh?: boolean, syncGapLimit? :boolean ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean, blindRefresh? :boolean ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
@@ -480,7 +480,7 @@ export default class SecureHDWallet extends Bitcoin {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
 
-    if( syncGapLimit ) await this.syncGapLimit()
+    if( blindRefresh ) await this.syncGapLimit()
 
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
@@ -727,7 +727,7 @@ export default class SecureHDWallet extends Bitcoin {
       accountNumber: number,
     }[],
     hardRefresh?: boolean,
-    syncGapLimit?: boolean,
+    blindRefresh?: boolean,
   ): Promise<{
     synched: boolean
     txsFound: TransactionDetails[]
@@ -742,11 +742,12 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     for( const { accountType, accountNumber } of accountsInfo ){
-      // preliminary checks
-      if ( !this.derivativeAccounts[ accountType ] )
-        throw new Error( `${accountType} does not exists` )
 
-      if( syncGapLimit ) await this.syncDerivativeAccGapLimit( accountType, accountNumber )
+      if( blindRefresh ){
+        if( !this.derivativeAccounts[ accountType ][ accountNumber ] )
+          this.generateDerivativeXpub( accountType, accountNumber )
+        await this.syncDerivativeAccGapLimit( accountType, accountNumber )
+      }
 
       let {
         nextFreeAddressIndex,
@@ -962,7 +963,7 @@ export default class SecureHDWallet extends Bitcoin {
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
     hardRefresh?: boolean,
-    syncGapLimit?: boolean,
+    blindRefresh?: boolean,
   ): Promise<{
     synched: boolean;
     txsFound: TransactionDetails[]
@@ -976,10 +977,11 @@ export default class SecureHDWallet extends Bitcoin {
       if ( dAccountType === TRUSTED_CONTACTS ) continue
       const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
-      if ( !derivativeAccounts.instance.using ) continue
+      const instanceToIterate = blindRefresh? derivativeAccounts.instance.max: derivativeAccounts.instance.using
+
       for (
         let accountNumber = 1;
-        accountNumber <= derivativeAccounts.instance.using;
+        accountNumber <= instanceToIterate;
         accountNumber++
       ) {
         accountsInfo.push( {
@@ -989,7 +991,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     if( accountsInfo.length )
-      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh, syncGapLimit )
+      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh, blindRefresh )
   }
 
   public syncViaXpubAgent = async (
