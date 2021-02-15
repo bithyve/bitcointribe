@@ -26,6 +26,7 @@ const Colors = {
   babyGray: '#BCB6B6',
   greyTextColor: '#656565',
   coral: '#D35400',
+  pink: '#FF82CE',
 
   // Grayscale
   gray1: '#d0d0d0',

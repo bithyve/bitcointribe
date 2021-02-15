@@ -41,9 +41,12 @@ export const getCurrencyImageName = ( currencyCodeValue ) => {
 export const isEmpty = ( obj ) => {
   return Object.keys( obj ).every( ( k ) => !Object.keys( obj[ k ] ).length )
 }
-export const isExistBuildVersion = (versionData) =>{
-  if(versionData.filter(version => version.buildNumber == DeviceInfo.getBuildNumber()).length == 0) return true;
-  return versionData.filter(version => version.version == DeviceInfo.getVersion()).length == 0;
+export const  buildVersionExists = ( versionData ) =>{
+  return (
+    ( versionData.filter( version => version.buildNumber == DeviceInfo.getBuildNumber() ).length > 0 )
+    &&
+    ( versionData.filter( version => version.version == DeviceInfo.getVersion() ).length > 0 )
+  )
 }
 
 export const APP_LIST = {

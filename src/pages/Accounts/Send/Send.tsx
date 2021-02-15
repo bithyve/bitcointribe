@@ -11,6 +11,7 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
   WYRE,
+  RAMP
 } from '../../../common/constants/serviceTypes'
 import SmallHeaderModal from '../../../components/SmallHeaderModal'
 import { TrustedContactDerivativeAccountElements } from '../../../bitcoin/utilities/Interface'

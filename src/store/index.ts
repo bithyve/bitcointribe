@@ -21,6 +21,7 @@ import keeper from './reducers/keeper';
 
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 
 
@@ -130,9 +131,15 @@ import {
 } from './sagas/SwanIntegration'
 
 import {
-  fetchWyreReservationWatcher
+  fetchWyreReservationWatcher,
+  fetchWyreReceiveAddressWatcher
 } from './sagas/WyreIntegration'
+import {
+  fetchRampReservationWatcher,
+  fetchRampReceiveAddressWatcher
+} from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
+import walletRescanningReducer from './reducers/wallet-rescanning'
 
 import {
   initHealthWatcher,
@@ -301,6 +308,11 @@ const rootSaga = function* () {
 
     // Wyre Integration
     fetchWyreReservationWatcher,
+    fetchWyreReceiveAddressWatcher,
+
+    // Ramp Integration
+    fetchRampReservationWatcher,
+    fetchRampReceiveAddressWatcher,
 
     //VersionHistory integration
     versionHistoryWatcher,
@@ -336,7 +348,9 @@ const rootReducer = combineReducers( {
   loaders,
   keeper,
   swanIntegration: swanIntegrationReducer,
+  walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
+  rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
 });
 

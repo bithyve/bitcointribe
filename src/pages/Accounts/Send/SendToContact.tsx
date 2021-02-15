@@ -44,6 +44,7 @@ import {
   TEST_ACCOUNT,
   DONATION_ACCOUNT,
   WYRE,
+  RAMP
 } from '../../../common/constants/serviceTypes'
 import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
@@ -1038,6 +1039,7 @@ class SendToContact extends Component<
                 'Test Account': TEST_ACCOUNT,
                 'Donation Account': DONATION_ACCOUNT,
                 'Wyre': WYRE,
+                'Ramp': RAMP
               }[ item.selectedContact.account_name || 'Checking Account' ]
 
               // 🔑 This seems to be the way the backend is distinguishing between
@@ -1050,6 +1052,7 @@ class SendToContact extends Component<
                   'Test Account': TEST_ACCOUNT,
                   'Donation Account': DONATION_ACCOUNT,
                   'Wyre': WYRE,
+                  'Ramp': RAMP
                 }[ item.selectedContact.account_name || 'Checking Account' ]
 
                 recipient = makeSubAccountRecipientDescription(
