@@ -65,7 +65,7 @@ export const fetchBalanceTx = (
     loader?: boolean;
     derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
-    syncGapLimit?: boolean;
+    blindRefresh?: boolean;
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   } = {
@@ -270,12 +270,12 @@ export const fetchDerivativeAccBalTx = (
   accountType: string,
   accountNumber?: number,
   hardRefresh?: boolean,
-  syncGapLimit?: boolean,
+  blindRefresh?: boolean,
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: {
-      serviceType, accountType, accountNumber, hardRefresh, syncGapLimit
+      serviceType, accountType, accountNumber, hardRefresh, blindRefresh
     },
   }
 }

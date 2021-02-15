@@ -178,7 +178,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
     loader?: boolean;
     derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
-    syncGapLimit?: boolean;
+    blindRefresh?: boolean;
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   }}} ) {
@@ -203,7 +203,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
       : service.hdWallet.transactions
   )
 
-  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh, payload.options.syncGapLimit )
+  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh, payload.options.blindRefresh )
   console.log( {
     res
   } )
@@ -259,7 +259,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
           parentSynched,
           derivativeAccountsToSync: payload.options.derivativeAccountsToSync,
           hardRefresh: payload.options.hardRefresh,
-          syncGapLimit: payload.options.syncGapLimit,
+          blindRefresh: payload.options.blindRefresh,
         },
       } )
       if( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
@@ -284,7 +284,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
-  let { serviceType, accountNumber, accountType, hardRefresh, syncGapLimit } = payload
+  let { serviceType, accountNumber, accountType, hardRefresh, blindRefresh } = payload
   const dervTxsFound : TransactionDescribing[] = []
 
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
@@ -311,7 +311,7 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
     ( service as BaseAccount | SecureAccount ).getDerivativeAccBalanceTransactions,
     accountsInfo,
     hardRefresh,
-    syncGapLimit,
+    blindRefresh,
   )
 
   if (
@@ -346,7 +346,7 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, syncGapLimit?: boolean} } ) {
+function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, blindRefresh?: boolean} } ) {
   const dervTxsFound : TransactionDescribing[] = []
 
   for ( const serviceType of payload.serviceTypes ) {
@@ -369,7 +369,7 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
       ( service as BaseAccount| SecureAccount ).syncDerivativeAccountsBalanceTxs,
       accountsToSync,
       payload.hardRefresh,
-      payload.syncGapLimit
+      payload.blindRefresh
     )
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -1245,7 +1245,7 @@ function* blindRefreshWorker() {
         accountKind === TEST_ACCOUNT ? false : true,
         derivativeAccountsToSync: Object.keys( config.DERIVATIVE_ACC ),
         hardRefresh: true,
-        syncGapLimit: true,
+        blindRefresh: true,
       },
     }
 
