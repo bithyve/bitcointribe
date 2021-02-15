@@ -33,7 +33,7 @@ import BottomSheet from "reanimated-bottom-sheet";
 import ModalHeader from "../../components/ModalHeader";
 import DeviceInfo from "react-native-device-info";
 import AntDesign from "react-native-vector-icons/AntDesign";
-import { requestTimedout } from "../../store/utils/utilities";
+import Loader from '../../components/loader';
 import BottomInfoBox from "../../components/BottomInfoBox";
 import RestoreFromICloud from "../RestoreHexaWithKeeper/RestoreFromICloud";
 import SetupPrimaryKeeper from "../Keeper/SetupPrimaryKeeper";
@@ -69,6 +69,8 @@ interface UpgradeBackupStateTypes {
   selectedContact: any[];
   encryptedCloudDataJson: any;
   isCloudBackupProcessing: Boolean;
+  showLoader: boolean;
+
 }
 
 interface UpgradeBackupPropsTypes {
@@ -218,6 +220,8 @@ class UpgradeBackup extends Component<
         //   ],
         // },
       ],
+      showLoader: false,
+
     };
   }
 
@@ -253,6 +257,7 @@ class UpgradeBackup extends Component<
     }
     if(JSON.stringify(prevProps.levelHealth) != JSON.stringify(this.props.levelHealth)){
       if(this.props.levelHealth[0] && this.props.levelHealth[0].levelInfo[0] && this.props.levelHealth[0].levelInfo[0].status == 'accessible') {
+        this.setState({ showLoader: false });
         this.props.navigation.replace('ManageBackupKeeper');
       }
     }
@@ -356,7 +361,7 @@ class UpgradeBackup extends Component<
   };
 
   render() {
-    const { listData, selectedIds, selectedContact, isCloudBackupProcessing } = this.state;
+    const { listData, selectedIds, selectedContact, isCloudBackupProcessing, showLoader } = this.state;
     const { navigation } = this.props;
     return (
       <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
@@ -510,6 +515,8 @@ class UpgradeBackup extends Component<
             </View>
           ))}
         </ScrollView>
+        {showLoader ? <Loader isLoading={true} /> : null}
+
         <BottomInfoBox
           backgroundColor={Colors.white}
           title={"Note"}
@@ -547,7 +554,7 @@ class UpgradeBackup extends Component<
                 backButtonText={"Back"}
                 modalRef={this.refs.RestoreFromICloud}
                 onPressProceed={() => {
-                  this.setState({isCloudBackupProcessing: true})
+                  this.setState({isCloudBackupProcessing: true, showLoader: true})
                   this.cloudBackup();
                   // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
                 }}

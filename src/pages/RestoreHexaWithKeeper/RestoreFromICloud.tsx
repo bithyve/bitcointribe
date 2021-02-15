@@ -69,9 +69,9 @@ export default function RestoreFromICloud(props) {
           onPress={() => props.onPressProceed()}
           style={styles.successModalButtonView}
         >
-          {props.isLoading ? (
+          {/* {props.isLoading ? (
             <ActivityIndicator size={"small"} color={Colors.white} />
-          ) : (
+          ) : ( */}
             <Text
               style={{
                 ...styles.proceedButtonText,
@@ -80,7 +80,7 @@ export default function RestoreFromICloud(props) {
             >
               {props.proceedButtonText}
             </Text>
-          )}
+          {/* )} */}
         </AppBottomSheetTouchableWrapper>
         <AppBottomSheetTouchableWrapper
           disabled={props.isLoading ? props.isLoading : false}
