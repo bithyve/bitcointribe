@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, ImageSourcePropType, FlatList, Image } from 'react-native'
+import { StyleSheet, ImageSourcePropType, FlatList, Image, Platform } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
@@ -34,19 +34,19 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   //   disabled: false
   // },
   {
-    title: 'Buy using Bank Transfer, Apple Pay and more',
+    title: Platform.OS == 'ios' ? 'Buy using Apple Pay, Debit Card & more' : 'Buy using Debit/Credit Card and Bank Transfer',
     subtitle: 'Powered by Ramp',
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false
   },
-  {
-    title: 'Buy using ApplePay or Debit Card',
-    subtitle: 'Powered by Wyre',
-    kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-    disabled: false
-  },
+  // {
+  //   title: 'Buy using ApplePay or Debit Card',
+  //   subtitle: 'Powered by Wyre',
+  //   kind: BuyMenuItemKind.WYRE,
+  //   imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+  //   disabled: false
+  // },
   {
     title: 'Set up automatic buys   (COMING SOON)',
     subtitle: 'Stack sats with SwanBitcoin',
