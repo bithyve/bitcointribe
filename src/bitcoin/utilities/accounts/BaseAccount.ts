@@ -8,6 +8,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  AverageTxFees,
 } from '../Interface'
 
 export default class BaseAccount {
@@ -644,7 +645,7 @@ export default class BaseAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -670,32 +671,47 @@ export default class BaseAccount {
         return recipient
       } )
 
-      const {
-        fee,
-        balance,
-        txPrerequisites,
-      } = await this.hdWallet.transactionPrerequisites(
-        recipients,
-        averageTxFees,
-        derivativeAccountDetails,
-      )
-
       let netAmount = 0
       recipients.forEach( ( recipient ) => {
         netAmount += recipient.amount
       } )
 
+      let {
+        fee,
+        balance,
+        txPrerequisites,
+      } = this.hdWallet.transactionPrerequisites(
+        recipients,
+        averageTxFees,
+        derivativeAccountDetails,
+      )
+
       if ( balance < netAmount + fee ) {
-        return {
-          status: 0o6,
-          err: 'Insufficient balance',
-          fee,
-          netAmount,
-          message: ErrMap[ 0o6 ],
+        // check w/ the lowest fee possible for this transaction
+        const minTxFeePerByte = 1 // default minimum relay fee
+        const minAvgTxFee = {
+          ...averageTxFees
         }
+        minAvgTxFee[ 'low' ].feePerByte = minTxFeePerByte
+
+        const minTxPrerequisites  = this.hdWallet.transactionPrerequisites(
+          recipients,
+          minAvgTxFee,
+          derivativeAccountDetails,
+        )
+
+        if( minTxPrerequisites.balance < netAmount + minTxPrerequisites.fee )
+          return {
+            status: 0o6,
+            err: 'Insufficient balance',
+            fee,
+            netAmount,
+            message: ErrMap[ 0o6 ],
+          }
+        else txPrerequisites = minTxPrerequisites.txPrerequisites
       }
 
-      if ( txPrerequisites ) {
+      if ( Object.keys( txPrerequisites ).length ) {
         return {
           status: config.STATUS.SUCCESS,
           data: {

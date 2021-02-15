@@ -1348,6 +1348,37 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
                 } )
               }
               break
+            case ServiceAccountKind.RAMP:
+              const rampAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const rampSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.RAMP,
+                rampAccountDetails
+              )
+
+              if ( rampSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+                subAccountId = rampSetupRes.data.accountId
+                subAccountInstanceNum = rampSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: rampSetupRes.err
+                } )
+              }
+              break
         }
         break
   }

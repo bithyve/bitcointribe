@@ -16,6 +16,7 @@ import {
   DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
+  AverageTxFees,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -25,6 +26,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   SECURE_ACCOUNT,
   WYRE,
+  RAMP
 } from '../../../common/constants/serviceTypes'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
@@ -278,7 +280,12 @@ export default class SecureHDWallet extends Bitcoin {
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
-
+        case RAMP:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const rampAccount = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
+          receivingAddress = rampAccount ? rampAccount.receivingAddress : ''
+          break
         default:
           receivingAddress = this.receivingAddress
     }
@@ -1136,6 +1143,24 @@ export default class SecureHDWallet extends Bitcoin {
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
           break
+        case RAMP:
+          const rampDerivativeAcc: DerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          const rampInUse = rampDerivativeAcc.instance.using
+          accountNumber = rampInUse + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const rampDerivativeInstance: DerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const rampUpdatedDervInstance = {
+            ...rampDerivativeInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = rampUpdatedDervInstance
+          accountId = rampUpdatedDervInstance.xpubId
+          break
     }
 
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
@@ -1831,15 +1856,14 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  public transactionPrerequisites = async (
+  public transactionPrerequisites = (
     recipients: {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
-  ): Promise<
-    | {
+  ): {
         fee: number;
         balance: number;
         txPrerequisites?: undefined;
@@ -1848,8 +1872,7 @@ export default class SecureHDWallet extends Bitcoin {
         txPrerequisites: TransactionPrerequisite;
         fee?: undefined;
         balance?: undefined;
-      }
-  > => {
+      } => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[

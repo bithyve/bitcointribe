@@ -14,6 +14,7 @@ export enum BuyMenuItemKind {
   FAST_BITCOINS = 'FAST_BITCOINS',
   SWAN = 'SWAN',
   WYRE = 'WYRE',
+  RAMP = 'RAMP'
 }
 
 export type BuyBitcoinBottomSheetMenuItem = {
@@ -25,27 +26,34 @@ export type BuyBitcoinBottomSheetMenuItem = {
 }
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
+  // {
+  //   title: 'Scan a Voucher',
+  //   subtitle: 'From select retail stores with FastBitcoins',
+  //   kind: BuyMenuItemKind.FAST_BITCOINS,
+  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+  //   disabled: false
+  // },
   {
-    title: 'Scan a Voucher',
-    subtitle: 'From select retail stores with FastBitcoins',
-    kind: BuyMenuItemKind.FAST_BITCOINS,
-    imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+    title: 'Buy using Bank Transfer, Apple Pay and more',
+    subtitle: 'Powered by Ramp',
+    kind: BuyMenuItemKind.RAMP,
+    imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false
   },
   {
-    title: 'More Buying Options Coming Soon',
-    subtitle: 'Apple Pay/Debit Card/Bank Transfer',
-    kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/icon_bitcoin_gray.png' ),
-    disabled: true
+    title: 'Buy using ApplePay or Debit Card',
+    subtitle: 'Powered by Wyre',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    disabled: false
   },
-  // {
-  //   title: 'Buy using ApplePay or Debit Card',
-  //   subtitle: 'Powered by Wyre',
-  //   kind: BuyMenuItemKind.WYRE,
-  //   imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-  //   disabled: false
-  // },
+  {
+    title: 'Set up automatic buys   (COMING SOON)',
+    subtitle: 'Stack sats with SwanBitcoin',
+    kind: BuyMenuItemKind.SWAN,
+    imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
+    disabled: true
+  }
 ]
 
 const listItemKeyExtractor = ( item: BuyBitcoinBottomSheetMenuItem ) => item.title
