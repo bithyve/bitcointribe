@@ -20,7 +20,7 @@ export default function RestoreFromICloud(props) {
       </View>
       <AppBottomSheetTouchableWrapper
         activeOpacity={10}
-        onPress={() => props.onPressCard()}
+        onPress={() => props.onPressCard ? props.onPressCard() : {}}
         style={{ justifyContent: "center", alignItems: "center" }}
       >
         <View style={styles.greyBox}>
