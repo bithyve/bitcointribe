@@ -176,6 +176,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
   options: {
     service?;
     loader?: boolean;
+    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
     syncGapLimit?: boolean;
     shouldNotInsert?: boolean;
@@ -256,6 +257,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
         payload: {
           serviceTypes: [ payload.serviceType ],
           parentSynched,
+          derivativeAccountsToSync: payload.options.derivativeAccountsToSync,
           hardRefresh: payload.options.hardRefresh,
           syncGapLimit: payload.options.syncGapLimit,
         },
@@ -344,7 +346,7 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean, syncGapLimit?: boolean} } ) {
+function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, syncGapLimit?: boolean} } ) {
   const dervTxsFound : TransactionDescribing[] = []
 
   for ( const serviceType of payload.serviceTypes ) {
@@ -360,11 +362,14 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
         ? service.hdWallet.derivativeAccounts
         : service.secureHDWallet.derivativeAccounts
     )
+    const { derivativeAccountsToSync } = payload
+    const accountsToSync = derivativeAccountsToSync && derivativeAccountsToSync.length ? derivativeAccountsToSync: config.DERIVATIVE_ACC_TO_SYNC
 
     const res = yield call(
       ( service as BaseAccount| SecureAccount ).syncDerivativeAccountsBalanceTxs,
-      config.DERIVATIVE_ACC_TO_SYNC,
-      payload.hardRefresh
+      accountsToSync,
+      payload.hardRefresh,
+      payload.syncGapLimit
     )
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -1238,6 +1243,7 @@ function* blindRefreshWorker() {
         loader: true,
         syncTrustedDerivative:
         accountKind === TEST_ACCOUNT ? false : true,
+        derivativeAccountsToSync: Object.keys( config.DERIVATIVE_ACC ),
         hardRefresh: true,
         syncGapLimit: true,
       },

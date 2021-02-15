@@ -63,6 +63,7 @@ export const fetchBalanceTx = (
   options: {
     service?;
     loader?: boolean;
+    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
     syncGapLimit?: boolean;
     shouldNotInsert?: boolean;
