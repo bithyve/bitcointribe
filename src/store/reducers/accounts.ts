@@ -176,6 +176,7 @@ export type AccountsState = {
   accountShellMergeDestination: AccountShell | null;
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
+  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
 };
 
 const initialState: AccountsState = {
@@ -211,6 +212,7 @@ const initialState: AccountsState = {
   accountShellMergeDestination: null,
 
   currentWyreSubAccount: null,
+  currentRampSubAccount: null,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -608,11 +610,18 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         // for now there is only one wyre account created so the first one is added as default
         // this will need to be modified later elsewhere to add default wyre account to state
         let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
+        let currentRampSubAccount: ExternalServiceSubAccountInfo | null
         if (
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
         ) {
           currentWyreSubAccount = action.payload.primarySubAccount
+        }
+        if (
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.RAMP
+        ) {
+          currentRampSubAccount = action.payload.primarySubAccount
         }
 
         return {
@@ -622,6 +631,9 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accountShells: state.accountShells.concat( action.payload ),
           ...currentWyreSubAccount && {
             currentWyreSubAccount
+          },
+          ...currentRampSubAccount && {
+            currentRampSubAccount
           }
         }
 

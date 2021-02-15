@@ -8,8 +8,9 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import { View, Text } from 'react-native'
 import NavStyles from '../../../common/Styles/NavStyles'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
+import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
-
+import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 
 const AddNewAccountStack = createStackNavigator(
   {
@@ -43,6 +44,13 @@ const AddNewAccountStack = createStackNavigator(
     },
     NewWyreAccountDetails: {
       screen: NewWyreAccountDetailsScreen,
+      navigationOptions: {
+        title: 'Account Details'
+      }
+    },
+
+    NewRampAccountDetails: {
+      screen: NewRampAccountDetailsScreen,
       navigationOptions: {
         title: 'Account Details'
       }

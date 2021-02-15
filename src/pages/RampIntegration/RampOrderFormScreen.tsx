@@ -7,11 +7,11 @@ import ListStyles from '../../common/Styles/ListStyles'
 import { Button, ListItem } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import useWyreIntegrationState from '../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
+import useRampIntegrationState from '../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
 import openLink from '../../utils/OpenLink'
-import { clearWyreCache, fetchWyreReservation, fetchWyreReceiveAddress } from '../../store/actions/WyreIntegration'
-import useWyreReservationFetchEffect from '../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
-import DepositSubAccountShellListItem from '../Accounts/AddNew/WyreAccount/DepositAccountShellListItem'
+import { clearRampCache, fetchRampReservation, fetchRampReceiveAddress } from '../../store/actions/RampIntegration'
+import useRampReservationFetchEffect from '../../utils/hooks/ramp-integration/UseRampReservationFetchEffect'
+import DepositSubAccountShellListItem from '../Accounts/AddNew/RampAccount/DepositAccountShellListItem'
 import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import { RFValue } from 'react-native-responsive-fontsize'
 
@@ -20,32 +20,30 @@ export type Props = {
   navigation: any;
 };
 
-const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-
+const RampOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
-  const { wyreHostedUrl, wyreReceiveAddress } = useWyreIntegrationState()
-
+  const { rampHostedUrl, rampReceiveAddress } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-
   const currentSubAccount: ExternalServiceSubAccountInfo = useMemo( () => {
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
 
-  const wyreAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
+  const rampAccountShell = useAccountShellForID( currentSubAccount.accountShellID )
 
   function handleProceedButtonPress() {
-    if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation() )}
+    if( !hasButtonBeenPressed ){dispatch( fetchRampReservation() )}
     setHasButtonBeenPressed( true )
   }
 
   useEffect( () => {
-    dispatch( clearWyreCache() )
-    dispatch( fetchWyreReceiveAddress() )
+    dispatch( clearRampCache() )
+    dispatch( fetchRampReceiveAddress() )
   }, [] )
 
-  useWyreReservationFetchEffect( {
+
+  useRampReservationFetchEffect( {
     onSuccess: () => {
-      openLink( wyreHostedUrl )
+      openLink( rampHostedUrl )
     },
     onFailure: () => {
       setHasButtonBeenPressed( true )
@@ -63,7 +61,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <Text style={{
             ...ListStyles.infoHeaderTitleText, marginBottom: 10
           }}>
-            Wyre Destination Account:
+            Ramp Destination Account:
           </Text>
 
           <ListItem
@@ -73,7 +71,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             }}
             disabled
           >
-            <DepositSubAccountShellListItem accountShell={wyreAccountShell} />
+            <DepositSubAccountShellListItem accountShell={rampAccountShell} />
           </ListItem>
           <Text style={{
             ...ListStyles.infoHeaderTitleText, marginBottom: 10, marginTop: 10
@@ -88,8 +86,10 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             disabled
           >
 
-            <Text style={styles.bottomNoteInfoText}>
-              {wyreReceiveAddress}
+            <Text style={{
+              ...styles.bottomNoteInfoText
+            }}>
+              {rampReceiveAddress}
             </Text>
           </ListItem>
         </View>
@@ -101,7 +101,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <Text style={{
             textAlign: 'justify', ...ListStyles.infoHeaderSubtitleText
           }}>
-            {'Hexa Wyre Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
+            {'Hexa Ramp Account enables purchases of BTC using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to the Hexa Ramp account address displayed above.'}
           </Text>
         </View>
 
@@ -110,7 +110,7 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             disabled={hasButtonBeenPressed}
             raised
             buttonStyle={ButtonStyles.primaryActionButton}
-            title="Proceed to Wyre"
+            title="Proceed to Ramp"
             titleStyle={ButtonStyles.actionButtonText}
             onPress={handleProceedButtonPress}
           />
@@ -124,11 +124,12 @@ const WyreOrderFormScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                   Powered by
             </Text>
             <Image
-              source={require( '../../assets/images/icons/wyre_logo_large.png' )}
+              source={require( '../../assets/images/icons/ramp_logo_large.png' )}
               style={{
-                marginLeft: 2,
-                width: 50,
-                height: 30,
+                marginLeft: 5,
+                width: 62,
+                height: 27,
+
               }}
             />
           </View>
@@ -170,4 +171,4 @@ const styles = StyleSheet.create( {
 } )
 
 
-export default WyreOrderFormScreen
+export default RampOrderFormScreen
