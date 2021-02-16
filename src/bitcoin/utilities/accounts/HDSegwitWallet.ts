@@ -476,6 +476,27 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public blindRefreshCleanup = ( ) => {
+    for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+      for( let accountNumber = this.derivativeAccounts[ accountType ].instance.max; accountNumber > 0; accountNumber -- ){
+        if ( ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration ){
+          // dynamically generated derv account (blind refresh)
+          const { transactionDetails } = this.derivativeAccounts[ accountType ][ accountNumber ].transactions
+          // remove if no txs exist on such an account
+          if( !transactionDetails.length ){
+            delete this.derivativeAccounts[ accountType ][ accountNumber ]
+          } else {
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber
+            for( let remainingAcc = accountNumber; remainingAcc > 0; remainingAcc -- ){
+              ( this.derivativeAccounts[ accountType ][ remainingAcc ] as DerivativeAccountElements ).blindGeneration = null
+            }
+            break
+          }
+        }
+      }
+    }
+  }
+
   public fetchDerivativeAccBalanceTxs = async (
     accountsInfo: {
       accountType: string,
@@ -501,8 +522,11 @@ export default class HDSegwitWallet extends Bitcoin {
     for( const { accountType, accountNumber, contactName } of accountsInfo ){
 
       if( blindRefresh ){
-        if( !this.derivativeAccounts[ accountType ][ accountNumber ] )
-          this.getDerivativeAccXpub( accountType, accountNumber, contactName )
+        if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
+          // blind derv-account generation
+          this.getDerivativeAccXpub( accountType, accountNumber, contactName );
+          ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
+        }
         await this.syncDerivativeAccGapLimit( accountType, accountNumber )
       }
 
@@ -716,6 +740,10 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
+    // blind refresh sub-acc cleanup
+    if( blindRefresh )
+      this.blindRefreshCleanup()
+
     return {
       synched: true,
       txsFound,
@@ -752,7 +780,10 @@ export default class HDSegwitWallet extends Bitcoin {
         } = {
           accountType: dAccountType, accountNumber
         }
-        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = blindRefresh? `contact ${accountNumber}`: derivativeAccounts[ accountNumber ].contactName
+        if( dAccountType === TRUSTED_CONTACTS ){
+          if( derivativeAccounts[ accountNumber ] ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+          else if( blindRefresh ) info.contactName = `contact ${accountNumber}`
+        }
         accountsInfo.push( info )
       }
     }

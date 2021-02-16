@@ -721,6 +721,29 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  public blindRefreshCleanup = ( ) => {
+    for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+      if( accountType === TRUSTED_CONTACTS ) continue
+
+      for( let accountNumber = this.derivativeAccounts[ accountType ].instance.max; accountNumber > 0; accountNumber -- ){
+        if ( ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration ){
+          // dynamically generated derv account (blind refresh)
+          const { transactionDetails } = this.derivativeAccounts[ accountType ][ accountNumber ].transactions
+          // remove if no txs exist on such an account
+          if( !transactionDetails.length ){
+            delete this.derivativeAccounts[ accountType ][ accountNumber ]
+          } else {
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber
+            for( let remainingAcc = accountNumber; remainingAcc > 0; remainingAcc -- ){
+              ( this.derivativeAccounts[ accountType ][ remainingAcc ] as DerivativeAccountElements ).blindGeneration = null
+            }
+            break
+          }
+        }
+      }
+    }
+  }
+
   public fetchDerivativeAccBalanceTxs = async (
     accountsInfo: {
       accountType: string,
@@ -744,8 +767,11 @@ export default class SecureHDWallet extends Bitcoin {
     for( const { accountType, accountNumber } of accountsInfo ){
 
       if( blindRefresh ){
-        if( !this.derivativeAccounts[ accountType ][ accountNumber ] )
-          this.generateDerivativeXpub( accountType, accountNumber )
+        if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
+          // blind derv-account generation
+          this.generateDerivativeXpub( accountType, accountNumber );
+          ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
+        }
         await this.syncDerivativeAccGapLimit( accountType, accountNumber )
       }
 
@@ -953,6 +979,10 @@ export default class SecureHDWallet extends Bitcoin {
         ).address,
       }
     }
+
+    // blind refresh sub-acc cleanup
+    if( blindRefresh )
+      this.blindRefreshCleanup()
 
     return {
       synched: true,
