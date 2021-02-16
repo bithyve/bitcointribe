@@ -246,7 +246,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"0817c9eb6dde106222e3df78","publicKey":"4ee6fa8ceb617e3af97d1b711f7551c493b8a58324c2a08ad7569aba2d2d5bc3","ephemeralAddress":"36f7d6fcbfb13295b98cbae353e2d879a8293e6544f8a5eb07e6d9d724b7917d","walletName":"gh"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
+            ? '{"uuid":"80b2d4c76176815732347bff","publicKey":"77159e32e038857f381a4a0bb5b1dba09c8e01eb16e1581f407f9e779be75ef8","ephemeralAddress":"083ac816db424d8edf09d360446086c3bc0d160da1214360acab2f1e88c372f7","walletName":"sd"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,

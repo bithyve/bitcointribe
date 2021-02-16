@@ -441,18 +441,18 @@ function* requestShareWorker( { payload } ) {
   // } // capping to 3 shares reception
 
   const { key } = yield call( S3Service.generateRequestCreds )
-
-  const updatedBackup = {
-    ...DECENTRALIZED_BACKUP,
-    RECOVERY_SHARES: {
-      ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
-      [ payload.shareIndex ]: {
-        REQUEST_DETAILS: {
-          TAG: WALLET_SETUP.walletName,
-          KEY: key,
-        },
+  let recoveryShares = { ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+    [ payload.shareIndex ]: {
+      ...DECENTRALIZED_BACKUP.RECOVERY_SHARES[ payload.shareIndex ],
+      REQUEST_DETAILS: {
+        TAG: WALLET_SETUP.walletName,
+        KEY: key,
       },
     },
+  };
+  const updatedBackup = {
+    ...DECENTRALIZED_BACKUP,
+    RECOVERY_SHARES: recoveryShares
   }
 
   yield call( insertDBWorker, {
@@ -468,75 +468,79 @@ export const requestShareWatcher = createWatcher(
 )
 
 function* uploadRequestedShareWorker( { payload } ) {
-  // Transfer: Guardian >>> User
-  const { tag, encryptedKey, otp } = payload
-  const { DECENTRALIZED_BACKUP } = yield select(
-    ( state ) => state.storage.database,
-  )
-  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+  try {
+    // Transfer: Guardian >>> User
+    const { tag, encryptedKey, otp } = payload
+    const { DECENTRALIZED_BACKUP } = yield select(
+      ( state ) => state.storage.database,
+    )
+    const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
 
-  if ( !UNDER_CUSTODY[ tag ] ) {
-    yield put( ErrorSending( true ) )
-    // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
-  }
-
-  const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS } = UNDER_CUSTODY[
-    tag
-  ]
-
-  // preventing re-uploads till expiry
-  // if (TRANSFER_DETAILS) {
-  //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
-  //     return;
-  //   }
-  // }
-
-  // TODO: 10 min removal strategy
-  yield put( switchS3Loader( 'uploadRequestedShare' ) )
-
-  const res = yield call(
-    S3Service.uploadRequestedShare,
-    encryptedKey,
-    otp,
-    META_SHARE,
-    ENC_DYNAMIC_NONPMDD,
-  )
-
-  if ( res.status === 200 && res.data.success === true ) {
-    // yield success
-    console.log( 'Upload successful!' )
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      UNDER_CUSTODY: {
-        ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
-        [ tag ]: {
-          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
-          TRANSFER_DETAILS: {
-            KEY: encryptedKey,
-            UPLOADED_AT: Date.now(),
-          },
-        },
-      },
+    if ( !UNDER_CUSTODY[ tag ] ) {
+      yield put( ErrorSending( true ) )
+      // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
     }
 
-    yield call( insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup
-      },
-    } )
+    const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS } = UNDER_CUSTODY[
+      tag
+    ]
 
-    yield put( requestedShareUploaded( tag, true ) )
-    yield put( UploadSuccessfully( true ) )
-    // Alert.alert(
-    //   'Upload successful!',
-    //   "Requester's share has been uploaded to the relay.",
-    // );
-    Toast( `${tag}'s Recovery Key sent.` )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( requestedShareUploaded( tag, false, res.err ) )
+    // preventing re-uploads till expiry
+    // if (TRANSFER_DETAILS) {
+    //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
+    //     return;
+    //   }
+    // }
+
+    // TODO: 10 min removal strategy
+    yield put( switchS3Loader( 'uploadRequestedShare' ) )
+
+    const res = yield call(
+      S3Service.uploadRequestedShare,
+      encryptedKey,
+      otp,
+      META_SHARE,
+      ENC_DYNAMIC_NONPMDD,
+    )
+
+    if ( res.status === 200 && res.data.success === true ) {
+      // yield success
+      console.log( 'Upload successful!' )
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+          [ tag ]: {
+            ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
+            TRANSFER_DETAILS: {
+              KEY: encryptedKey,
+              UPLOADED_AT: Date.now(),
+            },
+          },
+        },
+      }
+
+      yield call( insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup
+        },
+      } )
+
+      yield put( requestedShareUploaded( tag, true ) )
+      yield put( UploadSuccessfully( true ) )
+      // Alert.alert(
+      //   'Upload successful!',
+      //   "Requester's share has been uploaded to the relay.",
+      // );
+      Toast( `${tag}'s Recovery Key sent.` )
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      yield put( requestedShareUploaded( tag, false, res.err ) )
+    }
+  } catch (error) {
+    console.log('RECOVERY error', error)
+    yield put( switchS3Loader( 'uploadRequestedShare' ) )
   }
-  yield put( switchS3Loader( 'uploadRequestedShare' ) )
 }
 
 export const uploadRequestedShareWatcher = createWatcher(

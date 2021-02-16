@@ -207,9 +207,9 @@ export const putKeeperInfo = (info) =>{
 export const downloadMShare = (
   payload: {
     encryptedKey: string;
-    otp: string;
+    otp?: string;
     downloadType?: string;
-    replaceIndex?: string;
+    replaceIndex?: any;
     walletName?: string;
   }
 ) => {

@@ -1002,16 +1002,19 @@ const TrustedContactHistoryKeeper = (props) => {
               (SendViaLinkBottomSheet as any).current.snapTo(0);
           }}
           onPressDone={() => {
-            setTimeout(() => {
-              setRenderTimer(true);
-            }, 2);
             if (isOTPType) {
+              setTimeout(() => {
+                setRenderTimer(true);
+              }, 2);
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
               (shareOtpWithTrustedContactBottomSheet as any).current.snapTo(1);
+            } 
+            else {
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+              const popAction = StackActions.pop({ n: 1 });
+              props.navigation.dispatch(popAction);
+              props.navigation.replace('ManageBackupKeeper');
             }
-            (SendViaLinkBottomSheet as any).current.snapTo(0);
-            const popAction = StackActions.pop({ n: 1 });
-            props.navigation.dispatch(popAction);
-            props.navigation.replace('ManageBackupKeeper');
           }}
         />
       );
