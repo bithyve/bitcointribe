@@ -731,7 +731,8 @@ export default class SecureHDWallet extends Bitcoin {
           const { transactionDetails } = this.derivativeAccounts[ accountType ][ accountNumber ].transactions
           // remove if no txs exist on such an account
           if( !transactionDetails.length ){
-            delete this.derivativeAccounts[ accountType ][ accountNumber ]
+            delete this.derivativeAccounts[ accountType ][ accountNumber ];
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber - 1
           } else {
             ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber
             for( let remainingAcc = accountNumber; remainingAcc > 0; remainingAcc -- ){
@@ -956,8 +957,10 @@ export default class SecureHDWallet extends Bitcoin {
 
       // find tx delta(missing txs): hard vs soft refresh
       if( hardRefresh ){
-        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
-        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        if( txIdMap ){
+          const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+          if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        } else txsFound.push( ...res.transactions.transactionDetails )
       }
 
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
