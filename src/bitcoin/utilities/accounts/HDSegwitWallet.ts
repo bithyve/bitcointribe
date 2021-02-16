@@ -716,8 +716,10 @@ export default class HDSegwitWallet extends Bitcoin {
 
       // find tx delta(missing txs): hard vs soft refresh
       if( hardRefresh ){
-        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
-        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        if( txIdMap ){
+          const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+          if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        } else txsFound.push( ...res.transactions.transactionDetails )
       }
 
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
