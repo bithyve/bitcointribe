@@ -246,7 +246,7 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"80b2d4c76176815732347bff","publicKey":"77159e32e038857f381a4a0bb5b1dba09c8e01eb16e1581f407f9e779be75ef8","ephemeralAddress":"083ac816db424d8edf09d360446086c3bc0d160da1214360acab2f1e88c372f7","walletName":"sd"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
+            ? '{"uuid":"b0020db78f86a75a7acec96d","publicKey":"507fcf14ac310051172cf9fed6dd2d52a05e210f828c7c81350ae7ead8a7a666","ephemeralAddress":"151bc50ae433427f50cad1a0edbc529c4a0aee2d45e92421199676873be2e297","walletName":"Mad"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,

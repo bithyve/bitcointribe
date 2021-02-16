@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,52 +6,51 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
-} from 'react-native';
+} from "react-native";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from './../../common/Fonts';
-import CommonStyles from '../../common/Styles/Styles';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { UsNumberFormat } from '../../common/utilities';
-import MessageAsPerHealth from '../../components/home/messgae-health';
-import { useDispatch, useSelector } from 'react-redux';
-import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch';
+} from "react-native-responsive-screen";
+import Colors from "../../common/Colors";
+import Fonts from "./../../common/Fonts";
+import CommonStyles from "../../common/Styles/Styles";
+import { RFValue } from "react-native-responsive-fontsize";
+import { UsNumberFormat } from "../../common/utilities";
+import { useDispatch, useSelector } from "react-redux";
+import CurrencyKindToggleSwitch from "../../components/CurrencyKindToggleSwitch";
 const currencyCode = [
-  'BRL',
-  'CNY',
-  'JPY',
-  'GBP',
-  'KRW',
-  'RUB',
-  'TRY',
-  'INR',
-  'EUR',
+  "BRL",
+  "CNY",
+  "JPY",
+  "GBP",
+  "KRW",
+  "RUB",
+  "TRY",
+  "INR",
+  "EUR",
 ];
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { getCurrencyImageName } from '../../common/CommonFunctions/index';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import CurrencyKind from '../../common/data/enums/CurrencyKind';
-import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind';
-import { currencyKindSet } from '../../store/actions/preferences';
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface';
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { getCurrencyImageName } from "../../common/CommonFunctions/index";
+import AntDesign from "react-native-vector-icons/AntDesign";
+import CurrencyKind from "../../common/data/enums/CurrencyKind";
+import useCurrencyKind from "../../utils/hooks/state-selectors/UseCurrencyKind";
+import { currencyKindSet } from "../../store/actions/preferences";
+import S3Service from "../../bitcoin/services/sss/S3Service";
+import { LevelHealthInterface } from "../../bitcoin/utilities/Interface";
+import { SATOSHIS_IN_BTC } from "../../common/constants/Bitcoin";
 
 function setCurrencyCodeToImage(currencyName, currencyColor) {
   return (
     <View
       style={{
         marginRight: 5,
-        marginBottom: wp('0.7%'),
+        marginBottom: wp("0.7%"),
       }}
     >
       <MaterialCommunityIcons
         name={currencyName}
-        color={currencyColor == 'light' ? Colors.white : Colors.lightBlue}
-        size={wp('3.5%')}
+        color={currencyColor == "light" ? Colors.white : Colors.lightBlue}
+        size={wp("3.5%")}
       />
     </View>
   );
@@ -69,7 +68,7 @@ const HomeHeader = ({
   currentLevel,
 }) => {
   const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.health.levelHealth,
+    (state) => state.health.levelHealth
   );
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.health.service);
@@ -80,85 +79,170 @@ const HomeHeader = ({
   }, [currencyKind]);
 
   const getMessage = (health, keeper) => {
-    let boldMessage = '';
-    let normalMessage = ' to improve health'
-    if(!s3Service.levelhealth.healthCheckInitializedKeeper) boldMessage = 'Upgrade Backup'
-    else if(!health) boldMessage = 'Add Keeper';
-    else if(health=='ugly') {
+    let { messageOne, messageTwo } = getMessageToShow();
+    let boldMessage = "";
+    let normalMessage = " to improve health";
+
+    if (!health) boldMessage = "Add ";
+    else if (health == "ugly") {
       boldMessage = keeper;
-      normalMessage = ' needs your attention';
+      normalMessage = " needs your attention";
     }
-    if(health=='good'){
+
+    if (
+      messageTwo === " needs your attention" ||
+      messageOne == "Upgrade Backup"
+    ) {
       return (
-        <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
-          <Text style={styles.manageBackupMessageText}>Your wallet is now </Text>
-          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>secure</Text>
+        <View
+          style={{
+            flexDirection: "row",
+            width: wp("57%"),
+            alignItems: "flex-end",
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            style={styles.manageBackupMessageTextHighlight}
+          >
+            {messageOne}
+          </Text>
+          <Text
+            numberOfLines={1}
+            style={{ ...styles.manageBackupMessageText, flex: 1 }}
+          >
+            {messageTwo}
+          </Text>
         </View>
       );
     }
     return (
-      <View style={{flexDirection: 'row', width: wp('57%'), alignItems: 'flex-end'}}>
+      <View
+        style={{
+          flexDirection: "row",
+          width: wp("57%"),
+          alignItems: "flex-end",
+        }}
+      >
+        <Text style={styles.manageBackupMessageText}>{messageOne}</Text>
         <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
-          {boldMessage}
+          {messageTwo}
         </Text>
-        <Text numberOfLines={1} style={{...styles.manageBackupMessageText, flex: 1}}>{normalMessage}</Text>
       </View>
     );
   };
-  
+
+  useEffect(() => {
+    const focusListener = navigation.addListener("didFocus", () => {
+      getMessageToShow();
+    });
+    return () => {
+      focusListener.remove();
+    };
+  }, []);
+
+  const getMessageToShow = () => {
+    let name = "";
+    let message = "";
+    if (levelHealth.length) {
+      for (let i = 0; i < levelHealth.length; i++) {
+        const element = levelHealth[i].levelInfo;
+        let j = 0;
+        if (currentLevel == 1 && i == 1) j = 2;
+        else if (currentLevel == 2 && i == 2) j = 4;
+        for (j; j < element.length; j++) {
+          const item = element[j];
+          if (j == 0 && item.status == "notAccessible") name = "Cloud";
+          if (j == 1 && item.status == "notAccessible")
+            name = "Security Question";
+          if (j == 2 && item.status == "notAccessible") name = "Primary Keeper";
+          if (j == 3 && item.status == "notAccessible") name = "Second Keeper";
+          if (j == 4 && item.status == "notAccessible") name = "Third Keeper";
+          if (j == 5 && item.status == "notAccessible") name = "Fourth Keeper";
+          if (item.name && item.status == "notAccessible") name = item.name;
+          if (item.updatedAt == 0 && item.status == "notAccessible") {
+            message = "Add ";
+          } else if (item.updatedAt && item.status == "notAccessible") {
+            message = " needs your attention";
+          } else {
+            message = "";
+          }
+          if (
+            element[j].status == "notAccessible" &&
+            name &&
+            message == "Add "
+          ) {
+            return { messageOne: message, messageTwo: name };
+          } else if (
+            element[j].status == "notAccessible" &&
+            name &&
+            message == " needs your attention"
+          ) {
+            return { messageOne: name, messageTwo: message };
+          }
+        }
+      }
+      return { messageOne: "Your wallet is now ", messageTwo: "secure" };
+    } else {
+      return { messageOne: "Upgrade Backup", messageTwo: " to improve health" };
+    }
+  };
+
   return (
     <View style={{ ...styles.headerViewContainer, flex: 1 }}>
-      <View style={{ flexDirection: 'row' }}>
+      <View style={{ flexDirection: "row" }}>
         <CurrencyKindToggleSwitch
           fiatCurrencyCode={CurrencyCode}
           onpress={() => {
-            dispatch(currencyKindSet(
-              prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-            ));
+            dispatch(
+              currencyKindSet(
+                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+              )
+            );
           }}
           isOn={prefersBitcoin}
         />
         <TouchableOpacity
           onPress={onPressNotifications}
           style={{
-            height: wp('10%'),
-            width: wp('10%'),
-            justifyContent: 'center',
-            marginLeft: 'auto',
+            height: wp("10%"),
+            width: wp("10%"),
+            justifyContent: "center",
+            marginLeft: "auto",
           }}
         >
           <ImageBackground
-            source={require('../../assets/images/icons/icon_notification.png')}
-            style={{ width: wp('6%'), height: wp('6%'), marginLeft: 'auto' }}
-            resizeMode={'contain'}
+            source={require("../../assets/images/icons/icon_notification.png")}
+            style={{ width: wp("6%"), height: wp("6%"), marginLeft: "auto" }}
+            resizeMode={"contain"}
           >
             {notificationData.findIndex((value) => value.read == false) > -1 ? (
               <View
                 style={{
                   backgroundColor: Colors.red,
-                  height: wp('2.5%'),
-                  width: wp('2.5%'),
-                  borderRadius: wp('2.5%') / 2,
-                  alignSelf: 'flex-end',
+                  height: wp("2.5%"),
+                  width: wp("2.5%"),
+                  borderRadius: wp("2.5%") / 2,
+                  alignSelf: "flex-end",
                 }}
               />
             ) : null}
           </ImageBackground>
         </TouchableOpacity>
       </View>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <View
           style={{
-            marginBottom: wp('2%'),
-            justifyContent: 'center',
-            alignItems: 'center',
+            marginBottom: wp("2%"),
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
+              flexDirection: "row",
+              alignItems: "flex-end",
               // marginBottom: wp('3%'),
             }}
           >
@@ -166,54 +250,54 @@ const HomeHeader = ({
               <Image
                 style={{
                   ...CommonStyles.homepageAmountImage,
-                  marginBottom: wp('1.5%'),
+                  marginBottom: wp("1.5%"),
                 }}
-                source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                source={require("../../assets/images/icons/icon_bitcoin_light.png")}
               />
             ) : currencyCode.includes(CurrencyCode) ? (
               setCurrencyCodeToImage(
                 getCurrencyImageName(CurrencyCode),
-                'light',
+                "light"
               )
             ) : (
               <Image
                 style={{
                   ...styles.cardBitCoinImage,
-                  marginBottom: wp('1.5%'),
+                  marginBottom: wp("1.5%"),
                 }}
-                source={getCurrencyImageByRegion(CurrencyCode, 'light')}
+                source={getCurrencyImageByRegion(CurrencyCode, "light")}
               />
             )}
             <Text style={styles.homeHeaderAmountText}>
-            {prefersBitcoin
-                  ? UsNumberFormat( netBalance )
-                  : exchangeRates && exchangeRates[ CurrencyCode ]
-                    ? (
-                      ( netBalance / SATOSHIS_IN_BTC ) *
-                      exchangeRates[ CurrencyCode ].last
-                    ).toFixed( 2 )
-                    : 0}
+              {prefersBitcoin
+                ? UsNumberFormat(netBalance)
+                : exchangeRates && exchangeRates[CurrencyCode]
+                ? (
+                    (netBalance / SATOSHIS_IN_BTC) *
+                    exchangeRates[CurrencyCode].last
+                  ).toFixed(2)
+                : 0}
             </Text>
             <Text style={styles.homeHeaderAmountUnitText}>
-              {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+              {prefersBitcoin ? "sats" : CurrencyCode.toLocaleLowerCase()}
             </Text>
           </View>
         </View>
       </View>
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginTop: 'auto',
+          flexDirection: "row",
+          alignItems: "center",
+          marginTop: "auto",
         }}
       >
         <ImageBackground
-          source={require('../../assets/images/icons/Keeper_shield_white.png')}
+          source={require("../../assets/images/icons/Keeper_shield_white.png")}
           style={{
-            width: wp('15%'),
-            height: wp('20%'),
-            justifyContent: 'center',
-            alignItems: 'center',
+            width: wp("15%"),
+            height: wp("20%"),
+            justifyContent: "center",
+            alignItems: "center",
           }}
         >
           <Text
@@ -223,23 +307,27 @@ const HomeHeader = ({
               fontSize: RFValue(18),
             }}
           >
-            {currentLevel ? currentLevel : ''}
+            {currentLevel ? currentLevel : ""}
           </Text>
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[0].status == 'accessible'){
-              navigation.navigate('ManageBackupKeeper');
+            if (
+              levelHealth[0] &&
+              levelHealth[0].levelInfo[0] &&
+              levelHealth[0].levelInfo[0].status == "accessible"
+            ) {
+              navigation.navigate("ManageBackupKeeper");
             } else {
-              navigation.navigate('ManageBackup');
+              navigation.navigate("ManageBackup");
             }
           }}
           style={styles.manageBackupMessageView}
         >
-          {getMessage('ugly', 'Security Question')}
+          {getMessage("ugly", "Security Question")}
           <AntDesign
-            style={{ marginLeft: 'auto' }}
-            name={'arrowright'}
+            style={{ marginLeft: "auto" }}
+            name={"arrowright"}
             color={Colors.white}
             size={17}
           />
@@ -253,7 +341,7 @@ export default HomeHeader;
 
 const styles = StyleSheet.create({
   headerViewContainer: {
-    marginTop: hp('1%'),
+    marginTop: hp("1%"),
     marginLeft: 20,
     marginRight: 20,
   },
@@ -261,25 +349,25 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue(25),
-    marginBottom: wp('2%'),
+    marginBottom: wp("2%"),
   },
   cardBitCoinImage: {
-    width: wp('3%'),
-    height: wp('3%'),
+    width: wp("3%"),
+    height: wp("3%"),
     marginRight: 5,
-    resizeMode: 'contain',
-    marginBottom: wp('0.7%'),
+    resizeMode: "contain",
+    marginBottom: wp("0.7%"),
   },
   manageBackupMessageView: {
-    marginLeft: wp('2%'),
-    borderRadius: wp('13') / 2,
-    height: wp('13'),
+    marginLeft: wp("2%"),
+    borderRadius: wp("13") / 2,
+    height: wp("13"),
     flex: 1,
     backgroundColor: Colors.deepBlue,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: wp('5%'),
-    paddingRight: wp('5%'),
+    flexDirection: "row",
+    alignItems: "center",
+    paddingLeft: wp("5%"),
+    paddingRight: wp("5%"),
   },
   manageBackupMessageTextHighlight: {
     color: Colors.white,
