@@ -11,11 +11,15 @@ import Config from 'react-native-config'
 import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
-  WYRE
+  WYRE,
+  RAMP
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
 class HexaConfig {
+  //RAMP details
+  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL || 'https://buy.ramp.network/'
+  public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE || 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID: string = Config.SWAN_CLIENT_ID || 'demo-web-client'
   public SWAN_BASE_URL: string = Config.SWAN_AUTH_URL || 'https://dev-api.swanbitcoin.com'
@@ -149,7 +153,7 @@ class HexaConfig {
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
     series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
     instance: {
-      max: Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -157,7 +161,7 @@ class HexaConfig {
   public FAST_BITCOINS: DerivativeAccount = {
     series: Config.BIT_FAST_BITCOINS_SERIES ? parseInt( Config.BIT_FAST_BITCOINS_SERIES.trim(), 10 ) : 11,
     instance: {
-      max: Config.BIT_FAST_BITCOINS_INSTANCE_COUNT ? parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_FAST_BITCOINS_INSTANCE_COUNT ? parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -165,7 +169,15 @@ class HexaConfig {
   public WYRE: DerivativeAccount = {
     series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
     instance: {
-      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 5,
+      using: 0,
+    },
+  };
+
+  public RAMP: DerivativeAccount = {
+    series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 31,
+    instance: {
+      max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -174,7 +186,7 @@ class HexaConfig {
     // corresponds to trusted channels
     series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
     instance: {
-      max: Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT ? parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ) : 1000,
+      max: Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT ? parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ) : 20,
       using: 0,
     },
   };
@@ -182,7 +194,7 @@ class HexaConfig {
   public DONATION_ACCOUNT: DonationDerivativeAccount = {
     series: Config.BIT_DONATION_ACCOUNT_SERIES ? parseInt( Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10 ) : 101,
     instance: {
-      max: Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -192,11 +204,12 @@ class HexaConfig {
     SUB_PRIMARY_ACCOUNT: this.SUB_PRIMARY_ACCOUNT,
     FAST_BITCOINS: this.FAST_BITCOINS,
     WYRE: this.WYRE,
+    RAMP: this.RAMP,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE ];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys( this.DERIVATIVE_ACC ).filter(
     ( account ) => !this.EJECTED_ACCOUNTS.includes( account ),
@@ -204,10 +217,6 @@ class HexaConfig {
 
   constructor( env: string ) {
     this.ENVIRONMENT = env || 'MAIN'
-    // console.log({ env });
-
-    // console.log({ BIT_SERVER_MODE: Config.BIT_SERVER_MODE.trim() });
-
     this.RELAY = this.BH_SERVERS.RELAY
     this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER
     this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = parseInt(

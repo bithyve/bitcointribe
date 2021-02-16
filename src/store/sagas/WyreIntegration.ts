@@ -3,6 +3,8 @@ import { call, put, select } from 'redux-saga/effects'
 import {
   FETCH_WYRE_RESERVATION,
   fetchWyreReservationSucceeded,
+  FETCH_WYRE_RECEIVE_ADDRESS,
+  fetchWyreReceiveAddressSucceeded
 } from '../actions/WyreIntegration'
 
 import {
@@ -38,9 +40,7 @@ function* fetchWyreReservationWorker( { payload } ) {
   const receiveAddress =  service.getReceivingAddress( WYRE, instance? instance: 1 )
 
   const wyreResponse = yield call( fetchWyreReservation, amount, receiveAddress, currencyCode, country )
-  console.log( {
-    wyreResponse
-  } )
+
   const { reservation, url, error } = wyreResponse.data
   if( error ) {
     yield put( fetchWyreReservationSucceeded( {
@@ -51,5 +51,30 @@ function* fetchWyreReservationWorker( { payload } ) {
   yield put( fetchWyreReservationSucceeded( {
     wyreReservationCode: reservation,
     wyreHostedUrl: url
+  } ) )
+}
+
+export const fetchWyreReceiveAddressWatcher = createWatcher(
+  fetchWyreReceiveAddressWorker,
+  FETCH_WYRE_RECEIVE_ADDRESS
+)
+
+function* fetchWyreReceiveAddressWorker( { payload } ) {
+  const { instance, sourceKind } = payload
+  let service: RegularAccount| SecureAccount
+  switch ( sourceKind ) {
+      case SourceAccountKind.SECURE_ACCOUNT:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
+        )
+        break
+      default:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
+        )
+  }
+  const receiveAddress =  service.getReceivingAddress( WYRE, instance? instance: 1 )
+  yield put( fetchWyreReceiveAddressSucceeded( {
+    wyreReceiveAddress: receiveAddress
   } ) )
 }

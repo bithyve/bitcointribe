@@ -16,6 +16,7 @@ import {
   DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
+  AverageTxFees,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -23,6 +24,9 @@ import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
+  SECURE_ACCOUNT,
+  WYRE,
+  RAMP
 } from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
@@ -276,7 +280,12 @@ export default class SecureHDWallet extends Bitcoin {
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
-
+        case RAMP:
+          if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
+          const rampAccount = this
+            .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
+          receivingAddress = rampAccount ? rampAccount.receivingAddress : ''
+          break
         default:
           receivingAddress = this.receivingAddress
     }
@@ -401,6 +410,30 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  private syncGapLimit = async () => {
+    // synching nextFreeAddressIndex and nextFreeChangeAddressIndex(typically during blind refresh)
+    let tryAgain = false
+    const hardGapLimit = 10
+    const externalAddress = this.createSecureMultiSig( this.nextFreeAddressIndex + hardGapLimit - 1 ).address
+
+    const internalAddress = this.createSecureMultiSig( this.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
+
+    if ( txCounts[ externalAddress ] > 0 ) {
+      this.nextFreeAddressIndex += this.gapLimit
+      tryAgain = true
+    }
+
+    if ( txCounts[ internalAddress ] > 0 ) {
+      this.nextFreeChangeAddressIndex += this.gapLimit
+      tryAgain = true
+    }
+
+    if ( tryAgain ) {
+      return this.syncGapLimit()
+    }
+  };
+
   public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
     // return new/found transactions(delta b/w hard and soft refresh)
     const txsFound: TransactionDetails[] = []
@@ -436,7 +469,7 @@ export default class SecureHDWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( hardRefresh?: boolean ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean, blindRefresh? :boolean ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
@@ -446,6 +479,8 @@ export default class SecureHDWallet extends Bitcoin {
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
+
+    if( blindRefresh ) await this.syncGapLimit()
 
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
@@ -638,12 +673,85 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+
+  private syncDerivativeAccGapLimit = async ( accountType, accountNumber ) => {
+    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    let tryAgain = false
+    let { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub } = this.derivativeAccounts[ accountType ][
+      accountNumber
+    ]
+
+    if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
+      nextFreeAddressIndex = 0
+    if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
+      nextFreeChangeAddressIndex = 0
+
+    const externalAddress = this.createSecureMultiSig(
+      nextFreeAddressIndex + this.derivativeGapLimit -
+        1,
+      false,
+      xpub,
+    ).address
+
+    const internalAddress = this.createSecureMultiSig(
+      nextFreeChangeAddressIndex + this.derivativeGapLimit -
+        1,
+      true,
+      xpub,
+    ).address
+
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
+
+    if ( txCounts[ externalAddress ] > 0 ) {
+      this.derivativeAccounts[ accountType ][
+        accountNumber
+      ].nextFreeAddressIndex += this.derivativeGapLimit
+      tryAgain = true
+    }
+
+    if ( txCounts[ internalAddress ] > 0 ) {
+      this.derivativeAccounts[ accountType ][
+        accountNumber
+      ].nextFreeChangeAddressIndex += this.derivativeGapLimit
+      tryAgain = true
+    }
+
+    if ( tryAgain ) {
+      return this.syncDerivativeAccGapLimit( accountType, accountNumber )
+    }
+  };
+
+  public blindRefreshCleanup = ( ) => {
+    for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+      if( accountType === TRUSTED_CONTACTS ) continue
+
+      for( let accountNumber = this.derivativeAccounts[ accountType ].instance.max; accountNumber > 0; accountNumber -- ){
+        if ( ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration ){
+          // dynamically generated derv account (blind refresh)
+          const { transactionDetails } = this.derivativeAccounts[ accountType ][ accountNumber ].transactions
+          // remove if no txs exist on such an account
+          if( !transactionDetails.length ){
+            delete this.derivativeAccounts[ accountType ][ accountNumber ];
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber - 1
+          } else {
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber
+            for( let remainingAcc = accountNumber; remainingAcc > 0; remainingAcc -- ){
+              ( this.derivativeAccounts[ accountType ][ remainingAcc ] as DerivativeAccountElements ).blindGeneration = null
+            }
+            break
+          }
+        }
+      }
+    }
+  }
+
   public fetchDerivativeAccBalanceTxs = async (
     accountsInfo: {
       accountType: string,
       accountNumber: number,
     }[],
     hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<{
     synched: boolean
     txsFound: TransactionDetails[]
@@ -658,9 +766,15 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     for( const { accountType, accountNumber } of accountsInfo ){
-      // preliminary checks
-      if ( !this.derivativeAccounts[ accountType ] )
-        throw new Error( `${accountType} does not exists` )
+
+      if( blindRefresh ){
+        if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
+          // blind derv-account generation
+          this.generateDerivativeXpub( accountType, accountNumber );
+          ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
+        }
+        await this.syncDerivativeAccGapLimit( accountType, accountNumber )
+      }
 
       let {
         nextFreeAddressIndex,
@@ -843,8 +957,10 @@ export default class SecureHDWallet extends Bitcoin {
 
       // find tx delta(missing txs): hard vs soft refresh
       if( hardRefresh ){
-        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
-        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        if( txIdMap ){
+          const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+          if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        } else txsFound.push( ...res.transactions.transactionDetails )
       }
 
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
@@ -867,6 +983,10 @@ export default class SecureHDWallet extends Bitcoin {
       }
     }
 
+    // blind refresh sub-acc cleanup
+    if( blindRefresh )
+      this.blindRefreshCleanup()
+
     return {
       synched: true,
       txsFound,
@@ -875,7 +995,8 @@ export default class SecureHDWallet extends Bitcoin {
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
-    hardRefresh?: boolean
+    hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<{
     synched: boolean;
     txsFound: TransactionDetails[]
@@ -889,10 +1010,11 @@ export default class SecureHDWallet extends Bitcoin {
       if ( dAccountType === TRUSTED_CONTACTS ) continue
       const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
-      if ( !derivativeAccounts.instance.using ) continue
+      const instanceToIterate = blindRefresh? derivativeAccounts.instance.max: derivativeAccounts.instance.using
+
       for (
         let accountNumber = 1;
-        accountNumber <= derivativeAccounts.instance.using;
+        accountNumber <= instanceToIterate;
         accountNumber++
       ) {
         accountsInfo.push( {
@@ -902,7 +1024,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     if( accountsInfo.length )
-      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh )
+      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh, blindRefresh )
   }
 
   public syncViaXpubAgent = async (
@@ -1055,6 +1177,24 @@ export default class SecureHDWallet extends Bitcoin {
             accountNumber
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
+          break
+        case RAMP:
+          const rampDerivativeAcc: DerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          const rampInUse = rampDerivativeAcc.instance.using
+          accountNumber = rampInUse + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const rampDerivativeInstance: DerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const rampUpdatedDervInstance = {
+            ...rampDerivativeInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = rampUpdatedDervInstance
+          accountId = rampUpdatedDervInstance.xpubId
           break
     }
 
@@ -1751,15 +1891,14 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
-  public transactionPrerequisites = async (
+  public transactionPrerequisites = (
     recipients: {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
-  ): Promise<
-    | {
+  ): {
         fee: number;
         balance: number;
         txPrerequisites?: undefined;
@@ -1768,8 +1907,7 @@ export default class SecureHDWallet extends Bitcoin {
         txPrerequisites: TransactionPrerequisite;
         fee?: undefined;
         balance?: undefined;
-      }
-  > => {
+      } => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[

@@ -46,6 +46,7 @@ import {
   twoFAValid,
   ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
+  BLIND_REFRESH,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -72,6 +73,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -158,7 +160,9 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
   options: {
     service?;
     loader?: boolean;
+    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
+    blindRefresh?: boolean;
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   }}} ) {
@@ -183,7 +187,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
       : service.hdWallet.transactions
   )
 
-  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh )
+  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh, payload.options.blindRefresh )
   console.log( {
     res
   } )
@@ -237,7 +241,9 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
         payload: {
           serviceTypes: [ payload.serviceType ],
           parentSynched,
-          hardRefresh: payload.options.hardRefresh
+          derivativeAccountsToSync: payload.options.derivativeAccountsToSync,
+          hardRefresh: payload.options.hardRefresh,
+          blindRefresh: payload.options.blindRefresh,
         },
       } )
       if( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
@@ -262,7 +268,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
-  let { serviceType, accountNumber, accountType, hardRefresh } = payload
+  let { serviceType, accountNumber, accountType, hardRefresh, blindRefresh } = payload
   const dervTxsFound : TransactionDescribing[] = []
 
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
@@ -287,7 +293,8 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   const res = yield call(
     ( service as BaseAccount | SecureAccount ).getDerivativeAccBalanceTransactions,
     accountsInfo,
-    hardRefresh
+    hardRefresh,
+    blindRefresh,
   )
 
   if (
@@ -322,7 +329,7 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean} } ) {
+function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, blindRefresh?: boolean} } ) {
   const dervTxsFound : TransactionDescribing[] = []
 
   for ( const serviceType of payload.serviceTypes ) {
@@ -338,11 +345,14 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
         ? service.hdWallet.derivativeAccounts
         : service.secureHDWallet.derivativeAccounts
     )
+    const { derivativeAccountsToSync } = payload
+    const accountsToSync = derivativeAccountsToSync && derivativeAccountsToSync.length ? derivativeAccountsToSync: config.DERIVATIVE_ACC_TO_SYNC
 
     const res = yield call(
       ( service as BaseAccount| SecureAccount ).syncDerivativeAccountsBalanceTxs,
-      config.DERIVATIVE_ACC_TO_SYNC,
-      payload.hardRefresh
+      accountsToSync,
+      payload.hardRefresh,
+      payload.blindRefresh
     )
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -861,6 +871,34 @@ export const autoSyncShellsWatcher = createWatcher(
   AUTO_SYNC_SHELLS
 )
 
+function* blindRefreshWorker() {
+  const netDeltaTxs: TransactionDescribing[] = []
+  for( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ){
+    const payload = {
+      serviceType: accountKind,
+      options: {
+        loader: true,
+        syncTrustedDerivative:
+        accountKind === TEST_ACCOUNT ? false : true,
+        derivativeAccountsToSync: Object.keys( config.DERIVATIVE_ACC ),
+        hardRefresh: true,
+        blindRefresh: true,
+      },
+    }
+
+    const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
+      payload
+    } )
+    if( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
+  }
+  return netDeltaTxs
+}
+
+export const blindRefreshWatcher = createWatcher(
+  blindRefreshWorker,
+  BLIND_REFRESH
+)
+
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   let subAccountId: string
   let subAccountInstanceNum: number
@@ -917,6 +955,73 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
         } else console.log( {
           err: derivativeSetupRes.err
         } )
+        break
+
+      case SubAccountKind.SERVICE:
+        switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+            case ServiceAccountKind.WYRE:
+              const wyreAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const wyreSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.WYRE,
+                wyreAccountDetails
+              )
+
+              if ( wyreSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+                subAccountId = wyreSetupRes.data.accountId
+                subAccountInstanceNum = wyreSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: wyreSetupRes.err
+                } )
+              }
+              break
+            case ServiceAccountKind.RAMP:
+              const rampAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const rampSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.RAMP,
+                rampAccountDetails
+              )
+
+              if ( rampSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+                subAccountId = rampSetupRes.data.accountId
+                subAccountInstanceNum = rampSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: rampSetupRes.err
+                } )
+              }
+              break
+        }
         break
   }
 

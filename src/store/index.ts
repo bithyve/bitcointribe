@@ -18,6 +18,7 @@ import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 
 
@@ -62,7 +63,8 @@ import {
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
   addNewSecondarySubAccountWatcher,
-  autoSyncShellsWatcher
+  autoSyncShellsWatcher,
+  blindRefreshWatcher
 } from './sagas/accounts'
 
 import {
@@ -122,8 +124,13 @@ import {
 } from './sagas/SwanIntegration'
 
 import {
-  fetchWyreReservationWatcher
+  fetchWyreReservationWatcher,
+  fetchWyreReceiveAddressWatcher
 } from './sagas/WyreIntegration'
+import {
+  fetchRampReservationWatcher,
+  fetchRampReceiveAddressWatcher
+} from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
 import { calculateSendMaxFeeWatcher } from './sagas/sending'
@@ -164,6 +171,7 @@ const rootSaga = function* () {
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
     autoSyncShellsWatcher,
+    blindRefreshWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -220,6 +228,11 @@ const rootSaga = function* () {
 
     // Wyre Integration
     fetchWyreReservationWatcher,
+    fetchWyreReceiveAddressWatcher,
+
+    // Ramp Integration
+    fetchRampReservationWatcher,
+    fetchRampReceiveAddressWatcher,
 
     //VersionHistory integration
     versionHistoryWatcher,
@@ -259,6 +272,7 @@ const rootReducer = combineReducers( {
   swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
+  rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
 } )
 
