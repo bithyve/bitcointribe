@@ -153,7 +153,7 @@ class HexaConfig {
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
     series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
     instance: {
-      max: Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -161,7 +161,7 @@ class HexaConfig {
   public FAST_BITCOINS: DerivativeAccount = {
     series: Config.BIT_FAST_BITCOINS_SERIES ? parseInt( Config.BIT_FAST_BITCOINS_SERIES.trim(), 10 ) : 11,
     instance: {
-      max: Config.BIT_FAST_BITCOINS_INSTANCE_COUNT ? parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_FAST_BITCOINS_INSTANCE_COUNT ? parseInt( Config.BIT_FAST_BITCOINS_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -169,7 +169,7 @@ class HexaConfig {
   public WYRE: DerivativeAccount = {
     series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
     instance: {
-      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -177,7 +177,7 @@ class HexaConfig {
   public RAMP: DerivativeAccount = {
     series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 31,
     instance: {
-      max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -186,7 +186,7 @@ class HexaConfig {
     // corresponds to trusted channels
     series: Config.BIT_TRUSTED_CONTACTS_SERIES ? parseInt( Config.BIT_TRUSTED_CONTACTS_SERIES.trim(), 10 ) : 1001,
     instance: {
-      max: Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT ? parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ) : 1000,
+      max: Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT ? parseInt( Config.BIT_TRUSTED_CONTACTS_INSTANCE_COUNT.trim(), 10 ) : 20,
       using: 0,
     },
   };
@@ -194,7 +194,7 @@ class HexaConfig {
   public DONATION_ACCOUNT: DonationDerivativeAccount = {
     series: Config.BIT_DONATION_ACCOUNT_SERIES ? parseInt( Config.BIT_DONATION_ACCOUNT_SERIES.trim(), 10 ) : 101,
     instance: {
-      max: Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 10,
+      max: Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT ? parseInt( Config.BIT_DONATION_ACCOUNT_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
