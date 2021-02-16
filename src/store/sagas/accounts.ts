@@ -85,6 +85,9 @@ import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import { createTrustedContactSubAccount } from './trustedContacts'
 import SyncStatus from '../../common/data/enums/SyncStatus'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import { rescanSucceeded } from '../actions/wallet-rescanning'
+import { RescannedTransactionData } from '../reducers/wallet-rescanning'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -97,6 +100,9 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   }}} ) {
+  // delta txs(hard refresh)
+  const txsFound : TransactionDescribing[] = []
+
   if ( payload.options.loader )
     yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   const service = payload.options.service
@@ -133,6 +139,8 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
       preFetchTransactions !== postFetchTransactions )
   ) {
     parentSynched = true
+    if( res.data.txsFound && res.data.txsFound.length ) txsFound.push( ...res.data.txsFound )
+
     if (
       payload.serviceType === TEST_ACCOUNT ||
       ( !payload.options.shouldNotInsert &&
@@ -148,7 +156,8 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
           SERVICES: updatedSERVICES
         }
       } )
-      return
+
+      return txsFound
     }
   } else if ( res.status !== 200 ) {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -156,18 +165,20 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
   }
 
   if (
+    res.status === 200 &&
     payload.options.syncTrustedDerivative &&
     ( payload.serviceType === REGULAR_ACCOUNT ||
       payload.serviceType === SECURE_ACCOUNT )
   ) {
     try {
-      yield call( syncDerivativeAccountsWorker, {
+      const dervTxsFound: TransactionDescribing[] = yield call( syncDerivativeAccountsWorker, {
         payload: {
           serviceTypes: [ payload.serviceType ],
           parentSynched,
           hardRefresh: payload.options.hardRefresh
         },
       } )
+      if( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
     } catch ( err ) {
       console.log( {
         err
@@ -179,6 +190,8 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
     // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
     yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   }
+
+  return txsFound
 }
 
 export const fetchBalanceTxWatcher = createWatcher(
@@ -188,6 +201,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   let { serviceType, accountNumber, accountType, hardRefresh } = payload
+  const dervTxsFound : TransactionDescribing[] = []
 
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
@@ -218,6 +232,9 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   if (
     res.status === 200
   ) {
+    const { txsFound } = res.data
+    if( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
+
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
       ...SERVICES,
@@ -235,6 +252,8 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     throw new Error( 'Failed to fetch balance/transactions from the indexer' )
   }
+
+  return dervTxsFound
 }
 
 export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
@@ -243,6 +262,8 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
 )
 
 function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean} } ) {
+  const dervTxsFound : TransactionDescribing[] = []
+
   for ( const serviceType of payload.serviceTypes ) {
     console.log( 'Syncing DAs for: ', serviceType )
 
@@ -270,6 +291,12 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
     )
 
     if ( res.status === 200 ) {
+      // accumulate delta txs(during hard refresh) from derivative accounts(if present)
+      if( res.data ){
+        const { txsFound } = res.data
+        if( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
+      }
+
       if (
         postFetchDerivativeAccounts !== preFetchDerivativeAccounts ||
         payload.parentSynched
@@ -289,9 +316,9 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
       console.log( 'Failed to sync derivative account' )
     }
-
-    // yield put(switchLoader(serviceType, 'derivativeBalanceTx'));
   }
+
+  return dervTxsFound
 }
 
 function* syncViaXpubAgentWorker( { payload } ) {
@@ -1038,9 +1065,18 @@ function* refreshAccountShellWorker( { payload } ) {
         accountNumber: primarySubAccount.instanceNumber,
         hardRefresh: options.hardRefresh
       }
-      yield call( fetchDerivativeAccBalanceTxWorker, {
+      const deltaTxs: TransactionDescribing[] = yield call( fetchDerivativeAccBalanceTxWorker, {
         payload
       } )
+
+      const rescanTxs : RescannedTransactionData[]= []
+      deltaTxs.forEach( ( deltaTx )=>{
+        rescanTxs.push( {
+          details: deltaTx,
+          accountShell: shell,
+        } )
+      } )
+      yield put( rescanSucceeded( rescanTxs ) )
     }
 
     yield put(
@@ -1057,9 +1093,18 @@ function* refreshAccountShellWorker( { payload } ) {
       },
     }
 
-    yield call( fetchBalanceTxWorker, {
+    const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
+
+    const rescanTxs : RescannedTransactionData[]= []
+    deltaTxs.forEach( ( deltaTx )=>{
+      rescanTxs.push( {
+        details: deltaTx,
+        accountShell: shell,
+      } )
+    } )
+    yield put( rescanSucceeded( rescanTxs ) )
 
     yield put(
       setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
@@ -1190,6 +1235,37 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
               } else {
                 console.log( {
                   err: wyreSetupRes.err
+                } )
+              }
+              break
+            case ServiceAccountKind.RAMP:
+              const rampAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const rampSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.RAMP,
+                rampAccountDetails
+              )
+
+              if ( rampSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+                subAccountId = rampSetupRes.data.accountId
+                subAccountInstanceNum = rampSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: rampSetupRes.err
                 } )
               }
               break

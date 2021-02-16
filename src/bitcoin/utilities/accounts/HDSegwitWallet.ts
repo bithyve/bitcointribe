@@ -16,11 +16,13 @@ import {
   DonationDerivativeAccountElements,
   SubPrimaryDerivativeAccountElements,
   WyreDerivativeAccountElements,
+  RampDerivativeAccountElements,
   DerivativeAccount,
   DerivativeAccountElements,
   InputUTXOs,
+  AverageTxFees,
 } from '../Interface'
-import axios, { AxiosResponse } from 'axios'
+import { AxiosResponse } from 'axios'
 import {
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
@@ -28,10 +30,12 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   WYRE,
+  RAMP,
   FAST_BITCOINS,
 } from '../../../common/constants/serviceTypes'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import _ from 'lodash'
 const { HEXA_ID } = config
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -248,21 +252,21 @@ export default class HDSegwitWallet extends Bitcoin {
     accountNumber?: number,
   ): string => {
     let receivingAddress
+    let account = null
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
+        case RAMP:
           if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
-          const account = this
+          account = this
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break
-
         default:
           receivingAddress = this.receivingAddress
     }
-
     return receivingAddress
   };
 
@@ -383,7 +387,8 @@ export default class HDSegwitWallet extends Bitcoin {
     }[],
     hardRefresh?: boolean,
   ): Promise<{
-    synched: boolean
+    synched: boolean,
+    txsFound: TransactionDetails[]
     }> => {
 
     const accounts = {
@@ -553,12 +558,13 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
+    const txsFound: TransactionDetails[] = []
     for( let { accountType, accountNumber, contactName } of accountsInfo ){
       if ( accountType === TRUSTED_CONTACTS ) {
         contactName = contactName.toLowerCase().trim()
         accountNumber = this.trustedContactToDA[ contactName ]
       }
-      const { xpubId }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
+      const { xpubId, txIdMap }  =  ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements )
       const res = synchedAccounts[ xpubId ]
       const { internalAddresses } = accountsTemp[ xpubId ]
 
@@ -597,6 +603,12 @@ export default class HDSegwitWallet extends Bitcoin {
         }
       }
 
+      // find tx delta(missing txs): hard vs soft refresh
+      if( hardRefresh ){
+        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+      }
+
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
         ...this.derivativeAccounts[ accountType ][ accountNumber ],
         lastBalTxSync: latestSyncTime,
@@ -618,7 +630,8 @@ export default class HDSegwitWallet extends Bitcoin {
     }
 
     return {
-      synched: true
+      synched: true,
+      txsFound,
     }
   };
 
@@ -627,6 +640,7 @@ export default class HDSegwitWallet extends Bitcoin {
     hardRefresh?: boolean
   ): Promise<{
     synched: boolean;
+    txsFound: TransactionDetails[];
   }> => {
     const accountsInfo :  {
       accountType: string,
@@ -642,9 +656,15 @@ export default class HDSegwitWallet extends Bitcoin {
         accountNumber <= derivativeAccounts.instance.using;
         accountNumber++
       ) {
-        accountsInfo.push( {
+        const info: {
+          accountType: string;
+          accountNumber: number;
+          contactName?: string;
+        } = {
           accountType: dAccountType, accountNumber
-        } )
+        }
+        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+        accountsInfo.push( info )
       }
     }
 
@@ -791,7 +811,6 @@ export default class HDSegwitWallet extends Bitcoin {
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
-
           const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
           accountNumber = derivativeAcc.instance.using + 1
@@ -808,7 +827,6 @@ export default class HDSegwitWallet extends Bitcoin {
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
           break
-
 
         case TRUSTED_CONTACTS:
           if ( !contactName )
@@ -830,6 +848,25 @@ export default class HDSegwitWallet extends Bitcoin {
             this.trustedContactToDA[ contactName ] = accountNumber
             accountId = derivativeInstance.xpubId
           }
+          break
+
+        case RAMP:
+          const RampDerivativeAcc: DerivativeAccount = this
+            .derivativeAccounts[ accountType ]
+          const RampInUse = RampDerivativeAcc.instance.using
+          accountNumber = RampInUse + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const RampDerivativeInstance: DerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          const RampUpdatedDervInstance = {
+            ...RampDerivativeInstance,
+            accountName: accountDetails.accountName,
+            accountDescription: accountDetails.accountDescription,
+          }
+          this.derivativeAccounts[ accountType ][
+            accountNumber
+          ] = RampUpdatedDervInstance
+          accountId = RampUpdatedDervInstance.xpubId
           break
     }
 
@@ -880,6 +917,13 @@ export default class HDSegwitWallet extends Bitcoin {
 
           wyreInstance.accountName = account.customDisplayName
           wyreInstance.accountDescription = account.customDescription
+          break
+        case RAMP:
+          const rampInstance: RampDerivativeAccountElements =
+              this.derivativeAccounts[ RAMP ][ account.instanceNumber ]
+
+          rampInstance.accountName = account.customDisplayName
+          rampInstance.accountDescription = account.customDescription
           break
     }
 
@@ -1155,6 +1199,23 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
+    // return new/found transactions(delta b/w hard and soft refresh)
+    const txsFound: TransactionDetails[] = []
+    const newTxIds: string[] = _.difference( Object.keys( currentTxIdMap ),  Object.keys( previousTxidMap ) )
+    const newTxIdMap = {
+    }
+    newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
+
+    if( newTxIds.length ){
+      transactions.transactionDetails.forEach( tx => {
+        if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
+      } )
+    }
+
+    return txsFound
+  }
+
   public setNewTransactions = ( transactions: Transactions ) => {
     // delta transactions setter
     const lastSyncTime = this.lastBalTxSync
@@ -1179,6 +1240,7 @@ export default class HDSegwitWallet extends Bitcoin {
       unconfirmedBalance: number;
     };
     transactions: Transactions;
+    txsFound: TransactionDetails[]
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
@@ -1324,19 +1386,19 @@ export default class HDSegwitWallet extends Bitcoin {
 
     this.unconfirmedUTXOs = unconfirmedUTXOs
     this.confirmedUTXOs = confirmedUTXOs
+    this.balances = balances
     this.addressQueryList = addressQueryList
     this.nextFreeAddressIndex = nextFreeAddressIndex
     this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
     this.receivingAddress = this.getAddress( false, this.nextFreeAddressIndex )
 
-    this.setNewTransactions( transactions )
-
-    this.balances = balances
+    const txsFound: TransactionDetails[] = hardRefresh? this.findTxDelta( this.txIdMap, txIdMap, transactions ) : []
     this.transactions = transactions
     this.txIdMap = txIdMap
+    this.setNewTransactions( transactions )
 
     return {
-      balances, transactions
+      balances, transactions, txsFound
     }
   };
 
@@ -1462,15 +1524,14 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
-  public transactionPrerequisites = async (
+  public transactionPrerequisites = (
     recipients: {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
-  ): Promise<
-    | {
+  ): {
         fee: number;
         balance: number;
         txPrerequisites?: undefined;
@@ -1479,8 +1540,7 @@ export default class HDSegwitWallet extends Bitcoin {
         txPrerequisites: TransactionPrerequisite;
         fee?: undefined;
         balance?: undefined;
-      }
-  > => {
+      } => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[

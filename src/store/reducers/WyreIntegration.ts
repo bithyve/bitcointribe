@@ -2,8 +2,9 @@ import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import {
   FETCH_WYRE_RESERVATION_SUCCEEDED,
   CLEAR_WYRE_CACHE,
-  FETCH_WYRE_RESERVATION_COMPLETED
-
+  FETCH_WYRE_RESERVATION_COMPLETED,
+  FETCH_WYRE_RECEIVE_ADDRESS_SUCCEEDED,
+  FETCH_WYRE_RECEIVE_ADDRESS_COMPLETED
 } from '../actions/WyreIntegration'
 
 
@@ -18,6 +19,10 @@ export type WyreIntegrationState = {
   hasWyreReservationFetchSucceeded: boolean;
   hasWyreReservationFetchFailed: boolean;
   fetchWyreReservationFailedMessage: string | null;
+
+  wyreReceiveAddress: string | null;
+  hasWyreReceiveAddressSucceeded: boolean;
+  hasWyreReceiveAddressFailed: boolean;
 
   pendingWyreOrder: WyreOrder | null;
   isProcessingWyreOrder: boolean;
@@ -35,6 +40,11 @@ const INITIAL_STATE: WyreIntegrationState = {
   hasWyreReservationFetchSucceeded: false,
   hasWyreReservationFetchFailed: false,
   fetchWyreReservationFailedMessage: null,
+
+
+  wyreReceiveAddress: null,
+  hasWyreReceiveAddressSucceeded: false,
+  hasWyreReceiveAddressFailed: false,
 
   pendingWyreOrder: null,
   isProcessingWyreOrder: false,
@@ -60,6 +70,18 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           ...state,
           hasWyreReservationFetchSucceeded: false,
           hasWyreReservationFetchFailed: false,
+        }
+      case FETCH_WYRE_RECEIVE_ADDRESS_SUCCEEDED:
+        return {
+          ...state,
+          wyreReceiveAddress: action.payload.data.wyreReceiveAddress,
+          hasWyreReceiveAddressSucceeded: true
+        }
+      case FETCH_WYRE_RECEIVE_ADDRESS_COMPLETED:
+        return {
+          ...state,
+          hasWyreReceiveAddressSucceeded: false,
+          hasWyreReceiveAddressFailed: false,
         }
       case CLEAR_WYRE_CACHE:
         return {

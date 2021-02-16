@@ -67,6 +67,12 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
             navigation.navigate( 'NewWyreAccountDetails', {
               currentSubAccount: selectedChoice,
             } )
+            break
+          case ServiceAccountKind.RAMP:
+            navigation.navigate( 'NewRampAccountDetails', {
+              currentSubAccount: selectedChoice,
+            } )
+            break
           default:
             break
       }

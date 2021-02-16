@@ -3,10 +3,14 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { WyreOrder } from '../reducers/WyreIntegration'
 
 export const FETCH_WYRE_RESERVATION = 'FETCH_WYRE_RESERVATION'
-
 export const FETCH_WYRE_RESERVATION_FAILED = 'FETCH_WYRE_RESERVATION_FAILED'
 export const FETCH_WYRE_RESERVATION_SUCCEEDED = 'FETCH_WYRE_RESERVATION_SUCCEEDED'
 export const FETCH_WYRE_RESERVATION_COMPLETED = 'FETCH_WYRE_RESERVATION_COMPLETED'
+
+export const FETCH_WYRE_RECEIVE_ADDRESS = 'FETCH_WYRE_RECEIVE_ADDRESS'
+export const FETCH_WYRE_RECEIVE_ADDRESS_FAILED = 'FETCH_WYRE_RECEIVE_ADDRESS_FAILED'
+export const FETCH_WYRE_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_WYRE_RECEIVE_ADDRESS_SUCCEEDED'
+export const FETCH_WYRE_RECEIVE_ADDRESS_COMPLETED = 'FETCH_WYRE_RECEIVE_ADDRESS_COMPLETED'
 
 export const WYRE_ORDER_FAILED = 'WYRE_ORDER_FAILED'
 export const WYRE_ORDER_SUCCEEDED = 'WYRE_ORDER_SUCCEEDED'
@@ -20,7 +24,7 @@ export enum WyreActionKind {
   CREATE_WYRE_ACCOUNT_SHELL,
   LINK_HEXA_AND_WYRE_SUB_ACCOUNTS,
   FETCH_WYRE_RESERVATION,
-
+  FETCH_WYRE_RECEIVE_ADDRESS,
   CLEAR_WYRE_CACHE
 }
 
@@ -42,6 +46,13 @@ export interface WyreReservationFetchAction extends Action {
   };
 }
 
+export interface WyreReceiveAddressFetchAction extends Action {
+  type: typeof FETCH_WYRE_RECEIVE_ADDRESS;
+  payload: {
+    instance?: number;
+    sourceKind?: SourceAccountKind;
+  }
+}
 
 export const fetchWyreReservation = (
   amount?: number,
@@ -83,6 +94,42 @@ export const fetchWyreReservationSucceeded = ( data ) => {
   }
 }
 
+export const fetchWyreReceiveAddress = (
+  instance?: number,
+  sourceKind?: SourceAccountKind,
+):WyreReceiveAddressFetchAction  => {
+  return {
+    type: FETCH_WYRE_RECEIVE_ADDRESS,
+    payload: {
+      instance, sourceKind
+    },
+  }
+}
+
+
+export const fetchWyreReceiveAddressCompleted = ( ) => {
+  return {
+    type: FETCH_WYRE_RECEIVE_ADDRESS_COMPLETED,
+  }
+}
+
+export const fetchWyreReceiveAddressFailed = ( data ) => {
+  return {
+    type: FETCH_WYRE_RECEIVE_ADDRESS_FAILED,
+    payload: {
+      data
+    },
+  }
+}
+
+export const fetchWyreReceiveAddressSucceeded = ( data ) => {
+  return {
+    type: FETCH_WYRE_RECEIVE_ADDRESS_SUCCEEDED,
+    payload: {
+      data
+    },
+  }
+}
 
 export interface WyreOrderSuccessAction extends Action {
   type: typeof WYRE_ORDER_SUCCEEDED;
