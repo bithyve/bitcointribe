@@ -126,6 +126,7 @@ import {
 } from './sagas/WyreIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
+import { calculateSendMaxFeeWatcher } from './sagas/sending'
 
 const rootSaga = function* () {
   const sagas = [
@@ -222,6 +223,9 @@ const rootSaga = function* () {
 
     //VersionHistory integration
     versionHistoryWatcher,
+
+    // Sending
+    calculateSendMaxFeeWatcher,
   ]
 
   yield all(

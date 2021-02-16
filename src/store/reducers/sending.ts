@@ -1,10 +1,12 @@
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 
-export type AmountDesignations = Record<string, Satoshis>;
+type RecipientID = string;
+
+export type AmountDesignations = Record<RecipientID, Satoshis>;
 
 export type SendingState = {
   sourceAccountShell: AccountShell | null;
@@ -17,6 +19,8 @@ export type SendingState = {
   isSendingInProgress: boolean;
   hasSendingFailed: boolean;
   sendingFailedErrorMessage: string | null;
+
+  sendMaxFee: Satoshis;
 };
 
 const INITIAL_STATE: SendingState = {
@@ -35,6 +39,9 @@ const INITIAL_STATE: SendingState = {
 
   hasSendingFailed: false,
   sendingFailedErrorMessage: null,
+
+  sendMaxFee: 0,
+
   /*
   the UI needs to keep track of fees to display on screen
   Three level of fees priority with time estimate for each
@@ -93,7 +100,15 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
         }
 
       case SENDING_COMPLETED:
-        return INITIAL_STATE
+        return {
+          ...INITIAL_STATE
+        }
+
+      case SEND_MAX_FEE_CALCULATED:
+        return {
+          ...state,
+          sendMaxFee: action.payload,
+        }
 
       default:
         return state

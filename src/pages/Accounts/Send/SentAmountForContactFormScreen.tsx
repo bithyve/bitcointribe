@@ -21,6 +21,8 @@ import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import { calculateSendMaxFee } from '../../../store/actions/sending'
+import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
 
 export type NavigationParams = {
 };
@@ -39,20 +41,25 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-
-  const orderedRecipients = useMemo( () => {
-    return Array.from( selectedRecipients ).reverse()
-  }, [ selectedRecipients ] )
-
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( null )
   const [ noteText, setNoteText ] = useState( '' )
+  const averageTransactionFees = useAverageTransactionFees()
+
+  const availableBalance = useMemo( () => {
+    return AccountShell.getTotalBalance( sourceAccountShell )
+  }, [ sourceAccountShell ] )
+
+  const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
-    const availableBalance = AccountShell.getTotalBalance( sourceAccountShell )
 
-    return `${title} (Available to spend: ${useFormattedAmountText( availableBalance )} sats)`
-  }, [ sourceAccountShell, sourcePrimarySubAccount ] )
+    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
+  }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
+
+  const orderedRecipients = useMemo( () => {
+    return Array.from( selectedRecipients || [] ).reverse()
+  }, [ selectedRecipients ] )
 
 
   function handleRecipientRemoval( recipient: RecipientDescribing ) {
@@ -65,6 +72,14 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   function handleAddRecipientButtonPress() {
 
+  }
+
+  function handleSendMaxPress() {
+    dispatch( calculateSendMaxFee( {
+      numberOfRecipients: selectedRecipients.length,
+      accountShellID: sourceAccountShell.id,
+      feePerByte: averageTransactionFees.feePerByte,
+    } ) )
   }
 
   return (
@@ -83,14 +98,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         alignItems: 'flex-start',
         paddingHorizontal: 24,
         marginBottom: 24,
-        // backgroundColor: 'red',
-        // overflow: 'hidden'
       }}>
-        {/* <View style={{
-            // flexDirection: 'row',
-            // justifyContent: 'center',
-            // paddingHorizontal: 24
-          }}> */}
         <Text style={{
           marginRight: 4
         }}>
@@ -111,6 +119,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         <BalanceEntryFormGroup
           subAccountKind={sourcePrimarySubAccount.kind}
           onAmountChanged={setSelectedAmount}
+          onSendMaxPressed={handleSendMaxPress}
         />
 
         {sourcePrimarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT && (

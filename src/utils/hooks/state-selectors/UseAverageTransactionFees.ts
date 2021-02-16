@@ -1,10 +1,10 @@
 import { useMemo } from 'react'
 import useAccountsState from './accounts/UseAccountsState'
 
-export default function useExchangeRates(): unknown {
+export default function useAverageTransactionFees(): unknown {
   const accountsState = useAccountsState()
 
   return useMemo( () => {
-    return accountsState.exchangeRates
-  }, [ accountsState.exchangeRates ] )
+    return accountsState.averageTxFees
+  }, [ accountsState.averageTxFees ] )
 }
