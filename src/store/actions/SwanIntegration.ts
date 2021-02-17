@@ -1,7 +1,9 @@
 export const CLEAR_SWAN_CACHE = 'CLEAR_SWAN_CACHE'
+export const FETCH_SWAN_AUTHENTICATION_URL_STARTED = 'FETCH_SWAN_AUTHENTICATION_URL_STARTED'
 export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
 export const FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED = 'FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED'
 
+export const REDEEM_SWAN_CODE_FOR_TOKEN_STARTED = 'REDEEM_SWAN_CODE_FOR_TOKEN_STARTED'
 export const REDEEM_SWAN_CODE_FOR_TOKEN = 'REDEEM_SWAN_CODE_FOR_TOKEN'
 export const REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED = 'REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED'
 
@@ -48,6 +50,12 @@ export const fetchSwanAuthenticationUrl = ( data ) =>  {
   }
 }
 
+export const fetchSwanAuthenticationUrlInitiated = () => {
+  return {
+    type: FETCH_SWAN_AUTHENTICATION_URL_STARTED,
+  }
+}
+
 export const fetchSwanAuthenticationUrlSucceeded = ( data ) => {
   return {
     type: FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
@@ -63,6 +71,12 @@ export const redeemSwanCodeForToken = ( data ) => {
     payload : {
       data
     }
+  }
+}
+
+export const redeemSwanCodeForTokenInitiated = () => {
+  return {
+    type: REDEEM_SWAN_CODE_FOR_TOKEN_STARTED,
   }
 }
 

@@ -1,11 +1,12 @@
 import {
   CLEAR_SWAN_CACHE,
+  FETCH_SWAN_AUTHENTICATION_URL_STARTED,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
+  REDEEM_SWAN_CODE_FOR_TOKEN_STARTED,
   REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
-
   LINK_SWAN_WALLET,
 } from '../actions/SwanIntegration'
 
@@ -17,8 +18,12 @@ export type SwanIntegrationState = {
   code_challenge: string | null,
   state: string | null,
   nonce: number | null,
+  hasFetchSwanAuthenticationUrlInitiated: boolean | null,
   hasFetchSwanAuthenticationUrlSucceeded: boolean | null,
-  hasRedeemSwanCodeForTokenSucceeded: boolen | null,
+  hasFetchSwanAuthenticationUrlCompleted: boolean | null,
+  hasRedeemSwanCodeForTokenSucceeded: boolean | null,
+  hasRedeemSwanCodeForTokenCompleted: boolean | null,
+  hasRedeemSwanCodeForTokenInitiated: boolean | null,
   swanAuthenticatedCode: string | null,
   isSwanRedeemCodeInProgress: boolean | null,
   swanToken: string | null
@@ -52,8 +57,12 @@ const INITIAL_STATE: SwanIntegrationState = {
   code_verifier: null,
   state: null,
   nonce: null,
+  hasFetchSwanAuthenticationUrlInitiated: false,
   hasFetchSwanAuthenticationUrlSucceeded: false,
+  hasFetchSwanAuthenticationUrlCompleted: false,
   hasRedeemSwanCodeForTokenSucceeded: false,
+  hasRedeemSwanCodeForTokenCompleted: false,
+  hasRedeemSwanCodeForTokenInitiated: false,
   swanAuthenticatedCode: null,
   isSwanRedeemCodeInProgress: false,
   swanToken: null,
@@ -83,34 +92,42 @@ const INITIAL_STATE: SwanIntegrationState = {
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
       case CLEAR_SWAN_CACHE:
-        console.log( '***->clearing cache' )
+        return {
+          ...INITIAL_STATE
+        }
+      case FETCH_SWAN_AUTHENTICATION_URL_STARTED:
         return {
           ...state,
-          isSwanAuthenticationInProgress: null,
-          hasFetchSwanAuthenticationUrlSucceeded: null,
-          swanAuthenticationUrl: null,
-          code_challenge: null,
-          code_verifier: null,
-          nonce: null,
-          state: null,
-          swanAuthenticatedCode: null,
-          hasRedeemSwanCodeForTokenSucceeded: null
+          hasFetchSwanAuthenticationUrlInitiated: true
         }
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
           ...state,
           isSwanAuthenticationInProgress: true,
+          hasFetchSwanAuthenticationUrlInitiated: true,
           hasFetchSwanAuthenticationUrlSucceeded: true,
+          hasFetchSwanAuthenticationUrlCompleted: true,
           swanAuthenticationUrl: action.payload.data.swanAuthenticationUrl,
           code_challenge: action.payload.data.code_challenge,
           code_verifier: action.payload.data.code_verifier,
           nonce: action.payload.data.nonce,
-          state: action.payload.data.state
+          state: action.payload.data.state,
+          swanAuthenticatedCode: null,
+          hasRedeemSwanCodeForTokenSucceeded: false,
+          hasRedeemSwanCodeForTokenCompleted: false,
+          hasRedeemSwanCodeForTokenInitiated: false,
+        }
+      case REDEEM_SWAN_CODE_FOR_TOKEN_STARTED:
+        return {
+          ...state,
+          hasRedeemSwanCodeForTokenInitiated: true,
         }
       case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
+        console.log( '@@@ -> Insidie code succeeded reducer action.payload.data', action.payload.data )
         return {
           ...state,
           hasRedeemSwanCodeForTokenSucceeded: true,
+          hasRedeemSwanCodeForTokenCompleted: true,
           swanAuthenticatedCode: action.payload.data.swanAuthenticatedCode
         }
       case LINK_SWAN_WALLET:
@@ -120,11 +137,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case LINK_SWAN_WALLET_FAILED:
-        console.log(
-          'action.payload.linkSwanWalletFailedMessage',
-          action.payload.linkSwanWalletFailed,
-          action.payload.linkSwanWalletFailedMessage,
-        )
         return {
           ...state,
           isLinkingSwanWallet: false,
@@ -133,10 +145,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case LINK_SWAN_WALLET_SUCCEEDED:
-        console.log(
-          'payload.swanWalletDetails',
-          action.payload.swanWalletDetails,
-        )
         return {
           ...state,
           isLinkingSwanWallet: false,
