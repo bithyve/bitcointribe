@@ -111,6 +111,7 @@
     "react-native-localize": "^1.4.1",
     "react-native-mail": "4.1.0",
     "react-native-os": "^1.2.6",
+    "react-native-pkce-challenge": "^3.0.0",
     "react-native-print": "^0.6.0",
     "react-native-progress-circle": "^2.1.0",
     "react-native-push-notification": "^7.0.0",
