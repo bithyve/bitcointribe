@@ -42,7 +42,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   },
   {
     title: 'Buy with Wyre     (COMING SOON)',
-    subtitle: 'Buy using ApplePay or Debit Card',
+    subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
     imageSource: require( '../../assets/images/icons/wyre_notext_small_disabled.png' ),
     disabled: true
