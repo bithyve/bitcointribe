@@ -556,7 +556,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
     PushNotification.getScheduledLocalNotifications( ( notiifcations )=>{
-      console.log( 'SCHEDULE notiifcations', notiifcations )
+      console.log( 'SCHEDULE notifications', notiifcations )
     } )
 
   };
@@ -1049,7 +1049,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     console.log( 'Home::handleDeepLinking::URL: ' + url )
 
     const splits = url.split( '/' )
-    console.log( `url length ${splits.length} last param ${splits[ splits.length-1 ]} second last param ${splits[ splits.length-2 ]}` )
     if ( splits.includes( 'swan' ) ) {
       this.setState( {
         swanDeepLinkContent:url,

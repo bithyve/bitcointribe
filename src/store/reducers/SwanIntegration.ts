@@ -123,7 +123,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasRedeemSwanCodeForTokenInitiated: true,
         }
       case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
-        console.log( '@@@ -> Insidie code succeeded reducer action.payload.data', action.payload.data )
         return {
           ...state,
           hasRedeemSwanCodeForTokenSucceeded: true,

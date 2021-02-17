@@ -15,7 +15,7 @@ import { clearSwanCache, fetchSwanAuthenticationUrl, redeemSwanCodeForToken } fr
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 
-let boottomSheetRenderCount = 0
+const boottomSheetRenderCount = 0
 type Props = {
   swanDeepLinkContent: string | null;
   swanFromDeepLink: boolean | null;
@@ -24,12 +24,6 @@ type Props = {
 }
 
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu, onClickSetting }: Props ) => {
-  console.log( '@@@ -> Inside Bottom Sheet Swan Info ', {
-    boottomSheetRenderCount: boottomSheetRenderCount++,
-    ...{
-      swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu
-    }
-  } )
   const dispatch = useDispatch()
   const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedCode, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted } = useSwanIntegrationState()
   // useEffect( ()=>{
@@ -37,9 +31,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
   // }, [] )
 
   if ( swanFromBuyMenu ) {
-    console.log( '@@@ Coming from buy menu fetchSwanAuthenticationUrl', {
-      hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlCompleted, hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl
-    } )
     if( !hasFetchSwanAuthenticationUrlInitiated ) dispatch( fetchSwanAuthenticationUrl( {
     } ) )
   }
@@ -51,19 +42,14 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
   }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )
 
   if( swanFromDeepLink && !hasRedeemSwanCodeForTokenInitiated ) {
-    console.log( '@@@ -> Inside call to dispatch code redeem' )
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
 
   useEffect( ()=>{
     if( swanFromDeepLink ) {
-      console.log( '@@@ coming from deep link', swanDeepLinkContent )
       swanFromBuyMenu = false
-      console.log( '@@@ redeem changed', hasRedeemSwanCodeForTokenInitiated,  hasRedeemSwanCodeForTokenCompleted, hasRedeemSwanCodeForTokenSucceeded, swanAuthenticatedCode )
       if( hasRedeemSwanCodeForTokenCompleted )
-        console.log( {
-          swanAuthenticatedCode
-        } )
+        console.log( 'success!' )
     }
   }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedCode ] )
 
