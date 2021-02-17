@@ -46,12 +46,12 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
       <ScrollView
         ref={scrollViewRef}
         style={styles.modalContainer}
-        snapToInterval={hp('80%')}
+        snapToInterval={hp('85%')}
         decelerationRate="fast"
       >
         <View
           style={{
-            height: hp('80%'),
+            height: hp('85%'),
             paddingBottom: hp('6%'),
             marginTop: hp('2%'),
             justifyContent: 'space-between',
@@ -80,7 +80,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             />
           </View>
           <Text
-           style={styles.infoText}
+           style={{...styles.infoText, marginBottom: wp('8%'),}}
           >
             Be careful: If you end up sending sats from your Checking Account to your Savings Account and then decide to spend sats from your Savings Account, it will cost you much more in transaction fees every time.
           </Text>
@@ -89,7 +89,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             onPress={() => {
               scrollViewRef.current?.scrollTo({
                 x: 0,
-                y: hp('80%'),
+                y: hp('85%'),
                 animated: true,
               });
             }}
@@ -106,7 +106,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
         </View>
         <View
           style={{
-            height: hp('80%'),
+            height: hp('85%'),
             // paddingTop: hp('2%'),
             paddingBottom: hp('2%'),
             justifyContent: 'space-between',
@@ -137,7 +137,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             onPress={() => {
               scrollViewRef.current?.scrollTo({
                 x: 0,
-                y: hp('162%'),
+                y: hp('170%'),
                 animated: true,
               });
             }}
@@ -154,7 +154,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
         </View>
         <View
           style={{
-            height: hp('80%'),
+            height: hp('85%'),
             marginTop: hp('2%'),
           }}
         >
@@ -211,5 +211,7 @@ separatorView: {
   borderColor: Colors.white,
   width: wp('70%'),
   height: 0,
+  marginBottom: wp('1%'),
+  marginTop: wp('1%'),
 }
 });

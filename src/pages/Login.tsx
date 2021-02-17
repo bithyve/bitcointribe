@@ -29,7 +29,6 @@ import ModalHeader from '../components/ModalHeader'
 import RelayServices from '../bitcoin/services/RelayService'
 import { initMigration } from '../store/actions/preferences'
 import { clearAccountSyncCache } from '../store/actions/accounts'
-import BottomInfoBox from '../components/BottomInfoBox'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
 
@@ -641,13 +640,6 @@ export default function Login( props ) {
               </Text>
             </TouchableOpacity>
           </View>
-
-          <BottomInfoBox
-            title={content.login.tos}
-            infoText={content.login.tos_agree}
-            linkText={content.login.tos}
-            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
-          />
         </View>
         <BottomSheet
           onCloseEnd={() => { }}
