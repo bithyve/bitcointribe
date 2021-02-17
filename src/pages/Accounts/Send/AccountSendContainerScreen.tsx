@@ -58,9 +58,11 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 
   function handleRecipientSelection( recipient: RecipientDescribing ) {
-    dispatch( addRecipientForSending( recipient ) )
-    dispatch( recipientSelectedForAmountSetting( recipient ) )
+    if ( isRecipientSelectedForSending( recipient ) == false ) {
+      dispatch( addRecipientForSending( recipient ) )
+    }
 
+    dispatch( recipientSelectedForAmountSetting( recipient ) )
     navigateToSendDetails( recipient )
   }
 

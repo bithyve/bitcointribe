@@ -67,11 +67,11 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   }
 
   function handleConfirmationButtonPress() {
-
+    navigation.navigate( 'SendConfirmation' )
   }
 
   function handleAddRecipientButtonPress() {
-
+    navigation.goBack()
   }
 
   function handleSendMaxPress() {

@@ -5,6 +5,7 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
 import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
+import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
 
 
 const SubAccountTFAHelpStack = createStackNavigator( {
@@ -26,12 +27,12 @@ const SendStack = createStackNavigator(
         title: 'Send To Contact'
       },
     },
-    // SendConfirmation: {
-    //   screen: SendConfirmationScreen,
-    //   navigationOptions: {
-    //     header: null,
-    //   },
-    // },
+    SendConfirmation: {
+      screen: AccountSendConfirmationContainerScreen,
+      navigationOptions: {
+        title: 'Send Confirmation'
+      },
+    },
     SubAccountTFAHelp: {
       screen: SubAccountTFAHelpStack,
       navigationOptions: {

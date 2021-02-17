@@ -51,13 +51,7 @@ const RecipientSelectionStrip: React.FC<Props> = ( {
         renderItem={( { item: recipient }: { item: RecipientDescribing } ) => (
           <TouchableOpacity
             style={styles.listItemTouchableWrapper}
-            onPress={() => {
-              if ( isSelected( recipient ) == false ) {
-                onRecipientSelected( recipient )
-              } else {
-                // TODO: Implement removal from selection state
-              }
-            }}
+            onPress={() => onRecipientSelected( recipient ) }
           >
             {recipient.kind == RecipientKind.CONTACT && (
               <SendableContactCarouselItem

@@ -226,7 +226,7 @@ const Navigator = createSwitchNavigator( {
 export type BaseNavigationProp = {
   getParam: ( param: string ) => any;
   setParams: ( params: Record<string, unknown> ) => void;
-  navigate: ( route: string, params: Record<string, unknown> ) => void;
+  navigate: ( route: string, params?: Record<string, unknown> ) => void;
 } & Record<string, unknown>;
 
 export default createAppContainer( Navigator )
