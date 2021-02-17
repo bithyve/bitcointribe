@@ -334,6 +334,8 @@ const updatePrimarySubAccounts = (
     return shell
   } )
 
+  // TODO: remap primary sub-account shells from backend (ejected derv accounts), aids accountShell recovery during blind-refresh @Adv-Sharing
+
   return updatedAccountShells
 }
 

@@ -55,6 +55,7 @@ import {
   ADD_NEW_SECONDARY_SUBACCOUNT,
   ContactInfo,
   clearAccountSyncCache,
+  BLIND_REFRESH,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -88,6 +89,7 @@ import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
 import { RescannedTransactionData } from '../reducers/wallet-rescanning'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -96,7 +98,9 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
   options: {
     service?;
     loader?: boolean;
+    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
+    blindRefresh?: boolean;
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   }}} ) {
@@ -121,7 +125,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
       : service.hdWallet.transactions
   )
 
-  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh )
+  const res = yield call( ( service as BaseAccount | SecureAccount ).getBalanceTransactions, payload.options.hardRefresh, payload.options.blindRefresh )
   console.log( {
     res
   } )
@@ -175,7 +179,9 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
         payload: {
           serviceTypes: [ payload.serviceType ],
           parentSynched,
-          hardRefresh: payload.options.hardRefresh
+          derivativeAccountsToSync: payload.options.derivativeAccountsToSync,
+          hardRefresh: payload.options.hardRefresh,
+          blindRefresh: payload.options.blindRefresh,
         },
       } )
       if( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
@@ -200,7 +206,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
-  let { serviceType, accountNumber, accountType, hardRefresh } = payload
+  let { serviceType, accountNumber, accountType, hardRefresh, blindRefresh } = payload
   const dervTxsFound : TransactionDescribing[] = []
 
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
@@ -226,7 +232,8 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   const res = yield call(
     ( service as BaseAccount | SecureAccount ).getDerivativeAccBalanceTransactions,
     accountsInfo,
-    hardRefresh
+    hardRefresh,
+    blindRefresh,
   )
 
   if (
@@ -261,7 +268,7 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, hardRefresh?: boolean} } ) {
+function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, blindRefresh?: boolean} } ) {
   const dervTxsFound : TransactionDescribing[] = []
 
   for ( const serviceType of payload.serviceTypes ) {
@@ -277,11 +284,14 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
         ? service.hdWallet.derivativeAccounts
         : service.secureHDWallet.derivativeAccounts
     )
+    const { derivativeAccountsToSync } = payload
+    const accountsToSync = derivativeAccountsToSync && derivativeAccountsToSync.length ? derivativeAccountsToSync: config.DERIVATIVE_ACC_TO_SYNC
 
     const res = yield call(
       ( service as BaseAccount| SecureAccount ).syncDerivativeAccountsBalanceTxs,
-      config.DERIVATIVE_ACC_TO_SYNC,
-      payload.hardRefresh
+      accountsToSync,
+      payload.hardRefresh,
+      payload.blindRefresh
     )
 
     const postFetchDerivativeAccounts = JSON.stringify(
@@ -1144,6 +1154,34 @@ function* autoSyncShellsWorker( { payload } ) {
 export const autoSyncShellsWatcher = createWatcher(
   autoSyncShellsWorker,
   AUTO_SYNC_SHELLS
+)
+
+function* blindRefreshWorker() {
+  const netDeltaTxs: TransactionDescribing[] = []
+  for( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ){
+    const payload = {
+      serviceType: accountKind,
+      options: {
+        loader: true,
+        syncTrustedDerivative:
+        accountKind === TEST_ACCOUNT ? false : true,
+        derivativeAccountsToSync: Object.keys( config.DERIVATIVE_ACC ),
+        hardRefresh: true,
+        blindRefresh: true,
+      },
+    }
+
+    const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
+      payload
+    } )
+    if( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
+  }
+  return netDeltaTxs
+}
+
+export const blindRefreshWatcher = createWatcher(
+  blindRefreshWorker,
+  BLIND_REFRESH
 )
 
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {

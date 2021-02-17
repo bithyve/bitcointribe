@@ -42,6 +42,7 @@ export const ACCOUNT_SHELL_MERGE_COMPLETED = 'ACCOUNT_SHELL_MERGE_COMPLETED'
 export const ACCOUNT_SHELLS_ORDER_UPDATED = 'ACCOUNT_SHELLS_ORDER_UPDATED'
 export const ACCOUNT_SHELL_ORDERED_TO_FRONT = 'ACCOUNT_SHELL_ORDERED_TO_FRONT'
 export const REFRESH_ACCOUNT_SHELL = 'REFRESH_ACCOUNT_SHELL'
+export const BLIND_REFRESH = 'BLIND_REFRESH'
 export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED'
 export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
@@ -52,7 +53,9 @@ export const fetchBalanceTx = (
   options: {
     service?;
     loader?: boolean;
+    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
+    blindRefresh?: boolean;
     shouldNotInsert?: boolean;
     syncTrustedDerivative?: boolean;
   } = {
@@ -247,12 +250,13 @@ export const fetchDerivativeAccBalTx = (
   serviceType: string,
   accountType: string,
   accountNumber?: number,
-  hardRefresh?: boolean
+  hardRefresh?: boolean,
+  blindRefresh?: boolean,
 ) => {
   return {
     type: FETCH_DERIVATIVE_ACC_BALANCE_TX,
     payload: {
-      serviceType, accountType, accountNumber, hardRefresh
+      serviceType, accountType, accountNumber, hardRefresh, blindRefresh
     },
   }
 }
@@ -334,6 +338,13 @@ export const refreshAccountShell = (
     }
   }
 }
+
+export const blindRefresh = () => {
+  return {
+    type: BLIND_REFRESH
+  }
+}
+
 
 export const accountShellRefreshCompleted = ( payload: AccountShell ) => {
   return {
