@@ -23,7 +23,7 @@ import Config from '../../bitcoin/HexaConfig'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}/oidc/auth`
 const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
-let count = 0
+const count = 0
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
   FETCH_SWAN_AUTHENTICATION_URL
@@ -44,11 +44,6 @@ client_id=${Config.SWAN_CLIENT_ID}\
 &response_mode=query\
 `
 
-  // &ui_locales=en\
-  // &nonce=${nonce}\
-  console.log( {
-    code_challenge, code_verifier, nonce, state, swanAuthenticationUrl
-  } )
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )
@@ -61,7 +56,7 @@ export const redeemSwanCodeForTokenWatcher = createWatcher(
 )
 export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield put( redeemSwanCodeForTokenInitiated() )
-  console.log( '***-> inside redeem ', count++, payload )
+
   const splits = payload.data.split( '/' )
   const code = splits[ splits.length - 1 ].split( '&' )[ 0 ]
 
@@ -73,9 +68,7 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     state,
     code_verifier
   } )
-  console.log( {
-    swanResponse: swanResponse.data
-  } )
+
   const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
   yield put( redeemSwanCodeForTokenSucceeded( {
     swanAuthenticatedCode: access_token
@@ -83,7 +76,6 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
 }
 
 function* linkSwanWalletWorker( { payload } ) {
-  console.log( 'linkSwanWallet payload.data', payload.data )
   /*
   Continue with this worker only if:
   condition 1: Swan Account is not present
