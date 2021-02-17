@@ -350,15 +350,18 @@ class FriendsAndFamilyScreen extends PureComponent<
   renderAddContactFriendsAndFamily = () => {
     const { navigation } = this.props;
     const { isLoadContacts, selectedContact } = this.state;
+    if(!isLoadContacts) return;
     return (
       <AddContactAddressBook
         isLoadContacts={isLoadContacts}
         proceedButtonText={'Confirm & Proceed'}
         onPressContinue={() => {
+          if (selectedContact && selectedContact.length) {
           navigation.navigate('AddContactSendRequest', {
             SelectedContact: selectedContact,
           });
           this.addContactAddressBookBottomSheetRef.current?.snapTo(0);
+        }
         }}
         onSelectContact={(selectedData) => {
           this.setState({
@@ -493,11 +496,9 @@ class FriendsAndFamilyScreen extends PureComponent<
 
                 <TouchableOpacity
                   onPress={() => {
-                    setTimeout(() => {
-                      this.setState({
+                    this.setState({
                         isLoadContacts: true,
                       });
-                    }, 2);
                     this.addContactAddressBookBottomSheetRef.current.snapTo(1);
                   }}
                   style={{

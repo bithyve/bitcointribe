@@ -91,6 +91,9 @@ import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs';
 import BottomSheet from '@gorhom/bottom-sheet';
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions';
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+import { getReleaseTopic } from "../../utils/notifications/getReleaseTopic"
+const releaseNotificationTopic = getReleaseTopic()
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
 
@@ -306,7 +309,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               selectedContact: item,
               serviceType,
               bitcoinAmount: options.amount
-                ? `${Math.round(options.amount * 1e8)}`
+                ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
                 : '',
               donationId,
             });
@@ -833,7 +836,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         selectedContact: item,
         serviceType,
         bitcoinAmount: options.amount
-          ? `${Math.round(options.amount * 1e8)}`
+          ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
           : '',
       });
     }
@@ -881,6 +884,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     Linking.removeEventListener('url', this.handleDeepLinkEvent);
 
     clearTimeout(this.openBottomSheetOnLaunchTimeout);
+    if (this.firebaseNotificationListener) {
+      this.firebaseNotificationListener();
+    }
   }
 
   componentWillUnmount() {
@@ -1089,9 +1095,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { currencyCode } = this.props;
     let currencyCodeTmp = currencyCode;
     if (!currencyCodeTmp) {
-      currencyCodeTmp = await AsyncStorage.getItem('currencyCode');
-    }
-    if (!currencyCodeTmp) {
       this.props.setCurrencyCode(RNLocalize.getCurrencies()[0]);
       this.setState({
         currencyCode: RNLocalize.getCurrencies()[0],
@@ -1143,6 +1146,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationArrives = async (notification) => {
+    console.log('*-* notification has been received ',{ notification });
     this.props.fetchNotifications();
     const { title, body } = notification;
     const deviceTrayNotification = new firebase.notifications.Notification()
@@ -1200,8 +1204,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     /*
      * Triggered for data only payload in foreground
      * */
-    firebase.messaging().onMessage(() => {
-      //process data message
+    firebase.messaging().onMessage(async remoteMessage => {
+      // console.log('A new FCM message arrived!',remoteMessage);
     });
   };
 
@@ -1215,7 +1219,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       asyncNotificationList = [];
     }
     let readStatus = true;
-    if (content.notificationType == 'release') {
+    if (content.notificationType == releaseNotificationTopic) {
       let releaseCases = this.props.releaseCasesValue;
       //JSON.parse(await AsyncStorage.getItem('releaseCases'));
       if (releaseCases.ignoreClick) {
@@ -1635,8 +1639,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     let asyncNotifications = JSON.parse(
       await AsyncStorage.getItem('notificationList'),
     );
+    console.log('Notification clicked Home>onNotificationClicked')
+    console.log('asyncNotifications ', asyncNotifications)
+    console.log('notification passed ', value)
 
     const { notificationData } = this.state;
+    console.log('notificationData from state ', notificationData)
     const { navigation } = this.props;
     let tempNotificationData = notificationData;
     for (let i = 0; i < tempNotificationData.length; i++) {
@@ -1674,7 +1682,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return;
     }
 
-    if (value.type == 'release') {
+    if (value.type == releaseNotificationTopic) {
       RelayServices.fetchReleases(value.info.split(' ')[1])
         .then(async (res) => {
           if (res.data.releases.length) {
@@ -1717,7 +1725,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       for (let i = 0; i < notificationList['notifications'].length; i++) {
         const element = notificationList['notifications'][i];
         let readStatus = false;
-        if (element.notificationType == 'release') {
+        if (element.notificationType == releaseNotificationTopic) {
           let releaseCases = this.props.releaseCasesValue;
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
@@ -1744,7 +1752,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 (value) => value.notificationId == element.notificationId,
               )
             ];
-          if (element.notificationType == 'release') {
+          if (element.notificationType == releaseNotificationTopic) {
             readStatus = readStatus;
           } else {
             readStatus = temp.read;
@@ -2151,7 +2159,7 @@ const mapStateToProps = (state) => {
     paymentDetails: idx(state, (_) => _.trustedContacts.paymentDetails),
     notificationListNew: idx(state, (_) => _.notifications.notificationListNew),
     FBTCAccountData: idx(state, (_) => _.fbtc.FBTCAccountData),
-    currencyCode: idx(state, (_) => _.preferences.currencyCode) || 'USD',
+    currencyCode: idx(state, (_) => _.preferences.currencyCode),
     fcmTokenValue: idx(state, (_) => _.preferences.fcmTokenValue),
     secondaryDeviceAddressValue: idx(
       state,

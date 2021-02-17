@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, Image, Text, StyleSheet } from 'react-native';
 import {
     widthPercentageToDP as wp,
     heightPercentageToDP as hp,
@@ -12,7 +12,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 export default function FriendsAndFamilyHelpContents(props) {
-    const scrollViewRef = useRef();
+    const scrollViewRef = useRef<ScrollView>();
     return (
         <View style={styles.modalContainer}>
             <AppBottomSheetTouchableWrapper style={{ justifyContent: 'center', alignItems: 'center' }}
@@ -75,11 +75,11 @@ export default function FriendsAndFamilyHelpContents(props) {
                         Recovery Keys are sent through secure, encrypted{'\n'}channels, most frequently used in Internet{'\n'}communications. These channels are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt their information,{'\n'}and are called ECDH channels.
                 {/* Recovery Keys are sent through ECDH channels,{'\n'}most frequently used in Internet{'\n'}communication. ECDH communications are{'\n'}encrypted end-to-end, enabling only the receiver{'\n'}and sender to decrypt information */}
                     </Text>
-                    <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+                    <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
                         scrollViewRef.current && scrollViewRef.current.scrollTo({ x: 0, y: hp('85%'), animated: true });
                     }}>
                         <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-                    </TouchableOpacity>
+                    </AppBottomSheetTouchableWrapper>
                     <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                         <View
                             style={{

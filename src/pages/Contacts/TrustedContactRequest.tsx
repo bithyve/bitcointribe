@@ -108,6 +108,8 @@ export default function TrustedContactRequest(props) {
               props.bottomSheetRef.current?.snapTo(1);
             }}
             value={EmailId}
+            autoCorrect={false}
+            autoCompleteType="off"
           />
         </View>
       );
@@ -141,6 +143,8 @@ export default function TrustedContactRequest(props) {
               props.bottomSheetRef.current?.snapTo(1);
             }}
             value={PhoneNumber}
+            autoCorrect={false}
+            autoCompleteType="off"
           />
         </View>
       );
@@ -233,6 +237,8 @@ export default function TrustedContactRequest(props) {
                     }
                   }
                 }}
+                autoCorrect={false}
+                autoCompleteType="off"
                 //value={passcodeArray[i] && passcodeArray[i].length ? passcodeArray[i] : ""}
               />
             );

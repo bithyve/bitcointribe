@@ -2,16 +2,15 @@ import React, { useState } from 'react';
 import {
     View,
     Image,
-    TouchableOpacity,
     Text,
     StyleSheet,
-    ScrollView
 } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import Colors from "../../common/Colors";
 import Fonts from "../../common/Fonts";
 import { RFValue } from "react-native-responsive-fontsize";
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function RegenerateHealper( props ) {
     const array = [ 1, 2, 3, 4 ];

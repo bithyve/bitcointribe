@@ -375,7 +375,7 @@ const PairNewWallet = (props) => {
             />
           </View>
         </ScrollView>
-        {showLoader ? <Loader /> : null}
+        {showLoader ? <Loader isLoading={true}/> : null}
 
         <BottomInfoBox
           title={'Pair Hexa with FastBitcoins'}

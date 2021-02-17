@@ -1,11 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import openLink from '../../utils/OpenLink';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function TestAccountHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -69,11 +68,11 @@ export default function TestAccountHelpContents(props) {
             bitcoin for people to experiment with. Test bitcoin can not be
             sent to wallets that only support Bitcoin Mainnet
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollToEnd({ animated: true })
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View
             style={{
               borderStyle: 'dotted',

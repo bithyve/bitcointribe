@@ -1046,6 +1046,10 @@ const VoucherScanner = (props) => {
                 setTextHideShow(true);
               }}
               value={voucherCode}
+              autoCompleteType="off"
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              }
             />
           </View>
         </ScrollView>
@@ -1223,7 +1227,7 @@ const VoucherScanner = (props) => {
           </View>
         </TouchableOpacity>
       </View>
-      {showLoader ? <Loader /> : null}
+      {showLoader ? <Loader isLoading={true}/> : null}
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}

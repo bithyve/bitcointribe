@@ -2,10 +2,8 @@ import React, { useRef } from 'react';
 import {
   View,
   Image,
-  TouchableOpacity,
   Text,
   StyleSheet,
-  ScrollView,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -17,6 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper';
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import openLink from '../../utils/OpenLink';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function KeeperDeviceHelpContents(props) {
   const scrollViewRef = useRef<ScrollView>();
@@ -96,11 +95,11 @@ export default function KeeperDeviceHelpContents(props) {
             If your Keeper Device is not accessible, it is possible to restore
             it using your primary device and one of your Keepers.
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollTo({ x: 0, y: hp('85%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
@@ -160,11 +159,11 @@ export default function KeeperDeviceHelpContents(props) {
             be used to derive your addresses and private keys at any time. This
             string is also called a “mnemonic”.
           </Text>
-          <TouchableOpacity style={{ alignItems: 'center' }} onPress={() => {
+          <AppBottomSheetTouchableWrapper style={{ alignItems: 'center' }} onPress={() => {
             scrollViewRef.current?.scrollTo({ x: 0, y: hp('170%'), animated: true });
           }}>
             <FontAwesome name="angle-double-down" color={Colors.white} size={40} />
-          </TouchableOpacity>
+          </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <View
               style={{
