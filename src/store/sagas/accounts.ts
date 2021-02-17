@@ -58,6 +58,7 @@ import {
   ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
   BLIND_REFRESH,
+  blindRefreshStarted,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -1235,6 +1236,8 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* blindRefreshWorker() {
+  console.log("blindRefreshWorker",blindRefreshWorker);
+  yield put(blindRefreshStarted(true))
   const netDeltaTxs: TransactionDescribing[] = []
   for( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ){
     const payload = {
@@ -1248,12 +1251,25 @@ function* blindRefreshWorker() {
         blindRefresh: true,
       },
     }
+    console.log("payload",payload);
 
     const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
+    console.log("deltaTxs",deltaTxs);
+    const rescanTxs : RescannedTransactionData[]= []
+    deltaTxs.forEach( ( deltaTx )=>{
+      rescanTxs.push( {
+        details: deltaTx,
+      } )
+    } )
+    yield put( rescanSucceeded( rescanTxs ) )
     if( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
   }
+  console.log("netDeltaTxs",netDeltaTxs);
+  
+  yield put(blindRefreshStarted(false));
+
   return netDeltaTxs
 }
 

@@ -43,6 +43,7 @@ import {
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
+  BLIND_REFRESH_STARTED
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -177,6 +178,8 @@ export type AccountsState = {
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
+
+  refreshed: boolean;
 };
 
 const initialState: AccountsState = {
@@ -213,6 +216,8 @@ const initialState: AccountsState = {
 
   currentWyreSubAccount: null,
   currentRampSubAccount: null,
+
+  refreshed: false,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -807,6 +812,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ( shell ) => shell.syncStatus = SyncStatus.PENDING )
         return {
           ...state,
+        }
+
+        case BLIND_REFRESH_STARTED:
+        return {
+          ...state,
+          refreshed: action.payload.refreshed,
         }
       default:
         return state

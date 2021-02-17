@@ -552,6 +552,7 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
   'TRANSACTION_REASSIGNMENT_FAILED'
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
+export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
 
 export const testcoinsReceived = ( serviceType, service ) => {
   return {
@@ -768,5 +769,13 @@ export const accountShellMergeSucceeded = (
 ) => {
   return {
     type: ACCOUNT_SHELL_MERGE_SUCCEEDED, payload
+  }
+}
+
+export const blindRefreshStarted = ( refreshed ) => {
+  return {
+    type: BLIND_REFRESH_STARTED, payload: {
+      refreshed
+    }
   }
 }
