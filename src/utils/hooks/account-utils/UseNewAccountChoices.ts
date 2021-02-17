@@ -101,13 +101,13 @@ export default function useNewAccountChoices() {
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Ramp Account',
-          defaultDescription: 'Buy using ApplePay/Debit card',
+          defaultDescription: 'Buy using Bank Transfer, Apple Pay or Card',
           serviceAccountKind: ServiceAccountKind.RAMP,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Wyre Account',
-          defaultDescription: 'Buy using ApplePay/Debit card',
+          defaultDescription: 'Buy using ApplePay or Debit card',
           serviceAccountKind: ServiceAccountKind.WYRE,
         } ),
         new ExternalServiceSubAccountInfo( {
