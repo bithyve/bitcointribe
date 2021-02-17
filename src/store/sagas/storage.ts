@@ -21,6 +21,7 @@ import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
 import { updateWalletImage } from '../actions/sss'
 import { walletCheckIn } from '../actions/trustedContacts'
+import config from '../../bitcoin/HexaConfig'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -182,6 +183,24 @@ function* servicesEnricherWorker( { payload } ) {
           console.log( 'Standardized Primary XKeys for secure a/c' )
           migrated = true
         }
+      }
+
+      if( semver.lt( dbVersion, '1.4.4' ) ){
+        // update sub-account instances count
+        const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT
+
+        for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+          let instanceCount = 5
+          if( accountType == 'TRUSTED_CONTACTS' ){
+            instanceCount = 20
+          }
+          regularAccount.hdWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
+          secureAccount.secureHDWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
+        }
+
+        console.log( 'Updated sub-account instances count' )
+        migrated = true
       }
     } else {
       services = {
