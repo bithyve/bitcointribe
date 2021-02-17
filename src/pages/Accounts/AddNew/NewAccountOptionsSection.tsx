@@ -60,7 +60,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.FAST_BITCOINS:
           return false
         case ServiceAccountKind.SWAN:
-          return false
+          return true
         case ServiceAccountKind.WYRE:
           return currentWyreSubAccount == null
         case ServiceAccountKind.RAMP:
