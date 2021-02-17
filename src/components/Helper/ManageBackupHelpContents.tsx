@@ -45,7 +45,7 @@ export default function ManageBackupHelpContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            Backup makes sure that you can recover your wallet even if you lose your phone or delete Hexa - set this up ASAP!
+            Backup ensures that you can recover your wallet even if you lose your phone or accidently delete the Hexa App from your phone – set this up ASAP!
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -59,8 +59,7 @@ export default function ManageBackupHelpContents(props) {
               // marginBottom: wp('15%'),
             }}
           >
-            The first five items in this section are called Keepers, and they help keep your Recovery Keys safe. The sixth item is your Security Question, the answer to which is used to encrypt your backup.
-          </Text>
+            The first five items in this section are called Keepers, and they help keep your Recovery Keys safe. The sixth item is your Security Question, the answer to which is used to encrypt your backup          </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
             onPress={() => {
@@ -91,7 +90,7 @@ export default function ManageBackupHelpContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            It looks daunting, we know. We've made it easy, though - just watch!
+            It looks daunting, we know! But backing up your wallet is literally child’s play. We have ensured it.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -100,7 +99,7 @@ export default function ManageBackupHelpContents(props) {
             />
           </View>
           <Text style={{ ...styles.infoText }}>
-          The Recovery Keys can be shared with Keepers and confirmed by following the steps suggested. Use Know More in each section to guide you through the process of backing up your wallet!
+          The Recovery Keys can be shared with Keepers and confirmed by following the steps suggested. Use Know More in each section to guide you through the process of backing up your wallet.
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -133,7 +132,7 @@ export default function ManageBackupHelpContents(props) {
               marginTop: wp('7%'),
             }}
           >
-            The Health shield indicates the extent to which your wallet is safely backed up. Red requires immediate action. Yellow requires you to act when possible. Green shows your Recovery Keys are safe.
+            The Health shield indicates the extent to which your wallet is safely backed up. Red requires immediate action. Yellow requires you to act when possible. Green shows your Recovery Keys are available.
           </Text>
           <View style={styles.viewStyle}>
             <Image
@@ -147,7 +146,7 @@ export default function ManageBackupHelpContents(props) {
               // marginBottom: wp('15%'),
             }}
           >
-            Remember: Recovery Keys need to be available at all times, as you'll need access to them if your wallet is lost. If your keys are not available, you will not be able to recover your wallet. Choose your keepers wisely!
+            Recovery Keys need to be available at all times, as you'll need access to them if your wallet is lost. If your keys are not available, you will not be able to recover your wallet. Choose your keepers wisely!
           </Text>
 
           <View
