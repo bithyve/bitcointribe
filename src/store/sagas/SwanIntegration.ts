@@ -3,10 +3,12 @@ import { call, put, select } from 'redux-saga/effects'
 import {
   REDEEM_SWAN_CODE_FOR_TOKEN,
   FETCH_SWAN_AUTHENTICATION_URL,
+  fetchSwanAuthenticationUrlInitiated,
   fetchSwanAuthenticationUrlSucceeded,
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
+  redeemSwanCodeForTokenInitiated,
   redeemSwanCodeForTokenSucceeded,
 } from '../actions/SwanIntegration'
 
@@ -19,10 +21,8 @@ import { createWatcher } from '../utils/utilities'
 import { generatePKCEParameters } from '../lib/swan'
 import Config from '../../bitcoin/HexaConfig'
 
-const client_id = Config.SWAN_CLIENT_ID || 'hexa-dev'
-const swanOAuthURL = Config.SWAN_BASE_URL || 'https://login-demo.curity.io/oauth/v2/oauth-token'
-const swan_auth_url = `${swanOAuthURL}/oidc/auth`
-const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'//'http%3A%2F%2Flocalhost%3A15000%2Foidc-client-sample.html'//'https://oauth.tools/callback/code' //
+const swan_auth_url = `${Config.SWAN_BASE_URL}/oidc/auth`
+const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
 let count = 0
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
@@ -30,10 +30,11 @@ export const fetchSwanAuthenticationUrlWatcher = createWatcher(
 )
 
 export function* fetchSwanAuthenticationUrlWorker( { payload } ) {
-  const { code_challenge, code_verifier, nonce, state } = generatePKCEParameters()
+  yield put( fetchSwanAuthenticationUrlInitiated() )
+  const { code_challenge, code_verifier, nonce, state } = yield call( generatePKCEParameters )
   const swanAuthenticationUrl = `\
 ${swan_auth_url}?\
-client_id=${client_id}\
+client_id=${Config.SWAN_CLIENT_ID}\
 &redirect_uri=${redirect_uri}\
 &response_type=code\
 &scope=openid%20v1%20write%3Avendor_wallet%20read%3Avendor_wallet%20write%3Aautomatic_withdrawal%20read%3Aautomatic_withdrawal\
@@ -59,21 +60,25 @@ export const redeemSwanCodeForTokenWatcher = createWatcher(
   REDEEM_SWAN_CODE_FOR_TOKEN
 )
 export function* redeemSwanCodeForTokenWorker( { payload } ) {
+  yield put( redeemSwanCodeForTokenInitiated() )
   console.log( '***-> inside redeem ', count++, payload )
   const splits = payload.data.split( '/' )
   const code = splits[ splits.length - 1 ].split( '&' )[ 0 ]
-  console.log( {
-    splits, code: code.split( '=' )[ 1 ]
-  } )
-  const { code_verifier } = yield select(
+
+  const { code_verifier, state } = yield select(
     ( state ) => state.swanIntegration
   )
-  const swanAuthenticatedCode = yield call( redeemAuthCodeForToken, {
-    code: code.split( '=' )[ 1 ], code_verifier
+  const swanResponse = yield call( redeemAuthCodeForToken, {
+    code: code.split( '=' )[ 1 ],
+    state,
+    code_verifier
   } )
-
+  console.log( {
+    swanResponse: swanResponse.data
+  } )
+  const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
   yield put( redeemSwanCodeForTokenSucceeded( {
-    swanAuthenticatedCode
+    swanAuthenticatedCode: access_token
   } ) )
 }
 
