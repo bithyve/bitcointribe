@@ -24,42 +24,48 @@ type Props = {
 }
 
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu, onClickSetting }: Props ) => {
-  console.log( {
+  console.log( '@@@ -> Inside Bottom Sheet Swan Info ', {
     boottomSheetRenderCount: boottomSheetRenderCount++,
     ...{
       swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu
     }
   } )
   const dispatch = useDispatch()
-  const { hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, swanAuthenticatedCode, hasRedeemSwanCodeForTokenSucceeded } = useSwanIntegrationState()
-  useEffect( ()=>{
-    dispatch( clearSwanCache() )
-  }, [] )
+  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedCode, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted } = useSwanIntegrationState()
+  // useEffect( ()=>{
+  //   dispatch( clearSwanCache() )
+  // }, [] )
 
-  useEffect( ()=>{
-    console.log( 'inside use effect', {
-      hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl
+  if ( swanFromBuyMenu ) {
+    console.log( '@@@ Coming from buy menu fetchSwanAuthenticationUrl', {
+      hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlCompleted, hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl
     } )
-    if ( swanFromBuyMenu ) {
-      if( !hasFetchSwanAuthenticationUrlSucceeded ) dispatch( fetchSwanAuthenticationUrl( {
-      } ) )
+    if( !hasFetchSwanAuthenticationUrlInitiated ) dispatch( fetchSwanAuthenticationUrl( {
+    } ) )
+  }
 
+  useEffect( ()=>{
+    if ( swanFromBuyMenu ) {
       if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
     }
-  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
+  }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )
 
-  if( swanFromDeepLink ) {
-    swanFromDeepLink = false
+  if( swanFromDeepLink && !hasRedeemSwanCodeForTokenInitiated ) {
+    console.log( '@@@ -> Inside call to dispatch code redeem' )
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
 
   useEffect( ()=>{
-    console.log( {
-      swanAuthenticatedCode, hasRedeemSwanCodeForTokenSucceeded
-    } )
-    if( hasRedeemSwanCodeForTokenSucceeded )
-      console.log( 'hasRedeemSwanCodeForTokenSucceeded ', hasRedeemSwanCodeForTokenSucceeded )
-  }, [ hasRedeemSwanCodeForTokenSucceeded, swanAuthenticatedCode ] )
+    if( swanFromDeepLink ) {
+      console.log( '@@@ coming from deep link', swanDeepLinkContent )
+      swanFromBuyMenu = false
+      console.log( '@@@ redeem changed', hasRedeemSwanCodeForTokenInitiated,  hasRedeemSwanCodeForTokenCompleted, hasRedeemSwanCodeForTokenSucceeded, swanAuthenticatedCode )
+      if( hasRedeemSwanCodeForTokenCompleted )
+        console.log( {
+          swanAuthenticatedCode
+        } )
+    }
+  }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedCode ] )
 
   return ( <View style={{
     ...styles.modalContentContainer
@@ -71,7 +77,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
         <Text style={styles.modalTitleText}>Athentication in progress...</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
-        }}>Communicating with SwanBitcoins and setting authenticating.</Text>
+        }}>Communicating with SwanBitcoins and setting authentication token: {swanAuthenticatedCode}.</Text>
       </View>
 
       <View style={{

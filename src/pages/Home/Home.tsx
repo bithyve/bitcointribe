@@ -100,6 +100,7 @@ import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheet
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
+import { clearSwanCache } from '../../store/actions/SwanIntegration'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -191,6 +192,7 @@ interface HomePropsTypes {
   swanFromBuyMenu: boolean | null;
   swanFromDeepLink: boolean | null;
   setVersion: any;
+  clearSwanCache: any;
   versionHistory: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
@@ -802,6 +804,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // This will sync balances and transactions for all account shells
       this.props.autoSyncShells()
       this.props.setVersion()
+      this.props.clearSwanCache()
     } )
   };
 
@@ -1320,10 +1323,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          // this.props.navigation.navigate( 'SwanIntegrationScreen' )
           this.setState( {
             swanFromBuyMenu: true,
-            swanFromDeepLink: false
+            swanFromDeepLink: false,
+            swanDeepLinkContent: null
           }, () => {
             this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
           } )
@@ -2147,7 +2150,8 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    setVersion
+    setVersion,
+    clearSwanCache
   } )( Home ),
 )
 
