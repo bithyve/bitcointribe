@@ -62,11 +62,11 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
     <View style={styles.rootContainer}>
       <View style={styles.headerSection}>
         <View style={{
-          flexDirection: 'row' 
+          flexDirection: 'row'
         }}>
           <Text style={styles.headerText}>Please edit the </Text>
           <Text style={{
-            ...styles.headerText, fontStyle: 'italic' 
+            ...styles.headerText, fontStyle: 'italic'
           }}>Name and Description</Text>
         </View>
       </View>
@@ -95,11 +95,12 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
           value={accountDescription}
           numberOfLines={2}
           onChangeText={setAccountDescription}
+          maxLength={40}
         />
       </View>
 
       <View style={styles.listFooterSection}>
-      <ButtonBlue
+        <ButtonBlue
           buttonText="Confirm & Proceed"
           handleButtonPress={handleSaveButtonPress}
           buttonDisable={canSaveChanges === false}
