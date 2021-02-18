@@ -264,37 +264,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
 }
 
-function* initializedTrustedContactWorker( { payload } ) {
-  const service: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
-  )
-
-  const { contactName, encKey } = payload
-  const res = yield call( service.initializeContact, contactName, encKey )
-  if ( res.status === 200 ) {
-    const { publicKey } = res.data
-    yield put( trustedContactInitialized( contactName, publicKey ) )
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      TRUSTED_CONTACTS: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    console.log( res.err )
-  }
-}
-
-export const initializedTrustedContactWatcher = createWatcher(
-  initializedTrustedContactWorker,
-  INITIALIZE_TRUSTED_CONTACT,
-)
-
 function* approveTrustedContactWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,

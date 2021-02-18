@@ -44,7 +44,6 @@ import {
 } from './sagas/setupAndAuth'
 
 import {
-  fetchTransactionsWatcher,
   testcoinsWatcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
