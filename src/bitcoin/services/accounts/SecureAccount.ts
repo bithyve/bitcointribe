@@ -477,7 +477,7 @@ export default class SecureAccount {
       accountNumber,
     );
 
-  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean, blindRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -506,7 +506,7 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh ),
+        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh, blindRefresh ),
       }
     } catch ( err ) {
       return {
@@ -518,6 +518,7 @@ export default class SecureAccount {
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
     hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<
     | {
         status: number;
@@ -540,7 +541,8 @@ export default class SecureAccount {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
-          hardRefresh
+          hardRefresh,
+          blindRefresh
         ),
       }
     } catch ( err ) {
@@ -1129,6 +1131,7 @@ export default class SecureAccount {
       contactName?: string,
     }[],
     hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ):  Promise<
   | {
       status: number;
@@ -1152,6 +1155,7 @@ export default class SecureAccount {
         data: await this.secureHDWallet.fetchDerivativeAccBalanceTxs(
           accountInfo,
           hardRefresh,
+          blindRefresh,
         ),
       }
     } catch ( err ) {

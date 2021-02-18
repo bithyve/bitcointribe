@@ -429,6 +429,75 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+  private syncDerivativeAccGapLimit = async ( accountType, accountNumber ) => {
+    // scanning future addresses in hierarchy for transactions, in case our 'next free addr' indexes are lagging behind
+    let tryAgain = false
+    let { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub } = this.derivativeAccounts[ accountType ][
+      accountNumber
+    ]
+
+    if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
+      nextFreeAddressIndex = 0
+    if ( nextFreeChangeAddressIndex !== 0 && !nextFreeChangeAddressIndex )
+      nextFreeChangeAddressIndex = 0
+
+    const externalAddress = this.getAddress(
+      false,
+      nextFreeAddressIndex + this.derivativeGapLimit -
+        1,
+      xpub,
+    )
+
+    const internalAddress = this.getAddress(
+      true,
+      nextFreeChangeAddressIndex + this.derivativeGapLimit -
+        1,
+      xpub,
+    )
+
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
+
+    if ( txCounts[ externalAddress ] > 0 ) {
+      this.derivativeAccounts[ accountType ][
+        accountNumber
+      ].nextFreeAddressIndex += this.derivativeGapLimit
+      tryAgain = true
+    }
+
+    if ( txCounts[ internalAddress ] > 0 ) {
+      this.derivativeAccounts[ accountType ][
+        accountNumber
+      ].nextFreeChangeAddressIndex += this.derivativeGapLimit
+      tryAgain = true
+    }
+
+    if ( tryAgain ) {
+      return this.syncDerivativeAccGapLimit( accountType, accountNumber )
+    }
+  };
+
+  public blindRefreshCleanup = ( ) => {
+    for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+      for( let accountNumber = this.derivativeAccounts[ accountType ].instance.max; accountNumber > 0; accountNumber -- ){
+        if ( ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration ){
+          // dynamically generated derv account (blind refresh)
+          const { transactionDetails } = this.derivativeAccounts[ accountType ][ accountNumber ].transactions
+          // remove if no txs exist on such an account
+          if( !transactionDetails.length ){
+            delete this.derivativeAccounts[ accountType ][ accountNumber ];
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber - 1
+          } else {
+            ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber
+            for( let remainingAcc = accountNumber; remainingAcc > 0; remainingAcc -- ){
+              ( this.derivativeAccounts[ accountType ][ remainingAcc ] as DerivativeAccountElements ).blindGeneration = null
+            }
+            break
+          }
+        }
+      }
+    }
+  }
+
   public fetchDerivativeAccBalanceTxs = async (
     accountsInfo: {
       accountType: string,
@@ -436,6 +505,7 @@ export default class HDSegwitWallet extends Bitcoin {
       contactName?: string,
     }[],
     hardRefresh?: boolean,
+    blindRefresh?: boolean
   ): Promise<{
     synched: boolean,
     txsFound: TransactionDetails[]
@@ -450,23 +520,15 @@ export default class HDSegwitWallet extends Bitcoin {
     } = {
     }
 
-    for( let { accountType, accountNumber, contactName } of accountsInfo ){
-      // preliminary checks
-      if ( !this.derivativeAccounts[ accountType ] )
-        throw new Error( `${accountType} does not exists` )
+    for( const { accountType, accountNumber, contactName } of accountsInfo ){
 
-      if ( accountType === TRUSTED_CONTACTS && !accountNumber ) {
-        if ( !contactName )
-          throw new Error( `Required param: contactName for ${accountType}` )
-
-        contactName = contactName.toLowerCase().trim()
-        accountNumber = this.trustedContactToDA[ contactName ]
-
-        if ( !accountNumber ) {
-          throw new Error(
-            `No contact derivative account exists for: ${contactName}`,
-          )
+      if( blindRefresh ){
+        if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
+          // blind derv-account generation
+          this.getDerivativeAccXpub( accountType, accountNumber, contactName );
+          ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
         }
+        await this.syncDerivativeAccGapLimit( accountType, accountNumber )
       }
 
       let {
@@ -655,8 +717,10 @@ export default class HDSegwitWallet extends Bitcoin {
 
       // find tx delta(missing txs): hard vs soft refresh
       if( hardRefresh ){
-        const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
-        if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        if( txIdMap ){
+          const deltaTxs = this.findTxDelta( txIdMap, res.txIdMap, res.transactions )
+          if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+        } else txsFound.push( ...res.transactions.transactionDetails )
       }
 
       this.derivativeAccounts[ accountType ][ accountNumber ] = {
@@ -679,6 +743,10 @@ export default class HDSegwitWallet extends Bitcoin {
       }
     }
 
+    // blind refresh sub-acc cleanup
+    if( blindRefresh )
+      this.blindRefreshCleanup()
+
     return {
       synched: true,
       txsFound,
@@ -687,7 +755,8 @@ export default class HDSegwitWallet extends Bitcoin {
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
-    hardRefresh?: boolean
+    hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<{
     synched: boolean;
     txsFound: TransactionDetails[];
@@ -695,15 +764,16 @@ export default class HDSegwitWallet extends Bitcoin {
     const accountsInfo :  {
       accountType: string,
       accountNumber: number,
+      contactName?: string
     }[] = []
 
     for ( const dAccountType of accountTypes ) {
       const derivativeAccounts = this.derivativeAccounts[ dAccountType ]
 
-      if ( !derivativeAccounts.instance.using ) continue
+      const instanceToIterate = blindRefresh? derivativeAccounts.instance.max: derivativeAccounts.instance.using
       for (
         let accountNumber = 1;
-        accountNumber <= derivativeAccounts.instance.using;
+        accountNumber <= instanceToIterate;
         accountNumber++
       ) {
         const info: {
@@ -713,13 +783,16 @@ export default class HDSegwitWallet extends Bitcoin {
         } = {
           accountType: dAccountType, accountNumber
         }
-        if( dAccountType === TRUSTED_CONTACTS ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+        if( dAccountType === TRUSTED_CONTACTS ){
+          if( derivativeAccounts[ accountNumber ] ) info.contactName = derivativeAccounts[ accountNumber ].contactName
+          else if( blindRefresh ) info.contactName = `contact ${accountNumber}`
+        }
         accountsInfo.push( info )
       }
     }
 
     if( accountsInfo.length )
-      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh )
+      return this.fetchDerivativeAccBalanceTxs( accountsInfo, hardRefresh, blindRefresh )
   }
 
   public syncViaXpubAgent = async (
@@ -1226,6 +1299,36 @@ export default class HDSegwitWallet extends Bitcoin {
     }
   };
 
+
+  private syncGapLimit = async () => {
+    // synching nextFreeAddressIndex and nextFreeChangeAddressIndex(typically during blind refresh)
+    let tryAgain = false
+    const hardGapLimit = 10
+    const externalAddress = this.getAddress( false,
+      this.nextFreeAddressIndex + hardGapLimit - 1,
+    )
+
+    const internalAddress = this.getAddress( true,
+      this.nextFreeChangeAddressIndex + hardGapLimit - 1,
+    )
+
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
+
+    if ( txCounts[ externalAddress ] > 0 ) {
+      this.nextFreeAddressIndex += this.gapLimit
+      tryAgain = true
+    }
+
+    if ( txCounts[ internalAddress ] > 0 ) {
+      this.nextFreeChangeAddressIndex += this.gapLimit
+      tryAgain = true
+    }
+
+    if ( tryAgain ) {
+      return this.syncGapLimit()
+    }
+  };
+
   public findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
     // return new/found transactions(delta b/w hard and soft refresh)
     const txsFound: TransactionDetails[] = []
@@ -1261,7 +1364,7 @@ export default class HDSegwitWallet extends Bitcoin {
     this.lastBalTxSync = latestSyncTime
   };
 
-  public fetchBalanceTransaction = async ( hardRefresh?: boolean  ): Promise<{
+  public fetchBalanceTransaction = async ( hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
     balances: {
       balance: number;
       unconfirmedBalance: number;
@@ -1271,6 +1374,8 @@ export default class HDSegwitWallet extends Bitcoin {
   }> => {
     const ownedAddresses = [] // owned address mapping
     // owned addresses are used for apt tx categorization and transfer amount calculation
+
+    if( blindRefresh ) await this.syncGapLimit()
 
     // init refresh dependent params
     let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number

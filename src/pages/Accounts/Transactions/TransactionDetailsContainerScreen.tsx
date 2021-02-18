@@ -70,14 +70,6 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
     }
   }, [ transaction.transactionType ] )
 
-
-  async function openExplorer( txid ) {
-    let explorerTarget: string
-    if( config.ENVIRONMENT !== 'DEV' &&  primarySubAccount.sourceKind !== SourceAccountKind.TEST_ACCOUNT ) explorerTarget = `https://live.blockcypher.com/btc/tx/${txiid}`
-    else explorerTarget = `https://live.blockcypher.com/btc-testnet/tx/${txid}`
-    await openLink( explorerTarget )
-  }
-
   return (
     <View style={styles.rootContainer}>
 
@@ -118,9 +110,12 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitle}>Transaction ID</Text>
-          <Text style={ListStyles.listItemSubtitle} onPress={()=>{
-            openExplorer( transaction.txid )
-          }}>{transaction.txid}</Text>
+          <Text style={ListStyles.listItemSubtitle} onPress={() =>
+            openLink(
+              `https://blockstream.info${
+                transaction.accountType === 'Test Account' ? '/testnet' : ''
+              }/tx/${transaction.txid}`,
+            )}>{transaction.txid}</Text>
         </View>
 
         <View style={styles.lineItem}>

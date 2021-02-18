@@ -171,6 +171,7 @@ export interface DerivativeAccountElements {
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
+  blindGeneration?: boolean // temporarily generated during blind refresh
 }
 
 export enum DerivativeAccountTypes {
