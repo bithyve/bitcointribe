@@ -5,13 +5,13 @@ import SelectedRecipientCarouselItem from '../../../components/send/SelectedReci
 
 export type Props = {
   recipients: RecipientDescribing[];
-  onRemoveSelected: ( recipient: RecipientDescribing ) => void;
+  onRemoveSelected?: ( recipient: RecipientDescribing ) => void;
 };
 
 
 const SelectedRecipientsCarousel: React.FC<Props> = ( {
   recipients,
-  onRemoveSelected,
+  onRemoveSelected = () => {},
 }: Props ) => {
   return (
     <FlatList

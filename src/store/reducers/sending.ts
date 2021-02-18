@@ -3,10 +3,13 @@ import { RecipientDescribing } from '../../common/data/models/interfaces/Recipie
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
+import TransactionPriority from '../../common/data/enums/TransactionPriority'
+import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
 
 type RecipientID = string;
 
 export type AmountDesignations = Record<RecipientID, Satoshis>;
+export type TransactionFeeInfo = Record<TransactionPriority, TransactionFeeSnapshot>;
 
 export type SendingState = {
   sourceAccountShell: AccountShell | null;
@@ -21,6 +24,8 @@ export type SendingState = {
   sendingFailedErrorMessage: string | null;
 
   sendMaxFee: Satoshis;
+
+  transactionFeeInfo: TransactionFeeInfo;
 };
 
 const INITIAL_STATE: SendingState = {
@@ -47,6 +52,24 @@ const INITIAL_STATE: SendingState = {
   Three level of fees priority with time estimate for each
   fees: {}, // 3 levels of fees and priority
   */
+  transactionFeeInfo: {
+    [ TransactionPriority.LOW ]: {
+      amount: 0,
+      estimatedBlocksBeforeConfirmation: 50,
+    },
+    [ TransactionPriority.MEDIUM ]: {
+      amount: 0,
+      estimatedBlocksBeforeConfirmation: 20,
+    },
+    [ TransactionPriority.HIGH ]: {
+      amount: 0,
+      estimatedBlocksBeforeConfirmation: 4,
+    },
+    [ TransactionPriority.CUSTOM ]: {
+      amount: 0,
+      estimatedBlocksBeforeConfirmation: 0,
+    },
+  },
 }
 
 
