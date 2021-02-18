@@ -53,7 +53,7 @@ import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import {
   EncDynamicNonPMDD,
   MetaShare,
@@ -72,7 +72,7 @@ import { AsyncStorage, Platform, NativeModules } from 'react-native'
 import {
   updateEphemeralChannel,
   updateTrustedChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from '../actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -1809,7 +1809,7 @@ function* stateDataToBackup() {
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
   const versionHistory = yield select(
     ((state) => idx(state, (_) => _.versionHistory.versions))
-  ); 
+  );
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
@@ -1908,7 +1908,7 @@ function* updateWalletImageWorker() {
   }
 
   // console.log( {
-  //   walletImage 
+  //   walletImage
   // } )
 
   if ( Object.keys( walletImage ).length === 0 ) {
@@ -1988,7 +1988,7 @@ function* fetchWalletImageWorker( { payload } ) {
 
         if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
           const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactInfoLocally( trustedContactsInfo ) )
+          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
         }
       }
     }
@@ -1998,7 +1998,7 @@ function* fetchWalletImageWorker( { payload } ) {
         if( !STATE_DATA[ key ] ) continue
 
         switch( key ){
-            case 'accountShells': 
+            case 'accountShells':
               const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
               yield put( restoredAccountShells( {
                 accountShells
@@ -2007,12 +2007,12 @@ function* fetchWalletImageWorker( { payload } ) {
 
             case 'activePersonalNode':
               const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
-              yield put( restorePersonalNodeConfiguration( 
+              yield put( restorePersonalNodeConfiguration(
                 activePersonalNode
               ) )
               break
 
-              case 'versionHistory': 
+              case 'versionHistory':
               const versions: VersionHistory[] = JSON.parse( STATE_DATA[ key ] )
               yield put( restoredVersionHistory( {
                 versions

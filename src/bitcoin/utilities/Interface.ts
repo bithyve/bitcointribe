@@ -444,6 +444,10 @@ export interface VersionHistory {
   date: Date;
 }
 
+export enum ScannedAddressKind {
+  ADDRESS = 'address',
+  PAYMENT_URI = 'paymentURI',
+}
 
 export interface AverageTxFees {
   [priority: string]: {

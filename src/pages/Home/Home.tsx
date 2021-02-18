@@ -25,7 +25,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   FAST_BITCOINS,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import { connect } from 'react-redux'
 import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
@@ -63,7 +63,7 @@ import {
   addTransferDetails,
   autoSyncShells
 } from '../../store/actions/accounts'
-import { trustedChannelActions } from '../../bitcoin/utilities/Interface'
+import { trustedChannelActions, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import { withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
@@ -281,26 +281,31 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( qrData )
+
       if ( type ) {
         let item
+
         switch ( type ) {
-            case 'address':
+            case ScannedAddressKind.ADDRESS:
               const recipientAddress = qrData
+
               item = {
-                id: recipientAddress,
+                id: recipientAddress
               }
 
               addTransferDetails( serviceType, {
                 selectedContact: item,
               } )
+
               navigation.navigate( 'SendToContact', {
                 selectedContact: item,
                 serviceType,
               } )
               break
 
-            case 'paymentURI':
+            case ScannedAddressKind.PAYMENT_URI:
               let address, options, donationId
+
               try {
                 const res = service.decodePaymentURI( qrData )
                 address = res.address
@@ -317,7 +322,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
 
               item = {
-                id: address,
+                id: address
               }
 
               addTransferDetails( serviceType, {
@@ -333,13 +338,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 donationId,
               } )
               break
-
-            default:
-              Toast( 'Invalid QR' )
-              break
         }
-
-        return
+      } else {
+        Toast( 'Invalid QR' )
       }
     }
 
@@ -1670,11 +1671,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ( value ) => value.notificationId == element.notificationId,
               )
             ]
-          if ( element.notificationType == releaseNotificationTopic ) {
-            readStatus = readStatus
-          } else {
+          if ( element.notificationType != releaseNotificationTopic ) {
             readStatus = temp.read
           }
+
           const obj = {
             ...temp,
             read: readStatus,

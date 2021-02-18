@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
-  Image,
   TouchableOpacity,
   Text,
   TextInput,
@@ -9,13 +8,12 @@ import {
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
-  Alert,
   AsyncStorage,
   Platform,
 } from 'react-native'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
-import commonStyle from '../../common/Styles/Styles'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import commonStyle from '../../../common/Styles/Styles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
@@ -26,27 +24,23 @@ import {
   transferST3,
   clearTransfer,
   fetchBalanceTx,
-} from '../../store/actions/accounts'
-import SendStatusModalContents from '../../components/SendStatusModalContents'
+} from '../../../store/actions/accounts'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
-import SendConfirmationContent from './SendConfirmationContent'
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
+import ModalHeader from '../../../components/ModalHeader'
+import SendConfirmationContent from '../SendConfirmationContent'
+import { createRandomString } from '../../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
-import {
-  REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes'
 import DeviceInfo from 'react-native-device-info'
+import SendStatusModalContents from '../../../components/SendStatusModalContents'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 
 export default function TwoFAToken( props ) {
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )
   const serviceType = props.navigation.getParam( 'serviceType' )
-  const recipientAddress = props.navigation.getParam( 'recipientAddress' )
-  const [ SendUnSuccessBottomSheet, setSendUnSuccessBottomSheet ] = useState(
+  const [ SendUnSuccessBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
   const { transfer, loading } = useSelector(
@@ -68,34 +62,6 @@ export default function TwoFAToken( props ) {
   }
 
   const dispatch = useDispatch()
-  const renderSuccessStatusContents = () => (
-    <SendStatusModalContents
-      title1stLine={'Sent Successfully'}
-      title2ndLine={''}
-      info1stLine={'bitcoin successfully sent to'}
-      info2ndLine={''}
-      userName={recipientAddress}
-      // modalRef={SendSuccessBottomSheet}
-      isSuccess={true}
-      onPressViewAccount={() => {
-        dispatch( clearTransfer( serviceType ) )
-        // dispatch(fetchTransactions(serviceType));
-        const fetchOptions =  {
-          loader: true,
-          syncTrustedDerivative:
-            serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT
-              ? true
-              : false,
-        }
-        dispatch(
-          fetchBalanceTx( serviceType, fetchOptions ),
-        )
-        props.navigation.navigate( 'AccountDetails' )
-      }}
-      transactionId={transfer.txid}
-      transactionDateTime={Date()}
-    />
-  )
 
   const storeTrustedContactsHistory = async ( details ) => {
     if ( details && details.length > 0 ) {
@@ -213,6 +179,7 @@ export default function TwoFAToken( props ) {
       flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+
       <View style={commonStyle.headerContainer}>
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
@@ -410,6 +377,7 @@ export default function TwoFAToken( props ) {
               />
             </View>
           </View>
+
           <View
             style={{
               marginBottom: hp( '8%' ),
@@ -454,7 +422,7 @@ export default function TwoFAToken( props ) {
 
             <TouchableOpacity
               onPress={() => {
-                props.navigation.navigate( 'ResetTwoFAHelp' )
+                props.navigation.navigate( 'SubAccountTFAHelp' )
               }}
               style={{
                 width: wp( '30%' ),

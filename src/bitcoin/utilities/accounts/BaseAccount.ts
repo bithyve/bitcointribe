@@ -8,6 +8,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  ScannedAddressKind,
   AverageTxFees,
 } from '../Interface'
 
@@ -149,7 +150,7 @@ export default class BaseAccount {
   public addressDiff = (
     scannedStr: string,
   ): {
-    type: string;
+      type: ScannedAddressKind | null;
   } => this.hdWallet.addressDiff( scannedStr );
 
   public getReceivingAddress = (

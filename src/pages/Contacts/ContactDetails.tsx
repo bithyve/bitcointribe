@@ -32,7 +32,7 @@ import {
   clearTransfer,
   addNewSecondarySubAccount
 } from '../../store/actions/accounts'
-import { REGULAR_ACCOUNT } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import BottomSheet from 'reanimated-bottom-sheet'
 import SendViaLink from '../../components/SendViaLink'
 import ModalHeader from '../../components/ModalHeader'
@@ -42,6 +42,7 @@ import {
   uploadRequestedShare,
   ErrorSending,
   UploadSuccessfully,
+  uploadEncMShare,
 } from '../../store/actions/sss'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -133,7 +134,7 @@ interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
   Loading: boolean;
   contact: any;
-  SelectedOption: Number;
+  SelectedOption: number;
   errorMessage: string;
   buttonText: string;
   errorMessageHeader: string;
@@ -338,14 +339,13 @@ class ContactDetails extends PureComponent<
         defaultAccountShell = shell
     } )
 
-    this.props.navigation.dispatch(
-      resetStackToSend( {
-        accountShellID: defaultAccountShell.id,
-        selectedContact: this.Contact,
-        serviceType: REGULAR_ACCOUNT,
-        isFromAddressBook: true,
-      } )
-    )
+    this.props.navigation.navigate( 'SentAmountForContactForm', {
+      accountShellID: defaultAccountShell.id,
+      spendableBalance: AccountShell.getSpendableBalance( defaultAccountShell ),
+      selectedContact: this.Contact,
+      serviceType: REGULAR_ACCOUNT,
+      isFromAddressBook: true,
+    } )
 
   };
 

@@ -1,38 +1,44 @@
-import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import ContactAvatar from '../ContactAvatar';
-import Colors from '../../common/Colors';
-import ImageStyles from '../../common/Styles/ImageStyles';
-import HeadingStyles from '../../common/Styles/HeadingStyles';
-import Fonts from '../../common/Fonts';
-; import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing';
-import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText';
-import { TEST_ACCOUNT } from '../../common/constants/serviceTypes';
-import BitcoinUnit from '../../common/data/enums/BitcoinUnit';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React from 'react'
+import { View, StyleSheet, Text } from 'react-native'
+import RecipientAvatar from '../RecipientAvatar'
+import Colors from '../../common/Colors'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import HeadingStyles from '../../common/Styles/HeadingStyles'
+import Fonts from '../../common/Fonts'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import { TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 
 
 export type Props = {
   recipient: RecipientDescribing;
   accountKind: string;
+  designatedAmount: Satoshis;
   containerStyle?: Record<string, unknown>;
 };
 
 
-const ConfirmedRecipientCarouselItem: React.FC<Props> = ({
+const ConfirmedRecipientCarouselItem: React.FC<Props> = ( {
   recipient,
   accountKind,
-  containerStyle = {},
-}: Props) => {
-  const unitText = useFormattedUnitText({
+  designatedAmount,
+  containerStyle = {
+  },
+}: Props ) => {
+  const unitText = useFormattedUnitText( {
     bitcoinUnit: accountKind == TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS,
-  });
+  } )
 
   return (
-    <View style={{ ...styles.rootContainer, ...containerStyle }}>
+    <View style={{
+      ...styles.rootContainer, ...containerStyle
+    }}>
 
-      <ContactAvatar
-        contact={recipient}
+      <RecipientAvatar
+        recipient={recipient}
         containerStyle={styles.circledAvatarContainer}
       />
 
@@ -50,14 +56,14 @@ const ConfirmedRecipientCarouselItem: React.FC<Props> = ({
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {recipient.availableBalance} {unitText}
+          {designatedAmount} {unitText}
         </Text>
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     alignItems: 'center',
     maxWidth: 120,
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
 
   recipientNameText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
   },
@@ -85,6 +91,6 @@ const styles = StyleSheet.create({
     color: Colors.blue,
     textAlign: 'center',
   },
-});
+} )
 
-export default ConfirmedRecipientCarouselItem;
+export default ConfirmedRecipientCarouselItem

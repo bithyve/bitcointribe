@@ -29,14 +29,14 @@ import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import {
   REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -121,7 +121,7 @@ export default function AddContactSendRequest( props ) {
       tcInfo[ 3 ] = contact
     }
     await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-    dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
   const dispatch = useDispatch()

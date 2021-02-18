@@ -18,6 +18,8 @@ def all_pods
 end
 target 'HEXA' do
   all_pods
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
 end
 target 'HEXA Dev' do
   all_pods

@@ -11,6 +11,7 @@ import accountsReducer from './reducers/accounts'
 import sssReducer from './reducers/sss'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
+import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
 import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
@@ -43,17 +44,13 @@ import {
 } from './sagas/setupAndAuth'
 
 import {
-  transferST1Watcher,
-  transferST2Watcher,
+  fetchTransactionsWatcher,
   testcoinsWatcher,
-  transferST3Watcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
-  alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  validateTwoFAWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
@@ -106,7 +103,6 @@ import {
 } from './sagas/notifications'
 
 import {
-  initializedTrustedContactWatcher,
   approveTrustedContactWatcher,
   fetchTrustedChannelWatcher,
   fetchEphemeralChannelWatcher,
@@ -136,6 +132,7 @@ import {
 } from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
+import { calculateSendMaxFeeWatcher } from './sagas/sending'
 
 const rootSaga = function* () {
   const sagas = [
@@ -154,15 +151,10 @@ const rootSaga = function* () {
 
     // accounts watchers
     fetchBalanceTxWatcher,
-    transferST1Watcher,
-    transferST2Watcher,
-    alternateTransferST2Watcher,
-    transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    validateTwoFAWatcher,
     removeTwoFAWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
@@ -217,7 +209,6 @@ const rootSaga = function* () {
     fetchNotificationsWatcher,
 
     // Trusted Contacts
-    initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
     removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
@@ -242,6 +233,9 @@ const rootSaga = function* () {
 
     //VersionHistory integration
     versionHistoryWatcher,
+
+    // Sending
+    calculateSendMaxFeeWatcher,
   ]
 
   yield all(
@@ -268,6 +262,7 @@ const rootReducer = combineReducers( {
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
+  sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,

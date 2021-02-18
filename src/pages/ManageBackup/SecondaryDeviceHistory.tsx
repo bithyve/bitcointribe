@@ -32,7 +32,7 @@ import DeviceInfo from 'react-native-device-info'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
@@ -41,7 +41,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -177,7 +177,7 @@ const SecondaryDeviceHistory = ( props ) => {
         tcInfo[ 0 ] = contact
       }
       await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-      dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
     },
     [ trustedContactsInfo ],
   )

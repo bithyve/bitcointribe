@@ -43,14 +43,15 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import config from '../../bitcoin/HexaConfig'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import {
-  updateTrustedContactInfoLocally,
+  updateEphemeralChannel,
+  updateTrustedContactsInfoLocally,
   clearTrustedContactsCache
 } from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import {
   REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
@@ -772,7 +773,7 @@ const TrustedContactHistory = ( props ) => {
       }
       await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
 
-      dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
     },
     [ index, trustedContactsInfo ],
   )

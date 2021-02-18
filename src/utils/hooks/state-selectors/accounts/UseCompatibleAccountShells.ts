@@ -4,8 +4,7 @@ import useAccountShellsInUTXOCompatibilityGroup from './UseAccountShellsInUTXOCo
 
 
 /**
- * Finds account shells that can serve as compatible destination's for
- * another account shell's transactions during reassignment, or for merging.
+ * Finds other account shells that share the given shell's `UTXOCompatibilityGroup`
  */
 function useCompatibleAccountShells(accountShell: AccountShell): AccountShell[] {
   const accountShellsInGroup = useAccountShellsInUTXOCompatibilityGroup(AccountShell.getUTXOCompatibilityGroup(accountShell));

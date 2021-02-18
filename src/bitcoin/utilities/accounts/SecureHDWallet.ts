@@ -27,7 +27,7 @@ import {
   SECURE_ACCOUNT,
   WYRE,
   RAMP
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
 const {  HEXA_ID } = config

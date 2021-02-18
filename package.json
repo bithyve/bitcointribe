@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^1.4.1",
+    "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/netinfo": "^5.9.5",
     "@react-native-community/push-notification-ios": "^1.8.0",
     "@react-native-firebase/analytics": "^10.4.0",
@@ -120,6 +121,7 @@
     "react-native-responsive-fontsize": "^0.4.3",
     "react-native-responsive-screen": "^1.4.1",
     "react-native-root-toast": "^3.2.1",
+    "react-native-safe-area-context": "^3.1.9",
     "react-native-screens": "^2.9.0",
     "react-native-share": "^3.7.0",
     "react-native-slider": "^0.11.0",

@@ -32,7 +32,7 @@ import {
   WYRE,
   RAMP,
   FAST_BITCOINS,
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import _ from 'lodash'

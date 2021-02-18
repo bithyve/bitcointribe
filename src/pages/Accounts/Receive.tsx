@@ -40,9 +40,12 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+  TRUSTED_CONTACTS,
+  DONATION_ACCOUNT,
+} from '../../common/constants/wallet-service-types'
 import {
-  updateTrustedContactInfoLocally,
+  updateEphemeralChannel,
+  updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
@@ -315,7 +318,7 @@ export default function Receive( props ) {
       tcInfo[ 3 ] = contact // initial 3 reserved for Guardians
     }
     await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-    dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
   const createTrustedContact = useCallback( async () => {

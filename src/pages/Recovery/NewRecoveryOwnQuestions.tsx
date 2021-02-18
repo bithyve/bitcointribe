@@ -37,7 +37,7 @@ import {
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../../components/LoaderModal'
 import { getTestcoins, accountsSynched } from '../../store/actions/accounts'
-import { TEST_ACCOUNT } from '../../common/constants/serviceTypes'
+import { TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
 
 import DeviceInfo from 'react-native-device-info'
 
@@ -79,7 +79,7 @@ export default function NewRecoveryOwnQuestions( props ) {
           dispatch( initializeRecovery( walletName, security ) )
         }}
         style={{
-          ...styles.buttonView 
+          ...styles.buttonView
         }}
       >
         <Text style={styles.buttonText}>{'Confirm'}</Text>
@@ -89,22 +89,22 @@ export default function NewRecoveryOwnQuestions( props ) {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <KeyboardAvoidingView
         style={{
-          flex: 1 
+          flex: 1
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
         <ScrollView>
           <View style={{
-            flex: 1 
+            flex: 1
           }}>
             <View style={CommonStyles.headerContainer}>
               <TouchableOpacity
@@ -113,7 +113,7 @@ export default function NewRecoveryOwnQuestions( props ) {
                   props.navigation.goBack()
                 }}
                 hitSlop={{
-                  top: 20, left: 20, bottom: 20, right: 20 
+                  top: 20, left: 20, bottom: 20, right: 20
                 }}
               >
                 <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -129,7 +129,7 @@ export default function NewRecoveryOwnQuestions( props ) {
             <TouchableOpacity
               activeOpacity={10}
               style={{
-                flex: 1 
+                flex: 1
               }}
               onPress={() => {
                 Keyboard.dismiss()
@@ -137,17 +137,17 @@ export default function NewRecoveryOwnQuestions( props ) {
               disabled={isDisabled}
             >
               <View style={{
-                flexDirection: 'row', padding: wp( '7%' ) 
+                flexDirection: 'row', padding: wp( '7%' )
               }}>
                 <View style={{
-                  flex: 3, justifyContent: 'center' 
+                  flex: 3, justifyContent: 'center'
                 }}>
                   <Text style={styles.modalTitleText}>
                     Enter Security Question{'\n'}and Answer
                   </Text>
                   <Text
                     style={{
-                      ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
+                      ...styles.modalInfoText, marginTop: wp( '1.5%' )
                     }}
                   >
                     To recover your wallet you have to select the security
@@ -190,7 +190,7 @@ export default function NewRecoveryOwnQuestions( props ) {
                 />
               </View>
               <View style={{
-                marginTop: 15 
+                marginTop: 15
               }}>
                 <View
                   style={{
@@ -262,7 +262,7 @@ export default function NewRecoveryOwnQuestions( props ) {
         </ScrollView>
       </KeyboardAvoidingView>
       <View style={{
-        ...styles.bottomButtonView 
+        ...styles.bottomButtonView
       }}>
         {setButtonVisible()}
         <View style={styles.statusIndicatorView}>
@@ -308,7 +308,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
   },
@@ -361,7 +361,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
   },
@@ -387,7 +387,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 0, height: 10 
+      width: 0, height: 10
     },
     backgroundColor: Colors.white,
   },

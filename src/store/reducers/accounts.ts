@@ -51,7 +51,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
@@ -143,7 +143,7 @@ export type AccountsState = {
 
   averageTxFees: any;
 
-  // TODO: How does this differ from ANY added account? (See `activeAccounts`)
+  // TODO: How does this differ from ANY added account?
   // Perhaps we should consolidate the items here into that array?
   additional?: {
     regular?: any;

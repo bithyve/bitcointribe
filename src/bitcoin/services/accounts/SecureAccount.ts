@@ -7,6 +7,7 @@ import {
   TransactionDetails,
   TransactionPrerequisite,
   InputUTXOs,
+  ScannedAddressKind,
   AverageTxFees,
 } from '../../utilities/Interface'
 
@@ -443,7 +444,7 @@ export default class SecureAccount {
   public addressDiff = (
     scannedStr: string,
   ): {
-    type: string;
+      type: ScannedAddressKind | null
   } => this.secureHDWallet.addressDiff( scannedStr );
 
   public decodePaymentURI = (

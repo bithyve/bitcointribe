@@ -18,7 +18,7 @@ import { UsNumberFormat } from '../../common/utilities';
 import {
   TEST_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import openLink from '../../utils/OpenLink';
 

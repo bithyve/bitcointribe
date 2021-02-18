@@ -1,7 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
 import {
-  INITIALIZE_TRUSTED_CONTACT,
-  trustedContactInitialized,
   APPROVE_TRUSTED_CONTACT,
   trustedContactApproved,
   UPDATE_EPHEMERAL_CHANNEL,
@@ -17,7 +15,7 @@ import {
   paymentDetailsFetched,
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
   WALLET_CHECK_IN,
@@ -41,7 +39,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
 import { AsyncStorage } from 'react-native'
 import { fetchNotificationsWorker } from './notifications'
@@ -62,7 +60,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
-  if ( recipient.walletID )
+  if ( recipient.walletID && recipient.FCMs.length )
     receivers.push( {
       walletId: recipient.walletID,
       FCMs: recipient.FCMs,
@@ -474,7 +472,7 @@ function* removeTrustedContactWorker( { payload } ) {
           //   'TrustedContactsInfo',
           //   JSON.stringify(tcInfo),
           // );
-          yield put( updateTrustedContactInfoLocally( tcInfo ) )
+          yield put( updateTrustedContactsInfoLocally( tcInfo ) )
           break
         }
       }
@@ -1458,7 +1456,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
             }
           }
         }
-        yield put( updateTrustedContactInfoLocally( tcInfo ) )
+        yield put( updateTrustedContactsInfoLocally( tcInfo ) )
       }
 
       const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
