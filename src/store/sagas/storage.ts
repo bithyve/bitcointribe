@@ -181,6 +181,7 @@ function* servicesEnricherWorker( { payload } ) {
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
         if ( secureAccount.secureHDWallet.rederivePrimaryXKeys() ) {
           console.log( 'Standardized Primary XKeys for secure a/c' )
+          services.SECURE_ACCOUNT = secureAccount
           migrated = true
         }
       }
@@ -200,6 +201,8 @@ function* servicesEnricherWorker( { payload } ) {
         }
 
         console.log( 'Updated sub-account instances count' )
+        services.REGULAR_ACCOUNT = regularAccount
+        services.SECURE_ACCOUNT = secureAccount
         migrated = true
       }
     } else {
@@ -216,6 +219,13 @@ function* servicesEnricherWorker( { payload } ) {
     yield put( servicesEnriched( services ) )
     if ( migrated ) {
       database.VERSION = DeviceInfo.getVersion()
+      database.SERVICES = {
+        REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
+        TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
+        SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
+        S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
+        TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+      }
       yield call( insertDBWorker, {
         payload: database
       } )
