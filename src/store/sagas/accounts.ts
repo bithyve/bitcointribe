@@ -1236,7 +1236,6 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* blindRefreshWorker() {
-  console.log("blindRefreshWorker",blindRefreshWorker);
   yield put(blindRefreshStarted(true))
   const netDeltaTxs: TransactionDescribing[] = []
   for( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ){
@@ -1251,12 +1250,11 @@ function* blindRefreshWorker() {
         blindRefresh: true,
       },
     }
-    console.log("payload",payload);
-
+    
     const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
-    console.log("deltaTxs",deltaTxs);
+   // console.log("deltaTxs",deltaTxs);
     const rescanTxs : RescannedTransactionData[]= []
     deltaTxs.forEach( ( deltaTx )=>{
       rescanTxs.push( {
@@ -1266,7 +1264,7 @@ function* blindRefreshWorker() {
     yield put( rescanSucceeded( rescanTxs ) )
     if( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
   }
-  console.log("netDeltaTxs",netDeltaTxs);
+ // console.log("netDeltaTxs",netDeltaTxs);
   
   yield put(blindRefreshStarted(false));
 

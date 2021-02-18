@@ -12,7 +12,6 @@ import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { blindRefresh, refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
-import sampleRescannedTransactionDetails from '../account-shell-rescanning-bottom-sheet/sample-rescanned-transaction-details'
 import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
 import useSyncStatusForAccountShellID from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShellID'
 import useFoundTransactionsFromReScan from '../../../utils/hooks/state-selectors/wallet-rescanning/UseFoundTransactionsFromRescan'
@@ -72,7 +71,7 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
   }, [] )
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
   //const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
-  console.log("foundTransactions",foundTransactions);
+  //console.log("foundTransactions",foundTransactions);
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
