@@ -42,8 +42,8 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const [ showLoader, setShowLoader ] = useState( false )
   const [ buttonPressed, setButtonPressed ] = useState ( false )
 
-  const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( '' )
+  const [ accountName, setAccountName ] = useState( '' )
+  const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
 
   const canProceed = useMemo( () => {
     return (
@@ -108,6 +108,7 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
               value={accountDescription}
               numberOfLines={2}
               onChangeText={setAccountDescription}
+              maxLength={40}
             />
           </View>
 
