@@ -30,6 +30,7 @@ import moment from 'moment'
 import {
   addTransferDetails,
   clearTransfer,
+  addNewSecondarySubAccount
 } from '../../store/actions/accounts'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -50,13 +51,14 @@ import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import SendShareModal from '../ManageBackup/SendShareModal'
 import {
-  EphemeralDataElements,
   MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import { removeTrustedContact } from '../../store/actions/trustedContacts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const getImageIcon = ( item ) => {
   if ( item ) {
@@ -125,8 +127,7 @@ interface ContactDetailsPropTypes {
   addTransferDetails: any;
   UploadSuccessfully: any;
   uploadRequestedShare: any;
-  uploadEncMShare: any;
-  updateEphemeralChannel: any;
+  addNewSecondarySubAccount: any;
   removeTrustedContact: any;
 }
 interface ContactDetailsStateTypes {
@@ -603,8 +604,8 @@ class ContactDetails extends PureComponent<
   createGuardian = async () => {
     const {
       trustedContacts,
-      uploadEncMShare,
-      updateEphemeralChannel,
+      accountShells,
+      addNewSecondarySubAccount,
       DECENTRALIZED_BACKUP,
     } = this.props
     const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP
@@ -614,50 +615,61 @@ class ContactDetails extends PureComponent<
       ( ( this.Contact.phoneNumbers && this.Contact.phoneNumbers.length ) ||
         ( this.Contact.emails && this.Contact.emails.length ) )
     ) {
-      const walletID = await AsyncStorage.getItem( 'walletID' )
-      const FCM = await AsyncStorage.getItem( 'fcmToken' )
-      console.log( {
-        walletID, FCM
-      } )
-
       const contactName = `${this.Contact.firstName} ${
         this.Contact.lastName ? this.Contact.lastName : ''
       }`
         .toLowerCase()
         .trim()
-      const data: EphemeralDataElements = {
-        walletID,
-        FCM,
-      }
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
 
-      if (
-        !SHARES_TRANSFER_DETAILS[ this.index ] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[ this.index ].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        this.setState( {
-          trustedLink: '',
-          trustedQR: '',
-        } )
-        uploadEncMShare( this.index, contactName, data )
-      } else if (
-        trustedContact &&
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
+      let info = ''
+      if ( this.Contact.phoneNumbers && this.Contact.phoneNumbers.length ) {
+        const phoneNumber = this.Contact.phoneNumbers[ 0 ].number
+        let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+        number = number.slice( number.length - 10 ) // last 10 digits only
+        info = number
+      } else if ( this.Contact.emails && this.Contact.emails.length ) {
+        info = this.Contact.emails[ 0 ].email
+      }
+
+      // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
+      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+      const shareExpired =    !SHARES_TRANSFER_DETAILS[ this.index ] ||
+      Date.now() - SHARES_TRANSFER_DETAILS[ this.index ].UPLOADED_AT >
+        config.TC_REQUEST_EXPIRY
+
+      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
         trustedContact.ephemeralChannel.initiatedAt &&
         Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY
-      ) {
+        config.TC_REQUEST_EXPIRY? true: false
+
+      if ( shareExpired || ( !hasTrustedChannel && isEphemeralChannelExpired ) ) {
         this.setState( {
           trustedLink: '',
           trustedQR: '',
         } )
-        updateEphemeralChannel(
-          contactName,
-          trustedContact.ephemeralChannel.data[ 0 ]
-        )
       }
+
+      const contactInfo = {
+        contactName,
+        info: info? info.trim(): info,
+        isGuardian: true,
+        shareIndex: this.index,
+      }
+
+      let parentShell: AccountShell
+      accountShells.forEach( ( shell: AccountShell ) => {
+        if( !shell.primarySubAccount.instanceNumber ){
+          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+        }
+      } )
+      const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+        accountShellID: parentShell.id,
+        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+      } )
+
+      addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo )
+
     } else {
       // case: OTP
       // Alert.alert(
@@ -1395,7 +1407,7 @@ export default connect( mapStateToProps, {
   addTransferDetails,
   clearTransfer,
   UploadSuccessfully,
-  uploadEncMShare,
+  addNewSecondarySubAccount,
   uploadRequestedShare,
   ErrorSending,
   removeTrustedContact,

@@ -1,5 +1,4 @@
 import {
-  TRANSACTIONS_FETCHED,
   TRANSFER_ST1_EXECUTED,
   TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER,
@@ -225,19 +224,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           [ accountType ]: {
             ...state[ accountType ],
             service: action.payload.service,
-          },
-        }
-
-      case TRANSACTIONS_FETCHED:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            transactions: action.payload.transactions,
-            loading: {
-              ...state[ accountType ].loading,
-              transactions: false,
-            },
           },
         }
 
