@@ -68,24 +68,29 @@ export default function useNewAccountChoices() {
         //   }`,
         // }),
         new CheckingSubAccountInfo( {
-          defaultTitle: `Checking Account${hexaAccountCounts[ SubAccountKind.REGULAR_ACCOUNT ] > 0 ?
-            ` ${hexaAccountCounts[ SubAccountKind.REGULAR_ACCOUNT ] + 1}`
-            : ''
-          }`,
+          defaultTitle: 'Checking Account',
+          // defaultTitle: `Checking Account${hexaAccountCounts[ SubAccountKind.REGULAR_ACCOUNT ] > 0 ?
+          //   ` ${hexaAccountCounts[ SubAccountKind.REGULAR_ACCOUNT ] + 1}`
+          //   : ''
+          // }`,
+          defaultDescription: 'User Checking Account'
         } ),
         new SavingsSubAccountInfo( {
-          defaultTitle: `Savings Account${
-            hexaAccountCounts[ SubAccountKind.SECURE_ACCOUNT ] > 0 ?
-              ` ${hexaAccountCounts[ SubAccountKind.SECURE_ACCOUNT ] + 1}`
-              : ''
-          }`,
+          defaultTitle: 'Savings Account',
+          // defaultTitle: `Savings Account${
+          //   hexaAccountCounts[ SubAccountKind.SECURE_ACCOUNT ] > 0 ?
+          //     ` ${hexaAccountCounts[ SubAccountKind.SECURE_ACCOUNT ] + 1}`
+          //     : ''
+          // }`,
+          defaultDescription: 'User Savings Account'
         } ),
         new DonationSubAccountInfo( {
-          defaultTitle: `Donation Account${
-            hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] > 0 ?
-              ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
-              : ''
-          }`,
+          defaultTitle: 'Donation Account',
+          // defaultTitle: `Donation Account${
+          //   hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] > 0 ?
+          //     ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
+          //     : ''
+          // }`,
           defaultDescription: 'Directly accept donations',
           doneeName: '',
           causeName: '',
@@ -96,13 +101,13 @@ export default function useNewAccountChoices() {
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Ramp Account',
-          defaultDescription: 'Buy using ApplePay/Debit card',
+          defaultDescription: 'Buy using Bank Transfer, Apple Pay or Card',
           serviceAccountKind: ServiceAccountKind.RAMP,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Wyre Account',
-          defaultDescription: 'Buy using ApplePay/Debit card',
+          defaultDescription: 'Buy using ApplePay or Debit card',
           serviceAccountKind: ServiceAccountKind.WYRE,
         } ),
         new ExternalServiceSubAccountInfo( {

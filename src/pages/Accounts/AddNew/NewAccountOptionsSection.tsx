@@ -62,7 +62,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.SWAN:
           return true
         case ServiceAccountKind.WYRE:
-          return currentWyreSubAccount == null
+          return false//currentWyreSubAccount == null
         case ServiceAccountKind.RAMP:
           return currentRampSubAccount == null
         default:
@@ -106,7 +106,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.SWAN:
           return 'COMING SOON'
         case ServiceAccountKind.WYRE:
-          return 'NEW'
+          return 'COMING SOON'
         case ServiceAccountKind.RAMP:
           return 'NEW'
         default:

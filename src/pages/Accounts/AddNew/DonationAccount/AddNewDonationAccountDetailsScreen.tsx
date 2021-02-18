@@ -4,7 +4,7 @@ import FormStyles from '../../../../common/Styles/FormStyles'
 import Colors from '../../../../common/Colors'
 import Fonts from '../../../../common/Fonts'
 import ListStyles from '../../../../common/Styles/ListStyles'
-import { Input, CheckBox } from 'react-native-elements'
+import { Input } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
@@ -18,6 +18,11 @@ import openLink from '../../../../utils/OpenLink'
 import SourceAccountKind from '../../../../common/data/enums/SourceAccountKind'
 import Loader from '../../../../components/loader'
 import ButtonBlue from '../../../../components/ButtonBlue'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
+import Entypo from 'react-native-vector-icons/Entypo'
 
 export type Props = {
   navigation: any;
@@ -144,16 +149,24 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
                 }}>
               Enable 2-Factor Authentication
                 </Text>
-
-                <CheckBox
+                <View style={styles.checkbox}>
+                    {isTFAEnabled && (
+                      <Entypo
+                        name="check"
+                        size={RFValue( 20 )}
+                        color={Colors.green}
+                      />
+                    )}
+                  </View>
+                {/* <CheckBox
                   checkedIcon="check"
                   uncheckedIcon="square-o"
                   size={24}
                   checkedColor={Colors.darkGreen}
-                  uncheckedColor={Colors.white}
                   checked={isTFAEnabled}
+                  containerStyle={{backgroundColor: Colors.white,}}
                   disabled
-                />
+                /> */}
               </View>
             </TouchableOpacity>
 
@@ -210,6 +223,7 @@ const styles = StyleSheet.create( {
     marginBottom: 36,
     marginHorizontal: 14,
     paddingHorizontal: 10,
+    padding:10
   },
 
   tfaSelectionFieldContentContainer: {
@@ -223,7 +237,17 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
-
+  checkbox: {
+    width: wp( '7%' ),
+      height: wp( '7%' ),
+      borderRadius: 7,
+      backgroundColor: Colors.white,
+      borderColor: Colors.borderColor,
+      borderWidth: 1,
+      marginLeft: 'auto',
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
   linkText: {
     fontFamily: Fonts.FiraSansItalic,
     color: Colors.blue,

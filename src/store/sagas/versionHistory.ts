@@ -16,7 +16,7 @@ function* versionHistoryWorker( { payload } ) {
 
   const id = versionHistory && versionHistory.length ? versionHistory.length + 1 : 1
 
-  if( !( versionType==='Restored' ) ) {
+  if( versionType !== 'Restored' ) {
     if( id==1 ) {
       versionType = 'Current'
     } else if( id>1 && !buildVersionExists( versionHistory ) )  {

@@ -41,3 +41,33 @@ export const timeConvertNear30 = ( valueInMinutes ) => {
     return rminutes + ' minutes'
   }
 }
+
+export const getVersions = (versionHistory, restoreVersions) => {
+  let versions = [];
+  let versionHistoryArray = [];
+  let restoreVersionsArray = [];
+  if(versionHistory){
+  for (let i=0; i<versionHistory.length; i++) {
+    versionHistoryArray.push(versionHistory[i]);
+  }
+}
+//console.log("versionHistoryArray",versionHistoryArray);
+
+  if(restoreVersions){
+  for (let i=0; i<restoreVersions.length; i++) {
+    restoreVersionsArray.push(restoreVersions[i]);
+  }
+}
+//console.log("restoreVersionsArray",restoreVersionsArray);
+
+  if(versionHistoryArray.length && restoreVersionsArray.length){
+    versions = [...versionHistoryArray ,...restoreVersionsArray];
+  } else if(versionHistoryArray.length){
+    versions = [...versionHistoryArray]
+  } else if(restoreVersionsArray.length){
+    versions = [...restoreVersionsArray]
+  }
+  //console.log("versions",versions);
+
+  return versions;
+}
