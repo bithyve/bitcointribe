@@ -186,7 +186,7 @@ function* servicesEnricherWorker( { payload } ) {
         }
       }
 
-      if( semver.lt( dbVersion, '1.4.4' ) ){
+      if( semver.lt( dbVersion, '1.4.5' ) ){
         // update sub-account instances count
         const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
