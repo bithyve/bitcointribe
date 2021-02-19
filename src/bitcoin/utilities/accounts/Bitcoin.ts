@@ -12,7 +12,7 @@ import {
 import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
-const bitcoinAxios = axios.create( {
+let bitcoinAxios = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 export default class Bitcoin {
@@ -173,6 +173,9 @@ export default class Bitcoin {
       }
 
       let usedFallBack = false
+      bitcoinAxios = axios.create( {
+        timeout: 4 * REQUEST_TIMEOUT // accounting for blind refresh
+      } )
       try{
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(
