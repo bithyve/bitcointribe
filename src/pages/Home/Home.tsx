@@ -100,6 +100,8 @@ import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheet
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -172,6 +174,8 @@ interface HomePropsTypes {
   s3Service: any;
   overallHealth: any;
   autoSyncShells: any;
+  clearWyreCache: any;
+  clearRampCache: any;
   addNewAccountShell: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -1050,15 +1054,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const splits = url.split( '/' )
 
     if ( splits.includes( 'wyre' ) ) {
+      this.props.clearWyreCache()
       this.setState( {
-        wyreDeepLinkContent:url
+        wyreDeepLinkContent:url,
+        wyreFromBuyMenu: false,
+        wyreFromDeepLink: true
       }, () => {
         this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
       } )
     }
     if ( splits.includes( 'ramp' ) ) {
+      this.props.clearRampCache()
       this.setState( {
-        rampDeepLinkContent:url
+        rampDeepLinkContent:url,
+        rampFromBuyMenu: false,
+        rampFromDeepLink: true
       }, () => {
         this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
       } )
@@ -1324,10 +1334,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
             this.props.addNewAccountShell( newSubAccount )
           }
+          this.props.clearRampCache()
           this.setState( {
-            wyreDeepLinkContent: null,
-            wyreFromDeepLink: false,
-            wyreFromBuyMenu: true
+            rampDeepLinkContent: null,
+            rampFromDeepLink: false,
+            rampFromBuyMenu: true
           }, () => {
             this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
           } )
@@ -1345,6 +1356,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             //   currentSubAccount: newSubAccount,
             // } )
           }
+          this.props.clearWyreCache()
           this.setState( {
             wyreDeepLinkContent: null,
             wyreFromDeepLink: false,
@@ -1743,8 +1755,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.WYRE_STATUS_INFO:
+          return ( this.state.wyreFromDeepLink )
+            ? [ 0, '30%' ]
+            : [ 0, '55%' ]
         case BottomSheetKind.RAMP_STATUS_INFO:
-          return [ 0, '35%' ]
+          return ( this.state.rampFromDeepLink )
+            ? [ 0, '30%' ]
+            : [ 0, '55%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return [ 0, '50%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
@@ -1796,11 +1813,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.WYRE_STATUS_INFO:
           return (
             <>
-              <BottomSheetHeader title="Buy bitcoin with Wyre" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
               <BottomSheetWyreInfo
                 wyreDeepLinkContent={this.state.wyreDeepLinkContent}
                 wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromBuyMenu}
+                wyreFromDeepLink={this.state.wyreFromDeepLink}
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
@@ -1811,11 +1828,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.RAMP_STATUS_INFO:
           return (
             <>
-              <BottomSheetHeader title="Buy bitcoin with Ramp" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
               <BottomSheetRampInfo
                 rampDeepLinkContent={this.state.rampDeepLinkContent}
                 rampFromBuyMenu={this.state.rampFromBuyMenu}
-                rampFromDeepLink={this.state.rampFromBuyMenu}
+                rampFromDeepLink={this.state.rampFromDeepLink}
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
@@ -2120,6 +2137,8 @@ export default withNavigationFocus(
     fetchTrustedChannel,
     uploadRequestedShare,
     autoSyncShells,
+    clearWyreCache,
+    clearRampCache,
     addNewAccountShell,
     addTransferDetails,
     clearPaymentDetails,
