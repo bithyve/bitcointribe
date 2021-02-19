@@ -19,20 +19,23 @@ RCT_EXPORT_METHOD(startBackup:(NSString*) json
                   rejecter:(RCTPromiseRejectBlock)reject){
   NSLog(@"into native startBackup %@",json);
   iCloudBackup *backup = [[iCloudBackup alloc]init];
-  [backup startBackupWithJson:json];
-  resolve(@"true");
+  [backup startBackupWithJson:json callback:^(BOOL isUploaded) {
+    if (isUploaded) {
+      resolve(@"true");
+    }else{
+      resolve(@"false");
+    }
+  }];
+  
 }
 
 RCT_EXPORT_METHOD(downloadBackup:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject){
   NSLog(@"into native download backup");
   iCloudRestore *restore = [[iCloudRestore alloc]init];
-  NSString* content = @"";
-  NSString* filePath = [restore getPath];
-  if ( [filePath length] != 0 ){
-    content =  [NSString stringWithContentsOfFile:filePath encoding:NSUTF8StringEncoding error:NULL];
-  };
-  resolve(content);
+  [restore getBackupWithCallback:^(NSString * _Nonnull jsonContent) {
+    resolve(jsonContent);
+  }];
 }
 
 

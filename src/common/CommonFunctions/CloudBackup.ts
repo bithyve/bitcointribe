@@ -49,7 +49,7 @@ export default class CloudBackup {
     if (Platform.OS == 'ios') {
       // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
       iCloud.downloadBackup().then((backedJson) => {
-        console.log('BackedUp JSON: DONE');
+        //console.log('BackedUp JSON: DONE', backedJson);
         if (backedJson) this.recoveryCallback(backedJson);
         else this.recoveryCallback(null);
       });
