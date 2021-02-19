@@ -586,7 +586,7 @@ class RestoreWithICloud extends Component<
           <View style={{ flex: 1, flexDirection: "row" }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate("RestoreAndRecoverWallet");
+                navigation.goBack()
               }}
               style={styles.headerBackArrowView}
             >
