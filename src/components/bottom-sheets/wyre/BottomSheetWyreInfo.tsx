@@ -1,22 +1,16 @@
 import React, { useEffect, useState } from 'react'
-import {
-  View,
-  Text,
-  StyleSheet,
-} from 'react-native'
+import { View, StyleSheet, Text, Image } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import useWyreIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
-import { clearWyreCache, fetchWyreReceiveAddress, fetchWyreReservation } from '../../../store/actions/WyreIntegration'
+import { fetchWyreReceiveAddress, fetchWyreReservation } from '../../../store/actions/WyreIntegration'
 import useWyreReservationFetchEffect from '../../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
 import openLink from '../../../utils/OpenLink'
 
-let boottomSheetRenderCount = 0
 type Props = {
   wyreFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
@@ -25,22 +19,15 @@ type Props = {
 }
 
 const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBuyMenu, wyreFromDeepLink, onClickSetting }: Props ) => {
-
-  const { currentWyreSubAccount } = useAccountsState()
-
   const dispatch = useDispatch()
   const { wyreHostedUrl, wyreReceiveAddress } = useWyreIntegrationState()
-
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-
-
   function handleProceedButtonPress() {
     if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation() )}
     setHasButtonBeenPressed( true )
   }
 
   useEffect( () => {
-    dispatch( clearWyreCache() )
     dispatch( fetchWyreReceiveAddress() )
   }, [] )
 
@@ -53,18 +40,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       setHasButtonBeenPressed( true )
     }
   } )
-
-  console.log( {
-    boottomSheetRenderCount: boottomSheetRenderCount++,
-    ...{
-      wyreDeepLinkContent
-    }
-  } )
-  let wyreMessage = 'Hexa Wyre Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'
-  let wyreTitle = 'Buy from Ramp'
-  if( wyreDeepLinkContent.search( 'fail' )>=0 ) {
+  // eslint-disable-next-line quotes
+  let wyreMessage = `\nWyre enables purchases of BTC using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Wyre Account\n- ${wyreReceiveAddress}`
+  let wyreTitle = 'Buy with Wyre'
+  if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'fail' )>=0 ) {
     wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
     wyreTitle = 'Wyre order failed'
+  }
+  if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'success' )>=0 ) {
+    wyreMessage = 'Your order has been successful, the purchased bitcoin will be transferred to your Wyre account shortly'
+    wyreTitle = 'Order successfull'
   }
   return ( <View style={{
     ...styles.modalContentContainer
@@ -76,23 +61,49 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         <Text style={styles.modalTitleText}>{wyreTitle}</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
-        }}>{wyreMessage}.</Text>
+        }}>{wyreMessage}</Text>
       </View>
 
       <View style={{
-        flexDirection: 'row', marginTop: 'auto', alignItems: 'center'
+        flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
       }} >
         <AppBottomSheetTouchableWrapper
-          onPress={() => onClickSetting()}
+          disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
+          onPress={wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting}
           style={{
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>OK</Text>
+          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Proceed to Wyre' : 'OK'}</Text>
+
         </AppBottomSheetTouchableWrapper>
+        {wyreFromBuyMenu
+          ? <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            alignContent: 'center'
+          }}>
+            <Text style={{
+              marginLeft: wp( '12%' ),
+            }}>
+        Powered by
+            </Text>
+            <Image
+              source={require( '../../../assets/images/icons/wyre_logo_large.png' )}
+              style={{
+                marginLeft: 5,
+                width: 62,
+                height: 27,
+              }}
+            />
+          </View>
+          : null
+        }
         {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
       </View>
+
     </View>
+
   </View>
   )
 }
@@ -104,7 +115,7 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
-    marginTop: wp( '10%' ),
+    marginTop: wp( '5%' ),
     flex: 1.7
   },
   modalTitleText: {
@@ -116,13 +127,18 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
+    textAlign: 'justify'
   },
   successModalButtonView: {
+    minHeight: 50,
+    minWidth: 144,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: wp( '40%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 10,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
@@ -130,7 +146,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
     marginLeft: wp( '10%' ),
   },
   successModalImage: {
