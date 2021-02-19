@@ -138,7 +138,7 @@ export default class Bitcoin {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs } = accounts[ accountId ]
+        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
         const upToDateTxs: TransactionDetails[] = []
         const txsToUpdate: TransactionDetails[] = []
         const newTxs : TransactionDetails[] = []
@@ -155,6 +155,10 @@ export default class Bitcoin {
               }
             }
           } else upToDateTxs.push( tx )
+
+          if( !cachedTxIdMap[ tx.txid ] ) // backward compatibility (for versions w/o txIdMaps)
+            cachedTxIdMap[ tx.txid ] = [ tx.address ]
+
         } )
 
         accountsTemp[ accountId ] = {
