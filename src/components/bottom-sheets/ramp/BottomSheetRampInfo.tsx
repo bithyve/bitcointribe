@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   View,
   Text,
@@ -9,20 +9,43 @@ import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 
 let boottomSheetRenderCount = 0
 type Props = {
   rampDeepLinkContent: string | null;
+  rampFromDeepLink: boolean | null;
+  rampFromBuyMenu: boolean | null;
   onClickSetting: ()=>any;
 }
 
-const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, onClickSetting }: Props ) => {
+const { currentRampSubAccount } = useAccountsState()
+
+const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDeepLink, rampFromBuyMenu, onClickSetting }: Props ) => {
   console.log( {
     boottomSheetRenderCount: boottomSheetRenderCount++,
     ...{
       rampDeepLinkContent
     }
   } )
+  function handleProceedButtonPress() {
+    currentSubAccount.customDisplayName = accountName
+    currentSubAccount.customDescription = accountDescription
+
+    
+    setHasButtonBeenPressed( true )
+  }
+
+  useEffect( ()=>{
+    if ( swanFromBuyMenu ) {
+      if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
+    }
+  }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )
+
+  if( swanFromDeepLink && !hasRedeemSwanCodeForTokenInitiated ) {
+    dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
+  }
+
   let rampMessage = 'Your order has been successful, the purchased bitcoin will be transferred to your Ramp account shortly'
   let rampTitle = 'Order successful'
   if( rampDeepLinkContent.search( 'fail' )>=0 ) {

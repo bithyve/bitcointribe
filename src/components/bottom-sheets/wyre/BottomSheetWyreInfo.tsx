@@ -1,30 +1,67 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Text,
   StyleSheet,
 } from 'react-native'
+import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import useWyreIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
+import { clearWyreCache, fetchWyreReceiveAddress, fetchWyreReservation } from '../../../store/actions/WyreIntegration'
+import useWyreReservationFetchEffect from '../../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
+import openLink from '../../../utils/OpenLink'
 
 let boottomSheetRenderCount = 0
 type Props = {
+  wyreFromDeepLink: boolean | null;
+  wyreFromBuyMenu: boolean | null;
   wyreDeepLinkContent: string | null;
   onClickSetting: ()=>any;
 }
 
-const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, onClickSetting }: Props ) => {
+const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBuyMenu, wyreFromDeepLink, onClickSetting }: Props ) => {
+
+  const { currentWyreSubAccount } = useAccountsState()
+
+  const dispatch = useDispatch()
+  const { wyreHostedUrl, wyreReceiveAddress } = useWyreIntegrationState()
+
+  const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+
+
+  function handleProceedButtonPress() {
+    if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation() )}
+    setHasButtonBeenPressed( true )
+  }
+
+  useEffect( () => {
+    dispatch( clearWyreCache() )
+    dispatch( fetchWyreReceiveAddress() )
+  }, [] )
+
+
+  useWyreReservationFetchEffect( {
+    onSuccess: () => {
+      openLink( wyreHostedUrl )
+    },
+    onFailure: () => {
+      setHasButtonBeenPressed( true )
+    }
+  } )
+
   console.log( {
     boottomSheetRenderCount: boottomSheetRenderCount++,
     ...{
       wyreDeepLinkContent
     }
   } )
-  let wyreMessage = 'Your order has been successful, the purchased bitcoin will be transferred to your Wyre account shortly'
-  let wyreTitle = 'Order successful'
+  let wyreMessage = 'Hexa Wyre Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'
+  let wyreTitle = 'Buy from Ramp'
   if( wyreDeepLinkContent.search( 'fail' )>=0 ) {
     wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
     wyreTitle = 'Wyre order failed'
