@@ -49,7 +49,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   },
   {
     title: 'Set up automatic buys  (COMING SOON)',
-    subtitle: 'Stack sats with SwanBitcoin',
+    subtitle: 'Stack sats with Swan Bitcoin',
     kind: BuyMenuItemKind.SWAN,
     imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
     disabled: true
