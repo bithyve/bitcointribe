@@ -48,9 +48,9 @@ export default function ContactListForRestore(props) {
                     fontSize: RFValue(10),
                   }}
                 >
-                  {data.phoneNumbers && data.phoneNumbers.length
+                  {data && data.phoneNumbers && data.phoneNumbers.length
                     ? data.phoneNumbers[0].number
-                    : data.emails && data.emails.length
+                    : data && data.emails && data.emails.length
                     ? data.emails[0].email
                     : ""}
                 </Text>

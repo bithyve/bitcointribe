@@ -361,7 +361,6 @@ class RestoreWithICloud extends Component<
     } else {
       (this.refs.ErrorBottomSheet as any).snapTo(1);
     }
-    //
   };
 
   handleScannedData = async (scannedData) => {
@@ -915,19 +914,8 @@ class RestoreWithICloud extends Component<
                 info={
                   "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
                 }
-                cardInfo={"Restoring Wallet from"}
-                cardTitle={"selectedBackup.walletName"}
-                levelStatus={"sfds"}
-                proceedButtonText={"Continue"}
-                backButtonText={"Back"}
                 contactList={contactList}
                 modalRef={this.refs.ContactListForRestore}
-                onPressProceed={() => {
-                  this.restoreWallet();
-                }}
-                onPressBack={() => {
-                  (this.refs.ContactListForRestore as any).snapTo(0);
-                }}
                 onPressCard={(contact, index) => {
                   this.setState({ selectedContact: contact });
                   (this.refs.ContactListForRestore as any).snapTo(0);
@@ -938,11 +926,7 @@ class RestoreWithICloud extends Component<
             );
           }}
           renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() =>
-                (this.refs.RestoreFromICloud as any).snapTo(0)
-              }
-            />
+            <ModalHeader onPressHeader={() => (this.refs.ContactListForRestore as any).snapTo(0)}/>
           )}
         />
         <BottomSheet

@@ -501,12 +501,13 @@ class ManageBackup extends Component<
       id,
       selectedKeeper,
       isSetup,
+      isPrimaryKeeper
     } = value;
     let navigationParams = {
       selectedTime: updatedAt ? this.getTime(updatedAt) : "never",
       selectedStatus: keeperStatus,
       selectedTitle: name,
-      isPrimaryKeeper: this.state.isPrimaryKeeper,
+      isPrimaryKeeper: isPrimaryKeeper ? isPrimaryKeeper : this.state.isPrimaryKeeper,
       selectedLevelId: id,
       selectedContact: selectedKeeper.data,
       selectedKeeper,
@@ -561,9 +562,11 @@ class ManageBackup extends Component<
     );
     if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       onApprovalStatusChange(
-        false,
-        moment(new Date()).valueOf(),
-        this.state.selectedKeeper.shareId ? this.state.selectedKeeper.shareId : shareId
+        {
+          status: false,
+          initiatedAt: moment(new Date()).valueOf(),
+          shareId: this.state.selectedKeeper.shareId ? this.state.selectedKeeper.shareId : shareId,
+        }
       );
     }
     (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
@@ -625,6 +628,7 @@ class ManageBackup extends Component<
         id: value.id,
         selectedKeeper: keeper,
         isSetup: false,
+        isPrimaryKeeper: value.id === 2 && number == 1 ? true : false,
       };
       this.goToHistory(obj);
       return;
@@ -1412,6 +1416,7 @@ class ManageBackup extends Component<
                   id: selectedLevelId,
                   selectedKeeper: selectedKeeper,
                   isSetup: true,
+                  isPrimaryKeeper: false
                 };
                 this.goToHistory(obj);
               }}

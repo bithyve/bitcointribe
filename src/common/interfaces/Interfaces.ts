@@ -30,6 +30,7 @@ export interface DecentralizedBackup {
         KEY: string;
         UPLOADED_AT: number;
       };
+      SECONDARY_SHARE?: MetaShare;
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;

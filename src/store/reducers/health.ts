@@ -94,6 +94,10 @@ const initialState: {
     initiatedAt: number;
     shareId: string;
     secondaryShare?: MetaShare;
+    transferDetails?: {
+      key: string;
+      otp: string;
+    } 
   }
   secondaryShareDownloaded: any;
   pdfInfo: {
@@ -138,7 +142,8 @@ const initialState: {
     status: false,
     initiatedAt: 0,
     shareId: '',
-    secondaryShare: null
+    secondaryShare: null,
+    transferDetails: null
   },
   secondaryShareDownloaded: null,
   pdfInfo: {
@@ -340,6 +345,8 @@ export default (state = initialState, action) => {
           status: action.payload.status,
           initiatedAt: action.payload.initiatedAt,
           shareId: action.payload.shareId,
+          secondaryShare: action.payload.secondaryShare,
+          transferDetails: action.payload.transferDetails,
         },
       };
 

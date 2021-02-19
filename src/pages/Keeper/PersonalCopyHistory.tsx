@@ -324,11 +324,11 @@ const PersonalCopyHistory = (props) => {
     );
     if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       dispatch(
-        onApprovalStatusChange(
-          false,
-          moment(new Date()).valueOf(),
-          selectedKeeper.shareId
-        )
+        onApprovalStatusChange({
+          status: false,
+          initiatedAt: moment(new Date()).valueOf(),
+          shareId: selectedKeeper.shareId,
+        })
       );
     }
     (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);

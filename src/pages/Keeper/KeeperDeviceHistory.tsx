@@ -6,6 +6,7 @@ import {
   StatusBar,
   AsyncStorage,
   Platform,
+  Alert,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -34,6 +35,11 @@ import {
   LevelHealthInterface,
   notificationType,
 } from "../../bitcoin/utilities/Interface";
+import SendViaLink from "../../components/SendViaLink";
+import config from "../../bitcoin/HexaConfig";
+import ShareOtpWithTrustedContact from "./ShareOtpWithTrustedContact";
+import ContactListForRestore from "../RestoreHexaWithKeeper/ContactListForRestore";
+import TrustedContactsService from "../../bitcoin/services/TrustedContactsService";
 
 const KeeperDeviceHistory = (props) => {
   const dispatch = useDispatch();
@@ -43,12 +49,27 @@ const KeeperDeviceHistory = (props) => {
   const [errorMessageHeader, setErrorMessageHeader] = useState("");
   const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(React.createRef());
-  const [ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet] = useState(React.createRef());
-  const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(React.createRef());
-  const [ReshareBottomSheet, setReshareBottomSheet] = useState(React.createRef());
-
-  const [qrScannedData, setQrScannedData] = useState("");
+  const [ApproveSetupBottomSheet, setApproveSetupBottomSheet] = useState(
+    React.createRef()
+  );
+  const [
+    ApprovePrimaryKeeperBottomSheet,
+    setApprovePrimaryKeeperBottomSheet,
+  ] = useState(React.createRef());
+  const [
+    ContactListForRestoreBottomSheet,
+    setContactListForRestoreBottomSheet,
+  ] = useState(React.createRef());
+  const [SendViaLinkBottomSheet, setSendViaLinkBottomSheet] = useState(
+    React.createRef()
+  );
+  const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(
+    React.createRef()
+  );
+  const [
+    shareOtpWithTrustedContactBottomSheet,
+    setShareOtpWithTrustedContactBottomSheet,
+  ] = useState(React.createRef());
   const [secondaryDeviceHistory, setSecondaryDeviceHistory] = useState([
     {
       id: 1,
@@ -77,7 +98,11 @@ const KeeperDeviceHistory = (props) => {
     },
   ]);
   const [isPrimaryKeeper, setIsPrimaryKeeper] = useState(
-    props.navigation.state.params.selectedKeeper && props.navigation.state.params.selectedKeeper.shareType && props.navigation.state.params.selectedKeeper.shareType == 'primaryKeeper' ? true : false
+    props.navigation.state.params.selectedKeeper &&
+      props.navigation.state.params.selectedKeeper.shareType &&
+      props.navigation.state.params.selectedKeeper.shareType == "primaryKeeper"
+      ? true
+      : false
   );
   const [selectedLevelId, setSelectedLevelId] = useState(
     props.navigation.state.params.selectedLevelId
@@ -101,7 +126,26 @@ const KeeperDeviceHistory = (props) => {
     (state) => state.health.keeperApproveStatus
   );
   const [isChange, setIsChange] = useState(false);
+  const [contactList, setContactList] = useState([]);
+  const [selectedContact, setSelectedContact]: [
+    selectedContact: any,
+    setSelectedContact: any
+  ] = useState({});
+  const [linkToRequest, setLinkToRequest] = useState("");
+  const [renderTimer, setRenderTimer] = useState(false);
+  const [isOtpType, setIsOtpType] = useState(false);
+  const [otp, setOtp] = useState("");
+  const database = useSelector((state) => state.storage.database);
+  let trustedContactsInfo = useSelector(
+    (state) => state.trustedContacts.trustedContactsInfo
+  );
+  const trustedContacts: TrustedContactsService = useSelector(
+    (state) => state.trustedContacts.service
+  );
+  const { SHARES_TRANSFER_DETAILS } = database.DECENTRALIZED_BACKUP;
+  const [publicKey, setPublicKey] = useState('');
   useEffect(() => {
+    console.log('props.navigation.state.params.isPrimaryKeeper', props.navigation.state.params.isPrimaryKeeper)
     setIsPrimaryKeeper(props.navigation.state.params.isPrimaryKeeper);
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
@@ -163,6 +207,7 @@ const KeeperDeviceHistory = (props) => {
 
   useEffect(() => {
     (async () => {
+      getContactList();
       if (!isReshare) {
         setQrBottomSheetsFlag(true);
         (QrBottomSheet as any).current.snapTo(1);
@@ -175,6 +220,40 @@ const KeeperDeviceHistory = (props) => {
       if (shareHistory) updateHistory(shareHistory);
     })();
   }, []);
+
+  const getContactList = () => {
+    if (
+      levelHealth.length > 1 &&
+      currentLevel >= 2 &&
+      levelHealth.findIndex(
+        (value) =>
+          value.levelInfo.findIndex((item) => item.shareType == "contact") > -1
+      ) > -1
+    ) {
+      let i = 0;
+      let contactArr = [];
+      if (currentLevel == 2 && levelHealth[1]) i = 1;
+      if (currentLevel == 3 && levelHealth[2]) i = 2;
+      for (i; i < levelHealth.length; i++) {
+        const element = levelHealth[i].levelInfo;
+        for (let j = 0; j < element.length; j++) {
+          const item = element[j];
+          let index = keeperInfo.findIndex(
+            (value) => value.shareId == item.shareId
+          );
+          if (item.shareType == "contact" && index > -1) {
+            let obj = {
+              data: keeperInfo[index].data ? keeperInfo[index].data : {},
+              ...item,
+            };
+            contactArr.push(obj);
+          }
+        }
+      }
+      setContactList(contactArr);
+      console.log("contactArr", contactArr);
+    }
+  };
 
   const renderErrorModalContent = useCallback(() => {
     return (
@@ -215,18 +294,21 @@ const KeeperDeviceHistory = (props) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={(qrData) => {
           try {
-            setQrScannedData(qrData);
             if (qrData) {
               props.navigation.navigate("KeeperFeatures", {
-                    isReshare,
-                    qrScannedData : qrData,
-                    isPrimaryKeeper: isPrimaryKeeper,
-                    selectedShareId: selectedKeeper.shareId,
-                    selectedLevelId: selectedLevelId,
-                    isChange,
-                    prevKeeperType: props.navigation.getParam('prevKeeperType') ? props.navigation.getParam('prevKeeperType') : null,
-                    contactIndex: props.navigation.getParam('contactIndex') ? props.navigation.getParam('contactIndex') : null,
-                  });
+                isReshare,
+                qrScannedData: qrData,
+                isPrimaryKeeper: isPrimaryKeeper,
+                selectedShareId: selectedKeeper.shareId,
+                selectedLevelId: selectedLevelId,
+                isChange,
+                prevKeeperType: props.navigation.getParam("prevKeeperType")
+                  ? props.navigation.getParam("prevKeeperType")
+                  : null,
+                contactIndex: props.navigation.getParam("contactIndex")
+                  ? props.navigation.getParam("contactIndex")
+                  : null,
+              });
               (QrBottomSheet as any).current.snapTo(0);
             }
           } catch (err) {
@@ -246,7 +328,8 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"b0020db78f86a75a7acec96d","publicKey":"507fcf14ac310051172cf9fed6dd2d52a05e210f828c7c81350ae7ead8a7a666","ephemeralAddress":"151bc50ae433427f50cad1a0edbc529c4a0aee2d45e92421199676873be2e297","walletName":"Mad"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
+            ? '{"uuid":"c0be718911b0981b7a5e8992","publicKey":"62e685e47cbe51209d6ec43efc7d0d12e142805653e1103cb58cb2480c1e99fc","ephemeralAddress":"e1d4f6612060d956fb40baca58619d9e364427a1a80d2545a5a1c92368570845","walletName":"Excellent"}'
+            : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
@@ -254,8 +337,12 @@ const KeeperDeviceHistory = (props) => {
             selectedShareId: selectedKeeper.shareId,
             selectedLevelId: selectedLevelId,
             isChange,
-            prevKeeperType: props.navigation.getParam('prevKeeperType') ? props.navigation.getParam('prevKeeperType') : null,
-            contactIndex: props.navigation.getParam('contactIndex') ? props.navigation.getParam('contactIndex') : null,
+            prevKeeperType: props.navigation.getParam("prevKeeperType")
+              ? props.navigation.getParam("prevKeeperType")
+              : null,
+            contactIndex: props.navigation.getParam("contactIndex")
+              ? props.navigation.getParam("contactIndex")
+              : null,
           });
         }}
       />
@@ -316,47 +403,16 @@ const KeeperDeviceHistory = (props) => {
     );
     if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
       dispatch(
-        onApprovalStatusChange(
-          false,
-          moment(new Date()).valueOf(),
-          selectedKeeper.shareId
-        )
+        onApprovalStatusChange({
+          status: false,
+          initiatedAt: moment(new Date()).valueOf(),
+          shareId: selectedKeeper.shareId,
+        })
       );
     }
     (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
     (keeperTypeBottomSheet as any).current.snapTo(0);
   };
-
-  const renderReshareContent = useCallback(() => {
-    return (
-      <ErrorModalContents
-        modalRef={ReshareBottomSheet}
-        title={"Reshare with the same keeper?"}
-        info={"Proceed if you want to reshare the share with the same keeper"}
-        note={
-          "For a different keeper, please go back and choose ‘Change Keeper"
-        }
-        proceedButtonText={"Reshare"}
-        cancelButtonText={"Back"}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          if (isPrimaryKeeper) {
-            setQrBottomSheetsFlag(true);
-            (QrBottomSheet as any).current.snapTo(1);
-          } else {
-            sendApprovalRequestToPK(
-              isPrimaryKeeper ? "primaryKeeper" : "device"
-            );
-          }
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
-        onPressIgnore={() => {
-          (ReshareBottomSheet as any).current.snapTo(0);
-        }}
-        isBottomImage={false}
-      />
-    );
-  }, []);
 
   const onPressChangeKeeperType = (type, name) => {
     if (type == "contact") {
@@ -418,7 +474,7 @@ const KeeperDeviceHistory = (props) => {
         ...props.navigation.state.params,
         selectedTitle: name,
         index: index,
-        isChangeKeeperType: true
+        isChangeKeeperType: true,
       });
     }
     if (type == "device") {
@@ -431,6 +487,151 @@ const KeeperDeviceHistory = (props) => {
       });
     }
   };
+
+  useEffect(() => {
+    if (
+      selectedContact &&
+      selectedContact.firstName &&
+      SHARES_TRANSFER_DETAILS[selectedContact.index]
+    ) {
+      const contactName = `${selectedContact.firstName} ${
+        selectedContact.lastName ? selectedContact.lastName : ""
+      }`
+        .toLowerCase()
+        .trim();
+      console.log({ contactName });
+      if (!trustedContacts.tc.trustedContacts[contactName]) return;
+      createDeepLink();
+    }
+  }, [
+    SHARES_TRANSFER_DETAILS[selectedContact.index],
+    selectedContact,
+    trustedContacts,
+    // uploadMetaShare,
+    // updateEphemeralChannelLoader,
+    // updateTrustedChannelLoader,
+  ]);
+
+  const createDeepLink = useCallback(() => {
+    let chosenContact: any = selectedContact;
+    try {
+      if (!chosenContact) {
+        console.log("Err: Contact missing");
+        return;
+      }
+      if (!SHARES_TRANSFER_DETAILS[chosenContact.index]) {
+        setTimeout(() => {
+          setErrorMessageHeader("Failed to share");
+          setErrorMessage(
+            "There was some error while sharing the Recovery Key, please try again"
+          );
+        }, 2);
+        (ErrorBottomSheet as any).current.snapTo(1);
+        return;
+      }
+
+      const contactName = `${chosenContact.firstName} ${
+        chosenContact.lastName ? chosenContact.lastName : ""
+      }`
+        .toLowerCase()
+        .trim();
+      if (
+        !trustedContacts.tc.trustedContacts[contactName] &&
+        !trustedContacts.tc.trustedContacts[contactName].ephemeralChannel
+      ) {
+        console.log(
+          "Err: Trusted Contact/Ephemeral Channel does not exists for contact: ",
+          contactName
+        );
+        return;
+      }
+      const {
+        publicKey,
+        symmetricKey,
+        otp,
+      } = trustedContacts.tc.trustedContacts[contactName];
+      setPublicKey(publicKey);
+      const requester = database.WALLET_SETUP.walletName;
+      const appVersion = DeviceInfo.getVersion();
+      if (chosenContact.phoneNumbers && chosenContact.phoneNumbers.length) {
+        const phoneNumber = chosenContact.phoneNumbers[0].number;
+        console.log({ phoneNumber });
+        let number = phoneNumber.replace(/[^0-9]/g, ""); // removing non-numeric characters
+        number = number.slice(number.length - 10); // last 10 digits only
+        const numHintType = "num";
+        const numHint = number[0] + number.slice(number.length - 2);
+        const numberEncPubKey = TrustedContactsService.encryptPub(
+          publicKey,
+          number
+        ).encryptedPub;
+        const numberDL =
+          `https://hexawallet.io/${config.APP_STAGE}/scns` +
+          `/${requester}` +
+          `/${numberEncPubKey}` +
+          `/${numHintType}` +
+          `/${numHint}` +
+          `/v${appVersion}`;
+        console.log({ numberDL });
+        setIsOtpType(false);
+        setLinkToRequest(numberDL);
+      } else if (chosenContact.emails && chosenContact.emails.length) {
+        const email = chosenContact.emails[0].email;
+        const emailHintType = "eml";
+        const trucatedEmail = email.replace(".com", "");
+        const emailHint =
+          email[0] + trucatedEmail.slice(trucatedEmail.length - 2);
+        const emailEncPubKey = TrustedContactsService.encryptPub(
+          publicKey,
+          email
+        ).encryptedPub;
+
+        const emailDL =
+          `https://hexawallet.io/${config.APP_STAGE}/scns/${
+            symmetricKey ? "atcg" : "tcg"
+          }` +
+          `/${requester}` +
+          `/${emailEncPubKey}` +
+          `/${emailHintType}` +
+          `/${emailHint}` +
+          `/v${appVersion}`;
+        console.log({ emailDL });
+        setIsOtpType(false);
+        setLinkToRequest(emailDL);
+      } else if (otp) {
+        const otpHintType = "otp";
+        const otpHint = "xxx";
+        const otpEncPubKey = TrustedContactsService.encryptPub(publicKey, otp)
+          .encryptedPub;
+
+        const otpDL =
+          `https://hexawallet.io/${config.APP_STAGE}/scns/${
+            symmetricKey ? "atcg" : "tcg"
+          }` +
+          `/${requester}` +
+          `/${otpEncPubKey}` +
+          `/${otpHintType}` +
+          `/${otpHint}` +
+          `/v${appVersion}`;
+        setIsOtpType(true);
+        setOtp(otp);
+        setLinkToRequest(otpDL);
+      } else {
+        Alert.alert("Invalid Contact", "Something went wrong.");
+        return;
+      }
+      dispatch(
+        onApprovalStatusChange(
+          {
+            status: false,
+            initiatedAt: moment(new Date()).valueOf(),
+            shareId: 'PK_recovery',
+            transferDetails: {key: publicKey.substring(0, 24), otp: ''}
+          })
+      );
+    } catch (error) {
+      console.log("error TC", error);
+    }
+  }, [selectedContact, trustedContacts]);
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -457,7 +658,23 @@ const KeeperDeviceHistory = (props) => {
           }}
           reshareButtonText={"Restore Keeper"}
           onPressReshare={async () => {
-            (ReshareBottomSheet as any).current.snapTo(1);
+            if (isPrimaryKeeper) {
+              console.log("contactList.length", contactList.length);
+              if (contactList.length) {
+                if(keeperApproveStatus.shareId == 'PK_recovery' && keeperApproveStatus.secondaryShare) {
+                  (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+                } else {
+                  (ContactListForRestoreBottomSheet as any).current.snapTo(1);
+                }                
+              } else {
+                setQrBottomSheetsFlag(true);
+                (QrBottomSheet as any).current.snapTo(1);
+              }
+            } else {
+              sendApprovalRequestToPK(
+                isPrimaryKeeper ? "primaryKeeper" : "device"
+              );
+            }
           }}
           changeButtonText={"Change Keeper"}
           onPressChange={() => {
@@ -512,7 +729,7 @@ const KeeperDeviceHistory = (props) => {
       />
       <BottomSheet
         enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet}
+        ref={ApprovePrimaryKeeperBottomSheet as any}
         snapPoints={[
           -50,
           Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
@@ -520,13 +737,14 @@ const KeeperDeviceHistory = (props) => {
         renderContent={() => (
           <ApproveSetup
             isContinueDisabled={
-              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
+                selectedKeeperType != "device"
                 ? !keeperApproveStatus.status
                 : false
             }
             onPressContinue={() => {
               if (isPrimaryKeeper) {
                 (QrBottomSheet.current as any).snapTo(1);
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
               } else {
                 onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
                 (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
@@ -542,17 +760,6 @@ const KeeperDeviceHistory = (props) => {
             }}
           />
         )}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ReshareBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("37%") : hp("45%"),
-        ]}
-        renderContent={renderReshareContent}
-        renderHeader={() => <ModalHeader />}
       />
       <BottomSheet
         enabledInnerScrolling={true}
@@ -577,6 +784,122 @@ const KeeperDeviceHistory = (props) => {
           <SmallHeaderModal
             onPressHeader={() =>
               (keeperTypeBottomSheet as any).current.snapTo(0)
+            }
+          />
+        )}
+      />
+      <BottomSheet
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={SendViaLinkBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("83%") : hp("85%"),
+        ]}
+        renderContent={() => (
+          <SendViaLink
+            headerText={"Send Request"}
+            subHeaderText={"Send a Primary Keeper recovery request link"}
+            contactText={"Requesting for Primary Keeper recovery:"}
+            contact={selectedContact ? selectedContact : null}
+            contactEmail={""}
+            infoText={`Click here to accept Keeper request for ${
+              database.WALLET_SETUP.walletName
+            } Hexa wallet- link will expire in ${
+              config.TC_REQUEST_EXPIRY / (60000 * 60)
+            } hours`}
+            link={linkToRequest}
+            onPressBack={() => {
+              if (isOtpType) {
+                setRenderTimer(true);
+                (shareOtpWithTrustedContactBottomSheet as any).snapTo(1);
+              }
+              (SendViaLinkBottomSheet as any).current.snapTo(0);
+              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+            }}
+            onPressDone={() => {
+              if (isOtpType) {
+                setRenderTimer(true);
+                (shareOtpWithTrustedContactBottomSheet as any).snapTo(1);
+                (SendViaLinkBottomSheet as any).current.snapTo(0);
+              }else{
+                (SendViaLinkBottomSheet as any).current.snapTo(0);
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+              }
+              dispatch(
+                onApprovalStatusChange(
+                  {
+                    status: false,
+                    initiatedAt: moment(new Date()).valueOf(),
+                    shareId: 'PK_recovery',
+                    transferDetails: {key: publicKey.substring(0, 24), otp: ''}
+                  })
+              );
+            }}
+          />
+        )}
+        renderHeader={() => <ModalHeader />}
+      />
+      <BottomSheet
+        onCloseEnd={() => {}}
+        enabledInnerScrolling={true}
+        ref={shareOtpWithTrustedContactBottomSheet as any}
+        snapPoints={[-30, hp("65%")]}
+        renderContent={() => (
+          <ShareOtpWithTrustedContact
+            renderTimer={renderTimer}
+            onPressOk={() => {
+              setRenderTimer(false);
+              (shareOtpWithTrustedContactBottomSheet as any).snapTo(0);
+            }}
+            onPressBack={() => {
+              setRenderTimer(false);
+              (shareOtpWithTrustedContactBottomSheet as any).snapTo(0);
+            }}
+            OTP={otp}
+          />
+        )}
+        renderHeader={() => (
+          <ModalHeader
+            onPressHeader={() => {
+              setRenderTimer(false);
+              (shareOtpWithTrustedContactBottomSheet as any).snapTo(0);
+            }}
+          />
+        )}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ContactListForRestoreBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("50%") : hp("60%"),
+        ]}
+        renderContent={() => {
+          return (
+            <ContactListForRestore
+              title={"Select Contact to Create link"}
+              subText={
+                "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
+              }
+              info={
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
+              }
+              contactList={contactList}
+              modalRef={ContactListForRestoreBottomSheet}
+              onPressCard={(contact, index) => {
+                setSelectedContact(contact.data);
+                console.log("contact", contact);
+                (ContactListForRestoreBottomSheet as any).current.snapTo(0);
+                (SendViaLinkBottomSheet as any).current.snapTo(1);
+              }}
+            />
+          );
+        }}
+        renderHeader={() => (
+          <ModalHeader
+            onPressHeader={() =>
+              (ContactListForRestoreBottomSheet as any).current.snapTo(0)
             }
           />
         )}

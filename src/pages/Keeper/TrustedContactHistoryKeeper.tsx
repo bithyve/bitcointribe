@@ -744,7 +744,11 @@ const TrustedContactHistoryKeeper = (props) => {
         data: {...contact, index}
       };
       dispatch(updatedKeeperInfo(obj));
-      dispatch(onApprovalStatusChange(false, 0, ""));
+      dispatch(onApprovalStatusChange({
+        status: false,
+        initiatedAt: 0,
+        shareId: '',
+      }));
     },
     [index, trustedContactsInfo],
   );
@@ -1063,11 +1067,11 @@ const TrustedContactHistoryKeeper = (props) => {
       )
     );
     if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
-      dispatch(onApprovalStatusChange(
-        false,
-        moment(new Date()).valueOf(),
-        selectedKeeper.shareId
-      ));
+      dispatch(onApprovalStatusChange({
+        status: false,
+        initiatedAt: moment(new Date()).valueOf(),
+        shareId: selectedKeeper.shareId,
+      }));
     }
     (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
     (keeperTypeBottomSheet as any).current.snapTo(0);

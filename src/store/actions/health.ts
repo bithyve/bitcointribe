@@ -3,6 +3,7 @@
 import { share } from "secrets.js-grempe";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { EphemeralDataElements, WalletImage } from "../../bitcoin/utilities/Interface";
+import { MetaShare } from '../../bitcoin/utilities/Interface';
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP';
 export const HEALTH_UPDATE = 'HEALTH_UPDATE';
@@ -66,6 +67,7 @@ export const UPLOAD_SM_SHARE = 'UPLOAD_SM_SHARE';
 export const UPDATE_WALLET_IMAGE_HEALTH = 'UPDATE_WALLET_IMAGE_HEALTH';
 export const EMPTY_SHARE_TRANSFER_DETAILS = 'EMPTY_SHARE_TRANSFER_DETAILS';
 export const REMOVE_UNWANTED_UNDER_CUSTODY = 'REMOVE_UNWANTED_UNDER_CUSTODY';
+export const UPLOAD_SM_SHARE_FOR_PK = 'UPLOAD_SM_SHARE_FOR_PK';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -305,8 +307,15 @@ export const pdfGenerated = (generated: Boolean) => {
   };
 };
 
-export const onApprovalStatusChange = (status, initiatedAt, shareId) => {
-  return { type: ON_APPROVAL_STATUS_CHANGE, payload: { status, initiatedAt, shareId }, };
+export const onApprovalStatusChange = (payload: {
+  status: boolean;
+  initiatedAt: any;
+  shareId: string;
+  secondaryShare?: MetaShare
+  transferDetails?: {key: string; otp: string};
+}) => {
+  let { status, initiatedAt, shareId, secondaryShare, transferDetails} = payload;
+  return { type: ON_APPROVAL_STATUS_CHANGE, payload: { status, initiatedAt, shareId, secondaryShare, transferDetails }, };
 };
 
 export const uploadPdfShare = (
@@ -425,4 +434,12 @@ export const emptyShareTransferDetailsForContactChange = (index) => {
 
 export const removeUnwantedUnderCustodyShares = () => {
   return { type: REMOVE_UNWANTED_UNDER_CUSTODY };
+}
+
+export const uploadSecondaryShareForPK = ( tag, encryptedKey, otp? ) => {
+  return {
+    type: UPLOAD_SM_SHARE_FOR_PK, payload: {
+      tag, encryptedKey, otp
+    }
+  }
 }

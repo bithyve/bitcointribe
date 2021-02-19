@@ -299,6 +299,7 @@ export enum notificationType {
   uploadSecondaryShare = 'uploadSecondaryShare',
   reShare = 'reShare',
   reShareResponse = 'reShareResponse',
+  smUploadedForPK = 'smUploadedForPK',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -388,6 +389,7 @@ export interface TrustedDataElements {
       qrData: string;
       secret: string;
   };
+  secondaryShare?: MetaShare[];
 }
 export interface TrustedData {
   publicKey: string;

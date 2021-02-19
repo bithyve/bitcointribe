@@ -58,6 +58,7 @@ import {
   EMPTY_SHARE_TRANSFER_DETAILS,
   removeUnwantedUnderCustodyShares,
   REMOVE_UNWANTED_UNDER_CUSTODY,
+  UPLOAD_SM_SHARE_FOR_PK,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -119,6 +120,7 @@ import { remapAccountShells, restoredAccountShells } from "../actions/accounts";
 import PersonalNode from "../../common/data/models/PersonalNode";
 import { personalNodeConfigurationSet } from "../actions/nodeSettings";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import Toast from "../../components/Toast";
 
 function* initHealthWorker() {
   let s3Service: S3Service = yield select((state) => state.health.service);
@@ -311,6 +313,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
     } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
     let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
+    let keeperApproveStatus = yield select((state) => state.health.keeperApproveStatus);
     console.log('metaShare createAndUploadOnEFChannelWorker', metaShare);
     let shareIndex = level == 2 ? 1 : 3;
     if (selectedShareId && s3Service.levelhealth.metaSharesKeeper.length) {
@@ -420,7 +423,7 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
       console.log("updateEphemeralChannel saga res", res);
       if (res.status == 200) {
         // Create trusted channel
-        const data: TrustedDataElements = {
+        let data: TrustedDataElements = {
           xPub: { testXpub, regularXpub, secureXpub: secureXpub },
           walletID,
           FCM: fcmTokenValue,
@@ -434,6 +437,14 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
           featuresList,
           securityQuestion,
         };
+        if (isReshare) {
+          data.secondaryShare = [DECENTRALIZED_BACKUP.PK_SHARE];
+          if(keeperApproveStatus.secondaryShare && keeperApproveStatus.shareId == 'PK_recovery')
+          {
+            data.secondaryShare.push(keeperApproveStatus.secondaryShare)
+          }
+        }
+        console.log('data TrustedDataElements', data);
         if(isPrimaryKeeper && s3ServiceSecure.secureHDWallet.secondaryMnemonic && s3ServiceSecure.secureHDWallet.twoFASetup.secret) {
           data.secondaryMnemonics = s3ServiceSecure.secureHDWallet.secondaryMnemonic;
           data.twoFASetup = s3ServiceSecure.secureHDWallet.twoFASetup;
@@ -453,15 +464,6 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
           yield call(insertDBWorker, {
             payload: { SERVICES: updatedSERVICES },
           });
-          if (isReshare) {
-            yield call(uploadSecondaryShareWorker, {
-              payload: {
-                encryptedKey: dataElements.shareTransferDetails.encryptedKey,
-                metaShare: DECENTRALIZED_BACKUP.PK_SHARE,
-                otp: dataElements.shareTransferDetails.otp,
-              },
-            });
-          }
           let shareArray = [
             {
               walletId: s3Service.getWalletId().data.walletId,
@@ -484,7 +486,11 @@ function* createAndUploadOnEFChannelWorker({ payload }) {
             data: {}
           };
           yield put(updatedKeeperInfo(obj));
-          yield put(onApprovalStatusChange(false, 0, ""));
+          yield put(onApprovalStatusChange({
+            status: false,
+            initiatedAt: 0,
+            shareId: '',
+          }));
         }
       }
     }
@@ -675,7 +681,7 @@ export function* downloadMetaShareWorker({ payload }) {
 
   let pkShare = {}
   let result;
-  if (DECENTRALIZED_BACKUP && !DECENTRALIZED_BACKUP.PK_SHARE && payload.downloadType !== "recovery") {
+  if (DECENTRALIZED_BACKUP && payload.downloadType !== "recovery") {
     result = yield call(S3Service.downloadSMShare, encryptedKey, otp);
     console.log("result",result);
     if (result && result.data) {
@@ -688,14 +694,6 @@ export function* downloadMetaShareWorker({ payload }) {
     const { metaShare, encryptedDynamicNonPMDD } = res.data;
     let updatedBackup;
     if (payload.downloadType !== "recovery") {
-      //TODO: activate DNP Transportation Layer for Hexa Premium
-      // const dynamicNonPMDD = {
-      //   ...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD,
-      //   META_SHARES: DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES
-      //     ? [...DECENTRALIZED_BACKUP.DYNAMIC_NONPMDD.META_SHARES, metaShare]
-      //     : [metaShare],
-      // };
-
       updatedBackup = {
         ...DECENTRALIZED_BACKUP,
         UNDER_CUSTODY: {
@@ -703,10 +701,9 @@ export function* downloadMetaShareWorker({ payload }) {
           [metaShare.meta.tag]: {
             META_SHARE: metaShare,
             ENC_DYNAMIC_NONPMDD: encryptedDynamicNonPMDD,
+            SECONDARY_SHARE: pkShare
           },
         },
-        PK_SHARE: pkShare
-        // DYNAMIC_NONPMDD: dynamicNonPMDD,
       };
 
       console.log({ updatedBackup });
@@ -1918,7 +1915,11 @@ function* uploadPdfShareWorker({ payload }) {
     //         keeperInfo.push(obj);
     //       }
     //       yield put(updatedKeeperInfo(keeperInfo));
-    //       yield put(onApprovalStatusChange(false, 0, ''));
+    //       yield put(onApprovalStatusChange({
+                    //   status: false,
+                    //   initiatedAt: 0,
+                    //   shareId: '',
+                    // });
     //     }
     //   }
     // }
@@ -2454,7 +2455,11 @@ function* getPDFDataWorker({ payload }) {
         );
         console.log("pdfPath", pdfPath);
         yield put(setPDFInfo({ filePath: pdfPath, publicKey, privateKey }));
-        yield put(onApprovalStatusChange(false, 0, ""));
+        yield put(onApprovalStatusChange({
+          status: false,
+          initiatedAt: 0,
+          shareId: '',
+        }));
       }
     }
     yield put(switchS3LoaderKeeper("pdfDataProcess"));
@@ -2636,7 +2641,11 @@ function* confirmPDFSharedWorker({ payload }) {
       data: {}
     };
     yield put(updatedKeeperInfo(obj));
-    yield put(onApprovalStatusChange(false, 0, ""));
+    yield put(onApprovalStatusChange({
+      status: false,
+      initiatedAt: 0,
+      shareId: '',
+    }));
     yield put(switchS3LoaderKeeper("pdfDataConfirm"));
   } catch (error) {
     yield put(switchS3LoaderKeeper("pdfDataConfirm"));
@@ -2825,4 +2834,75 @@ function* uploadSMShareWorker({ payload }) {
   export const removeUnwantedUnderCustodySharesWatcher = createWatcher(
     removeUnwantedUnderCustodySharesWorker,
     REMOVE_UNWANTED_UNDER_CUSTODY
+  );
+
+  function* uploadSecondaryShareForPKWorker( { payload } ) {
+    try {
+      // Transfer: Guardian >>> User
+      const { tag, encryptedKey, otp } = payload
+      const { DECENTRALIZED_BACKUP } = yield select(
+        ( state ) => state.storage.database,
+      )
+      const database = yield select(
+        ( state ) => state.storage.database,
+      )
+      const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+  
+      if ( !UNDER_CUSTODY[ tag ] ) {
+        yield put( ErrorSending( true ) )
+      }
+  
+      const { SECONDARY_SHARE, META_SHARE }: {SECONDARY_SHARE: MetaShare, META_SHARE: MetaShare} = UNDER_CUSTODY[tag];
+      if(SECONDARY_SHARE){
+        const trustedContacts: TrustedContactsService = yield select(
+          (state) => state.trustedContacts.service
+        );
+        if (payload.previousGuardianName) {
+          trustedContacts.tc.trustedContacts[
+            payload.previousGuardianName
+          ].isGuardian = false;
+        }
+        trustedContacts.tc.trustedContacts
+        let FCMs = [];
+        Object.keys(trustedContacts.tc.trustedContacts).map((tag) => {
+          if(META_SHARE.meta.walletId == trustedContacts.tc.trustedContacts[tag].walletID){
+            FCMs = trustedContacts.tc.trustedContacts[tag].FCMs
+          }
+        });
+        yield put( switchS3LoadingStatus( 'uploadRequestedShare' ) )
+        const keeper: KeeperService = yield select((state) => state.keeper.service);
+        const result = yield call(
+          keeper.uploadSecondaryShare,
+          encryptedKey,
+          SECONDARY_SHARE,
+          otp
+        );
+        if (result.status === 200) {
+          Toast( `${tag}'s Recovery Key sent.` );
+          const notification: INotification = {
+            notificationType: notificationType.smUploadedForPK,
+            title: "Request approved from "+ database.WALLET_SETUP.walletName,
+            body: "Request approved from "+ database.WALLET_SETUP.walletName,
+            data: JSON.stringify({ walletId: META_SHARE.meta.walletId }),
+            tag: notificationTag.IMP,
+            date: new Date(),
+          };
+          let ress = yield call(
+            RelayServices.sendNotifications,
+            [{ walletId: META_SHARE.meta.walletId, FCMs }],
+            notification
+          );
+        } else {
+          if ( result.err === 'ECONNABORTED' ) requestTimedout()
+        }
+      } 
+    } catch (error) {
+      console.log('RECOVERY error', error)
+      yield put( switchS3LoadingStatus( 'uploadRequestedShare' ) )
+    }
+  }
+  
+  export const uploadSecondaryShareForPKWatcher = createWatcher(
+    uploadSecondaryShareForPKWorker,
+    UPLOAD_SM_SHARE_FOR_PK,
   );
