@@ -35,13 +35,13 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   // },
   {
     title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
-    subtitle: 'Starting at 0.49% fee',
+    subtitle: 'Fees starting from 0.49%',
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false
   },
   {
-    title: 'Buy with Wyre     (COMING SOON)',
+    title: 'Buy with Wyre  (COMING SOON)',
     subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
     imageSource: require( '../../assets/images/icons/wyre_notext_small_disabled.png' ),
