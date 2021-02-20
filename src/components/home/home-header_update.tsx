@@ -78,17 +78,8 @@ const HomeHeader = ({
     return currencyKind === CurrencyKind.BITCOIN;
   }, [currencyKind]);
 
-  const getMessage = (health, keeper) => {
+  const getMessage = () => {
     let { messageOne, messageTwo } = getMessageToShow();
-    let boldMessage = "";
-    let normalMessage = " to improve health";
-
-    if (!health) boldMessage = "Add ";
-    else if (health == "ugly") {
-      boldMessage = keeper;
-      normalMessage = " needs your attention";
-    }
-
     if (
       messageTwo === " needs your attention" ||
       messageOne == "Upgrade Backup"
@@ -312,11 +303,7 @@ const HomeHeader = ({
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            if (
-              levelHealth[0] &&
-              levelHealth[0].levelInfo[0] &&
-              levelHealth[0].levelInfo[0].status == "accessible"
-            ) {
+            if (s3Service.levelhealth.healthCheckInitializedKeeper) {
               navigation.navigate("ManageBackupKeeper");
             } else {
               navigation.navigate("ManageBackup");
@@ -324,7 +311,7 @@ const HomeHeader = ({
           }}
           style={styles.manageBackupMessageView}
         >
-          {getMessage("ugly", "Security Question")}
+          {getMessage()}
           <AntDesign
             style={{ marginLeft: "auto" }}
             name={"arrowright"}

@@ -358,6 +358,7 @@ class ManageBackup extends Component<
         }
       }
     } catch (error) {
+      this.props.setIsBackupProcessing({ status: false });
       throw error;
     }
   };

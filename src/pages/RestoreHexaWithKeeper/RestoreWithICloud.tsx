@@ -196,7 +196,7 @@ class RestoreWithICloud extends Component<
 
     if (
       JSON.stringify(prevState.contactList) !=
-        JSON.stringify(this.state.contactList) &&
+        JSON.stringify(this.state.contactList) && this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[0] &&
       this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[0].META_SHARE
     ) {
       this.onCreatLink();
@@ -514,15 +514,10 @@ class RestoreWithICloud extends Component<
     this.setState({ refreshControlLoader: true });
     if (shareIndex) {
       let { database } = this.props;
-      console.log(
-        "database.DECENTRALIZED_BACKUP",
-        database.DECENTRALIZED_BACKUP
-      );
       const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP;
-      const { REQUEST_DETAILS, META_SHARE } = RECOVERY_SHARES[shareIndex];
 
-      if (!META_SHARE) {
-        const { KEY } = REQUEST_DETAILS;
+      if (RECOVERY_SHARES[shareIndex] && !RECOVERY_SHARES[shareIndex].META_SHARE) {
+        const { KEY } = RECOVERY_SHARES[shareIndex].REQUEST_DETAILS;
         console.log({
           KEY,
         });

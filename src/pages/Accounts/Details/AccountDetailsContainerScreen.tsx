@@ -40,6 +40,8 @@ import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serv
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
+import { useSelector } from 'react-redux';
+import S3Service from '../../../bitcoin/services/sss/S3Service'
 
 export type Props = {
   navigation: any;
@@ -57,7 +59,7 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
-
+  const s3Service: S3Service = useSelector((state) => state.health.service);
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
@@ -254,7 +256,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   useEffect( ()=>{
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     const serviceType = primarySubAccount.sourceKind
-    if ( serviceType === SECURE_ACCOUNT && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
+    if ( serviceType === SECURE_ACCOUNT && !s3Service.levelhealth.healthCheckInitializedKeeper && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
       navigation.navigate( 'TwoFASetup', {
         twoFASetup:
           accountsState[ serviceType ].service.secureHDWallet

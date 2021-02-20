@@ -328,8 +328,8 @@ const KeeperDeviceHistory = (props) => {
         }}
         onPressContinue={() => {
           let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"c0be718911b0981b7a5e8992","publicKey":"62e685e47cbe51209d6ec43efc7d0d12e142805653e1103cb58cb2480c1e99fc","ephemeralAddress":"e1d4f6612060d956fb40baca58619d9e364427a1a80d2545a5a1c92368570845","walletName":"Excellent"}'
-            : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
+            ? '{"uuid":"0b768868de97d00fd7ed00d5","publicKey":"04b51297b65f0317d1c2516287958c5af74cf88f1d6b2bea53fcd5f4552df901","ephemeralAddress":"b970070a49d19e2f3c46f4b53c2014f52902b52ce48b1970b12e9138308a36e3","walletName":"Mac"}'
+            : '{"uuid":"7ea01bc0744adf0db0cd001f","publicKey":"00bdcb15b112d68673a7fc1a36ed00ca4626c7ef6c6d58141a83465d60837b1c","ephemeralAddress":"b5c4fcc1674364ca7a1bcc13f043d31c727fbfb8739e4a8a792a772bf7e10353","walletName":"TK"}';
           props.navigation.navigate("KeeperFeatures", {
             isReshare,
             qrScannedData,
