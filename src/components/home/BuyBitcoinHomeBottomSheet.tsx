@@ -45,7 +45,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
     imageSource: require( '../../assets/images/icons/wyre_notext_small_disabled.png' ),
-    disabled: false
+    disabled: true
   },
   {
     title: 'Set up automatic buys  (COMING SOON)',
