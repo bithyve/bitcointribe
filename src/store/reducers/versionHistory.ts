@@ -6,8 +6,10 @@ import {
 
 const initialState: {
     versions: VersionHistory[];
+    restoreVersions: VersionHistory[];
   } = {
     versions: [],
+    restoreVersions: [],
   }
 
 
@@ -22,7 +24,7 @@ export default ( state = initialState, { type, payload } ) => {
       case RESTORED_VERSIONS_HISTORY:
         return {
           ...state,
-          versions: payload.versions,
+          restoreVersions: payload.restoreVersions.versions,
         }
 
       default:

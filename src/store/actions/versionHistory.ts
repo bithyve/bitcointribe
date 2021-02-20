@@ -25,7 +25,7 @@ export const setVersionHistory = ( versions ) => {
     return {
       type: RESTORED_VERSIONS_HISTORY,
       payload: {
-        versions
+        restoreVersions : versions
       },
     }
   }  

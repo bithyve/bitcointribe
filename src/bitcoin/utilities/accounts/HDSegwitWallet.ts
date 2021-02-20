@@ -484,6 +484,10 @@ export default class HDSegwitWallet extends Bitcoin {
           const { transactionDetails } = this.derivativeAccounts[ accountType ][ accountNumber ].transactions
           // remove if no txs exist on such an account
           if( !transactionDetails.length ){
+            if( accountType === TRUSTED_CONTACTS ){
+              const { contactName } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as TrustedContactDerivativeAccountElements )
+              delete this.trustedContactToDA[ contactName ]
+            }
             delete this.derivativeAccounts[ accountType ][ accountNumber ];
             ( this.derivativeAccounts[ accountType ] as DerivativeAccount ).instance.using = accountNumber - 1
           } else {
