@@ -18,7 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
 import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP } from '../../common/constants/serviceTypes'
 
 export default function SendConfirmationContent( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
@@ -41,7 +41,8 @@ export default function SendConfirmationContent( props ) {
       'Savings Account': SECURE_ACCOUNT,
       'Test Account': TEST_ACCOUNT,
       'Donation Account': DONATION_ACCOUNT,
-      'Wyre': WYRE
+      'Wyre': WYRE,
+      'Ramp': RAMP
     }[ selectedContactData.account_name || 'Checking Account' ]
 
     // 🔑 This seems to be the way the backend is distinguishing between

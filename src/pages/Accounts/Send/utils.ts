@@ -1,4 +1,4 @@
-import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE } from '../../../common/constants/serviceTypes'
+import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP } from '../../../common/constants/serviceTypes'
 
 export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
   // determines account icon
@@ -8,12 +8,14 @@ export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
         case DONATION_ACCOUNT:
           accountImageSource = require( '../../../assets/images/icons/icon_donation_hexa.png' )
           break
-           
+        case RAMP:
+          accountImageSource = require( '../../../assets/images/icons/icon_ramp.png' )
+          break
         case WYRE:
           accountImageSource = require( '../../../assets/images/icons/wyre_notext_small.png' )
-          break     
+          break
     }
-  } 
+  }
   if( !accountImageSource ){
     switch( accountKind ){
         case TEST_ACCOUNT:
@@ -42,12 +44,13 @@ export const getAccountTitle = ( accountKind, derivativeAccountDetails ) => {
         case DONATION_ACCOUNT:
           accountTitle = 'Donation Account'
           break
-         
+        case RAMP:
+          accountTitle = 'Ramp'
         case WYRE:
           accountTitle = 'Wyre'
-          break     
+          break
     }
-  } 
+  }
 
   if( !accountTitle ){
     switch( accountKind ){

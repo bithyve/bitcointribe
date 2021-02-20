@@ -11,6 +11,9 @@ import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/Use
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 import TransactionDetailsHeader from './TransactionDetailsHeader'
+import openLink from '../../../utils/OpenLink'
+import config from '../../../bitcoin/HexaConfig'
+import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 
 export type Props = {
   navigation: any;
@@ -67,7 +70,6 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
     }
   }, [ transaction.transactionType ] )
 
-
   return (
     <View style={styles.rootContainer}>
 
@@ -108,7 +110,12 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
         <View style={styles.lineItem}>
           <Text style={ListStyles.listItemTitle}>Transaction ID</Text>
-          <Text style={ListStyles.listItemSubtitle}>{transaction.txid}</Text>
+          <Text style={ListStyles.listItemSubtitle} onPress={() =>
+            openLink(
+              `https://blockstream.info${
+                transaction.accountType === 'Test Account' ? '/testnet' : ''
+              }/tx/${transaction.txid}`,
+            )}>{transaction.txid}</Text>
         </View>
 
         <View style={styles.lineItem}>

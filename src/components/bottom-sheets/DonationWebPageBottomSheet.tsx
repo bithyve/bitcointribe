@@ -26,7 +26,7 @@ export default function DonationWebPageBottomSheet( props ) {
         }}>
           <View
             style={{
-              ...styles.successModalHeaderView, flexDirection: 'row'
+              ...styles.successModalHeaderView, flexDirection: 'row',
             }}
           >
             <View>
@@ -52,7 +52,6 @@ export default function DonationWebPageBottomSheet( props ) {
             <AppBottomSheetTouchableWrapper
               style={{
                 marginLeft: 'auto',
-                marginRight: 10,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}

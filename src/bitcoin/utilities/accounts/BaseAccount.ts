@@ -8,6 +8,7 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  AverageTxFees,
 } from '../Interface'
 
 export default class BaseAccount {
@@ -236,6 +237,7 @@ export default class BaseAccount {
       contactName?: string,
     }[],
     hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<
     | {
         status: number;
@@ -259,6 +261,7 @@ export default class BaseAccount {
         data: await this.hdWallet.fetchDerivativeAccBalanceTxs(
           accountInfo,
           hardRefresh,
+          blindRefresh,
         ),
       }
     } catch ( err ) {
@@ -273,7 +276,8 @@ export default class BaseAccount {
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
-    hardRefresh?: boolean
+    hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<
     | {
         status: number;
@@ -296,7 +300,8 @@ export default class BaseAccount {
         status: config.STATUS.SUCCESS,
         data: await this.hdWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
-          hardRefresh
+          hardRefresh,
+          blindRefresh
         ),
       }
     } catch ( err ) {
@@ -541,7 +546,7 @@ export default class BaseAccount {
   public isValidAddress = ( recipientAddress: string ): boolean =>
     this.hdWallet.isValidAddress( recipientAddress );
 
-  public getBalanceTransactions = async ( hardRefresh?: boolean ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean, blindRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -570,7 +575,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh ),
+        data: await this.hdWallet.fetchBalanceTransaction( hardRefresh, blindRefresh ),
       }
     } catch ( err ) {
       return {
@@ -640,7 +645,7 @@ export default class BaseAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -666,32 +671,47 @@ export default class BaseAccount {
         return recipient
       } )
 
-      const {
-        fee,
-        balance,
-        txPrerequisites,
-      } = await this.hdWallet.transactionPrerequisites(
-        recipients,
-        averageTxFees,
-        derivativeAccountDetails,
-      )
-
       let netAmount = 0
       recipients.forEach( ( recipient ) => {
         netAmount += recipient.amount
       } )
 
+      let {
+        fee,
+        balance,
+        txPrerequisites,
+      } = this.hdWallet.transactionPrerequisites(
+        recipients,
+        averageTxFees,
+        derivativeAccountDetails,
+      )
+
       if ( balance < netAmount + fee ) {
-        return {
-          status: 0o6,
-          err: 'Insufficient balance',
-          fee,
-          netAmount,
-          message: ErrMap[ 0o6 ],
+        // check w/ the lowest fee possible for this transaction
+        const minTxFeePerByte = 1 // default minimum relay fee
+        const minAvgTxFee = {
+          ...averageTxFees
         }
+        minAvgTxFee[ 'low' ].feePerByte = minTxFeePerByte
+
+        const minTxPrerequisites  = this.hdWallet.transactionPrerequisites(
+          recipients,
+          minAvgTxFee,
+          derivativeAccountDetails,
+        )
+
+        if( minTxPrerequisites.balance < netAmount + minTxPrerequisites.fee )
+          return {
+            status: 0o6,
+            err: 'Insufficient balance',
+            fee,
+            netAmount,
+            message: ErrMap[ 0o6 ],
+          }
+        else txPrerequisites = minTxPrerequisites.txPrerequisites
       }
 
-      if ( txPrerequisites ) {
+      if ( Object.keys( txPrerequisites ).length ) {
         return {
           status: config.STATUS.SUCCESS,
           data: {
