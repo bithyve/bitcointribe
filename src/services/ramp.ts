@@ -2,7 +2,7 @@ import config from '../bitcoin/HexaConfig'
 import { getEnvDeepLinkPrefix } from '../utils/geEnvSpecificParams'
 
 const deepLinkEnv = getEnvDeepLinkPrefix()
-const finalURL = `https://hexawallet.io${deepLinkEnv}/ramp`
+const finalURL = `https://hexawallet.io${deepLinkEnv}/ramp/`
 
 export const fetchRampReservation = ( { receiveAddress } ) => {
   try {

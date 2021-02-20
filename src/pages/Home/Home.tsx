@@ -1756,14 +1756,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
-            ? [ 0, '30%' ]
-            : [ 0, '55%' ]
+            ? [ 0, '32%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
         case BottomSheetKind.RAMP_STATUS_INFO:
           return ( this.state.rampFromDeepLink )
-            ? [ 0, '30%' ]
-            : [ 0, '55%' ]
+            ? [ 0, '32%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return [ 0, '50%' ]
+          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '57%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints

@@ -46,10 +46,10 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
       ? 'Ramp was not able to process your payment. Please try after sometime or use a different payment method'
-      : 'Your order has been successful, the purchased bitcoin will be transferred to your Ramp account shortly'
+      : 'Your order is being processed by Ramp, once successfull the purchased bitcoin will be transferred to your Ramp account'
     rampTitle = ( rampDeepLinkContent.search( 'fail' )>=0 )
       ? 'Ramp order failed'
-      : 'Order Successful'
+      : 'Order being processed'
   }
   return ( <View style={{
     ...styles.modalContentContainer
@@ -84,7 +84,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             alignContent: 'center'
           }}>
             <Text style={{
-              marginLeft: wp( '12%' ),
+              marginLeft: wp( '13.5%' ),
             }}>
         Powered by
             </Text>
@@ -132,13 +132,13 @@ const styles = StyleSheet.create( {
   successModalButtonView: {
     minHeight: 50,
     minWidth: 144,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: wp( 4 ),
+    paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '40%' ),
+    width: wp( '43%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 11,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
