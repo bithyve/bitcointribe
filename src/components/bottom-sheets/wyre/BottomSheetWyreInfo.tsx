@@ -84,7 +84,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             alignContent: 'center'
           }}>
             <Text style={{
-              marginLeft: wp( '12%' ),
+              marginLeft: wp( '13.5%' ),
             }}>
         Powered by
             </Text>
@@ -132,13 +132,13 @@ const styles = StyleSheet.create( {
   successModalButtonView: {
     minHeight: 50,
     minWidth: 144,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: wp( 4 ),
+    paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '40%' ),
+    width: wp( '43%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: 11,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
