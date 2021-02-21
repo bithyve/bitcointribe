@@ -66,7 +66,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Hexa installed - choose your Keepers wisely! 
+            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Hexa installed - choose your Keepers wisely!  
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -88,7 +88,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Share a QR code or a link with your intended Keepers and ask them to open Hexa. The Keeper will have to either scan the QR code with Hexa or touch the link, which will open Hexa automatically.
+            Share a QR code or a link with your intended Keepers and ask them to open Hexa. The Keeper will have to either scan the QR code with Hexa or touch the link, which will open Hexa automatically
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -137,7 +137,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-           Hexa requires access to your phone’s Address Book to help you add contacts as Keepers. This information is locally stored - we don't keep any contacts from your device!
+           Hexa requires access to your phone’s Address Book to help you add contacts as Keepers. This does not mean that BitHyve, the company behind Hexa, would have access to your personal information
           </Text>
           <View
             style={{
@@ -166,7 +166,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Your private information is safe, even from Keepers: they would not have any access to your account information, including your bitcoin balance.
+            Rest assured that the friends or family members you designate as Keepers would not have any access to your account information, including your bitcoin balance
           </Text>
 
           <AppBottomSheetTouchableWrapper
@@ -244,7 +244,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            The initial contact creation and communication with Friends & Family needs to be processed on our backend - so setting someone as your Keeper may not work the first time and you may have to try again.
+            The initial contact creation and communication with Friends & Family needs to be processed on our backend - so setting someone as your Keeper may not work the first time and you may have to try again
           </Text>
         </View>
       </ScrollView>
