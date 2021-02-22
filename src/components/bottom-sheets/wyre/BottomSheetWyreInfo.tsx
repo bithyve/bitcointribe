@@ -41,7 +41,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     }
   } )
   // eslint-disable-next-line quotes
-  let wyreMessage = `\nWyre enables purchases of BTC using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Wyre Account\n- ${wyreReceiveAddress}`
+  let wyreMessage = `Wyre enables purchases of BTC using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Wyre Account\n- ${wyreReceiveAddress}`
   let wyreTitle = 'Buy with Wyre'
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'fail' )>=0 ) {
     wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
