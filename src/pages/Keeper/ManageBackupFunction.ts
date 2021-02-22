@@ -57,7 +57,12 @@ const checkLevelHealth = (
     levelHealthVar[index].levelInfo[index2 + 1].updatedAt === 0
   ) {
     levelData[index].status = 'notSetup';
-    if(index != 0 && currentLevel > 0){
+    if(index == 2 && currentLevel > 0 && levelHealthVar[index]){
+      levelData[index].keeper1 = levelHealthVar[index] && levelHealthVar[index].levelInfo ? levelHealthVar[index].levelInfo[index2] : levelData[index2].keeper1;
+      levelData[index].keeper2 = levelHealthVar[index] && levelHealthVar[index].levelInfo[index2] ? levelHealthVar[index].levelInfo[index2] : levelData[index2].keeper2;
+      levelData[index].status = checkStatus(levelHealthVar, index, index2);
+    }
+    else if(index != 0 && currentLevel > 0){
       levelData[index-1].keeper1 = levelHealthVar[currentLevel - 1] && levelHealthVar[currentLevel - 1].levelInfo ? levelHealthVar[currentLevel - 1].levelInfo[0] : levelData[0].keeper1;
       levelData[index-1].keeper1.name = index == 0 ? 'Cloud' : levelHealthVar[currentLevel - 1].levelInfo[0].name;
       levelData[index-1].keeper2 = levelHealthVar[currentLevel - 1] && levelHealthVar[currentLevel - 1].levelInfo[1] ? levelHealthVar[currentLevel - 1].levelInfo[1] : levelData[0].keeper2;

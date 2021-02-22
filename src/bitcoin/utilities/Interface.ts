@@ -300,6 +300,7 @@ export enum notificationType {
   reShare = 'reShare',
   reShareResponse = 'reShareResponse',
   smUploadedForPK = 'smUploadedForPK',
+  newFCM = 'newFCM',
 }
 export enum notificationTag {
   IMP = 'IMP',

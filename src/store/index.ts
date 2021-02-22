@@ -175,7 +175,8 @@ import {
 } from './sagas/health';
 
 import {
-  fetchKeeperTrustedChannelWatcher
+  fetchKeeperTrustedChannelWatcher,
+  updateNewFCMWatcher
 } from './sagas/keeper';
 
 import { fromPrivateKey } from 'bip32';
@@ -306,6 +307,7 @@ const rootSaga = function* () {
     uploadSecondaryShareForPKWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
+    updateNewFCMWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

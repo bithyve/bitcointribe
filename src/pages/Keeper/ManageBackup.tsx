@@ -11,6 +11,7 @@ import {
   RefreshControl,
   ImageBackground,
   Platform,
+  AsyncStorage,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -61,7 +62,7 @@ import {
 import { modifyLevelStatus } from "./ManageBackupFunction";
 import ApproveSetup from "./ApproveSetup";
 import { LevelHealthInterface, MetaShare, notificationType } from "../../bitcoin/utilities/Interface";
-import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
+import { fetchKeeperTrustedChannel, updateNewFcm } from "../../store/actions/keeper";
 import { nameToInitials } from "../../common/CommonFunctions";
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import ModalHeader from "../../components/ModalHeader";
@@ -129,7 +130,8 @@ interface ManageBackupPropsTypes {
   accountShells: AccountShell[];
   activePersonalNode: PersonalNode;
   versionHistory: any;
-
+  updateNewFcm: any;
+  isNewFCMUpdated: Boolean;
 }
 
 class ManageBackup extends Component<
@@ -204,9 +206,12 @@ class ManageBackup extends Component<
   }
 
   componentDidMount = async () => {
-    // console.log("keeperInfo", this.props.keeperInfo);
-    // console.log("isLevel2Initialized",this.props.isLevel2Initialized);
-    // console.log("isLevelTwoMetaShareCreated",this.props.isLevelTwoMetaShareCreated);
+    await AsyncStorage.getItem("walletRecovered").then((recovered) => {
+      // updates the new FCM token to channels post recovery
+      if (recovered && !this.props.isNewFCMUpdated) {
+        this.props.updateNewFcm();
+      }
+    });
 
     await this.onRefresh();
     this.modifyLevelData();
@@ -561,7 +566,7 @@ class ManageBackup extends Component<
         ? notificationType.uploadSecondaryShare
         : notificationType.approveKeeper
     );
-    if ((type == "pdf" || type == "contact") && !keeperApproveStatus.shareId) {
+    if ((type == "pdf" || type == "contact") && keeperApproveStatus.shareId != this.state.selectedKeeper.shareId) {
       onApprovalStatusChange(
         {
           status: false,
@@ -1486,7 +1491,7 @@ const mapStateToProps = (state) => {
     accountShells: idx(state, (_) => _.accounts.accountShells),
     activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
     versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
-
+    isNewFCMUpdated: idx( state, ( _ ) => _.keeper.isNewFCMUpdated)
   };
 };
 
@@ -1505,6 +1510,7 @@ export default withNavigationFocus(
     reShareWithSameKeeper,
     autoShareContact,
     trustedChannelsSetupSync,
+    updateNewFcm
   })(ManageBackup)
 );
 

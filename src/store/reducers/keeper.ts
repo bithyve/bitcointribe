@@ -1,7 +1,7 @@
 import { SERVICES_ENRICHED } from '../actions/storage';
 import { KEEPERS_INFO } from '../../common/constants/serviceTypes';
 import KeeperService from '../../bitcoin/services/KeeperService';
-import { KEEPER_LOADING } from '../actions/keeper';
+import { IS_UPDATE_NEW_FCM, KEEPER_LOADING } from '../actions/keeper';
 
 const initialState: {
   service: KeeperService;
@@ -9,13 +9,14 @@ const initialState: {
   loading: {
     fetchKeeperTC: Boolean;
   },
+  isNewFCMUpdated: Boolean;
 } = {
   service: null,
   serviceEnriched: false,
   loading: {
     fetchKeeperTC: false,
   },
-
+  isNewFCMUpdated: false
 };
 
 export default (state = initialState, action) => {
@@ -37,7 +38,15 @@ export default (state = initialState, action) => {
           ],
         },
       };
+
+    case IS_UPDATE_NEW_FCM:
+      return {
+        ...state,
+        isNewFCMUpdated: action.payload.flag,
+      };
   }
+
+  
 
   return state;
 };

@@ -1,24 +1,34 @@
-import KeeperService from '../../bitcoin/services/KeeperService';
+import KeeperService from "../../bitcoin/services/KeeperService";
 import {
   FETCH_KEEPER_TRUSTED_CHANNEL,
+  isUpdateNewFcm,
   keeperLoading,
-} from '../actions/keeper';
-import { call, delay, put, select } from 'redux-saga/effects';
-import { createWatcher } from '../utils/utilities';
-import { insertDBWorker } from './storage';
-import { TrustedDataElements } from '../../bitcoin/utilities/Interface';
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
-import { DecentralizedBackup } from '../../common/interfaces/Interfaces';
+  UPDATE_NEW_FCM,
+} from "../actions/keeper";
+import { call, delay, put, select } from "redux-saga/effects";
+import { createWatcher } from "../utils/utilities";
+import { insertDBWorker } from "./storage";
+import {
+  INotification,
+  Keepers,
+  LevelHealthInterface,
+  notificationTag,
+  notificationType,
+  TrustedDataElements,
+} from "../../bitcoin/utilities/Interface";
+import S3Service from "../../bitcoin/services/sss/S3Service";
+import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
+import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
+import { DecentralizedBackup } from "../../common/interfaces/Interfaces";
+import RelayServices from "../../bitcoin/services/RelayService";
 
 function* fetchKeeperTrustedChannelWorker({ payload }) {
   try {
-    yield put(keeperLoading('fetchKeeperTC'));
+    yield put(keeperLoading("fetchKeeperTC"));
     let { shareId, walletName, type } = payload;
     const keeper: KeeperService = yield select((state) => state.keeper.service);
     const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-      (state) => state.storage.database,
+      (state) => state.storage.database
     );
     const res = yield call(keeper.fetchTrustedChannel, shareId, walletName);
     if (res.status == 200) {
@@ -26,12 +36,12 @@ function* fetchKeeperTrustedChannelWorker({ payload }) {
       let { encryptedKey, otp } = data.shareTransferDetails;
       let { bh, secondary } = data.xPub.secureXpub;
       switch (type) {
-        case 'secureXpub':
+        case "secureXpub":
           let s3ServiceSecure: SecureAccount = yield select(
-            (state) => state.accounts[SECURE_ACCOUNT].service,
+            (state) => state.accounts[SECURE_ACCOUNT].service
           );
           let secureXpubs = s3ServiceSecure.getXpubsForAccount();
-          if (secureXpubs.secondary == '' && secureXpubs.bh == '') {
+          if (secureXpubs.secondary == "" && secureXpubs.bh == "") {
             let response = s3ServiceSecure.setSecureXpubsAccount(secondary, bh);
           }
           let result;
@@ -62,13 +72,54 @@ function* fetchKeeperTrustedChannelWorker({ payload }) {
           break;
       }
     }
-    yield put(keeperLoading('fetchKeeperTC'));
+    yield put(keeperLoading("fetchKeeperTC"));
   } catch (error) {
-    yield put(keeperLoading('fetchKeeperTC'));
+    yield put(keeperLoading("fetchKeeperTC"));
   }
 }
 
 export const fetchKeeperTrustedChannelWatcher = createWatcher(
   fetchKeeperTrustedChannelWorker,
-  FETCH_KEEPER_TRUSTED_CHANNEL,
+  FETCH_KEEPER_TRUSTED_CHANNEL
+);
+
+function* updateNewFCMWorker() {
+  try {
+    const keeper: KeeperService = yield select((state) => state.keeper.service);
+    const levelHealth: LevelHealthInterface[] = yield select(
+      (state) => state.health.levelHealth
+    );
+    const currentLevel: Number = yield select(
+      (state) => state.health.currentLevel
+    );
+    const fcmTokenValue = yield select(
+      (state) => state.preferences.fcmTokenValue
+    );
+    if (currentLevel == 2 && levelHealth[1]) {
+      let KeeperInfo: Keepers = keeper.keeper.keepers;
+      let uuid;
+      if (KeeperInfo[levelHealth[1].levelInfo[2].shareId]) {
+        uuid = KeeperInfo[levelHealth[1].levelInfo[2].shareId].keeperUUID;
+      }
+      yield put(isUpdateNewFcm(true));
+      const notification: INotification = {
+        notificationType: notificationType.newFCM,
+        title: "New FCM updated",
+        body: "New FCM updated",
+        data: JSON.stringify({ fmc: fcmTokenValue }),
+        tag: notificationTag.mandatory,
+        date: new Date(),
+      };
+      let res = yield call(
+        RelayServices.sendKeeperNotifications,
+        [uuid],
+        notification
+      );
+    }
+  } catch (error) {}
+}
+
+export const updateNewFCMWatcher = createWatcher(
+  updateNewFCMWorker,
+  UPDATE_NEW_FCM
 );

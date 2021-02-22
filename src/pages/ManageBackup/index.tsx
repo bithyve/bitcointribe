@@ -1740,7 +1740,7 @@ export default function ManageBackup(props) {
                 style={{ ...styles.healthShieldImage, position: "relative" }}
                 resizeMode={"contain"}
               >
-                <View
+                {/* <View
                   style={{
                     backgroundColor: Colors.red,
                     height: wp("3%"),
@@ -1752,7 +1752,7 @@ export default function ManageBackup(props) {
                     borderWidth: 2,
                     borderColor: Colors.white,
                   }}
-                />
+                /> */}
               </ImageBackground>
               <View style={styles.headerSeparator} />
               <View>
