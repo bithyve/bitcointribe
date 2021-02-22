@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   Image,
@@ -11,7 +11,7 @@ import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { clearSwanCache, fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 
@@ -26,13 +26,13 @@ type Props = {
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu, onClickSetting }: Props ) => {
   const dispatch = useDispatch()
   const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedCode, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted } = useSwanIntegrationState()
-  // useEffect( ()=>{
-  //   dispatch( clearSwanCache() )
-  // }, [] )
-
-  if ( swanFromBuyMenu ) {
-    if( !hasFetchSwanAuthenticationUrlInitiated ) dispatch( fetchSwanAuthenticationUrl( {
-    } ) )
+  const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+  function handleProceedButtonPress() {
+    if ( swanFromBuyMenu ) {
+      if( !hasFetchSwanAuthenticationUrlInitiated ) dispatch( fetchSwanAuthenticationUrl( {
+      } ) )
+      setHasButtonBeenPressed( true )
+    }
   }
 
   useEffect( ()=>{
@@ -67,16 +67,40 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
       </View>
 
       <View style={{
-        flexDirection: 'row', marginTop: 'auto', alignItems: 'center'
+        flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
       }} >
         <AppBottomSheetTouchableWrapper
-          onPress={() => onClickSetting()}
+          disabled={swanFromBuyMenu ? hasButtonBeenPressed : false}
+          onPress={swanFromBuyMenu ? handleProceedButtonPress : onClickSetting}
           style={{
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>OK</Text>
+          <Text style={styles.proceedButtonText}>{swanFromBuyMenu ? 'Proceed to Swan' : 'OK'}</Text>
+
         </AppBottomSheetTouchableWrapper>
+        {swanFromBuyMenu
+          ? <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            alignContent: 'center'
+          }}>
+            <Text style={{
+              marginLeft: wp( '13.5%' ),
+            }}>
+        Powered by
+            </Text>
+            <Image
+              source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
+              style={{
+                marginLeft: 5,
+                width: 62,
+                height: 27,
+              }}
+            />
+          </View>
+          : null
+        }
         {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
       </View>
     </View>
@@ -103,47 +127,18 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-  },
-  successModalAmountView: {
-    flex: 2,
-    justifyContent: 'center',
-    marginRight: wp( '10%' ),
-    marginLeft: wp( '10%' ),
-  },
-  successModalWalletNameText: {
-    color: Colors.black,
-    fontSize: RFValue( 25 ),
-    fontFamily: Fonts.FiraSansRegular
-  },
-  successModalAmountImage: {
-    width: wp( '3%' ),
-    height: wp( '3%' ),
-    marginRight: 5,
-    marginBottom: wp( '1%' ),
-    resizeMode: 'contain',
-  },
-  successModalAmountText: {
-    color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 21 ),
-    marginRight: 5
-  },
-  successModalAmountUnitText: {
-    color: Colors.borderColor,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue( 11 ),
-  },
-  successModalAmountInfoView: {
-    flex: 0.4,
-    marginRight: wp( '10%' ),
-    marginLeft: wp( '10%' ),
+    textAlign: 'justify'
   },
   successModalButtonView: {
+    minHeight: 50,
+    minWidth: 144,
+    paddingHorizontal: wp( 4 ),
+    paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: wp( '43%' ),
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
+    borderRadius: 11,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
@@ -151,7 +146,7 @@ const styles = StyleSheet.create( {
       width: 15, height: 15
     },
     backgroundColor: Colors.blue,
-    alignSelf: 'center',
+    alignSelf: 'flex-start',
     marginLeft: wp( '10%' ),
   },
   successModalImage: {
@@ -166,5 +161,4 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   },
 } )
-
 export default BottomSheetSwanInfo
