@@ -410,6 +410,7 @@ const updateSecondarySubAccounts = (
                     accountShellID: shell.id,
                     balances: dervBalances,
                     transactions: dervTransactions,
+                    isTFAEnabled: shell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
                   } )
                   break
 

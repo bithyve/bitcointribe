@@ -44,13 +44,11 @@ import {
 } from './sagas/setupAndAuth'
 
 import {
-  fetchTransactionsWatcher,
   testcoinsWatcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
-  fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
@@ -151,14 +149,12 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
     removeTwoFAWatcher,
-    fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,

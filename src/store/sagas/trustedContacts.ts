@@ -33,7 +33,7 @@ import {
   notificationTag,
   trustedChannelActions,
 } from '../../bitcoin/utilities/Interface'
-import { calculateOverallHealth, downloadMShare } from '../actions/sss'
+import { calculateOverallHealth, downloadMShare, uploadEncMShare } from '../actions/sss'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
@@ -50,7 +50,13 @@ import Toast from '../../components/Toast'
 import { downloadMetaShareWorker } from './sss'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import { ContactInfo, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import { AccountsState } from '../reducers/accounts'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import AccountShell from '../../common/data/models/AccountShell'
+import config from '../../bitcoin/HexaConfig'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -62,6 +68,200 @@ const sendNotification = ( recipient, notification ) => {
 
   if ( receivers.length )
     RelayServices.sendNotifications( receivers, notification ).then( console.log )
+}
+
+export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
+  const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
+  const trustedContactsInfo = yield select(
+    ( state ) => state.trustedContacts.trustedContactsInfo,
+  )
+  const FCM = yield select ( state => state.preferences.fcmTokenValue )
+  const { contactName } = contactInfo
+
+  const { walletId } = regularAccount.hdWallet.getWalletId()
+
+  // check whether a derivative account already exist for this contact
+  let accountNumber =
+    regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+  if ( !accountNumber ) {
+    // initialize a trusted derivative account against the following contact
+    const res = regularAccount.setupDerivativeAccount(
+      TRUSTED_CONTACTS,
+      null,
+      contactName,
+    )
+    if ( res.status !== 200 ) {
+      throw new Error( `${res.err}` )
+    } else {
+      // refresh the account number
+      accountNumber =
+        regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+      const secondarySubAccountId = res.data.accountId
+      secondarySubAccount.id = secondarySubAccountId
+      secondarySubAccount.instanceNumber = accountNumber
+      secondarySubAccount.balances = {
+        confirmed: 0,
+        unconfirmed: 0,
+      }
+      secondarySubAccount.transactions = []
+
+      AccountShell.addSecondarySubAccount(
+        parentShell,
+        secondarySubAccountId,
+        secondarySubAccount,
+      )
+    }
+  }
+
+  const trustedReceivingAddress = ( regularAccount.hdWallet
+    .derivativeAccounts[ TRUSTED_CONTACTS ][
+      accountNumber
+    ] as TrustedContactDerivativeAccountElements ).receivingAddress
+
+  const data: EphemeralDataElements = {
+    walletID: walletId,
+    FCM,
+    trustedAddress: trustedReceivingAddress,
+    trustedTestAddress: testAccount.hdWallet.receivingAddress,
+  }
+
+  const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+
+  if( contactInfo.isGuardian ){
+    // Trusted Contact: Guardian
+    const { changeContact, shareIndex } = contactInfo
+    const { SHARES_TRANSFER_DETAILS } = yield select(
+      ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
+    )
+    const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
+    Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
+    config.TC_REQUEST_EXPIRY
+
+
+    if ( changeContact ) {
+      let previousGuardianName: string
+      // find previous TC (except keeper: shareIndex 0)
+      if ( trustedContactsInfo && shareIndex ) {
+        const previousGuardian = trustedContactsInfo[ shareIndex ]
+        if ( previousGuardian ) {
+          previousGuardianName = `${previousGuardian.firstName} ${
+            previousGuardian.lastName ? previousGuardian.lastName : ''
+          }`
+            .toLowerCase()
+            .trim()
+        } else console.log( 'Previous guardian details missing' )
+      }
+
+      // upload share for the new contact(guardian)
+      yield put(
+        uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
+      )
+    } else if( shareExpired ) {
+      // share expired, re-upload (creates ephermeal channel as well)
+      yield put(
+        uploadEncMShare( shareIndex, contactInfo, data ),
+      )
+    } else {
+      // re-initiating expired Ephemeral Channel
+      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+      trustedContact.ephemeralChannel.initiatedAt &&
+      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+      config.TC_REQUEST_EXPIRY? true: false
+
+      if (
+        !hasTrustedChannel &&
+        isEphemeralChannelExpired
+      ){
+        yield put(
+          updateEphemeralChannel(
+            contactInfo,
+            trustedContact.ephemeralChannel.data[ 0 ],
+          ),
+        )
+      }
+    }
+  } else{
+
+    // update ephemeral data (if payment details are available)
+    const { paymentDetails } = contactInfo
+    let paymentURI, trustedPaymentURI
+    if( paymentDetails ){
+      const { amount, address }  = paymentDetails
+      paymentURI = regularAccount.getPaymentURI( address, {
+        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+      } ).paymentURI
+      trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
+        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+      } ).paymentURI
+
+      data.paymentDetails =  {
+        trusted: {
+          address: trustedReceivingAddress,
+          paymentURI: trustedPaymentURI,
+        },
+        alternate: {
+          address: address,
+          paymentURI,
+        },
+      }
+    }
+
+    if ( !trustedContact ) {
+      // create emphemeral channel(initiating TC)
+      yield put( updateEphemeralChannel( contactInfo, data ) )
+    } else {
+      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+      trustedContact.ephemeralChannel.initiatedAt &&
+      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+      config.TC_REQUEST_EXPIRY? true: false
+
+      if ( !hasTrustedChannel ){
+        if( isEphemeralChannelExpired ){
+          // re-initiating expired Ephemeral Channel
+          yield put(
+            updateEphemeralChannel(
+              contactInfo,
+              trustedContact.ephemeralChannel.data[ 0 ],
+            ),
+          )
+        }
+        else{
+          // if payment details are changed(on receive); re-upload the data
+          if( paymentDetails && trustedContact.ephemeralChannel ) {
+            const { address }  = paymentDetails
+            const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
+            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
+            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+              .address === address &&
+            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+              .paymentURI === paymentURI ? true: false
+
+            if ( !isPaymentDetailsSame ){
+              const updatedPaymentDetails = {
+                trusted: {
+                  address: trustedReceivingAddress,
+                  paymentURI: trustedPaymentURI,
+                },
+                alternate: {
+                  address: paymentDetails.address,
+                  paymentURI,
+                },
+              }
+              trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
+              yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 function* approveTrustedContactWorker( { payload } ) {
@@ -366,28 +566,73 @@ function* updateEphemeralChannelWorker( { payload } ) {
 
     if ( payload.uploadXpub ) {
       console.log( 'Uploading xpub for: ', contactInfo.contactName )
-      const res = yield call(
-        regularService.getDerivativeAccXpub,
-        TRUSTED_CONTACTS,
-        null,
-        contactInfo.contactName,
-      )
 
-      if ( res.status === 200 ) {
+      let accountNumber =
+      regularService.hdWallet.trustedContactToDA[ contactInfo.contactName ]
+      if ( !accountNumber ) {
+        // initialize a trusted derivative account against the following contact (will get triggered during approval flow)
+        const res = regularService.setupDerivativeAccount(
+          TRUSTED_CONTACTS,
+          null,
+          contactInfo.contactName,
+        )
+        if ( res.status !== 200 ) {
+          throw new Error( `${res.err}` )
+        } else {
+          // refresh the account number and add trusted contact sub acc to acc-shell
+          accountNumber =
+          regularService.hdWallet.trustedContactToDA[ contactInfo.contactName ]
+          const secondarySubAccountId = res.data.accountId
+
+          const accountShells: AccountShell[] = yield select(
+            ( state ) => state.accounts.accountShells,
+          )
+          let parentShell: AccountShell
+          accountShells.forEach( ( shell: AccountShell ) => {
+            if( !shell.primarySubAccount.instanceNumber ){
+              if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+            }
+          } )
+          const secondarySubAccount = new TrustedContactsSubAccountInfo( {
+            accountShellID: parentShell.id,
+            isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+          } )
+
+          secondarySubAccount.id = secondarySubAccountId
+          secondarySubAccount.instanceNumber = accountNumber
+          secondarySubAccount.balances = {
+            confirmed: 0,
+            unconfirmed: 0,
+          }
+          secondarySubAccount.transactions = []
+
+          AccountShell.addSecondarySubAccount(
+            parentShell,
+            secondarySubAccountId,
+            secondarySubAccount,
+          )
+        }
+      }
+
+      const xpub = ( regularService.hdWallet
+        .derivativeAccounts[ TRUSTED_CONTACTS ][
+          accountNumber
+        ] as TrustedContactDerivativeAccountElements ).xpub
+
+      if ( xpub ) {
         // send acceptance notification
         const { walletName } = yield select(
           ( state ) => state.storage.database.WALLET_SETUP,
         )
 
-        const xpub = res.data
         const tpub = testService.getTestXpub()
-        const walletID = yield call( AsyncStorage.getItem, 'walletID' )
-        const FCM = yield call( AsyncStorage.getItem, 'fcmToken' )
+        const { walletId } = regularService.hdWallet.getWalletId()
+        const FCM = yield select ( state => state.preferences.fcmTokenValue )
 
         const data: TrustedDataElements = {
           xpub,
           tpub,
-          walletID,
+          walletID: walletId,
           FCM,
           walletName,
           version: DeviceInfo.getVersion(),
@@ -785,15 +1030,58 @@ export function* trustedChannelsSetupSyncWorker() {
       }
     } else {
       // generate a corresponding derivative acc and assign xpub(uploading info to trusted channel)
-      const res = yield call(
-        regularService.getDerivativeAccXpub,
-        TRUSTED_CONTACTS,
-        null,
-        contactName,
-      )
+      let accountNumber =
+      regularService.hdWallet.trustedContactToDA[ contactName ]
+      if ( !accountNumber ) {
+        // initialize a trusted derivative account against the following contact
+        const res = regularService.setupDerivativeAccount(
+          TRUSTED_CONTACTS,
+          null,
+          contactName,
+        )
+        if ( res.status !== 200 ) {
+          throw new Error( `${res.err}` )
+        } else {
+          // refresh the account number and add trusted contact sub acc to acc-shell
+          accountNumber =
+          regularService.hdWallet.trustedContactToDA[ contactName ]
+          const secondarySubAccountId = res.data.accountId
 
-      if ( res.status === 200 ) {
-        const xpub = res.data
+          const accountShells: AccountShell[] = yield select(
+            ( state ) => state.accounts.accountShells,
+          )
+          let parentShell: AccountShell
+          accountShells.forEach( ( shell: AccountShell ) => {
+            if( !shell.primarySubAccount.instanceNumber ){
+              if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+            }
+          } )
+          const secondarySubAccount = new TrustedContactsSubAccountInfo( {
+            accountShellID: parentShell.id,
+            isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+          } )
+
+          secondarySubAccount.id = secondarySubAccountId
+          secondarySubAccount.instanceNumber = accountNumber
+          secondarySubAccount.balances = {
+            confirmed: 0,
+            unconfirmed: 0,
+          }
+          secondarySubAccount.transactions = []
+          AccountShell.addSecondarySubAccount(
+            parentShell,
+            secondarySubAccountId,
+            secondarySubAccount,
+          )
+        }
+      }
+
+      const xpub = ( regularService.hdWallet
+        .derivativeAccounts[ TRUSTED_CONTACTS ][
+          accountNumber
+        ] as TrustedContactDerivativeAccountElements ).xpub
+
+      if ( xpub ) {
         const tpub = testService.getTestXpub()
         const data: TrustedDataElements = {
           xpub,
@@ -1192,7 +1480,7 @@ function* postRecoveryChannelSyncWorker( {} ) {
   )
 
   const trustedData: TrustedDataElements = {
-    FCM: yield call( AsyncStorage.getItem, 'fcmToken' ),
+    FCM: yield select ( state => state.preferences.fcmTokenValue ),
     version: DeviceInfo.getVersion(),
   }
   for ( const contactName of Object.keys( trustedContacts.tc.trustedContacts ) ) {

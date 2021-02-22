@@ -1150,7 +1150,7 @@ export default class SecureHDWallet extends Bitcoin {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ): {
     accountId: string;
     accountNumber: number;
@@ -1170,8 +1170,8 @@ export default class SecureHDWallet extends Bitcoin {
             .derivativeAccounts[ accountType ][ accountNumber ]
           const updatedDervInstance = {
             ...derivativeInstance,
-            accountName: accountDetails.accountName,
-            accountDescription: accountDetails.accountDescription,
+            accountName: accountDetails? accountDetails.accountName: null,
+            accountDescription:accountDetails? accountDetails.accountDescription: null,
           }
           this.derivativeAccounts[ accountType ][
             accountNumber

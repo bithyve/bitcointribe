@@ -585,7 +585,7 @@ export default class SecureAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ):
     | {
         status: number;

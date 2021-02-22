@@ -158,41 +158,6 @@ export default class BaseAccount {
     accountNumber?: number,
   ) => this.hdWallet.getReceivingAddress( derivativeAccountType, accountNumber );
 
-  public getDerivativeAccXpub = (
-    accountType: string,
-    accountNumber?: number,
-    contactName?: string,
-  ):
-    | {
-        status: number;
-        data: string;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getDerivativeAccXpub(
-          accountType,
-          accountNumber,
-          contactName.toLowerCase().trim(),
-        ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to generate derivative account\'s xpub',
-      }
-    }
-  };
-
   public getDerivativeAccAddress = async (
     accountType: string,
     accountNumber?: number,
@@ -349,7 +314,8 @@ export default class BaseAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
+    contactName?: string
   ):
     | {
         status: number;
@@ -369,7 +335,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails ),
+        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactName ),
       }
     } catch ( err ) {
       return {
