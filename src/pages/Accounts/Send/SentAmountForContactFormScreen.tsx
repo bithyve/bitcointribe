@@ -78,7 +78,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     dispatch( calculateSendMaxFee( {
       numberOfRecipients: selectedRecipients.length,
       accountShellID: sourceAccountShell.id,
-      feePerByte: averageTransactionFees.feePerByte,
     } ) )
   }
 
