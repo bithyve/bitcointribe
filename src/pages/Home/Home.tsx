@@ -1784,6 +1784,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.SWAN_STATUS_INFO:
+          return ( this.state.swanFromDeepLink )
+            ? Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '32%' ]

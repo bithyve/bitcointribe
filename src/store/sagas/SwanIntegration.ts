@@ -57,14 +57,15 @@ export const redeemSwanCodeForTokenWatcher = createWatcher(
 export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield put( redeemSwanCodeForTokenInitiated() )
 
+  // Extract swan auth code from deep link redirect url
   const splits = payload.data.split( '/' )
-  const code = splits[ splits.length - 1 ].split( '&' )[ 0 ]
+  const code = splits[ splits.length - 1 ].split( '&' )[ 0 ].split( '=' )[ 1 ]
 
   const { code_verifier, state } = yield select(
     ( state ) => state.swanIntegration
   )
   const swanResponse = yield call( redeemAuthCodeForToken, {
-    code: code.split( '=' )[ 1 ],
+    code,
     state,
     code_verifier
   } )
