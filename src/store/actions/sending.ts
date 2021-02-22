@@ -1,5 +1,4 @@
 import { Action } from 'redux'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import AccountShell from '../../common/data/models/AccountShell'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
@@ -107,7 +106,6 @@ export interface CalculateSendMaxFeeAction extends Action {
   payload: {
     numberOfRecipients: number;
     accountShellID: string;
-    feePerByte: Satoshis;
   };
 }
 
@@ -115,7 +113,6 @@ export const calculateSendMaxFee = (
   payload: {
     numberOfRecipients: number;
     accountShellID: string;
-    feePerByte: Satoshis;
   },
 ): CalculateSendMaxFeeAction => {
   return {
