@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
+import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native'
 import FormStyles from '../../../../common/Styles/FormStyles'
 import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
@@ -28,7 +28,7 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const { rampHostedUrl } = useRampIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
+  const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from Ramp' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const canProceed = useMemo( () => {
     return (
@@ -101,7 +101,20 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
                 onChangeText={setAccountDescription}
               />
             </View>
+            <View style={{
+              marginBottom: 12
+            }}>
+              <BottomInfoBox
+                containerStyle={{
+                  textAlign: 'justify',
+                  marginTop: 0,
+                  paddingTop: 0,
+                  paddingHorizontal: 12,
 
+                }}
+                infoText={'Hexa Ramp Account enables purchase of BTC using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available\n\nPayment methods available may vary based on your country. By proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to a new Hexa Ramp account.'}
+              />
+            </View>
             <View style={styles.footerSection}>
               <Button
                 raised
@@ -111,6 +124,26 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
                 onPress={handleProceedButtonPress}
                 disabled={canProceed === false}
               />
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}>
+                <Text style={{
+
+
+                }}>
+                  Powered by
+                </Text>
+                <Image
+                  source={require( '../../../../assets/images/icons/ramp_logo_large.png' )}
+                  style={{
+                    marginLeft: 5,
+                    width: 62,
+                    height: 27,
+
+                  }}
+                />
+              </View>
             </View>
 
           </View>
@@ -118,19 +151,6 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
         </ScrollView>
 
       </KeyboardAvoidingView>
-
-      <View style={{
-        marginBottom: 12
-      }}>
-        <BottomInfoBox
-          containerStyle={{
-            marginTop: 0,
-            paddingTop: 0,
-            paddingHorizontal: 12,
-          }}
-          infoText={'Hexa Ramp Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Ramp service. BTC purchased will be transferred to the Hexa Ramp account.'}
-        />
-      </View>
     </View>
   )
 }

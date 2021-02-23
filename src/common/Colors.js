@@ -21,7 +21,7 @@ const Colors = {
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
   coral: '#D35400',
-  purple: '#9B39FD',
+  riptide: '#77E3B5',
 
   // Grayscale
   gray1: '#d0d0d0',

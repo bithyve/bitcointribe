@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native'
-import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import RadioButton from '../../../components/RadioButton'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -13,7 +11,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import CustomPriorityContent from '../CustomPriorityContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import { timeConvertNear30 } from '../../../common/utilities'
 
 export type Props = {
@@ -37,7 +34,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {}: Props ) => {
         okButtonText={'Confirm'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={( amount, customEstimatedBlock ) => {
+        onPressOk={(  ) => {
           Keyboard.dismiss()
           dismissBottomSheet()
           // this.handleCustomFee( amount, customEstimatedBlock )

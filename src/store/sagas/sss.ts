@@ -93,9 +93,10 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import {  restorePersonalNodeConfiguration } from '../actions/nodeSettings'
+import { restorePersonalNodeConfiguration } from '../actions/nodeSettings'
 import { restoredVersionHistory } from '../actions/versionHistory'
 import versionHistory from '../reducers/versionHistory'
+import { getVersions } from '../../common/utilities'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -280,8 +281,8 @@ function* uploadEncMetaShareWorker( { payload } ) {
     if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ] ) {
       if (
         Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ]
-            .UPLOADED_AT <
+        DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ]
+          .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
       ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
@@ -757,7 +758,7 @@ function* generatePersonalCopyWorker( { payload } ) {
         : false
       const originalSharingDetails =
         personalCopyDetails[ selectedPersonalCopy.type ] &&
-        personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
+          personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
           ? personalCopyDetails[ selectedPersonalCopy.type ].sharingDetails
           : {
           }
@@ -880,7 +881,7 @@ function* sharePersonalCopyWorker( { payload } ) {
                   path:
                   Platform.OS == 'android'
                     ? 'file://' +
-                      personalCopyDetails[ selectedPersonalCopy.type ].path
+                    personalCopyDetails[ selectedPersonalCopy.type ].path
                     : personalCopyDetails[ selectedPersonalCopy.type ].path, // The absolute path of the file from which to read data.
                   type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                   name: selectedPersonalCopy.title, // Optional: Custom filename for attachment
@@ -909,7 +910,7 @@ function* sharePersonalCopyWorker( { payload } ) {
               url:
               Platform.OS == 'android'
                 ? 'file://' +
-                  personalCopyDetails[ selectedPersonalCopy.type ].path
+                personalCopyDetails[ selectedPersonalCopy.type ].path
                 : personalCopyDetails[ selectedPersonalCopy.type ].path,
               type: 'application/pdf',
               showAppsToView: true,
@@ -1798,7 +1799,7 @@ const asyncDataToBackup = async () => {
   if ( personalCopyDetails )
     ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
   if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
-  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
+  if ( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
 
   return ASYNC_DATA
 }
@@ -1807,19 +1808,25 @@ function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+
   const versionHistory = yield select(
-    ((state) => idx(state, (_) => _.versionHistory.versions))
-  );
+    ( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
+  )
+  const restoreVersions = yield select(
+    ( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) )
+
+  const versions = getVersions( versionHistory, restoreVersions )
+
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if( activePersonalNode )
+  if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
-  if ( versionHistory && versionHistory.length )
-    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+  if ( versions && versions.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versions )
 
   return STATE_DATA
 }
@@ -1995,9 +2002,9 @@ function* fetchWalletImageWorker( { payload } ) {
 
     if ( STATE_DATA ) {
       for ( const key of Object.keys( STATE_DATA ) ) {
-        if( !STATE_DATA[ key ] ) continue
+        if ( !STATE_DATA[ key ] ) continue
 
-        switch( key ){
+        switch ( key ) {
             case 'accountShells':
               const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
               yield put( restoredAccountShells( {
@@ -2012,8 +2019,9 @@ function* fetchWalletImageWorker( { payload } ) {
               ) )
               break
 
-              case 'versionHistory':
+            case 'versionHistory':
               const versions: VersionHistory[] = JSON.parse( STATE_DATA[ key ] )
+              console.log( 'versions in ssssss', versions )
               yield put( restoredVersionHistory( {
                 versions
               } ) )

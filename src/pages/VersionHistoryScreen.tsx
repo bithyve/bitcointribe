@@ -18,11 +18,17 @@ import DeviceInfo from 'react-native-device-info'
 import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment'
 import idx from 'idx'
+import { type } from 'os'
+import { getVersions } from '../common/utilities'
 
 
 export default function VersionHistoryScreen( props ) {
   const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
-  const [ SelectedOption, setSelectedOption ] = useState( 0 )
+ const restoreVersions = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) 
+ 
+ const [ SelectedOption, setSelectedOption ] = useState( 0 );
+  const [ isDataSet, setIsDataSet ] = useState(false)
+
   const dispatch = useDispatch()
 
   const SelectOption = ( Id ) => {
@@ -32,37 +38,31 @@ export default function VersionHistoryScreen( props ) {
       setSelectedOption( Id )
     }
   }
-  const [ data, setData ] = useState( [
-    {
-      'id': '',
-      'version': '',
-      'buildNumber': '',
-      'versionName': '',
-      'title': 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-      'date': ''
-    }
-  ] )
+  const [ data, setData ] = useState([])
 
   useEffect( () => {
-    if ( versionHistory ) {
-      setData( versionHistory )
-      SelectOption( versionHistory.length )
-    }
-  }, [ versionHistory ] )
+    let versions = getVersions(versionHistory, restoreVersions);
+    if(versions.length){
+    setData( versions )
+    setIsDataSet(!isDataSet);
+    SelectOption( versions.length )}
+  }, [] )
+
 
   return (
+    
     <SafeAreaView style={{
       flex: 1
     }}>
       <View style={styles.rootContainer}>
-        {data && data.length && (
+        {data && data.length ? (
           <View style={{
             flex: 1
           }}>
             <ScrollView style={{
             }}>
-              {data.map( ( value ) => {
-                if ( SelectedOption == parseInt( value.id ) ) {
+              {data.map(value => {
+                if ( value && SelectedOption == parseInt( value.id ) ) {
                   return (
                     <TouchableOpacity
                       key={value.id}
@@ -70,12 +70,12 @@ export default function VersionHistoryScreen( props ) {
                       style={styles.selection}
                     >
                       <Text style={styles.versionText}>
-                        {value.versionName}
+                        {value.versionName ? value.versionName : ''}
                       </Text>
                       <Text style={{
                         ...styles.text, fontSize: RFValue( 9 ),
                       }}>
-                        {value.date}
+                        {value.date ? value.date : ''}
                       </Text>
                     </TouchableOpacity>
                   )
@@ -95,22 +95,19 @@ export default function VersionHistoryScreen( props ) {
                         ...styles.versionText, color: Colors.textColorGrey,
                         fontSize: RFValue( 10 ),
                       }}>
-                        {value.versionName}
+                        {value.versionName ? value.versionName : ''}
                       </Text>
                       <Text
                         style={styles.date}
                       >
-                        {value.date}
+                        {value.date ? value.date : ''}
                       </Text>
                     </View>
-                    {/* <Text style={styles.text}>
-                      {value.title}
-                    </Text> */}
                   </TouchableOpacity>
                 )
               } )}
             </ScrollView>
-          </View> )}
+          </View> ) : null}
       </View>
     </SafeAreaView>
   )

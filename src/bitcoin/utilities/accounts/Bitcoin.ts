@@ -14,7 +14,7 @@ import {
 import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
-const bitcoinAxios = axios.create( {
+let bitcoinAxios = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 export default class Bitcoin {
@@ -140,7 +140,7 @@ export default class Bitcoin {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs } = accounts[ accountId ]
+        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
         const upToDateTxs: TransactionDetails[] = []
         const txsToUpdate: TransactionDetails[] = []
         const newTxs : TransactionDetails[] = []
@@ -157,6 +157,10 @@ export default class Bitcoin {
               }
             }
           } else upToDateTxs.push( tx )
+
+          if( !cachedTxIdMap[ tx.txid ] ) // backward compatibility (for versions w/o txIdMaps)
+            cachedTxIdMap[ tx.txid ] = [ tx.address ]
+
         } )
 
         accountsTemp[ accountId ] = {
@@ -175,6 +179,9 @@ export default class Bitcoin {
       }
 
       let usedFallBack = false
+      bitcoinAxios = axios.create( {
+        timeout: 4 * REQUEST_TIMEOUT // accounting for blind refresh
+      } )
       try{
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(
