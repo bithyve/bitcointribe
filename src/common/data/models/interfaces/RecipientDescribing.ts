@@ -2,12 +2,13 @@ import { ImageSourcePropType } from 'react-native'
 import RecipientKind from '../../enums/RecipientKind'
 import { Satoshis } from '../../typealiases/UnitAliases'
 import ContactTrustKind from '../../enums/ContactTrustKind'
+import SourceAccountKind from '../../enums/SourceAccountKind'
 
 export interface RecipientDescribing {
   id: string;
   kind: RecipientKind;
   displayedName: string;
-  amount: Satoshis;
+  amount?: Satoshis;
   avatarImageSource: ImageSourcePropType | null;
 }
 
@@ -39,4 +40,6 @@ export interface AccountRecipientDescribing extends RecipientDescribing {
   * Current balance of the account in Satoshis.
   */
   currentBalance: Satoshis;
+  sourceAccount: SourceAccountKind;
+  instanceNumber: number;
 }

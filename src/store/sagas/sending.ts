@@ -12,9 +12,9 @@ import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { AccountRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
@@ -96,12 +96,18 @@ function* processRecipients( accountShell: AccountShell ){
 
         // TODO: RecipientDescribing should have type and instance/acc number properties
         case RecipientKind.ACCOUNT_SHELL:
+          const instanceNumber = ( recipient as AccountRecipientDescribing ).instanceNumber
+          let accountKind = recipient.id
+          if( instanceNumber && [ REGULAR_ACCOUNT, SECURE_ACCOUNT ].includes( accountKind ) ){
+            accountKind = SUB_PRIMARY_ACCOUNT
+          }
+
           recipients.push( {
-            id: recipient.id,
+            id: accountKind,
             address: null,
             amount: recipient.amount,
-            type: recipient.type, // underlying accountType (used in case of derv acc)
-            accountNumber: recipient.account_number, // derviative acc number
+            type: ( recipient as AccountRecipientDescribing ).sourceAccount,
+            accountNumber: instanceNumber,
           } )
           break
 
@@ -126,7 +132,6 @@ function* processRecipients( accountShell: AccountShell ){
     if ( recipient.address ) addressedRecipients.push( recipient )
     // recipient kind: External address
     else {
-      if ( !recipient.id ) throw new Error( 'Invalid recipient' )
       if (
         recipient.id === REGULAR_ACCOUNT ||
         recipient.id === SECURE_ACCOUNT ||
@@ -236,6 +241,25 @@ function* executeSendStage1( { payload }: {payload: {
   const service: BaseAccount | SecureAccount = accountsState[
     accountShell.primarySubAccount.sourceKind
   ].service
+
+  if( !accountsState.averageTxFees ){
+    // custom fee-fallback (missing txn fee intel)
+
+    // TODO: fire intel absent action such that the UI would navigate to SendConfirmation screen w/ below params
+    this.props.navigation.navigate( 'SendConfirmation', {
+      accountShellID,
+      serviceType,
+      sweepSecure,
+      spendableBalance,
+      recipients,
+      averageTxFees,
+      isSendMax,
+      derivativeAccountDetails,
+      donationId,
+      feeIntelAbsent: true,
+    } )
+    return
+  }
 
   const averageTxFeeByNetwork = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ]
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )

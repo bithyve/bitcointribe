@@ -67,26 +67,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   }
 
   function handleConfirmationButtonPress() {
-
-    if( averageTransactionFees ){
-      executeSendStage1( {
-        accountShellID: sourceAccountShell.id
-      } )
-    } else {
-      // custom fee-fallback (missing txn fee intel)
-      this.props.navigation.navigate( 'SendConfirmation', {
-        accountShellID,
-        serviceType,
-        sweepSecure,
-        spendableBalance,
-        recipients,
-        averageTxFees,
-        isSendMax,
-        derivativeAccountDetails,
-        donationId,
-        feeIntelAbsent: true,
-      } )
-    }
+    executeSendStage1( {
+      accountShellID: sourceAccountShell.id
+    } )
   }
 
   function handleAddRecipientButtonPress() {
