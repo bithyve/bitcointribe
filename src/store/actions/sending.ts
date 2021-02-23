@@ -8,12 +8,13 @@ export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
 export const RECIPIENT_SELECTED_FOR_AMOUNT_SETTING = 'RECIPIENT_SELECTED_FOR_AMOUNT_SETTING'
 export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPIENT'
 export const EXECUTE_SENDING = 'EXECUTE_SENDING'
+export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
+export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
 export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
 export const CALCULATE_SEND_MAX_FEE = 'CALCULATE_SEND_MAX_FEE'
 export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
-
 
 export interface SourceAccountSelectedForSendingAction extends Action {
   type: typeof SOURCE_ACCOUNT_SELECTED_FOR_SENDING;
@@ -68,6 +69,39 @@ export const executeSending = (): ExecuteSendingAction => {
   }
 }
 
+
+
+export interface ExecuteSendStage1Action extends Action {
+  type: typeof EXECUTE_SEND_STAGE1;
+  payload: {
+    accountShellID: string;
+  };
+}
+
+export const executeSendStage1 = (
+  payload: {
+    accountShellID: string;
+  },
+): ExecuteSendStage1Action => {
+  return {
+    type: EXECUTE_SEND_STAGE1,
+    payload,
+  }
+}
+
+export interface SendStage1ExecutedAction extends Action {
+  type: typeof SEND_STAGE1_EXECUTED;
+  payload: boolean;
+}
+
+export const sendStage1Executed = (
+  payload: boolean,
+): SendStage1ExecutedAction => {
+  return {
+    type: SEND_STAGE1_EXECUTED,
+    payload,
+  }
+}
 
 export interface SendingFailureAction extends Action {
   type: typeof SENDING_FAILED;

@@ -131,7 +131,7 @@ import {
 } from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
-import { calculateSendMaxFeeWatcher } from './sagas/sending'
+import { calculateSendMaxFeeWatcher, executeSendStage1Watcher } from './sagas/sending'
 
 const rootSaga = function* () {
   const sagas = [
@@ -234,6 +234,7 @@ const rootSaga = function* () {
     versionHistoryWatcher,
 
     // Sending
+    executeSendStage1Watcher,
     calculateSendMaxFeeWatcher,
   ]
 
