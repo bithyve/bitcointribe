@@ -7,7 +7,7 @@ export interface RecipientDescribing {
   id: string;
   kind: RecipientKind;
   displayedName: string;
-
+  amount: Satoshis;
   avatarImageSource: ImageSourcePropType | null;
 }
 

@@ -14,6 +14,8 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import RecipientKind from '../../common/data/enums/RecipientKind'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -59,8 +61,19 @@ const getDerivativeAccountDetails = ( accountShell: AccountShell ) => {
 
 
 function* processRecipients( accountShell: AccountShell ){
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const selectedRecipients: RecipientDescribing[] = yield select(
+    ( state ) => state.sending.selectedRecipients
+  )
+  const trustedContactsServices: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service
+  )
+  const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
 
-  // TODO: fetch and pre-process recipients
   const recipients: [
     {
       id: string;
@@ -71,15 +84,42 @@ function* processRecipients( accountShell: AccountShell ){
     }?
   ]  = []
 
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const trustedContactsServices: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service
-  )
-  const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+  selectedRecipients.forEach( ( recipient )=>{
+    switch( recipient.kind ){
+        case RecipientKind.ADDRESS:
+          recipients.push( {
+            id: recipient.id,
+            address: recipient.id,
+            amount: recipient.amount,
+          } )
+          break
+
+        // TODO: RecipientDescribing should have type and instance/acc number properties
+        case RecipientKind.ACCOUNT_SHELL:
+          recipients.push( {
+            id: recipient.id,
+            address: null,
+            amount: recipient.amount,
+            type: recipient.type, // underlying accountType (used in case of derv acc)
+            accountNumber: recipient.account_number, // derviative acc number
+          } )
+          break
+
+        case RecipientKind.CONTACT:
+          const contactName = `${recipient.displayedName}`
+            .toLowerCase()
+            .trim()
+
+          recipients.push( {
+            id: contactName,
+            address: null,
+            amount: recipient.amount,
+          } )
+          break
+    }
+  } )
+
+  if( !recipients.length ) throw new Error( 'Recipients missing' )
 
   const addressedRecipients = []
   for ( const recipient of recipients ) {
