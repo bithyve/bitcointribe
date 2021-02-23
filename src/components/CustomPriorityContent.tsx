@@ -15,7 +15,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import DeviceInfo from 'react-native-device-info';
+import { useSelector } from 'react-redux'
 
 export default function CustomPriorityContent( props ) {
   const [ amount, setAmount ] = useState( '' )
@@ -269,7 +269,7 @@ const styles = StyleSheet.create( {
     fontStyle: 'italic',
   },
 } )
-function useSelector(arg0: (state: any) => any) {
-  throw new Error('Function not implemented.');
-}
+// function useSelector(arg0: (state: any) => any) {
+//   throw new Error('Function not implemented.');
+// }
 
