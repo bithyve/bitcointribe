@@ -20,8 +20,8 @@ import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
 import { updateWalletImage } from '../actions/sss'
-import { startupSync } from '../actions/accounts'
 import { walletCheckIn } from '../actions/trustedContacts'
+import config from '../../bitcoin/HexaConfig'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -44,8 +44,8 @@ function* fetchDBWorker() {
     if ( key && database ) {
       yield call( servicesEnricherWorker, {
         payload: {
-          database 
-        } 
+          database
+        }
       } )
       yield put( dbFetched( database ) )
 
@@ -53,7 +53,6 @@ function* fetchDBWorker() {
         // actions post DB fetch
         yield put( walletCheckIn() )
         yield put( updateWalletImage() )
-        yield put( startupSync() )
       }
     } else {
       // DB would be absent during wallet setup
@@ -95,8 +94,8 @@ export function* insertDBWorker( { payload } ) {
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
     yield call( servicesEnricherWorker, {
       payload: {
-        database: updatedDB 
-      } 
+        database: updatedDB
+      }
     } )
   } catch ( err ) {
     console.log( err )
@@ -182,8 +181,29 @@ function* servicesEnricherWorker( { payload } ) {
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
         if ( secureAccount.secureHDWallet.rederivePrimaryXKeys() ) {
           console.log( 'Standardized Primary XKeys for secure a/c' )
+          services.SECURE_ACCOUNT = secureAccount
           migrated = true
         }
+      }
+
+      if( semver.lt( dbVersion, '1.4.5' ) ){
+        // update sub-account instances count
+        const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT
+
+        for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+          let instanceCount = 5
+          if( accountType == 'TRUSTED_CONTACTS' ){
+            instanceCount = 20
+          }
+          regularAccount.hdWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
+          secureAccount.secureHDWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
+        }
+
+        console.log( 'Updated sub-account instances count' )
+        services.REGULAR_ACCOUNT = regularAccount
+        services.SECURE_ACCOUNT = secureAccount
+        migrated = true
       }
     } else {
       services = {
@@ -199,8 +219,15 @@ function* servicesEnricherWorker( { payload } ) {
     yield put( servicesEnriched( services ) )
     if ( migrated ) {
       database.VERSION = DeviceInfo.getVersion()
+      database.SERVICES = {
+        REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
+        TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
+        SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
+        S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
+        TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+      }
       yield call( insertDBWorker, {
-        payload: database 
+        payload: database
       } )
     }
   } catch ( err ) {

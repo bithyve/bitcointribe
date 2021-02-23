@@ -10,6 +10,8 @@ import {
   SubPrimaryDerivativeAccountElements,
   WyreDerivativeAccount,
   WyreDerivativeAccountElements,
+  RampDerivativeAccount,
+  RampDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
@@ -190,7 +192,7 @@ const updatePrimarySubAccounts = (
 
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
-              accountDescription = subPrimInstance.accountDescription  
+              accountDescription = subPrimInstance.accountDescription
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -222,7 +224,7 @@ const updatePrimarySubAccounts = (
 
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
-              accountDescription = subPrimInstance.accountDescription  
+              accountDescription = subPrimInstance.accountDescription
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -251,7 +253,7 @@ const updatePrimarySubAccounts = (
 
           if ( donationInstance && donationInstance.balances ) {
             accountName = donationInstance.subject
-            accountDescription = donationInstance.description 
+            accountDescription = donationInstance.description
             balances = {
               confirmed: donationInstance.balances.balance,
               unconfirmed: donationInstance.balances.unconfirmedBalance,
@@ -269,7 +271,7 @@ const updatePrimarySubAccounts = (
                     case SourceAccountKind.REGULAR_ACCOUNT:
                       derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
                       break
-      
+
                     case SourceAccountKind.SECURE_ACCOUNT:
                       derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
                       break
@@ -277,7 +279,7 @@ const updatePrimarySubAccounts = (
                 const wyreAccounts: WyreDerivativeAccount =
                 derivativeAccounts[ DerivativeAccountTypes.WYRE ]
                 const wyreInstance: WyreDerivativeAccountElements = wyreAccounts[ instanceNumber ]
-      
+
                 if ( wyreInstance && wyreInstance.balances ) {
                   accountName = wyreInstance.accountName
                   accountDescription = wyreInstance.accountDescription
@@ -286,6 +288,35 @@ const updatePrimarySubAccounts = (
                     unconfirmed: wyreInstance.balances.unconfirmedBalance,
                   }
                   transactions = wyreInstance.transactions.transactionDetails
+                }
+                break
+              case ServiceAccountKind.RAMP:
+                //const { sourceKind, instanceNumber } = shell.primarySubAccount
+                const rampSourceKind = shell.primarySubAccount.sourceKind
+                const rampInstanceNumber = shell.primarySubAccount.instanceNumber
+
+                let rampDerivativeAccounts
+                switch ( rampSourceKind ) {
+                    case SourceAccountKind.REGULAR_ACCOUNT:
+                      rampDerivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+                      break
+
+                    case SourceAccountKind.SECURE_ACCOUNT:
+                      rampDerivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+                      break
+                }
+                const rampAccounts: RampDerivativeAccount =
+                rampDerivativeAccounts[ DerivativeAccountTypes.RAMP ]
+                const rampInstance: RampDerivativeAccountElements = rampAccounts[ rampInstanceNumber ]
+
+                if ( rampInstance && rampInstance.balances ) {
+                  accountName = rampInstance.accountName
+                  accountDescription = rampInstance.accountDescription
+                  balances = {
+                    confirmed: rampInstance.balances.balance,
+                    unconfirmed: rampInstance.balances.unconfirmedBalance,
+                  }
+                  transactions = rampInstance.transactions.transactionDetails
                 }
                 break
           }
@@ -302,6 +333,8 @@ const updatePrimarySubAccounts = (
 
     return shell
   } )
+
+  // TODO: remap primary sub-account shells from backend (ejected derv accounts), aids accountShell recovery during blind-refresh @Adv-Sharing
 
   return updatedAccountShells
 }
@@ -386,6 +419,7 @@ const updateSecondarySubAccounts = (
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
+                    isTFAEnabled: shell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
                     balances: dervBalances,
                     transactions: dervTransactions,
                   } )

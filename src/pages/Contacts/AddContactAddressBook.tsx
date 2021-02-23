@@ -70,7 +70,7 @@ export default function AddContactAddressBook( props ) {
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
           'title': 'Hexa Would Like to Access Your Contacts',
-          'message': 'Address book details like name and image are used for you to better recognize your Hexa Friends and Family contacts. Don’t worry, they don’t get stored anywhere else and are for your eyes only.',
+          'message': 'Address book details are only stored locally',
           'buttonPositive': 'Allow',
           'buttonNegative': 'Deny'
         }
@@ -322,7 +322,7 @@ export default function AddContactAddressBook( props ) {
     return (
       <ErrorModalContents
         modalRef={contactPermissionBottomSheet}
-        title={'Why does the app need access to your address book?'}
+        title={'Hexa needs access to your address book.'}
         info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
         otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
         proceedButtonText={'Continue'}
@@ -407,9 +407,9 @@ export default function AddContactAddressBook( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      
+
       <View style={{
-        height: '100%',
+        flex : 1
       }}>
         <View
           style={{
@@ -423,7 +423,7 @@ export default function AddContactAddressBook( props ) {
           </Text> */}
         </View>
         <View style={{
-          height: '100%', ...props.style
+          height: '95%', ...props.style
         }}>
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
@@ -452,22 +452,6 @@ export default function AddContactAddressBook( props ) {
               } )
               : null}
           </View>
-          {/* <View style={{ alignItems: 'flex-end' }}>
-            <AppBottomSheetTouchableWrapper
-              style={{ marginRight: 10, padding: 10 }}
-              onPress={() => props.onSkipContinue()}
-            >
-              <Text
-                style={{
-                  fontSize: RFValue(13, 812),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-                onPress={() => props.onSkipContinue()}
-              >
-                Skip Contact
-              </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View> */}
           <View style={[ styles.searchBoxContainer ]}>
             <View style={styles.searchBoxIcon}>
               <EvilIcons
@@ -498,7 +482,7 @@ export default function AddContactAddressBook( props ) {
             />
           </View>
           <View style={{
-            height: '100%', flexDirection: 'row', position: 'relative'
+            height: '95%', flexDirection: 'row', position: 'relative'
           }}>
             {filterContactData ? (
               <FlatList
@@ -607,6 +591,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
     paddingTop: hp( '2%' ),
+    marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
   },
@@ -653,12 +638,12 @@ const styles = StyleSheet.create( {
     padding: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   selectedContactNameText: {
     color: Colors.white,
     fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansRegular
   },
   selectedContactContainer: {
     height: wp( '20%' ),
@@ -683,6 +668,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     borderBottomColor: Colors.borderColor,
     borderBottomWidth: 0.5,
+    marginTop: wp( '5%' ),
     marginLeft: 10,
     marginRight: 10,
     height: 40,

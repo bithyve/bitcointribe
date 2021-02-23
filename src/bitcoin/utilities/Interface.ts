@@ -80,6 +80,11 @@ export interface TransactionDetails {
    * Note/message attached w/ the transaction(Donation acc specific)
    */
   message?: string;
+
+   /**
+   * Address corresponding to which this tx has been fetched
+   */
+  address?: string
 }
 
 export interface Balances {
@@ -150,13 +155,23 @@ export interface DerivativeAccountElements {
     address: string;
     status?: any;
   }[];
+  unconfirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[];
   balances?: {
     balance: number;
     unconfirmedBalance: number;
   };
   transactions?: Transactions;
+  txIdMap?: {[txid: string]: string[]};
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
+  blindGeneration?: boolean // temporarily generated during blind refresh
 }
 
 export enum DerivativeAccountTypes {
@@ -164,7 +179,8 @@ export enum DerivativeAccountTypes {
   FAST_BITCOINS = 'FAST_BITCOINS',
   TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
-  WYRE = 'WYRE'
+  WYRE = 'WYRE',
+  RAMP = 'RAMP'
 }
 
 // Base Dervative Account
@@ -252,6 +268,21 @@ export interface WyreDerivativeAccount {
     using: number;
   };
   [accounts: number]: WyreDerivativeAccountElements;
+}
+
+export interface RampDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface RampDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: RampDerivativeAccountElements;
 }
 
 export interface DerivativeAccounts {
@@ -402,4 +433,22 @@ export interface EncryptedImage {
   SERVICES?: string;
   ASYNC_DATA?: string;
   STATE_DATA?: string;
+}
+//VersionHistory
+export interface VersionHistory {
+  id: string;
+  version: string;
+  buildNumber: string;
+  versionName: string;
+  title: string;
+  date: Date;
+}
+
+
+export interface AverageTxFees {
+  [priority: string]: {
+    averageTxFee: number,
+    feePerByte: number,
+    estimatedBlocks: number,
+  },
 }

@@ -26,9 +26,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import {
   transferST2,
   clearTransfer,
-  fetchBalanceTx,
-  syncViaXpubAgent,
-  fetchDerivativeAccBalTx,
+  refreshAccountShell,
   alternateTransferST2,
 } from '../../../store/actions/accounts'
 import { UsNumberFormat, timeConvertNear30 } from '../../../common/utilities'
@@ -43,6 +41,7 @@ import {
   SECURE_ACCOUNT,
   DONATION_ACCOUNT,
   WYRE,
+  RAMP
 } from '../../../common/constants/serviceTypes'
 import RelayServices from '../../../bitcoin/services/RelayService'
 import {
@@ -72,6 +71,9 @@ import { processRecipients } from '../../../store/sagas/accounts'
 import { AccountsState } from '../../../store/reducers/accounts'
 import { NodeSettingsState } from '../../../store/reducers/nodeSettings'
 import { getAccountIcon, getAccountTitle } from './utils'
+import config from '../../../bitcoin/HexaConfig'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
+import RegularAccount from '../../../bitcoin/services/accounts/RegularAccount'
 
 interface SendConfirmationStateTypes {
   selectedRecipients: unknown[];
@@ -83,7 +85,7 @@ interface SendConfirmationStateTypes {
   transfer: any;
   loading: any;
   isConfirmDisabled: boolean;
-  customFeePerByte: string;
+  customFee: string;
   customEstimatedBlock: number;
   customFeePerByteErr: string;
   customTxPrerequisites: any;
@@ -98,9 +100,7 @@ interface SendConfirmationPropsTypes {
   WALLET_SETUP: any;
   trustedContactsService: any;
   exchangeRates: any;
-  fetchBalanceTx: any;
-  syncViaXpubAgent: any;
-  fetchDerivativeAccBalTx: any;
+  refreshAccountShell: any;
   clearTransfer: any;
   alternateTransferST2: any;
   transferST2: any;
@@ -158,7 +158,7 @@ class SendConfirmation extends Component<
       loading: {
       },
       isConfirmDisabled: false,
-      customFeePerByte: '',
+      customFee: '',
       customFeePerByteErr: '',
       customEstimatedBlock: 0,
       customTxPrerequisites: null,
@@ -177,7 +177,7 @@ class SendConfirmation extends Component<
         totalAmount += parseInt( item.bitcoinAmount )
       } )
       if ( totalAmount ) this.setState( {
-        totalAmount: totalAmount 
+        totalAmount: totalAmount
       } )
     }
     this.setState( {
@@ -192,7 +192,7 @@ class SendConfirmation extends Component<
   componentDidUpdate = ( prevProps ) => {
     if ( prevProps.exchangeRates !== this.props.exchangeRates ) {
       this.setState( {
-        exchangeRates: this.props.exchangeRates 
+        exchangeRates: this.props.exchangeRates
       } )
     }
 
@@ -213,7 +213,7 @@ class SendConfirmation extends Component<
       this.props.accounts[ this.serviceType ].loading
     ) {
       this.setState( {
-        loading: this.props.accounts[ this.serviceType ].loading 
+        loading: this.props.accounts[ this.serviceType ].loading
       } )
     }
   };
@@ -247,6 +247,21 @@ class SendConfirmation extends Component<
     RelayServices.sendNotifications( receivers, notification ).then( console.log )
   };
 
+  refreshAccount = () => {
+    const accountShellID =  this.props.navigation.getParam(
+      'accountShellID',
+    )
+    const accountShell = this.props.accounts
+      .accountShells
+      .find( accountShell => accountShell.id === accountShellID )
+
+    const refreshOptions = {
+      autoSync: false,
+      hardRefresh: false,
+    }
+    this.props.refreshAccountShell( accountShell, refreshOptions )
+  }
+
   onChangeInTransfer = () => {
     const { transfer } = this.state
     if ( transfer.details ) {
@@ -255,13 +270,13 @@ class SendConfirmation extends Component<
         totalAmount += parseInt( item.bitcoinAmount )
       } )
       if ( totalAmount ) this.setState( {
-        totalAmount: totalAmount 
+        totalAmount: totalAmount
       } )
     }
 
     if ( transfer.stage2 && transfer.stage2.failed ) {
       this.setState( {
-        isConfirmDisabled: false, showLoader: false 
+        isConfirmDisabled: false, showLoader: false
       } )
       setTimeout( () => {
         ( this.refs.SendUnSuccessBottomSheet as any ).snapTo( 1 )
@@ -278,33 +293,10 @@ class SendConfirmation extends Component<
       }
 
       this.sendNotifications()
-
       this.storeTrustedContactsHistory( transfer.details )
-      if ( this.state.derivativeAccountDetails ) {
-        if ( this.state.derivativeAccountDetails.type === DONATION_ACCOUNT )
-          this.props.syncViaXpubAgent(
-            this.serviceType,
-            this.state.derivativeAccountDetails.type,
-            this.state.derivativeAccountDetails.number,
-          )
-        else
-          this.props.fetchDerivativeAccBalTx(
-            this.serviceType,
-            this.state.derivativeAccountDetails.type,
-            this.state.derivativeAccountDetails.number,
-          )
-      } else {
-        this.props.fetchBalanceTx( this.serviceType, {
-          loader: true,
-          syncTrustedDerivative:
-            this.serviceType === REGULAR_ACCOUNT ||
-            this.serviceType === SECURE_ACCOUNT
-              ? true
-              : false,
-        } )
-      }
+
       this.setState( {
-        showLoader: false 
+        showLoader: false
       } )
 
       setTimeout( () => {
@@ -312,7 +304,7 @@ class SendConfirmation extends Component<
       }, 10 )
     } else if ( !transfer.txid && transfer.executed === 'ST2' ) {
       this.setState( {
-        showLoader: false 
+        showLoader: false
       } )
       this.props.navigation.navigate( 'TwoFAToken', {
         serviceType: this.serviceType,
@@ -365,16 +357,18 @@ class SendConfirmation extends Component<
     }
   };
 
-  handleCustomFee = async ( amount, customEstimatedBlock ) => {
-    if ( parseInt( amount ) < 1 ) {
+  handleCustomFee = async ( feePerByte, customEstimatedBlock ) => {
+    // feerate > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
+    if ( parseInt( feePerByte ) < 1 ) {
       this.setState( {
-        customFeePerByte: '',
+        customFee: '',
         customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
       } )
       return
     }
 
-    const { service, transfer } = this.props.accounts[ this.serviceType ]
+    const service : RegularAccount | SecureAccount  =this.props.accounts[ this.serviceType ].service
+    const transfer = this.props.accounts[ this.serviceType ].transfer
 
     let outputs
     if( this.feeIntelAbsent ){
@@ -393,12 +387,54 @@ class SendConfirmation extends Component<
         ( output ) => output.address,
       )
     }
-   
+
+    const selectedRecipients = this.state.selectedRecipients
+    if( !this.feeIntelAbsent && this.isSendMax ){
+      // custom fee w/ send max
+      const { fee } = service.calculateSendMaxFee(
+        this.recipients.length,
+        parseInt( feePerByte ),
+        this.state.derivativeAccountDetails,
+      )
+
+      // upper bound: default low
+      if( fee > transfer.stage1.txPrerequisites[ 'low' ].fee ){
+        this.setState( {
+          customFee: '',
+          customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
+        } )
+        return
+      }
+
+      const recipientToBeModified = this.recipients[ this.recipients.length - 1 ]
+
+      // deduct the previous(default low) fee and add the custom fee
+      if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
+      else recipientToBeModified.amount += transfer.stage1.txPrerequisites[ 'low' ].fee
+      recipientToBeModified.amount -= fee
+      this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
+
+      outputs.forEach( ( output )=>{
+        if( output.address === recipientToBeModified.address )
+          output.value = recipientToBeModified.amount
+      } )
+
+      selectedRecipients.forEach( ( recipient: any ) => {
+        if( recipient.selectedContact.id === recipientToBeModified.address ) recipient.bitcoinAmount = recipientToBeModified.amount
+      } )
+    }
+
     const customTxPrerequisites = service.calculateCustomFee(
       outputs,
-      parseInt( amount ),
+      parseInt( feePerByte ),
       this.state.derivativeAccountDetails,
     )
+
+    if( !this.feeIntelAbsent && this.isSendMax )
+      this.setState( {
+        totalAmount: this.spendableBalance - customTxPrerequisites.fee,
+        selectedRecipients,
+      } )
 
     if ( customTxPrerequisites.inputs ) {
       if ( this.refs.CustomPriorityBottomSheet as any )
@@ -407,7 +443,7 @@ class SendConfirmation extends Component<
       setTimeout( () => {
         this.setState( {
           customTxPrerequisites: customTxPrerequisites,
-          customFeePerByte: customTxPrerequisites.fee,
+          customFee: customTxPrerequisites.fee,
           customFeePerByteErr: '',
           customEstimatedBlock,
         } )
@@ -415,7 +451,7 @@ class SendConfirmation extends Component<
     } else {
       // display err message
       this.setState( {
-        customFeePerByte: '',
+        customFee: '',
         customFeePerByteErr: `Insufficient balance to pay: amount ${this.state.totalAmount} + fee(${customTxPrerequisites.fee}) at ${amount} sats/byte`,
       } )
     }
@@ -467,15 +503,15 @@ class SendConfirmation extends Component<
         const location = ( evt.nativeEvent.locationX - px ) / width
         if ( location >= -0.1 && location <= 0.2 ) {
           this.setState( {
-            sliderValue: 0 
+            sliderValue: 0
           } )
         } else if ( location >= 0.3 && location <= 0.6 ) {
           this.setState( {
-            sliderValue: 5 
+            sliderValue: 5
           } )
         } else if ( location >= 0.7 && location <= 1 ) {
           this.setState( {
-            sliderValue: 10 
+            sliderValue: 10
           } )
         }
       } )
@@ -545,15 +581,15 @@ class SendConfirmation extends Component<
 
     return (
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <SafeAreaView style={{
-          flex: 0 
+          flex: 0
         }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
           <View style={{
-            flex: 1, flexDirection: 'row', alignItems: 'center' 
+            flex: 1, flexDirection: 'row', alignItems: 'center'
           }}>
             <TouchableOpacity
               onPress={() => {
@@ -561,10 +597,10 @@ class SendConfirmation extends Component<
                 this.props.clearTransfer( this.serviceType, 'stage1' )
               }}
               hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20 
+                top: 20, left: 20, bottom: 20, right: 20
               }}
               style={{
-                height: 30, width: 30, justifyContent: 'center' 
+                height: 30, width: 30, justifyContent: 'center'
               }}
               disabled={isConfirmDisabled}
             >
@@ -579,11 +615,11 @@ class SendConfirmation extends Component<
                 getAccountIcon( this.serviceType,   this.state.derivativeAccountDetails )
               }
               style={{
-                width: wp( '10%' ), height: wp( '10%' ) 
+                width: wp( '10%' ), height: wp( '10%' )
               }}
             />
             <View style={{
-              marginLeft: wp( '2.5%' ) 
+              marginLeft: wp( '2.5%' )
             }}>
               <Text style={styles.modalHeaderTitleText}>
                 {'Send Confirmation'}
@@ -597,7 +633,7 @@ class SendConfirmation extends Component<
                 ( this.refs.KnowMoreBottomSheet as any ).snapTo( 1 )
               }}
               style={{
-                marginLeft: 'auto' 
+                marginLeft: 'auto'
               }}
             >
               <Text
@@ -692,14 +728,14 @@ class SendConfirmation extends Component<
           <FlatList
             horizontal
             contentContainerStyle={{
-              paddingVertical: 16 
+              paddingVertical: 16
             }}
             // data={this.recipients}
             data={selectedRecipients}
             keyExtractor={( item ) => item.id}
             showsHorizontalScrollIndicator={false}
             contentOffset={{
-              x: -14, y: 0 
+              x: -14, y: 0
             }}
             renderItem={( { item }: { item: unknown } ) => {
               const selectedContactData = {
@@ -721,6 +757,7 @@ class SendConfirmation extends Component<
                 'Test Account': TEST_ACCOUNT,
                 'Donation Account': DONATION_ACCOUNT,
                 'Wyre': WYRE,
+                'Ramo': RAMP
               }[ selectedContactData.account_name || 'Checking Account' ]
 
               // 🔑 This seems to be the way the backend is distinguishing between
@@ -739,7 +776,7 @@ class SendConfirmation extends Component<
               return (
                 <ConfirmedRecipientCarouselItem
                   containerStyle={{
-                    marginHorizontal: 14 
+                    marginHorizontal: 14
                   }}
                   recipient={recipient}
                   accountKind={accountKind}
@@ -790,7 +827,7 @@ class SendConfirmation extends Component<
 
               <View style={styles.priorityTableHeadingContainer}>
                 <View style={{
-                  flex: 1, paddingLeft: 10 
+                  flex: 1, paddingLeft: 10
                 }}>
                   <Text style={styles.tableHeadingText}>Priority</Text>
                 </View>
@@ -800,7 +837,7 @@ class SendConfirmation extends Component<
                 <View style={styles.priorityDataContainer}>
                   <Text
                     style={{
-                      ...styles.tableHeadingText, textAlign: 'center' 
+                      ...styles.tableHeadingText, textAlign: 'center'
                     }}
                   >
                   Total Fee
@@ -823,7 +860,7 @@ class SendConfirmation extends Component<
                       onpress={() => this.onPrioritySelect( 'High Fee' )}
                     />
                     <Text style={{
-                      ...styles.priorityTableText, marginLeft: 10 
+                      ...styles.priorityTableText, marginLeft: 10
                     }}>
                     High
                     </Text>
@@ -871,7 +908,7 @@ class SendConfirmation extends Component<
                       onpress={() => this.onPrioritySelect( 'Medium Fee' )}
                     />
                     <Text style={{
-                      ...styles.priorityTableText, marginLeft: 10 
+                      ...styles.priorityTableText, marginLeft: 10
                     }}>
                     Medium
                     </Text>
@@ -904,10 +941,10 @@ class SendConfirmation extends Component<
                 </View>
               ) : null}
 
-              <View
+              {this.isSendMax && this.state.customFee? null : ( <View
                 style={{
                   ...styles.priorityTableContainer,
-                  borderBottomWidth: this.state.customFeePerByte !== '' ? 0.5 : 0,
+                  borderBottomWidth: this.state.customFee !== '' ? 0.5 : 0,
                 }}
               >
                 <View
@@ -924,31 +961,25 @@ class SendConfirmation extends Component<
                     onpress={() => this.onPrioritySelect( 'Low Fee' )}
                   />
                   <Text style={{
-                    ...styles.priorityTableText, marginLeft: 10 
+                    ...styles.priorityTableText, marginLeft: 10
                   }}>
                   Low
                   </Text>
                 </View>
                 <View style={styles.priorityValueContainer}>
-                  {!this.isSendMax ? (
-                    transfer &&
+                  { transfer &&
                   transfer.stage1 &&
                   transfer.stage1.txPrerequisites ? (
-                        <Text style={styles.priorityTableText}>
+                      <Text style={styles.priorityTableText}>
                       ~
-                          {timeConvertNear30(
-                            ( transfer.stage1.txPrerequisites[ 'low' ]
-                              .estimatedBlocks +
+                        {timeConvertNear30(
+                          ( transfer.stage1.txPrerequisites[ 'low' ]
+                            .estimatedBlocks +
                           1 ) *
                           10,
-                          )}
-                        </Text>
-                      ) : null
-                  ) : (
-                    <View style={[ styles.priorityValueContainer ]}>
-                      <Text style={styles.priorityTableText}>~6.5 hours</Text>
-                    </View>
-                  )}
+                        )}
+                      </Text>
+                    ) : null}
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
@@ -961,9 +992,10 @@ class SendConfirmation extends Component<
                   </Text>
                 </View>
               </View>
-            </View>} 
+              )}
+            </View> }
 
-            {this.state.customFeePerByte !== '' && (
+            {this.state.customFee !== '' && (
               <View
                 style={{
                   ...styles.priorityTableContainer,
@@ -984,7 +1016,7 @@ class SendConfirmation extends Component<
                     onpress={() => this.onPrioritySelect( 'Custom Fee' )}
                   />
                   <Text style={{
-                    ...styles.priorityTableText, marginLeft: 10 
+                    ...styles.priorityTableText, marginLeft: 10
                   }}>
                     Custom
                   </Text>
@@ -999,7 +1031,7 @@ class SendConfirmation extends Component<
                 </View>
                 <View style={styles.priorityValueContainer}>
                   <Text style={styles.priorityTableText}>
-                    {this.convertBitCoinToCurrency( this.state.customFeePerByte )}
+                    {this.convertBitCoinToCurrency( this.state.customFee )}
                     {' ' + this.getCorrectCurrencySymbol()}
                   </Text>
                 </View>
@@ -1013,12 +1045,11 @@ class SendConfirmation extends Component<
                 backgroundColor: Colors.white,
                 borderColor: Colors.backgroundColor,
                 borderWidth: 2,
-                opacity: this.isSendMax ? 0.5 : 1,
+                opacity: 1,
               }}
               onPress={() => {
                 ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 1 )
               }}
-              disabled={this.isSendMax}
             >
               <View
                 style={{
@@ -1054,7 +1085,7 @@ class SendConfirmation extends Component<
             <TouchableOpacity
               onPress={() => {
                 this.setState( {
-                  isConfirmDisabled: true, showLoader: true 
+                  isConfirmDisabled: true, showLoader: true
                 } )
                 this.onConfirm()
               }}
@@ -1068,7 +1099,7 @@ class SendConfirmation extends Component<
                 shadowColor: Colors.shadowBlue,
                 shadowOpacity: 1,
                 shadowOffset: {
-                  width: 15, height: 15 
+                  width: 15, height: 15
                 },
               }}
             >
@@ -1093,7 +1124,7 @@ class SendConfirmation extends Component<
               }}
             >
               <Text style={{
-                ...styles.buttonText, color: Colors.blue 
+                ...styles.buttonText, color: Colors.blue
               }}>
                 Back
               </Text>
@@ -1127,6 +1158,7 @@ class SendConfirmation extends Component<
                 const accountShellID = this.props.navigation.getParam(
                   'accountShellID',
                 )
+                this.refreshAccount()
 
                 navigation.dispatch(
                   resetStackToAccountDetails( {
@@ -1228,12 +1260,18 @@ class SendConfirmation extends Component<
           enabledInnerScrolling={true}
           ref={'CustomPriorityBottomSheet'}
           snapPoints={[ -50, hp( '75%' ) ]}
-          renderContent={() => (
-            <CustomPriorityContent
+          renderContent={() => {
+            const network =
+                config.APP_STAGE !== 'dev' &&
+                [ REGULAR_ACCOUNT, SECURE_ACCOUNT ].includes( this.serviceType )
+                  ? 'MAINNET'
+                  : 'TESTNET'
+
+            return <CustomPriorityContent
               title={'Custom Priority'}
               info={'Enter the fee rate in sats per byte.'}
               err={this.state.customFeePerByteErr}
-              service={this.props.accounts[ this.serviceType ].service}
+              network={network}
               okButtonText={'Confirm'}
               cancelButtonText={'Back'}
               isCancel={true}
@@ -1247,7 +1285,7 @@ class SendConfirmation extends Component<
                   ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
               }}
             />
-          )}
+          }}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
@@ -1277,9 +1315,7 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchBalanceTx,
-    syncViaXpubAgent,
-    fetchDerivativeAccBalTx,
+    refreshAccountShell,
     clearTransfer,
     alternateTransferST2,
     transferST2,

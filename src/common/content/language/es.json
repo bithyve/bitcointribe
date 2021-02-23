@@ -1,0 +1,23 @@
+{
+    "common": {
+        "ok": "okay",
+        "proceed": "Continuar",
+        "continue": "Seguir",
+        "done": "Hecho",
+        "cancel": "Cancelar"
+    },
+    "login": {
+        "welcome": "¡Dar una buena acogida!",
+        "enter_your": "Por favor ingrese su ",
+        "passcode": "contraseña",
+        "tos": "Términos de servicio",
+        "tos_agree": "Al continuar con el siguiente paso, acepta nuestros "
+    },
+    "home": {
+        "the_wallet_backup": "La copia de seguridad de la billetera ",
+        "not_secured": "no está asegurada!",
+        "manage_backup": "Manage Backup",
+        "add_new": "Nueva cuenta",
+        "buy": "Comprar"
+    }
+}

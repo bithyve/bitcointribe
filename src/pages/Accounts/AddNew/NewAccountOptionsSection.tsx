@@ -25,6 +25,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 }: Props ) => {
 
   const { currentWyreSubAccount } = useAccountsState()
+  const { currentRampSubAccount } = useAccountsState()
   /**
    * Helper to determine whether or not adding a new sub-account kind
    * from the "Add New" screen is currently supported.
@@ -61,7 +62,9 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.SWAN:
           return false
         case ServiceAccountKind.WYRE:
-          return currentWyreSubAccount == null
+          return false//currentWyreSubAccount == null
+        case ServiceAccountKind.RAMP:
+          return currentRampSubAccount == null
         default:
           return false
     }
@@ -103,6 +106,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.SWAN:
           return 'COMING SOON'
         case ServiceAccountKind.WYRE:
+          return 'COMING SOON'
+        case ServiceAccountKind.RAMP:
           return 'NEW'
         default:
           return 'COMING SOON'
@@ -123,20 +128,22 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
 
           return (
             <View style={styles.cardShadowContainer}>
-              <View style={styles.cardRootContainer}>
-                <TouchableOpacity
-                  style={styles.cardTouchableContainer}
-                  onPress={() => onOptionSelected( subAccountInfo )}
-                  disabled={isDisabled}
-                >
-                  <SubAccountOptionCard
-                    subAccountInfo={subAccountInfo}
-                    isDisabled={isDisabled}
-                    isSelected={subAccountInfo.id == selectedChoice?.id}
-                    specialTag={specialTagForChoice( subAccountInfo )}
-                  />
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                style={{
+                  ...styles.cardTouchableContainer,
+                  ...styles.cardRootContainer
+                }}
+                onPress={() => onOptionSelected( subAccountInfo )}
+                disabled={isDisabled}
+                activeOpacity={1}
+              >
+                <SubAccountOptionCard
+                  subAccountInfo={subAccountInfo}
+                  isDisabled={isDisabled}
+                  isSelected={subAccountInfo.id == selectedChoice?.id}
+                  specialTag={specialTagForChoice( subAccountInfo )}
+                />
+              </TouchableOpacity>
             </View>
           )
         }}
@@ -168,7 +175,6 @@ const styles = StyleSheet.create( {
     flex: 1,
     width: widthPercentageToDP( 34 ),
     minWidth: 120,
-    marginLeft: 4,
   },
 
   cardTouchableContainer: {
@@ -176,6 +182,7 @@ const styles = StyleSheet.create( {
     borderRadius: CardStyles.horizontalScrollViewCardContainer.borderRadius,
     backgroundColor: 'white',
     overflow: 'hidden',
+    marginLeft: 4,
   },
 } )
 

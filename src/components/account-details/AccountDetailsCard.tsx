@@ -18,6 +18,10 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import AccountShell from '../../common/data/models/AccountShell'
 import usePrimarySubAccountForShell from '../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import { subAccountSettingsUpdateCompleted } from '../../store/actions/accounts'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 export type Props = {
   accountShell: AccountShell;
@@ -26,9 +30,9 @@ export type Props = {
 };
 
 function backgroundImageForAccountKind(
-  accountKind: SubAccountKind,
+  primarySubAccount: SubAccountDescribing,
 ): ImageSourcePropType {
-  switch ( accountKind ) {
+  switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
         return require( '../../assets/images/carouselImages/test_account_background.png' )
       case SubAccountKind.REGULAR_ACCOUNT:
@@ -38,14 +42,19 @@ function backgroundImageForAccountKind(
       case SubAccountKind.DONATION_ACCOUNT:
         return require( '../../assets/images/carouselImages/donation_account_background.png' )
       case SubAccountKind.SERVICE:
-        return require( '../../assets/images/carouselImages/wyre_account_background.png' )
+        switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ) {
+            case ServiceAccountKind.WYRE:
+              return require( '../../assets/images/carouselImages/wyre_account_background.png' )
+            case( ServiceAccountKind.RAMP ):
+              return require( '../../assets/images/carouselImages/ramp_account_background.png' )
+        }
       default:
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
   }
 }
 
-function shadowColorForAccountKind( accountKind: SubAccountKind ): string {
-  switch ( accountKind ) {
+function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): string {
+  switch ( primarySubAccount.kind ) {
       case SubAccountKind.TEST_ACCOUNT:
         return Colors.blue
       case SubAccountKind.REGULAR_ACCOUNT:
@@ -55,7 +64,12 @@ function shadowColorForAccountKind( accountKind: SubAccountKind ): string {
       case SubAccountKind.DONATION_ACCOUNT:
         return Colors.borderColor
       case SubAccountKind.SERVICE:
-        return Colors.coral
+        switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
+            case ( ServiceAccountKind.WYRE ):
+              return Colors.coral
+            case ( ServiceAccountKind.RAMP ):
+              return Colors.riptide
+        }
       default:
         return Colors.borderColor
   }
@@ -71,7 +85,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const rootContainerStyle = useMemo( () => {
     return {
       ...styles.rootContainer,
-      shadowColor: shadowColorForAccountKind( primarySubAccount?.kind ),
+      shadowColor: shadowColorForAccountKind( primarySubAccount ),
     }
   }, [ primarySubAccount ] )
 
@@ -79,9 +93,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const AccountKindDetailsSection: React.FC = () => {
     return (
       <View style={styles.accountKindDetailsSection}>
-
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start'
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          marginBottom: 8,
         }}>
           <Image
             source={getAvatarForSubAccount( primarySubAccount )}
@@ -95,26 +110,29 @@ const AccountDetailsCard: React.FC<Props> = ( {
           </View>
         </View>
 
-
         <View style={{
-          flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between'
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          marginBottom: 8,
         }}>
-          <View>
-            <Text style={styles.title1Text}>
-              {primarySubAccount.customDisplayName ||
+          <Text style={styles.title1Text}>
+            {primarySubAccount.customDisplayName ||
               primarySubAccount.defaultTitle}
-            </Text>
-
-            <Text style={styles.title2Text}>
-              {primarySubAccount.customDescription ||
-              primarySubAccount.defaultDescription}
-            </Text>
-          </View>
-
+          </Text>
           {primarySubAccount.isTFAEnabled && (
             <Text style={styles.title1Text}>2FA</Text>
           )}
         </View>
+
+        <Text
+          style={styles.title2Text}
+          numberOfLines={2}
+          ellipsizeMode={'tail'}
+        >
+          {primarySubAccount.customDescription ||
+              primarySubAccount.defaultDescription}
+        </Text>
       </View>
     )
   }
@@ -174,7 +192,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   return (
     <View style={rootContainerStyle}>
       <ImageBackground
-        source={backgroundImageForAccountKind( primarySubAccount?.kind )}
+        source={backgroundImageForAccountKind( primarySubAccount )}
         style={{
           ...StyleSheet.absoluteFillObject,
         }}
@@ -195,7 +213,8 @@ const styles = StyleSheet.create( {
   rootContainer: {
     width: '100%',
     maxWidth: 440,
-    height: 190,
+    maxHeight: 440 * 0.7,
+    minHeight: 210,
     borderRadius: cardBorderRadius,
     elevation: 5,
     shadowOpacity: 0.62,

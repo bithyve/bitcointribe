@@ -6,6 +6,8 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  InputUTXOs,
+  AverageTxFees,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -26,7 +28,10 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -51,6 +56,7 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -58,6 +64,14 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -82,7 +96,10 @@ export default class SecureAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       twoFASetup,
       derivativeAccounts,
       lastBalTxSync,
@@ -113,6 +130,7 @@ export default class SecureAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -120,6 +138,14 @@ export default class SecureAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       twoFASetup: {
         qrData: string;
         secret: string;
@@ -160,7 +186,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 301, err: err.message, message: ErrMap[ 301 ] 
+        status: 301, err: err.message, message: ErrMap[ 301 ]
       }
     }
   };
@@ -176,7 +202,7 @@ export default class SecureAccount {
   } | {
       status: number;
       err: any;
-      message: string;  
+      message: string;
       data?: undefined;
   }> => {
     try {
@@ -186,7 +212,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 301, err: err.message, message: ErrMap[ 301 ] 
+        status: 301, err: err.message, message: ErrMap[ 301 ]
       }
     }
   };
@@ -230,12 +256,12 @@ export default class SecureAccount {
       }
       return {
         status: config.STATUS.SUCCESS, data: {
-          imported: true 
-        } 
+          imported: true
+        }
       }
     } catch ( err ) {
       return {
-        status: 302, err: err.message, message: ErrMap[ 302 ] 
+        status: 302, err: err.message, message: ErrMap[ 302 ]
       }
     }
   };
@@ -264,7 +290,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 303, err: err.message, message: ErrMap[ 303 ] 
+        status: 303, err: err.message, message: ErrMap[ 303 ]
       }
     }
   };
@@ -295,7 +321,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 304, err: err.message, message: ErrMap[ 304 ] 
+        status: 304, err: err.message, message: ErrMap[ 304 ]
       }
     }
   };
@@ -323,7 +349,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 305, err: err.message, message: ErrMap[ 305 ] 
+        status: 305, err: err.message, message: ErrMap[ 305 ]
       }
     }
   };
@@ -354,7 +380,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 306, err: err.message, message: ErrMap[ 306 ] 
+        status: 306, err: err.message, message: ErrMap[ 306 ]
       }
     }
   };
@@ -396,7 +422,7 @@ export default class SecureAccount {
       }
     } catch ( err ) {
       return {
-        status: 308, err: err.message, message: ErrMap[ 308 ] 
+        status: 308, err: err.message, message: ErrMap[ 308 ]
       }
     }
   };
@@ -443,9 +469,7 @@ export default class SecureAccount {
       accountNumber,
     );
 
-  public getBalanceTransactions = async ( options?: {
-    restore?;
-  } ): Promise<
+  public getBalanceTransactions = async ( hardRefresh?: boolean, blindRefresh?: boolean ): Promise<
     | {
         status: number;
         data: {
@@ -457,19 +481,9 @@ export default class SecureAccount {
             totalTransactions: number;
             confirmedTransactions: number;
             unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
+            transactionDetails: TransactionDetails[]
           };
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -484,22 +498,25 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchBalanceTransaction( options ),
+        data: await this.secureHDWallet.fetchBalanceTransaction( hardRefresh, blindRefresh ),
       }
     } catch ( err ) {
       return {
-        status: 0o3, err: err.message, message: ErrMap[ 0o3 ] 
+        status: 0o3, err: err.message, message: ErrMap[ 0o3 ]
       }
     }
   };
 
   public syncDerivativeAccountsBalanceTxs = async (
     accountTypes: string[],
+    hardRefresh?: boolean,
+    blindRefresh?: boolean,
   ): Promise<
     | {
         status: number;
         data: {
           synched: boolean;
+          txsFound: TransactionDetails[];
         };
         err?: undefined;
         message?: undefined;
@@ -516,6 +533,8 @@ export default class SecureAccount {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.syncDerivativeAccountsBalanceTxs(
           accountTypes,
+          hardRefresh,
+          blindRefresh
         ),
       }
     } catch ( err ) {
@@ -731,34 +750,6 @@ export default class SecureAccount {
     }
   };
 
-  public getTransactionDetails = async (
-    txHash: string,
-  ): Promise<
-    | {
-        status: number;
-        data: any;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.fetchTransactionDetails( txHash ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o4, err: err.message, message: ErrMap[ 0o4 ] 
-      }
-    }
-  };
-
   public generateSecondaryXpriv = (
     secondaryMnemonic: string,
   ): { generated: boolean } => {
@@ -767,24 +758,24 @@ export default class SecureAccount {
         secondaryMnemonic,
       )
       return {
-        generated 
+        generated
       }
     } catch ( err ) {
       // console.log({ err });
       return {
-        generated: false 
+        generated: false
       }
     }
   };
 
   public calculateSendMaxFee = (
-    numberOfRecipients,
-    averageTxFees,
+    numberOfRecipients: number,
+    feePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
   ) =>
     this.secureHDWallet.calculateSendMaxFee(
       numberOfRecipients,
-      averageTxFees,
+      feePerByte,
       derivativeAccountDetails,
     );
 
@@ -807,7 +798,7 @@ export default class SecureAccount {
       address: string;
       amount: number;
     }[],
-    averageTxFees: any,
+    averageTxFees: AverageTxFees,
     derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
@@ -833,7 +824,7 @@ export default class SecureAccount {
         return recipient
       } )
 
-      const {
+      let {
         fee,
         balance,
         txPrerequisites,
@@ -849,20 +840,35 @@ export default class SecureAccount {
       } )
 
       if ( balance < netAmount + fee ) {
-        return {
-          status: 0o6,
-          err: 'Insufficient balance',
-          fee,
-          netAmount,
-          message: ErrMap[ 0o6 ],
+        // check w/ the lowest fee possible for this transaction
+        const minTxFeePerByte = 1 // default minimum relay fee
+        const minAvgTxFee = {
+          ...averageTxFees
         }
+        minAvgTxFee[ 'low' ].feePerByte = minTxFeePerByte
+
+        const minTxPrerequisites  = this.secureHDWallet.transactionPrerequisites(
+          recipients,
+          minAvgTxFee,
+          derivativeAccountDetails,
+        )
+
+        if( minTxPrerequisites.balance < netAmount + minTxPrerequisites.fee )
+          return {
+            status: 0o6,
+            err: 'Insufficient balance',
+            fee,
+            netAmount,
+            message: ErrMap[ 0o6 ],
+          }
+        else txPrerequisites = minTxPrerequisites.txPrerequisites
       }
 
-      if ( txPrerequisites ) {
+      if ( Object.keys( txPrerequisites ).length ) {
         return {
           status: config.STATUS.SUCCESS,
           data: {
-            txPrerequisites 
+            txPrerequisites
           },
         }
       } else {
@@ -876,7 +882,7 @@ export default class SecureAccount {
       // }
     } catch ( err ) {
       return {
-        status: 106, err: err.message, message: ErrMap[ 106 ] 
+        status: 106, err: err.message, message: ErrMap[ 106 ]
       }
     }
   };
@@ -899,6 +905,8 @@ export default class SecureAccount {
               vout: number;
             };
           }>;
+          inputs: InputUTXOs[],
+          derivativeAccountDetails?: { type: string; number: number },
         };
         err?: undefined;
         message?: undefined;
@@ -919,7 +927,7 @@ export default class SecureAccount {
         nSequence,
       )
 
-      let inputs
+      let inputs: InputUTXOs[]
       if ( txnPriority === 'custom' && customTxPrerequisites ) {
         inputs = customTxPrerequisites.inputs
       } else {
@@ -940,12 +948,12 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: {
-          txHex, childIndexArray 
+          txHex, childIndexArray, inputs, derivativeAccountDetails
         },
       }
     } catch ( err ) {
       return {
-        status: 310, err: err.message, message: ErrMap[ 310 ] 
+        status: 310, err: err.message, message: ErrMap[ 310 ]
       }
     }
   };
@@ -960,6 +968,8 @@ export default class SecureAccount {
         vout: number;
       };
     }>,
+    inputs: InputUTXOs[],
+    derivativeAccountDetails?: { type: string; number: number },
   ): Promise<
     | {
         status: number;
@@ -977,17 +987,25 @@ export default class SecureAccount {
       }
   > => {
     try {
+      const { txid } =  await this.secureHDWallet.serverSigningAndBroadcast(
+        token,
+        txHex,
+        childIndexArray,
+      )
+      if( txid ){
+        // chip consumed utxos
+        this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
+      }
+
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.serverSigningAndBroadcast(
-          token,
-          txHex,
-          childIndexArray,
-        ),
+        data: {
+          txid
+        }
       }
     } catch ( err ) {
       return {
-        status: 311, err: err.message, message: ErrMap[ 311 ] 
+        status: 311, err: err.message, message: ErrMap[ 311 ]
       }
     }
   };
@@ -1037,6 +1055,10 @@ export default class SecureAccount {
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
       const { txid } = await this.secureHDWallet.broadcastTransaction( txHex )
+      if( txid ){
+        // chip consumed utxos
+        this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
+      }
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
@@ -1045,8 +1067,8 @@ export default class SecureAccount {
 
       return {
         status: config.STATUS.SUCCESS, data: {
-          txid 
-        } 
+          txid
+        }
       }
     } catch ( err ) {
       return {
@@ -1096,50 +1118,37 @@ export default class SecureAccount {
   };
 
   public getDerivativeAccBalanceTransactions = async (
-    accountType: string,
-    accountNumber?: number,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          balances: {
-            balance: number;
-            unconfirmedBalance: number;
-          };
-          transactions: {
-            totalTransactions: number;
-            confirmedTransactions: number;
-            unconfirmedTransactions: number;
-            transactionDetails: Array<{
-              txid: string;
-              status: string;
-              confirmations: number;
-              fee: string;
-              date: string;
-              transactionType: string;
-              amount: number;
-              accountType: string;
-              recipientAddresses?: string[];
-              senderAddresses?: string[];
-            }>;
-          };
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
+    accountInfo: {
+      accountType: string,
+      accountNumber: number,
+      contactName?: string,
+    }[],
+    hardRefresh?: boolean,
+    blindRefresh?: boolean,
+  ):  Promise<
+  | {
+      status: number;
+      data: {
+        synched: boolean;
+        txsFound: TransactionDetails[];
+      };
+      err?: undefined;
+      message?: undefined;
+    }
+  | {
+      status: number;
+      err: string;
+      message: string;
+      data?: undefined;
+    }
+  >=> {
     try {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.fetchDerivativeAccBalanceTxs(
-          accountType,
-          accountNumber,
+          accountInfo,
+          hardRefresh,
+          blindRefresh,
         ),
       }
     } catch ( err ) {

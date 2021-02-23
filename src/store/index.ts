@@ -17,6 +17,8 @@ import preferencesReducer from './reducers/preferences'
 import loaders from './reducers/loaders'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
+import rampIntegrationReducer from './reducers/RampIntegration'
+import VersionHistoryReducer from './reducers/versionHistory'
 
 
 const config = {
@@ -47,15 +49,12 @@ import {
   testcoinsWatcher,
   transferST3Watcher,
   accumulativeTxAndBalWatcher,
-  accountsSyncWatcher,
   fetchBalanceTxWatcher,
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  fetchDerivativeAccAddressWatcher,
-  startupSyncWatcher,
   validateTwoFAWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
@@ -67,6 +66,9 @@ import {
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
+  addNewSecondarySubAccountWatcher,
+  autoSyncShellsWatcher,
+  blindRefreshWatcher
 } from './sagas/accounts'
 
 import {
@@ -127,8 +129,15 @@ import {
 } from './sagas/SwanIntegration'
 
 import {
-  fetchWyreReservationWatcher
+  fetchWyreReservationWatcher,
+  fetchWyreReceiveAddressWatcher
 } from './sagas/WyreIntegration'
+import {
+  fetchRampReservationWatcher,
+  fetchRampReceiveAddressWatcher
+} from './sagas/RampIntegration'
+import { versionHistoryWatcher } from './sagas/versionHistory'
+import walletRescanningReducer from './reducers/wallet-rescanning'
 
 const rootSaga = function* () {
   const sagas = [
@@ -154,24 +163,24 @@ const rootSaga = function* () {
     transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
-    accountsSyncWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
     validateTwoFAWatcher,
     removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
-    fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
-    startupSyncWatcher,
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
     addNewAccountShellWatcher,
+    addNewSecondarySubAccountWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
+    autoSyncShellsWatcher,
+    blindRefreshWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -228,7 +237,15 @@ const rootSaga = function* () {
     fetchSwanAuthenticationUrlWatcher,
 
     // Wyre Integration
-    fetchWyreReservationWatcher
+    fetchWyreReservationWatcher,
+    fetchWyreReceiveAddressWatcher,
+
+    // Ramp Integration
+    fetchRampReservationWatcher,
+    fetchRampReceiveAddressWatcher,
+
+    //VersionHistory integration
+    versionHistoryWatcher,
   ]
 
   yield all(
@@ -259,7 +276,10 @@ const rootReducer = combineReducers( {
   preferences: preferencesReducer,
   loaders,
   swanIntegration: swanIntegrationReducer,
+  walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
+  rampIntegration: rampIntegrationReducer,
+  versionHistory: VersionHistoryReducer,
 } )
 
 export default function makeStore() {

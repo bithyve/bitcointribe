@@ -40,9 +40,10 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
   const [ showLoader, setShowLoader ] = useState( false )
+  const [ buttonPressed, setButtonPressed ] = useState ( false )
 
-  const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( '' )
+  const [ accountName, setAccountName ] = useState( '' )
+  const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
 
   const canProceed = useMemo( () => {
     return (
@@ -64,10 +65,11 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
 
   function handleProceedButtonPress() {
     setShowLoader( true )
+    setButtonPressed( true )
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.customDescription = accountDescription
     console.log( 'dispatching addNewAccountShell' )
-    dispatch( addNewAccountShell( currentSubAccount ) )
+    buttonPressed ? null : dispatch( addNewAccountShell( currentSubAccount ) )
   }
 
   return (
@@ -106,15 +108,16 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
               value={accountDescription}
               numberOfLines={2}
               onChangeText={setAccountDescription}
+              maxLength={40}
             />
           </View>
 
           <View style={styles.footerSection}>
-          <ButtonBlue
-            buttonText="Proceed"
-            handleButtonPress={handleProceedButtonPress}
-            buttonDisable={canProceed === false}
-          />
+            <ButtonBlue
+              buttonText="Proceed"
+              handleButtonPress={handleProceedButtonPress}
+              buttonDisable={ canProceed === false }
+            />
           </View>
         </View>
 

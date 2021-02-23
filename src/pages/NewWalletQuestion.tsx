@@ -38,6 +38,7 @@ import { TEST_ACCOUNT } from '../common/constants/serviceTypes'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
+import { setVersion } from '../store/actions/versionHistory'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -104,6 +105,7 @@ export default function NewWalletQuestion( props ) {
           answer,
         }
         dispatch( initializeSetup( walletName, security ) )
+        dispatch(setVersion('Current'));
         const current = Date.now()
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
@@ -250,7 +252,7 @@ export default function NewWalletQuestion( props ) {
       }} />
       <KeyboardAvoidingView
         style={{
-          flex: 1
+          flex: 1,
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
@@ -584,8 +586,9 @@ export default function NewWalletQuestion( props ) {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        </KeyboardAvoidingView>
         <View style={{
-          ...styles.bottomButtonView
+          ...styles.bottomButtonView,
         }}>
           {(
             answer.trim() == confirmAnswer.trim() &&
@@ -599,6 +602,7 @@ export default function NewWalletQuestion( props ) {
             <View style={styles.statusIndicatorActiveView} />
           </View>
         </View>
+        
         {!visibleButton ? (
           <View
             style={{
@@ -622,7 +626,7 @@ export default function NewWalletQuestion( props ) {
           renderContent={renderLoaderModalContent}
           renderHeader={renderLoaderModalHeader}
         />
-      </KeyboardAvoidingView>
+      
     </View>
   )
 }

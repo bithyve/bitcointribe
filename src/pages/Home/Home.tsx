@@ -9,7 +9,8 @@ import {
   Linking,
   Alert,
   Image,
-  AppState
+  AppState,
+  InteractionManager
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
@@ -41,7 +42,7 @@ import {
   notificationsUpdated,
 } from '../../store/actions/notifications'
 import { setCurrencyCode } from '../../store/actions/preferences'
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index'
+import { getCurrencyImageByRegion, isEmpty,  buildVersionExists } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
 import PushNotification from 'react-native-push-notification'
@@ -60,7 +61,8 @@ import CustomBottomTabs, {
 } from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
-  fetchDerivativeAccBalTx,
+  autoSyncShells,
+  addNewAccountShell
 } from '../../store/actions/accounts'
 import { trustedChannelActions } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -83,8 +85,7 @@ import BottomSheet from '@gorhom/bottom-sheet'
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { getReleaseTopic } from '../../utils/notifications/getReleaseTopic'
-const releaseNotificationTopic = getReleaseTopic()
+import { getEnvReleaseTopic } from '../../utils/geEnvSpecificParams'
 import { AccountsState } from '../../store/reducers/accounts'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -95,7 +96,12 @@ import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -111,6 +117,8 @@ export enum BottomSheetKind {
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
+  WYRE_STATUS_INFO,
+  RAMP_STATUS_INFO,
   ERROR,
 }
 
@@ -136,6 +144,12 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
+  wyreDeepLinkContent: string | null;
+  rampDeepLinkContent: string | null;
+  rampFromBuyMenu: boolean | null;
+  rampFromDeepLink: boolean | null;
+  wyreFromBuyMenu: boolean | null;
+  wyreFromDeepLink: boolean | null;
 }
 
 interface HomePropsTypes {
@@ -145,6 +159,7 @@ interface HomePropsTypes {
 
   accountsState: AccountsState;
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
+  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
 
   walletName: string;
   UNDER_CUSTODY: any;
@@ -158,7 +173,10 @@ interface HomePropsTypes {
   uploadRequestedShare: any;
   s3Service: any;
   overallHealth: any;
-  fetchDerivativeAccBalTx: any;
+  autoSyncShells: any;
+  clearWyreCache: any;
+  clearRampCache: any;
+  addNewAccountShell: any;
   addTransferDetails: any;
   paymentDetails: any;
   clearPaymentDetails: any;
@@ -174,7 +192,17 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
+  setVersion: any;
+  versionHistory: any;
+  wyreDeepLinkContent: string | null;
+  rampDeepLinkContent: string | null;
+  rampFromBuyMenu: boolean | null;
+  rampFromDeepLink: boolean | null;
+  wyreFromBuyMenu: boolean | null;
+  wyreFromDeepLink: boolean | null;
 }
+
+const releaseNotificationTopic = getEnvReleaseTopic()
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
@@ -215,6 +243,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
+      wyreDeepLinkContent: null,
+      rampDeepLinkContent: null,
+      rampFromBuyMenu: null,
+      rampFromDeepLink: null,
+      wyreFromBuyMenu: null,
+      wyreFromDeepLink: null
     }
   }
 
@@ -742,8 +776,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const { navigation } = this.props
-
+    const { navigation, versionHistory } = this.props
+    const versionData = []
     this.closeBottomSheet()
     this.calculateNetBalance()
 
@@ -770,6 +804,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
       this.handleDeepLinking( unhandledDeepLinkURL )
     }
+    InteractionManager.runAfterInteractions( () => {
+      // This will sync balances and transactions for all account shells
+      this.props.autoSyncShells()
+      this.props.setVersion()
+    } )
   };
 
   getNewTransactionNotifications = async () => {
@@ -777,7 +816,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    console.log( ':regularAccount', regularAccount )
+    // console.log( ':regularAccount', regularAccount )
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
@@ -785,7 +824,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    console.log( ':newTransactionsRegular', newTransactionsRegular )
+    // console.log( ':newTransactionsRegular', newTransactionsRegular )
     if ( newTransactionsRegular && newTransactionsRegular.length )
       newTransactions.push( ...newTransactionsRegular )
     if ( newTransactionsSecure && newTransactionsSecure.length )
@@ -1014,6 +1053,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const splits = url.split( '/' )
 
+    if ( splits.includes( 'wyre' ) ) {
+      this.props.clearWyreCache()
+      this.setState( {
+        wyreDeepLinkContent:url,
+        wyreFromBuyMenu: false,
+        wyreFromDeepLink: true
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
+      } )
+    }
+    if ( splits.includes( 'ramp' ) ) {
+      this.props.clearRampCache()
+      this.setState( {
+        rampDeepLinkContent:url,
+        rampFromBuyMenu: false,
+        rampFromDeepLink: true
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
+      } )
+    }
     if ( splits[ 5 ] === 'sss' ) {
       const requester = splits[ 4 ]
 
@@ -1264,23 +1323,47 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BuyMenuItemKind.SWAN:
           this.props.navigation.navigate( 'SwanIntegrationScreen' )
           break
-        case BuyMenuItemKind.WYRE:
-          if ( this.props.currentWyreSubAccount ) {
-            this.props.navigation.navigate( 'PlaceWyreOrder', {
-              currentSubAccount: this.props.currentWyreSubAccount
+        case BuyMenuItemKind.RAMP:
+          if ( !this.props.currentRampSubAccount ) {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Ramp Account',
+              defaultDescription: 'BTC Purchased from Ramp',
+              serviceAccountKind: ServiceAccountKind.RAMP,
             } )
-          } else {
+
+            this.props.addNewAccountShell( newSubAccount )
+          }
+          this.props.clearRampCache()
+          this.setState( {
+            rampDeepLinkContent: null,
+            rampFromDeepLink: false,
+            rampFromBuyMenu: true
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
+          } )
+          break
+        case BuyMenuItemKind.WYRE:
+          if ( !this.props.currentWyreSubAccount ) {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Wyre Account',
-              defaultDescription: 'Bought using Apple Pay / Credit Card',
+              defaultDescription: 'BTC Purchased from Wyre',
               serviceAccountKind: ServiceAccountKind.WYRE,
             } )
-
-            this.props.navigation.navigate( 'NewWyreAccountDetails', {
-              currentSubAccount: newSubAccount,
-            } )
+            this.props.addNewAccountShell( newSubAccount )
+            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
+            //   currentSubAccount: newSubAccount,
+            // } )
           }
+          this.props.clearWyreCache()
+          this.setState( {
+            wyreDeepLinkContent: null,
+            wyreFromDeepLink: false,
+            wyreFromBuyMenu: true
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
+          } )
           break
     }
   }
@@ -1671,7 +1754,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return ( this.state.wyreFromDeepLink )
+            ? [ 0, '32%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+        case BottomSheetKind.RAMP_STATUS_INFO:
+          return ( this.state.rampFromDeepLink )
+            ? [ 0, '32%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '57%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints
@@ -1714,6 +1806,36 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetWyreInfo
+                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
+                wyreFromDeepLink={this.state.wyreFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+              />
+            </>
+          )
+
+        case BottomSheetKind.RAMP_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetRampInfo
+                rampDeepLinkContent={this.state.rampDeepLinkContent}
+                rampFromBuyMenu={this.state.rampFromBuyMenu}
+                rampFromDeepLink={this.state.rampFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
               />
             </>
           )
@@ -1980,6 +2102,7 @@ const mapStateToProps = ( state ) => {
     notificationList: state.notifications,
     accountsState: state.accounts,
     currentWyreSubAccount: state.accounts.currentWyreSubAccount,
+    currentRampSubAccount: state.accounts.currentRampSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
@@ -1999,6 +2122,7 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.preferences.secondaryDeviceAddressValue,
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
+    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
   }
 }
 
@@ -2012,7 +2136,10 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
-    fetchDerivativeAccBalTx,
+    autoSyncShells,
+    clearWyreCache,
+    clearRampCache,
+    addNewAccountShell,
     addTransferDetails,
     clearPaymentDetails,
     notificationsUpdated,
@@ -2020,6 +2147,7 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
+    setVersion
   } )( Home ),
 )
 

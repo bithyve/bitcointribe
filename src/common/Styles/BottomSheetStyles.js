@@ -4,13 +4,13 @@ import Fonts from '../Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 
 
-const BottomSheetStyles = StyleSheet.create({
+const BottomSheetStyles = StyleSheet.create( {
   confirmationMessageHeading: {
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     marginBottom: 12,
     fontFamily: Fonts.FiraSansMedium,
     color: Colors.blue,
   },
-})
+} )
 
 export default BottomSheetStyles

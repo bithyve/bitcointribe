@@ -39,6 +39,7 @@ import DonationWebPageBottomSheet from '../../../components/bottom-sheets/Donati
 import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serviceTypes'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
+import SyncStatus from '../../../common/data/enums/SyncStatus'
 
 export type Props = {
   navigation: any;
@@ -83,7 +84,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       default:
         derivativeAccountKind = primarySubAccount.kind
   }
-  
+
   const derivativeAccountDetails: {
     type: string;
     number: number;
@@ -95,8 +96,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     : null
 
   const isRefreshing = useMemo( () => {
-    return accountShell.isSyncInProgress
-  }, [ accountShell.isSyncInProgress ] )
+    return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
+  }, [ accountShell.syncStatus ] )
 
   const isShowingDonationButton = useMemo( () => {
     return primarySubAccount.kind === SubAccountKind.DONATION_ACCOUNT
@@ -257,9 +258,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       navigation.navigate( 'TwoFASetup', {
         twoFASetup:
           accountsState[ serviceType ].service.secureHDWallet
-            .twoFASetup, 
+            .twoFASetup,
       } )
-      // dispatch( removeTwoFA() )    
+      // dispatch( removeTwoFA() )
     }
   }, [ primarySubAccount.sourceKind ] )
 
@@ -267,11 +268,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     // 📝 A slight timeout is needed here in order for the refresh control to
     // properly lay itself out above the rest of the content and become visible
     // when the loading starts
-    setTimeout( () => {
-      dispatch( refreshAccountShell( accountShell, {
-        autoSync: true
-      } ) )
-    }, 100 )
+    if( accountShell.syncStatus===SyncStatus.PENDING )
+      setTimeout( () => {
+        dispatch( refreshAccountShell( accountShell, {
+          autoSync: true
+        } ) )
+      }, 100 )
   }, [] )
 
   useEffect( () => {
@@ -380,6 +382,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
         refreshControl={
           <RefreshControl
             onRefresh={performRefreshOnPullDown}
