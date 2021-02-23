@@ -284,7 +284,7 @@ const KeeperDeviceHistory = (props) => {
   const renderQrContent = useCallback(() => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={"QR scanner"}
         title={"Note"}
         infoText={
@@ -327,23 +327,23 @@ const KeeperDeviceHistory = (props) => {
           if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={() => {
-          let qrScannedData = isPrimaryKeeper
-            ? '{"uuid":"0b768868de97d00fd7ed00d5","publicKey":"04b51297b65f0317d1c2516287958c5af74cf88f1d6b2bea53fcd5f4552df901","ephemeralAddress":"b970070a49d19e2f3c46f4b53c2014f52902b52ce48b1970b12e9138308a36e3","walletName":"Mac"}'
-            : '{"uuid":"7ea01bc0744adf0db0cd001f","publicKey":"00bdcb15b112d68673a7fc1a36ed00ca4626c7ef6c6d58141a83465d60837b1c","ephemeralAddress":"b5c4fcc1674364ca7a1bcc13f043d31c727fbfb8739e4a8a792a772bf7e10353","walletName":"TK"}';
-          props.navigation.navigate("KeeperFeatures", {
-            isReshare,
-            qrScannedData,
-            isPrimaryKeeper: isPrimaryKeeper,
-            selectedShareId: selectedKeeper.shareId,
-            selectedLevelId: selectedLevelId,
-            isChange,
-            prevKeeperType: props.navigation.getParam("prevKeeperType")
-              ? props.navigation.getParam("prevKeeperType")
-              : null,
-            contactIndex: props.navigation.getParam("contactIndex")
-              ? props.navigation.getParam("contactIndex")
-              : null,
-          });
+          // let qrScannedData = isPrimaryKeeper
+          //   ? '{"uuid":"0b768868de97d00fd7ed00d5","publicKey":"04b51297b65f0317d1c2516287958c5af74cf88f1d6b2bea53fcd5f4552df901","ephemeralAddress":"b970070a49d19e2f3c46f4b53c2014f52902b52ce48b1970b12e9138308a36e3","walletName":"Mac"}'
+          //   : '{"uuid":"7ea01bc0744adf0db0cd001f","publicKey":"00bdcb15b112d68673a7fc1a36ed00ca4626c7ef6c6d58141a83465d60837b1c","ephemeralAddress":"b5c4fcc1674364ca7a1bcc13f043d31c727fbfb8739e4a8a792a772bf7e10353","walletName":"TK"}';
+          // props.navigation.navigate("KeeperFeatures", {
+          //   isReshare,
+          //   qrScannedData,
+          //   isPrimaryKeeper: isPrimaryKeeper,
+          //   selectedShareId: selectedKeeper.shareId,
+          //   selectedLevelId: selectedLevelId,
+          //   isChange,
+          //   prevKeeperType: props.navigation.getParam("prevKeeperType")
+          //     ? props.navigation.getParam("prevKeeperType")
+          //     : null,
+          //   contactIndex: props.navigation.getParam("contactIndex")
+          //     ? props.navigation.getParam("contactIndex")
+          //     : null,
+          // });
         }}
       />
     );
