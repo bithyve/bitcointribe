@@ -88,6 +88,7 @@ interface RestoreWithICloudStateTypes {
   isOtpType: boolean;
   otp: string;
   renderTimer: boolean;
+  isLinkCreated: boolean;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -147,6 +148,7 @@ class RestoreWithICloud extends Component<
       isOtpType: false,
       otp: "",
       renderTimer: false,
+      isLinkCreated: false,
     };
   }
 
@@ -195,10 +197,12 @@ class RestoreWithICloud extends Component<
     }
 
     if (
-      JSON.stringify(prevState.contactList) !=
-        JSON.stringify(this.state.contactList) && this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[0] &&
+      !this.state.isLinkCreated &&
+      this.state.contactList.length &&
+      this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[0] &&
       this.props.database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[0].META_SHARE
     ) {
+      this.setState({ isLinkCreated: true });
       this.onCreatLink();
     }
   };
@@ -419,9 +423,9 @@ class RestoreWithICloud extends Component<
       if (
         (RECOVERY_SHARES[1] && !RECOVERY_SHARES[1].REQUEST_DETAILS) ||
         !RECOVERY_SHARES[1]
-      )
-        console.log("sdfdsfsdfsd");
-      requestShare(1);
+      ) {
+        requestShare(1);
+      }
     } else if (
       this.state.contactList.length &&
       this.state.contactList.length == 2
@@ -429,29 +433,37 @@ class RestoreWithICloud extends Component<
       if (
         (RECOVERY_SHARES[1] && !RECOVERY_SHARES[1].REQUEST_DETAILS) ||
         !RECOVERY_SHARES[1]
-      )
+      ) {
         requestShare(1);
+      }
       if (
         (RECOVERY_SHARES[2] && !RECOVERY_SHARES[2].REQUEST_DETAILS) ||
         !RECOVERY_SHARES[2]
-      )
+      ) {
         requestShare(2);
+      }
     }
   };
 
   createLink = (selectedContact, index) => {
     let { database } = this.props;
     const requester = database.WALLET_SETUP.walletName;
+    console.log("index", index);
     const { REQUEST_DETAILS } = database.DECENTRALIZED_BACKUP.RECOVERY_SHARES[
       index == 0 ? 1 : 2
     ];
+    console.log(
+      "database.DECENTRALIZED_BACKUP.RECOVERY_SHARES",
+      database.DECENTRALIZED_BACKUP.RECOVERY_SHARES
+    );
     const appVersion = DeviceInfo.getVersion();
     if (
       selectedContact.data.phoneNumbers &&
       selectedContact.data.phoneNumbers.length
     ) {
+      console.log("selectedContact.data", selectedContact.data);
       let number = selectedContact.data.phoneNumbers.length
-        ? selectedContact.data.phoneNumbers[0].digits
+        ? selectedContact.data.phoneNumbers[0].number
         : "";
       number = number.slice(number.length - 10); // last 10 digits only
       const numHintType = "num";
@@ -516,7 +528,10 @@ class RestoreWithICloud extends Component<
       let { database } = this.props;
       const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP;
 
-      if (RECOVERY_SHARES[shareIndex] && !RECOVERY_SHARES[shareIndex].META_SHARE) {
+      if (
+        RECOVERY_SHARES[shareIndex] &&
+        !RECOVERY_SHARES[shareIndex].META_SHARE
+      ) {
         const { KEY } = RECOVERY_SHARES[shareIndex].REQUEST_DETAILS;
         console.log({
           KEY,
@@ -580,7 +595,7 @@ class RestoreWithICloud extends Component<
           <View style={{ flex: 1, flexDirection: "row" }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.goBack()
+                navigation.goBack();
               }}
               style={styles.headerBackArrowView}
             >
@@ -921,7 +936,11 @@ class RestoreWithICloud extends Component<
             );
           }}
           renderHeader={() => (
-            <ModalHeader onPressHeader={() => (this.refs.ContactListForRestore as any).snapTo(0)}/>
+            <ModalHeader
+              onPressHeader={() =>
+                (this.refs.ContactListForRestore as any).snapTo(0)
+              }
+            />
           )}
         />
         <BottomSheet
@@ -1097,8 +1116,9 @@ class RestoreWithICloud extends Component<
               }}
               onPressDone={() => {
                 if (isOtpType) {
-                  this.setState({renderTimer: true});
-                  (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(1);
+                  this.setState({ renderTimer: true });
+                  (this.refs
+                    .shareOtpWithTrustedContactBottomSheet as any).snapTo(1);
                 }
                 (this.refs.SendViaLinkBottomSheet as any).snapTo(0);
               }}
@@ -1116,11 +1136,15 @@ class RestoreWithICloud extends Component<
               renderTimer={renderTimer}
               onPressOk={() => {
                 this.setState({ renderTimer: false });
-                (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(0);
+                (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(
+                  0
+                );
               }}
               onPressBack={() => {
                 this.setState({ renderTimer: false });
-                (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(0);
+                (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(
+                  0
+                );
               }}
               OTP={otp}
             />
@@ -1129,7 +1153,9 @@ class RestoreWithICloud extends Component<
             <ModalHeader
               onPressHeader={() => {
                 this.setState({ renderTimer: false });
-                (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(0);
+                (this.refs.shareOtpWithTrustedContactBottomSheet as any).snapTo(
+                  0
+                );
               }}
             />
           )}
