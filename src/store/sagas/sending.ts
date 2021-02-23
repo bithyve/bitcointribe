@@ -7,9 +7,13 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
+import { DerivativeAccountTypes, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -54,6 +58,131 @@ const getDerivativeAccountDetails = ( accountShell: AccountShell ) => {
 }
 
 
+function* processRecipients( accountShell: AccountShell ){
+
+  // TODO: fetch and pre-process recipients
+  const recipients: [
+    {
+      id: string;
+      address: string;
+      amount: number;
+      type?: string;
+      accountNumber?: number;
+    }?
+  ]  = []
+
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const trustedContactsServices: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service
+  )
+  const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+
+  const addressedRecipients = []
+  for ( const recipient of recipients ) {
+    if ( recipient.address ) addressedRecipients.push( recipient )
+    // recipient kind: External address
+    else {
+      if ( !recipient.id ) throw new Error( 'Invalid recipient' )
+      if (
+        recipient.id === REGULAR_ACCOUNT ||
+        recipient.id === SECURE_ACCOUNT ||
+        config.EJECTED_ACCOUNTS.includes( recipient.id )
+      ) {
+        // recipient kind: Hexa Account
+        const subInstance =
+          recipient.type === REGULAR_ACCOUNT
+            ? regularAccount.hdWallet
+            : secureAccount.secureHDWallet
+
+        let receivingAddress
+        if ( config.EJECTED_ACCOUNTS.includes( recipient.id ) )
+          receivingAddress = yield call( subInstance.getReceivingAddress,
+            recipient.id,
+            recipient.accountNumber
+          )
+        else receivingAddress = yield call( subInstance.getReceivingAddress )
+
+        if ( !receivingAddress )
+          throw new Error(
+            `Failed to generate receiving address for recipient: ${recipient.id}`
+          )
+
+        recipient.address = receivingAddress
+        addressedRecipients.push( recipient )
+      } else {
+        // recipient kind: Trusted Contact
+        const contactName = recipient.id
+        let res
+        const accountNumber =
+          regularAccount.hdWallet.trustedContactToDA[
+            contactName.toLowerCase().trim()
+          ]
+        if ( accountNumber ) {
+          const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
+            TRUSTED_CONTACTS
+          ][ accountNumber ] as TrustedContactDerivativeAccountElements
+
+          if ( accountShell.primarySubAccount.sourceKind !== TEST_ACCOUNT ) {
+            if ( contactDetails && contactDetails.xpub ) res = yield call( regularAccount.getDerivativeAccAddress, TRUSTED_CONTACTS, null, contactName )
+            else {
+              const { trustedAddress, } = trustedContactsServices.tc.trustedContacts[
+                contactName.toLowerCase().trim()
+              ]
+              if ( trustedAddress )
+                res = {
+                  status: 200, data: {
+                    address: trustedAddress
+                  }
+                }
+              else
+                throw new Error( 'Failed fetch contact address, xpub missing' )
+            }
+          } else {
+            if ( contactDetails && contactDetails.tpub ) res = yield call( testAccount.deriveReceivingAddress, contactDetails.tpub )
+            else {
+              const { trustedTestAddress } = trustedContactsServices.tc.trustedContacts[
+                contactName.toLowerCase().trim()
+              ]
+              if ( trustedTestAddress )
+                res = {
+                  status: 200, data: {
+                    address: trustedTestAddress
+                  }
+                }
+              else
+                throw new Error(
+                  'Failed fetch contact testnet address, tpub missing'
+                )
+            }
+          }
+        } else {
+          throw new Error(
+            'Failed fetch testnet address, accountNumber missing'
+          )
+        }
+
+        // console.log( { res } )
+        if ( res.status === 200 ) {
+          const receivingAddress = res.data.address
+          recipient.address = receivingAddress
+          addressedRecipients.push( recipient )
+        } else {
+          throw new Error(
+            `Failed to generate receiving address for recipient: ${recipient.id}`
+          )
+        }
+      }
+    }
+  }
+
+  return addressedRecipients
+}
+
+
 function* executeSendStage1( { payload }: {payload: {
   accountShellID: string;
 }} ) {
@@ -71,17 +200,24 @@ function* executeSendStage1( { payload }: {payload: {
   const averageTxFeeByNetwork = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ]
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
 
-  const res = yield call(
-    service.transferST1,
-    recipients,
-    averageTxFeeByNetwork,
-    derivativeAccountDetails
-  )
-  if ( res.status === 200 )
-    yield put( sendStage1Executed( true ) )
-  else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+  try {
+    const recipients = yield call( processRecipients, accountShell )
+
+    const res = yield call(
+      service.transferST1,
+      recipients,
+      averageTxFeeByNetwork,
+      derivativeAccountDetails
+    )
+    if ( res.status === 200 )
+      yield put( sendStage1Executed( true ) )
+    else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      yield put( sendStage1Executed( false ) )
+    }
+  } catch ( err ) {
     yield put( sendStage1Executed( false ) )
+    return
   }
 }
 
