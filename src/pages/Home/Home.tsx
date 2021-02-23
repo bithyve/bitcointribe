@@ -89,59 +89,59 @@ import CustomBottomTabs, {
 import {
   addTransferDetails,
   autoSyncShells,
+  addNewAccountShell
 } from "../../store/actions/accounts";
 import {
   trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
 } from "../../bitcoin/utilities/Interface";
-import moment from "moment";
-import { withNavigationFocus } from "react-navigation";
-import CustodianRequestModalContents from "../../components/CustodianRequestModalContents";
-import semver from "semver";
+import moment from 'moment'
+import { withNavigationFocus } from 'react-navigation'
+import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
+import semver from 'semver'
 import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
   setIsBackupProcessing,
 } from "../../store/actions/preferences";
-import Bitcoin from "../../bitcoin/utilities/accounts/Bitcoin";
-import TrustedContactRequestContent from "./TrustedContactRequestContent";
-import BottomSheetBackground from "../../components/bottom-sheets/BottomSheetBackground";
-import BottomSheetHeader from "../Accounts/BottomSheetHeader";
-import { Button } from "react-native-elements";
-import checkAppVersionCompatibility from "../../utils/CheckAppVersionCompatibility";
-import defaultBottomSheetConfigs from "../../common/configs/BottomSheetConfigs";
-import BottomSheet from "@gorhom/bottom-sheet";
-import { resetToHomeAction } from "../../navigation/actions/NavigationActions";
-import { Milliseconds } from "../../common/data/typealiases/UnitAliases";
-import { SATOSHIS_IN_BTC } from "../../common/constants/Bitcoin";
-import { getEnvReleaseTopic } from "../../utils/geEnvSpecificParams";
-import { AccountsState } from "../../store/reducers/accounts";
-import HomeAccountCardsList from "./HomeAccountCardsList";
-import AccountShell from "../../common/data/models/AccountShell";
-import PushNotificationIOS from "@react-native-community/push-notification-ios";
-import SourceAccountKind from "../../common/data/enums/SourceAccountKind";
-import TransactionDescribing from "../../common/data/models/Transactions/Interfaces";
-import messaging from "@react-native-firebase/messaging";
-import firebase from "@react-native-firebase/app";
-import ExternalServiceSubAccountInfo from "../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo";
-import BuyBitcoinHomeBottomSheet, {
-  BuyBitcoinBottomSheetMenuItem,
-  BuyMenuItemKind,
-} from "../../components/home/BuyBitcoinHomeBottomSheet";
-import BottomSheetWyreInfo from "../../components/bottom-sheets/wyre/BottomSheetWyreInfo";
-import BottomSheetRampInfo from "../../components/bottom-sheets/ramp/BottomSheetRampInfo";
-import ServiceAccountKind from "../../common/data/enums/ServiceAccountKind";
-import { setVersion } from "../../store/actions/versionHistory";
 
 import CloudBackup from "../../common/CommonFunctions/CloudBackup";
 import { fetchKeeperTrustedChannel } from "../../store/actions/keeper";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import PersonalNode from "../../common/data/models/PersonalNode";
+import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
+import TrustedContactRequestContent from './TrustedContactRequestContent'
+import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
+import BottomSheetHeader from '../Accounts/BottomSheetHeader'
+import { Button } from 'react-native-elements'
+import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
+import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
+import BottomSheet from '@gorhom/bottom-sheet'
+import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
+import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { getEnvReleaseTopic } from '../../utils/geEnvSpecificParams'
+import { AccountsState } from '../../store/reducers/accounts'
+import HomeAccountCardsList from './HomeAccountCardsList'
+import AccountShell from '../../common/data/models/AccountShell'
+import PushNotificationIOS from '@react-native-community/push-notification-ios'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import messaging from '@react-native-firebase/messaging'
+import firebase from '@react-native-firebase/app'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
+import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { setVersion } from '../../store/actions/versionHistory'
+import { clearRampCache } from '../../store/actions/RampIntegration'
+import { clearWyreCache } from '../../store/actions/WyreIntegration'
 
-export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800;
+export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
 export enum BottomSheetState {
   Closed,
@@ -187,6 +187,10 @@ interface HomeStateTypes {
   encryptedCloudDataJson: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
+  rampFromBuyMenu: boolean | null;
+  rampFromDeepLink: boolean | null;
+  wyreFromBuyMenu: boolean | null;
+  wyreFromDeepLink: boolean | null;
 }
 
 interface HomePropsTypes {
@@ -217,6 +221,9 @@ interface HomePropsTypes {
   currentLevel: number;
   keeperInfo: any[];
   autoSyncShells: any;
+  clearWyreCache: any;
+  clearRampCache: any;
+  addNewAccountShell: any;
   addTransferDetails: any;
   paymentDetails: any;
   clearPaymentDetails: any;
@@ -255,6 +262,10 @@ interface HomePropsTypes {
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
   downloadSMShard: any;
+  rampFromBuyMenu: boolean | null;
+  rampFromDeepLink: boolean | null;
+  wyreFromBuyMenu: boolean | null;
+  wyreFromDeepLink: boolean | null;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic();
@@ -302,7 +313,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       encryptedCloudDataJson: [],
       wyreDeepLinkContent: null,
       rampDeepLinkContent: null,
-    };
+      rampFromBuyMenu: null,
+      rampFromDeepLink: null,
+      wyreFromBuyMenu: null,
+      wyreFromDeepLink: null
+    }
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -1208,25 +1223,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const splits = url ? url.split("/") : [];
 
-    if (splits.includes("wyre")) {
-      this.setState(
-        {
-          wyreDeepLinkContent: url,
-        },
-        () => {
-          this.openBottomSheet(BottomSheetKind.WYRE_STATUS_INFO);
-        }
-      );
+    if ( splits.includes( 'wyre' ) ) {
+      this.props.clearWyreCache()
+      this.setState( {
+        wyreDeepLinkContent:url,
+        wyreFromBuyMenu: false,
+        wyreFromDeepLink: true
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
+      } )
     }
-    if (splits.includes("ramp")) {
-      this.setState(
-        {
-          rampDeepLinkContent: url,
-        },
-        () => {
-          this.openBottomSheet(BottomSheetKind.RAMP_STATUS_INFO);
-        }
-      );
+    if ( splits.includes( 'ramp' ) ) {
+      this.props.clearRampCache()
+      this.setState( {
+        rampDeepLinkContent:url,
+        rampFromBuyMenu: false,
+        rampFromDeepLink: true
+      }, () => {
+        this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
+      } )
     }
     if (splits[5] === "sss") {
       const requester = splits[4];
@@ -1501,52 +1516,56 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleBuyBitcoinBottomSheetSelection = (
-    menuItem: BuyBitcoinBottomSheetMenuItem
-  ) => {
-    switch (menuItem.kind) {
-      case BuyMenuItemKind.FAST_BITCOINS:
-        this.props.navigation.navigate("VoucherScanner");
-        break;
-      case BuyMenuItemKind.SWAN:
-        this.props.navigation.navigate("SwanIntegrationScreen");
-        break;
-      case BuyMenuItemKind.RAMP:
-        if (this.props.currentRampSubAccount) {
-          this.props.navigation.navigate("PlaceRampOrder", {
-            currentSubAccount: this.props.currentRampSubAccount,
-          });
-        } else {
-          const newSubAccount = new ExternalServiceSubAccountInfo({
-            instanceNumber: 1,
-            defaultTitle: "Ramp Account",
-            defaultDescription: "Buy using ApplePay/Debit card",
-            serviceAccountKind: ServiceAccountKind.RAMP,
-          });
+  handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+    switch ( menuItem.kind ) {
+        case BuyMenuItemKind.FAST_BITCOINS:
+          this.props.navigation.navigate( 'VoucherScanner' )
+          break
+        case BuyMenuItemKind.SWAN:
+          this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          break
+        case BuyMenuItemKind.RAMP:
+          if ( !this.props.currentRampSubAccount ) {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Ramp Account',
+              defaultDescription: 'Buy using ApplePay/Debit card',
+              serviceAccountKind: ServiceAccountKind.RAMP,
+            } )
 
-          this.props.navigation.navigate("NewRampAccountDetails", {
-            currentSubAccount: newSubAccount,
-          });
-        }
-        break;
-      case BuyMenuItemKind.WYRE:
-        if (this.props.currentWyreSubAccount) {
-          this.props.navigation.navigate("PlaceWyreOrder", {
-            currentSubAccount: this.props.currentWyreSubAccount,
-          });
-        } else {
-          const newSubAccount = new ExternalServiceSubAccountInfo({
-            instanceNumber: 1,
-            defaultTitle: "Wyre Account",
-            defaultDescription: "Buy using ApplePay/Debit card",
-            serviceAccountKind: ServiceAccountKind.WYRE,
-          });
-
-          this.props.navigation.navigate("NewWyreAccountDetails", {
-            currentSubAccount: newSubAccount,
-          });
-        }
-        break;
+            this.props.addNewAccountShell( newSubAccount )
+          }
+          this.props.clearRampCache()
+          this.setState( {
+            rampDeepLinkContent: null,
+            rampFromDeepLink: false,
+            rampFromBuyMenu: true
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
+          } )
+          break
+        case BuyMenuItemKind.WYRE:
+          if ( !this.props.currentWyreSubAccount ) {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Wyre Account',
+              defaultDescription: 'Buy using ApplePay/Debit card',
+              serviceAccountKind: ServiceAccountKind.WYRE,
+            } )
+            this.props.addNewAccountShell( newSubAccount )
+            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
+            //   currentSubAccount: newSubAccount,
+            // } )
+          }
+          this.props.clearWyreCache()
+          this.setState( {
+            wyreDeepLinkContent: null,
+            wyreFromDeepLink: false,
+            wyreFromBuyMenu: true
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
+          } )
+          break
     }
   };
 
@@ -2164,53 +2183,127 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getBottomSheetSnapPoints(): any[] {
-    switch (this.state.currentBottomSheetKind) {
-      case BottomSheetKind.WYRE_STATUS_INFO:
-      case BottomSheetKind.RAMP_STATUS_INFO:
-        return [0, "35%"];
-      case BottomSheetKind.TAB_BAR_BUY_MENU:
-        return [0, "50%"];
-      case BottomSheetKind.CUSTODIAN_REQUEST:
-      case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
-        return defaultBottomSheetConfigs.snapPoints;
+    switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return ( this.state.wyreFromDeepLink )
+            ? [ 0, '32%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+        case BottomSheetKind.RAMP_STATUS_INFO:
+          return ( this.state.rampFromDeepLink )
+            ? [ 0, '32%' ]
+            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '57%' ]
+        case BottomSheetKind.CUSTODIAN_REQUEST:
+        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
+          return defaultBottomSheetConfigs.snapPoints
 
-      case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-        return [
-          -50,
-          heightPercentageToDP(
-            Platform.OS == "ios" && DeviceInfo.hasNotch ? 70 : 65
-          ),
-          heightPercentageToDP(95),
-        ];
+        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+            ),
+            heightPercentageToDP( 95 ),
+          ]
 
-      case BottomSheetKind.ERROR:
-        return [
-          -50,
-          heightPercentageToDP(
-            Platform.OS == "ios" && DeviceInfo.hasNotch ? 40 : 35
-          ),
-        ];
+        case BottomSheetKind.ERROR:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+            ),
+          ]
 
-      case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
-      case BottomSheetKind.NOTIFICATIONS_LIST:
-        return [-50, heightPercentageToDP(82)];
+        case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
+        case BottomSheetKind.NOTIFICATIONS_LIST:
+          return [ -50, heightPercentageToDP( 82 ) ]
 
-      default:
-        return defaultBottomSheetConfigs.snapPoints;
+        default:
+          return defaultBottomSheetConfigs.snapPoints
     }
   }
 
   renderBottomSheetContent() {
-    const { UNDER_CUSTODY, navigation } = this.props;
-    const { custodyRequest } = this.state;
+    const { UNDER_CUSTODY, navigation } = this.props
+    const { custodyRequest } = this.state
 
-    switch (this.state.currentBottomSheetKind) {
-      case BottomSheetKind.TAB_BAR_BUY_MENU:
-        return (
-          <>
-            <BottomSheetHeader
-              title="Buy Bitcoin"
-              onPress={this.closeBottomSheet}
+    switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return (
+            <>
+              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
+
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetWyreInfo
+                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
+                wyreFromDeepLink={this.state.wyreFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+              />
+            </>
+          )
+
+        case BottomSheetKind.RAMP_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetRampInfo
+                rampDeepLinkContent={this.state.rampDeepLinkContent}
+                rampFromBuyMenu={this.state.rampFromBuyMenu}
+                rampFromDeepLink={this.state.rampFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+              />
+            </>
+          )
+
+        case BottomSheetKind.CUSTODIAN_REQUEST:
+          return (
+            <>
+            <CustodianRequestModalContents
+              userName={custodyRequest.requester}
+              onPressAcceptSecret={() => {
+                this.closeBottomSheet()
+
+                if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
+                  Alert.alert(
+                    'Request expired!',
+                    'Please ask the sender to initiate a new request',
+                  )
+                } else {
+                  if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
+                    Alert.alert(
+                      'Failed to store',
+                      'You cannot custody multiple shares of the same user.',
+                    )
+                  } else {
+                    if ( custodyRequest.isQR ) {
+                      downloadMShare( custodyRequest.ek, custodyRequest.otp )
+                    } else {
+                      navigation.navigate( 'CustodianRequestOTP', {
+                        custodyRequest,
+                      } )
+                    }
+                  }
+                }
+              }}
+              onPressRejectSecret={() => {
+                this.closeBottomSheet()
+                this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
+              }}
             />
 
             <BuyBitcoinHomeBottomSheet
@@ -2227,11 +2320,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               onPress={this.closeBottomSheet}
             />
             <BottomSheetWyreInfo
-              wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-              onClickSetting={() => {
-                this.closeBottomSheet();
-              }}
-            />
+                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
+                wyreFromDeepLink={this.state.wyreFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+              />
           </>
         );
 
@@ -2578,6 +2673,9 @@ export default withNavigationFocus(
     initializeHealthSetup,
     initHealthCheck,
     autoSyncShells,
+    clearWyreCache,
+    clearRampCache,
+    addNewAccountShell,
     addTransferDetails,
     clearPaymentDetails,
     notificationsUpdated,
