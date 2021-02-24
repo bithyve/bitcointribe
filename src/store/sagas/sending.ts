@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed } from '../actions/sending'
+import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -16,6 +16,7 @@ import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT, TEST_ACCOUNT, TRU
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { AccountRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
+import { SendingState } from '../reducers/sending'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -317,4 +318,61 @@ function* calculateSendMaxFee( { payload }: {payload: {
 export const calculateSendMaxFeeWatcher = createWatcher(
   calculateSendMaxFee,
   CALCULATE_SEND_MAX_FEE
+)
+
+function* executeSendStage2( { payload }: {payload: {
+  accountShellID: string;
+  txnPriority: string,
+  customTxPrerequisites: any,
+  nSequence: number
+}} ) {
+  const { accountShellID } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sending: SendingState = yield select(
+    ( state ) => state.sending
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+  const { txPrerequisites } = sending.sendST1
+  const { txnPriority, customTxPrerequisites, nSequence } = payload
+  if ( !txPrerequisites && !customTxPrerequisites ) {
+    console.log( 'Transaction prerequisites missing' )
+    return
+  }
+
+  const res = yield call(
+    service.transferST2,
+    txPrerequisites,
+    txnPriority,
+    customTxPrerequisites,
+    derivativeAccountDetails,
+    nSequence
+  )
+
+  if ( res.status === 200 ) {
+    if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
+      // console.log( { res } )
+      yield put( executedST2( serviceType, res.data ) )
+    } else yield put( executedST2( serviceType, res.data.txid ) )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( failedST2( serviceType, {
+      ...res
+    } ) )
+    // yield put(switchLoader(serviceType, 'transfer'));
+  }
+}
+
+export const executeSendStage2Watcher = createWatcher(
+  executeSendStage2,
+  EXECUTE_SEND_STAGE2
 )

@@ -12,6 +12,8 @@ export const EXECUTE_SENDING = 'EXECUTE_SENDING'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
 export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
 export const FEE_INTEL_MISSING = 'FEE_INTEL_MISSING'
+export const EXECUTE_SEND_STAGE2 = 'EXECUTE_SEND_STAGE2'
+export const SEND_STAGE2_EXECUTED = 'SEND_STAGE2_EXECUTED'
 export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
@@ -116,6 +118,44 @@ export const feeIntelMissing = (
 ): FeeIntelMissingAction => {
   return {
     type: FEE_INTEL_MISSING,
+    payload,
+  }
+}
+
+export interface ExecuteSendStage2Action extends Action {
+  type: typeof EXECUTE_SEND_STAGE2;
+  payload: {
+    accountShellID: string;
+    txnPriority: string,
+    customTxPrerequisites: any,
+    nSequence: number
+  };
+}
+
+export const executeSendStage2 = (
+  payload: {
+    accountShellID: string;
+    txnPriority: string,
+    customTxPrerequisites: any,
+    nSequence: number
+    },
+): ExecuteSendStage2Action => {
+  return {
+    type: EXECUTE_SEND_STAGE2,
+    payload,
+  }
+}
+
+export interface SendStage2ExecutedAction extends Action {
+  type: typeof SEND_STAGE2_EXECUTED;
+  payload: {successful: boolean, data: string};
+}
+
+export const sendStage2Executed = (
+  payload: {successful: boolean, data: string},
+): SendStage2ExecutedAction => {
+  return {
+    type: SEND_STAGE2_EXECUTED,
     payload,
   }
 }

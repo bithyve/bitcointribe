@@ -132,6 +132,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             txPrerequisites: null
           },
           feeIntelMissing: false,
+          transactionFeeInfo: INITIAL_STATE.transactionFeeInfo,
         }
 
       case SEND_STAGE1_EXECUTED:
