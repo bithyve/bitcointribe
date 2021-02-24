@@ -92,29 +92,42 @@ function* updateNewFCMWorker() {
     const currentLevel: Number = yield select(
       (state) => state.health.currentLevel
     );
+    const keeperInfo2: {
+      shareId: string;
+      name: string;
+      uuid: string;
+      publicKey: string;
+      ephemeralAddress: string;
+      type: string;
+      data?: any;
+    }[] = yield select(
+      (state) => state.health.keeperInfo
+    );
     const fcmTokenValue = yield select(
       (state) => state.preferences.fcmTokenValue
     );
     if (currentLevel == 2 && levelHealth[1]) {
-      let KeeperInfo: Keepers = keeper.keeper.keepers;
-      let uuid;
-      if (KeeperInfo[levelHealth[1].levelInfo[2].shareId]) {
-        uuid = KeeperInfo[levelHealth[1].levelInfo[2].shareId].keeperUUID;
+      if(keeperInfo2.findIndex(value => value.shareId == levelHealth[1].levelInfo[2].shareId) > -1){
+        let uuid2 = keeperInfo2[keeperInfo2.findIndex(value => value.shareId == levelHealth[1].levelInfo[2].shareId)].uuid;
+        if(uuid2){
+          const notification: INotification = {
+            notificationType: notificationType.newFCM,
+            title: "New FCM updated",
+            body: "New FCM updated",
+            data: JSON.stringify({ fmc: fcmTokenValue }),
+            tag: notificationTag.IMP,
+            date: new Date(),
+          };
+          let res = yield call(
+            RelayServices.sendKeeperNotifications,
+            [uuid2],
+            notification
+          );
+          if(res.status == 200 && res.data.sent){
+            yield put(isUpdateNewFcm(true));
+          }
+        }
       }
-      yield put(isUpdateNewFcm(true));
-      const notification: INotification = {
-        notificationType: notificationType.newFCM,
-        title: "New FCM updated",
-        body: "New FCM updated",
-        data: JSON.stringify({ fmc: fcmTokenValue }),
-        tag: notificationTag.mandatory,
-        date: new Date(),
-      };
-      let res = yield call(
-        RelayServices.sendKeeperNotifications,
-        [uuid],
-        notification
-      );
     }
   } catch (error) {}
 }
