@@ -11,6 +11,7 @@ export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPI
 export const EXECUTE_SENDING = 'EXECUTE_SENDING'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
 export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
+export const FEE_INTEL_MISSING = 'FEE_INTEL_MISSING'
 export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
@@ -69,9 +70,6 @@ export const executeSending = (): ExecuteSendingAction => {
     type: EXECUTE_SENDING,
   }
 }
-
-
-
 export interface ExecuteSendStage1Action extends Action {
   type: typeof EXECUTE_SEND_STAGE1;
   payload: {
@@ -100,6 +98,24 @@ export const sendStage1Executed = (
 ): SendStage1ExecutedAction => {
   return {
     type: SEND_STAGE1_EXECUTED,
+    payload,
+  }
+}
+
+export interface FeeIntelMissingAction extends Action {
+  type: typeof FEE_INTEL_MISSING;
+  payload: {
+    intelMissing: boolean;
+  };
+}
+
+export const feeIntelMissing = (
+  payload: {
+    intelMissing: boolean;
+  },
+): FeeIntelMissingAction => {
+  return {
+    type: FEE_INTEL_MISSING,
     payload,
   }
 }

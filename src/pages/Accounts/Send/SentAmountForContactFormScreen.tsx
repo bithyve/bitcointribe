@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Keyboard } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
@@ -23,6 +23,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { calculateSendMaxFee, executeSendStage1 } from '../../../store/actions/sending'
 import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
 export type NavigationParams = {
 };
@@ -44,6 +45,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( null )
   const [ noteText, setNoteText ] = useState( '' )
   const averageTransactionFees = useAverageTransactionFees()
+  const sendingState = useSendingState()
 
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
@@ -82,6 +84,25 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       accountShellID: sourceAccountShell.id,
     } ) )
   }
+
+  useEffect( ()=>{
+    if( sendingState.feeIntelMissing ){
+      // missing fee intel: custom fee-fallback
+
+      // this.props.navigation.navigate( 'SendConfirmation', {
+      //   accountShellID,
+      //   serviceType,
+      //   sweepSecure,
+      //   spendableBalance,
+      //   recipients,
+      //   averageTxFees,
+      //   isSendMax,
+      //   derivativeAccountDetails,
+      //   donationId,
+      //   feeIntelAbsent: true,
+      // } )
+    }
+  }, [ sendingState.feeIntelMissing ] )
 
   return (
     <View style={styles.rootContainer}>

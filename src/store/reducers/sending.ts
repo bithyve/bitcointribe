@@ -1,7 +1,7 @@
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1 } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, feeIntelMissing } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
@@ -24,6 +24,7 @@ export type SendingState = {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
+    txPrerequisites: TransactionPrerequisite | null;
   };
   sendST2: {
     inProgress: boolean;
@@ -37,6 +38,7 @@ export type SendingState = {
   }
 
   sendMaxFee: Satoshis;
+  feeIntelMissing: Boolean,
   transactionFeeInfo: TransactionFeeInfo;
 };
 
@@ -51,6 +53,7 @@ const INITIAL_STATE: SendingState = {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
+    txPrerequisites: null
   },
   sendST2: {
     inProgress: false,
@@ -64,7 +67,7 @@ const INITIAL_STATE: SendingState = {
   },
 
   sendMaxFee: 0,
-
+  feeIntelMissing: false,
   /*
   the UI needs to keep track of fees to display on screen
   Three level of fees priority with time estimate for each
@@ -125,14 +128,17 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           sendST1:{
             inProgress: true,
             hasFailed: false,
-            failedErrorMessage: null
-          }
+            failedErrorMessage: null,
+            txPrerequisites: null
+          },
+          feeIntelMissing: false,
         }
 
       case SEND_STAGE1_EXECUTED:
         const transactionFeeInfo: TransactionFeeInfo = state.transactionFeeInfo
+        let txPrerequisites: TransactionPrerequisite
         if( action.payload.successful ){
-          const txPrerequisites: TransactionPrerequisite = action.payload.data
+          txPrerequisites = action.payload.data
           Object.keys( txPrerequisites ).forEach( ( priority ) =>{
             transactionFeeInfo[ priority.toUpperCase() ].amount = txPrerequisites[ priority ].fee
             transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation = txPrerequisites[ priority ].estimatedBlocks
@@ -143,9 +149,16 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           sendST1: {
             inProgress: false,
             hasFailed: !action.payload.successful,
-            failedErrorMessage: !action.payload.successful? action.payload.data : null
+            failedErrorMessage: !action.payload.successful? action.payload.data : null,
+            txPrerequisites
           },
           transactionFeeInfo
+        }
+
+      case FEE_INTEL_MISSING:
+        return {
+          ...state,
+          feeIntelMissing: action.payload.intelMissing
         }
 
       case SENDING_COMPLETED:

@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, sendMaxFeeCalculated, sendStage1Executed } from '../actions/sending'
+import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -243,21 +243,9 @@ function* executeSendStage1( { payload }: {payload: {
   ].service
 
   if( !accountsState.averageTxFees ){
-    // custom fee-fallback (missing txn fee intel)
-
-    // TODO: fire intel absent action such that the UI would navigate to SendConfirmation screen w/ below params
-    this.props.navigation.navigate( 'SendConfirmation', {
-      accountShellID,
-      serviceType,
-      sweepSecure,
-      spendableBalance,
-      recipients,
-      averageTxFees,
-      isSendMax,
-      derivativeAccountDetails,
-      donationId,
-      feeIntelAbsent: true,
-    } )
+    yield put( feeIntelMissing( {
+      intelMissing: true
+    } ) )
     return
   }
 
