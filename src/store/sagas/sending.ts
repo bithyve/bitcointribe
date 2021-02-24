@@ -7,7 +7,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
+import { DerivativeAccountTypes, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -273,14 +273,22 @@ function* executeSendStage1( { payload }: {payload: {
       averageTxFeeByNetwork,
       derivativeAccountDetails
     )
-    if ( res.status === 200 )
-      yield put( sendStage1Executed( true ) )
+    if ( res.status === 200 ){
+      const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
+      yield put( sendStage1Executed( {
+        successful: true, data: txPrerequisites
+      } ) )
+    }
     else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
-      yield put( sendStage1Executed( false ) )
+      yield put( sendStage1Executed( {
+        successful: false, data: res.err
+      } ) )
     }
   } catch ( err ) {
-    yield put( sendStage1Executed( false ) )
+    yield put( sendStage1Executed( {
+      successful: false, data: err
+    } ) )
     return
   }
 }

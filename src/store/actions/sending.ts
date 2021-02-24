@@ -2,6 +2,7 @@ import { Action } from 'redux'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import AccountShell from '../../common/data/models/AccountShell'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
+import { TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
 
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
@@ -91,11 +92,11 @@ export const executeSendStage1 = (
 
 export interface SendStage1ExecutedAction extends Action {
   type: typeof SEND_STAGE1_EXECUTED;
-  payload: boolean;
+  payload: {successful: boolean, data: TransactionPrerequisite | string};
 }
 
 export const sendStage1Executed = (
-  payload: boolean,
+  payload: {successful: boolean, data: TransactionPrerequisite | string},
 ): SendStage1ExecutedAction => {
   return {
     type: SEND_STAGE1_EXECUTED,
