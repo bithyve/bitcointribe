@@ -92,11 +92,11 @@ export const executeSendStage1 = (
 
 export interface SendStage1ExecutedAction extends Action {
   type: typeof SEND_STAGE1_EXECUTED;
-  payload: {successful: boolean, data: TransactionPrerequisite | string};
+  payload: {successful: boolean, carryOver?: { txPrerequisites?: TransactionPrerequisite }, err?: string };
 }
 
 export const sendStage1Executed = (
-  payload: {successful: boolean, data: TransactionPrerequisite | string},
+  payload: {successful: boolean, carryOver?: { txPrerequisites?: TransactionPrerequisite }, err?: string },
 ): SendStage1ExecutedAction => {
   return {
     type: SEND_STAGE1_EXECUTED,
@@ -127,8 +127,8 @@ export interface ExecuteSendStage2Action extends Action {
   payload: {
     accountShellID: string;
     txnPriority: string,
-    customTxPrerequisites: any,
-    nSequence: number
+    customTxPrerequisites?: any,
+    nSequence?: number
   };
 }
 
@@ -136,8 +136,8 @@ export const executeSendStage2 = (
   payload: {
     accountShellID: string;
     txnPriority: string,
-    customTxPrerequisites: any,
-    nSequence: number
+    customTxPrerequisites?: any,
+    nSequence?: number
     },
 ): ExecuteSendStage2Action => {
   return {
@@ -148,11 +148,11 @@ export const executeSendStage2 = (
 
 export interface SendStage2ExecutedAction extends Action {
   type: typeof SEND_STAGE2_EXECUTED;
-  payload: {successful: boolean, data: string};
+  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string};
 }
 
 export const sendStage2Executed = (
-  payload: {successful: boolean, data: string},
+  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string},
 ): SendStage2ExecutedAction => {
   return {
     type: SEND_STAGE2_EXECUTED,

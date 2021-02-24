@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed } from '../actions/sending'
+import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -265,18 +265,22 @@ function* executeSendStage1( { payload }: {payload: {
     if ( res.status === 200 ){
       const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
       yield put( sendStage1Executed( {
-        successful: true, data: txPrerequisites
+        successful: true, carryOver: {
+          txPrerequisites
+        }
       } ) )
     }
     else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
       yield put( sendStage1Executed( {
-        successful: false, data: res.err
+        successful: false,
+        err: res.err
       } ) )
     }
   } catch ( err ) {
     yield put( sendStage1Executed( {
-      successful: false, data: err
+      successful: false,
+      err
     } ) )
     return
   }
@@ -360,15 +364,24 @@ function* executeSendStage2( { payload }: {payload: {
 
   if ( res.status === 200 ) {
     if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
-      // console.log( { res } )
-      yield put( executedST2( serviceType, res.data ) )
-    } else yield put( executedST2( serviceType, res.data.txid ) )
+      const { txHex, childIndexArray, inputs, derivativeAccountDetails } = res.data
+      yield put( sendStage2Executed( {
+        successful: true,
+        carryOver: {
+          txHex, childIndexArray, inputs, derivativeAccountDetails
+        }
+      }
+      ) )
+    } else yield put( sendStage2Executed( {
+      successful: true,
+      txid: res.data.txid
+    } ) )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( failedST2( serviceType, {
-      ...res
+    yield put( sendStage2Executed( {
+      successful: false,
+      err: res.err
     } ) )
-    // yield put(switchLoader(serviceType, 'transfer'));
   }
 }
 

@@ -15,6 +15,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
+import { executeSendStage2 } from '../../../store/actions/sending'
 
 export type NavigationParams = {
 };
@@ -31,7 +32,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-
+  const dispatch = useDispatch()
   const availableBalance = useMemo( () => {
     return AccountShell.getTotalBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -46,6 +47,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
 
   function handleConfirmationButtonPress() {
+
+    // TODO: populate txnPriority based on user selection
+    const txnPriority = 'low'
+    dispatch( executeSendStage2( {
+      accountShellID: sourceAccountShell.id,
+      txnPriority,
+    } ) )
   }
 
   function handleBackButtonPress() {

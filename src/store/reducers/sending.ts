@@ -139,7 +139,8 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
         const transactionFeeInfo: TransactionFeeInfo = state.transactionFeeInfo
         let txPrerequisites: TransactionPrerequisite
         if( action.payload.successful ){
-          txPrerequisites = action.payload.data
+          const carryOver = action.payload.carryOver
+          txPrerequisites = carryOver.txPrerequisites
           Object.keys( txPrerequisites ).forEach( ( priority ) =>{
             transactionFeeInfo[ priority.toUpperCase() ].amount = txPrerequisites[ priority ].fee
             transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation = txPrerequisites[ priority ].estimatedBlocks
@@ -150,7 +151,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           sendST1: {
             inProgress: false,
             hasFailed: !action.payload.successful,
-            failedErrorMessage: !action.payload.successful? action.payload.data : null,
+            failedErrorMessage: !action.payload.successful? action.payload.err : null,
             txPrerequisites
           },
           transactionFeeInfo
