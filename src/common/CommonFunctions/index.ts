@@ -141,7 +141,7 @@ export const CloudData = async (database, accountShells, activePersonalNode,vers
       if (database.WALLET_SETUP)
         walletImage.WALLET_SETUP = database.WALLET_SETUP;
       walletImage.ASYNC_DATA = await asyncDataToBackup();
-      walletImage.STATE_DATA = stateDataToBackup(accountShells,activePersonalNode);
+      walletImage.STATE_DATA = stateDataToBackup(accountShells, activePersonalNode, versionHistory);
       let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
       CloudDataJson = {
         walletImage,

@@ -326,25 +326,20 @@ const KeeperDeviceHistory = (props) => {
           }, 2);
           if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(0);
         }}
-        onPressContinue={() => {
-          // let qrScannedData = isPrimaryKeeper
-          //   ? '{"uuid":"0b768868de97d00fd7ed00d5","publicKey":"04b51297b65f0317d1c2516287958c5af74cf88f1d6b2bea53fcd5f4552df901","ephemeralAddress":"b970070a49d19e2f3c46f4b53c2014f52902b52ce48b1970b12e9138308a36e3","walletName":"Mac"}'
-          //   : '{"uuid":"7ea01bc0744adf0db0cd001f","publicKey":"00bdcb15b112d68673a7fc1a36ed00ca4626c7ef6c6d58141a83465d60837b1c","ephemeralAddress":"b5c4fcc1674364ca7a1bcc13f043d31c727fbfb8739e4a8a792a772bf7e10353","walletName":"TK"}';
-          // props.navigation.navigate("KeeperFeatures", {
-          //   isReshare,
-          //   qrScannedData,
-          //   isPrimaryKeeper: isPrimaryKeeper,
-          //   selectedShareId: selectedKeeper.shareId,
-          //   selectedLevelId: selectedLevelId,
-          //   isChange,
-          //   prevKeeperType: props.navigation.getParam("prevKeeperType")
-          //     ? props.navigation.getParam("prevKeeperType")
-          //     : null,
-          //   contactIndex: props.navigation.getParam("contactIndex")
-          //     ? props.navigation.getParam("contactIndex")
-          //     : null,
-          // });
-        }}
+        // onPressContinue={() => {
+        //   let qrScannedData = isPrimaryKeeper
+        //     ? '{"uuid":"b0020db78f86a75a7acec96d","publicKey":"507fcf14ac310051172cf9fed6dd2d52a05e210f828c7c81350ae7ead8a7a666","ephemeralAddress":"151bc50ae433427f50cad1a0edbc529c4a0aee2d45e92421199676873be2e297","walletName":"Mad"}' : '{"uuid":"eead4aa97a699820ece330d5","publicKey":"2e140dccaf2f5e7aaf426f7adb9d0bbf260266edbefc2a42a2d2914df70df06e","ephemeralAddress":"3d4d58d6dc3fff4e72e0d3f1470ae6e89850eb78ff97074b08b2503ab23a9329","walletName":"df"}';
+        //   props.navigation.navigate("KeeperFeatures", {
+        //     isReshare,
+        //     qrScannedData,
+        //     isPrimaryKeeper: isPrimaryKeeper,
+        //     selectedShareId: selectedKeeper.shareId,
+        //     selectedLevelId: selectedLevelId,
+        //     isChange,
+        //     prevKeeperType: props.navigation.getParam('prevKeeperType') ? props.navigation.getParam('prevKeeperType') : null,
+        //     contactIndex: props.navigation.getParam('contactIndex') ? props.navigation.getParam('contactIndex') : null,
+        //   });
+        // }}
       />
     );
   }, [QrBottomSheetsFlag]);
