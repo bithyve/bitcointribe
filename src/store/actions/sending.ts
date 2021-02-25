@@ -14,6 +14,8 @@ export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
 export const FEE_INTEL_MISSING = 'FEE_INTEL_MISSING'
 export const EXECUTE_SEND_STAGE2 = 'EXECUTE_SEND_STAGE2'
 export const SEND_STAGE2_EXECUTED = 'SEND_STAGE2_EXECUTED'
+export const EXECUTE_SEND_STAGE3 = 'EXECUTE_SEND_STAGE3'
+export const SEND_STAGE3_EXECUTED = 'SEND_STAGE3_EXECUTED'
 export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
@@ -156,6 +158,40 @@ export const sendStage2Executed = (
 ): SendStage2ExecutedAction => {
   return {
     type: SEND_STAGE2_EXECUTED,
+    payload,
+  }
+}
+
+export interface ExecuteSendStage3Action extends Action {
+  type: typeof EXECUTE_SEND_STAGE3;
+  payload: {
+    accountShellID: string;
+    token: number
+  };
+}
+
+export const executeSendStage3 = (
+  payload: {
+    accountShellID: string;
+    token: number
+    },
+): ExecuteSendStage3Action => {
+  return {
+    type: EXECUTE_SEND_STAGE3,
+    payload,
+  }
+}
+
+export interface SendStage3ExecutedAction extends Action {
+  type: typeof SEND_STAGE3_EXECUTED;
+  payload: {successful: boolean, txid?: string, err?: string};
+}
+
+export const sendStage3Executed = (
+  payload: {successful: boolean, txid?: string, err?: string},
+): SendStage3ExecutedAction => {
+  return {
+    type: SEND_STAGE3_EXECUTED,
     payload,
   }
 }
