@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -391,7 +391,7 @@ export const executeSendStage2Watcher = createWatcher(
   EXECUTE_SEND_STAGE2
 )
 
-function* executeSendStage3Worker( { payload } ) {
+function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
   const { accountShellID, token } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -431,4 +431,67 @@ function* executeSendStage3Worker( { payload } ) {
 export const executeSendStage3Watcher = createWatcher(
   executeSendStage3Worker,
   EXECUTE_SEND_STAGE3
+)
+
+function* executeAlternateSendStage2Worker( { payload }: {payload: {
+  accountShellID: string;
+  txnPriority: string,
+  customTxPrerequisites: any,
+  nSequence: number
+  }} ) {
+
+  const {
+    accountShellID,
+    txnPriority,
+    customTxPrerequisites,
+    nSequence,
+  } = payload
+
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sending: SendingState = yield select(
+    ( state ) => state.sending
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
+    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
+  }
+
+  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
+  if ( !txPrerequisites ) {
+    console.log( 'Transaction prerequisites missing' )
+    return
+  }
+
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+  const res = yield call(
+    service.alternateTransferST2,
+    txPrerequisites,
+    txnPriority,
+    customTxPrerequisites,
+    derivativeAccountDetails,
+    nSequence
+  )
+  if ( res.status === 200 ) {
+    yield put( alternateTransferST2Executed( serviceType, res.data.txid ) )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( failedST2( serviceType, {
+      ...res
+    } ) )
+    // yield put(switchLoader(serviceType, 'transfer'));
+  }
+}
+
+export const executeAlternateSendStage2Watcher = createWatcher(
+  executeAlternateSendStage2Worker,
+  EXECUTE_ALTERNATE_SEND_STAGE2
 )
