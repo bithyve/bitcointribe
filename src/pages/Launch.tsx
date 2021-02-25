@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   View,
   StyleSheet,
@@ -8,191 +8,202 @@ import {
   AsyncStorage,
   Platform,
   AppState,
-} from 'react-native';
-import Video from 'react-native-video';
-import Colors from '../common/Colors';
+} from 'react-native'
+import Video from 'react-native-video'
+import Colors from '../common/Colors'
 
-import { initializeDB } from '../store/actions/storage';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from '../components/ErrorModalContents';
-import ModalHeader from '../components/ModalHeader';
+import { initializeDB } from '../store/actions/storage'
+import BottomSheet from 'reanimated-bottom-sheet'
+import DeviceInfo from 'react-native-device-info'
+import ErrorModalContents from '../components/ErrorModalContents'
+import ModalHeader from '../components/ModalHeader'
 import {
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import config from '../bitcoin/HexaConfig';
+} from 'react-native-responsive-screen'
+import config from '../bitcoin/HexaConfig'
 import { connect } from 'react-redux'
-import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility';
+import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility'
 
-interface HomePropsTypes {
+type LaunchScreenProps = {
   initializeDB: any;
   navigation: any;
   lastSeen: any;
 }
 
-interface HomeStateTypes { }
+type LaunchScreenState = { }
 
-class Launch extends Component<HomePropsTypes, HomeStateTypes> {
+class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   errorBottomSheet: any;
-  constructor(props) {
-    super(props);
-    this.errorBottomSheet = React.createRef();
+  constructor( props ) {
+    super( props )
+    this.errorBottomSheet = React.createRef()
   }
 
   componentDidMount = () => {
-    this.props.initializeDB();
+    this.props.initializeDB()
 
-    AppState.addEventListener("change", this.handleAppStateChange);
-    Linking.addEventListener('url', this.handleAppStateChange);
+    AppState.addEventListener( 'change', this.handleAppStateChange )
+    Linking.addEventListener( 'url', this.handleAppStateChange )
 
-    this.handleDeepLinking();
+    this.handleDeepLinking()
   };
 
 
   componentWillUnmount = () => {
-    AppState.removeEventListener("change", this.handleAppStateChange);
-    Linking.removeEventListener('url', this.handleAppStateChange);
+    AppState.removeEventListener( 'change', this.handleAppStateChange )
+    Linking.removeEventListener( 'url', this.handleAppStateChange )
   };
 
 
-  handleAppStateChange = async (nextAppState) => {
+  handleAppStateChange = async ( nextAppState ) => {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
-    let walletExists = await AsyncStorage.getItem('walletExists');
-    let lastSeen = await AsyncStorage.getItem('lastSeen');
-    if (!walletExists) {
-      return;
+    const walletExists = await AsyncStorage.getItem( 'walletExists' )
+    const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
+    if ( !walletExists ) {
+      return
     }
 
-    if (Platform.OS === 'android' && nextAppState === 'background') {
+    if ( Platform.OS === 'android' && nextAppState === 'background' ) {
       // if no last seen don't do anything
-      if (lastSeen) {
-        this.props.navigation.navigate('Intermediate');
-        return;
+      if ( lastSeen ) {
+        this.props.navigation.navigate( 'Intermediate' )
+        return
       }
-      return;
+      return
     }
 
     if (
       Platform.OS === 'ios' &&
-      (nextAppState === 'inactive' || nextAppState == 'background')
+      ( nextAppState === 'inactive' || nextAppState == 'background' )
     ) {
       // if no last seen don't do anything
-      if (lastSeen) {
-        this.props.navigation.navigate('Intermediate');
-        return;
+      if ( lastSeen ) {
+        this.props.navigation.navigate( 'Intermediate' )
+        return
       }
 
-      return;
+      return
     }
   };
 
   handleDeepLinking = async () => {
     try {
-      const url = await Linking.getInitialURL();
+      const url = await Linking.getInitialURL()
 
-      console.log("Launch::handleDeepLinking::initialURL: " + url);
+      console.log( 'Launch::handleDeepLinking::initialURL: ' + url )
 
-      setTimeout(async () => {
-        if (await AsyncStorage.getItem('hasCreds')) {
-          if (!url) {
-            this.props.navigation.replace('Login');
+      setTimeout( async () => {
+        if ( await AsyncStorage.getItem( 'hasCreds' ) ) {
+          if ( !url ) {
+            this.props.navigation.replace( 'Login' )
           } else {
-            const splits = url.split('/');
+            const splits = url.split( '/' )
 
-            if (splits[5] === 'sss') {
-              const requester = splits[4];
+            if ( splits[ 5 ] === 'sss' ) {
+              const requester = splits[ 4 ]
 
-              if (splits[6] === 'ek') {
+              if ( splits[ 6 ] === 'ek' ) {
                 const custodyRequest = {
                   requester,
-                  ek: splits[7],
-                  uploadedAt: splits[8],
-                };
+                  ek: splits[ 7 ],
+                  uploadedAt: splits[ 8 ],
+                }
 
-                this.props.navigation.replace('Login', { custodyRequest });
+                this.props.navigation.replace( 'Login', {
+                  custodyRequest
+                } )
 
-              } else if (splits[6] === 'rk') {
-                const recoveryRequest = { requester, rk: splits[7] };
+              } else if ( splits[ 6 ] === 'rk' ) {
+                const recoveryRequest = {
+                  requester, rk: splits[ 7 ]
+                }
 
-                this.props.navigation.replace('Login', { recoveryRequest });
+                this.props.navigation.replace( 'Login', {
+                  recoveryRequest
+                } )
               }
-            } else if (['tc', 'tcg', 'atcg', 'ptc'].includes(splits[4])) {
-              if (splits[3] !== config.APP_STAGE) {
+            } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
+              if ( splits[ 3 ] !== config.APP_STAGE ) {
                 Alert.alert(
                   'Invalid deeplink',
                   `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                  splits[3]
+                    splits[ 3 ]
                   }`,
-                );
+                )
               } else {
-                const version = splits.pop().slice(1);
+                const version = splits.pop().slice( 1 )
 
-                if (version) {
-                  if (!(await checkAppVersionCompatibility({
-                    relayCheckMethod: splits[4],
+                if ( version ) {
+                  if ( !( await checkAppVersionCompatibility( {
+                    relayCheckMethod: splits[ 4 ],
                     version,
-                  }))) {
-                    return;
+                  } ) ) ) {
+                    return
                   }
                 }
 
                 const trustedContactRequest = {
-                  isGuardian: ['tcg', 'atcg'].includes(splits[4]),
-                  approvedTC: splits[4] === 'atcg' ? true : false,
-                  isPaymentRequest: splits[4] === 'ptc' ? true : false,
-                  requester: splits[5],
-                  encryptedKey: splits[6],
-                  hintType: splits[7],
-                  hint: splits[8],
-                  uploadedAt: splits[9],
+                  isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
+                  approvedTC: splits[ 4 ] === 'atcg' ? true : false,
+                  isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
+                  requester: splits[ 5 ],
+                  encryptedKey: splits[ 6 ],
+                  hintType: splits[ 7 ],
+                  hint: splits[ 8 ],
+                  uploadedAt: splits[ 9 ],
                   version,
-                };
+                }
 
-                this.props.navigation.replace('Login', {
+                this.props.navigation.replace( 'Login', {
                   trustedContactRequest,
-                });
+                } )
               }
-            } else if (splits[4] === 'rk') {
+            } else if ( splits[ 4 ] === 'rk' ) {
               const recoveryRequest = {
                 isRecovery: true,
-                requester: splits[5],
-                encryptedKey: splits[6],
-                hintType: splits[7],
-                hint: splits[8],
-              };
-              this.props.navigation.replace('Login', { recoveryRequest });
-            } else if (splits[4] === 'rrk') {
+                requester: splits[ 5 ],
+                encryptedKey: splits[ 6 ],
+                hintType: splits[ 7 ],
+                hint: splits[ 8 ],
+              }
+              this.props.navigation.replace( 'Login', {
+                recoveryRequest
+              } )
+            } else if ( splits[ 4 ] === 'rrk' ) {
               Alert.alert(
                 'Restoration link Identified',
                 'Restoration links only works during restoration mode',
-              );
-            } else if (url.includes('fastbitcoins')) {
-              const userKey = url.substr(url.lastIndexOf('/') + 1);
+              )
+            } else if ( url.includes( 'fastbitcoins' ) ) {
+              const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
 
-              this.props.navigation.navigate('Login', { userKey });
+              this.props.navigation.navigate( 'Login', {
+                userKey
+              } )
             } else {
-              const EmailToken = url.substr(url.lastIndexOf('/') + 1);
+              const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
 
-              this.props.navigation.navigate('SignUpDetails', { EmailToken });
+              this.props.navigation.navigate( 'SignUpDetails', {
+                EmailToken
+              } )
             }
           }
         } else {
-          this.props.navigation.replace('PasscodeConfirm');
+          this.props.navigation.replace( 'PasscodeConfirm' )
         }
-      }, 4000);
+      }, 4000 )
 
-    } catch (err) {
-      (this.errorBottomSheet as any).current.snapTo(1);
+    } catch ( err ) {
+      ( this.errorBottomSheet as any ).current.snapTo( 1 )
     }
   };
 
   render() {
-    // console.log('lastSeen', this.props.lastSeen);
     return (
       <View style={styles.container}>
         <Video
-          source={require('./../assets/video/splash_animation.mp4')}
+          source={require( './../assets/video/splash_animation.mp4' )}
           style={{
             flex: 1,
           }}
@@ -213,8 +224,8 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('35%')
-              : hp('40%'),
+              ? hp( '35%' )
+              : hp( '40%' ),
           ]}
           renderContent={() => (
             <ErrorModalContents
@@ -223,33 +234,35 @@ class Launch extends Component<HomePropsTypes, HomeStateTypes> {
               proceedButtonText={'Open Setting'}
               isIgnoreButton={true}
               onPressProceed={() => {
-                (this.errorBottomSheet as any).current.snapTo(0);
+                ( this.errorBottomSheet as any ).current.snapTo( 0 )
               }}
               onPressIgnore={() => {
-                (this.errorBottomSheet as any).current.snapTo(0);
+                ( this.errorBottomSheet as any ).current.snapTo( 0 )
               }}
               isBottomImage={true}
-              bottomImage={require('../assets/images/icons/errorImage.png')}
+              bottomImage={require( '../assets/images/icons/errorImage.png' )}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                (this.errorBottomSheet as any).current.snapTo(0);
+                ( this.errorBottomSheet as any ).current.snapTo( 0 )
               }}
             />
           )}
         />
       </View>
-    );
+    )
   }
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   container: {
     flex: 1,
     backgroundColor: Colors.white,
   },
-});
+} )
 
-export default connect(null, { initializeDB })(Launch);
+export default connect( null, {
+  initializeDB
+} )( Launch )

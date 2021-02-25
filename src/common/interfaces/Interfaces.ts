@@ -1,12 +1,7 @@
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
-import TestAccount from '../../bitcoin/services/accounts/TestAccount';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import S3Service from '../../bitcoin/services/sss/S3Service';
 import {
   MetaShare,
   EncDynamicNonPMDD,
-} from '../../bitcoin/utilities/Interface';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+} from '../../bitcoin/utilities/Interface'
 
 export interface DynamicNonPMDD {
   META_SHARES?: MetaShare[];
@@ -55,5 +50,5 @@ export interface Database {
   };
   DECENTRALIZED_BACKUP: DecentralizedBackup;
   SERVICES?: ServicesJSON;
-  VERSION: String;
+  VERSION: string;
 }

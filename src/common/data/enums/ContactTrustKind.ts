@@ -15,6 +15,6 @@ enum ContactTrustKind {
    * the user's wallet (or vice-versa).
    */
   OTHER,
-};
+}
 
-export default ContactTrustKind;
+export default ContactTrustKind

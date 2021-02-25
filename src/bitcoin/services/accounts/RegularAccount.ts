@@ -1,17 +1,19 @@
-import BaseAccount from '../../utilities/accounts/BaseAccount';
+import BaseAccount from '../../utilities/accounts/BaseAccount'
 import {
   Transactions,
   DerivativeAccounts,
   TransactionDetails,
-} from '../../utilities/Interface';
+} from '../../utilities/Interface'
 
 export default class RegularAccount extends BaseAccount {
-  public static fromJSON = (json: string) => {
-    const { hdWallet } = JSON.parse(json);
+  public static fromJSON = ( json: string ) => {
+    const { hdWallet } = JSON.parse( json )
     const {
       mnemonic,
       passphrase,
       purpose,
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -19,7 +21,10 @@ export default class RegularAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -29,6 +34,8 @@ export default class RegularAccount extends BaseAccount {
       mnemonic: string;
       passphrase: string;
       purpose: number;
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -39,6 +46,7 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -46,14 +54,24 @@ export default class RegularAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
       feeRates: any;
-    } = hdWallet;
+    } = hdWallet
 
-    return new RegularAccount(mnemonic, passphrase, purpose, {
+    return new RegularAccount( mnemonic, passphrase, purpose, {
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -61,13 +79,16 @@ export default class RegularAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
       feeRates,
-    });
+    } )
   };
 
   constructor(
@@ -75,6 +96,8 @@ export default class RegularAccount extends BaseAccount {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -82,6 +105,7 @@ export default class RegularAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -89,6 +113,14 @@ export default class RegularAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -96,6 +128,6 @@ export default class RegularAccount extends BaseAccount {
       feeRates: any;
     },
   ) {
-    super(mnemonic, passphrase, dPathPurpose, stateVars);
+    super( mnemonic, passphrase, dPathPurpose, stateVars )
   }
 }

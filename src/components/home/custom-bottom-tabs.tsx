@@ -1,23 +1,24 @@
 import React, { useMemo } from 'react'
 import { View, Image, StyleSheet, TouchableOpacity, ImageSourcePropType } from 'react-native'
-import Colors from '../../common/Colors';
-import DeviceInfo from 'react-native-device-info';
+import Colors from '../../common/Colors'
+import DeviceInfo from 'react-native-device-info'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
+} from 'react-native-responsive-screen'
 
 export enum BottomTab {
   Transactions,
-  Add,
+  FriendsAndFamily,
   QR,
   More,
 }
 
 export interface Props {
+  isEnabled: boolean;
   tabBarZIndex?: number;
-  onSelect: (tab: BottomTab) => void;
-  selectedTab: BottomTab | null;
+  selectedTab?: BottomTab | null;
+  onSelect: ( tab: BottomTab ) => void;
 }
 
 type TabItem = {
@@ -29,25 +30,25 @@ type TabItem = {
 const tabItems: TabItem[] = [
   {
     tab: BottomTab.Transactions,
-    activeImageSource: require('../../assets/images/HomePageIcons/icon_transactions_active.png'),
-    inactiveImageSource: require('../../assets/images/HomePageIcons/icon_transactions.png'),
+    activeImageSource: require( '../../assets/images/HomePageIcons/icon_transactions_active.png' ),
+    inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_transactions.png' ),
   },
   {
-    tab: BottomTab.Add,
-    activeImageSource: require('../../assets/images/HomePageIcons/icon_add_active.png'),
-    inactiveImageSource: require('../../assets/images/HomePageIcons/icon_add.png'),
+    tab: BottomTab.FriendsAndFamily,
+    activeImageSource: require( '../../assets/images/icons/icon_contact.png' ),
+    inactiveImageSource: require( '../../assets/images/icons/icon_contact.png' ),
   },
   {
     tab: BottomTab.QR,
-    activeImageSource: require('../../assets/images/HomePageIcons/icon_qr_active.png'),
-    inactiveImageSource: require('../../assets/images/HomePageIcons/icon_qr.png'),
+    activeImageSource: require( '../../assets/images/HomePageIcons/icon_qr_active.png' ),
+    inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_qr.png' ),
   },
   {
     tab: BottomTab.More,
-    activeImageSource: require('../../assets/images/HomePageIcons/icon_more.png'),
-    inactiveImageSource: require('../../assets/images/HomePageIcons/icon_more.png'),
+    activeImageSource: require( '../../assets/images/HomePageIcons/icon_more.png' ),
+    inactiveImageSource: require( '../../assets/images/HomePageIcons/icon_more.png' ),
   },
-];
+]
 
 
 type TabViewProps = {
@@ -56,15 +57,15 @@ type TabViewProps = {
   onPress: () => void;
 }
 
-const Tab: React.FC<TabViewProps> = ({
+const Tab: React.FC<TabViewProps> = ( {
   tabItem,
   isActive,
   onPress,
-}: TabViewProps) => {
+}: TabViewProps ) => {
 
-  const imageSource = useMemo(() => {
-    return isActive ? tabItem.activeImageSource : tabItem.inactiveImageSource;
-  }, [tabItem.activeImageSource, tabItem.inactiveImageSource, isActive]);
+  const imageSource = useMemo( () => {
+    return isActive ? tabItem.activeImageSource : tabItem.inactiveImageSource
+  }, [ tabItem.activeImageSource, tabItem.inactiveImageSource, isActive ] )
 
   return (
     <TouchableOpacity
@@ -78,33 +79,40 @@ const Tab: React.FC<TabViewProps> = ({
         />
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
-const CustomBottomTabs: React.FC<Props> = ({
+const CustomBottomTabs: React.FC<Props> = ( {
+  isEnabled,
   tabBarZIndex = 1,
   onSelect,
   selectedTab,
-}: Props) => {
+}: Props ) => {
   return (
-    <View style={{ ...styles.bottomTabBarContainer, zIndex: tabBarZIndex }}>
-      {tabItems.map((tabItem, index) => {
+    <View style={{
+      ...styles.bottomTabBarContainer, zIndex: tabBarZIndex
+    }}>
+      {tabItems.map( ( tabItem, index ) => {
         return (
           <Tab
             key={index}
             tabItem={tabItem}
             isActive={selectedTab == tabItem.tab}
-            onPress={() => onSelect(tabItem.tab)}
+            onPress={() => {
+              if ( isEnabled ) {
+                onSelect( tabItem.tab )
+              }
+            }}
           />
-        );
-      })}
+        )
+      } )}
     </View>
   )
 }
 
-export const TAB_BAR_HEIGHT = hp('12%');
+export const TAB_BAR_HEIGHT = hp( '12%' )
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
 
   bottomTabBarContainer: {
     backgroundColor: Colors.white,
@@ -120,11 +128,11 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     borderTopColor: Colors.borderColor,
     borderTopWidth: 1,
-    paddingBottom: DeviceInfo.hasNotch() ? hp('4%') : 0,
+    paddingBottom: DeviceInfo.hasNotch() ? hp( '4%' ) : 0,
   },
 
   tabBarTabView: {
-    padding: wp('5%'),
+    padding: wp( '5%' ),
   },
 
   tab: {
@@ -136,6 +144,6 @@ const styles = StyleSheet.create({
     height: 21,
     resizeMode: 'contain',
   },
-})
+} )
 
 export default CustomBottomTabs

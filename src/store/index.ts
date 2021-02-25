@@ -1,33 +1,38 @@
-import { applyMiddleware, createStore, combineReducers } from 'redux';
-import { AsyncStorage as storage } from 'react-native';
-import thunk from 'redux-thunk';
-import createSagaMiddleware from 'redux-saga';
-import { call, all, spawn } from 'redux-saga/effects';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { applyMiddleware, createStore, combineReducers } from 'redux'
+import { AsyncStorage as storage } from 'react-native'
+import thunk from 'redux-thunk'
+import createSagaMiddleware from 'redux-saga'
+import { call, all, spawn } from 'redux-saga/effects'
+import { composeWithDevTools } from 'redux-devtools-extension'
 
-import storageReducer from './reducers/storage';
-import setupAndAuthReducer from './reducers/setupAndAuth';
-import accountsReducer from './reducers/accounts';
-import sssReducer from './reducers/sss';
-import fBTCReducers from './reducers/fbtc';
-import notificationsReducer from './reducers/notifications';
-import trustedContactsReducer from './reducers/trustedContacts';
-import { persistStore, persistReducer } from 'redux-persist';
-import preferencesReducer from './reducers/preferences';
-import loaders from './reducers/loaders';
+import storageReducer from './reducers/storage'
+import setupAndAuthReducer from './reducers/setupAndAuth'
+import accountsReducer from './reducers/accounts'
+import sssReducer from './reducers/sss'
+import fBTCReducers from './reducers/fbtc'
+import notificationsReducer from './reducers/notifications'
+import trustedContactsReducer from './reducers/trustedContacts'
+import { persistStore, persistReducer } from 'redux-persist'
+import preferencesReducer from './reducers/preferences'
+import loaders from './reducers/loaders'
+import swanIntegrationReducer from './reducers/SwanIntegration'
+import wyreIntegrationReducer from './reducers/WyreIntegration'
+import rampIntegrationReducer from './reducers/RampIntegration'
+import VersionHistoryReducer from './reducers/versionHistory'
+
 
 const config = {
   key: 'root', // key is required
   storage, // storage is now required
-  blacklist: ['setupAndAuth', 'loaders'],
-};
+  blacklist: [ 'setupAndAuth', 'loaders' ],
+}
 
 import {
   initDBWatcher,
   fetchDBWatcher,
   insertDBWatcher,
   servicesEnricherWatcher,
-} from './sagas/storage';
+} from './sagas/storage'
 
 import {
   initSetupWatcher,
@@ -35,7 +40,7 @@ import {
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
-} from './sagas/setupAndAuth';
+} from './sagas/setupAndAuth'
 
 import {
   fetchTransactionsWatcher,
@@ -44,20 +49,27 @@ import {
   testcoinsWatcher,
   transferST3Watcher,
   accumulativeTxAndBalWatcher,
-  accountsSyncWatcher,
   fetchBalanceTxWatcher,
   alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  fetchDerivativeAccAddressWatcher,
-  startupSyncWatcher,
+  validateTwoFAWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
+  addNewAccountShellWatcher,
   syncViaXpubAgentWatcher,
-} from './sagas/accounts';
+  updateAccountSettingsWatcher,
+  reassignTransactionsWatcher,
+  mergeAccountShellsWatcher,
+  refreshAccountShellWatcher,
+  feeAndExchangeRatesWatcher,
+  addNewSecondarySubAccountWatcher,
+  autoSyncShellsWatcher,
+  blindRefreshWatcher
+} from './sagas/accounts'
 
 import {
   initHCWatcher,
@@ -81,19 +93,19 @@ import {
   updateWalletImageWatcher,
   fetchWalletImageWatcher,
   sharePersonalCopyWatcher,
-} from './sagas/sss';
+} from './sagas/sss'
 
 import {
   accountSyncWatcher,
   getQuoteWatcher,
   executeOrderWatcher,
   getBalancesWatcher,
-} from './sagas/fbtc';
+} from './sagas/fbtc'
 
 import {
   updateFCMTokensWatcher,
   fetchNotificationsWatcher,
-} from './sagas/notifications';
+} from './sagas/notifications'
 
 import {
   initializedTrustedContactWatcher,
@@ -107,7 +119,25 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
-} from './sagas/trustedContacts';
+} from './sagas/trustedContacts'
+
+import nodeSettingsReducer from './reducers/nodeSettings'
+import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+
+import {
+  fetchSwanAuthenticationUrlWatcher,
+} from './sagas/SwanIntegration'
+
+import {
+  fetchWyreReservationWatcher,
+  fetchWyreReceiveAddressWatcher
+} from './sagas/WyreIntegration'
+import {
+  fetchRampReservationWatcher,
+  fetchRampReceiveAddressWatcher
+} from './sagas/RampIntegration'
+import { versionHistoryWatcher } from './sagas/versionHistory'
+import walletRescanningReducer from './reducers/wallet-rescanning'
 
 const rootSaga = function* () {
   const sagas = [
@@ -133,17 +163,24 @@ const rootSaga = function* () {
     transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
-    accountsSyncWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
+    validateTwoFAWatcher,
     removeTwoFAWatcher,
     fetchDerivativeAccXpubWatcher,
-    fetchDerivativeAccAddressWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
-    startupSyncWatcher,
+    feeAndExchangeRatesWatcher,
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
+    refreshAccountShellWatcher,
+    addNewAccountShellWatcher,
+    addNewSecondarySubAccountWatcher,
+    updateAccountSettingsWatcher,
+    reassignTransactionsWatcher,
+    mergeAccountShellsWatcher,
+    autoSyncShellsWatcher,
+    blindRefreshWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -174,6 +211,11 @@ const rootSaga = function* () {
     executeOrderWatcher,
     getBalancesWatcher,
 
+    // Node Settings
+    savePersonalNodeConfigurationWatcher,
+    connectToBitHyveNodeWatcher,
+    restorePersonalNodeConfigurationWatcher,
+
     // Notifications
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
@@ -190,47 +232,67 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
-  ];
+
+    // Swan Integration
+    fetchSwanAuthenticationUrlWatcher,
+
+    // Wyre Integration
+    fetchWyreReservationWatcher,
+    fetchWyreReceiveAddressWatcher,
+
+    // Ramp Integration
+    fetchRampReservationWatcher,
+    fetchRampReceiveAddressWatcher,
+
+    //VersionHistory integration
+    versionHistoryWatcher,
+  ]
 
   yield all(
-    sagas.map((saga) =>
-      spawn(function* () {
-        while (true) {
+    sagas.map( ( saga ) =>
+      spawn( function* () {
+        while ( true ) {
           try {
-            yield call(saga);
-            break;
-          } catch (e) {
-            console.log(e);
+            yield call( saga )
+            break
+          } catch ( e ) {
+            console.log( e )
           }
         }
-      }),
-    ),
-  );
-};
+      } )
+    )
+  )
+}
 
-const rootReducer = combineReducers({
+const rootReducer = combineReducers( {
   storage: storageReducer,
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
   fbtc: fBTCReducers,
+  nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,
-});
+  swanIntegration: swanIntegrationReducer,
+  walletRescanning: walletRescanningReducer,
+  wyreIntegration: wyreIntegrationReducer,
+  rampIntegration: rampIntegrationReducer,
+  versionHistory: VersionHistoryReducer,
+} )
 
 export default function makeStore() {
-  const sagaMiddleware = createSagaMiddleware();
-  const reducers = persistReducer(config, rootReducer);
+  const sagaMiddleware = createSagaMiddleware()
+  const reducers = persistReducer( config, rootReducer )
   const storeMiddleware = composeWithDevTools(
-    applyMiddleware(sagaMiddleware, thunk),
-  );
+    applyMiddleware( sagaMiddleware, thunk )
+  )
 
-  const store = createStore(reducers, storeMiddleware);
+  const store = createStore( reducers, storeMiddleware )
 
-  persistStore(store);
-  sagaMiddleware.run(rootSaga);
+  persistStore( store )
+  sagaMiddleware.run( rootSaga )
 
-  return store;
+  return store
 }

@@ -1,7 +1,7 @@
 import {
   DecentralizedBackup,
   ServicesJSON,
-} from '../../common/interfaces/Interfaces';
+} from '../../common/interfaces/Interfaces'
 
 export interface InputUTXOs {
   txId: string;
@@ -28,17 +28,68 @@ export interface TransactionDetails {
   txid: string;
   status: string;
   confirmations: number;
+
+  /**
+   * Sats per byte
+   */
   fee: string;
+
+  /**
+   * UTC string
+   */
   date: string;
+
+  /**
+   * Inbound(Received)/Outbound(Sent) transaction
+   */
   transactionType: string;
+
+  /**
+   * Amount in Satoshis.
+   */
   amount: number;
+
+  /**
+   * Account(sub) to which the transaction belongs
+   */
   accountType: string;
+
+  /**
+   * Account(primary-sub) to which the transaction belongs
+   */
   primaryAccType?: string;
+
+  /**
+   * Name of the contact in case of an inbound transaction from trusted-contact
+   */
   contactName?: string;
+
+  /**
+   * Outbound transaction's destination
+   */
   recipientAddresses?: string[];
+
+  /**
+   * Inbound transaction's source
+   */
   senderAddresses?: string[];
+
   blockTime?: number;
+
+  /**
+   * Note/message attached w/ the transaction(Donation acc specific)
+   */
   message?: string;
+
+   /**
+   * Address corresponding to which this tx has been fetched
+   */
+  address?: string
+}
+
+export interface Balances {
+  confirmed: number;
+  unconfirmed: number;
 }
 
 export interface Transactions {
@@ -93,7 +144,6 @@ export interface DerivativeAccountElements {
   xpub: string;
   xpubId: string;
   xpriv: string;
-  accountName?: string;
   usedAddresses?: string[];
   nextFreeAddressIndex?: number;
   nextFreeChangeAddressIndex?: number;
@@ -105,13 +155,32 @@ export interface DerivativeAccountElements {
     address: string;
     status?: any;
   }[];
+  unconfirmedUTXOs?: {
+    txId: string;
+    vout: number;
+    value: number;
+    address: string;
+    status?: any;
+  }[];
   balances?: {
     balance: number;
     unconfirmedBalance: number;
   };
   transactions?: Transactions;
+  txIdMap?: {[txid: string]: string[]};
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
   newTransactions?: TransactionDetails[];
+  blindGeneration?: boolean // temporarily generated during blind refresh
+}
+
+export enum DerivativeAccountTypes {
+  SUB_PRIMARY_ACCOUNT = 'SUB_PRIMARY_ACCOUNT',
+  FAST_BITCOINS = 'FAST_BITCOINS',
+  TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
+  DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+  WYRE = 'WYRE',
+  RAMP = 'RAMP'
 }
 
 // Base Dervative Account
@@ -119,6 +188,8 @@ export interface DerivativeAccount {
   series: number;
   instance: {
     max: number;
+
+    // TODO: Is this a count of some sort?
     using: number;
   };
   [accounts: number]: DerivativeAccountElements;
@@ -160,7 +231,6 @@ export interface DonationDerivativeAccountElements
   disableAccount: boolean;
 }
 
-// Base Dervative Account
 export interface DonationDerivativeAccount {
   series: number;
   instance: {
@@ -169,11 +239,58 @@ export interface DonationDerivativeAccount {
   };
   [accounts: number]: DonationDerivativeAccountElements;
 }
+
+export interface SubPrimaryDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface SubPrimaryDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: SubPrimaryDerivativeAccountElements;
+}
+
+export interface WyreDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface WyreDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: WyreDerivativeAccountElements;
+}
+
+export interface RampDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface RampDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: RampDerivativeAccountElements;
+}
+
 export interface DerivativeAccounts {
   [accountType: string]:
     | DerivativeAccount
     | TrustedContactDerivativeAccount
-    | DonationDerivativeAccount;
+    | DonationDerivativeAccount
+    | SubPrimaryDerivativeAccount;
 }
 
 export enum notificationType {
@@ -280,8 +397,8 @@ export interface Contacts {
     secondaryKey?: string;
     contactsPubKey?: string;
     contactsWalletName?: string;
-    isWard?: Boolean;
-    isGuardian?: Boolean;
+    isWard?: boolean;
+    isGuardian?: boolean;
     walletID?: string;
     FCMs?: string[];
     ephemeralChannel?: {
@@ -293,7 +410,7 @@ export interface Contacts {
       address: string;
       data?: TrustedData[];
     };
-    lastSeen?: Number;
+    lastSeen?: number;
     trustedAddress?: string;
     trustedTestAddress?: string;
   };
@@ -305,6 +422,9 @@ export interface WalletImage {
   ASYNC_DATA?: {
     [identifier: string]: string;
   };
+  STATE_DATA?: {
+    [identifier: string]: string;
+  };
 }
 
 export interface EncryptedImage {
@@ -312,4 +432,23 @@ export interface EncryptedImage {
   DECENTRALIZED_BACKUP?: string;
   SERVICES?: string;
   ASYNC_DATA?: string;
+  STATE_DATA?: string;
+}
+//VersionHistory
+export interface VersionHistory {
+  id: string;
+  version: string;
+  buildNumber: string;
+  versionName: string;
+  title: string;
+  date: Date;
+}
+
+
+export interface AverageTxFees {
+  [priority: string]: {
+    averageTxFee: number,
+    feePerByte: number,
+    estimatedBlocks: number,
+  },
 }

@@ -35,20 +35,6 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
-	<key>Fabric</key>
-	<dict>
-		<key>APIKey</key>
-		<string>2d0b58f102661fcabd3be54e6516854e2b0983f6</string>
-		<key>Kits</key>
-		<array>
-			<dict>
-				<key>KitInfo</key>
-				<dict/>
-				<key>KitName</key>
-				<string>Crashlytics</string>
-			</dict>
-		</array>
-	</dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
@@ -74,7 +60,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>$(PRODUCT_NAME) would like to use your camera for scanning QR codes.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Address book details like name and image are used for you to better recognize your Hexa Friends and Family contacts. Don’t worry, they don’t get stored anywhere else and are for your eyes only.</string>
+	<string>Address book details are only stored locally</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allow HEXA to use your location</string>
 	<key>NSLocationAlwaysUsageDescription</key>
@@ -139,6 +125,11 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

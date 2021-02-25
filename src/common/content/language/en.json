@@ -1,0 +1,23 @@
+{
+    "common": {
+        "ok": "ok",
+        "proceed": "Proceed",
+        "continue": "Continue",
+        "done": "Done",
+        "cancel": "Cancel"
+    },
+    "login": {
+        "welcome": "Welcome back!",
+        "enter_your": "Please enter your ",
+        "passcode": "passcode",
+        "tos": "Terms of Service",
+        "tos_agree": "By proceeding to the next step, you agree to our "
+    },
+    "home": {
+        "the_wallet_backup": "The wallet backup is ",
+        "not_secured": "not secured!",
+        "manage_backup": "Manage Backup",
+        "add_new": "Add New",
+        "buy": "Buy"
+    }
+}

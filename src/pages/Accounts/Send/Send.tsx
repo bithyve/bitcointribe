@@ -1,56 +1,55 @@
-import React, { Component, createRef, ReactElement } from 'react';
-import { View, Image, Text, StyleSheet, FlatList, Alert } from 'react-native';
-import Colors from '../../../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import {
-  heightPercentageToDP,
-} from 'react-native-responsive-screen';
-import BottomSheet from 'reanimated-bottom-sheet';
+import React, { Component, createRef, ReactElement } from 'react'
+import { View, Image, Text, StyleSheet, FlatList, Alert } from 'react-native'
+import Colors from '../../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
+import BottomSheet from 'reanimated-bottom-sheet'
 import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   DONATION_ACCOUNT,
-} from '../../../common/constants/serviceTypes';
-import SmallHeaderModal from '../../../components/SmallHeaderModal';
-import { TrustedContactDerivativeAccountElements } from '../../../bitcoin/utilities/Interface';
-import RegularAccount from '../../../bitcoin/services/accounts/RegularAccount';
-import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService';
+  WYRE,
+  RAMP
+} from '../../../common/constants/serviceTypes'
+import SmallHeaderModal from '../../../components/SmallHeaderModal'
+import { TrustedContactDerivativeAccountElements } from '../../../bitcoin/utilities/Interface'
+import RegularAccount from '../../../bitcoin/services/accounts/RegularAccount'
+import TrustedContactsService from '../../../bitcoin/services/TrustedContactsService'
 import {
   addTransferDetails,
   clearTransfer,
-  removeTwoFA,
-  setAverageTxFee,
-} from '../../../store/actions/accounts';
-import BottomInfoBox from '../../../components/BottomInfoBox';
-import SendHelpContents from '../../../components/Helper/SendHelpContents';
-import Toast from '../../../components/Toast';
-import config from '../../../bitcoin/HexaConfig';
-import AccountsListSend from '../AccountsListSend';
-import { connect } from 'react-redux';
-import { withNavigationFocus, NavigationScreenConfig } from 'react-navigation';
-import idx from 'idx';
+} from '../../../store/actions/accounts'
+import BottomInfoBox from '../../../components/BottomInfoBox'
+import SendHelpContents from '../../../components/Helper/SendHelpContents'
+import Toast from '../../../components/Toast'
+import config from '../../../bitcoin/HexaConfig'
+import AccountsListSend from '../AccountsListSend'
+import { connect } from 'react-redux'
+import { withNavigationFocus, NavigationScreenConfig } from 'react-navigation'
+import idx from 'idx'
 import {
-  setTwoFASetup,
   initialKnowMoreSendSheetShown,
-} from '../../../store/actions/preferences';
-import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner';
-import { NavigationStackOptions } from 'react-navigation-stack';
-import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions';
-import KnowMoreButton from '../../../components/KnowMoreButton';
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-import NavStyles from '../../../common/Styles/NavStyles';
-import HeadingStyles from '../../../common/Styles/HeadingStyles';
-import RecipientSelectionStrip from '../../../components/send/RecipientSelectionStrip';
-import RecipientAddressTextInputSection from '../../../components/send/RecipientAddressTextInputSection';
-import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view';
+} from '../../../store/actions/preferences'
+import CoveredQRCodeScanner from '../../../components/qr-code-scanning/CoveredQRCodeScanner'
+import { NavigationStackOptions } from 'react-navigation-stack'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import KnowMoreButton from '../../../components/KnowMoreButton'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import NavStyles from '../../../common/Styles/NavStyles'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
+import RecipientSelectionStrip from '../../../components/send/RecipientSelectionStrip'
+import RecipientAddressTextInputSection from '../../../components/send/RecipientAddressTextInputSection'
+import { KeyboardAwareSectionList } from 'react-native-keyboard-aware-scroll-view'
 import {
   ContactRecipientDescribing,
   AccountRecipientDescribing,
   makeContactRecipientDescription,
-} from '../../../common/data/models/interfaces/RecipientDescribing';
-import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin';
+} from '../../../common/data/models/interfaces/RecipientDescribing'
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import SecureAccount from '../../../bitcoin/services/accounts/SecureAccount'
+import { getAccountIcon, getAccountTitle } from './utils'
 
 export enum SectionKind {
   SCAN_QR,
@@ -59,35 +58,31 @@ export enum SectionKind {
   SELECT_SUB_ACCOUNTS,
 }
 
-const sectionListItemKeyExtractor = (index) => String(index);
+const sectionListItemKeyExtractor = ( index ) => String( index )
 
 function renderSectionHeader(
   sectionKind: SectionKind,
   accountKind: string,
 ): ReactElement | null {
-  switch (sectionKind) {
-    case SectionKind.SELECT_CONTACTS:
-      return <Text style={styles.listSectionHeading}>Send To Contacts</Text>;
-    case SectionKind.SELECT_SUB_ACCOUNTS:
-      if (accountKind != TEST_ACCOUNT) {
-        return <Text style={styles.listSectionHeading}>Send To Accounts</Text>;
-      }
+  switch ( sectionKind ) {
+      case SectionKind.SELECT_CONTACTS:
+        return <Text style={styles.listSectionHeading}>Send To Contacts</Text>
+      case SectionKind.SELECT_SUB_ACCOUNTS:
+        if ( accountKind != TEST_ACCOUNT ) {
+          return <Text style={styles.listSectionHeading}>Send To Accounts</Text>
+        }
   }
 }
 
 interface SendPropsTypes {
   navigation: any;
   addTransferDetails: any;
-  removeTwoFA: any;
   clearTransfer: any;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
   accountsState: any; // TODO: Strongly type this
   trustedContactsInfo: any;
-  isTwoFASetupDone: boolean;
   hasShownInitialKnowMoreSendSheet: boolean;
-  setTwoFASetup: any;
-  setAverageTxFee: any;
   initialKnowMoreSendSheetShown: Function;
 }
 
@@ -102,9 +97,6 @@ interface SendStateTypes {
   sweepSecure: any;
   spendableBalance: any;
   derivativeAccountDetails: { type: string; number: number };
-  getServiceType: any;
-  carouselIndex: number;
-  averageTxFees: any;
   selectedContacts: ContactRecipientDescribing[];
   selectedSubAccounts: AccountRecipientDescribing[];
 }
@@ -114,18 +106,16 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
 
   knowMoreBottomSheetRef = createRef<BottomSheet>();
 
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
 
-    const accountKind = this.props.navigation.getParam('serviceType') || REGULAR_ACCOUNT;
-
+    const accountKind = this.props.navigation.getParam( 'serviceType' )
     this.state = {
       trustedContacts: [],
       isShowingKnowMoreSheet: false,
       serviceType: accountKind,
-      sweepSecure: this.props.navigation.getParam('sweepSecure'),
-      spendableBalance: this.props.navigation.getParam('spendableBalance'),
-      averageTxFees: this.props.navigation.getParam('averageTxFees'),
+      sweepSecure: this.props.navigation.getParam( 'sweepSecure' ),
+      spendableBalance: this.props.navigation.getParam( 'spendableBalance' ),
       derivativeAccountDetails: this.props.navigation.getParam(
         'derivativeAccountDetails',
       ),
@@ -142,466 +132,466 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           account_name: 'Checking Account',
           type: REGULAR_ACCOUNT,
           checked: false,
-          image: require('../../../assets/images/icons/icon_regular_account.png'),
+          image: require( '../../../assets/images/icons/icon_regular_account.png' ),
         },
         {
           id: SECURE_ACCOUNT,
           account_name: 'Savings Account',
           type: SECURE_ACCOUNT,
           checked: false,
-          image: require('../../../assets/images/icons/icon_secureaccount_white.png'),
+          image: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
         },
       ],
-      getServiceType: this.props.navigation.getParam('getServiceType') || null,
-      carouselIndex: this.props.navigation.getParam('carouselIndex') || null,
+
       selectedContacts: [],
       selectedSubAccounts: [],
-    };
+    }
+    this.props.clearTransfer( accountKind )
   }
 
   componentDidMount = () => {
-    this.props.navigation.setParams({
+    this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
-    });
-    this.updateAccountData();
-    this.getAccountBalances();
-    console.log({ avgTxFee: this.state.averageTxFees });
-    if (this.state.serviceType === SECURE_ACCOUNT) {
-      this.twoFASetupMethod();
-    }
-
+    } )
+    this.updateAccountData()
+    this.getAccountBalances()
     if (
       this.state.serviceType === TEST_ACCOUNT &&
       !this.props.hasShownInitialKnowMoreSendSheet
     ) {
-      this.knowMoreBottomSheetRef.current?.snapTo(1);
+      this.knowMoreBottomSheetRef.current?.snapTo( 1 )
     }
 
-    this.setRecipientAddress();
+    this.setRecipientAddress()
 
-    if (this.props.regularAccount.hdWallet.derivativeAccounts) {
-      this.updateAddressBook();
+    if ( this.props.regularAccount.hdWallet.derivativeAccounts ) {
+      this.updateAddressBook()
     }
   };
 
-  componentDidUpdate = (prevProps, prevState) => {
-    if (prevProps.accountsState !== this.props.accountsState) {
-      this.getAccountBalances();
+  componentDidUpdate = ( prevProps, prevState ) => {
+    if ( prevProps.accountsState !== this.props.accountsState ) {
+      this.getAccountBalances()
 
-      const accountKind = this.state.serviceType;
-      const selectedRecipients = this.props.accountsState[accountKind].transfer.details;
+      const accountKind = this.state.serviceType
+      const selectedRecipients = this.props.accountsState[ accountKind ].transfer
+        .details
 
-      const selectedContacts = selectedRecipients.filter((data) => {
-        // TODO: This seems to be the way the backend is distinguishing between
-        // an "account" recipient and a "contact" recipient. There should be a way
-        // to refactor this around leveraging the `RecipientKind` enum.
+      const selectedContacts = selectedRecipients
+        .filter( ( data ) => {
+          // TODO: This seems to be the way the backend is distinguishing between
+          // an "account" recipient and a "contact" recipient. There should be a way
+          // to refactor this around leveraging the `RecipientKind` enum.
 
-        return data.selectedContact.hasOwnProperty('account_name') == false;
-      })
+          return data.selectedContact.hasOwnProperty( 'account_name' ) == false
+        } )
 
-      // These items are currently being structured as objects with a `selectedContact` key.
-      .map(object => object.selectedContact);
+        // These items are currently being structured as objects with a `selectedContact` key.
+        .map( ( object ) => object.selectedContact )
 
-      this.setState({ selectedContacts });
+      this.setState( {
+        selectedContacts 
+      } )
     }
 
     if (
       prevProps.regularAccount.hdWallet.derivativeAccounts !==
       this.props.regularAccount.hdWallet.derivativeAccounts
     ) {
-      this.updateAddressBook();
+      this.updateAddressBook()
     }
 
-    if (prevState.recipientAddress !== this.state.recipientAddress) {
-      this.setRecipientAddress();
+    if ( prevState.recipientAddress !== this.state.recipientAddress ) {
+      this.setRecipientAddress()
     }
   };
 
   toggleKnowMoreSheet = () => {
-    const shouldShow = !this.state.isShowingKnowMoreSheet;
+    const shouldShow = !this.state.isShowingKnowMoreSheet
 
-    this.setState({ isShowingKnowMoreSheet: shouldShow }, () => {
-      if (shouldShow) {
-        this.knowMoreBottomSheetRef.current?.snapTo(1);
+    this.setState( {
+      isShowingKnowMoreSheet: shouldShow 
+    }, () => {
+      if ( shouldShow ) {
+        this.knowMoreBottomSheetRef.current?.snapTo( 1 )
       } else {
-        this.knowMoreBottomSheetRef.current?.snapTo(0);
+        this.knowMoreBottomSheetRef.current?.snapTo( 0 )
       }
-    });
+    } )
   };
 
   updateAccountData = () => {
+    // includes 2FA based accounts post setup validation
+    const is2FAActive = !( this.props.accountsState[ SECURE_ACCOUNT ].service as SecureAccount ).secureHDWallet.twoFASetup
+
     const defaultAccountData = [
       {
         id: REGULAR_ACCOUNT,
         account_name: 'Checking Account',
         type: REGULAR_ACCOUNT,
         checked: false,
-        image: require('../../../assets/images/icons/icon_regular_account.png'),
+        image: require( '../../../assets/images/icons/icon_regular_account.png' ),
       },
-      {
-        id: SECURE_ACCOUNT,
-        account_name: 'Savings Account',
-        type: SECURE_ACCOUNT,
-        checked: false,
-        image: require('../../../assets/images/icons/icon_secureaccount_white.png'),
-      },
-    ];
+    ]
 
-    const additionalAccountData = [];
-    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
-      const derivativeAccounts = this.props.accountsState[serviceType].service[
+    if( is2FAActive ) defaultAccountData.push( {
+      id: SECURE_ACCOUNT,
+      account_name: 'Savings Account',
+      type: SECURE_ACCOUNT,
+      checked: false,
+      image: require( '../../../assets/images/icons/icon_secureaccount_white.png' ),
+    } )
+
+    const parentAccounts = [ REGULAR_ACCOUNT ]
+    if( is2FAActive ) parentAccounts.push( SECURE_ACCOUNT )
+
+    const additionalAccountData = []
+    for ( const serviceType of parentAccounts ) {
+      const derivativeAccounts = this.props.accountsState[ serviceType ].service[
         serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-      ].derivativeAccounts;
+      ].derivativeAccounts
 
-      for (const accType of config.EJECTED_ACCOUNTS) {
-        if (!derivativeAccounts[accType]) continue;
+      for ( const accType of config.EJECTED_ACCOUNTS ) {
+        if ( !derivativeAccounts[ accType ] ) continue
 
         for (
           let index = 1;
-          index <= derivativeAccounts[accType].instance.using;
+          index <= derivativeAccounts[ accType ].instance.using;
           index++
         ) {
+          const derivativeAccountDetails = {
+            type: accType, number: index
+          }
           const accInstance = {
             id: accType,
             account_number: index,
-            account_name:
-              accType === DONATION_ACCOUNT
-                ? 'Donation Account'
-                : serviceType === REGULAR_ACCOUNT
-                  ? 'Checking Account'
-                  : 'Savings Account',
+            account_name: getAccountTitle( serviceType, derivativeAccountDetails ),
             type: serviceType,
             checked: false,
-            image:
-              accType === DONATION_ACCOUNT
-                ? require('../../../assets/images/icons/icon_donation_account.png')
-                : serviceType === REGULAR_ACCOUNT
-                  ? require('../../../assets/images/icons/icon_regular_account.png')
-                  : require('../../../assets/images/icons/icon_secureaccount_white.png'),
-          };
-          additionalAccountData.push(accInstance);
+            image: getAccountIcon( serviceType, derivativeAccountDetails ) 
+          }
+          additionalAccountData.push( accInstance )
         }
       }
     }
 
-    this.setState({
-      accountData: [...defaultAccountData, ...additionalAccountData],
-    });
+    this.setState( {
+      accountData: [ ...defaultAccountData, ...additionalAccountData ],
+    } )
   };
 
   getAccountBalances = () => {
-    const { accountsState } = this.props;
-    const { serviceType } = this.state;
+    const { accountsState } = this.props
+    const { serviceType } = this.state
 
-    const testBalance = accountsState[TEST_ACCOUNT].service
-      ? accountsState[TEST_ACCOUNT].service.hdWallet.balances.balance +
-      accountsState[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-      : 0;
-    let regularBalance = accountsState[REGULAR_ACCOUNT].service
-      ? accountsState[REGULAR_ACCOUNT].service.hdWallet.balances.balance +
-      accountsState[REGULAR_ACCOUNT].service.hdWallet.balances
-        .unconfirmedBalance
-      : 0;
-    let secureBalance = accountsState[SECURE_ACCOUNT].service
-      ? accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances.balance +
-      accountsState[SECURE_ACCOUNT].service.secureHDWallet.balances
-        .unconfirmedBalance
-      : 0;
+    const testBalance = accountsState[ TEST_ACCOUNT ].service
+      ? accountsState[ TEST_ACCOUNT ].service.hdWallet.balances.balance +
+        accountsState[ TEST_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
+      : 0
+    let regularBalance = accountsState[ REGULAR_ACCOUNT ].service
+      ? accountsState[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
+        accountsState[ REGULAR_ACCOUNT ].service.hdWallet.balances
+          .unconfirmedBalance
+      : 0
+    let secureBalance = accountsState[ SECURE_ACCOUNT ].service
+      ? accountsState[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
+        accountsState[ SECURE_ACCOUNT ].service.secureHDWallet.balances
+          .unconfirmedBalance
+      : 0
 
-    let derivativeBalance = 0;
-    if (serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT) {
-      for (const dAccountType of config.DERIVATIVE_ACC_TO_SYNC) {
-        let derivativeAccount;
+    let derivativeBalance = 0
+    if ( serviceType === REGULAR_ACCOUNT || serviceType === SECURE_ACCOUNT ) {
+      for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
+        let derivativeAccount
 
         // calculating opposite accounts derivative balance for account tiles
-        if (serviceType !== REGULAR_ACCOUNT) {
+        if ( serviceType !== REGULAR_ACCOUNT ) {
           derivativeAccount =
-            accountsState[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
-            dAccountType
-            ];
-        } else if (serviceType !== SECURE_ACCOUNT) {
+            accountsState[ REGULAR_ACCOUNT ].service.hdWallet.derivativeAccounts[
+              dAccountType
+            ]
+        } else if ( serviceType !== SECURE_ACCOUNT ) {
           derivativeAccount =
-            accountsState[SECURE_ACCOUNT].service.secureHDWallet
-              .derivativeAccounts[dAccountType];
+            accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
+              .derivativeAccounts[ dAccountType ]
         }
 
         if (
           serviceType !== SECURE_ACCOUNT &&
           dAccountType === TRUSTED_CONTACTS
         ) {
-          continue;
+          continue
         }
 
-        if (derivativeAccount.instance.using) {
+        if ( derivativeAccount.instance.using ) {
           for (
             let accountNumber = 1;
             accountNumber <= derivativeAccount.instance.using;
             accountNumber++
           ) {
-            if (derivativeAccount[accountNumber].balances) {
+            if ( derivativeAccount[ accountNumber ].balances ) {
               derivativeBalance +=
-                derivativeAccount[accountNumber].balances.balance +
-                derivativeAccount[accountNumber].balances.unconfirmedBalance;
+                derivativeAccount[ accountNumber ].balances.balance +
+                derivativeAccount[ accountNumber ].balances.unconfirmedBalance
             }
           }
         }
       }
     }
 
-    if (serviceType !== REGULAR_ACCOUNT) regularBalance += derivativeBalance;
-    else if (serviceType !== SECURE_ACCOUNT) secureBalance += derivativeBalance;
+    if ( serviceType !== REGULAR_ACCOUNT ) regularBalance += derivativeBalance
+    else if ( serviceType !== SECURE_ACCOUNT ) secureBalance += derivativeBalance
 
-    let additionalBalances = {};
-    for (const serviceType of [REGULAR_ACCOUNT, SECURE_ACCOUNT]) {
+    const additionalBalances = {
+    }
+    for ( const serviceType of [ REGULAR_ACCOUNT, SECURE_ACCOUNT ] ) {
       const derivativeAccounts =
-        accountsState[serviceType].service[
+        accountsState[ serviceType ].service[
           serviceType === SECURE_ACCOUNT ? 'secureHDWallet' : 'hdWallet'
-        ].derivativeAccounts;
+        ].derivativeAccounts
 
-      for (const ejectedAcc of config.EJECTED_ACCOUNTS) {
-        if (!derivativeAccounts[ejectedAcc]) continue;
+      for ( const ejectedAcc of config.EJECTED_ACCOUNTS ) {
+        if ( !derivativeAccounts[ ejectedAcc ] ) continue
 
         for (
           let index = 1;
-          index <= derivativeAccounts[ejectedAcc].instance.using;
+          index <= derivativeAccounts[ ejectedAcc ].instance.using;
           index++
         ) {
-          const acc = derivativeAccounts[ejectedAcc][index];
-          additionalBalances[serviceType + ejectedAcc + index] = acc.balances
+          const acc = derivativeAccounts[ ejectedAcc ][ index ]
+          additionalBalances[ serviceType + ejectedAcc + index ] = acc.balances
             ? acc.balances.balance + acc.balances.unconfirmedBalance
-            : 0;
+            : 0
         }
       }
     }
 
-    this.setState({
+    this.setState( {
       balances: {
         testBalance,
         regularBalance,
         secureBalance,
         additionalBalances,
       },
-    });
+    } )
   };
 
   setRecipientAddress = () => {
-    const { accountsState } = this.props;
+    const { accountsState } = this.props
     const {
       recipientAddress,
       serviceType,
       sweepSecure,
       spendableBalance,
       derivativeAccountDetails,
-    } = this.state;
+    } = this.state
 
-    const { type } = accountsState[serviceType].service.addressDiff(
+    const { type } = accountsState[ serviceType ].service.addressDiff(
       recipientAddress.trim(),
-    );
+    )
 
-    if (type) {
-      let item;
-      switch (type) {
-        case 'address':
-          item = {
-            id: recipientAddress.trim(), // address serves as the id during manual addition
-          };
-          this.onRecipientSelected(item);
-          break;
-
-        case 'paymentURI':
-          let address, options, donationId;
-          try {
-            const res = accountsState[serviceType].service.decodePaymentURI(
-              recipientAddress.trim(),
-            );
-            address = res.address;
-            options = res.options;
-
-            // checking for donationId to send note
-            if (options && options.message) {
-              const rawMessage = options.message;
-              donationId = rawMessage.split(':').pop().trim();
-            }
-          } catch (err) {
-            Alert.alert('Unable to decode payment URI');
-            return;
-          }
-
-          item = {
-            id: address,
-          };
-
-          this.props.addTransferDetails(serviceType, {
-            selectedContact: item,
-          });
-
-          this.props.navigation.navigate('SendToContact', {
-            selectedContact: item,
-            serviceType,
-            sweepSecure,
-            spendableBalance,
-            derivativeAccountDetails,
-            bitcoinAmount: options.amount
-              ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
-              : '',
-            donationId,
-          });
-          break;
-      }
-    }
-  };
-
-  barcodeRecognized = async (barcodes) => {
-    const { accountsState } = this.props;
-
-    const {
-      serviceType,
-      sweepSecure,
-      spendableBalance,
-      derivativeAccountDetails,
-    } = this.state;
-
-    if (barcodes.data) {
-      const { type } = accountsState[serviceType].service.addressDiff(
-        barcodes.data.trim(),
-      );
-      if (type) {
-        let item;
-        switch (type) {
+    if ( type ) {
+      let item
+      switch ( type ) {
           case 'address':
-            const recipientAddress = barcodes.data;
             item = {
-              id: recipientAddress,
-            };
-            this.onRecipientSelected(item);
-            break;
+              id: recipientAddress.trim(), // address serves as the id during manual addition
+            }
+            this.onRecipientSelected( item )
+            break
 
           case 'paymentURI':
-            let address, options, donationId;
+            let address, options, donationId
             try {
-              const res = accountsState[serviceType].service.decodePaymentURI(
-                barcodes.data,
-              );
-              address = res.address;
-              options = res.options;
+              const res = accountsState[ serviceType ].service.decodePaymentURI(
+                recipientAddress.trim(),
+              )
+              address = res.address
+              options = res.options
 
               // checking for donationId to send note
-              if (options && options.message) {
-                const rawMessage = options.message;
-                donationId = rawMessage.split(':').pop().trim();
+              if ( options && options.message ) {
+                const rawMessage = options.message
+                donationId = rawMessage.split( ':' ).pop().trim()
               }
-            } catch (err) {
-              Alert.alert('Unable to decode payment URI');
-              return;
+            } catch ( err ) {
+              Alert.alert( 'Unable to decode payment URI' )
+              return
             }
+
             item = {
               id: address,
-            };
+            }
 
-            this.props.addTransferDetails(serviceType, {
+            this.props.addTransferDetails( serviceType, {
               selectedContact: item,
-            });
+            } )
+            const accountShellID = this.props.navigation.getParam(
+              'accountShellID',
+            )
 
-            this.props.navigation.navigate('SendToContact', {
+            this.props.navigation.navigate( 'SendToContact', {
+              accountShellID,
               selectedContact: item,
               serviceType,
               sweepSecure,
               spendableBalance,
               derivativeAccountDetails,
               bitcoinAmount: options.amount
-                ? `${Math.round(options.amount * SATOSHIS_IN_BTC)}`
+                ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
                 : '',
               donationId,
-            });
-            break;
+            } )
+            break
+      }
+    }
+  };
 
-          default:
-            Toast('Invalid QR');
-            break;
+  barcodeRecognized = async ( barcodes ) => {
+    const { accountsState } = this.props
+
+    const {
+      serviceType,
+      sweepSecure,
+      spendableBalance,
+      derivativeAccountDetails,
+    } = this.state
+
+    if ( barcodes.data ) {
+      const { type } = accountsState[ serviceType ].service.addressDiff(
+        barcodes.data.trim(),
+      )
+      if ( type ) {
+        let item
+        switch ( type ) {
+            case 'address':
+              const recipientAddress = barcodes.data
+              item = {
+                id: recipientAddress,
+              }
+              this.onRecipientSelected( item )
+              break
+
+            case 'paymentURI':
+              let address, options, donationId
+              try {
+                const res = accountsState[ serviceType ].service.decodePaymentURI(
+                  barcodes.data,
+                )
+                address = res.address
+                options = res.options
+
+                // checking for donationId to send note
+                if ( options && options.message ) {
+                  const rawMessage = options.message
+                  donationId = rawMessage.split( ':' ).pop().trim()
+                }
+              } catch ( err ) {
+                Alert.alert( 'Unable to decode payment URI' )
+                return
+              }
+              item = {
+                id: address,
+              }
+
+              this.props.addTransferDetails( serviceType, {
+                selectedContact: item,
+              } )
+              const accountShellID = this.props.navigation.getParam(
+                'accountShellID',
+              )
+
+              this.props.navigation.navigate( 'SendToContact', {
+                accountShellID,
+                selectedContact: item,
+                serviceType,
+                sweepSecure,
+                spendableBalance,
+                derivativeAccountDetails,
+                bitcoinAmount: options.amount
+                  ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
+                  : '',
+                donationId,
+              } )
+              break
+
+            default:
+              Toast( 'Invalid QR' )
+              break
         }
       }
     }
   };
 
-  onRecipientSelected = (recipient, bitcoinAmount?) => {
-    const { accountsState } = this.props;
+  onRecipientSelected = ( recipient, bitcoinAmount? ) => {
+    const { accountsState } = this.props
 
     const {
       serviceType,
-      averageTxFees,
       sweepSecure,
       spendableBalance,
       derivativeAccountDetails,
-    } = this.state;
+    } = this.state
 
-    let isNavigate = true;
+    let isNavigate = true
 
     if (
-      accountsState[serviceType].transfer.details &&
-      accountsState[serviceType].transfer.details.length === 0
+      accountsState[ serviceType ].transfer.details &&
+      accountsState[ serviceType ].transfer.details.length === 0
     ) {
-      this.props.addTransferDetails(serviceType, {
+      this.props.addTransferDetails( serviceType, {
         selectedContact: recipient,
-      });
-      this.setState({ recipientAddress: '' });
+      } )
+      this.setState( {
+        recipientAddress: '' 
+      } )
+      const accountShellID = this.props.navigation.getParam( 'accountShellID' )
 
-      this.props.navigation.navigate('SendToContact', {
+      this.props.navigation.navigate( 'SendToContact', {
+        accountShellID,
         selectedContact: recipient,
         serviceType,
-        averageTxFees,
         sweepSecure,
         spendableBalance,
         derivativeAccountDetails,
         bitcoinAmount,
-      });
+      } )
     } else {
-      accountsState[serviceType].transfer.details.length &&
-        accountsState[serviceType].transfer.details.map((contact) => {
-          if (contact.selectedContact.id === recipient.id) {
-            if (config.EJECTED_ACCOUNTS.includes(recipient.id)) {
+      accountsState[ serviceType ].transfer.details.length &&
+        accountsState[ serviceType ].transfer.details.map( ( contact ) => {
+          if ( contact.selectedContact.id === recipient.id ) {
+            if ( config.EJECTED_ACCOUNTS.includes( recipient.id ) ) {
               if (
                 recipient.account_number ===
-                contact.selectedContact.account_number &&
+                  contact.selectedContact.account_number &&
                 recipient.type === contact.selectedContact.type
               ) {
-                return (isNavigate = false);
+                return ( isNavigate = false )
               }
             } else {
-              return (isNavigate = false);
+              return ( isNavigate = false )
             }
           }
-        });
-      if (isNavigate) {
-        this.props.addTransferDetails(serviceType, {
+        } )
+      if ( isNavigate ) {
+        this.props.addTransferDetails( serviceType, {
           selectedContact: recipient,
-        });
-        this.setState({ recipientAddress: '' });
-        this.props.navigation.navigate('SendToContact', {
+        } )
+        this.setState( {
+          recipientAddress: '' 
+        } )
+        const accountShellID = this.props.navigation.getParam( 'accountShellID' )
+
+        this.props.navigation.navigate( 'SendToContact', {
+          accountShellID,
           selectedContact: recipient,
           serviceType,
-          averageTxFees,
           sweepSecure,
           spendableBalance,
           derivativeAccountDetails,
           bitcoinAmount,
-        });
+        } )
       }
-    }
-  };
-
-  twoFASetupMethod = async () => {
-    const { accountsState, isTwoFASetupDone } = this.props;
-
-    if (
-      !isTwoFASetupDone &&
-      accountsState[this.state.serviceType].service.secureHDWallet.twoFASetup
-    ) {
-      this.props.navigation.navigate('TwoFASetup', {
-        twoFASetup:
-          accountsState[this.state.serviceType].service.secureHDWallet
-            .twoFASetup,
-      });
-      this.props.removeTwoFA();
     }
   };
 
@@ -610,48 +600,48 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       regularAccount,
       trustedContactsService,
       trustedContactsInfo,
-    } = this.props;
-    const { serviceType } = this.state;
+    } = this.props
+    const { serviceType } = this.state
 
-    if (trustedContactsInfo) {
-      if (trustedContactsInfo.length) {
-        const sendableTrustedContacts = [];
-        for (let index = 0; index < trustedContactsInfo.length; index++) {
-          const contactInfo = trustedContactsInfo[index];
-          if (!contactInfo) continue;
+    if ( trustedContactsInfo ) {
+      if ( trustedContactsInfo.length ) {
+        const sendableTrustedContacts = []
+        for ( let index = 0; index < trustedContactsInfo.length; index++ ) {
+          const contactInfo = trustedContactsInfo[ index ]
+          if ( !contactInfo ) continue
           const contactName = `${contactInfo.firstName} ${
             contactInfo.lastName ? contactInfo.lastName : ''
-            }`;
-          let connectedVia;
-          if (contactInfo.phoneNumbers && contactInfo.phoneNumbers.length) {
-            connectedVia = contactInfo.phoneNumbers[0].number;
-          } else if (contactInfo.emails && contactInfo.emails.length) {
-            connectedVia = contactInfo.emails[0].email;
+          }`
+          let connectedVia
+          if ( contactInfo.phoneNumbers && contactInfo.phoneNumbers.length ) {
+            connectedVia = contactInfo.phoneNumbers[ 0 ].number
+          } else if ( contactInfo.emails && contactInfo.emails.length ) {
+            connectedVia = contactInfo.emails[ 0 ].email
           }
 
-          let hasXpub = false;
+          let hasXpub = false
           const {
             trustedContactToDA,
             derivativeAccounts,
-          } = regularAccount.hdWallet;
+          } = regularAccount.hdWallet
           const accountNumber =
-            trustedContactToDA[contactName.toLowerCase().trim()];
-          if (accountNumber) {
+            trustedContactToDA[ contactName.toLowerCase().trim() ]
+          if ( accountNumber ) {
             const trustedContact: TrustedContactDerivativeAccountElements =
-              derivativeAccounts[TRUSTED_CONTACTS][accountNumber];
-            if (serviceType === TEST_ACCOUNT) {
+              derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ]
+            if ( serviceType === TEST_ACCOUNT ) {
               if (
                 trustedContact.contactDetails &&
                 trustedContact.contactDetails.tpub
               ) {
-                hasXpub = true;
+                hasXpub = true
               }
             } else {
               if (
                 trustedContact.contactDetails &&
                 trustedContact.contactDetails.xpub
               ) {
-                hasXpub = true;
+                hasXpub = true
               }
             }
           }
@@ -664,17 +654,17 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
             lastSeen,
           } = trustedContactsService.tc.trustedContacts[
             contactName.toLowerCase().trim()
-            ];
+          ]
 
           const hasTrustedAddress = Boolean(
             serviceType === TEST_ACCOUNT ? trustedTestAddress : trustedAddress,
-          );
+          )
 
-          const isGuardian = index < 3 ? true : false;
+          const isGuardian = index < 3 ? true : false
 
-          if (hasXpub || hasTrustedAddress) {
+          if ( hasXpub || hasTrustedAddress ) {
             // sendable
-            sendableTrustedContacts.push({
+            sendableTrustedContacts.push( {
               contactName,
               connectedVia,
               hasXpub,
@@ -684,29 +674,31 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               lastSeen,
               contactsWalletName,
               ...contactInfo,
-            });
+            } )
           }
         }
 
-        let sortedTrustedContacts = sendableTrustedContacts.sort(function (
+        const sortedTrustedContacts = sendableTrustedContacts.sort( function (
           contactA,
           contactB,
         ) {
-          if (contactA.contactName && contactB.contactName) {
+          if ( contactA.contactName && contactB.contactName ) {
             if (
               contactA.contactName.toLowerCase().trim() <
               contactB.contactName.toLowerCase().trim()
             )
-              return -1;
+              return -1
             if (
               contactA.contactName.toLowerCase().trim() >
               contactB.contactName.toLowerCase().trim()
             )
-              return 1;
+              return 1
           }
-          return 0;
-        });
-        this.setState({ trustedContacts: sortedTrustedContacts });
+          return 0
+        } )
+        this.setState( {
+          trustedContacts: sortedTrustedContacts 
+        } )
       }
     }
   };
@@ -719,9 +711,9 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
       trustedContacts,
       selectedContacts,
       selectedSubAccounts,
-    } = this.state;
+    } = this.state
 
-    const { accountsState } = this.props;
+    const { accountsState } = this.props
 
     return (
       <View style={styles.rootContainer}>
@@ -736,7 +728,7 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
           sections={[
             {
               kind: SectionKind.SCAN_QR,
-              data: [null],
+              data: [ null ],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
@@ -745,35 +737,39 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                       containerStyle={styles.qrScannerContainer}
                     />
                   </View>
-                );
+                )
               },
             },
             {
               kind: SectionKind.ENTER_ADDRESS,
-              data: [null],
+              data: [ null ],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
                     <RecipientAddressTextInputSection
-                      containerStyle={{ margin: 0, padding: 0 }}
+                      containerStyle={{
+                        margin: 0, padding: 0 
+                      }}
                       placeholder="Enter Address Manually"
                       accountKind={serviceType}
-                      onAddressSubmitted={(address) => {
-                        this.setState({ recipientAddress: address });
+                      onAddressSubmitted={( address ) => {
+                        this.setState( {
+                          recipientAddress: address 
+                        } )
                       }}
                     />
                   </View>
-                );
+                )
               },
             },
             {
               kind: SectionKind.SELECT_CONTACTS,
-              data: [null],
+              data: [ null ],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
                     <View style={styles.viewSectionContentContainer}>
-                      {(trustedContacts.length && (
+                      {( trustedContacts.length && (
                         <RecipientSelectionStrip
                           accountKind={serviceType}
                           recipients={trustedContacts.map(
@@ -782,23 +778,23 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                           selectedRecipients={selectedContacts}
                           onRecipientSelected={this.onRecipientSelected}
                         />
-                      )) || (
-                          <BottomInfoBox
-                            containerStyle={styles.infoBoxContainer}
-                            title={'You have not added any Contacts'}
-                            infoText={
-                              'Add a Contact to send them sats without having to scan an address'
-                            }
-                          />
-                        )}
+                      ) ) || (
+                        <BottomInfoBox
+                          containerStyle={styles.infoBoxContainer}
+                          title={'You have not added any Contacts'}
+                          infoText={
+                            'Add a Contact to send them sats without having to scan an address'
+                          }
+                        />
+                      )}
                     </View>
                   </View>
-                );
+                )
               },
             },
             {
               kind: SectionKind.SELECT_SUB_ACCOUNTS,
-              data: [null],
+              data: [ null ],
               renderItem: () => {
                 return (
                   <View style={styles.viewSectionContainer}>
@@ -814,52 +810,54 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                             alwaysBounceHorizontal
                             showsHorizontalScrollIndicator={false}
                             showsVerticalScrollIndicator={false}
-                            renderItem={(Items) => {
-                              let checked = false;
+                            renderItem={( Items ) => {
+                              let checked = false
                               for (
                                 let i = 0;
                                 i <
-                                accountsState[serviceType].transfer.details
+                                accountsState[ serviceType ].transfer.details
                                   .length;
                                 i++
                               ) {
                                 const element =
-                                  accountsState[serviceType].transfer.details[i]
-                                    .selectedContact;
+                                  accountsState[ serviceType ].transfer.details[ i ]
+                                    .selectedContact
 
-                                if (element.id == Items.item.id) {
+                                if ( element.id == Items.item.id ) {
                                   if (
-                                    config.EJECTED_ACCOUNTS.includes(element.id)
+                                    config.EJECTED_ACCOUNTS.includes( element.id )
                                   ) {
                                     if (
                                       element.account_number ===
-                                      Items.item.account_number &&
+                                        Items.item.account_number &&
                                       element.type === Items.item.type
                                     ) {
-                                      checked = true;
+                                      checked = true
                                     }
                                   } else {
-                                    checked = true;
+                                    checked = true
                                   }
                                 }
                               }
 
-                              const { derivativeAccountDetails } = this.state;
+                              const { derivativeAccountDetails } = this.state
 
                               if (
                                 Items.item.type != serviceType ||
-                                config.EJECTED_ACCOUNTS.includes(Items.item.id) ||
+                                config.EJECTED_ACCOUNTS.includes(
+                                  Items.item.id,
+                                ) ||
                                 derivativeAccountDetails
                               ) {
                                 if (
                                   derivativeAccountDetails &&
                                   derivativeAccountDetails.type ===
-                                  Items.item.id &&
+                                    Items.item.id &&
                                   serviceType === Items.item.type &&
                                   derivativeAccountDetails.number ===
-                                  Items.item.account_number
+                                    Items.item.account_number
                                 ) {
-                                  return;
+                                  return
                                 } else {
                                   return (
                                     <AccountsListSend
@@ -869,29 +867,29 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
                                       checkedItem={checked}
                                       onSelectContact={this.onRecipientSelected}
                                     />
-                                  );
+                                  )
                                 }
                               }
                             }}
                             extraData={{
                               details:
-                                accountsState[serviceType].transfer.details,
+                                accountsState[ serviceType ].transfer.details,
                               balances,
                               selectedSubAccounts,
                             }}
-                          //keyExtractor={(item, index) => index.toString()}
+                            //keyExtractor={(item, index) => index.toString()}
                           />
                         </View>
                       )}
                     </View>
                   </View>
-                );
+                )
               },
             },
           ]}
           keyExtractor={sectionListItemKeyExtractor}
-          renderSectionHeader={({ section }) => {
-            return renderSectionHeader(section.kind, serviceType);
+          renderSectionHeader={( { section } ) => {
+            return renderSectionHeader( section.kind, serviceType )
           }}
           stickySectionHeadersEnabled={false}
         />
@@ -899,16 +897,18 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
         <BottomSheet
           enabledInnerScrolling={true}
           ref={this.knowMoreBottomSheetRef}
-          snapPoints={[-50, heightPercentageToDP('89%')]}
+          snapPoints={[ -50, heightPercentageToDP( '89%' ) ]}
           onCloseEnd={() => {
-            this.setState({ isShowingKnowMoreSheet: false }, () => {
-              this.props.initialKnowMoreSendSheetShown();
-            });
+            this.setState( {
+              isShowingKnowMoreSheet: false 
+            }, () => {
+              this.props.initialKnowMoreSendSheetShown()
+            } )
           }}
           renderContent={() => (
             <SendHelpContents
               titleClicked={() => {
-                this.knowMoreBottomSheetRef.current?.snapTo(0);
+                this.knowMoreBottomSheetRef.current?.snapTo( 0 )
               }}
             />
           )}
@@ -917,47 +917,43 @@ class Send extends Component<SendPropsTypes, SendStateTypes> {
               borderColor={Colors.blue}
               backgroundColor={Colors.blue}
               onPressHeader={() => {
-                this.knowMoreBottomSheetRef.current?.snapTo(0);
+                this.knowMoreBottomSheetRef.current?.snapTo( 0 )
               }}
             />
           )}
         />
       </View>
-    );
+    )
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ( state ) => {
   return {
     accountsState: state.accounts,
-    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
-    trustedContactsService: idx(state, (_) => _.trustedContacts.service),
+    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
+    trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
     trustedContactsInfo: idx(
       state,
-      (_) => _.trustedContacts.trustedContactsInfo,
+      ( _ ) => _.trustedContacts.trustedContactsInfo,
     ),
-    isTwoFASetupDone: idx(state, (_) => _.preferences.isTwoFASetupDone),
     hasShownInitialKnowMoreSendSheet: idx(
       state,
-      (_) => _.preferences.hasShownInitialKnowMoreSendSheet,
+      ( _ ) => _.preferences.hasShownInitialKnowMoreSendSheet,
     ),
-  };
-};
+  }
+}
 
 export default withNavigationFocus(
-  connect(mapStateToProps, {
-    removeTwoFA,
+  connect( mapStateToProps, {
     addTransferDetails,
     clearTransfer,
-    setTwoFASetup,
-    setAverageTxFee,
     initialKnowMoreSendSheetShown,
-  })(Send),
-);
+  } )( Send ),
+)
 
-const qrScannerHeight = heightPercentageToDP(35);
+const qrScannerHeight = heightPercentageToDP( 35 )
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -980,12 +976,12 @@ const styles = StyleSheet.create({
     ...HeadingStyles.listSectionHeading,
     marginBottom: 9,
     paddingHorizontal: 28,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
   },
 
   qrScannerContainer: {
     width: '100%',
-    maxWidth: qrScannerHeight * (1.31),
+    maxWidth: qrScannerHeight * 1.31,
     height: qrScannerHeight,
     marginBottom: 9,
   },
@@ -1002,17 +998,13 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor,
   },
-});
+} )
 
-function makeNavigationOptions({
-  navigation,
-}): NavigationScreenConfig<NavigationStackOptions, any> {
-  const accountKind = navigation.getParam('serviceType') || REGULAR_ACCOUNT;
-  const carouselIndex = navigation.getParam('carouselIndex');
-  const getServiceType = navigation.getParam('getServiceType');
+function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {
+  const accountKind = navigation.getParam( 'serviceType' )
   const derivativeAccountDetails = navigation.getParam(
     'derivativeAccountDetails',
-  );
+  )
 
   return {
     ...defaultStackScreenNavigationOptions,
@@ -1026,15 +1018,11 @@ function makeNavigationOptions({
       return (
         <SmallNavHeaderBackButton
           onPress={() => {
-            if (getServiceType) {
-              getServiceType(accountKind, carouselIndex);
-            }
-
-            clearTransfer(accountKind);
-            navigation.popToTop();
+            clearTransfer( accountKind )
+            navigation.popToTop()
           }}
         />
-      );
+      )
     },
 
     headerTitle: () => {
@@ -1042,36 +1030,33 @@ function makeNavigationOptions({
         <View style={styles.navHeaderTitleContainer}>
           <Image
             source={
-              derivativeAccountDetails &&
-                derivativeAccountDetails.type === DONATION_ACCOUNT
-                ? require('../../../assets/images/icons/icon_donation_hexa.png')
-                : accountKind == TEST_ACCOUNT
-                  ? require('../../../assets/images/icons/icon_test.png')
-                  : accountKind == REGULAR_ACCOUNT
-                    ? require('../../../assets/images/icons/icon_regular.png')
-                    : require('../../../assets/images/icons/icon_secureaccount.png')
+              getAccountIcon( accountKind, derivativeAccountDetails ) 
             }
-            style={{ width: 40, height: 40 }}
+            style={{
+              width: 40, height: 40 
+            }}
           />
 
-          <View style={{ marginLeft: 16 }}>
+          <View style={{
+            marginLeft: 16 
+          }}>
             <Text style={NavStyles.modalHeaderTitleText}>Send</Text>
             <Text style={NavStyles.modalHeaderSubtitleText}>
               Choose a recipient
             </Text>
           </View>
         </View>
-      );
+      )
     },
 
     headerRight: () => {
-      if (accountKind != TEST_ACCOUNT) {
-        return null;
+      if ( accountKind != TEST_ACCOUNT ) {
+        return null
       }
 
       return (
-        <KnowMoreButton onpress={navigation.getParam('toggleKnowMoreSheet')} />
-      );
+        <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
+      )
     },
-  };
+  }
 }

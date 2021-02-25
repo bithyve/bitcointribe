@@ -1,18 +1,20 @@
-import * as bitcoinJS from 'bitcoinjs-lib';
-import BaseAccount from '../../utilities/accounts/BaseAccount';
+import * as bitcoinJS from 'bitcoinjs-lib'
+import BaseAccount from '../../utilities/accounts/BaseAccount'
 import {
   Transactions,
   DerivativeAccounts,
   TransactionDetails,
-} from '../../utilities/Interface';
+} from '../../utilities/Interface'
 
 export default class TestAccount extends BaseAccount {
-  public static fromJSON = (json: string) => {
-    const { hdWallet } = JSON.parse(json);
+  public static fromJSON = ( json: string ) => {
+    const { hdWallet } = JSON.parse( json )
     const {
       mnemonic,
       passphrase,
       purpose,
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -23,7 +25,10 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
@@ -33,6 +38,8 @@ export default class TestAccount extends BaseAccount {
       mnemonic: string;
       passphrase: string;
       purpose: number;
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -43,6 +50,7 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -50,14 +58,24 @@ export default class TestAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList:{external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
       trustedContactToDA: { [contactName: string]: number };
       feeRates: any;
-    } = hdWallet;
+    } = hdWallet
 
-    return new TestAccount(mnemonic, passphrase, purpose, {
+    return new TestAccount( mnemonic, passphrase, purpose, {
+      accountName,
+      accountDescription,
       usedAddresses,
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
@@ -68,13 +86,16 @@ export default class TestAccount extends BaseAccount {
       balances,
       receivingAddress,
       transactions,
+      txIdMap,
       confirmedUTXOs,
+      unconfirmedUTXOs,
+      addressQueryList,
       derivativeAccounts,
       lastBalTxSync,
       newTransactions,
       trustedContactToDA,
       feeRates,
-    });
+    } )
   };
 
   constructor(
@@ -82,6 +103,8 @@ export default class TestAccount extends BaseAccount {
     passphrase?: string,
     dPathPurpose?: number,
     stateVars?: {
+      accountName: string;
+      accountDescription: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -92,6 +115,7 @@ export default class TestAccount extends BaseAccount {
       balances: { balance: number; unconfirmedBalance: number };
       receivingAddress: string;
       transactions: Transactions;
+      txIdMap: {[txid: string]: string[]};
       confirmedUTXOs: Array<{
         txId: string;
         vout: number;
@@ -99,6 +123,14 @@ export default class TestAccount extends BaseAccount {
         address: string;
         status?: any;
       }>;
+      unconfirmedUTXOs: Array<{
+        txId: string;
+        vout: number;
+        value: number;
+        address: string;
+        status?: any;
+      }>;
+      addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       derivativeAccounts: DerivativeAccounts;
       lastBalTxSync: number;
       newTransactions: TransactionDetails[];
@@ -106,7 +138,7 @@ export default class TestAccount extends BaseAccount {
       feeRates: any;
     },
   ) {
-    const network: bitcoinJS.Network = bitcoinJS.networks.testnet;
-    super(mnemonic, passphrase, dPathPurpose, stateVars, network);
+    const network: bitcoinJS.Network = bitcoinJS.networks.testnet
+    super( mnemonic, passphrase, dPathPurpose, stateVars, network )
   }
 }

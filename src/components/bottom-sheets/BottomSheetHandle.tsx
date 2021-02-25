@@ -1,29 +1,43 @@
-import React from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
-import Colors from '../../common/Colors';
-import DeviceInfo from 'react-native-device-info';
+import { BottomSheetHandleProps } from '@gorhom/bottom-sheet'
+import React from 'react'
+import { View, Text, StyleSheet, Platform } from 'react-native'
+import Colors from '../../common/Colors'
 
-const BottomSheetHandle: React.FC = () => {
-  return (
-    <View style={styles.rootContainer}>
-      <View style={styles.handleIndicator}></View>
-    </View>
-  );
+export const HANDLE_CONTAINER_HEIGHT = 12
+
+export type Props = BottomSheetHandleProps & {
+  containerStyle?: Record<string, unknown>;
+  handleIndicatorStyle?: Record<string, unknown>;
 };
 
-const styles = StyleSheet.create({
+const BottomSheetHandle: React.FC<Props> = ( {
+  containerStyle,
+  handleIndicatorStyle,
+}: Props ) => {
+  return (
+    <View style={{
+      ...styles.rootContainer, ...containerStyle 
+    }}>
+      <View style={{
+        ...styles.handleIndicator, ...handleIndicatorStyle 
+      }}></View>
+    </View>
+  )
+}
+
+const styles = StyleSheet.create( {
   rootContainer: {
     backgroundColor: Colors.white,
     flexDirection: 'row',
     justifyContent: 'center',
     borderTopLeftRadius: 10,
-    borderLeftColor: Colors.borderColor,
-    borderLeftWidth: 1,
+    // borderLeftColor: Colors.borderColor,
+    // borderLeftWidth: 1,
     borderTopRightRadius: 10,
-    borderRightColor: Colors.borderColor,
-    borderRightWidth: 1,
-    borderTopColor: Colors.borderColor,
-    borderTopWidth: 1,
+    // borderRightColor: Colors.borderColor,
+    // borderRightWidth: 1,
+    // borderTopColor: Colors.borderColor,
+    // borderTopWidth: 1,
   },
 
   handleIndicator: {
@@ -33,6 +47,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 7,
   },
-});
+} )
 
-export default BottomSheetHandle;
+export default BottomSheetHandle

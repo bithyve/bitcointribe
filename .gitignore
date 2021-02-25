@@ -21,6 +21,8 @@ DerivedData
 *.ipa
 *.xcuserstate
 project.xcworkspace
+ios/HEXA.xcodeproj/project.pbxproj
+
 
 # Android/IntelliJ
 #

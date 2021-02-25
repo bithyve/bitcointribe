@@ -1,16 +1,17 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { newAccountShellCreationCompleted } from "../../../store/actions/accounts";
+import { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { newAccountShellCreationCompleted } from '../../../store/actions/accounts'
+import useAccountsState from '../state-selectors/accounts/UseAccountsState'
 
 
-export default function useAccountShellCreationCompletionEffect(onComplete: () => void) {
-  const dispatch = useDispatch();
-  const { hasNewAccountGenerationSucceeded } = useSelector(state => state.accounts);
+export default function useAccountShellCreationCompletionEffect( onComplete: () => void ) {
+  const dispatch = useDispatch()
+  const { hasNewAccountShellGenerationSucceeded } = useAccountsState()
 
-  useEffect(() => {
-    if (hasNewAccountGenerationSucceeded) {
-      dispatch(newAccountShellCreationCompleted());
-      onComplete();
+  useEffect( () => {
+    if ( hasNewAccountShellGenerationSucceeded ) {
+      dispatch( newAccountShellCreationCompleted() )
+      onComplete()
     }
-  }, [hasNewAccountGenerationSucceeded]);
+  }, [ hasNewAccountShellGenerationSucceeded ] )
 }

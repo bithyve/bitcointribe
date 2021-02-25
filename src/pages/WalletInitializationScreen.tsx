@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react'
 import {
   StyleSheet,
   View,
@@ -8,34 +8,40 @@ import {
   StatusBar,
   Text,
   AsyncStorage,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
-} from 'react-native-responsive-screen';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Fonts from '../common/Fonts';
-import Colors from '../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import BottomInfoBox from '../components/BottomInfoBox';
-import openLink from '../utils/OpenLink';
+} from 'react-native-responsive-screen'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Fonts from '../common/Fonts'
+import Colors from '../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import BottomInfoBox from '../components/BottomInfoBox'
+import openLink from '../utils/OpenLink'
 
 const WalletInitializationScreen = props => {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1 
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ flex: 1 }}>
-        <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
+      <View style={{
+        flex: 1 
+      }}>
+        <View style={{
+          ...styles.viewSetupWallet, paddingTop: wp( '10%' ) 
+        }}>
           <Text style={styles.headerTitleText}>New Hexa Wallet</Text>
           <Text style={styles.headerInfoText}>
             If this is your first time using Hexa on this device
           </Text>
           <TouchableOpacity
-            onPress={() => props.navigation.navigate('NewWalletName')}
+            onPress={() => props.navigation.navigate( 'NewWalletName' )}
             style={styles.NewWalletTouchableView}
           >
             <Image
               style={styles.iconImage}
-              source={require('../assets/images/icons/icon_newwallet.png')}
+              source={require( '../assets/images/icons/icon_newwallet.png' )}
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>
@@ -47,24 +53,28 @@ const WalletInitializationScreen = props => {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={15}
-                style={{ alignSelf: 'center' }}
+                style={{
+                  alignSelf: 'center' 
+                }}
               />
             </View>
           </TouchableOpacity>
         </View>
         <View style={styles.separator} />
-        <View style={{ ...styles.viewSetupWallet, paddingTop: wp('10%') }}>
+        <View style={{
+          ...styles.viewSetupWallet, paddingTop: wp( '10%' ) 
+        }}>
           <Text style={styles.headerTitleText}>Restore Wallet</Text>
           <Text style={styles.headerInfoText}>
             If you would like to restore an existing Hexa Wallet
           </Text>
           <TouchableOpacity
             onPress={async () => {
-              if (await AsyncStorage.getItem('recoveryExists')) {
-                props.navigation.navigate('RestoreSelectedContactsList');
+              if ( await AsyncStorage.getItem( 'recoveryExists' ) ) {
+                props.navigation.navigate( 'RestoreSelectedContactsList' )
 
               } else {
-                props.navigation.navigate('WalletNameRecovery');
+                props.navigation.navigate( 'WalletNameRecovery' )
               }
             }}
             style={{
@@ -75,7 +85,7 @@ const WalletInitializationScreen = props => {
           >
             <Image
               style={styles.iconImage}
-              source={require('../assets/images/icons/icon_secrets.png')}
+              source={require( '../assets/images/icons/icon_secrets.png' )}
             />
             <View style={styles.textView}>
               <Text style={styles.touchableText}>Using Recovery Keys</Text>
@@ -85,49 +95,55 @@ const WalletInitializationScreen = props => {
                 name="ios-arrow-forward"
                 color={Colors.textColorGrey}
                 size={15}
-                style={{ alignSelf: 'center' }}
+                style={{
+                  alignSelf: 'center' 
+                }}
               />
             </View>
           </TouchableOpacity>
         </View>
         <View style={styles.separator} />
-        <View style={{ flex: 1 }}>
-          <View style={{ marginTop: 'auto' }}>
+        <View style={{
+          flex: 1 
+        }}>
+          <View style={{
+            marginTop: 'auto' 
+          }}>
             <BottomInfoBox
-              title={"Terms of Service"}
+              title={'Terms of Service'}
               infoText={
                 'By proceeding to the next step, you agree to our '
               }
               linkText={'Terms of Service'}
-              onPress={() => openLink("https://hexawallet.io/terms-of-service/")}
+              onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
             />
           </View>
         </View>
       </View>
     </SafeAreaView>
-  );
-};
+  )
+}
 
-export default WalletInitializationScreen;
+export default WalletInitializationScreen
 
-let styles = StyleSheet.create({
+let styles = StyleSheet.create( {
   container: {
     flex: 1,
   },
   viewSetupWallet: {
-    height: wp('55%'),
+    height: wp( '55%' ),
     backgroundColor: Colors.white,
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     marginLeft: 15,
     marginRight: 15,
     fontFamily: Fonts.FiraSansRegular,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginLeft: 15,
     marginRight: 15,
     fontWeight: 'normal',
@@ -153,7 +169,7 @@ let styles = StyleSheet.create({
   },
   touchableText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   arrowIconView: {
@@ -165,4 +181,4 @@ let styles = StyleSheet.create({
     height: 4,
     backgroundColor: Colors.backgroundColor,
   },
-});
+} )

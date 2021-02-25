@@ -1,48 +1,47 @@
-import TrustedContacts from '../utilities/TrustedContacts';
-import config from '../HexaConfig';
+import TrustedContacts from '../utilities/TrustedContacts'
+import config from '../HexaConfig'
 import {
   Contacts,
   TrustedData,
   EphemeralDataElements,
   TrustedDataElements,
-  trustedChannelActions,
   ShareUploadables,
   MetaShare,
   EncDynamicNonPMDD,
-} from '../utilities/Interface';
+} from '../utilities/Interface'
 
 export default class TrustedContactsService {
-  public static fromJSON = (json: string) => {
-    const { tc } = JSON.parse(json);
+  public static fromJSON = ( json: string ) => {
+    const { tc } = JSON.parse( json )
     const {
       trustedContacts,
       skippedContactsCount,
     }: {
       trustedContacts: Contacts;
       skippedContactsCount: number;
-    } = tc;
+    } = tc
 
-    return new TrustedContactsService({
+    return new TrustedContactsService( {
       trustedContacts,
       skippedContactsCount,
-    });
+    } )
   };
 
   public static encryptPub = (
     publicKey: string,
     key: string,
-  ): { encryptedPub: string } => TrustedContacts.encryptPub(publicKey, key);
+  ): { encryptedPub: string } => TrustedContacts.encryptPub( publicKey, key );
 
   public static decryptPub = (
     encryptedPub: string,
     key: string,
   ): {
     decryptedPub: string;
-  } => TrustedContacts.decryptPub(encryptedPub, key);
+  } => TrustedContacts.decryptPub( encryptedPub, key );
 
   public tc: TrustedContacts;
-  constructor(stateVars?) {
-    this.tc = new TrustedContacts(stateVars);
+  constructor( stateVars? ) {
+    this.tc = new TrustedContacts( stateVars )
   }
 
   public initializeContact = (
@@ -70,13 +69,13 @@ export default class TrustedContactsService {
           contactName.toLowerCase().trim(),
           encKey,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to setup contact',
-      };
+      }
     }
   };
 
@@ -113,13 +112,13 @@ export default class TrustedContactsService {
           contactsWalletName,
           isGuardian,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to finalize contact',
-      };
+      }
     }
   };
 
@@ -127,7 +126,7 @@ export default class TrustedContactsService {
     contactName: string,
     dataElements: EphemeralDataElements,
     encKey: string,
-    fetch?: Boolean,
+    fetch?: boolean,
     shareUploadables?: ShareUploadables,
   ): Promise<
     | {
@@ -163,20 +162,20 @@ export default class TrustedContactsService {
           fetch,
           shareUploadables,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to update ephemeral channel',
-      };
+      }
     }
   };
 
   public fetchEphemeralChannel = async (
     contactName: string,
     encKey: string,
-    approveTC?: Boolean,
+    approveTC?: boolean,
     publicKey?: string,
   ): Promise<
     | {
@@ -203,20 +202,20 @@ export default class TrustedContactsService {
           approveTC,
           publicKey,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from ephemeral channel',
-      };
+      }
     }
   };
 
   public updateTrustedChannel = async (
     contactName: string,
     dataElements: TrustedDataElements,
-    fetch?: Boolean,
+    fetch?: boolean,
     shareUploadables?: ShareUploadables,
   ): Promise<
     | {
@@ -249,13 +248,13 @@ export default class TrustedContactsService {
           fetch,
           shareUploadables,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to update contact',
-      };
+      }
     }
   };
 
@@ -285,13 +284,13 @@ export default class TrustedContactsService {
           contactName.toLowerCase().trim(),
           contactsWalletName,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
-      };
+      }
     }
   };
 
@@ -303,7 +302,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          updated: Boolean;
+          updated: boolean;
           healthCheckStatus: any;
           updationInfo: Array<{
             walletId: string;
@@ -313,7 +312,7 @@ export default class TrustedContactsService {
             encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
             err?: string;
           }>;
-          exchangeRates: { [currency: string]: Number };
+          exchangeRates: { [currency: string]: number };
           averageTxFees;
         };
         err?: undefined;
@@ -334,13 +333,13 @@ export default class TrustedContactsService {
           healthCheckStatus,
           metaSharesUnderCustody,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to sync last seens',
-      };
+      }
     }
   };
 
@@ -348,7 +347,7 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          updated: Boolean;
+          updated: boolean;
         };
         err?: undefined;
         message?: undefined;
@@ -364,13 +363,13 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.syncLastSeens(),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to sync last seens',
-      };
+      }
     }
   };
 
@@ -380,9 +379,9 @@ export default class TrustedContactsService {
     | {
         status: number;
         data: {
-          synched: Boolean;
-          contactsToRemove: String[];
-          guardiansToRemove: String[];
+          synched: boolean;
+          contactsToRemove: string[];
+          guardiansToRemove: string[];
         };
         err?: undefined;
         message?: undefined;
@@ -397,14 +396,14 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.syncTrustedChannels(contacts),
-      };
-    } catch (err) {
+        data: await this.tc.syncTrustedChannels( contacts ),
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to sync trusted channels',
-      };
+      }
     }
   };
 }
