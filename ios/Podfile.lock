@@ -330,6 +330,8 @@ PODS:
     - React-Core
   - react-native-sqlite-storage (5.0.0):
     - React
+  - react-native-tor (0.1.6):
+    - React
   - react-native-udp (2.7.0):
     - React
   - react-native-video (4.4.5):
@@ -499,6 +501,7 @@ DEPENDENCIES:
   - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
+  - react-native-tor (from `../node_modules/react-native-tor`)
   - react-native-udp (from `../node_modules/react-native-udp`)
   - react-native-video (from `../node_modules/react-native-video`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -633,6 +636,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-randombytes"
   react-native-sqlite-storage:
     :path: "../node_modules/react-native-sqlite-storage"
+  react-native-tor:
+    :path: "../node_modules/react-native-tor"
   react-native-udp:
     :path: "../node_modules/react-native-udp"
   react-native-video:
@@ -772,6 +777,7 @@ SPEC CHECKSUMS:
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-sqlite-storage: 418ef4afc5e6df6ce3574c4617e5f0b65cffde55
+  react-native-tor: a7215932fd6826b2ef95573f0c09063e8953c3a3
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
   react-native-video: eee541262ada11bc7ffe8ec5508e6a877937c462
   React-RCTActionSheet: 53ea72699698b0b47a6421cb1c8b4ab215a774aa
@@ -816,6 +822,6 @@ SPEC CHECKSUMS:
   UMTaskManagerInterface: 80653f25c55d9e6d79d6a0a65589fa213feaee11
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
 
-PODFILE CHECKSUM: c98886d7e364f1f4a7318f4d6fdc05272f2195e2
+PODFILE CHECKSUM: 631016bd1e50777f0b4ee840dc180d2b55f587ad
 
 COCOAPODS: 1.8.4

@@ -8086,6 +8086,11 @@ react-native-tcp@^3.3.2:
     process "^0.11.9"
     util "^0.10.3"
 
+react-native-tor@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/react-native-tor/-/react-native-tor-0.1.6.tgz#a34eca86723699e237fbc7de72ef2930b4fe1152"
+  integrity sha512-iibIRAPpFy62va64ka6glzN4yefBGoRORv6zGqx6xo527UPh3Kg1xvusa/rRaHrtTloWzoir++2M7JG7SjaTaQ==
+
 react-native-udp@^2.7.0:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/react-native-udp/-/react-native-udp-2.7.0.tgz#d04c5100fcbff343f8a2bf35a3025743d8960f93"
