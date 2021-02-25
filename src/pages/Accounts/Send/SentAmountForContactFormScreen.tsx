@@ -21,7 +21,7 @@ import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { calculateSendMaxFee } from '../../../store/actions/sending'
+import { calculateSendMaxFee, executeSendStage1 } from '../../../store/actions/sending'
 import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
 
 export type NavigationParams = {
@@ -46,7 +46,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const averageTransactionFees = useAverageTransactionFees()
 
   const availableBalance = useMemo( () => {
-    return AccountShell.getTotalBalance( sourceAccountShell )
+    return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
@@ -67,7 +67,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   }
 
   function handleConfirmationButtonPress() {
-    navigation.navigate( 'SendConfirmation' )
+    executeSendStage1( {
+      accountShellID: sourceAccountShell.id
+    } )
   }
 
   function handleAddRecipientButtonPress() {
