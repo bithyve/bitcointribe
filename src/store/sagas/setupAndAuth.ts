@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGenerator2, serviceGenerator } from '../utils/utilities'
+import { createWatcher, serviceGenerator2, serviceGenerator, serviceGeneratorForNewBHR } from '../utils/utilities'
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -37,15 +37,16 @@ function* initSetupWorker( { payload } ) {
     trustedContacts: {},
     keepersInfo: {}
   }
-  let isNewSetup = false;
-  if(isNewSetup){
-    yield put(setIsNewHealthSystemSet(true))
-    accountData = yield call( serviceGenerator2, security.answer )
-  }else{
-    yield put(setIsNewHealthSystemSet(false))
-    accountData = yield call( serviceGenerator, security.answer )
-  }
-
+  // let isNewSetup = false;
+  // if(isNewSetup){
+  //   yield put(setIsNewHealthSystemSet(true))
+  //   accountData = yield call( serviceGenerator2, security.answer )
+  // }else{
+  //   yield put(setIsNewHealthSystemSet(false))
+  //   accountData = yield call( serviceGenerator, security.answer )
+  // }
+  yield put(setIsNewHealthSystemSet(true))
+  accountData = yield call( serviceGeneratorForNewBHR, security.answer )
   const initialDatabase: Database = {
     WALLET_SETUP: {
       walletName, security 
