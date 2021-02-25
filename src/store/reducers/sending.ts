@@ -1,7 +1,7 @@
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, feeIntelMissing, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2 } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, feeIntelMissing, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
@@ -50,6 +50,7 @@ export type SendingState = {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
+    txid: string | null,
   }
 
   sendMaxFee: Satoshis;
@@ -81,6 +82,7 @@ const INITIAL_STATE: SendingState = {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
+    txid: null,
   },
 
   sendMaxFee: 0,
@@ -235,6 +237,28 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             carryOver: {
               txHex, childIndexArray, inputs, derivativeAccountDetails,
             }
+          },
+        }
+
+      case EXECUTE_SEND_STAGE3:
+        return {
+          ...state,
+          sendST3:{
+            inProgress: true,
+            hasFailed: false,
+            failedErrorMessage: null,
+            txid: null,
+          },
+        }
+
+      case SEND_STAGE3_EXECUTED:
+        return {
+          ...state,
+          sendST3: {
+            inProgress: false,
+            hasFailed: !action.payload.successful,
+            failedErrorMessage: !action.payload.successful? action.payload.err: null,
+            txid: action.payload.successful? action.payload.txid: null,
           },
         }
 
