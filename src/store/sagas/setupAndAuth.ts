@@ -38,7 +38,7 @@ function* initSetupWorker( { payload } ) {
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
-      walletName, security 
+      walletName, security
     },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {
@@ -60,7 +60,7 @@ function* initSetupWorker( { payload } ) {
     VERSION: DeviceInfo.getVersion(),
   }
   yield call( insertDBWorker, {
-    payload: initialDatabase 
+    payload: initialDatabase
   } )
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
   yield put( setupInitialized() )
@@ -73,7 +73,7 @@ function* initRecoveryWorker( { payload } ) {
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
-      walletName, security 
+      walletName, security
     },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {
@@ -89,7 +89,7 @@ function* initRecoveryWorker( { payload } ) {
   }
 
   yield call( insertDBWorker, {
-    payload: initialDatabase 
+    payload: initialDatabase
   } )
   // yield call(AsyncStorage.setItem, "walletExists", "true");
   // yield put(setupInitialized());
@@ -137,7 +137,7 @@ function* credentialsAuthWorker( { payload } ) {
     key = yield call( Cipher.decrypt, encryptedKey, hash )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
@@ -155,7 +155,10 @@ function* credentialsAuthWorker( { payload } ) {
     // initialize configuration file
     const { activePersonalNode } = yield select( state => state.nodeSettings )
     if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
-    
+
+    const { activeTor } = yield select( state => state.torSettings )
+    if( activeTor ) config.connectOverTor( activeTor )
+
     // TODO -- this need to be done on
     yield put( fetchFromDB() )
   }
@@ -190,7 +193,7 @@ function* changeAuthCredWorker( { payload } ) {
     yield put( credsChanged( 'changed' ) )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     yield put( pinChangedFailed( true ) )
     // Alert.alert('Pin change failed!', err.message);

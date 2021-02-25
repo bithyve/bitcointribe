@@ -10,6 +10,7 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import WalletSettingsStack from './WalletSettingsStack'
 import AccountManagementStack from './AccountManagementStack'
 import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings/NodeSettingsContainerScreen'
+import TorSettingsContainerScreen from '../../../pages/MoreOptions/TorSettings/TorSettingsContainerScreen'
 
 
 const MoreOptionsStack = createStackNavigator(
@@ -41,6 +42,12 @@ const MoreOptionsStack = createStackNavigator(
       screen: NodeSettingsContainerScreen,
       navigationOptions: {
         title: 'Node Settings',
+      },
+    },
+    TorSettings: {
+      screen: TorSettingsContainerScreen,
+      navigationOptions: {
+        title: 'Tor Settings',
       },
     },
     FundingSources: {
