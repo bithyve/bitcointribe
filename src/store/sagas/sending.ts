@@ -17,6 +17,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AccountRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
+import idx from 'idx'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -346,7 +347,7 @@ function* executeSendStage2( { payload }: {payload: {
 
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
 
-  const { txPrerequisites } = sending.sendST1
+  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
   const { txnPriority, customTxPrerequisites, nSequence } = payload
   if ( !txPrerequisites && !customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )

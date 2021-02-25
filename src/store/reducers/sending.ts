@@ -1,11 +1,11 @@
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, feeIntelMissing } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, feeIntelMissing, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2 } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
-import {  TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
+import {  InputUTXOs, TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
 
 type RecipientID = string;
 
@@ -24,13 +24,28 @@ export type SendingState = {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
-    txPrerequisites: TransactionPrerequisite | null;
+    carryOver: { txPrerequisites: TransactionPrerequisite } | null;
   };
+
   sendST2: {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
+    txid: string | null,
+    carryOver: {
+      txHex: string;
+      childIndexArray: Array<{
+        childIndex: number;
+        inputIdentifier: {
+          txId: string;
+          vout: number;
+        };
+      }>;
+      inputs: InputUTXOs[],
+      derivativeAccountDetails?: { type: string; number: number },
+    };
   };
+
   sendST3: {
     inProgress: boolean;
     hasFailed: boolean;
@@ -53,12 +68,14 @@ const INITIAL_STATE: SendingState = {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
-    txPrerequisites: null
+    carryOver: null
   },
   sendST2: {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
+    txid: null,
+    carryOver: null,
   },
   sendST3: {
     inProgress: false,
@@ -129,7 +146,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: true,
             hasFailed: false,
             failedErrorMessage: null,
-            txPrerequisites: null
+            carryOver: null
           },
           feeIntelMissing: false,
           transactionFeeInfo: INITIAL_STATE.transactionFeeInfo,
@@ -152,7 +169,9 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: false,
             hasFailed: !action.payload.successful,
             failedErrorMessage: !action.payload.successful? action.payload.err : null,
-            txPrerequisites
+            carryOver: {
+              txPrerequisites
+            }
           },
           transactionFeeInfo
         }
@@ -161,6 +180,62 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
         return {
           ...state,
           feeIntelMissing: action.payload.intelMissing
+        }
+
+
+      case EXECUTE_SEND_STAGE2:
+        return {
+          ...state,
+          sendST2:{
+            inProgress: true,
+            hasFailed: false,
+            failedErrorMessage: null,
+            txid: null,
+            carryOver: null
+          },
+        }
+
+      case SEND_STAGE2_EXECUTED:
+        if( !action.payload.successful ){
+          return {
+            ...state,
+            sendST2: {
+              inProgress: false,
+              hasFailed: true,
+              failedErrorMessage: action.payload.err,
+              txid: null,
+              carryOver: null,
+            },
+          }
+        }
+
+        if( action.payload.txid ){
+          // non-2FA send
+          return {
+            ...state,
+            sendST2: {
+              inProgress: false,
+              hasFailed: false,
+              failedErrorMessage: null,
+              txid: action.payload.txid,
+              carryOver: null,
+            },
+          }
+        }
+
+        const carryOver = action.payload.carryOver
+        const{ txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
+        return {
+          ...state,
+          sendST2: {
+            inProgress: false,
+            hasFailed: false,
+            failedErrorMessage: null,
+            txid: null,
+            carryOver: {
+              txHex, childIndexArray, inputs, derivativeAccountDetails,
+            }
+          },
         }
 
       case SENDING_COMPLETED:
