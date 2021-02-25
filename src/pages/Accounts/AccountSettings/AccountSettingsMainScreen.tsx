@@ -51,7 +51,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
         },
         {
-          title: 'Manual Rescan',
+          title: 'Account Sync',
           subtitle: 'Completely sync the account',
           imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
           onOptionPressed: handleRescanListItemSelection,

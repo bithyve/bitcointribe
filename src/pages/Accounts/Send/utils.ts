@@ -46,6 +46,7 @@ export const getAccountTitle = ( accountKind, derivativeAccountDetails ) => {
           break
         case RAMP:
           accountTitle = 'Ramp'
+          break
         case WYRE:
           accountTitle = 'Wyre'
           break

@@ -1531,7 +1531,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Ramp Account',
-              defaultDescription: 'Buy using ApplePay/Debit card',
+              defaultDescription: 'BTC Purchased from Ramp',
               serviceAccountKind: ServiceAccountKind.RAMP,
             } )
 
@@ -1551,7 +1551,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Wyre Account',
-              defaultDescription: 'Buy using ApplePay/Debit card',
+              defaultDescription: 'BTC Purchased from Wyre',
               serviceAccountKind: ServiceAccountKind.WYRE,
             } )
             this.props.addNewAccountShell( newSubAccount )
