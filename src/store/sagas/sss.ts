@@ -94,6 +94,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import {  restorePersonalNodeConfiguration } from '../actions/nodeSettings'
+import {  restoreTorConfiguration } from '../actions/torSettings'
 import { restoredVersionHistory } from '../actions/versionHistory'
 import versionHistory from '../reducers/versionHistory'
 
@@ -1807,9 +1808,10 @@ function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+  const activeTor = yield select( ( state ) => state.nodeSettings.activeTor )
   const versionHistory = yield select(
     ((state) => idx(state, (_) => _.versionHistory.versions))
-  ); 
+  );
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
@@ -1817,6 +1819,9 @@ function* stateDataToBackup() {
 
   if( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
+  if( activeTor )
+    STATE_DATA[ 'activeTor' ] = JSON.stringify( activeTor )
 
   if ( versionHistory && versionHistory.length )
     STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
@@ -1908,7 +1913,7 @@ function* updateWalletImageWorker() {
   }
 
   // console.log( {
-  //   walletImage 
+  //   walletImage
   // } )
 
   if ( Object.keys( walletImage ).length === 0 ) {
@@ -1998,7 +2003,7 @@ function* fetchWalletImageWorker( { payload } ) {
         if( !STATE_DATA[ key ] ) continue
 
         switch( key ){
-            case 'accountShells': 
+            case 'accountShells':
               const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
               yield put( restoredAccountShells( {
                 accountShells
@@ -2007,12 +2012,19 @@ function* fetchWalletImageWorker( { payload } ) {
 
             case 'activePersonalNode':
               const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
-              yield put( restorePersonalNodeConfiguration( 
+              yield put( restorePersonalNodeConfiguration(
                 activePersonalNode
               ) )
               break
 
-              case 'versionHistory': 
+            case 'activeTor':
+              const activeTor: Tor = JSON.parse( STATE_DATA[ key ] )
+              yield put( restoreTorConfiguration(
+                activeTor
+              ) )
+              break
+
+              case 'versionHistory':
               const versions: VersionHistory[] = JSON.parse( STATE_DATA[ key ] )
               yield put( restoredVersionHistory( {
                 versions

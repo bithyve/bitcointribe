@@ -43,6 +43,13 @@ const menuOptions: MenuOption[] = [
     subtitle: 'Connect Hexa wallet to your own Bitcoin node',
     screenName: 'NodeSettings',
   },
+  {
+    title: 'Tor Settings',
+    // TODO new icon needed
+    imageSource: require( '../../assets/images/icons/own-node.png' ),
+    subtitle: 'Connect over the Tor network',
+    screenName: 'TorSettings',
+  },
   /*
   Commenting this out as per https://github.com/bithyve/hexa/issues/2560
   leaving the option here so that it can be enabled in a future release.

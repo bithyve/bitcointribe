@@ -122,7 +122,9 @@ import {
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
+import torSettingsReducer from './reducers/torSettings'
 import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, savePersonalNodeConfigurationWatcher } from './sagas/nodeSettings'
+import { connectOverPlainnetWatcher, restoreTorConfigurationWatcher, saveTorConfigurationWatcher } from './sagas/torSettings'
 
 import {
   fetchSwanAuthenticationUrlWatcher,
@@ -216,6 +218,11 @@ const rootSaga = function* () {
     connectToBitHyveNodeWatcher,
     restorePersonalNodeConfigurationWatcher,
 
+    // Tor Settings
+    saveTorConfigurationWatcher,
+    connectOverPlainnetWatcher,
+    restoreTorConfigurationWatcher,
+
     // Notifications
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
@@ -271,6 +278,7 @@ const rootReducer = combineReducers( {
   sss: sssReducer,
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
+  torSettings: torSettingsReducer,
   notifications: notificationsReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
