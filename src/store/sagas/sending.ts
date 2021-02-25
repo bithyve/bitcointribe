@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -292,39 +292,6 @@ export const executeSendStage1Watcher = createWatcher(
   EXECUTE_SEND_STAGE1
 )
 
-function* calculateSendMaxFee( { payload }: {payload: {
-  numberOfRecipients: number;
-  accountShellID: string;
-}} ) {
-
-  const { numberOfRecipients, accountShellID } = payload
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const feePerByte = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ][ 'low' ].feePerByte
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
-
-  const { fee } = service.calculateSendMaxFee(
-    numberOfRecipients,
-    feePerByte,
-    derivativeAccountDetails,
-  )
-
-  yield put( sendMaxFeeCalculated( fee ) )
-}
-
-export const calculateSendMaxFeeWatcher = createWatcher(
-  calculateSendMaxFee,
-  CALCULATE_SEND_MAX_FEE
-)
-
 function* executeSendStage2( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
@@ -391,48 +358,6 @@ export const executeSendStage2Watcher = createWatcher(
   EXECUTE_SEND_STAGE2
 )
 
-function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
-  const { accountShellID, token } = payload
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const sending: SendingState = yield select(
-    ( state ) => state.sending
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
-    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
-  }
-
-  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = idx( sending, ( _ ) => _.sendST2.carryOver )
-  if ( !txHex || !childIndexArray || !inputs ) {
-    console.log( 'TxHex/child-index/inputs missing' )
-  }
-
-  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
-  if ( res.status === 200 ) {
-    yield put( sendStage3Executed( {
-      successful: true, txid: res.data.txid
-    } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( sendStage3Executed( {
-      successful: false, err: res.err
-    } ) )
-  }
-}
-
-export const executeSendStage3Watcher = createWatcher(
-  executeSendStage3Worker,
-  EXECUTE_SEND_STAGE3
-)
-
 function* executeAlternateSendStage2Worker( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
@@ -481,17 +406,95 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
     nSequence
   )
   if ( res.status === 200 ) {
-    yield put( alternateTransferST2Executed( serviceType, res.data.txid ) )
+    yield put( alternateSendStage2Executed( {
+      successful: true, txid: res.data.txid
+    } ) )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( failedST2( serviceType, {
-      ...res
+    yield put( alternateSendStage2Executed( {
+      successful: false, err: res.err
     } ) )
-    // yield put(switchLoader(serviceType, 'transfer'));
   }
 }
 
 export const executeAlternateSendStage2Watcher = createWatcher(
   executeAlternateSendStage2Worker,
   EXECUTE_ALTERNATE_SEND_STAGE2
+)
+
+function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
+  const { accountShellID, token } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sending: SendingState = yield select(
+    ( state ) => state.sending
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
+    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
+  }
+
+  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = idx( sending, ( _ ) => _.sendST2.carryOver )
+  if ( !txHex || !childIndexArray || !inputs ) {
+    console.log( 'TxHex/child-index/inputs missing' )
+  }
+
+  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
+  if ( res.status === 200 ) {
+    yield put( sendStage3Executed( {
+      successful: true, txid: res.data.txid
+    } ) )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( sendStage3Executed( {
+      successful: false, err: res.err
+    } ) )
+  }
+}
+
+export const executeSendStage3Watcher = createWatcher(
+  executeSendStage3Worker,
+  EXECUTE_SEND_STAGE3
+)
+
+
+
+function* calculateSendMaxFee( { payload }: {payload: {
+  numberOfRecipients: number;
+  accountShellID: string;
+}} ) {
+
+  const { numberOfRecipients, accountShellID } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  const feePerByte = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ][ 'low' ].feePerByte
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+  const { fee } = service.calculateSendMaxFee(
+    numberOfRecipients,
+    feePerByte,
+    derivativeAccountDetails,
+  )
+
+  yield put( sendMaxFeeCalculated( fee ) )
+}
+
+export const calculateSendMaxFeeWatcher = createWatcher(
+  calculateSendMaxFee,
+  CALCULATE_SEND_MAX_FEE
 )
