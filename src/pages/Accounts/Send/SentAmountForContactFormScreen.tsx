@@ -77,7 +77,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     dispatch( executeSendStage1( {
       accountShellID: sourceAccountShell.id
     } ) )
-    navigation.navigate( 'SendConfirmation' )
   }
 
   function handleAddRecipientButtonPress() {
@@ -90,6 +89,14 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       accountShellID: sourceAccountShell.id,
     } ) )
   }
+
+  useEffect( ()=>{
+    const { isSuccessful, hasFailed, failedErrorMessage } = sendingState.sendST1
+    if( isSuccessful ) navigation.navigate( 'SendConfirmation' )
+    else if( hasFailed ) {
+      // TODO: show send failure bottomsheet w/ failedErrorMessage
+    }
+  }, [ sendingState.sendST1 ] )
 
   useEffect( ()=>{
     if( sendingState.feeIntelMissing ){

@@ -22,6 +22,7 @@ export type SendingState = {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
+    isSuccessful: boolean,
     carryOver: { txPrerequisites: TransactionPrerequisite } | null;
   };
 
@@ -29,6 +30,7 @@ export type SendingState = {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
+    isSuccessful: boolean,
     txid: string | null,
     carryOver: {
       txHex: string;
@@ -48,6 +50,7 @@ export type SendingState = {
     inProgress: boolean;
     hasFailed: boolean;
     failedErrorMessage: string | null;
+    isSuccessful: boolean,
     txid: string | null,
   }
 
@@ -65,12 +68,14 @@ const INITIAL_STATE: SendingState = {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
+    isSuccessful: false,
     carryOver: null
   },
   sendST2: {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
+    isSuccessful: false,
     txid: null,
     carryOver: null,
   },
@@ -78,6 +83,7 @@ const INITIAL_STATE: SendingState = {
     inProgress: false,
     hasFailed: false,
     failedErrorMessage: null,
+    isSuccessful: false,
     txid: null,
   },
 
@@ -155,6 +161,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           sendST1:{
             inProgress: true,
             hasFailed: false,
+            isSuccessful: false,
             failedErrorMessage: null,
             carryOver: null
           },
@@ -179,6 +186,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: false,
             hasFailed: !action.payload.successful,
             failedErrorMessage: !action.payload.successful? action.payload.err : null,
+            isSuccessful: action.payload.successful,
             carryOver: {
               txPrerequisites
             }
@@ -200,6 +208,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: true,
             hasFailed: false,
             failedErrorMessage: null,
+            isSuccessful: false,
             txid: null,
             carryOver: null
           },
@@ -213,6 +222,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
               inProgress: false,
               hasFailed: true,
               failedErrorMessage: action.payload.err,
+              isSuccessful: false,
               txid: null,
               carryOver: null,
             },
@@ -227,6 +237,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
               inProgress: false,
               hasFailed: false,
               failedErrorMessage: null,
+              isSuccessful: true,
               txid: action.payload.txid,
               carryOver: null,
             },
@@ -241,6 +252,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: false,
             hasFailed: false,
             failedErrorMessage: null,
+            isSuccessful: true,
             txid: null,
             carryOver: {
               txHex, childIndexArray, inputs, derivativeAccountDetails,
@@ -255,6 +267,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: true,
             hasFailed: false,
             failedErrorMessage: null,
+            isSuccessful: false,
             txid: null,
           },
         }
@@ -266,6 +279,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: false,
             hasFailed: !action.payload.successful,
             failedErrorMessage: !action.payload.successful? action.payload.err: null,
+            isSuccessful: action.payload.successful,
             txid: action.payload.successful? action.payload.txid: null,
           },
         }
@@ -277,6 +291,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: true,
             hasFailed: false,
             failedErrorMessage: null,
+            isSuccessful: false,
             txid: null,
             carryOver: null
           },
@@ -289,6 +304,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             inProgress: false,
             hasFailed: !action.payload.successful,
             failedErrorMessage: !action.payload.successful? action.payload.err: null,
+            isSuccessful: action.payload.successful,
             txid: action.payload.successful? action.payload.txid: null,
           },
         }
