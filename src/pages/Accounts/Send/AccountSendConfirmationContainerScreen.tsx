@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useMemo, useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
@@ -17,6 +17,8 @@ import SendConfirmationCurrentTotalHeader from '../../../components/send/SendCon
 import TransactionPriorityMenu from './TransactionPriorityMenu'
 import { executeAlternateSendStage2, executeSendStage2 } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import RelayServices from '../../../bitcoin/services/RelayService'
 
 export type NavigationParams = {
 };
@@ -33,11 +35,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  const usingExitKey = useExitKeyForSending( )
-  const dispatch = useDispatch()
+  const usingExitKey = useExitKeyForSending()
+  const sendingState = useSendingState()
   const availableBalance = useMemo( () => {
-    return AccountShell.getTotalBalance( sourceAccountShell )
+    return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
+  const dispatch = useDispatch()
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
@@ -46,7 +49,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
     return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
-
 
   function handleConfirmationButtonPress() {
     // TODO: populate txnPriority based on user selection
@@ -68,6 +70,32 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     navigation.goBack()
   }
 
+  useEffect( ()=>{
+    const { isSuccessful, txid, hasFailed, failedErrorMessage } = sendingState.sendST2
+    if( isSuccessful ) {
+      if( txid ){
+        // TODO: show send succcesful bottomsheet
+
+
+        // TODO: integrate donation send
+        // if ( this.donationId ) {
+        //   if ( transfer.details[ 0 ].note ) {
+        //     const txNote = {
+        //       txId: transfer.txid,
+        //       note: transfer.details[ 0 ].note,
+        //     }
+        //     RelayServices.sendDonationNote( this.donationId, txNote )
+        //   }
+        // }
+
+        // this.sendNotifications()
+        // this.storeTrustedContactsHistory( transfer.details )
+      } else navigation.navigate( 'TwoFAToken' )
+    }
+    else if( hasFailed ) {
+      // TODO: show send failure bottomsheet w/ failedErrorMessage
+    }
+  }, [ sendingState.sendST2 ] )
 
   return (
     <View style={styles.rootContainer}>

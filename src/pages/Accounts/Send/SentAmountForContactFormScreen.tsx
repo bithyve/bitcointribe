@@ -44,7 +44,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( null )
   const [ noteText, setNoteText ] = useState( '' )
-  const averageTransactionFees = useAverageTransactionFees()
   const sendingState = useSendingState()
 
   const availableBalance = useMemo( () => {
