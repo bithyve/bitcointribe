@@ -68,7 +68,7 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
             case ( ServiceAccountKind.WYRE ):
               return Colors.coral
             case ( ServiceAccountKind.RAMP ):
-              return Colors.purple
+              return Colors.riptide
         }
       default:
         return Colors.borderColor

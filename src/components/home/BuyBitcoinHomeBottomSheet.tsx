@@ -34,22 +34,22 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   //   disabled: false
   // },
   {
-    title: Platform.OS == 'ios' ? 'Buy using Apple Pay, Debit Card & more' : 'Buy using Debit/Credit Card and Bank Transfer',
-    subtitle: 'Powered by Ramp',
+    title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
+    subtitle: 'Fees starting from 0.49%',
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false
   },
-  // {
-  //   title: 'Buy using ApplePay or Debit Card',
-  //   subtitle: 'Powered by Wyre',
-  //   kind: BuyMenuItemKind.WYRE,
-  //   imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-  //   disabled: false
-  // },
   {
-    title: 'Set up automatic buys   (COMING SOON)',
-    subtitle: 'Stack sats with SwanBitcoin',
+    title: 'Buy with Wyre  (COMING SOON)',
+    subtitle: 'Buy any amount',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/wyre_notext_small_disabled.png' ),
+    disabled: true
+  },
+  {
+    title: 'Set up automatic buys  (COMING SOON)',
+    subtitle: 'Stack sats with Swan Bitcoin',
     kind: BuyMenuItemKind.SWAN,
     imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
     disabled: true

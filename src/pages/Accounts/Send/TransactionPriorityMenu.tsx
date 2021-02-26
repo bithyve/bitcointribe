@@ -1,9 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native'
-import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
-import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import RadioButton from '../../../components/RadioButton'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -13,14 +11,19 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import CustomPriorityContent from '../CustomPriorityContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import { timeConvertNear30 } from '../../../common/utilities'
+import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
+import NetworkKind from '../../../common/data/enums/NetworkKind'
+import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
+import config from '../../../bitcoin/HexaConfig'
+
 
 export type Props = {
-
+  sourceSubAccount: SubAccountDescribing
 };
 
-const TransactionPriorityMenu: React.FC<Props> = ( {}: Props ) => {
+
+const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
 
@@ -28,16 +31,21 @@ const TransactionPriorityMenu: React.FC<Props> = ( {}: Props ) => {
 
 
   const showCustomPriorityBottomSheet = useCallback( () => {
+    const network = (
+      config.APP_STAGE === 'dev' ||
+      sourceSubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+    ) ? NetworkKind.TESTNET : NetworkKind.MAINNET
+
     presentBottomSheet(
       <CustomPriorityContent
         title={'Custom Priority'}
         info={'Enter the fee rate in sats per byte.'}
         // err={this.state.customFeePerByteErr}
-        // network={network}
+        network={network}
         okButtonText={'Confirm'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={( amount, customEstimatedBlock ) => {
+        onPressOk={(  ) => {
           Keyboard.dismiss()
           dismissBottomSheet()
           // this.handleCustomFee( amount, customEstimatedBlock )

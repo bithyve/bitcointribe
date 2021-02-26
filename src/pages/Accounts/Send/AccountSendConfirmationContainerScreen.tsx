@@ -96,6 +96,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationCurrentTotalHeader />
 
       <TransactionPriorityMenu
+        sourceSubAccount={sourcePrimarySubAccount}
         // onSelect={handlePrioritySelection}
       />
 

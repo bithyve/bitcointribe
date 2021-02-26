@@ -1,7 +1,6 @@
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, feeIntelMissing, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED, AMOUNT_FOR_RECIPIENT_UPDATED } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
@@ -16,7 +15,6 @@ export type SendingState = {
   sourceAccountShell: AccountShell | null;
 
   selectedRecipients: RecipientDescribing[];
-  amountDesignations: AmountDesignations;
 
   recipientSelectedForSettingAmount: RecipientDescribing | null;
 
@@ -61,8 +59,6 @@ export type SendingState = {
 const INITIAL_STATE: SendingState = {
   sourceAccountShell: null,
   selectedRecipients: [],
-  amountDesignations: {
-  },
   recipientSelectedForSettingAmount: null,
 
   sendST1: {
@@ -128,11 +124,10 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
 
         return {
           ...state,
-          selectedRecipients: [ ...state.selectedRecipients, recipient ],
-          amountDesignations: {
-            ...state.amountDesignations,
-            [ recipient.id ]: 0,
-          },
+          selectedRecipients: state
+            .selectedRecipients
+            .filter( r => r.id != recipient.id )
+            .concat( recipient )
         }
 
       case RECIPIENT_SELECTED_FOR_AMOUNT_SETTING:
@@ -140,6 +135,19 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           ...state,
           recipientSelectedForSettingAmount: action.payload,
         }
+
+      case AMOUNT_FOR_RECIPIENT_UPDATED: {
+        recipient = action.payload.recipient
+        recipient.amount = action.payload.amount
+
+        return {
+          ...state,
+          selectedRecipients: state
+            .selectedRecipients
+            .filter( r => r.id != recipient.id )
+            .concat( recipient )
+        }
+      }
 
       case EXECUTE_SEND_STAGE1:
         return {

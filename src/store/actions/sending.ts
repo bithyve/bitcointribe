@@ -7,6 +7,7 @@ import { TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
 export const RECIPIENT_SELECTED_FOR_AMOUNT_SETTING = 'RECIPIENT_SELECTED_FOR_AMOUNT_SETTING'
+export const AMOUNT_FOR_RECIPIENT_UPDATED = 'AMOUNT_FOR_RECIPIENT_UPDATED'
 export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPIENT'
 export const EXECUTE_SENDING = 'EXECUTE_SENDING'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
@@ -66,6 +67,28 @@ export const recipientSelectedForAmountSetting = (
     payload,
   }
 }
+
+
+export interface AmountForRecipientUpdatedAction extends Action {
+  type: typeof AMOUNT_FOR_RECIPIENT_UPDATED;
+  payload: {
+    recipient: RecipientDescribing;
+    amount: Satoshis;
+  }
+}
+
+export const amountForRecipientUpdated = (
+  payload: {
+    recipient: RecipientDescribing;
+    amount: Satoshis;
+  }
+): AmountForRecipientUpdatedAction => {
+  return {
+    type: AMOUNT_FOR_RECIPIENT_UPDATED,
+    payload,
+  }
+}
+
 
 export interface ExecuteSendingAction extends Action {
   type: typeof EXECUTE_SENDING;

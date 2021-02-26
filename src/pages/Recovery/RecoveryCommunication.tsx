@@ -314,6 +314,9 @@ export default function RecoveryCommunication( props ) {
       flex: 1 
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={{
+        flex: 1 
+      }}>
       <View style={commonStyle.headerContainer}>
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
@@ -329,11 +332,7 @@ export default function RecoveryCommunication( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      <View style={styles.modalContentContainer}>
-        <View style={{
-          height: '100%' 
-        }}>
-          <View style={{
+      <View style={{
             marginTop: hp( '2%' ), marginBottom: hp( '2%' ) 
           }}>
             <Text style={styles.commModeModalHeaderText}>
@@ -420,8 +419,7 @@ export default function RecoveryCommunication( props ) {
               </View>
             </View>
           </View>
-          <View>
-            <ScrollView>
+          <ScrollView >
               {contactInfo &&
                 contactInfo.map( ( item, index ) => {
                   return (
@@ -443,7 +441,7 @@ export default function RecoveryCommunication( props ) {
                   )
                 } )}
             </ScrollView>
-          </View>
+          <View style={{height: wp( '15%' ),}}>
           {selectedContactMode ? (
             <TouchableOpacity
               onPress={() => {
@@ -462,7 +460,6 @@ export default function RecoveryCommunication( props ) {
               )}
             </TouchableOpacity>
           ) : null}
-        </View>
       </View>
       <BottomSheet
         onCloseStart={() => {}}
@@ -472,13 +469,13 @@ export default function RecoveryCommunication( props ) {
         renderContent={renderTrustedContactQrContents}
         renderHeader={renderTrustedContactQrHeader}
       />
+      </View>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
   },
   commModeModalHeaderText: {
@@ -536,7 +533,6 @@ const styles = StyleSheet.create( {
   },
   proceedButtonView: {
     marginLeft: 20,
-    marginTop: hp( '3.5%' ),
     height: wp( '13%' ),
     width: wp( '30%' ),
     justifyContent: 'center',
