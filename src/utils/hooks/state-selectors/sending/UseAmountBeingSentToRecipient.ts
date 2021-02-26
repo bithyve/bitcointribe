@@ -7,9 +7,7 @@ import { Satoshis } from '../../../../common/data/typealiases/UnitAliases'
 export default function useAmountBeingSentToRecipient(
   recipient: RecipientDescribing
 ): Satoshis {
-  const sendingState = useSendingState()
-
   return useMemo( () => {
-    return sendingState.amountDesignations[ recipient.id ]
-  }, [ sendingState.amountDesignations ] )
+    return recipient.amount ?? 0
+  }, [ recipient.amount ] )
 }

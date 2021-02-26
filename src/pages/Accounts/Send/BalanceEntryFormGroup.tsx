@@ -162,6 +162,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             onChangeText={( value ) => {
               setIsSendingMax( false )
               setCurrentFiatAmountTextValue( value )
+              setCurrentBTCAmountTextValue( String( currentBTCAmount ) )
               onAmountChanged( currentBTCAmount )
             }}
             onFocus={() => {
@@ -243,6 +244,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             onChangeText={( value ) => {
               setIsSendingMax( false )
               setCurrentBTCAmountTextValue( value )
+              setCurrentFiatAmountTextValue( String( currentFiatAmount ) )
               onAmountChanged( currentBTCAmount )
             }}
             onFocus={() => {
