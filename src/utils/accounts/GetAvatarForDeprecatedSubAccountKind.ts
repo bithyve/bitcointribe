@@ -18,7 +18,7 @@ export default function getAvatarForDeprecatedSubAccountKind( accountKind: strin
   } else if ( [ 'Donation Account', 'DONATION_ACCOUNT' ].includes( accountKind ) ) {
     return require( '../../assets/images/icons/icon_donation_hexa.png' )
   } else if ( [ 'Wyre', 'WYRE' ].includes( accountKind ) ) {
-    return require( '../../assets/images/icons/wyre_notext_small.png' )
+    return require( '../../assets/images/icons/icon_wyre.png' )
   } else if ( [ 'Ramp', 'RAMP' ].includes( accountKind ) ) {
     return require( '../../assets/images/icons/icon_ramp.png' )
   }
