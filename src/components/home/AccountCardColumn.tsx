@@ -38,7 +38,7 @@ const AccountCardColumn: React.FC<Props> = ( {
 
       {cardData.map((accountShell) => {
         let disabled = false;
-        if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
+        // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
         return (
           <TouchableOpacity
             key={accountShell.id}
