@@ -1,7 +1,6 @@
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, EXECUTE_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, AMOUNT_FOR_RECIPIENT_UPDATED } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
@@ -91,6 +90,16 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             .concat( recipient )
         }
 
+      case RECIPIENT_REMOVED_FROM_SENDING:
+        recipient = action.payload
+
+        return {
+          ...state,
+          selectedRecipients: state
+            .selectedRecipients
+            .filter( r => r.id != recipient.id )
+        }
+
       case RECIPIENT_SELECTED_FOR_AMOUNT_SETTING:
         return {
           ...state,
@@ -109,12 +118,6 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
             .concat( recipient )
         }
       }
-
-      case EXECUTE_SENDING:
-        return {
-          ...state,
-          isSendingInProgress: true,
-        }
 
       case SENDING_FAILED:
         return {

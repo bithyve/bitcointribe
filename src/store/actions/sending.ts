@@ -5,12 +5,14 @@ import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
+export const RECIPIENT_REMOVED_FROM_SENDING = 'RECIPIENT_REMOVED_FROM_SENDING'
 export const RECIPIENT_SELECTED_FOR_AMOUNT_SETTING = 'RECIPIENT_SELECTED_FOR_AMOUNT_SETTING'
 export const AMOUNT_FOR_RECIPIENT_UPDATED = 'AMOUNT_FOR_RECIPIENT_UPDATED'
 export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPIENT'
-export const EXECUTE_SENDING = 'EXECUTE_SENDING'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
 export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
+export const EXECUTE_SEND_STAGE2 = 'EXECUTE_SEND_STAGE2'
+export const SEND_STAGE2_EXECUTED = 'SEND_STAGE2_EXECUTED'
 export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
@@ -61,6 +63,22 @@ export const recipientSelectedForAmountSetting = (
 }
 
 
+export interface RecipientRemovedFromSendingAction extends Action {
+  type: typeof RECIPIENT_REMOVED_FROM_SENDING;
+  payload: RecipientDescribing;
+}
+
+export const recipientRemovedFromSending = (
+  payload: RecipientDescribing
+): RecipientRemovedFromSendingAction => {
+  return {
+    type: RECIPIENT_REMOVED_FROM_SENDING,
+    payload,
+  }
+}
+
+
+
 export interface AmountForRecipientUpdatedAction extends Action {
   type: typeof AMOUNT_FOR_RECIPIENT_UPDATED;
   payload: {
@@ -80,19 +98,6 @@ export const amountForRecipientUpdated = (
     payload,
   }
 }
-
-
-export interface ExecuteSendingAction extends Action {
-  type: typeof EXECUTE_SENDING;
-}
-
-export const executeSending = (): ExecuteSendingAction => {
-  return {
-    type: EXECUTE_SENDING,
-  }
-}
-
-
 
 export interface ExecuteSendStage1Action extends Action {
   type: typeof EXECUTE_SEND_STAGE1;
@@ -125,6 +130,49 @@ export const sendStage1Executed = (
     payload,
   }
 }
+
+
+export interface ExecuteSendStage2Action extends Action {
+  type: typeof EXECUTE_SEND_STAGE2;
+  payload: {
+    accountShellID: string;
+    feeAmount: Satoshis;
+  };
+}
+
+
+export const executeSendStage2 = (
+  payload: {
+    accountShellID: string;
+    feeAmount: Satoshis;
+  },
+): ExecuteSendStage2Action => {
+  return {
+    type: EXECUTE_SEND_STAGE2,
+    payload,
+  }
+}
+
+export interface SendStage2ExecutedAction extends Action {
+  type: typeof SEND_STAGE2_EXECUTED;
+  payload: boolean;
+}
+
+export const sendStage2Executed = (
+  payload: boolean,
+): SendStage2ExecutedAction => {
+  return {
+    type: SEND_STAGE2_EXECUTED,
+    payload,
+  }
+}
+
+
+
+
+
+
+
 
 export interface SendingFailureAction extends Action {
   type: typeof SENDING_FAILED;

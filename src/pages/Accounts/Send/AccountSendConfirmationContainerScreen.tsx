@@ -15,6 +15,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
+import { executeSendStage1, executeSendStage2 } from '../../../store/actions/sending'
 
 export type NavigationParams = {
 };
@@ -28,9 +29,11 @@ export type Props = {
 };
 
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  const dispatch = useDispatch()
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const [ feeAmount, setFeeAmount ] = useState( 0 )
 
   const availableBalance = useMemo( () => {
     return AccountShell.getTotalBalance( sourceAccountShell )
@@ -46,12 +49,15 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
 
   function handleConfirmationButtonPress() {
+    dispatch( executeSendStage2( {
+      accountShellID: sourceAccountShell.id,
+      feeAmount,
+    } ) )
   }
 
   function handleBackButtonPress() {
     navigation.goBack()
   }
-
 
   return (
     <View style={styles.rootContainer}>
@@ -65,19 +71,19 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingHorizontal: 24,
         marginBottom: 24,
       }}>
         <Text style={{
-          marginRight: 4
+          marginRight: RFValue( 4 )
         }}>
           Sending From:
         </Text>
 
         <Text style={{
           fontFamily: Fonts.FiraSansRegular,
-          fontSize: RFValue( 12 ),
+          fontSize: RFValue( 11 ),
           fontStyle: 'italic',
           color: Colors.blue,
         }}>
@@ -89,7 +95,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
       <TransactionPriorityMenu
         sourceSubAccount={sourcePrimarySubAccount}
-        // onSelect={handlePrioritySelection}
+        onFeeChanged={setFeeAmount}
       />
 
 

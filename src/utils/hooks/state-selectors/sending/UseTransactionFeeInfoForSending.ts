@@ -1,7 +1,5 @@
 import useSendingState from './UseSendingState'
 import { useMemo } from 'react'
-import { RecipientDescribing } from '../../../../common/data/models/interfaces/RecipientDescribing'
-import { Satoshis } from '../../../../common/data/typealiases/UnitAliases'
 import { TransactionFeeInfo } from '../../../../store/reducers/sending'
 
 
