@@ -6,10 +6,10 @@ import { TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
 
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
+export const RECIPIENT_REMOVED_FROM_SENDING = 'RECIPIENT_REMOVED_FROM_SENDING'
 export const RECIPIENT_SELECTED_FOR_AMOUNT_SETTING = 'RECIPIENT_SELECTED_FOR_AMOUNT_SETTING'
 export const AMOUNT_FOR_RECIPIENT_UPDATED = 'AMOUNT_FOR_RECIPIENT_UPDATED'
 export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPIENT'
-export const EXECUTE_SENDING = 'EXECUTE_SENDING'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
 export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
 export const FEE_INTEL_MISSING = 'FEE_INTEL_MISSING'
@@ -69,6 +69,22 @@ export const recipientSelectedForAmountSetting = (
 }
 
 
+export interface RecipientRemovedFromSendingAction extends Action {
+  type: typeof RECIPIENT_REMOVED_FROM_SENDING;
+  payload: RecipientDescribing;
+}
+
+export const recipientRemovedFromSending = (
+  payload: RecipientDescribing
+): RecipientRemovedFromSendingAction => {
+  return {
+    type: RECIPIENT_REMOVED_FROM_SENDING,
+    payload,
+  }
+}
+
+
+
 export interface AmountForRecipientUpdatedAction extends Action {
   type: typeof AMOUNT_FOR_RECIPIENT_UPDATED;
   payload: {
@@ -89,16 +105,6 @@ export const amountForRecipientUpdated = (
   }
 }
 
-
-export interface ExecuteSendingAction extends Action {
-  type: typeof EXECUTE_SENDING;
-}
-
-export const executeSending = (): ExecuteSendingAction => {
-  return {
-    type: EXECUTE_SENDING,
-  }
-}
 export interface ExecuteSendStage1Action extends Action {
   type: typeof EXECUTE_SEND_STAGE1;
   payload: {

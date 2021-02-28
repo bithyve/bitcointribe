@@ -2,6 +2,7 @@ import React, { useCallback, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
+import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import RadioButton from '../../../components/RadioButton'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -16,19 +17,20 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import config from '../../../bitcoin/HexaConfig'
+import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing
+  onFeeChanged: ( amount: Satoshis ) => void
 };
 
 
-const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, }: Props ) => {
+const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onFeeChanged }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
 
   const transactionFeeInfo = useTransactionFeeInfoForSending()
-
 
   const showCustomPriorityBottomSheet = useCallback( () => {
     const network = (
@@ -45,10 +47,11 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, }: Props 
         okButtonText={'Confirm'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={(  ) => {
+        onPressOk={( amount ) => {
           Keyboard.dismiss()
           dismissBottomSheet()
-          // this.handleCustomFee( amount, customEstimatedBlock )
+          setTransactionPriority( TransactionPriority.CUSTOM )
+          onFeeChanged( amount )
         }}
         onPressCancel={() => {
           Keyboard.dismiss()
@@ -65,20 +68,40 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, }: Props 
 
   return (
     <View style={styles.rootContainer}>
-      <Text>Transaction Priority</Text>
+      <Text style={{
+        ...HeadingStyles.listSectionHeading,
+        paddingHorizontal: 24,
+        marginBottom: 14,
+      }}>
+        Transaction Priority
+      </Text>
 
       <View style={{
         paddingHorizontal: 16
       }}>
-
         <View style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           paddingVertical: 10,
         }}>
-          <Text>Priority</Text>
-          <Text>Arrival Time</Text>
-          <Text>Fee</Text>
+          <Text style={{
+            fontSize: RFValue( 9 ),
+            fontWeight: '700',
+            flex: 1,
+            textAlign: 'center'
+          }}>Priority</Text>
+          <Text style={{
+            fontSize: RFValue( 9 ),
+            fontWeight: '700',
+            flex: 1,
+            textAlign: 'center'
+          }}>Arrival Time</Text>
+          <Text style={{
+            fontSize: RFValue( 9 ),
+            fontWeight: '700',
+            flex: 1,
+            textAlign: 'center'
+          }}>Fee</Text>
         </View>
 
         {[ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ].map( priority => {
@@ -94,7 +117,10 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, }: Props 
                   color={Colors.lightBlue}
                   borderColor={Colors.borderColor}
                   isChecked={transactionPriority == priority}
-                  onpress={() => setTransactionPriority( priority )}
+                  onpress={() => {
+                    setTransactionPriority( priority )
+                    onFeeChanged( transactionFeeInfo[ priority ].amount )
+                  }}
                 />
                 <Text style={{
                   ...styles.priorityTableText,
@@ -113,7 +139,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, }: Props 
               </Text>
 
               <Text style={styles.priorityTableText}>
-                0.10 $
+                {transactionFeeInfo[ priority ].amount} $
               </Text>
             </View>
           )

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react'
+import React, { useMemo, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
@@ -40,6 +40,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
+  const [ feeAmount, setFeeAmount ] = useState( 0 )
   const dispatch = useDispatch()
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
@@ -109,19 +110,19 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingHorizontal: 24,
         marginBottom: 24,
       }}>
         <Text style={{
-          marginRight: 4
+          marginRight: RFValue( 4 )
         }}>
           Sending From:
         </Text>
 
         <Text style={{
           fontFamily: Fonts.FiraSansRegular,
-          fontSize: RFValue( 12 ),
+          fontSize: RFValue( 11 ),
           fontStyle: 'italic',
           color: Colors.blue,
         }}>
@@ -133,7 +134,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
       <TransactionPriorityMenu
         sourceSubAccount={sourcePrimarySubAccount}
-        // onSelect={handlePrioritySelection}
+        onFeeChanged={setFeeAmount}
       />
 
 

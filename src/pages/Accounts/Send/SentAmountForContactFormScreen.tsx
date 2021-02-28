@@ -21,7 +21,7 @@ import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated } from '../../../store/actions/sending'
+import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
 import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
@@ -64,7 +64,8 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
 
   function handleRecipientRemoval( recipient: RecipientDescribing ) {
-    // dispatch(removeRecipientFromSending)
+    dispatch( recipientRemovedFromSending( recipient ) )
+    navigation.goBack()
   }
 
   function handleConfirmationButtonPress() {
@@ -129,19 +130,19 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: 'flex-start',
+        alignItems: 'center',
         paddingHorizontal: 24,
         marginBottom: 24,
       }}>
         <Text style={{
-          marginRight: 4
+          marginRight: RFValue( 4 )
         }}>
           Sending From:
         </Text>
 
         <Text style={{
           fontFamily: Fonts.FiraSansRegular,
-          fontSize: RFValue( 12 ),
+          fontSize: RFValue( 11 ),
           fontStyle: 'italic',
           color: Colors.blue,
         }}>
