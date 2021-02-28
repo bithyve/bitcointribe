@@ -131,7 +131,8 @@ import {
 } from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
-import { calculateSendMaxFeeWatcher, executeSendStage1Watcher } from './sagas/sending'
+import { calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher } from './sagas/sending'
+import { executeAlternateSendStage2 } from './actions/sending'
 
 const rootSaga = function* () {
   const sagas = [
@@ -235,6 +236,9 @@ const rootSaga = function* () {
 
     // Sending
     executeSendStage1Watcher,
+    executeSendStage2Watcher,
+    executeAlternateSendStage2Watcher,
+    executeSendStage3Watcher,
     calculateSendMaxFeeWatcher,
   ]
 

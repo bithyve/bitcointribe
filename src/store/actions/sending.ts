@@ -2,6 +2,7 @@ import { Action } from 'redux'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import AccountShell from '../../common/data/models/AccountShell'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
+import { TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
 
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
@@ -11,8 +12,13 @@ export const AMOUNT_FOR_RECIPIENT_UPDATED = 'AMOUNT_FOR_RECIPIENT_UPDATED'
 export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPIENT'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
 export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
+export const FEE_INTEL_MISSING = 'FEE_INTEL_MISSING'
 export const EXECUTE_SEND_STAGE2 = 'EXECUTE_SEND_STAGE2'
 export const SEND_STAGE2_EXECUTED = 'SEND_STAGE2_EXECUTED'
+export const EXECUTE_ALTERNATE_SEND_STAGE2 = 'EXECUTE_ALTERNATE_SEND_STAGE2'
+export const ALTERNATE_SEND_STAGE2_EXECUTED = 'ALTERNATE_SEND_STAGE2_EXECUTED'
+export const EXECUTE_SEND_STAGE3 = 'EXECUTE_SEND_STAGE3'
+export const SEND_STAGE3_EXECUTED = 'SEND_STAGE3_EXECUTED'
 export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
@@ -119,11 +125,11 @@ export const executeSendStage1 = (
 
 export interface SendStage1ExecutedAction extends Action {
   type: typeof SEND_STAGE1_EXECUTED;
-  payload: boolean;
+  payload: {successful: boolean, carryOver?: { txPrerequisites?: TransactionPrerequisite }, err?: string };
 }
 
 export const sendStage1Executed = (
-  payload: boolean,
+  payload: {successful: boolean, carryOver?: { txPrerequisites?: TransactionPrerequisite }, err?: string },
 ): SendStage1ExecutedAction => {
   return {
     type: SEND_STAGE1_EXECUTED,
@@ -131,21 +137,41 @@ export const sendStage1Executed = (
   }
 }
 
+export interface FeeIntelMissingAction extends Action {
+  type: typeof FEE_INTEL_MISSING;
+  payload: {
+    intelMissing: boolean;
+  };
+}
+
+export const feeIntelMissing = (
+  payload: {
+    intelMissing: boolean;
+  },
+): FeeIntelMissingAction => {
+  return {
+    type: FEE_INTEL_MISSING,
+    payload,
+  }
+}
 
 export interface ExecuteSendStage2Action extends Action {
   type: typeof EXECUTE_SEND_STAGE2;
   payload: {
     accountShellID: string;
-    feeAmount: Satoshis;
+    txnPriority: string,
+    customTxPrerequisites?: any,
+    nSequence?: number
   };
 }
-
 
 export const executeSendStage2 = (
   payload: {
     accountShellID: string;
-    feeAmount: Satoshis;
-  },
+    txnPriority: string,
+    customTxPrerequisites?: any,
+    nSequence?: number
+    },
 ): ExecuteSendStage2Action => {
   return {
     type: EXECUTE_SEND_STAGE2,
@@ -155,11 +181,11 @@ export const executeSendStage2 = (
 
 export interface SendStage2ExecutedAction extends Action {
   type: typeof SEND_STAGE2_EXECUTED;
-  payload: boolean;
+  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string};
 }
 
 export const sendStage2Executed = (
-  payload: boolean,
+  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string},
 ): SendStage2ExecutedAction => {
   return {
     type: SEND_STAGE2_EXECUTED,
@@ -168,11 +194,77 @@ export const sendStage2Executed = (
 }
 
 
+export interface ExecuteAlternateSendStage2Action extends Action {
+  type: typeof EXECUTE_ALTERNATE_SEND_STAGE2;
+  payload: {
+    accountShellID: string;
+    txnPriority: string,
+    customTxPrerequisites?: any,
+    nSequence?: number
+  };
+}
 
+export const executeAlternateSendStage2 = (
+  payload: {
+    accountShellID: string;
+    txnPriority: string,
+    customTxPrerequisites?: any,
+    nSequence?: number
+    },
+): ExecuteAlternateSendStage2Action => {
+  return {
+    type: EXECUTE_ALTERNATE_SEND_STAGE2,
+    payload,
+  }
+}
 
+export interface AlternateSendStage2ExecutedAction extends Action {
+  type: typeof ALTERNATE_SEND_STAGE2_EXECUTED;
+  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string};
+}
 
+export const alternateSendStage2Executed = (
+  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string},
+): AlternateSendStage2ExecutedAction => {
+  return {
+    type: ALTERNATE_SEND_STAGE2_EXECUTED,
+    payload,
+  }
+}
 
+export interface ExecuteSendStage3Action extends Action {
+  type: typeof EXECUTE_SEND_STAGE3;
+  payload: {
+    accountShellID: string;
+    token: number
+  };
+}
 
+export const executeSendStage3 = (
+  payload: {
+    accountShellID: string;
+    token: number
+    },
+): ExecuteSendStage3Action => {
+  return {
+    type: EXECUTE_SEND_STAGE3,
+    payload,
+  }
+}
+
+export interface SendStage3ExecutedAction extends Action {
+  type: typeof SEND_STAGE3_EXECUTED;
+  payload: {successful: boolean, txid?: string, err?: string};
+}
+
+export const sendStage3Executed = (
+  payload: {successful: boolean, txid?: string, err?: string},
+): SendStage3ExecutedAction => {
+  return {
+    type: SEND_STAGE3_EXECUTED,
+    payload,
+  }
+}
 
 export interface SendingFailureAction extends Action {
   type: typeof SENDING_FAILED;

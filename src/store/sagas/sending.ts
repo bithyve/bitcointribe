@@ -1,13 +1,13 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { CALCULATE_SEND_MAX_FEE, EXECUTE_SEND_STAGE1, sendMaxFeeCalculated, sendStage1Executed } from '../actions/sending'
+import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
+import { DerivativeAccountTypes, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -16,6 +16,8 @@ import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT, TEST_ACCOUNT, TRU
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { AccountRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
+import { SendingState } from '../reducers/sending'
+import idx from 'idx'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -243,21 +245,9 @@ function* executeSendStage1( { payload }: {payload: {
   ].service
 
   if( !accountsState.averageTxFees ){
-    // custom fee-fallback (missing txn fee intel)
-
-    // TODO: fire intel absent action such that the UI would navigate to SendConfirmation screen w/ below params
-    this.props.navigation.navigate( 'SendConfirmation', {
-      accountShellID,
-      serviceType,
-      sweepSecure,
-      spendableBalance,
-      recipients,
-      averageTxFees,
-      isSendMax,
-      derivativeAccountDetails,
-      donationId,
-      feeIntelAbsent: true,
-    } )
+    yield put( feeIntelMissing( {
+      intelMissing: true
+    } ) )
     return
   }
 
@@ -273,14 +263,26 @@ function* executeSendStage1( { payload }: {payload: {
       averageTxFeeByNetwork,
       derivativeAccountDetails
     )
-    if ( res.status === 200 )
-      yield put( sendStage1Executed( true ) )
+    if ( res.status === 200 ){
+      const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
+      yield put( sendStage1Executed( {
+        successful: true, carryOver: {
+          txPrerequisites
+        }
+      } ) )
+    }
     else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
-      yield put( sendStage1Executed( false ) )
+      yield put( sendStage1Executed( {
+        successful: false,
+        err: res.err
+      } ) )
     }
   } catch ( err ) {
-    yield put( sendStage1Executed( false ) )
+    yield put( sendStage1Executed( {
+      successful: false,
+      err
+    } ) )
     return
   }
 }
@@ -289,6 +291,180 @@ export const executeSendStage1Watcher = createWatcher(
   executeSendStage1,
   EXECUTE_SEND_STAGE1
 )
+
+function* executeSendStage2( { payload }: {payload: {
+  accountShellID: string;
+  txnPriority: string,
+  customTxPrerequisites: any,
+  nSequence: number
+}} ) {
+  const { accountShellID } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sending: SendingState = yield select(
+    ( state ) => state.sending
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
+  const { txnPriority, customTxPrerequisites, nSequence } = payload
+  if ( !txPrerequisites && !customTxPrerequisites ) {
+    console.log( 'Transaction prerequisites missing' )
+    return
+  }
+
+  const res = yield call(
+    service.transferST2,
+    txPrerequisites,
+    txnPriority,
+    customTxPrerequisites,
+    derivativeAccountDetails,
+    nSequence
+  )
+
+  if ( res.status === 200 ) {
+    if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
+      const { txHex, childIndexArray, inputs, derivativeAccountDetails } = res.data
+      yield put( sendStage2Executed( {
+        successful: true,
+        carryOver: {
+          txHex, childIndexArray, inputs, derivativeAccountDetails
+        }
+      }
+      ) )
+    } else yield put( sendStage2Executed( {
+      successful: true,
+      txid: res.data.txid
+    } ) )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( sendStage2Executed( {
+      successful: false,
+      err: res.err
+    } ) )
+  }
+}
+
+export const executeSendStage2Watcher = createWatcher(
+  executeSendStage2,
+  EXECUTE_SEND_STAGE2
+)
+
+function* executeAlternateSendStage2Worker( { payload }: {payload: {
+  accountShellID: string;
+  txnPriority: string,
+  customTxPrerequisites: any,
+  nSequence: number
+  }} ) {
+
+  const {
+    accountShellID,
+    txnPriority,
+    customTxPrerequisites,
+    nSequence,
+  } = payload
+
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sending: SendingState = yield select(
+    ( state ) => state.sending
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
+    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
+  }
+
+  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
+  if ( !txPrerequisites ) {
+    console.log( 'Transaction prerequisites missing' )
+    return
+  }
+
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+  const res = yield call(
+    service.alternateTransferST2,
+    txPrerequisites,
+    txnPriority,
+    customTxPrerequisites,
+    derivativeAccountDetails,
+    nSequence
+  )
+  if ( res.status === 200 ) {
+    yield put( alternateSendStage2Executed( {
+      successful: true, txid: res.data.txid
+    } ) )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( alternateSendStage2Executed( {
+      successful: false, err: res.err
+    } ) )
+  }
+}
+
+export const executeAlternateSendStage2Watcher = createWatcher(
+  executeAlternateSendStage2Worker,
+  EXECUTE_ALTERNATE_SEND_STAGE2
+)
+
+function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
+  const { accountShellID, token } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sending: SendingState = yield select(
+    ( state ) => state.sending
+  )
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
+    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
+  }
+
+  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = idx( sending, ( _ ) => _.sendST2.carryOver )
+  if ( !txHex || !childIndexArray || !inputs ) {
+    console.log( 'TxHex/child-index/inputs missing' )
+  }
+
+  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
+  if ( res.status === 200 ) {
+    yield put( sendStage3Executed( {
+      successful: true, txid: res.data.txid
+    } ) )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    yield put( sendStage3Executed( {
+      successful: false, err: res.err
+    } ) )
+  }
+}
+
+export const executeSendStage3Watcher = createWatcher(
+  executeSendStage3Worker,
+  EXECUTE_SEND_STAGE3
+)
+
+
 
 function* calculateSendMaxFee( { payload }: {payload: {
   numberOfRecipients: number;

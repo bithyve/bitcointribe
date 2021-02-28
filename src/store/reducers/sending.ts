@@ -1,9 +1,10 @@
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, SENDING_FAILED, SENDING_SUCCEEDED, SENDING_COMPLETED, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
+import {  InputUTXOs, TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
 
 type RecipientID = string;
 
@@ -17,12 +18,44 @@ export type SendingState = {
 
   recipientSelectedForSettingAmount: RecipientDescribing | null;
 
-  isSendingInProgress: boolean;
-  hasSendingFailed: boolean;
-  sendingFailedErrorMessage: string | null;
+  sendST1: {
+    inProgress: boolean;
+    hasFailed: boolean;
+    failedErrorMessage: string | null;
+    isSuccessful: boolean,
+    carryOver: { txPrerequisites: TransactionPrerequisite } | null;
+  };
+
+  sendST2: {
+    inProgress: boolean;
+    hasFailed: boolean;
+    failedErrorMessage: string | null;
+    isSuccessful: boolean,
+    txid: string | null,
+    carryOver: {
+      txHex: string;
+      childIndexArray: Array<{
+        childIndex: number;
+        inputIdentifier: {
+          txId: string;
+          vout: number;
+        };
+      }>;
+      inputs: InputUTXOs[],
+      derivativeAccountDetails?: { type: string; number: number },
+    };
+  };
+
+  sendST3: {
+    inProgress: boolean;
+    hasFailed: boolean;
+    failedErrorMessage: string | null;
+    isSuccessful: boolean,
+    txid: string | null,
+  }
 
   sendMaxFee: Satoshis;
-
+  feeIntelMissing: Boolean,
   transactionFeeInfo: TransactionFeeInfo;
 };
 
@@ -31,18 +64,31 @@ const INITIAL_STATE: SendingState = {
   selectedRecipients: [],
   recipientSelectedForSettingAmount: null,
 
-  /*
-  This should change to a new type with 4 stages
-  to start with please call them ST1, ST2, ST3 and ST4
-  Each one can be executed or failed
-  */
-  isSendingInProgress: false,
-
-  hasSendingFailed: false,
-  sendingFailedErrorMessage: null,
+  sendST1: {
+    inProgress: false,
+    hasFailed: false,
+    failedErrorMessage: null,
+    isSuccessful: false,
+    carryOver: null
+  },
+  sendST2: {
+    inProgress: false,
+    hasFailed: false,
+    failedErrorMessage: null,
+    isSuccessful: false,
+    txid: null,
+    carryOver: null,
+  },
+  sendST3: {
+    inProgress: false,
+    hasFailed: false,
+    failedErrorMessage: null,
+    isSuccessful: false,
+    txid: null,
+  },
 
   sendMaxFee: 0,
-
+  feeIntelMissing: false,
   /*
   the UI needs to keep track of fees to display on screen
   Three level of fees priority with time estimate for each
@@ -119,25 +165,160 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
         }
       }
 
-      case SENDING_FAILED:
+      case EXECUTE_SEND_STAGE1:
         return {
           ...state,
-          isSendingInProgress: false,
-          hasSendingFailed: true,
-          sendingFailedErrorMessage: action.payload,
+          sendST1:{
+            inProgress: true,
+            hasFailed: false,
+            isSuccessful: false,
+            failedErrorMessage: null,
+            carryOver: null
+          },
+          feeIntelMissing: false,
+          transactionFeeInfo: INITIAL_STATE.transactionFeeInfo,
         }
 
-      case SENDING_SUCCEEDED:
+      case SEND_STAGE1_EXECUTED:
+        const transactionFeeInfo: TransactionFeeInfo = state.transactionFeeInfo
+        let txPrerequisites: TransactionPrerequisite
+        if( action.payload.successful ){
+          const carryOver = action.payload.carryOver
+          txPrerequisites = carryOver.txPrerequisites
+          Object.keys( txPrerequisites ).forEach( ( priority ) =>{
+            transactionFeeInfo[ priority.toUpperCase() ].amount = txPrerequisites[ priority ].fee
+            transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation = txPrerequisites[ priority ].estimatedBlocks
+          } )
+        }
         return {
           ...state,
-          hasSendingFailed: false,
-          sendingFailedErrorMessage: null,
+          sendST1: {
+            inProgress: false,
+            hasFailed: !action.payload.successful,
+            failedErrorMessage: !action.payload.successful? action.payload.err : null,
+            isSuccessful: action.payload.successful,
+            carryOver: {
+              txPrerequisites
+            }
+          },
+          transactionFeeInfo
         }
 
-      case SENDING_COMPLETED:
+      case FEE_INTEL_MISSING:
         return {
-          ...INITIAL_STATE
+          ...state,
+          feeIntelMissing: action.payload.intelMissing
         }
+
+
+      case EXECUTE_SEND_STAGE2:
+        return {
+          ...state,
+          sendST2:{
+            inProgress: true,
+            hasFailed: false,
+            failedErrorMessage: null,
+            isSuccessful: false,
+            txid: null,
+            carryOver: null
+          },
+        }
+
+      case SEND_STAGE2_EXECUTED:
+        if( !action.payload.successful ){
+          return {
+            ...state,
+            sendST2: {
+              inProgress: false,
+              hasFailed: true,
+              failedErrorMessage: action.payload.err,
+              isSuccessful: false,
+              txid: null,
+              carryOver: null,
+            },
+          }
+        }
+
+        if( action.payload.txid ){
+          // non-2FA send
+          return {
+            ...state,
+            sendST2: {
+              inProgress: false,
+              hasFailed: false,
+              failedErrorMessage: null,
+              isSuccessful: true,
+              txid: action.payload.txid,
+              carryOver: null,
+            },
+          }
+        }
+
+        const carryOver = action.payload.carryOver
+        const{ txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
+        return {
+          ...state,
+          sendST2: {
+            inProgress: false,
+            hasFailed: false,
+            failedErrorMessage: null,
+            isSuccessful: true,
+            txid: null,
+            carryOver: {
+              txHex, childIndexArray, inputs, derivativeAccountDetails,
+            }
+          },
+        }
+
+      case EXECUTE_SEND_STAGE3:
+        return {
+          ...state,
+          sendST3:{
+            inProgress: true,
+            hasFailed: false,
+            failedErrorMessage: null,
+            isSuccessful: false,
+            txid: null,
+          },
+        }
+
+      case SEND_STAGE3_EXECUTED:
+        return {
+          ...state,
+          sendST3: {
+            inProgress: false,
+            hasFailed: !action.payload.successful,
+            failedErrorMessage: !action.payload.successful? action.payload.err: null,
+            isSuccessful: action.payload.successful,
+            txid: action.payload.successful? action.payload.txid: null,
+          },
+        }
+
+      case EXECUTE_ALTERNATE_SEND_STAGE2:
+        return {
+          ...state,
+          sendST2:{
+            inProgress: true,
+            hasFailed: false,
+            failedErrorMessage: null,
+            isSuccessful: false,
+            txid: null,
+            carryOver: null
+          },
+        }
+
+      case ALTERNATE_SEND_STAGE2_EXECUTED:
+        return {
+          ...state,
+          sendST3: {
+            inProgress: false,
+            hasFailed: !action.payload.successful,
+            failedErrorMessage: !action.payload.successful? action.payload.err: null,
+            isSuccessful: action.payload.successful,
+            txid: action.payload.successful? action.payload.txid: null,
+          },
+        }
+
 
       case SEND_MAX_FEE_CALCULATED:
         return {

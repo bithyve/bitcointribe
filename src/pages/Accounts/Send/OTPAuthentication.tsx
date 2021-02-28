@@ -20,11 +20,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  transferST3,
-  clearTransfer,
-  fetchBalanceTx,
-} from '../../../store/actions/accounts'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../../components/ModalHeader'
@@ -32,8 +27,8 @@ import SendConfirmationContent from '../SendConfirmationContent'
 import { createRandomString } from '../../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
 import DeviceInfo from 'react-native-device-info'
-import SendStatusModalContents from '../../../components/SendStatusModalContents'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
+import { executeSendStage3 } from '../../../store/actions/sending'
+import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 
 export default function TwoFAToken( props ) {
   const [ Elevation, setElevation ] = useState( 10 )
@@ -46,6 +41,8 @@ export default function TwoFAToken( props ) {
   const { transfer, loading } = useSelector(
     ( state ) => state.accounts[ serviceType ],
   )
+  const sourceAccountShell = useSourceAccountShellForSending()
+
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
   function onPressNumber( text ) {
@@ -139,7 +136,7 @@ export default function TwoFAToken( props ) {
             SendUnSuccessBottomSheet.current.snapTo( 0 )
         }}
         onPressCancel={() => {
-          dispatch( clearTransfer( serviceType ) )
+          // dispatch( clearTransfer( serviceType ) )
           if ( SendUnSuccessBottomSheet.current )
             SendUnSuccessBottomSheet.current.snapTo( 0 )
           props.navigation.navigate( 'AccountDetails' )
@@ -402,7 +399,10 @@ export default function TwoFAToken( props ) {
                 setTimeout( () => {
                   setIsConfirmDisabled( true )
                 }, 1 )
-                dispatch( transferST3( serviceType, token ) )
+                dispatch( executeSendStage3( {
+                  accountShellID: sourceAccountShell.id,
+                  token: parseInt( token )
+                } ) )
               }}
               style={{
                 ...styles.confirmModalButtonView,

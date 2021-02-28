@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Keyboard } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
@@ -23,6 +23,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
 import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
 export type NavigationParams = {
 };
@@ -43,7 +44,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( null )
   const [ noteText, setNoteText ] = useState( '' )
-  const averageTransactionFees = useAverageTransactionFees()
+  const sendingState = useSendingState()
 
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
@@ -76,7 +77,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     dispatch( executeSendStage1( {
       accountShellID: sourceAccountShell.id
     } ) )
-    navigation.navigate( 'SendConfirmation' )
   }
 
   function handleAddRecipientButtonPress() {
@@ -89,6 +89,33 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       accountShellID: sourceAccountShell.id,
     } ) )
   }
+
+  useEffect( ()=>{
+    const { isSuccessful, hasFailed, failedErrorMessage } = sendingState.sendST1
+    if( isSuccessful ) navigation.navigate( 'SendConfirmation' )
+    else if( hasFailed ) {
+      // TODO: show send failure bottomsheet w/ failedErrorMessage
+    }
+  }, [ sendingState.sendST1 ] )
+
+  useEffect( ()=>{
+    if( sendingState.feeIntelMissing ){
+      // missing fee intel: custom fee-fallback
+
+      // this.props.navigation.navigate( 'SendConfirmation', {
+      //   accountShellID,
+      //   serviceType,
+      //   sweepSecure,
+      //   spendableBalance,
+      //   recipients,
+      //   averageTxFees,
+      //   isSendMax,
+      //   derivativeAccountDetails,
+      //   donationId,
+      //   feeIntelAbsent: true,
+      // } )
+    }
+  }, [ sendingState.feeIntelMissing ] )
 
   return (
     <View style={styles.rootContainer}>
