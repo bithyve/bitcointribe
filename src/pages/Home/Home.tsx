@@ -1847,7 +1847,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.SWAN_STATUS_INFO:
           return (
             <>
-              <BottomSheetHeader title="Stack Sats with SwanBitcoin" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
               <BottomSheetSwanInfo
                 swanFromDeepLink={this.state.swanFromDeepLink}
                 swanFromBuyMenu={this.state.swanFromBuyMenu}

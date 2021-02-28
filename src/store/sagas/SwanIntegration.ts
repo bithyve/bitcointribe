@@ -69,10 +69,10 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     state,
     code_verifier
   } )
-
+  console.log( 'swanResponse.data ', swanResponse.data )
   const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
   yield put( redeemSwanCodeForTokenSucceeded( {
-    swanAuthenticatedCode: access_token
+    swanAuthenticatedToken: access_token
   } ) )
 }
 

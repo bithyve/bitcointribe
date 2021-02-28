@@ -24,7 +24,7 @@ export type SwanIntegrationState = {
   hasRedeemSwanCodeForTokenSucceeded: boolean | null,
   hasRedeemSwanCodeForTokenCompleted: boolean | null,
   hasRedeemSwanCodeForTokenInitiated: boolean | null,
-  swanAuthenticatedCode: string | null,
+  swanAuthenticatedToken: string | null,
   isSwanRedeemCodeInProgress: boolean | null,
   swanToken: string | null
 
@@ -63,7 +63,7 @@ const INITIAL_STATE: SwanIntegrationState = {
   hasRedeemSwanCodeForTokenSucceeded: false,
   hasRedeemSwanCodeForTokenCompleted: false,
   hasRedeemSwanCodeForTokenInitiated: false,
-  swanAuthenticatedCode: null,
+  swanAuthenticatedToken: null,
   isSwanRedeemCodeInProgress: false,
   swanToken: null,
 
@@ -112,7 +112,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           code_verifier: action.payload.data.code_verifier,
           nonce: action.payload.data.nonce,
           state: action.payload.data.state,
-          swanAuthenticatedCode: null,
+          swanAuthenticatedToken: null,
           hasRedeemSwanCodeForTokenSucceeded: false,
           hasRedeemSwanCodeForTokenCompleted: false,
           hasRedeemSwanCodeForTokenInitiated: false,
@@ -123,11 +123,12 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasRedeemSwanCodeForTokenInitiated: true,
         }
       case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
+        console.log( 'REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED ', action.payload )
         return {
           ...state,
           hasRedeemSwanCodeForTokenSucceeded: true,
           hasRedeemSwanCodeForTokenCompleted: true,
-          swanAuthenticatedCode: action.payload.data.swanAuthenticatedCode
+          swanAuthenticatedToken: action.payload.data.swanAuthenticatedToken
         }
       case LINK_SWAN_WALLET:
         return {
