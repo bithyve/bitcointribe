@@ -14,8 +14,9 @@ import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWra
 import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
+import { addNewAccountShell } from '../../../store/actions/accounts'
 
-const boottomSheetRenderCount = 0
+let boottomSheetRenderCount = 0
 type Props = {
   swanDeepLinkContent: string | null;
   swanFromDeepLink: boolean | null;
@@ -24,19 +25,27 @@ type Props = {
 }
 
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu, onClickSetting }: Props ) => {
+  console.log( {
+    boottomSheetRenderCount: boottomSheetRenderCount++, swanFromBuyMenu, swanFromDeepLink
+  } )
   const dispatch = useDispatch()
-  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedCode, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted } = useSwanIntegrationState()
+  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   function handleProceedButtonPress() {
     if ( swanFromBuyMenu ) {
-      if( !hasFetchSwanAuthenticationUrlInitiated ) dispatch( fetchSwanAuthenticationUrl( {
-      } ) )
-      setHasButtonBeenPressed( true )
+      if( !hasFetchSwanAuthenticationUrlInitiated ) {
+        setHasButtonBeenPressed( true )
+        dispatch( fetchSwanAuthenticationUrl( {
+        } ) )
+      }
     }
   }
 
   useEffect( ()=>{
     if ( swanFromBuyMenu ) {
+      console.log( {
+        swanAuthenticationUrl
+      } )
       if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
     }
   }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )
@@ -48,11 +57,35 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
   useEffect( ()=>{
     if( swanFromDeepLink ) {
       swanFromBuyMenu = false
-      if( hasRedeemSwanCodeForTokenCompleted )
-        console.log( 'success!' )
+      if( hasRedeemSwanCodeForTokenSucceeded )
+        dispatch( createWithdrawalWalletOnSwan( {
+        } ) )
     }
-  }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedCode ] )
+  }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken ] )
 
+  /*
+  // When withdrawal wallet has been created
+  // a new Swan service account should be created in Hexa
+  useEffect( ()=>{
+    if( swanFromDeepLink ) {
+      swanFromBuyMenu = false
+      if( hasCreateWithdrawalWalletOnSwanSucceeded )
+        dispatch( addNewAccountShell( {
+        } ) )
+    }
+  }, [ hasCreateWithdrawalWalletOnSwanCompleted ] )
+
+  // when new Swan Account is created
+  // send xpub to Swan
+  useEffect( ()=>{
+    if( swanFromDeepLink ) {
+      swanFromBuyMenu = false
+      if( hasRedeemSwanCodeForTokenSucceeded )
+        dispatch( linkSwanWallet( {
+        } ) )
+    }
+  }, [ linkSwanWalletSucceeded ] )
+*/
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
@@ -63,7 +96,22 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
         <Text style={styles.modalTitleText}>Athentication in progress...</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
-        }}>Communicating with SwanBitcoins and setting authentication token: {swanAuthenticatedCode}.</Text>
+        }}>Authorise Hexa Wallet on Swan: {swanFromDeepLink ? String.fromCodePoint( 0x2705 ) : null}</Text>
+        <Text style={{
+          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+        }}>Verify Hexa is authorised: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
+        <Text style={{
+          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+        }}>Create withdrawal wallet on Swan: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
+        <Text style={{
+          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+        }}>Create Swan Account in Hexa: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
+        <Text style={{
+          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+        }}>Link Swan Account and Swan: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
+        <Text style={{
+          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+        }}>Confirm Hexa and Swan Link is approved and active: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
       </View>
 
       <View style={{
@@ -115,10 +163,11 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
-    marginTop: wp( '10%' ),
+    marginTop: wp( '0%' ),
     flex: 1.7
   },
   modalTitleText: {
+    marginBottom: wp( '5%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
