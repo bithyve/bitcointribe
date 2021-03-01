@@ -29,7 +29,6 @@ import { withNavigationFocus } from "react-navigation";
 import { connect } from "react-redux";
 import { fetchEphemeralChannel } from "../../store/actions/trustedContacts";
 import {
-  setCloudBackupStatus,
   setIsBackupProcessing,
 } from "../../store/actions/preferences";
 import idx from "idx";
@@ -43,12 +42,9 @@ import {
 } from "../../common/constants/serviceTypes";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import {
-  CloudData,
-  getKeeperInfoFromShareId,
   getLevelInfo,
 } from "../../common/CommonFunctions";
 import { trustedChannelsSetupSync } from "../../store/actions/trustedContacts";
-import CloudBackup from "../../common/CommonFunctions/CloudBackup";
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -70,6 +66,7 @@ import ErrorModalContents from "../../components/ErrorModalContents";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import AccountShell from "../../common/data/models/AccountShell";
 import PersonalNode from "../../common/data/models/PersonalNode";
+import { setCloudData, setCloudBackupStatus,} from "../../store/actions/cloud";
 
 interface ManageBackupStateTypes {
   levelData: any[];
@@ -132,6 +129,7 @@ interface ManageBackupPropsTypes {
   versionHistory: any;
   updateNewFcm: any;
   isNewFCMUpdated: Boolean;
+  setCloudData: any;
 }
 
 class ManageBackup extends Component<
@@ -271,103 +269,6 @@ class ManageBackup extends Component<
       : timeFormatter(moment(new Date()), item);
   };
 
-  cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, accountShells, activePersonalNode, versionHistory } = this.props;
-    let encryptedCloudDataJson;
-    let shares =
-      share &&
-        !(Object.keys(share).length === 0 && share.constructor === Object)
-        ? JSON.stringify(share)
-        : "";
-    encryptedCloudDataJson = await CloudData(this.props.database, accountShells, activePersonalNode, versionHistory);
-    this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
-    let keeperData = [
-      {
-        shareId: "",
-        KeeperType: "cloud",
-        updated: "",
-        reshareVersion: 0,
-      },
-    ];
-    let data = {
-      levelStatus: level ? level : 1,
-      shares: shares,
-      encryptedCloudDataJson: encryptedCloudDataJson,
-      walletName: walletName,
-      regularAccount: regularAccount,
-      keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
-    };
-    if (!this.props.isBackupProcessing.status) {
-      this.props.setIsBackupProcessing({ status: true });
-      let cloudObject = new CloudBackup({
-        dataObject: data,
-        callBack: this.setCloudBackupStatus,
-        share,
-      });
-      cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
-    }
-  };
-
-  setCloudBackupStatus = (share) => {
-    try {
-      this.props.setCloudBackupStatus({ status: true });
-      if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
-        this.updateHealthForCloud();
-      } else if (
-        (this.props.cloudBackupStatus.status && this.props.currentLevel == 1) ||
-        this.props.currentLevel == 2
-      ) {
-        this.updateHealthForCloud(share);
-      }
-      this.props.setIsBackupProcessing({ status: false });
-    } catch (error) {
-      this.props.setIsBackupProcessing({ status: false });
-      console.log("ERRORsf", error);
-    }
-  };
-
-  updateHealthForCloud = (share?) => {
-    try {
-      let levelHealth = this.props.levelHealth;
-      if (levelHealth) {
-        let levelHealthVar = levelHealth[0].levelInfo[0];
-        if (
-          share &&
-          !(Object.keys(share).length === 0 && share.constructor === Object) &&
-          levelHealth.length > 0
-        ) {
-          levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
-        }
-        // health update for 1st upload to cloud
-        if (
-          levelHealth.length &&
-          levelHealthVar.status != "accessible"
-        ) {
-          if (levelHealthVar.shareType == "cloud") {
-            levelHealthVar.updatedAt = moment(new Date()).valueOf();
-            levelHealthVar.status == "accessible";
-            levelHealthVar.reshareVersion = 0;
-            levelHealthVar.name = "cloud";
-          }
-          let shareArray = [
-            {
-              walletId: this.props.s3Service.getWalletId().data.walletId,
-              shareId: levelHealthVar.shareId,
-              reshareVersion: levelHealthVar.reshareVersion,
-              updatedAt: moment(new Date()).valueOf(),
-              status: "accessible",
-              shareType: "cloud",
-            },
-          ];
-          this.props.updateMSharesHealth(shareArray);
-        }
-      }
-    } catch (error) {
-      this.props.setIsBackupProcessing({ status: false });
-      throw error;
-    }
-  };
-
   componentDidUpdate = (prevProps, prevState) => {
     const { healthLoading, trustedChannelsSetupSyncing, isBackupProcessing } = this.props;
     console.log('healthLoading || isBackupProcessing.status', healthLoading, isBackupProcessing.status)
@@ -384,10 +285,6 @@ class ManageBackup extends Component<
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
     ) {
-      // if (
-      //  prevProps.levelHealth !==
-      //   this.props.levelHealth
-      // ) {
       if(this.props.levelHealth.findIndex(value=>value.levelInfo.findIndex(item=>item.shareType=='contact') > -1) > -1){
         this.props.trustedChannelsSetupSync();
       }
@@ -397,7 +294,7 @@ class ManageBackup extends Component<
         this.props.levelHealth.length == 1 &&
         prevProps.levelHealth.length == 0
       ) {
-        this.cloudData();
+        this.props.setCloudData(this.setCloudBackupStatus);
       } else {
         this.updateCloudData();
         this.autoUploadShare();
@@ -425,6 +322,10 @@ class ManageBackup extends Component<
     }
   };
 
+  setCloudBackupStatus = (share) =>{
+    this.props.setCloudBackupStatus(share);
+  }
+
   updateCloudData = () => {
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let secretShare = {};
@@ -450,7 +351,7 @@ class ManageBackup extends Component<
         }
       }
     }
-    this.cloudData(keeperInfo, currentLevel, secretShare);
+    this.props.setCloudData(this.setCloudBackupStatus,keeperInfo, currentLevel, secretShare);
   };
 
   autoUploadShare = () => {
@@ -1510,7 +1411,8 @@ export default withNavigationFocus(
     reShareWithSameKeeper,
     autoShareContact,
     trustedChannelsSetupSync,
-    updateNewFcm
+    updateNewFcm,
+    setCloudData
   })(ManageBackup)
 );
 

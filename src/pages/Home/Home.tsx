@@ -59,7 +59,6 @@ import {
 } from "../../store/actions/notifications";
 import {
   setCurrencyCode,
-  setCloudBackupStatus,
   setCardData,
 } from "../../store/actions/preferences";
 import {
@@ -140,6 +139,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { setCloudData, setCloudBackupStatus, } from '../../store/actions/cloud'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -246,17 +246,13 @@ interface HomePropsTypes {
   updateMSharesHealth: any;
   setCardData: any;
   cardDataProps: any;
-  isLevel2Initialized: Boolean;
-  isLevel3Initialized: Boolean;
   fetchKeeperTrustedChannel: any;
   keeperApproveStatus: any;
   onApprovalStatusChange: any;
   secureAccount: any;
   autoDownloadShareContact: any;
   accountShells: AccountShell[];
-  activePersonalNode: PersonalNode;
   setVersion: any;
-  versionHistory: any;
   isNewHealthSystemSet: Boolean;
   setIsBackupProcessing: any;
   wyreDeepLinkContent: string | null;
@@ -267,6 +263,7 @@ interface HomePropsTypes {
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   updateNewFcm: any;
+  setCloudData: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic();
@@ -854,13 +851,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation,
       s3Service,
       initializeHealthSetup,
-      initHealthCheck,
-      versionHistory,
     } = this.props;
     let versionData = [];
     this.closeBottomSheet();
     this.calculateNetBalance();
-
     this.appStateListener = AppState.addEventListener(
       "change",
       this.onAppStateChange
@@ -906,64 +900,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.autoSyncShells();
       this.props.setVersion();
     });
-  };
-
-  cloudData = async (kpInfo?, level?, share?) => {
-    const {
-      walletName,
-      regularAccount,
-      database,
-      accountShells,
-      activePersonalNode,
-      versionHistory,
-    } = this.props;
-    let encryptedCloudDataJson;
-    let shares =
-      share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object)
-        ? JSON.stringify(share)
-        : "";
-    encryptedCloudDataJson = await CloudData(
-      database,
-      accountShells,
-      activePersonalNode,
-      versionHistory
-    );
-    this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
-    let keeperData = [
-      {
-        shareId: "",
-        KeeperType: "cloud",
-        updated: "",
-        reshareVersion: 0,
-      },
-    ];
-    let data = {
-      levelStatus: level ? level : 1,
-      shares: shares,
-      encryptedCloudDataJson: encryptedCloudDataJson,
-      walletName: walletName,
-      regularAccount: regularAccount,
-      keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
-    };
-    let cloudObject = new CloudBackup({
-      dataObject: data,
-      callBack: this.setCloudBackupStatus,
-      share,
-    });
-    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
-  };
-
-  setCloudBackupStatus = (share?) => {
-    this.props.setCloudBackupStatus({ status: true });
-    if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
-      this.updateHealthForCloud();
-    } else if (
-      this.props.cloudBackupStatus.status &&
-      this.props.currentLevel == 1
-    ) {
-      this.updateHealthForCloud(share);
-    }
   };
 
   getNewTransactionNotifications = async () => {
@@ -1057,7 +993,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.props.levelHealth.length == 1 &&
         prevProps.levelHealth.length == 0
       ) {
-        this.cloudData();
+        this.props.setCloudData(this.setCloudBackupStatus);
       }
     }
 
@@ -1130,6 +1066,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       });
     }
   };
+
+  setCloudBackupStatus = (share) =>{
+    this.props.setCloudBackupStatus(share);
+  }
 
   handleDeepLinkModal = () => {
     const custodyRequest = this.props.navigation.getParam("custodyRequest");
@@ -1893,43 +1833,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  updateHealthForCloud = (share?) => {
-    let levelHealth = this.props.levelHealth;
-    let levelHealthVar = levelHealth[0].levelInfo[0];
-    if (
-      share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object) &&
-      levelHealth.length > 0
-    ) {
-      levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
-    }
-    // health update for 1st upload to cloud
-    if (
-      this.props.cloudBackupStatus &&
-      levelHealth.length &&
-      !this.props.isLevel2Initialized &&
-      levelHealthVar.status != "accessible"
-    ) {
-      if (levelHealthVar.shareType == "cloud") {
-        levelHealthVar.updatedAt = moment(new Date()).valueOf();
-        levelHealthVar.status = "accessible";
-        levelHealthVar.reshareVersion = 0;
-        levelHealthVar.name = "Cloud";
-      }
-      let shareArray = [
-        {
-          walletId: this.props.s3Service.getWalletId().data.walletId,
-          shareId: levelHealthVar.shareId,
-          reshareVersion: levelHealthVar.reshareVersion,
-          updatedAt: moment(new Date()).valueOf(),
-          status: "accessible",
-          shareType: "cloud",
-        },
-      ];
-      this.props.updateMSharesHealth(shareArray);
-    }
-  };
-
   onPressElement = (item) => {
     const { navigation } = this.props;
     if (item.title == "Backup Health") {
@@ -2648,12 +2551,8 @@ const mapStateToProps = (state) => {
     levelHealth: idx(state, (_) => _.health.levelHealth),
     currentLevel: idx(state, (_) => _.health.currentLevel),
     keeperInfo: idx(state, (_) => _.health.keeperInfo),
-    isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
-    isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
     keeperApproveStatus: idx(state, (_) => _.health.keeperApproveStatus),
     accountShells: idx(state, (_) => _.accounts.accountShells),
-    activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
-    versionHistory: idx(state, (_) => _.versionHistory.versions),
     isNewHealthSystemSet: idx(
       state,
       (_) => _.setupAndAuth.isNewHealthSystemSet
@@ -2695,6 +2594,7 @@ export default withNavigationFocus(
     setIsBackupProcessing,
     downloadSMShard,
     updateNewFcm,
+    setCloudData
   })(Home)
 );
 

@@ -49,13 +49,12 @@ import {
 } from "../../store/actions/health";
 import { REGULAR_ACCOUNT } from "../../common/constants/serviceTypes";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import { CloudData } from "../../common/CommonFunctions";
-import CloudBackup from "../../common/CommonFunctions/CloudBackup";
-import { setCloudBackupStatus } from "../../store/actions/preferences";
 import { LevelHealthInterface } from "../../bitcoin/utilities/Interface";
 import AccountShell from "../../common/data/models/AccountShell";
 import PersonalNode from "../../common/data/models/PersonalNode";
 import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth';
+import { setCloudData, setCloudBackupStatus,} from "../../store/actions/cloud";
+
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
   listData: {
@@ -93,7 +92,7 @@ interface UpgradeBackupPropsTypes {
   isBackupProcessing: any;
   setIsNewHealthSystemSet: any;
   versionHistory: any;
-
+  setCloudData: any;
 }
 
 class UpgradeBackup extends Component<
@@ -253,7 +252,7 @@ class UpgradeBackup extends Component<
         this.props.s3Service.levelhealth.healthCheckInitializedKeeper &&
       this.props.s3Service.levelhealth.healthCheckInitializedKeeper
     ) {
-      this.cloudData();
+      this.props.setCloudData(this.setCloudBackupStatus);
     }
     if(JSON.stringify(prevProps.levelHealth) != JSON.stringify(this.props.levelHealth)){
       if(this.props.levelHealth[0] && this.props.levelHealth[0].levelInfo[0] && this.props.levelHealth[0].levelInfo[0].status == 'accessible') {
@@ -268,89 +267,9 @@ class UpgradeBackup extends Component<
 
   };
 
-  cloudData = async (kpInfo?, level?, share?) => {
-    const { walletName, regularAccount, database, accountShells, activePersonalNode, versionHistory } = this.props;
-    let encryptedCloudDataJson;
-    let shares =
-      share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object)
-        ? JSON.stringify(share)
-        : "";
-    encryptedCloudDataJson = await CloudData(database, accountShells, activePersonalNode,versionHistory);
-    console.log("encryptedCloudDataJson", encryptedCloudDataJson);
-    this.setState({ encryptedCloudDataJson: encryptedCloudDataJson });
-    let keeperData = [
-      {
-        shareId: "",
-        KeeperType: "cloud",
-        updated: "",
-        reshareVersion: 0,
-      },
-    ];
-    let data = {
-      levelStatus: level ? level : 1,
-      shares: shares,
-      encryptedCloudDataJson: encryptedCloudDataJson,
-      walletName: walletName,
-      regularAccount: regularAccount,
-      keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
-    };
-    let cloudObject = new CloudBackup({
-      dataObject: data,
-      callBack: this.setCloudBackupStatus,
-      share,
-    });
-    cloudObject.CloudDataBackup(data, this.setCloudBackupStatus, share);
-  };
-
-  setCloudBackupStatus = (share?) => {
-    this.props.setCloudBackupStatus({ status: true });
-    if (this.props.cloudBackupStatus.status && this.props.currentLevel == 0) {
-      this.updateHealthForCloud();
-    } else if (
-      this.props.cloudBackupStatus.status &&
-      this.props.currentLevel == 1
-    ) {
-      this.updateHealthForCloud(share);
-    }
-  };
-
-  updateHealthForCloud = (share?) => {
-    let levelHealth = this.props.levelHealth;
-    let levelHealthVar = levelHealth[0].levelInfo[0];
-    if (
-      share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object) &&
-      levelHealth.length > 0
-    ) {
-      levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0];
-    }
-    // health update for 1st upload to cloud
-    if (
-      this.props.cloudBackupStatus &&
-      levelHealth.length &&
-      !this.props.isLevel2Initialized &&
-      levelHealthVar.status != "accessible"
-    ) {
-      if (levelHealthVar.shareType == "cloud") {
-        levelHealthVar.updatedAt = moment(new Date()).valueOf();
-        levelHealthVar.status = "accessible";
-        levelHealthVar.reshareVersion = 0;
-        levelHealthVar.name = "Cloud";
-      }
-      let shareArray = [
-        {
-          walletId: this.props.s3Service.getWalletId().data.walletId,
-          shareId: levelHealthVar.shareId,
-          reshareVersion: levelHealthVar.reshareVersion,
-          updatedAt: moment(new Date()).valueOf(),
-          status: "accessible",
-          shareType: "cloud",
-        },
-      ];
-      this.props.updateMSharesHealth(shareArray);
-    }
-  };
+  setCloudBackupStatus = (share) =>{
+    this.props.setCloudBackupStatus(share);
+  }
 
   cloudBackup = () => {
     let { s3Service, initializeHealthSetup } = this.props;
@@ -750,6 +669,7 @@ export default withNavigationFocus(
     setCloudBackupStatus,
     updateMSharesHealth,
     setIsNewHealthSystemSet,
+    setCloudData
   })(UpgradeBackup)
 );
 

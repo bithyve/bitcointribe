@@ -61,7 +61,10 @@ export default class CloudBackup {
   };
 
   public CloudDataBackup = (data, callback, share?) => {
-    // console.log('share inside cloud', share);
+    //console.log('share inside cloud', share);
+    try{
+
+    
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};
@@ -83,6 +86,9 @@ export default class CloudBackup {
       console.log('isNotReading', this.isNotReading);
       this.GoogleDriveLogin({ share: this.share });
     }
+  } catch(e){
+    console.log("CloudDataBackup error", e);
+  }
   };
 
   public GoogleDriveLogin = (params: {

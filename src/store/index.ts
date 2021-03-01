@@ -23,6 +23,7 @@ import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
 import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
+import cloudReducer from './reducers/cloud'
 
 
 const config = {
@@ -179,6 +180,12 @@ import {
   updateNewFCMWatcher
 } from './sagas/keeper';
 
+import {
+  cloudWatcher,
+  setCloudBackupStatusWatcher,
+  updateHealthForCloudWatcher
+} from './sagas/cloud'
+
 import { fromPrivateKey } from 'bip32';
 import reducer from './reducers/fbtc';
 
@@ -322,6 +329,11 @@ const rootSaga = function* () {
 
     //VersionHistory integration
     versionHistoryWatcher,
+
+    //cloud Integration
+    cloudWatcher,
+    setCloudBackupStatusWatcher,
+    updateHealthForCloudWatcher
   ];
 
   yield all(
@@ -358,6 +370,7 @@ const rootReducer = combineReducers( {
   wyreIntegration: wyreIntegrationReducer,
   rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
+  cloud: cloudReducer,
 });
 
 export default function makeStore() {
