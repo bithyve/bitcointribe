@@ -26,6 +26,7 @@ const Colors = {
   babyGray: '#BCB6B6',
   greyTextColor: '#656565',
   coral: '#D35400',
+  danube: '#5D8ED1',
   riptide: '#77E3B5',
 
   // Grayscale
