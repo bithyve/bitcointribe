@@ -17,6 +17,7 @@ import {
   DerivativeAccountElements,
   InputUTXOs,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -1842,7 +1843,7 @@ export default class SecureHDWallet extends Bitcoin {
     }[],
     customTxFeePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
-  ) => {
+  ): TransactionPrerequisiteElements => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
@@ -1873,10 +1874,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
     // console.log({ inputUTXOs });
 
-    let confirmedBalance = 0
-    inputUTXOs.forEach( ( confirmedUtxo ) => {
-      confirmedBalance += confirmedUtxo.value
-    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
@@ -1884,10 +1881,10 @@ export default class SecureHDWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance
+      fee,
     }
     return {
-      inputs, outputs, fee, balance: confirmedBalance
+      inputs, outputs, fee,
     }
   };
 

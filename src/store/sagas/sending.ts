@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -295,8 +295,6 @@ export const executeSendStage1Watcher = createWatcher(
 function* executeSendStage2( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
-  customTxPrerequisites: any,
-  nSequence: number
 }} ) {
   const { accountShellID } = payload
   const accountsState: AccountsState = yield select(
@@ -314,8 +312,10 @@ function* executeSendStage2( { payload }: {payload: {
 
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
 
-  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
-  const { txnPriority, customTxPrerequisites, nSequence } = payload
+  const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+  const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+
+  const { txnPriority } = payload
   if ( !txPrerequisites && !customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
     return
@@ -327,7 +327,6 @@ function* executeSendStage2( { payload }: {payload: {
     txnPriority,
     customTxPrerequisites,
     derivativeAccountDetails,
-    nSequence
   )
 
   if ( res.status === 200 ) {
@@ -361,15 +360,11 @@ export const executeSendStage2Watcher = createWatcher(
 function* executeAlternateSendStage2Worker( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
-  customTxPrerequisites: any,
-  nSequence: number
   }} ) {
 
   const {
     accountShellID,
     txnPriority,
-    customTxPrerequisites,
-    nSequence,
   } = payload
 
   const accountsState: AccountsState = yield select(
@@ -389,8 +384,10 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
     throw new Error( 'ST3 cannot be executed for a non-2FA account' )
   }
 
-  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
-  if ( !txPrerequisites ) {
+  const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+  const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+
+  if ( !txPrerequisites  || ! customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
     return
   }
@@ -403,7 +400,6 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
     txnPriority,
     customTxPrerequisites,
     derivativeAccountDetails,
-    nSequence
   )
   if ( res.status === 200 ) {
     yield put( alternateSendStage2Executed( {
@@ -441,9 +437,11 @@ function* executeSendStage3Worker( { payload }: {payload: {accountShellID: strin
     throw new Error( 'ST3 cannot be executed for a non-2FA account' )
   }
 
-  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = idx( sending, ( _ ) => _.sendST2.carryOver )
+  const carryOver =  idx( sending, ( _ ) => _.sendST2.carryOver )
+  if( !carryOver ) throw new Error( 'ST2 carry-over missing' )
+  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
   if ( !txHex || !childIndexArray || !inputs ) {
-    console.log( 'TxHex/child-index/inputs missing' )
+    throw new Error( 'TxHex/child-index/inputs missing' )
   }
 
   const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
@@ -463,8 +461,6 @@ export const executeSendStage3Watcher = createWatcher(
   executeSendStage3Worker,
   EXECUTE_SEND_STAGE3
 )
-
-
 
 function* calculateSendMaxFee( { payload }: {payload: {
   numberOfRecipients: number;
@@ -497,4 +493,151 @@ function* calculateSendMaxFee( { payload }: {payload: {
 export const calculateSendMaxFeeWatcher = createWatcher(
   calculateSendMaxFee,
   CALCULATE_SEND_MAX_FEE
+)
+
+
+function* calculateCustomFee( { payload }: {payload: {
+  accountShellID: string,
+  feePerByte: string,
+  customEstimatedBlocks: string,
+  feeIntelAbsent: boolean,
+}} ) {
+
+  const { accountShellID, feePerByte, customEstimatedBlocks, feeIntelAbsent } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sendingState: SendingState = yield select(
+    ( state ) => state.sending
+  )
+
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  const selectedRecipients: RecipientDescribing[] = sendingState.selectedRecipients
+
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+
+  let outputs
+  if( feeIntelAbsent ){
+    // process recipients & generate outputs(normally handled by transfer ST1 saga)
+    const recipients = yield call( processRecipients, accountShell )
+    const outputsArray = []
+    for ( const recipient of recipients ) {
+      outputsArray.push( {
+        address: recipient.address,
+        value: Math.round( recipient.amount ),
+      } )
+    }
+    outputs = outputsArray
+  } else {
+    if( !txPrerequisites ) throw new Error( 'ST1 carry-over missing' )
+    outputs = txPrerequisites[ 'low' ].outputs.filter(
+      ( output ) => output.address,
+    )
+  }
+
+
+  if( !feeIntelAbsent && sendingState.sendMaxFee ){
+    // custom fee w/ send max
+    const { fee } = service.calculateSendMaxFee(
+      selectedRecipients.length,
+      parseInt( feePerByte ),
+      derivativeAccountDetails,
+    )
+
+    // upper bound: default low
+    if( fee > txPrerequisites[ 'low' ].fee ){
+      // this.setState( {
+      //   customFee: '',
+      //   customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
+      // } )
+      return
+    }
+
+    const recipients: [
+      {
+        id: string;
+        address: string;
+        amount: number;
+        type?: string;
+        accountNumber?: number;
+      }
+    ] = yield call( processRecipients, accountShell )
+    const recipientToBeModified = recipients[ recipients.length - 1 ]
+
+    // deduct the previous(default low) fee and add the custom fee
+    // TODO: recapture custom fee from sending reducer
+    if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
+    else recipientToBeModified.amount += txPrerequisites[ 'low' ].fee
+    recipientToBeModified.amount -= fee
+    this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
+
+    outputs.forEach( ( output )=>{
+      if( output.address === recipientToBeModified.address )
+        output.value = recipientToBeModified.amount
+    } )
+
+    selectedRecipients.forEach( ( recipient ) => {
+      if( recipient.id === recipientToBeModified.id ) recipient.amount = recipientToBeModified.amount
+    } )
+    // TODO: action to update selected recipients array
+  }
+
+  const customTxPrerequisites = service.calculateCustomFee(
+    outputs,
+    parseInt( feePerByte ),
+    derivativeAccountDetails,
+  )
+
+  // if( !this.feeIntelAbsent && this.isSendMax )
+  //   this.setState( {
+  //     totalAmount: this.spendableBalance - customTxPrerequisites.fee,
+  //     selectedRecipients,
+  //   } )
+
+  if ( customTxPrerequisites.inputs ) {
+    // if ( this.refs.CustomPriorityBottomSheet as any )
+    //   ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
+    // this.onPrioritySelect( 'Custom Fee' )
+    // setTimeout( () => {
+    //   this.setState( {
+    //     customTxPrerequisites: customTxPrerequisites,
+    //     customFee: customTxPrerequisites.fee,
+    //     customFeePerByteErr: '',
+    //     customEstimatedBlock,
+    //   } )
+    // }, 2 )
+    customTxPrerequisites.estimatedBlocks = parseInt( customEstimatedBlocks )
+    yield put ( customFeeCalculated( {
+      successful: true,
+      carryOver:{
+        customTxPrerequisites
+      },
+      err: null
+    } ) )
+  } else {
+    let totalAmount  = 0
+    outputs.forEach( ( output )=>{
+      totalAmount += output.value
+    } )
+    yield put ( customFeeCalculated( {
+      successful: false,
+      carryOver:{
+        customTxPrerequisites: null
+      },
+      err: `Insufficient balance to pay: amount ${totalAmount} + fee(${customTxPrerequisites.fee}) at ${feePerByte} sats/byte`,
+    } ) )
+  }
+
+}
+
+export const calculateCustomFeeWatcher = createWatcher(
+  calculateCustomFee,
+  CALCULATE_CUSTOM_FEE
 )

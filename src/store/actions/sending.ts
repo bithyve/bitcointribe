@@ -2,7 +2,7 @@ import { Action } from 'redux'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import AccountShell from '../../common/data/models/AccountShell'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { TransactionPrerequisite } from '../../bitcoin/utilities/Interface'
+import { TransactionPrerequisite, TransactionPrerequisiteElements } from '../../bitcoin/utilities/Interface'
 
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
@@ -24,6 +24,8 @@ export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
 export const CALCULATE_SEND_MAX_FEE = 'CALCULATE_SEND_MAX_FEE'
 export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
+export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
+export const CUSTOM_FEE_CALCULATED = 'CUSTOM_FEE_CALCULATED'
 
 export interface SourceAccountSelectedForSendingAction extends Action {
   type: typeof SOURCE_ACCOUNT_SELECTED_FOR_SENDING;
@@ -160,8 +162,6 @@ export interface ExecuteSendStage2Action extends Action {
   payload: {
     accountShellID: string;
     txnPriority: string,
-    customTxPrerequisites?: any,
-    nSequence?: number
   };
 }
 
@@ -169,8 +169,6 @@ export const executeSendStage2 = (
   payload: {
     accountShellID: string;
     txnPriority: string,
-    customTxPrerequisites?: any,
-    nSequence?: number
     },
 ): ExecuteSendStage2Action => {
   return {
@@ -199,8 +197,6 @@ export interface ExecuteAlternateSendStage2Action extends Action {
   payload: {
     accountShellID: string;
     txnPriority: string,
-    customTxPrerequisites?: any,
-    nSequence?: number
   };
 }
 
@@ -208,8 +204,6 @@ export const executeAlternateSendStage2 = (
   payload: {
     accountShellID: string;
     txnPriority: string,
-    customTxPrerequisites?: any,
-    nSequence?: number
     },
 ): ExecuteAlternateSendStage2Action => {
   return {
@@ -329,5 +323,51 @@ export const sendMaxFeeCalculated = (
   return {
     type: SEND_MAX_FEE_CALCULATED,
     payload,
+  }
+}
+
+export interface CalculateCustomFeeAction extends Action {
+  type: typeof CALCULATE_CUSTOM_FEE;
+  payload: {
+    accountShellID: string,
+    feePerByte: string,
+    customEstimatedBlocks: string,
+    feeIntelAbsent: boolean,
+  };
+}
+
+export const calculateCustomFee = (
+  payload: {
+    accountShellID: string,
+    feePerByte: string,
+    customEstimatedBlocks: string,
+    feeIntelAbsent: boolean,
+  },
+): CalculateCustomFeeAction => {
+  return {
+    type: CALCULATE_CUSTOM_FEE,
+    payload,
+  }
+}
+
+export interface CustomFeeCalculatedAction extends Action {
+  type: typeof CUSTOM_FEE_CALCULATED;
+  payload: {
+    successful: boolean,
+    carryOver?: {customTxPrerequisites: TransactionPrerequisiteElements},
+    err?: string | null,
+  };
+}
+
+export const customFeeCalculated = (
+  payload: {
+    successful: boolean,
+    carryOver?: {customTxPrerequisites: TransactionPrerequisiteElements},
+    err?: string | null,
+  }
+): CustomFeeCalculatedAction => {
+  return {
+    type: CUSTOM_FEE_CALCULATED,
+    payload
   }
 }

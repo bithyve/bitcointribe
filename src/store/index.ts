@@ -131,9 +131,7 @@ import {
 } from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
-import { calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher } from './sagas/sending'
-import { executeAlternateSendStage2 } from './actions/sending'
-
+import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher } from './sagas/sending'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -240,6 +238,7 @@ const rootSaga = function* () {
     executeAlternateSendStage2Watcher,
     executeSendStage3Watcher,
     calculateSendMaxFeeWatcher,
+    calculateCustomFeeWatcher,
   ]
 
   yield all(
