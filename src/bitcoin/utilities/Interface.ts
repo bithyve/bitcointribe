@@ -15,13 +15,15 @@ export interface OutputUTXOs {
   address: string;
 }
 
+export interface TransactionPrerequisiteElements {
+  inputs?: InputUTXOs[];
+  outputs?: OutputUTXOs[];
+  fee?: number;
+  estimatedBlocks?: number;
+}
+
 export interface TransactionPrerequisite {
-  [txnPriority: string]: {
-    inputs?: InputUTXOs[];
-    outputs: OutputUTXOs[];
-    fee: number;
-    estimatedBlocks: number;
-  };
+  [txnPriority: string]: TransactionPrerequisiteElements
 }
 
 export interface TransactionDetails {

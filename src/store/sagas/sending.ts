@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -295,8 +295,6 @@ export const executeSendStage1Watcher = createWatcher(
 function* executeSendStage2( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
-  customTxPrerequisites: any,
-  nSequence: number
 }} ) {
   const { accountShellID } = payload
   const accountsState: AccountsState = yield select(
@@ -315,7 +313,9 @@ function* executeSendStage2( { payload }: {payload: {
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
-  const { txnPriority, customTxPrerequisites, nSequence } = payload
+  const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+
+  const { txnPriority } = payload
   if ( !txPrerequisites && !customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
     return
@@ -327,7 +327,6 @@ function* executeSendStage2( { payload }: {payload: {
     txnPriority,
     customTxPrerequisites,
     derivativeAccountDetails,
-    nSequence
   )
 
   if ( res.status === 200 ) {
@@ -361,15 +360,11 @@ export const executeSendStage2Watcher = createWatcher(
 function* executeAlternateSendStage2Worker( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
-  customTxPrerequisites: any,
-  nSequence: number
   }} ) {
 
   const {
     accountShellID,
     txnPriority,
-    customTxPrerequisites,
-    nSequence,
   } = payload
 
   const accountsState: AccountsState = yield select(
@@ -390,7 +385,9 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
   }
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
-  if ( !txPrerequisites ) {
+  const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+
+  if ( !txPrerequisites  || ! customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
     return
   }
@@ -403,7 +400,6 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
     txnPriority,
     customTxPrerequisites,
     derivativeAccountDetails,
-    nSequence
   )
   if ( res.status === 200 ) {
     yield put( alternateSendStage2Executed( {
@@ -605,25 +601,39 @@ function* calculateCustomFee( { payload }: {payload: {
   //     selectedRecipients,
   //   } )
 
-  // if ( customTxPrerequisites.inputs ) {
-  //   if ( this.refs.CustomPriorityBottomSheet as any )
-  //     ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
-  //   this.onPrioritySelect( 'Custom Fee' )
-  //   setTimeout( () => {
-  //     this.setState( {
-  //       customTxPrerequisites: customTxPrerequisites,
-  //       customFee: customTxPrerequisites.fee,
-  //       customFeePerByteErr: '',
-  //       customEstimatedBlock,
-  //     } )
-  //   }, 2 )
-  // } else {
-  //   // display err message
-  //   this.setState( {
-  //     customFee: '',
-  //     customFeePerByteErr: `Insufficient balance to pay: amount ${this.state.totalAmount} + fee(${customTxPrerequisites.fee}) at ${amount} sats/byte`,
-  //   } )
-  // }
+  if ( customTxPrerequisites.inputs ) {
+    // if ( this.refs.CustomPriorityBottomSheet as any )
+    //   ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
+    // this.onPrioritySelect( 'Custom Fee' )
+    // setTimeout( () => {
+    //   this.setState( {
+    //     customTxPrerequisites: customTxPrerequisites,
+    //     customFee: customTxPrerequisites.fee,
+    //     customFeePerByteErr: '',
+    //     customEstimatedBlock,
+    //   } )
+    // }, 2 )
+    customTxPrerequisites.estimatedBlocks = parseInt( customEstimatedBlocks )
+    yield put ( customFeeCalculated( {
+      successful: true,
+      carryOver:{
+        customTxPrerequisites
+      },
+      err: null
+    } ) )
+  } else {
+    let totalAmount  = 0
+    outputs.forEach( ( output )=>{
+      totalAmount += output.value
+    } )
+    yield put ( customFeeCalculated( {
+      successful: false,
+      carryOver:{
+        customTxPrerequisites: null
+      },
+      err: `Insufficient balance to pay: amount ${totalAmount} + fee(${customTxPrerequisites.fee}) at ${feePerByte} sats/byte`,
+    } ) )
+  }
 
 }
 

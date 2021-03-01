@@ -21,6 +21,7 @@ import {
   DerivativeAccountElements,
   InputUTXOs,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../Interface'
 import { AxiosResponse } from 'axios'
 import {
@@ -1583,7 +1584,7 @@ export default class HDSegwitWallet extends Bitcoin {
     }[],
     customTxFeePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
-  ) => {
+  ): TransactionPrerequisiteElements => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
@@ -1613,11 +1614,6 @@ export default class HDSegwitWallet extends Bitcoin {
       inputUTXOs = [ ...this.confirmedUTXOs, ...derivativeUTXOs ]
     }
     // console.log({ inputUTXOs });
-
-    let confirmedBalance = 0
-    inputUTXOs.forEach( ( utxo ) => {
-      confirmedBalance += utxo.value
-    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
@@ -1625,11 +1621,11 @@ export default class HDSegwitWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance
+      fee
     }
 
     return {
-      inputs, outputs, fee, balance: confirmedBalance
+      inputs, outputs, fee
     }
   };
 
