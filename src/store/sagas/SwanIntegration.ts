@@ -1,15 +1,19 @@
 import { call, put, select } from 'redux-saga/effects'
 
 import {
-  REDEEM_SWAN_CODE_FOR_TOKEN,
   FETCH_SWAN_AUTHENTICATION_URL,
   fetchSwanAuthenticationUrlInitiated,
   fetchSwanAuthenticationUrlSucceeded,
-  LINK_SWAN_WALLET,
-  linkSwanWalletSucceeded,
-  linkSwanWalletFailed,
+  REDEEM_SWAN_CODE_FOR_TOKEN,
   redeemSwanCodeForTokenInitiated,
   redeemSwanCodeForTokenSucceeded,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN,
+  createWithdrawalWalletOnSwanInitiated,
+  createWithdrawalWalletOnSwanSucceeded,
+
+  LINK_SWAN_WALLET,
+  linkSwanWalletSucceeded,
+  linkSwanWalletFailed
 } from '../actions/SwanIntegration'
 
 import {
@@ -75,6 +79,35 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     swanAuthenticatedToken: access_token
   } ) )
 }
+
+
+export const createWithdrawalWalletOnSwanWatcher = createWatcher(
+  createWithdrawalWalletOnSwanWorker,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN
+)
+export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
+  console.log( 'inside createWithdrawalWalletOnSwanWatcher', payload )
+  yield put( createWithdrawalWalletOnSwanInitiated() )
+
+  // // Extract swan auth code from deep link redirect url
+  // const splits = payload.data.split( '/' )
+  // const code = splits[ splits.length - 1 ].split( '&' )[ 0 ].split( '=' )[ 1 ]
+
+  // const { code_verifier, state } = yield select(
+  //   ( state ) => state.swanIntegration
+  // )
+  // const swanResponse = yield call( redeemAuthCodeForToken, {
+  //   code,
+  //   state,
+  //   code_verifier
+  // } )
+  // console.log( 'swanResponse.data ', swanResponse.data )
+  // const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
+  yield put( createWithdrawalWalletOnSwanSucceeded( {
+    swanWalletId: 'wallXyZ'
+  } ) )
+}
+
 
 function* linkSwanWalletWorker( { payload } ) {
   /*

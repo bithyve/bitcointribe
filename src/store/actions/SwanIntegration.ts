@@ -7,6 +7,10 @@ export const REDEEM_SWAN_CODE_FOR_TOKEN_STARTED = 'REDEEM_SWAN_CODE_FOR_TOKEN_ST
 export const REDEEM_SWAN_CODE_FOR_TOKEN = 'REDEEM_SWAN_CODE_FOR_TOKEN'
 export const REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED = 'REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED'
 
+export const CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED = 'CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED'
+export const CREATE_WITHDRAWAL_WALLET_ON_SWAN = 'CREATE_WITHDRAWAL_WALLET_ON_SWAN'
+export const CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED = 'CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED'
+
 export const LINK_SWAN_WALLET = 'LINK_SWAN_WALLET'
 export const LINK_SWAN_WALLET_FAILED = 'LINK_SWAN_WALLET_FAILED'
 export const LINK_SWAN_WALLET_SUCCEEDED = 'LINK_SWAN_WALLET_SUCCEEDED'
@@ -29,6 +33,8 @@ export enum SwanActionKind {
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
   REDEEM_SWAN_CODE_FOR_TOKEN,
   REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN,
+  CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED,
   AUTHENTICATE,
   CREATE_SWAN_ACCOUNT_SHELL,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
@@ -89,6 +95,30 @@ export const redeemSwanCodeForTokenSucceeded = ( data ) => {
   }
 }
 
+// createWithdrawalWalletOnSwan
+export const createWithdrawalWalletOnSwan = ( data ) => {
+  return {
+    type: CREATE_WITHDRAWAL_WALLET_ON_SWAN,
+    payload : {
+      data
+    }
+  }
+}
+
+export const createWithdrawalWalletOnSwanInitiated = () => {
+  return {
+    type: CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED,
+  }
+}
+
+export const createWithdrawalWalletOnSwanSucceeded = ( data ) => {
+  return {
+    type: CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED,
+    payload : {
+      data
+    }
+  }
+}
 export const linkSwanWallet = ( data ) => {
   return {
     type: LINK_SWAN_WALLET,
