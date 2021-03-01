@@ -527,6 +527,16 @@ function* calculateCustomFee( { payload }: {payload: {
 
   let outputs
   if( feeIntelAbsent ){
+    // process recipients & generate outputs(normally handled by transfer ST1 saga)
+    const recipients = yield call( processRecipients, accountShell )
+    const outputsArray = []
+    for ( const recipient of recipients ) {
+      outputsArray.push( {
+        address: recipient.address,
+        value: Math.round( recipient.amount ),
+      } )
+    }
+    outputs = outputsArray
   } else {
     const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
     if( !txPrerequisites ) throw new Error( 'ST1 carry-over missing' )
