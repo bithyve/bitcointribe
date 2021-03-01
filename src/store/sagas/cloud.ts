@@ -11,6 +11,7 @@ import { createWatcher } from '../utils/utilities'
 function* cloudWorker({ payload }) {
     const { kpInfo, level, share, callback} = payload;
     const walletName = yield select((state) => state.storage.database.WALLET_SETUP.walletName)
+    const questionId = yield select((state) => state.storage.database.WALLET_SETUP.security.questionId)
     const regularAccount = yield select((state) => state.accounts[REGULAR_ACCOUNT].service)
     const database = yield select((state) => state.storage.database)
     const accountShells = yield select((state) => state.accounts.accountShells)
@@ -44,6 +45,7 @@ function* cloudWorker({ payload }) {
         shares: shares,
         encryptedCloudDataJson: encryptedCloudDataJson,
         walletName: walletName,
+        questionId: questionId,
         regularAccount: regularAccount,
         keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
     };

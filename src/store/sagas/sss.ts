@@ -116,6 +116,9 @@ function* generateMetaSharesWorker() {
   const { walletName } = yield select(
     (state) => state.storage.database.WALLET_SETUP,
   )
+  const { questionId } = yield select(
+    (state) => state.storage.database.WALLET_SETUP.security,
+  )
   const secureAccount: SecureAccount = yield select(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   )
@@ -142,6 +145,7 @@ function* generateMetaSharesWorker() {
       s3Service.createMetaShares,
       secureAssets,
       walletName,
+      questionId,
       appVersion,
     )
     if ( res.status === 200 ) {

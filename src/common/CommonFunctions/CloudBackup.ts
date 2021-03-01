@@ -214,6 +214,7 @@ export default class CloudBackup {
     let tempData = {
       levelStatus: this.dataObject.levelStatus,
       walletName: this.dataObject.walletName,
+      questionId: this.dataObject.questionId,
       walletId: data.walletId,
       data: this.dataObject.encryptedCloudDataJson,
       shares: this.dataObject.shares,
@@ -322,6 +323,7 @@ export default class CloudBackup {
         let tempData = {
           levelStatus: this.dataObject.levelStatus,
           walletName: this.dataObject.walletName,
+          questionId: this.dataObject.questionId,
           walletId: data.walletId,
           data: this.dataObject.encryptedCloudDataJson,
           shares: this.dataObject.shares,
@@ -330,6 +332,7 @@ export default class CloudBackup {
         };
         newArray.push(tempData);
       } else {
+        newArray[index].questionId = this.dataObject.questionId,
         newArray[index].levelStatus = this.dataObject.levelStatus;
         newArray[index].data = this.dataObject.encryptedCloudDataJson;
         newArray[index].shares = this.dataObject.shares ? this.dataObject.shares : newArray[index].shares;

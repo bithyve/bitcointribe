@@ -985,6 +985,7 @@ export default class SSS {
       bhXpub: string;
     },
     tag: string,
+    questionId: string,
     version?: string,
   ): {
     metaShares: MetaShare[];
@@ -1021,6 +1022,7 @@ export default class SSS {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         }
@@ -1036,6 +1038,7 @@ export default class SSS {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         }

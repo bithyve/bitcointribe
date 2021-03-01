@@ -29,7 +29,6 @@ import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux';
 import { initializeSetup } from '../store/actions/setupAndAuth';
-import { initializeHealthSetup } from '../store/actions/health';
 import BottomSheet from 'reanimated-bottom-sheet';
 import LoaderModal from '../components/LoaderModal';
 import {
@@ -104,11 +103,11 @@ export default function NewOwnQuestions(props) {
     (async () => {
       if (isLoaderStart) {
         const security = {
+          questionId: "0",
           question: question,
           answer,
         }
         dispatch(initializeSetup(walletName, security));
-        // if (security.answer) dispatch(initializeHealthSetup());
         dispatch(setVersion('Current'));
         const current = Date.now()
         await AsyncStorage.setItem(

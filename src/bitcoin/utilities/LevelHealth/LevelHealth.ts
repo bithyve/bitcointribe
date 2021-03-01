@@ -1134,6 +1134,7 @@ export default class LevelHealth {
       bhXpub: string;
     },
     tag: string,
+    questionId: string,
     version?: string,
   ): {
     metaShares: MetaShare[];
@@ -1170,6 +1171,7 @@ export default class LevelHealth {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         };
@@ -1185,6 +1187,7 @@ export default class LevelHealth {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         };
@@ -1209,6 +1212,7 @@ export default class LevelHealth {
       bhXpub: string;
     },
     tag: string,
+    questionId: string,
     version?: string,
     level?: number,
   ): {
@@ -1247,6 +1251,7 @@ export default class LevelHealth {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         };
@@ -1262,6 +1267,7 @@ export default class LevelHealth {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         };

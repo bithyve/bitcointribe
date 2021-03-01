@@ -110,6 +110,7 @@ export interface MetaShare {
     tag: string;
     timestamp: string;
     reshareVersion: number;
+    questionId: string;
     guardian?: string;
   };
   encryptedStaticNonPMDD?: string;

@@ -102,6 +102,7 @@ export default function NewWalletQuestion(props) {
     (async () => {
       if (isLoaderStart) {
         const security = {
+          questionId: dropdownBoxValue.id,
           question: dropdownBoxValue.question,
           answer,
         }

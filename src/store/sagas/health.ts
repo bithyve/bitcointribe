@@ -177,7 +177,7 @@ function* generateMetaSharesWorker({ payload }) {
   );
   const appVersion = DeviceInfo.getVersion();
   const { level } = payload;
-  const { answer } = yield select(
+  const { answer, questionId } = yield select(
     (state) => state.storage.database.WALLET_SETUP.security
   );
 
@@ -200,6 +200,7 @@ function* generateMetaSharesWorker({ payload }) {
       secureAssets,
       answer,
       walletName,
+      questionId,
       appVersion,
       level
     );
