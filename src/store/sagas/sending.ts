@@ -522,8 +522,10 @@ function* calculateCustomFee( { payload }: {payload: {
     accountShell.primarySubAccount.sourceKind
   ].service
 
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const selectedRecipients: RecipientDescribing[] = sendingState.selectedRecipients
 
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
 
   let outputs
   if( feeIntelAbsent ){
@@ -538,11 +540,57 @@ function* calculateCustomFee( { payload }: {payload: {
     }
     outputs = outputsArray
   } else {
-    const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
     if( !txPrerequisites ) throw new Error( 'ST1 carry-over missing' )
     outputs = txPrerequisites[ 'low' ].outputs.filter(
       ( output ) => output.address,
     )
+  }
+
+
+  if( !feeIntelAbsent && sendingState.sendMaxFee ){
+    // custom fee w/ send max
+    const { fee } = service.calculateSendMaxFee(
+      selectedRecipients.length,
+      parseInt( feePerByte ),
+      derivativeAccountDetails,
+    )
+
+    // upper bound: default low
+    if( fee > txPrerequisites[ 'low' ].fee ){
+      // this.setState( {
+      //   customFee: '',
+      //   customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
+      // } )
+      return
+    }
+
+    const recipients: [
+      {
+        id: string;
+        address: string;
+        amount: number;
+        type?: string;
+        accountNumber?: number;
+      }
+    ] = yield call( processRecipients, accountShell )
+    const recipientToBeModified = recipients[ recipients.length - 1 ]
+
+    // deduct the previous(default low) fee and add the custom fee
+    // TODO: recapture custom fee from sending reducer
+    if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
+    else recipientToBeModified.amount += txPrerequisites[ 'low' ].fee
+    recipientToBeModified.amount -= fee
+    this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
+
+    outputs.forEach( ( output )=>{
+      if( output.address === recipientToBeModified.address )
+        output.value = recipientToBeModified.amount
+    } )
+
+    selectedRecipients.forEach( ( recipient ) => {
+      if( recipient.id === recipientToBeModified.id ) recipient.amount = recipientToBeModified.amount
+    } )
+    // TODO: action to update selected recipients array
   }
 
   const customTxPrerequisites = service.calculateCustomFee(
@@ -550,6 +598,32 @@ function* calculateCustomFee( { payload }: {payload: {
     parseInt( feePerByte ),
     derivativeAccountDetails,
   )
+
+  // if( !this.feeIntelAbsent && this.isSendMax )
+  //   this.setState( {
+  //     totalAmount: this.spendableBalance - customTxPrerequisites.fee,
+  //     selectedRecipients,
+  //   } )
+
+  // if ( customTxPrerequisites.inputs ) {
+  //   if ( this.refs.CustomPriorityBottomSheet as any )
+  //     ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
+  //   this.onPrioritySelect( 'Custom Fee' )
+  //   setTimeout( () => {
+  //     this.setState( {
+  //       customTxPrerequisites: customTxPrerequisites,
+  //       customFee: customTxPrerequisites.fee,
+  //       customFeePerByteErr: '',
+  //       customEstimatedBlock,
+  //     } )
+  //   }, 2 )
+  // } else {
+  //   // display err message
+  //   this.setState( {
+  //     customFee: '',
+  //     customFeePerByteErr: `Insufficient balance to pay: amount ${this.state.totalAmount} + fee(${customTxPrerequisites.fee}) at ${amount} sats/byte`,
+  //   } )
+  // }
 
 }
 

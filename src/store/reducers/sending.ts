@@ -23,6 +23,8 @@ export type SendingState = {
     hasFailed: boolean;
     failedErrorMessage: string | null;
     isSuccessful: boolean,
+
+    // data elements carried over to the next send stage(2)
     carryOver: { txPrerequisites: TransactionPrerequisite } | null;
   };
 
@@ -31,7 +33,11 @@ export type SendingState = {
     hasFailed: boolean;
     failedErrorMessage: string | null;
     isSuccessful: boolean,
+
+    // available for the transactions from a non-2FA account
     txid: string | null,
+
+    // data elements carried over to the next send stage(3)
     carryOver: {
       txHex: string;
       childIndexArray: Array<{
@@ -55,7 +61,7 @@ export type SendingState = {
   }
 
   sendMaxFee: Satoshis;
-  feeIntelMissing: Boolean,
+  feeIntelMissing: boolean,
   transactionFeeInfo: TransactionFeeInfo;
 };
 
