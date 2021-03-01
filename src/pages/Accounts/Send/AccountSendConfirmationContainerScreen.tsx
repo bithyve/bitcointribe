@@ -4,7 +4,6 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import FormStyles from '../../../common/Styles/FormStyles'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
 import { useDispatch } from 'react-redux'
@@ -15,10 +14,9 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2 } from '../../../store/actions/sending'
+import { calculateCustomFee, executeAlternateSendStage2, executeSendStage2 } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-import RelayServices from '../../../bitcoin/services/RelayService'
 
 export type NavigationParams = {
 };
@@ -50,6 +48,26 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
     return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
+
+
+  function handleCustomFee ( feePerByte, customEstimatedBlocks ) {
+    // feerate > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
+    if ( parseInt( feePerByte ) < 1 ) {
+      // TODO: show err
+      // this.setState( {
+      //   customFee: '',
+      //   customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
+      // } )
+      return
+    }
+
+    dispatch( calculateCustomFee( {
+      accountShellID: sourceAccountShell.id,
+      feePerByte,
+      customEstimatedBlocks,
+      feeIntelAbsent: sendingState.feeIntelMissing,
+    } ) )
+  }
 
   function handleConfirmationButtonPress() {
     // TODO: populate txnPriority based on user selection

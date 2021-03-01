@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -314,7 +314,7 @@ function* executeSendStage2( { payload }: {payload: {
 
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
 
-  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
+  const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
   const { txnPriority, customTxPrerequisites, nSequence } = payload
   if ( !txPrerequisites && !customTxPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
@@ -389,7 +389,7 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
     throw new Error( 'ST3 cannot be executed for a non-2FA account' )
   }
 
-  const { txPrerequisites } = idx( sending, ( _ ) => _.sendST1.carryOver )
+  const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
   if ( !txPrerequisites ) {
     console.log( 'Transaction prerequisites missing' )
     return
@@ -441,9 +441,11 @@ function* executeSendStage3Worker( { payload }: {payload: {accountShellID: strin
     throw new Error( 'ST3 cannot be executed for a non-2FA account' )
   }
 
-  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = idx( sending, ( _ ) => _.sendST2.carryOver )
+  const carryOver =  idx( sending, ( _ ) => _.sendST2.carryOver )
+  if( !carryOver ) throw new Error( 'ST2 carry-over missing' )
+  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
   if ( !txHex || !childIndexArray || !inputs ) {
-    console.log( 'TxHex/child-index/inputs missing' )
+    throw new Error( 'TxHex/child-index/inputs missing' )
   }
 
   const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
@@ -463,8 +465,6 @@ export const executeSendStage3Watcher = createWatcher(
   executeSendStage3Worker,
   EXECUTE_SEND_STAGE3
 )
-
-
 
 function* calculateSendMaxFee( { payload }: {payload: {
   numberOfRecipients: number;
@@ -497,4 +497,53 @@ function* calculateSendMaxFee( { payload }: {payload: {
 export const calculateSendMaxFeeWatcher = createWatcher(
   calculateSendMaxFee,
   CALCULATE_SEND_MAX_FEE
+)
+
+
+function* calculateCustomFee( { payload }: {payload: {
+  accountShellID: string,
+  feePerByte: string,
+  customEstimatedBlocks: string,
+  feeIntelAbsent: boolean,
+}} ) {
+
+  const { accountShellID, feePerByte, customEstimatedBlocks, feeIntelAbsent } = payload
+  const accountsState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const sendingState: SendingState = yield select(
+    ( state ) => state.sending
+  )
+
+  const accountShell: AccountShell = accountsState.accountShells
+    .find( accountShell => accountShell.id === accountShellID )
+
+  const service: BaseAccount | SecureAccount = accountsState[
+    accountShell.primarySubAccount.sourceKind
+  ].service
+
+  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+
+  let outputs
+  if( feeIntelAbsent ){
+  } else {
+    const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+    if( !txPrerequisites ) throw new Error( 'ST1 carry-over missing' )
+    outputs = txPrerequisites[ 'low' ].outputs.filter(
+      ( output ) => output.address,
+    )
+  }
+
+  const customTxPrerequisites = service.calculateCustomFee(
+    outputs,
+    parseInt( feePerByte ),
+    derivativeAccountDetails,
+  )
+
+}
+
+export const calculateCustomFeeWatcher = createWatcher(
+  calculateCustomFee,
+  CALCULATE_CUSTOM_FEE
 )

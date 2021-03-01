@@ -24,6 +24,7 @@ export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
 export const CALCULATE_SEND_MAX_FEE = 'CALCULATE_SEND_MAX_FEE'
 export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
+export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
 
 export interface SourceAccountSelectedForSendingAction extends Action {
   type: typeof SOURCE_ACCOUNT_SELECTED_FOR_SENDING;
@@ -328,6 +329,30 @@ export const sendMaxFeeCalculated = (
 ): SendMaxFeeCalculatedAction => {
   return {
     type: SEND_MAX_FEE_CALCULATED,
+    payload,
+  }
+}
+
+export interface CalculateCustomFeeAction extends Action {
+  type: typeof CALCULATE_CUSTOM_FEE;
+  payload: {
+    accountShellID: string,
+    feePerByte: string,
+    customEstimatedBlocks: string,
+    feeIntelAbsent: boolean,
+  };
+}
+
+export const calculateCustomFee = (
+  payload: {
+    accountShellID: string,
+    feePerByte: string,
+    customEstimatedBlocks: string,
+    feeIntelAbsent: boolean,
+  },
+): CalculateCustomFeeAction => {
+  return {
+    type: CALCULATE_CUSTOM_FEE,
     payload,
   }
 }
