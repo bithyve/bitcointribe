@@ -11,7 +11,7 @@ import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
+import { createWithdrawalWalletOnSwan, fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 import { addNewAccountShell } from '../../../store/actions/accounts'
@@ -29,7 +29,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
     boottomSheetRenderCount: boottomSheetRenderCount++, swanFromBuyMenu, swanFromDeepLink
   } )
   const dispatch = useDispatch()
-  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted } = useSwanIntegrationState()
+  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted, hasCreateWithdrawalWalletOnSwanSucceeded, hasCreateWithdrawalWalletOnSwanCompleted, hasCreateWithdrawalWalletOnSwanInitiated } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   function handleProceedButtonPress() {
     if ( swanFromBuyMenu ) {
@@ -63,18 +63,19 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
     }
   }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken ] )
 
-  /*
+
   // When withdrawal wallet has been created
   // a new Swan service account should be created in Hexa
   useEffect( ()=>{
     if( swanFromDeepLink ) {
       swanFromBuyMenu = false
       if( hasCreateWithdrawalWalletOnSwanSucceeded )
-        dispatch( addNewAccountShell( {
-        } ) )
+        console.log( 'CREATE NEW ACCOUNT NOW!' )
+        // dispatch( addNewAccountShell( {
+        // } ) )
     }
   }, [ hasCreateWithdrawalWalletOnSwanCompleted ] )
-
+  /*
   // when new Swan Account is created
   // send xpub to Swan
   useEffect( ()=>{
@@ -102,7 +103,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
         }}>Verify Hexa is authorised: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
-        }}>Create withdrawal wallet on Swan: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
+        }}>Create withdrawal wallet on Swan: {hasCreateWithdrawalWalletOnSwanSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
           ...styles.modalInfoText, marginTop: wp( '1.5%' )
         }}>Create Swan Account in Hexa: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
