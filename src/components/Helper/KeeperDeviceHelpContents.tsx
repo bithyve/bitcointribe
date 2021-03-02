@@ -69,8 +69,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Any other phone that has Hexa installed can become a “Keeper
-            Device”. A Keeper Device stores one of your five Recovery Keys
+            Any other phone that has Hexa installed can become a “Keeper Device”. A Keeper Device stores one of your five Recovery Keys
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -94,8 +93,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            If your Keeper Device is not accessible, it is possible to restore
-            it using your primary device and one of your Keepers
+            If your Keeper Device is not accessible, it is possible to restore it using your primary device and one of your Personal Copy Keepers 
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -148,7 +146,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Click on “Backup Now”. You will see a QR Code
+            Click on Backup Now. You will see a QR Code
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
@@ -172,9 +170,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Go to the “Scan a QR” section on your Keeper Device and scan the QR
-            you just saw on your Primary Device. Click on “Yes I have scanned”
-            on your Primary Device after you have scanned the QR
+            Go to the Scan a QR section on your Keeper Device and scan the QR you just saw on your Primary Device. Click on ‘Yes I have scanned’ on your Primary Device after you have scanned the QR
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{
@@ -227,8 +223,7 @@ export default function KeeperDeviceHelpContents( props ) {
               marginRight: wp( '5%' ),
             }}
           >
-            Note that you cannot make a device that has your “Personal Copy”
-            backed up as your Keeper Device
+            Note that you cannot make a device that has your “Personal Copy” backed up as your Keeper Device. This is by design  
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center', marginTop: wp( '-20%' ), marginBottom: wp( '-20%' )
@@ -242,7 +237,7 @@ export default function KeeperDeviceHelpContents( props ) {
               }}
             />
           </View>
-          <Text
+         <Text
             style={{
               textAlign: 'center',
               color: Colors.white,
