@@ -316,11 +316,6 @@ function* executeSendStage2( { payload }: {payload: {
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
 
   const { txnPriority } = payload
-  if ( !txPrerequisites && !customTxPrerequisites ) {
-    console.log( 'Transaction prerequisites missing' )
-    return
-  }
-
   const res = yield call(
     service.transferST2,
     txPrerequisites,
@@ -386,12 +381,6 @@ function* executeAlternateSendStage2Worker( { payload }: {payload: {
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
-
-  if ( !txPrerequisites  || ! customTxPrerequisites ) {
-    console.log( 'Transaction prerequisites missing' )
-    return
-  }
-
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
 
   const res = yield call(
@@ -433,16 +422,8 @@ function* executeSendStage3Worker( { payload }: {payload: {accountShellID: strin
     accountShell.primarySubAccount.sourceKind
   ].service
 
-  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
-    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
-  }
-
   const carryOver =  idx( sending, ( _ ) => _.sendST2.carryOver )
-  if( !carryOver ) throw new Error( 'ST2 carry-over missing' )
   const { txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
-  if ( !txHex || !childIndexArray || !inputs ) {
-    throw new Error( 'TxHex/child-index/inputs missing' )
-  }
 
   const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
   if ( res.status === 200 ) {
