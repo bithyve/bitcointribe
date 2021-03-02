@@ -316,6 +316,7 @@ function* executeSendStage2( { payload }: {payload: {
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
 
   const { txnPriority } = payload
+
   const res = yield call(
     service.transferST2,
     txPrerequisites,

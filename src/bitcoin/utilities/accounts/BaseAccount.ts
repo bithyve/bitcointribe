@@ -10,6 +10,7 @@ import {
   TransactionPrerequisite,
   ScannedAddressKind,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../Interface'
 
 export default class BaseAccount {
@@ -704,7 +705,7 @@ export default class BaseAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
@@ -725,9 +726,10 @@ export default class BaseAccount {
   > => {
     let executed = 'tx-init'
     try {
+      txnPriority = txnPriority.toLowerCase()
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
-        txnPriority.toLowerCase(),
+        txnPriority,
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,

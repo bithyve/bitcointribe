@@ -1766,7 +1766,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public createHDTransaction = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<{

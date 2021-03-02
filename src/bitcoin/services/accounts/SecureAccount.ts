@@ -9,6 +9,7 @@ import {
   InputUTXOs,
   ScannedAddressKind,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -891,7 +892,7 @@ export default class SecureAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
@@ -920,9 +921,10 @@ export default class SecureAccount {
       }
   > => {
     try {
+      txnPriority = txnPriority.toLowerCase()
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
-        txnPriority.toLowerCase(),
+        txnPriority,
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,
