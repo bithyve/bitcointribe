@@ -144,7 +144,7 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
   switch ( action.type ) {
       case SOURCE_ACCOUNT_SELECTED_FOR_SENDING:
         return {
-          ...state,
+          ...INITIAL_STATE,
           sourceAccountShell: action.payload,
         }
 
