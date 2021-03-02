@@ -1836,7 +1836,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onPressElement = (item) => {
     const { navigation } = this.props;
     if (item.title == "Backup Health") {
-      navigation.navigate("ManageBackup");
+      navigation.navigate("ManageBackupNewBHR");
       return;
     }
     if (item.title == "Friends and Family") {

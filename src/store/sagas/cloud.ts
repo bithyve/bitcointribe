@@ -30,7 +30,7 @@ function* cloudWorker({ payload }) {
         activePersonalNode,
         versionHistory
     );
-    console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
+    // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
 
     let keeperData = [
         {

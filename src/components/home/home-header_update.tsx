@@ -304,7 +304,7 @@ const HomeHeader = ({
         <TouchableOpacity
           onPress={() => {
             if (s3Service.levelhealth.healthCheckInitializedKeeper) {
-              navigation.navigate("ManageBackupKeeper");
+              navigation.navigate("ManageBackupNewBHR");
             } else {
               navigation.navigate("ManageBackup");
             }

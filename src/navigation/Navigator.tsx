@@ -39,6 +39,7 @@ import SecureScan from '../pages/Accounts/SecureScan'
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP'
 import TwoFASetup from '../pages/Accounts/TwoFASetup'
 import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory'
+import SecondaryDeviceHistoryNewBHR from '../pages/NewBHR/SecondaryDeviceHistoryNewBHR';
 import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory'
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory'
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory'
@@ -77,6 +78,7 @@ import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup';
 import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys';
 import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity';
 import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
+import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR';
 import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
 import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
 import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
@@ -167,6 +169,7 @@ const HomeNavigator = createStackNavigator(
     SecureScan,
     GoogleAuthenticatorOTP,
     SecondaryDeviceHistory,
+    SecondaryDeviceHistoryNewBHR,
     TrustedContactHistory,
     PersonalCopyHistory,
     SecurityQuestionHistory,
@@ -182,6 +185,7 @@ const HomeNavigator = createStackNavigator(
     Receive,
     PairNewWallet,
     ManageBackupKeeper,
+    ManageBackupNewBHR,
     SecurityQuestionHistoryKeeper,
     KeeperFeatures,
     TrustedContactHistoryKeeper,
