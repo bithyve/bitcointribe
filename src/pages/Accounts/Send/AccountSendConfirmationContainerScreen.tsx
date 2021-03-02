@@ -21,7 +21,7 @@ import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import SendConfirmationContent from '../SendConfirmationContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { clearTransfer } from '../../../store/actions/accounts'
+import { clearTransfer, refreshAccountShell } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 
@@ -63,7 +63,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
-
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(
       <SendConfirmationContent
@@ -78,9 +77,10 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isCancel={false}
         onPressOk={() => {
           dismissBottomSheet()
-
-          dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
-
+          dispatch( refreshAccountShell( sourceAccountShell, {
+            autoSync: false,
+            hardRefresh: false,
+          } ) )
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,
