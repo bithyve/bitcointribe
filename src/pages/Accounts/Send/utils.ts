@@ -12,7 +12,7 @@ export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
           accountImageSource = require( '../../../assets/images/icons/icon_ramp.png' )
           break
         case WYRE:
-          accountImageSource = require( '../../../assets/images/icons/wyre_notext_small.png' )
+          accountImageSource = require( '../../../assets/images/icons/icon_wyre.png' )
           break
     }
   }
