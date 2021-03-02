@@ -18,10 +18,10 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import config from '../../../bitcoin/HexaConfig'
-import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 import { calculateCustomFee } from '../../../store/actions/sending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
+const defaultTransactionPrioritiesAvailable = [ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ]
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing
@@ -32,10 +32,10 @@ export type Props = {
 const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransactionPriorityChanged }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
-  const [ transactionPrioritiesAvailable, setTransactionPrioritiesAvailable ] = useState( [ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ] )
+  const sendingState  = useSendingState()
+  const [ transactionPrioritiesAvailable, setTransactionPrioritiesAvailable ] = useState( sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable )
   const [ customPriorityErr, setCustomPriorityErr ] = useState( '' )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
-  const sendingState  = useSendingState()
   const dispatch = useDispatch()
 
   const showCustomPriorityBottomSheet = useCallback( () => {
@@ -81,14 +81,15 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
 
   useEffect( ()=>{
     const { customPriorityST1 } = sendingState
+    const txPriorites = sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable
     if( customPriorityST1.hasFailed ) {
       setCustomPriorityErr( customPriorityST1.failedErrorMessage )
-      setTransactionPrioritiesAvailable( [ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ] )
+      setTransactionPrioritiesAvailable( txPriorites )
       setTransactionPriority( TransactionPriority.LOW )
       onTransactionPriorityChanged( TransactionPriority.LOW )
     }
     else if( customPriorityST1.isSuccessful ){
-      setTransactionPrioritiesAvailable( [ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH, TransactionPriority.CUSTOM ] )
+      setTransactionPrioritiesAvailable( [ ...txPriorites, TransactionPriority.CUSTOM ] )
       setTransactionPriority( TransactionPriority.CUSTOM )
       onTransactionPriorityChanged( TransactionPriority.CUSTOM )
       dismissBottomSheet()

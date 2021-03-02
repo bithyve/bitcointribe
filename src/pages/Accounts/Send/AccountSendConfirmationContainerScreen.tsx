@@ -14,7 +14,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { calculateCustomFee, executeAlternateSendStage2, executeSendStage2, resetSendState } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, resetSendState } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
