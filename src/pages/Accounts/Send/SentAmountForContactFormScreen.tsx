@@ -22,7 +22,6 @@ import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity, useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
-import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
@@ -101,7 +100,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     } ) )
   }
 
-
   const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
     presentBottomSheet(
       <SendConfirmationContent
@@ -146,19 +144,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   useEffect( ()=> {
     if ( sendingState.feeIntelMissing ) {
       // missing fee intel: custom fee-fallback
-
-      // this.props.navigation.navigate( 'SendConfirmation', {
-      //   accountShellID,
-      //   serviceType,
-      //   sweepSecure,
-      //   spendableBalance,
-      //   recipients,
-      //   averageTxFees,
-      //   isSendMax,
-      //   derivativeAccountDetails,
-      //   donationId,
-      //   feeIntelAbsent: true,
-      // } )
+      navigation.navigate( 'SendConfirmation' )
     }
   }, [ sendingState.feeIntelMissing ] )
 

@@ -1,6 +1,6 @@
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING, CALCULATE_CUSTOM_FEE, CUSTOM_FEE_CALCULATED } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING, CALCULATE_CUSTOM_FEE, CUSTOM_FEE_CALCULATED, RESET_SEND_STATE } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
@@ -142,6 +142,12 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
   let recipient: RecipientDescribing
 
   switch ( action.type ) {
+
+      case RESET_SEND_STATE:
+        return {
+          ...INITIAL_STATE
+        }
+
       case SOURCE_ACCOUNT_SELECTED_FOR_SENDING:
         return {
           ...INITIAL_STATE,
@@ -248,8 +254,8 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           const carryOver = action.payload.carryOver
           customTxPrerequisites = carryOver.customTxPrerequisites
           if( customTxPrerequisites ){
-            transactionFeeInfo[ TransactionPriority.CUSTOM ].amount = customTxPrerequisites.fee
-            transactionFeeInfo[ TransactionPriority.CUSTOM ].estimatedBlocksBeforeConfirmation = customTxPrerequisites.estimatedBlocks
+            txFeeInfo[ TransactionPriority.CUSTOM ].amount = customTxPrerequisites.fee
+            txFeeInfo[ TransactionPriority.CUSTOM ].estimatedBlocksBeforeConfirmation = customTxPrerequisites.estimatedBlocks
           }
         }
         return {

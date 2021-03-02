@@ -316,6 +316,7 @@ function* executeSendStage2( { payload }: {payload: {
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
 
   const { txnPriority } = payload
+
   const res = yield call(
     service.transferST2,
     txPrerequisites,
@@ -481,10 +482,22 @@ function* calculateCustomFee( { payload }: {payload: {
   accountShellID: string,
   feePerByte: string,
   customEstimatedBlocks: string,
-  feeIntelAbsent: boolean,
 }} ) {
 
-  const { accountShellID, feePerByte, customEstimatedBlocks, feeIntelAbsent } = payload
+  // feerate should be > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
+  if ( parseInt( payload.feePerByte ) < 1 ) {
+    yield put ( customFeeCalculated( {
+      successful: false,
+      carryOver:{
+        customTxPrerequisites: null
+      },
+      err: 'Custom fee minimum: 1 sat/byte',
+    } ) )
+    return
+  }
+
+
+  const { accountShellID, feePerByte, customEstimatedBlocks } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
@@ -505,7 +518,7 @@ function* calculateCustomFee( { payload }: {payload: {
   const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
 
   let outputs
-  if( feeIntelAbsent ){
+  if( sendingState.feeIntelMissing ){
     // process recipients & generate outputs(normally handled by transfer ST1 saga)
     const recipients = yield call( processRecipients, accountShell )
     const outputsArray = []
@@ -524,7 +537,7 @@ function* calculateCustomFee( { payload }: {payload: {
   }
 
 
-  if( !feeIntelAbsent && sendingState.sendMaxFee ){
+  if( !sendingState.feeIntelMissing && sendingState.sendMaxFee ){
     // custom fee w/ send max
     const { fee } = service.calculateSendMaxFee(
       selectedRecipients.length,
@@ -583,17 +596,6 @@ function* calculateCustomFee( { payload }: {payload: {
   //   } )
 
   if ( customTxPrerequisites.inputs ) {
-    // if ( this.refs.CustomPriorityBottomSheet as any )
-    //   ( this.refs.CustomPriorityBottomSheet as any ).snapTo( 0 )
-    // this.onPrioritySelect( 'Custom Fee' )
-    // setTimeout( () => {
-    //   this.setState( {
-    //     customTxPrerequisites: customTxPrerequisites,
-    //     customFee: customTxPrerequisites.fee,
-    //     customFeePerByteErr: '',
-    //     customEstimatedBlock,
-    //   } )
-    // }, 2 )
     customTxPrerequisites.estimatedBlocks = parseInt( customEstimatedBlocks )
     yield put ( customFeeCalculated( {
       successful: true,

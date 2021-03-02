@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -17,8 +18,10 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import config from '../../../bitcoin/HexaConfig'
-import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
+import { calculateCustomFee } from '../../../store/actions/sending'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
+const defaultTransactionPrioritiesAvailable = [ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ]
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing
@@ -29,8 +32,11 @@ export type Props = {
 const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransactionPriorityChanged }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
-
+  const sendingState  = useSendingState()
+  const [ transactionPrioritiesAvailable, setTransactionPrioritiesAvailable ] = useState( sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable )
+  const [ customPriorityErr, setCustomPriorityErr ] = useState( '' )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
+  const dispatch = useDispatch()
 
   const showCustomPriorityBottomSheet = useCallback( () => {
     const network = (
@@ -42,16 +48,14 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
       <CustomPriorityContent
         title={'Custom Priority'}
         info={'Enter the fee rate in sats per byte.'}
-        // err={this.state.customFeePerByteErr}
+        err={customPriorityErr}
         network={network}
         okButtonText={'Confirm'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={( amount ) => {
+        onPressOk={( amount, customEstimatedBlock ) => {
           Keyboard.dismiss()
-          dismissBottomSheet()
-          setTransactionPriority( TransactionPriority.CUSTOM )
-          onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+          handleCustomFee( amount, customEstimatedBlock )
         }}
         onPressCancel={() => {
           Keyboard.dismiss()
@@ -63,8 +67,34 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
         snapPoints: [ 0, '44%' ],
       },
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }, [ presentBottomSheet, dismissBottomSheet, customPriorityErr ] )
 
+
+  const handleCustomFee = ( feePerByte, customEstimatedBlocks ) => {
+    if( customPriorityErr ) setCustomPriorityErr( '' )
+    dispatch( calculateCustomFee( {
+      accountShellID: sourceSubAccount.accountShellID,
+      feePerByte,
+      customEstimatedBlocks,
+    } ) )
+  }
+
+  useEffect( ()=>{
+    const { customPriorityST1 } = sendingState
+    const txPriorites = sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable
+    if( customPriorityST1.hasFailed ) {
+      setCustomPriorityErr( customPriorityST1.failedErrorMessage )
+      setTransactionPrioritiesAvailable( txPriorites )
+      setTransactionPriority( TransactionPriority.LOW )
+      onTransactionPriorityChanged( TransactionPriority.LOW )
+    }
+    else if( customPriorityST1.isSuccessful ){
+      setTransactionPrioritiesAvailable( [ ...txPriorites, TransactionPriority.CUSTOM ] )
+      setTransactionPriority( TransactionPriority.CUSTOM )
+      onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+      dismissBottomSheet()
+    }
+  }, [ sendingState.customPriorityST1 ] )
 
   return (
     <View style={styles.rootContainer}>
@@ -104,7 +134,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
           }}>Fee</Text>
         </View>
 
-        {[ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ].map( priority => {
+        {transactionPrioritiesAvailable.map( priority => {
           return (
             <View style={styles.priorityRowContainer} key={priority}>
               <View style={{

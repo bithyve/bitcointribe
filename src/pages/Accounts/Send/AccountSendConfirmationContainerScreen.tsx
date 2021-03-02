@@ -14,14 +14,14 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { calculateCustomFee, executeAlternateSendStage2, executeSendStage2 } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, resetSendState } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import SendConfirmationContent from '../SendConfirmationContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import { clearTransfer } from '../../../store/actions/accounts'
+import { clearTransfer, refreshAccountShell } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 
@@ -63,7 +63,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
-
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(
       <SendConfirmationContent
@@ -78,9 +77,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isCancel={false}
         onPressOk={() => {
           dismissBottomSheet()
-
-          dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
-
+          dispatch( resetSendState() )
+          dispatch( refreshAccountShell( sourceAccountShell, {
+            autoSync: false,
+            hardRefresh: false,
+          } ) )
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,
@@ -131,26 +132,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     )
   },
   [ presentBottomSheet, dismissBottomSheet ] )
-
-
-  function handleCustomFee ( feePerByte, customEstimatedBlocks ) {
-    // feerate > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
-    if ( parseInt( feePerByte ) < 1 ) {
-      // TODO: show err
-      // this.setState( {
-      //   customFee: '',
-      //   customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
-      // } )
-      return
-    }
-
-    dispatch( calculateCustomFee( {
-      accountShellID: sourceAccountShell.id,
-      feePerByte,
-      customEstimatedBlocks,
-      feeIntelAbsent: sendingState.feeIntelMissing,
-    } ) )
-  }
 
   function handleConfirmationButtonPress() {
     if( usingExitKey ){
