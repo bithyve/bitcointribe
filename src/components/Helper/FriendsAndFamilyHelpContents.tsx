@@ -66,7 +66,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            You can add two of your contacts as Keepers for your Recovery Keys if they have Hexa installed
+            You can add two of your most trusted contacts as Keepers for your Recovery Keys if they have Hexa installed - choose your Keepers wisely!  
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -88,7 +88,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Share a QR code or a link with your contacts and ask them to open Hexa to act as your Keepers. The QR will have to be scanned from the HS scanner to be accepted, or the link has to be clicked and it will open in Hexa
+            Share a QR code or a link with your intended Keepers and ask them to open Hexa. The Keeper will have to either scan the QR code with Hexa or touch the link, which will open Hexa automatically
           </Text>
           <AppBottomSheetTouchableWrapper
             style={{ alignItems: 'center' }}
@@ -215,7 +215,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            Recovery Keys are sent through secure, encrypted channels called ECDH channels. These channels are encrypted end-to-end, enabling only the receiver and sender to decrypt the information
+            Recovery Keys are sent through secure, encrypted channels called ECDH channels. These channels are encrypted end-to-end, only letting the receiver and sender decrypt the information - no middle men can see your Recovery key!
           </Text>
           <View
             style={{
@@ -244,7 +244,7 @@ export default function FriendsAndFamilyHelpContents(props) {
               marginRight: wp('5%'),
             }}
           >
-            The initial contact creation and communication with Friends & Family needs passing encrypted messages through the backend servers. So sometimes, if the connection fails, it may not work and you may have to try again
+            The initial contact creation and communication with Friends & Family needs to be processed on our backend - so setting someone as your Keeper may not work the first time and you may have to try again
           </Text>
         </View>
       </ScrollView>

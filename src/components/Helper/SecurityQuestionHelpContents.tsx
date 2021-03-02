@@ -58,10 +58,7 @@ export default function SecurityQuestionHelpContents(props) {
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
-            The Security Question is used to safeguard your{'\n'}personal
-            Recovery Keys in the event someone {'\n'}gains possession without
-            your consent. Therefore, {'\n'}it is required that you remember
-            {'\n'}the question and answer you provide
+            Your Security Question is used to safeguard your personal Recovery Keys in the event someone gets access to them without your consent. Therefore, it is required that you remember the question and answer you provide
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Image
@@ -81,9 +78,7 @@ export default function SecurityQuestionHelpContents(props) {
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
-            Hexa will remind you of your Security Question{'\n'}routinely to
-            help you remember your question{'\n'}and answer. The Health Shield
-            automatically{'\n'}updates when you answer correctly
+            Hexa will remind you of your Security Question routinely, helping you remember your question and answer. The Health Shield automatically updates when you answer correctly
           </Text>
           <Text
             style={{
@@ -93,10 +88,7 @@ export default function SecurityQuestionHelpContents(props) {
               fontFamily: Fonts.FiraSansRegular,
             }}
           >
-            If a person gains knowledge of your Security{'\n'}Question and
-            Answer, they can not steal or deny {'\n'}access to your funds.
-            However, it is recommended{'\n'} that you keep the answer safe to
-            provide{'\n'} for an extra layer of security
+            If someone gets to know your Security Question and Answer, they cannot steal or deny access to your funds. However, you should still keep the answer safe to give yourself an extra layer of security
           </Text>
           <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: hp('2%') }}>
             <View
