@@ -22,11 +22,11 @@ import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing
-  onFeeChanged: ( amount: Satoshis ) => void
+  onTransactionPriorityChanged: ( priority: TransactionPriority ) => void
 };
 
 
-const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onFeeChanged }: Props ) => {
+const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransactionPriorityChanged }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
 
@@ -51,7 +51,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onFeeChan
           Keyboard.dismiss()
           dismissBottomSheet()
           setTransactionPriority( TransactionPriority.CUSTOM )
-          onFeeChanged( amount )
+          onTransactionPriorityChanged( TransactionPriority.CUSTOM )
         }}
         onPressCancel={() => {
           Keyboard.dismiss()
@@ -119,7 +119,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onFeeChan
                   isChecked={transactionPriority == priority}
                   onpress={() => {
                     setTransactionPriority( priority )
-                    onFeeChanged( transactionFeeInfo[ priority ].amount )
+                    onTransactionPriorityChanged( priority )
                   }}
                 />
                 <Text style={{

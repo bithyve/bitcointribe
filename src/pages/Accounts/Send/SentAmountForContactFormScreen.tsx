@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Keyboard } from 'react-native'
 import { Input } from 'react-native-elements'
 import Colors from '../../../common/Colors'
@@ -20,10 +20,15 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import { TouchableOpacity, useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
 import useAverageTransactionFees from '../../../utils/hooks/state-selectors/UseAverageTransactionFees'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import SendConfirmationContent from '../SendConfirmationContent'
+import { clearTransfer } from '../../../store/actions/accounts'
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 
 export type NavigationParams = {
 };
@@ -38,6 +43,12 @@ export type Props = {
 
 const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
+
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
   const selectedRecipients = useSelectedRecipientsForSending()
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
   const sourceAccountShell = useSourceAccountShellForSending()
@@ -90,16 +101,50 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     } ) )
   }
 
-  useEffect( ()=>{
-    const { isSuccessful, hasFailed, failedErrorMessage } = sendingState.sendST1
-    if( isSuccessful ) navigation.navigate( 'SendConfirmation' )
-    else if( hasFailed ) {
-      // TODO: show send failure bottomsheet w/ failedErrorMessage
-    }
-  }, [ sendingState.sendST1 ] )
 
-  useEffect( ()=>{
-    if( sendingState.feeIntelMissing ){
+  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
+    presentBottomSheet(
+      <SendConfirmationContent
+        title={'Send Unsuccessful'}
+        info={errorMessage}
+        // userInfo={transfer.details ? transfer.details : []}
+        userInfo={[]}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={dismissBottomSheet}
+        onPressCancel={() => {
+          dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
+          dismissBottomSheet()
+
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
+        }}
+        isUnSuccess={true}
+        accountKind={sourcePrimarySubAccount.kind}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '67%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ] )
+
+
+  useAccountSendST1CompletionEffect( {
+    onSuccess: () => {
+      navigation.navigate( 'SendConfirmation' )
+    },
+    onFailure: showSendFailureBottomSheet,
+  } )
+
+  useEffect( ()=> {
+    if ( sendingState.feeIntelMissing ) {
       // missing fee intel: custom fee-fallback
 
       // this.props.navigation.navigate( 'SendConfirmation', {

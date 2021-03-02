@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from 'react'
+import React, { useMemo, useEffect, useState, useCallback } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
@@ -17,6 +17,13 @@ import TransactionPriorityMenu from './TransactionPriorityMenu'
 import { calculateCustomFee, executeAlternateSendStage2, executeSendStage2 } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import TransactionPriority from '../../../common/data/enums/TransactionPriority'
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import SendConfirmationContent from '../SendConfirmationContent'
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import { clearTransfer } from '../../../store/actions/accounts'
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
+import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 
 export type NavigationParams = {
 };
@@ -30,6 +37,13 @@ export type Props = {
 };
 
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  const dispatch = useDispatch()
+
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
@@ -38,8 +52,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
-  const [ feeAmount, setFeeAmount ] = useState( 0 )
-  const dispatch = useDispatch()
+
+  const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
 
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
@@ -48,6 +62,75 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
     return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
+
+
+  const showSendSuccessBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <SendConfirmationContent
+        title={'Sent Successfully to Contact'}
+        info={'Transaction(s) successfully submitted'}
+        infoText={'Bitcoins successfully sent to Contact'}
+        // userInfo={transfer.details ? transfer.details : []}
+        userInfo={[]}
+        isFromContact={false}
+        okButtonText={'View Account'}
+        cancelButtonText={'Back'}
+        isCancel={false}
+        onPressOk={() => {
+          dismissBottomSheet()
+
+          dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
+
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
+        }}
+        onPressCancel={dismissBottomSheet}
+        isSuccess={true}
+        accountKind={sourcePrimarySubAccount.kind}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '67%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ] )
+
+  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
+    presentBottomSheet(
+      <SendConfirmationContent
+        title={'Send Unsuccessful'}
+        info={errorMessage}
+        // userInfo={transfer.details ? transfer.details : []}
+        userInfo={[]}
+        isFromContact={false}
+        okButtonText={'Try Again'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={dismissBottomSheet}
+        onPressCancel={() => {
+          dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
+          dismissBottomSheet()
+
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
+        }}
+        isUnSuccess={true}
+        accountKind={sourcePrimarySubAccount.kind}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '67%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ] )
 
 
   function handleCustomFee ( feePerByte, customEstimatedBlocks ) {
@@ -70,17 +153,15 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }
 
   function handleConfirmationButtonPress() {
-    // TODO: populate txnPriority based on user selection
-    const txnPriority = 'low'
     if( usingExitKey ){
       dispatch( executeAlternateSendStage2( {
         accountShellID: sourceAccountShell.id,
-        txnPriority,
+        txnPriority: String( transactionPriority ),
       } ) )
     } else {
       dispatch( executeSendStage2( {
         accountShellID: sourceAccountShell.id,
-        txnPriority,
+        txnPriority: String( transactionPriority ),
       } ) )
     }
   }
@@ -89,10 +170,15 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     navigation.goBack()
   }
 
+  useAccountSendST2CompletionEffect( {
+    onSuccess: showSendSuccessBottomSheet,
+    onFailure: showSendFailureBottomSheet,
+  } )
+
   useEffect( ()=>{
     const { isSuccessful, txid, hasFailed, failedErrorMessage } = sendingState.sendST2
-    if( isSuccessful ) {
-      if( txid ){
+    if ( isSuccessful ) {
+      if ( txid ){
         // TODO: show send succcesful bottomsheet
 
 
@@ -152,7 +238,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
       <TransactionPriorityMenu
         sourceSubAccount={sourcePrimarySubAccount}
-        onFeeChanged={setFeeAmount}
+        onTransactionPriorityChanged={setTransactionPriority}
       />
 
 
