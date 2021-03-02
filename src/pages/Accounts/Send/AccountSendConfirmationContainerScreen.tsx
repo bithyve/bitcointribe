@@ -104,9 +104,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     presentBottomSheet(
       <SendConfirmationContent
         title={'Send Unsuccessful'}
-        info={errorMessage}
-        // userInfo={transfer.details ? transfer.details : []}
-        userInfo={[]}
+        info={String( errorMessage )}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}

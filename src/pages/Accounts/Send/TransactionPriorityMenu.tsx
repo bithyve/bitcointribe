@@ -114,24 +114,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
           justifyContent: 'space-between',
           paddingVertical: 10,
         }}>
-          <Text style={{
-            fontSize: RFValue( 9 ),
-            fontWeight: '700',
-            flex: 1,
-            textAlign: 'center'
-          }}>Priority</Text>
-          <Text style={{
-            fontSize: RFValue( 9 ),
-            fontWeight: '700',
-            flex: 1,
-            textAlign: 'center'
-          }}>Arrival Time</Text>
-          <Text style={{
-            fontSize: RFValue( 9 ),
-            fontWeight: '700',
-            flex: 1,
-            textAlign: 'center'
-          }}>Fee</Text>
+          <Text style={styles.headingLabelText}>Priority</Text>
+          <Text style={styles.headingLabelText}>Arrival Time</Text>
+          <Text style={styles.headingLabelText}>Fee</Text>
         </View>
 
         {transactionPrioritiesAvailable.map( priority => {
@@ -276,6 +261,13 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansItalic,
+  },
+
+  headingLabelText: {
+    fontSize: RFValue( 9 ),
+    fontWeight: '700',
+    flex: 1,
+    textAlign: 'center'
   }
 } )
 
