@@ -22,7 +22,7 @@ class HexaConfig {
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE || 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa-dev'//'oidc-client-test'//
-  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'http://dev-api.swanbitcoin.com'
+  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'http://dev-api.swanbitcoin.com/'
   public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://testapi.bithyve.com'
   public MAINNET_BASE_URL: string = Config.BIT_MAINNET_BASE_URL ? Config.BIT_MAINNET_BASE_URL.trim() : 'https://api.bithyve.com'
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';

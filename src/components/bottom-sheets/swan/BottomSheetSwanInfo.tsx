@@ -96,22 +96,22 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
       <View style={styles.successModalHeaderView}>
         <Text style={styles.modalTitleText}>Athentication in progress...</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText, marginTop: wp( '2%' )
         }}>Authorise Hexa Wallet on Swan: {swanFromDeepLink ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText, marginTop: wp( '2%' )
         }}>Verify Hexa is authorised: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText, marginTop: wp( '2%' )
         }}>Create withdrawal wallet on Swan: {hasCreateWithdrawalWalletOnSwanSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText, marginTop: wp( '2%' )
         }}>Create Swan Account in Hexa: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText, marginTop: wp( '2%' )
         }}>Link Swan Account and Swan: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText, marginTop: wp( '2%' )
         }}>Confirm Hexa and Swan Link is approved and active: {hasRedeemSwanCodeForTokenSucceeded ? String.fromCodePoint( 0x2705 ) : null}</Text>
       </View>
 

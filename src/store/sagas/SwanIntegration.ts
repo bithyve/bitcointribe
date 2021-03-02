@@ -17,7 +17,8 @@ import {
 } from '../actions/SwanIntegration'
 
 import {
-  redeemAuthCodeForToken
+  redeemAuthCodeForToken,
+  createWithdrawalWalletOnSwan
 } from '../../services/swan'
 
 import { createWatcher } from '../utils/utilities'
@@ -25,7 +26,7 @@ import { createWatcher } from '../utils/utilities'
 import { generatePKCEParameters } from '../lib/swan'
 import Config from '../../bitcoin/HexaConfig'
 
-const swan_auth_url = `${Config.SWAN_BASE_URL}/oidc/auth`
+const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
 const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
 const count = 0
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
@@ -89,22 +90,36 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   console.log( 'inside createWithdrawalWalletOnSwanWatcher', payload )
   yield put( createWithdrawalWalletOnSwanInitiated() )
 
-  // // Extract swan auth code from deep link redirect url
-  // const splits = payload.data.split( '/' )
-  // const code = splits[ splits.length - 1 ].split( '&' )[ 0 ].split( '=' )[ 1 ]
+  // Extract swan xpub
+  const swanXpub = 'tpubDFH7ZHPhvoucybVJsemwLm8MD2Df9YZbqSvqTMBX4BW83QysHWtAbXjUYuXg3NifSvVSMogF2qMJDy55iTH89PMjSo5xuAEB8L9sZdEkW4B'
 
-  // const { code_verifier, state } = yield select(
-  //   ( state ) => state.swanIntegration
-  // )
-  // const swanResponse = yield call( redeemAuthCodeForToken, {
-  //   code,
-  //   state,
-  //   code_verifier
-  // } )
-  // console.log( 'swanResponse.data ', swanResponse.data )
-  // const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
+  const { swanAuthenticatedToken } = yield select(
+    ( state ) => state.swanIntegration
+  )
+  const res = {
+    'entity': 'wallet', 
+    'item': {
+      'btcAddress': 'tb1qdx0pd4h65d7mekkhk7n6jwzfwgqath7s9l2fum', 
+      'displayName': 'Stacking Sats (Hexa)', 
+      'id': 'd313d589-32bf-4635-923a-a5585a15a0d1', 
+      'isConfirmed': true, 
+      'metadata': {
+        'arbitraryMetadata': [ Object ], 'oidc': [ Object ]
+      }, 'walletAddressId': '7669a64f-5014-46ca-b809-85b606a86e58'
+    }
+  }
+  const swanResponse = yield call( createWithdrawalWalletOnSwan, {
+    access_token: swanAuthenticatedToken,
+    extendedPublicKey: swanXpub,
+    displayName: 'Stacking Sats (Hexa)',
+    metadata: {
+      foo: 'bar'
+    }
+  } )
+  console.log( 'swanResponse.data ', swanResponse.data, swanResponse.data.item.id )
+
   yield put( createWithdrawalWalletOnSwanSucceeded( {
-    swanWalletId: 'wallXyZ'
+    swanWalletId: swanResponse.data.item.id
   } ) )
 }
 
