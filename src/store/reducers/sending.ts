@@ -254,8 +254,8 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
           const carryOver = action.payload.carryOver
           customTxPrerequisites = carryOver.customTxPrerequisites
           if( customTxPrerequisites ){
-            transactionFeeInfo[ TransactionPriority.CUSTOM ].amount = customTxPrerequisites.fee
-            transactionFeeInfo[ TransactionPriority.CUSTOM ].estimatedBlocksBeforeConfirmation = customTxPrerequisites.estimatedBlocks
+            txFeeInfo[ TransactionPriority.CUSTOM ].amount = customTxPrerequisites.fee
+            txFeeInfo[ TransactionPriority.CUSTOM ].estimatedBlocksBeforeConfirmation = customTxPrerequisites.estimatedBlocks
           }
         }
         return {

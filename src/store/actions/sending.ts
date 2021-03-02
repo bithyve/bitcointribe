@@ -344,7 +344,6 @@ export interface CalculateCustomFeeAction extends Action {
     accountShellID: string,
     feePerByte: string,
     customEstimatedBlocks: string,
-    feeIntelAbsent: boolean,
   };
 }
 
@@ -353,7 +352,6 @@ export const calculateCustomFee = (
     accountShellID: string,
     feePerByte: string,
     customEstimatedBlocks: string,
-    feeIntelAbsent: boolean,
   },
 ): CalculateCustomFeeAction => {
   return {
