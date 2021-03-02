@@ -133,26 +133,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   },
   [ presentBottomSheet, dismissBottomSheet ] )
 
-
-  function handleCustomFee ( feePerByte, customEstimatedBlocks ) {
-    // feerate > minimum relay feerate(default: 1000 satoshis per kB or 1 sat/byte).
-    if ( parseInt( feePerByte ) < 1 ) {
-      // TODO: show err
-      // this.setState( {
-      //   customFee: '',
-      //   customFeePerByteErr: 'Custom fee minimum: 1 sat/byte ',
-      // } )
-      return
-    }
-
-    dispatch( calculateCustomFee( {
-      accountShellID: sourceAccountShell.id,
-      feePerByte,
-      customEstimatedBlocks,
-      feeIntelAbsent: sendingState.feeIntelMissing,
-    } ) )
-  }
-
   function handleConfirmationButtonPress() {
     if( usingExitKey ){
       dispatch( executeAlternateSendStage2( {
