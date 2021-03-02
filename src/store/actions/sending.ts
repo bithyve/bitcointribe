@@ -4,6 +4,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import { TransactionPrerequisite, TransactionPrerequisiteElements } from '../../bitcoin/utilities/Interface'
 
+export const RESET_SEND_STATE = 'RESET_SEND_STATE'
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
 export const ADD_RECIPIENT_FOR_SENDING = 'ADD_RECIPIENT_FOR_SENDING'
 export const RECIPIENT_REMOVED_FROM_SENDING = 'RECIPIENT_REMOVED_FROM_SENDING'
@@ -26,6 +27,17 @@ export const CALCULATE_SEND_MAX_FEE = 'CALCULATE_SEND_MAX_FEE'
 export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
 export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
 export const CUSTOM_FEE_CALCULATED = 'CUSTOM_FEE_CALCULATED'
+
+export interface ResetSendState extends Action {
+  type: typeof RESET_SEND_STATE;
+}
+
+export const resetSendState = (
+): ResetSendState => {
+  return {
+    type: RESET_SEND_STATE,
+  }
+}
 
 export interface SourceAccountSelectedForSendingAction extends Action {
   type: typeof SOURCE_ACCOUNT_SELECTED_FOR_SENDING;
