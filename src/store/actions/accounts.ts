@@ -53,6 +53,7 @@ export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
 export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
 export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
+export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 
 export const fetchTransactions = ( serviceType, service? ) => {
   return {
@@ -784,7 +785,7 @@ export const fetchReceiveAddress = (
   return {
     type: FETCH_RECEIVE_ADDRESS,
     payload: {
-      instance, sourceKind
+      derivativeAccountType, instance, sourceKind
     },
   }
 }
@@ -795,5 +796,12 @@ export const fetchReceiveAddressSucceeded = ( data ) => {
     payload: {
       data
     },
+  }
+}
+
+
+export const clearReceiveAddress = ( ) => {
+  return {
+    type: CLEAR_RECEIVE_ADDRESS,
   }
 }

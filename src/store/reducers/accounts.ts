@@ -44,6 +44,7 @@ import {
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
   FETCH_RECEIVE_ADDRESS_SUCCEEDED,
+  CLEAR_RECEIVE_ADDRESS
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -820,6 +821,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
           receiveAddress: action.payload.data.rampReceiveAddress,
           hasReceiveAddressSucceeded: true
+        }
+      case CLEAR_RECEIVE_ADDRESS:
+        return {
+          ...state,
+          receiveAddress: null,
+          hasReceiveAddressSucceeded: null
         }
       default:
         return state
