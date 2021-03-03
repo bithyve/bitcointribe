@@ -22,8 +22,9 @@ import useTotalSpendingAmount from '../../../utils/hooks/sending-utils/UseTotalS
 
 export type Props = {
   subAccountKind: SubAccountKind;
+  spendableBalance: Satoshis;
   onAmountChanged: ( amount: Satoshis ) => void;
-  onSendMaxPressed: () => void;
+  onSendMaxPressed: ( ) => void;
 };
 
 
@@ -56,9 +57,11 @@ function useFiatAmountConvertedFromSatoshis( amount: Satoshis ) {
 
 const BalanceEntryFormGroup: React.FC<Props> = ( {
   subAccountKind,
+  spendableBalance,
   onAmountChanged,
   onSendMaxPressed,
 }: Props ) => {
+  const exchangeRates = useExchangeRates()
   const currencyCode = useCurrencyCode()
   const currencyKind = useCurrencyKind()
   const sendingState = useSendingState()
@@ -70,31 +73,27 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
 
   const currentBTCAmountFormValue = useMemo( () => {
     return Number( currentBTCAmountTextValue )
-  }, [ currentBTCAmountTextValue ] )
+  }, [ currentBTCAmountTextValue, isSendingMax ] )
 
   const currentFiatAmountFormValue = useMemo( () => {
     return Number( currentFiatAmountTextValue )
-  }, [ currentFiatAmountTextValue ] )
+  }, [ currentFiatAmountTextValue, isSendingMax ] )
 
   const sendMaxFee = useMemo( () => {
     return sendingState.sendMaxFee
   }, [ sendingState.sendMaxFee ] )
 
+  const remainingSpendableBalance = useMemo( () => {
+    return spendableBalance - totalSpendingAmount - sendingState.sendMaxFee
+  }, [ totalSpendingAmount, sendMaxFee ] )
+
   const isAmountInvalid = useMemo( () => {
-    const remainingSpendableBalance = totalSpendingAmount - sendingState.sendMaxFee
+    return currentBTCAmountFormValue > spendableBalance
+  }, [ currentBTCAmountFormValue, spendableBalance ] )
 
-    return remainingSpendableBalance < currentBTCAmountFormValue
-  }, [ currentBTCAmountFormValue, totalSpendingAmount, sendMaxFee ] )
-
-  // const currentAmount = useMemo( () => {
-  //   return Number( currentBTCAmountText ) / SATOSHIS_IN_BTC
-  // }, [ currentBTCAmountTextValue ] )
-
-  const exchangeRates = useExchangeRates()
   const [ currencyKindForEntry, setCurrencyKindForEntry ] = useState( currencyKind )
   const currentBTCAmount = useBTCAmountConvertedFromFiat( currentFiatAmountFormValue )
   const currentFiatAmount = useFiatAmountConvertedFromSatoshis( currentBTCAmountFormValue )
-
 
   const FiatAmountInputLeftIcon: React.FC = () => {
     return (
@@ -120,6 +119,23 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
         )}
       </View>
     )
+  }
+
+  function handleSendMaxPress() {
+    const convertedFiatAmount = exchangeRates && exchangeRates[ currencyCode ]
+      ? remainingSpendableBalance / exchangeRates[ currencyCode ].last
+      : 0
+
+    if ( convertedFiatAmount < 1 ) {
+      convertedFiatAmount * SATOSHIS_IN_BTC
+    }
+
+    setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
+    setCurrentBTCAmountTextValue( String( remainingSpendableBalance ) )
+    onAmountChanged( remainingSpendableBalance )
+
+    setIsSendingMax( true )
+    onSendMaxPressed()
   }
 
   return (
@@ -179,24 +195,27 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             autoCompleteType="off"
           />
 
-          {currencyKindForEntry == CurrencyKind.FIAT && (
-            <TouchableOpacity
-              onPress={onSendMaxPressed}
-            >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  textAlign: 'center',
-                  paddingHorizontal: 10,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansItalic,
-                }}
+          {
+            ( currencyKindForEntry == CurrencyKind.FIAT ) &&
+            ( isSendingMax == false ) &&
+            (
+              <TouchableOpacity
+                onPress={handleSendMaxPress}
               >
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    textAlign: 'center',
+                    paddingHorizontal: 10,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansItalic,
+                  }}
+                >
               Send Max
-              </Text>
-            </TouchableOpacity>
+                </Text>
+              </TouchableOpacity>
 
-          )}
+            )}
         </TouchableOpacity>
 
 
@@ -261,23 +280,26 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             autoCompleteType="off"
           />
 
-          {currencyKindForEntry == CurrencyKind.BITCOIN && (
-            <TouchableOpacity
-              onPress={onSendMaxPressed}
-            >
-              <Text
-                style={{
-                  color: Colors.blue,
-                  textAlign: 'center',
-                  paddingHorizontal: 10,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansItalic,
-                }}
+          {
+            ( currencyKindForEntry == CurrencyKind.BITCOIN ) &&
+            ( isSendingMax == false ) &&
+            (
+              <TouchableOpacity
+                onPress={handleSendMaxPress}
               >
-              Send Max
-              </Text>
-            </TouchableOpacity>
-          )}
+                <Text
+                  style={{
+                    color: Colors.blue,
+                    textAlign: 'center',
+                    paddingHorizontal: 10,
+                    fontSize: RFValue( 10 ),
+                    fontFamily: Fonts.FiraSansItalic,
+                  }}
+                >
+                  Send Max
+                </Text>
+              </TouchableOpacity>
+            )}
         </TouchableOpacity>
 
 

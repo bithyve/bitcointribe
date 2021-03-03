@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
@@ -48,7 +48,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
-  const sendingState = useSendingState()
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -69,8 +68,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         title={'Sent Successfully to Contact'}
         info={'Transaction(s) successfully submitted'}
         infoText={'Bitcoins successfully sent to Contact'}
-        // userInfo={transfer.details ? transfer.details : []}
-        userInfo={[]}
         isFromContact={false}
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
@@ -150,19 +147,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }
 
   useAccountSendST2CompletionEffect( {
-    onSuccess: showSendSuccessBottomSheet,
-    onFailure: showSendFailureBottomSheet,
-  } )
-
-  useEffect( ()=>{
-    const { isSuccessful, txid, hasFailed, failedErrorMessage } = sendingState.sendST2
-    if ( isSuccessful ) {
-      if ( txid ){
-        // TODO: show send succcesful bottomsheet
-
+    onSuccess: ( txid: string | null ) => {
+      if ( txid ) {
+        showSendSuccessBottomSheet()
 
         // TODO: integrate donation send
-        // if ( this.donationId ) {
+        // if ( sourcePrimarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
         //   if ( transfer.details[ 0 ].note ) {
         //     const txNote = {
         //       txId: transfer.txid,
@@ -174,12 +164,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
         // this.sendNotifications()
         // this.storeTrustedContactsHistory( transfer.details )
-      } else navigation.navigate( 'TwoFAToken' )
-    }
-    else if( hasFailed ) {
-      // TODO: show send failure bottomsheet w/ failedErrorMessage
-    }
-  }, [ sendingState.sendST2 ] )
+      } else {
+        navigation.navigate( 'TwoFAToken' )
+      }
+    },
+    onFailure: showSendFailureBottomSheet,
+  } )
+
 
   return (
     <View style={styles.rootContainer}>
@@ -219,7 +210,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         sourceSubAccount={sourcePrimarySubAccount}
         onTransactionPriorityChanged={setTransactionPriority}
       />
-
 
       <View style={styles.footerSection}>
         <TouchableOpacity

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { View, Text, StyleSheet, TouchableOpacity, Keyboard } from 'react-native'
 import Colors from '../../../common/Colors'
@@ -28,15 +28,17 @@ export type Props = {
   onTransactionPriorityChanged: ( priority: TransactionPriority ) => void
 };
 
-
 const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransactionPriorityChanged }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
   const sendingState  = useSendingState()
   const [ transactionPrioritiesAvailable, setTransactionPrioritiesAvailable ] = useState( sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable )
-  const [ customPriorityErr, setCustomPriorityErr ] = useState( '' )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
   const dispatch = useDispatch()
+
+  const customPriorityError = useMemo( () => {
+    return sendingState.customPriorityST1.failedErrorMessage
+  }, [ sendingState.customPriorityST1.failedErrorMessage ] )
 
   const showCustomPriorityBottomSheet = useCallback( () => {
     const network = (
@@ -48,7 +50,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
       <CustomPriorityContent
         title={'Custom Priority'}
         info={'Enter the fee rate in sats per byte.'}
-        err={customPriorityErr}
+        err={customPriorityError}
         network={network}
         okButtonText={'Confirm'}
         cancelButtonText={'Back'}
@@ -67,11 +69,10 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
         snapPoints: [ 0, '44%' ],
       },
     )
-  }, [ presentBottomSheet, dismissBottomSheet, customPriorityErr ] )
+  }, [ presentBottomSheet, dismissBottomSheet, customPriorityError ] )
 
 
   const handleCustomFee = ( feePerByte, customEstimatedBlocks ) => {
-    if( customPriorityErr ) setCustomPriorityErr( '' )
     dispatch( calculateCustomFee( {
       accountShellID: sourceSubAccount.accountShellID,
       feePerByte,
@@ -83,12 +84,10 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
     const { customPriorityST1 } = sendingState
     const txPriorites = sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable
     if( customPriorityST1.hasFailed ) {
-      setCustomPriorityErr( customPriorityST1.failedErrorMessage )
       setTransactionPrioritiesAvailable( txPriorites )
       setTransactionPriority( TransactionPriority.LOW )
       onTransactionPriorityChanged( TransactionPriority.LOW )
-    }
-    else if( customPriorityST1.isSuccessful ){
+    } else if ( customPriorityST1.isSuccessful ) {
       setTransactionPrioritiesAvailable( [ ...txPriorites, TransactionPriority.CUSTOM ] )
       setTransactionPriority( TransactionPriority.CUSTOM )
       onTransactionPriorityChanged( TransactionPriority.CUSTOM )

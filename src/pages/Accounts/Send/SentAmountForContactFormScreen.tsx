@@ -28,6 +28,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import SendConfirmationContent from '../SendConfirmationContent'
 import { clearTransfer } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
+import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 
 export type NavigationParams = {
 };
@@ -52,6 +53,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const spendableBalance = useSpendableBalanceForAccountShell( sourceAccountShell )
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( null )
   const [ noteText, setNoteText ] = useState( '' )
   const sendingState = useSendingState()
@@ -93,7 +95,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     navigation.goBack()
   }
 
-  function handleSendMaxPress() {
+  function handleSendMaxPress( ) {
     dispatch( calculateSendMaxFee( {
       numberOfRecipients: selectedRecipients.length,
       accountShellID: sourceAccountShell.id,
@@ -182,7 +184,15 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       <View style={styles.formBodySection}>
         <BalanceEntryFormGroup
           subAccountKind={sourcePrimarySubAccount.kind}
-          onAmountChanged={setSelectedAmount}
+          spendableBalance={spendableBalance}
+          onAmountChanged={( amount: Satoshis ) => {
+            setSelectedAmount( amount )
+
+            dispatch( amountForRecipientUpdated( {
+              recipient: currentRecipient,
+              amount,
+            } ) )
+          }}
           onSendMaxPressed={handleSendMaxPress}
         />
 
