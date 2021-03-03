@@ -48,10 +48,10 @@ function useFiatAmountConvertedFromSatoshis( amount: Satoshis ) {
 
   return useMemo( () => {
     const convertedAmount = exchangeRates && exchangeRates[ currencyCode ]
-      ? amount / exchangeRates[ currencyCode ].last
+      ? ( amount / SATOSHIS_IN_BTC ) * exchangeRates[ currencyCode ].last
       : 0
 
-    return convertedAmount < 1 ? convertedAmount * SATOSHIS_IN_BTC : convertedAmount
+    return convertedAmount
   }, [ exchangeRates, currencyCode, amount ] )
 }
 
