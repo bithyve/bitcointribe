@@ -26,25 +26,25 @@ export type BuyBitcoinBottomSheetMenuItem = {
 }
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
-  // {
-  //   title: 'Scan a Voucher',
-  //   subtitle: 'From select retail stores with FastBitcoins',
-  //   kind: BuyMenuItemKind.FAST_BITCOINS,
-  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-  //   disabled: false
-  // },
+  {
+    title: 'Buy with Wyre',
+    subtitle: 'Buy any amount',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    disabled: false
+  },
   {
     title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
-    subtitle: 'Fees starting from 0.49%',
+    subtitle: 'Low fee for those big buys',
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false
   },
   {
-    title: 'Buy with Wyre  (COMING SOON)',
-    subtitle: 'Buy any amount',
-    kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    title: 'Scan a Voucher',
+    subtitle: 'From select retail stores with FastBitcoins',
+    kind: BuyMenuItemKind.FAST_BITCOINS,
+    imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
     disabled: false
   },
   {
@@ -73,7 +73,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
         >
           <Image
             source={menuItem.imageSource}
-            style={ImageStyles.thumbnailImageMedium}
+            style={ImageStyles.thumbnailImageSmall}
             resizeMode="contain"
           />
 
