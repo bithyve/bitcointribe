@@ -101,7 +101,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <View style={styles.separatorView}/>
+          {/* <View style={styles.separatorView}/> */}
           </View>
         </View>
         <View
@@ -149,7 +149,7 @@ export default function SavingsAccountKnowMoreSheetContents(props) {
             />
           </AppBottomSheetTouchableWrapper>
           <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-          <View style={styles.separatorView}/>
+          {/* <View style={styles.separatorView}/> */}
           </View>
         </View>
         <View
