@@ -1,4 +1,6 @@
 import { Action } from 'redux'
+import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -49,6 +51,8 @@ export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED'
 export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
+export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
+export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
 
 export const fetchTransactions = ( serviceType, service? ) => {
   return {
@@ -768,5 +772,28 @@ export const accountShellMergeSucceeded = (
 ) => {
   return {
     type: ACCOUNT_SHELL_MERGE_SUCCEEDED, payload
+  }
+}
+
+
+export const fetchReceiveAddress = (
+  derivativeAccountType?: DerivativeAccountTypes,
+  instance?: number,
+  sourceKind?: SourceAccountKind,
+)  => {
+  return {
+    type: FETCH_RECEIVE_ADDRESS,
+    payload: {
+      instance, sourceKind
+    },
+  }
+}
+
+export const fetchReceiveAddressSucceeded = ( data ) => {
+  return {
+    type: FETCH_RECEIVE_ADDRESS_SUCCEEDED,
+    payload: {
+      data
+    },
   }
 }

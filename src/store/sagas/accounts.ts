@@ -58,6 +58,8 @@ import {
   ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
   BLIND_REFRESH,
+  fetchReceiveAddressSucceeded,
+  FETCH_RECEIVE_ADDRESS,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -1620,3 +1622,32 @@ export const mergeAccountShellsWatcher = createWatcher(
   mergeAccountShells,
   MERGE_ACCOUNT_SHELLS
 )
+
+// TODO: Move the receive address watcher to sending saga or another appropriate saga
+
+
+export const fetchReceiveAddressWatcher = createWatcher(
+  fetchReceiveAddressWorker,
+  FETCH_RECEIVE_ADDRESS
+)
+
+function* fetchReceiveAddressWorker( { payload } ) {
+  const { derivativeAccountType, instance, sourceKind } = payload
+  let service: RegularAccount| SecureAccount
+  switch ( sourceKind ) {
+      case SourceAccountKind.SECURE_ACCOUNT:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
+        )
+        break
+      default:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
+        )
+  }
+  const receiveAddress =  service.getReceivingAddress( derivativeAccountType, instance? instance: 1 )
+  yield put( fetchReceiveAddressSucceeded( {
+    receiveAddress: receiveAddress
+  } ) )
+}
+
