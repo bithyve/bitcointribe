@@ -27,7 +27,7 @@ export const CALCULATE_SEND_MAX_FEE = 'CALCULATE_SEND_MAX_FEE'
 export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
 export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
 export const CUSTOM_FEE_CALCULATED = 'CUSTOM_FEE_CALCULATED'
-
+export const CUSTOM_SEND_MAX_CALCULATED = 'CUSTOM_SEND_MAX_CALCULATED'
 export interface ResetSendState extends Action {
   type: typeof RESET_SEND_STATE;
 }
@@ -381,3 +381,23 @@ export const customFeeCalculated = (
     payload
   }
 }
+
+
+export interface CustomSendMaxCalculatedAction extends Action {
+  type: typeof CUSTOM_SEND_MAX_CALCULATED;
+  payload: {
+   recipients: RecipientDescribing[]
+  };
+}
+
+export const customSendMaxUpdated = (
+  payload: {
+    recipients: RecipientDescribing[]
+  }
+): CustomSendMaxCalculatedAction => {
+  return {
+    type: CUSTOM_SEND_MAX_CALCULATED,
+    payload
+  }
+}
+

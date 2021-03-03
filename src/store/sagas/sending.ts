@@ -1,6 +1,6 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -496,7 +496,6 @@ function* calculateCustomFee( { payload }: {payload: {
     return
   }
 
-
   const { accountShellID, feePerByte, customEstimatedBlocks } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -512,8 +511,8 @@ function* calculateCustomFee( { payload }: {payload: {
     accountShell.primarySubAccount.sourceKind
   ].service
 
-  const selectedRecipients: RecipientDescribing[] = sendingState.selectedRecipients
-
+  const selectedRecipients: RecipientDescribing[] = [ ...sendingState.selectedRecipients
+  ]
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
   const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
 
@@ -536,7 +535,6 @@ function* calculateCustomFee( { payload }: {payload: {
     )
   }
 
-
   if( !sendingState.feeIntelMissing && sendingState.sendMaxFee ){
     // custom fee w/ send max
     const { fee } = service.calculateSendMaxFee(
@@ -547,10 +545,13 @@ function* calculateCustomFee( { payload }: {payload: {
 
     // upper bound: default low
     if( fee > txPrerequisites[ 'low' ].fee ){
-      // this.setState( {
-      //   customFee: '',
-      //   customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
-      // } )
+      yield put ( customFeeCalculated( {
+        successful: false,
+        carryOver:{
+          customTxPrerequisites: null
+        },
+        err: 'Custom fee cannot be greater than the default low priority fee',
+      } ) )
       return
     }
 
@@ -567,10 +568,12 @@ function* calculateCustomFee( { payload }: {payload: {
 
     // deduct the previous(default low) fee and add the custom fee
     // TODO: recapture custom fee from sending reducer
-    if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
+
+    const customFee = idx( sendingState, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites.fee )
+    if( customFee ) recipientToBeModified.amount += customFee // reusing custom-fee feature
     else recipientToBeModified.amount += txPrerequisites[ 'low' ].fee
     recipientToBeModified.amount -= fee
-    this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
+    recipients[ recipients.length - 1 ] = recipientToBeModified
 
     outputs.forEach( ( output )=>{
       if( output.address === recipientToBeModified.address )
@@ -580,7 +583,10 @@ function* calculateCustomFee( { payload }: {payload: {
     selectedRecipients.forEach( ( recipient ) => {
       if( recipient.id === recipientToBeModified.id ) recipient.amount = recipientToBeModified.amount
     } )
-    // TODO: action to update selected recipients array
+
+    yield put ( customSendMaxUpdated( {
+      recipients: selectedRecipients
+    } ) )
   }
 
   const customTxPrerequisites = service.calculateCustomFee(
@@ -588,12 +594,6 @@ function* calculateCustomFee( { payload }: {payload: {
     parseInt( feePerByte ),
     derivativeAccountDetails,
   )
-
-  // if( !this.feeIntelAbsent && this.isSendMax )
-  //   this.setState( {
-  //     totalAmount: this.spendableBalance - customTxPrerequisites.fee,
-  //     selectedRecipients,
-  //   } )
 
   if ( customTxPrerequisites.inputs ) {
     customTxPrerequisites.estimatedBlocks = parseInt( customEstimatedBlocks )
