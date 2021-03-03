@@ -151,7 +151,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
         showSendSuccessBottomSheet()
-
+        dispatch( sendTxNotification() )
         // TODO: integrate donation send
         // if ( sourcePrimarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
         //   if ( transfer.details[ 0 ].note ) {
@@ -162,9 +162,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         //     RelayServices.sendDonationNote( this.donationId, txNote )
         //   }
         // }
-
-        dispatch( sendTxNotification() )
-        // this.storeTrustedContactsHistory( transfer.details )
       } else {
         navigation.navigate( 'TwoFAToken' )
       }

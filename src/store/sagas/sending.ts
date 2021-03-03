@@ -1,4 +1,5 @@
 import { put, call, select } from 'redux-saga/effects'
+import { AsyncStorage } from 'react-native'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
@@ -19,6 +20,8 @@ import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
 import RelayServices from '../../bitcoin/services/RelayService'
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
+import moment from 'moment'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -626,6 +629,44 @@ export const calculateCustomFeeWatcher = createWatcher(
   CALCULATE_CUSTOM_FEE
 )
 
+async function updateTrustedContactTxHistory( selectedContacts ) {
+  let IMKeeperOfHistory = JSON.parse(
+    await AsyncStorage.getItem( 'IMKeeperOfHistory' ),
+  )
+  let OtherTrustedContactsHistory = JSON.parse(
+    await AsyncStorage.getItem( 'OtherTrustedContactsHistory' ),
+  )
+
+  selectedContacts.forEach( async ( contact )=>{
+    const txHistory = {
+      id: createRandomString( 36 ),
+      title: 'Sent Amount',
+      date: moment( Date.now() ).valueOf(),
+      info: '',
+      selectedContactInfo: contact,
+    }
+
+    if ( contact.isWard ) {
+      if ( !IMKeeperOfHistory ) IMKeeperOfHistory = []
+      IMKeeperOfHistory.push( txHistory )
+      await AsyncStorage.setItem(
+        'IMKeeperOfHistory',
+        JSON.stringify( IMKeeperOfHistory ),
+      )
+    }
+    if (
+      !contact.isWard &&
+      !contact.isGuardian
+    ) {
+      if ( !OtherTrustedContactsHistory ) OtherTrustedContactsHistory = []
+      OtherTrustedContactsHistory.push( txHistory )
+      await AsyncStorage.setItem(
+        'OtherTrustedContactsHistory',
+        JSON.stringify( OtherTrustedContactsHistory ),
+      )
+    }
+  } )
+}
 
 function* sendTxNotificationWorker() {
   const sendingState: SendingState = yield select( ( state ) => state.sending )
@@ -640,15 +681,18 @@ function* sendTxNotificationWorker() {
   const contacts: Contacts = trustedContacts.tc.trustedContacts
 
   const notifReceivers = []
+  const selectedContacts = []
   selectedRecipients.forEach( ( recipient ) => {
     if ( recipient.displayedName ) { // send notification to TC
       const contactName = recipient.displayedName.toLowerCase().trim()
       const contact = contacts[ contactName ]
-      if ( contact.walletID )
+      if ( contact && contact.walletID ){
+        selectedContacts.push( contact )
         notifReceivers.push( {
           walletId: contact.walletID,
           FCMs: contact.FCMs,
         } )
+      }
     }
   } )
 
@@ -667,6 +711,10 @@ function* sendTxNotificationWorker() {
       notifReceivers,
       notification,
     )
+
+  if( selectedContacts.length )
+  // update selected contacts' send history
+    yield call ( updateTrustedContactTxHistory, selectedContacts )
 }
 
 export const sendTxNotificationWatcher = createWatcher(
