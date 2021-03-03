@@ -778,14 +778,12 @@ export const accountShellMergeSucceeded = (
 
 
 export const fetchReceiveAddress = (
-  derivativeAccountType?: DerivativeAccountTypes,
-  instance?: number,
-  sourceKind?: SourceAccountKind,
+  subAccountInfo?: SubAccountDescribing
 )  => {
   return {
     type: FETCH_RECEIVE_ADDRESS,
     payload: {
-      derivativeAccountType, instance, sourceKind
+      subAccountInfo
     },
   }
 }

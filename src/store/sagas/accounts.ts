@@ -1623,18 +1623,43 @@ export const mergeAccountShellsWatcher = createWatcher(
   MERGE_ACCOUNT_SHELLS
 )
 
-// TODO: Move the receive address watcher to sending saga or another appropriate saga
-
-
+// TODO: Consider moving the receive address watcher and worker
+// to sending saga or another appropriate saga
 export const fetchReceiveAddressWatcher = createWatcher(
   fetchReceiveAddressWorker,
   FETCH_RECEIVE_ADDRESS
 )
 
-function* fetchReceiveAddressWorker( { payload } ) {
-  const { derivativeAccountType, instance, sourceKind } = payload
+// UI should send shell.primarySubAccount
+function* fetchReceiveAddressWorker( { payload }  ) {
+  const { subAccountInfo } = payload
+  let accountType: DerivativeAccountTypes
+
+  switch ( subAccountInfo.kind ) {
+      case SubAccountKind.DONATION_ACCOUNT:
+        accountType = DerivativeAccountTypes.DONATION_ACCOUNT
+        break
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
+        accountType = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        break
+      case SubAccountKind.SERVICE:
+        switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+            case ServiceAccountKind.WYRE:
+              accountType = DerivativeAccountTypes.WYRE
+              break
+            case ServiceAccountKind.RAMP:
+              accountType = DerivativeAccountTypes.RAMP
+              break
+            case ServiceAccountKind.FAST_BITCOINS:
+              accountType = DerivativeAccountTypes.FAST_BITCOINS
+              break
+        }
+        break
+  }
+
   let service: RegularAccount| SecureAccount
-  switch ( sourceKind ) {
+  switch ( subAccountInfo.sourceKind ) {
       case SourceAccountKind.SECURE_ACCOUNT:
         service = yield select(
           ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
@@ -1645,9 +1670,8 @@ function* fetchReceiveAddressWorker( { payload } ) {
           ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
         )
   }
-  const receiveAddress =  service.getReceivingAddress( derivativeAccountType, instance? instance: 1 )
+  const receiveAddress =  service.getReceivingAddress( accountType, subAccountInfo.instanceNumber ? subAccountInfo.instanceNumber : 1 )
   yield put( fetchReceiveAddressSucceeded( {
     receiveAddress: receiveAddress
   } ) )
 }
-
