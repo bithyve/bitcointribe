@@ -14,7 +14,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, resetSendState, sendTxNotification } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, resetSendState, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -74,7 +74,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isCancel={false}
         onPressOk={() => {
           dismissBottomSheet()
-          dispatch( resetSendState() )
+          // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
           dispatch( refreshAccountShell( sourceAccountShell, {
             autoSync: false,
             hardRefresh: false,
@@ -150,18 +150,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
-        showSendSuccessBottomSheet()
         dispatch( sendTxNotification() )
-        // TODO: integrate donation send
-        // if ( sourcePrimarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
-        //   if ( transfer.details[ 0 ].note ) {
-        //     const txNote = {
-        //       txId: transfer.txid,
-        //       note: transfer.details[ 0 ].note,
-        //     }
-        //     RelayServices.sendDonationNote( this.donationId, txNote )
-        //   }
-        // }
+        // TODO: dispatch donation note action during donation tx
+        // dispatch( sendDonationNote() )
+
+        showSendSuccessBottomSheet()
       } else {
         navigation.navigate( 'TwoFAToken' )
       }

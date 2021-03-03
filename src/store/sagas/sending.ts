@@ -1,7 +1,7 @@
 import { put, call, select } from 'redux-saga/effects'
 import { AsyncStorage } from 'react-native'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
+import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_DONATION_NOTE, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -712,12 +712,33 @@ function* sendTxNotificationWorker() {
       notification,
     )
 
-  if( selectedContacts.length )
   // update selected contacts' send history
+  if( selectedContacts.length )
     yield call ( updateTrustedContactTxHistory, selectedContacts )
 }
 
 export const sendTxNotificationWatcher = createWatcher(
   sendTxNotificationWorker,
   SEND_TX_NOTIFICATION,
+)
+
+
+function* sendDonationNoteWorker( { payload }: {payload: {
+  txid: string
+  donationId: string
+  donationNote: string
+}} ) {
+  const sendingState: SendingState = yield select( ( state ) => state.sending )
+  if ( sendingState.sourceAccountShell.primarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
+    const txNote = {
+      txId: payload.txid,
+      note: payload.donationNote
+    }
+    RelayServices.sendDonationNote( payload.donationId, txNote )
+  }
+}
+
+export const sendDonationNoteWatcher = createWatcher(
+  sendDonationNoteWorker,
+  SEND_DONATION_NOTE,
 )

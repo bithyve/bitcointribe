@@ -29,6 +29,7 @@ export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
 export const CUSTOM_FEE_CALCULATED = 'CUSTOM_FEE_CALCULATED'
 export const CUSTOM_SEND_MAX_CALCULATED = 'CUSTOM_SEND_MAX_CALCULATED'
 export const SEND_TX_NOTIFICATION = 'SEND_TX_NOTIFICATION'
+export const SEND_DONATION_NOTE = 'SEND_DONATION_NOTE'
 export interface ResetSendState extends Action {
   type: typeof RESET_SEND_STATE;
 }
@@ -407,8 +408,28 @@ export interface SendTxNotificationAction extends Action {
   type: typeof SEND_TX_NOTIFICATION;
 }
 
-export const sendTxNotification = () => {
+export const sendTxNotification = (): SendTxNotificationAction => {
   return {
     type: SEND_TX_NOTIFICATION,
+  }
+}
+
+export interface SendDonationNoteAction extends Action {
+  type: typeof SEND_DONATION_NOTE;
+  payload: {
+    txid: string
+    donationId: string
+    donationNote: string
+    }
+}
+
+export const sendDonationNote = ( payload: {
+  txid: string
+  donationId: string
+  donationNote: string
+} ) : SendDonationNoteAction=> {
+  return {
+    type: SEND_DONATION_NOTE,
+    payload
   }
 }
