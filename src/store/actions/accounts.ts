@@ -49,6 +49,24 @@ export const ACCOUNT_SHELL_REFRESH_COMPLETED =
   'ACCOUNT_SHELL_REFRESH_COMPLETED'
 export const ACCOUNT_SHELL_REFRESH_STARTED = 'ACCOUNT_SHELL_REFRESH_STARTED'
 export const REMAP_ACCOUNT_SHELLS = 'REMAP_ACCOUNT_SHELLS'
+export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
+export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
+
+export const getAllAccountsData = () => {
+  return {
+    type: GET_ALL_ACCOUNTS_DATA
+  }
+}
+
+export const setAllAccountsData = (accounts) => {
+  console.log("accounts",accounts)
+  return {
+    type: SET_ALL_ACCOUNTS_DATA, 
+    payload: {
+      accounts
+    }
+  }
+}
 
 export const fetchTransactions = ( serviceType, service? ) => {
   return {

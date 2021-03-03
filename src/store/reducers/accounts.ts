@@ -43,6 +43,7 @@ import {
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
+  SET_ALL_ACCOUNTS_DATA,
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -177,6 +178,7 @@ export type AccountsState = {
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
+  accounts: any,
 };
 
 const initialState: AccountsState = {
@@ -213,6 +215,7 @@ const initialState: AccountsState = {
 
   currentWyreSubAccount: null,
   currentRampSubAccount: null,
+  accounts: null,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -808,6 +811,14 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
         }
+
+        case SET_ALL_ACCOUNTS_DATA:
+          console.log("SET_ALL_ACCOUNTS_DATA",action.payloads.allAccounts);
+        return {
+          ...state,
+          accounts: action.payloads.accounts,
+        }
+
       default:
         return state
   }
