@@ -23,6 +23,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { clearTransfer, refreshAccountShell } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
 export type NavigationParams = {
 };
@@ -47,6 +48,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
+  const sendingState = useSendingState()
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -151,8 +153,16 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
         dispatch( sendTxNotification() )
-        // TODO: dispatch donation note action during donation tx
-        // dispatch( sendDonationNote() )
+
+        //dispatch donation note action during donation tx
+        if( sendingState.donationDetails.donationId ){
+          const { donationId, donationNote } = sendingState.donationDetails
+          dispatch( sendDonationNote( {
+            txid,
+            donationId: donationId,
+            donationNote: donationNote,
+          } ) )
+        }
 
         showSendSuccessBottomSheet()
       } else {

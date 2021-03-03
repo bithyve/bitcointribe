@@ -70,6 +70,11 @@ export type SendingState = {
     txid: string | null,
   }
 
+  donationDetails: {
+    donationId: string | null;
+    donationNote: string | null;
+  }
+
   sendMaxFee: Satoshis;
   feeIntelMissing: boolean,
   transactionFeeInfo: TransactionFeeInfo;
@@ -108,6 +113,12 @@ const INITIAL_STATE: SendingState = {
     failedErrorMessage: null,
     isSuccessful: false,
     txid: null,
+  },
+
+  // donation variables(used during the donation send flow)
+  donationDetails: {
+    donationId: null,
+    donationNote: null,
   },
 
   sendMaxFee: 0,
