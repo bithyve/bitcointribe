@@ -14,9 +14,8 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, resetSendState } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, resetSendState, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
-import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import SendConfirmationContent from '../SendConfirmationContent'
@@ -24,6 +23,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { clearTransfer, refreshAccountShell } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 
 export type NavigationParams = {
 };
@@ -48,6 +48,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
+  const sendingState = useSendingState()
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -75,7 +76,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         isCancel={false}
         onPressOk={() => {
           dismissBottomSheet()
-          dispatch( resetSendState() )
+          // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
           dispatch( refreshAccountShell( sourceAccountShell, {
             autoSync: false,
             hardRefresh: false,
@@ -151,21 +152,19 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
+        dispatch( sendTxNotification() )
+
+        //dispatch donation note action during donation tx
+        if( sendingState.donationDetails.donationId ){
+          const { donationId, donationNote } = sendingState.donationDetails
+          dispatch( sendDonationNote( {
+            txid,
+            donationId: donationId,
+            donationNote: donationNote,
+          } ) )
+        }
+
         showSendSuccessBottomSheet()
-
-        // TODO: integrate donation send
-        // if ( sourcePrimarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
-        //   if ( transfer.details[ 0 ].note ) {
-        //     const txNote = {
-        //       txId: transfer.txid,
-        //       note: transfer.details[ 0 ].note,
-        //     }
-        //     RelayServices.sendDonationNote( this.donationId, txNote )
-        //   }
-        // }
-
-        // this.sendNotifications()
-        // this.storeTrustedContactsHistory( transfer.details )
       } else {
         navigation.navigate( 'TwoFAToken' )
       }

@@ -1,13 +1,14 @@
 import { put, call, select } from 'redux-saga/effects'
+import { AsyncStorage } from 'react-native'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, ALTERNATE_SEND_STAGE2_EXECUTED, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_DONATION_NOTE, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
+import { Contacts, DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -18,6 +19,9 @@ import { AccountRecipientDescribing, RecipientDescribing } from '../../common/da
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
+import RelayServices from '../../bitcoin/services/RelayService'
+import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
+import moment from 'moment'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -496,7 +500,6 @@ function* calculateCustomFee( { payload }: {payload: {
     return
   }
 
-
   const { accountShellID, feePerByte, customEstimatedBlocks } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
@@ -512,8 +515,8 @@ function* calculateCustomFee( { payload }: {payload: {
     accountShell.primarySubAccount.sourceKind
   ].service
 
-  const selectedRecipients: RecipientDescribing[] = sendingState.selectedRecipients
-
+  const selectedRecipients: RecipientDescribing[] = [ ...sendingState.selectedRecipients
+  ]
   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
   const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
 
@@ -536,7 +539,6 @@ function* calculateCustomFee( { payload }: {payload: {
     )
   }
 
-
   if( !sendingState.feeIntelMissing && sendingState.sendMaxFee ){
     // custom fee w/ send max
     const { fee } = service.calculateSendMaxFee(
@@ -547,10 +549,13 @@ function* calculateCustomFee( { payload }: {payload: {
 
     // upper bound: default low
     if( fee > txPrerequisites[ 'low' ].fee ){
-      // this.setState( {
-      //   customFee: '',
-      //   customFeePerByteErr: 'Custom fee cannot be greater than the default low priority fee',
-      // } )
+      yield put ( customFeeCalculated( {
+        successful: false,
+        carryOver:{
+          customTxPrerequisites: null
+        },
+        err: 'Custom fee cannot be greater than the default low priority fee',
+      } ) )
       return
     }
 
@@ -567,10 +572,12 @@ function* calculateCustomFee( { payload }: {payload: {
 
     // deduct the previous(default low) fee and add the custom fee
     // TODO: recapture custom fee from sending reducer
-    if( this.state.customFee ) recipientToBeModified.amount += this.state.customFee // reusing custom-fee feature
+
+    const customFee = idx( sendingState, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites.fee )
+    if( customFee ) recipientToBeModified.amount += customFee // reusing custom-fee feature
     else recipientToBeModified.amount += txPrerequisites[ 'low' ].fee
     recipientToBeModified.amount -= fee
-    this.recipients[ this.recipients.length - 1 ] = recipientToBeModified
+    recipients[ recipients.length - 1 ] = recipientToBeModified
 
     outputs.forEach( ( output )=>{
       if( output.address === recipientToBeModified.address )
@@ -580,7 +587,10 @@ function* calculateCustomFee( { payload }: {payload: {
     selectedRecipients.forEach( ( recipient ) => {
       if( recipient.id === recipientToBeModified.id ) recipient.amount = recipientToBeModified.amount
     } )
-    // TODO: action to update selected recipients array
+
+    yield put ( customSendMaxUpdated( {
+      recipients: selectedRecipients
+    } ) )
   }
 
   const customTxPrerequisites = service.calculateCustomFee(
@@ -588,12 +598,6 @@ function* calculateCustomFee( { payload }: {payload: {
     parseInt( feePerByte ),
     derivativeAccountDetails,
   )
-
-  // if( !this.feeIntelAbsent && this.isSendMax )
-  //   this.setState( {
-  //     totalAmount: this.spendableBalance - customTxPrerequisites.fee,
-  //     selectedRecipients,
-  //   } )
 
   if ( customTxPrerequisites.inputs ) {
     customTxPrerequisites.estimatedBlocks = parseInt( customEstimatedBlocks )
@@ -623,4 +627,118 @@ function* calculateCustomFee( { payload }: {payload: {
 export const calculateCustomFeeWatcher = createWatcher(
   calculateCustomFee,
   CALCULATE_CUSTOM_FEE
+)
+
+async function updateTrustedContactTxHistory( selectedContacts ) {
+  let IMKeeperOfHistory = JSON.parse(
+    await AsyncStorage.getItem( 'IMKeeperOfHistory' ),
+  )
+  let OtherTrustedContactsHistory = JSON.parse(
+    await AsyncStorage.getItem( 'OtherTrustedContactsHistory' ),
+  )
+
+  selectedContacts.forEach( async ( contact )=>{
+    const txHistory = {
+      id: createRandomString( 36 ),
+      title: 'Sent Amount',
+      date: moment( Date.now() ).valueOf(),
+      info: '',
+      selectedContactInfo: contact,
+    }
+
+    if ( contact.isWard ) {
+      if ( !IMKeeperOfHistory ) IMKeeperOfHistory = []
+      IMKeeperOfHistory.push( txHistory )
+      await AsyncStorage.setItem(
+        'IMKeeperOfHistory',
+        JSON.stringify( IMKeeperOfHistory ),
+      )
+    }
+    if (
+      !contact.isWard &&
+      !contact.isGuardian
+    ) {
+      if ( !OtherTrustedContactsHistory ) OtherTrustedContactsHistory = []
+      OtherTrustedContactsHistory.push( txHistory )
+      await AsyncStorage.setItem(
+        'OtherTrustedContactsHistory',
+        JSON.stringify( OtherTrustedContactsHistory ),
+      )
+    }
+  } )
+}
+
+function* sendTxNotificationWorker() {
+  const sendingState: SendingState = yield select( ( state ) => state.sending )
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const { walletName } = yield select(
+    ( state ) => state.storage.database.WALLET_SETUP,
+  )
+
+  const { selectedRecipients } = sendingState
+  const contacts: Contacts = trustedContacts.tc.trustedContacts
+
+  const notifReceivers = []
+  const selectedContacts = []
+  selectedRecipients.forEach( ( recipient ) => {
+    if ( recipient.displayedName ) { // send notification to TC
+      const contactName = recipient.displayedName.toLowerCase().trim()
+      const contact = contacts[ contactName ]
+      if ( contact && contact.walletID ){
+        selectedContacts.push( contact )
+        notifReceivers.push( {
+          walletId: contact.walletID,
+          FCMs: contact.FCMs,
+        } )
+      }
+    }
+  } )
+
+  const notification: INotification = {
+    notificationType: notificationType.contact,
+    title: 'Friends and Family notification',
+    body: `You have a new transaction from ${walletName}`,
+    data: {
+    },
+    tag: notificationTag.IMP,
+  }
+
+  if( notifReceivers.length )
+    yield call(
+      RelayServices.sendNotifications,
+      notifReceivers,
+      notification,
+    )
+
+  // update selected contacts' send history
+  if( selectedContacts.length )
+    yield call ( updateTrustedContactTxHistory, selectedContacts )
+}
+
+export const sendTxNotificationWatcher = createWatcher(
+  sendTxNotificationWorker,
+  SEND_TX_NOTIFICATION,
+)
+
+
+function* sendDonationNoteWorker( { payload }: {payload: {
+  txid: string
+  donationId: string
+  donationNote: string
+}} ) {
+  const sendingState: SendingState = yield select( ( state ) => state.sending )
+  if ( sendingState.sourceAccountShell.primarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
+    const txNote = {
+      txId: payload.txid,
+      note: payload.donationNote
+    }
+    RelayServices.sendDonationNote( payload.donationId, txNote )
+  }
+}
+
+export const sendDonationNoteWatcher = createWatcher(
+  sendDonationNoteWorker,
+  SEND_DONATION_NOTE,
 )
