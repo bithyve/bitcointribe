@@ -1763,7 +1763,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             ? [ 0, '32%' ]
             : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '57%' ]
+          return Platform.OS == 'ios' ? [ 0, '65%' ] : [ 0, '70%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return defaultBottomSheetConfigs.snapPoints

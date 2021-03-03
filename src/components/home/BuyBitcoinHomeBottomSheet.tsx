@@ -26,13 +26,6 @@ export type BuyBitcoinBottomSheetMenuItem = {
 }
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
-  // {
-  //   title: 'Scan a Voucher',
-  //   subtitle: 'From select retail stores with FastBitcoins',
-  //   kind: BuyMenuItemKind.FAST_BITCOINS,
-  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-  //   disabled: false
-  // },
   {
     title: 'Buy with Wyre',
     subtitle: 'Buy any amount',
@@ -45,6 +38,13 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     subtitle: 'Low fee for those big buys',
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
+    disabled: false
+  },
+  {
+    title: 'Scan a Voucher',
+    subtitle: 'From select retail stores with FastBitcoins',
+    kind: BuyMenuItemKind.FAST_BITCOINS,
+    imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
     disabled: false
   },
   {
