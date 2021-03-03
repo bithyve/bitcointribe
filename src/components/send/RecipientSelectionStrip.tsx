@@ -61,7 +61,7 @@ const RecipientSelectionStrip: React.FC<Props> = ( {
               />
             ) || ( recipient.kind == RecipientKind.ACCOUNT_SHELL && (
               <SubAccountOptionCard
-                subAccount={getSubAccountForRecipient( ( recipient as AccountRecipientDescribing ) )}
+                subAccountInfo={getSubAccountForRecipient( ( recipient as AccountRecipientDescribing ) )}
                 isSelected={isSelected( recipient )}
                 containerStyle={styles.accountShellListItemContainer}
               />

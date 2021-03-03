@@ -40,15 +40,12 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 function renderSectionHeader(
   sectionKind: SectionKind,
-  subAccountKind: SubAccountKind,
 ): ReactElement | null {
   switch ( sectionKind ) {
       case SectionKind.SELECT_CONTACTS:
         return <Text style={styles.listSectionHeading}>Send To Contacts</Text>
       case SectionKind.SELECT_ACCOUNT_SHELLS:
-        if ( subAccountKind != SubAccountKind.TEST_ACCOUNT ) {
-          return <Text style={styles.listSectionHeading}>Send To Accounts</Text>
-        }
+        return <Text style={styles.listSectionHeading}>Send To Accounts</Text>
   }
 }
 
@@ -68,7 +65,7 @@ const AccountSendScreen: React.FC<Props> = ( {
   }, [ sendableAccountShells ] )
 
   const isShowingSelectableAccountsSection = useMemo( () => {
-    return primarySubAccount.kind != SubAccountKind.TEST_ACCOUNT && sendableAccountShells.length
+    return Boolean( sendableAccountShells.length )
   }, [ sendableAccountShells, primarySubAccount.kind ] )
 
   const selectedContactRecipients = useMemo( () => {
@@ -174,7 +171,7 @@ const AccountSendScreen: React.FC<Props> = ( {
         sections={sections}
         keyExtractor={sectionListItemKeyExtractor}
         renderSectionHeader={( { section } ) => {
-          return renderSectionHeader( section.kind, primarySubAccount.kind )
+          return renderSectionHeader( section.kind )
         }}
         stickySectionHeadersEnabled={false}
       />

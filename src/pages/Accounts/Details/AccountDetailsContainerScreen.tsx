@@ -130,7 +130,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }
 
   function navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType ) {
-
     navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,

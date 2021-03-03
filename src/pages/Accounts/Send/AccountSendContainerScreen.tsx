@@ -24,6 +24,7 @@ import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSen
 import { addRecipientForSending, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
 import AccountSendScreen from './AccountSendScreen'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 
 export type Props = {
   navigation: any;
@@ -35,7 +36,8 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const accountShell = useSourceAccountShellForSending()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const sendableAccountShells = useCompatibleAccountShells( accountShell )
+  // const sendableAccountShells = useCompatibleAccountShells( accountShell )
+  const sendableAccountShells = useActiveAccountShells()
   const sendableContacts = useTrustedContactRecipients()
   const walletService = useWalletServiceForSubAccountKind( primarySubAccount.kind )
 

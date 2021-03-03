@@ -45,7 +45,7 @@ export function makeAccountRecipientDescription(
   const currentBalance = AccountShell.getTotalBalance( accountShell )
 
   return {
-    id: primarySubAccount.kind,
+    id: accountShell.id,
     kind: RecipientKind.ACCOUNT_SHELL,
     displayedName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
     avatarImageSource: primarySubAccount.avatarImageSource,

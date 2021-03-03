@@ -10,16 +10,16 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
-  isDisabled: boolean;
-  isSelected: boolean;
-  specialTag: string | null;
+  isDisabled?: boolean;
+  isSelected?: boolean;
+  specialTag?: string | null;
   containerStyle?: Record<string, unknown>;
 }
 
 const SubAccountOptionCard: React.FC<Props> = ( {
   subAccountInfo,
-  isDisabled,
-  isSelected,
+  isDisabled = false,
+  isSelected = false,
   specialTag = null,
   containerStyle = {
   },
