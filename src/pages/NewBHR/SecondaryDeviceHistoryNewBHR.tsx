@@ -10,19 +10,14 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import Fonts from '../../common/Fonts';
-import NavStyles from '../../common/Styles/NavStyles';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
-import { getIconByStatus } from './utils';
 import { useDispatch, useSelector } from 'react-redux';
-import { ErrorSending } from '../../store/actions/sss';
+import { ErrorSending } from '../../store/actions/health';
 import { checkMSharesHealth, updatedKeeperInfo, updateMSharesHealth } from '../../store/actions/health';
 import Colors from '../../common/Colors';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { RFValue } from 'react-native-responsive-fontsize';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from '../../components/ModalHeader';
 import HistoryPageComponent from './HistoryPageComponent';
@@ -32,7 +27,7 @@ import _ from 'underscore';
 import ErrorModalContents from '../../components/ErrorModalContents';
 import DeviceInfo from 'react-native-device-info';
 import KnowMoreButton from '../../components/KnowMoreButton';
-import { uploadEncMShare } from '../../store/actions/sss';
+import { uploadEncMShareKeeper } from '../../store/actions/health';
 import {
   EphemeralDataElements,
   LevelHealthInterface,
@@ -64,10 +59,12 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
   const [HelpBottomSheet] = useState(React.createRef());
   const [errorMessage, setErrorMessage] = useState('');
   const [errorMessageHeader, setErrorMessageHeader] = useState('');
-  const isErrorSendingFailed = useSelector((state) => state.sss.errorSending);
+  const isErrorSendingFailed = useSelector((state) => state.health.errorSending);
   const [QrBottomSheet] = useState(React.createRef());
   const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [blockReshare, setBlockReshare] = useState('');
+  const [index, setIndex] = useState(props.navigation.state.params.index);
+
   const SHARES_TRANSFER_DETAILS = useSelector(
     (state) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
@@ -84,7 +81,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
 
   const dispatch = useDispatch();
   const [secondaryQR, setSecondaryQR] = useState('');
-  const s3Service: S3Service = useSelector((state) => state.sss.service);
+  const s3Service: S3Service = useSelector((state) => state.health.service);
   const secureAccount: SecureAccount = useSelector(
     (state) => state.accounts[SECURE_ACCOUNT].service,
   );
@@ -159,24 +156,24 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
   const [selectedKeeper, setSelectedKeeper] = useState(
     props.navigation.state.params.selectedKeeper,
   );
+  console.log("props.navigation.getParam('selectedTime'",props.navigation.state.params.selectedKeeper)
   console.log("RESHARE", props.navigation.state.params.selectedKeeper.updatedAt == 0
   ? false
   : true)
-  const [isReshare, setIsReshare] = useState(
-    props.navigation.state.params.selectedKeeper.updatedAt == 0
-      ? false
-      : true,
-  );
+  const [isReshare, setIsReshare] = useState( props.navigation.state.params.selectedKeeper.updatedAt == 0
+    ? false
+    : true);
   const [selectedShareId, setSelectedShareId] = useState(props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '');
   const [isChange, setIsChange] = useState(false);
   useEffect(() => {
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
     setIsReshare(
-      props.navigation.state.params.selectedTitle == 'Friends and Family'
-        ? false
-        : true,
+      props.navigation.state.params.selectedKeeper.updatedAt == 0
+    ? false
+    : true
     );
+    setIndex(props.navigation.state.params.index);
     setSelectedTime(props.navigation.state.params.selectedTime);
     setSelectedStatus(props.navigation.state.params.selectedStatus);
     setSelectedTitle(props.navigation.state.params.selectedTitle);
@@ -199,23 +196,20 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
     secondaryDeviceMessageBottomSheet,
   ] = useState(React.createRef());
   const uploadMetaShare = useSelector(
-    (state) => state.sss.loading.uploadMetaShare,
+    (state) => state.health.loading.uploadMetaShare,
   );
   const updateEphemeralChannelLoader = useSelector(
     (state) => state.trustedContacts.loading.updateEphemeralChannel,
   );
 
-  const updateAutoHighlightFlags = props.navigation.getParam(
-    'updateAutoHighlightFlags',
-  );
   const next = props.navigation.getParam('next');
 
   const saveInTransitHistory = async () => {
     const shareHistory = JSON.parse(await AsyncStorage.getItem('shareHistory'));
     if (shareHistory) {
       const updatedShareHistory = [...shareHistory];
-      updatedShareHistory[0] = {
-        ...updatedShareHistory[0],
+      updatedShareHistory[index] = {
+        ...updatedShareHistory[index],
         inTransit: Date.now(),
       };
       updateHistory(updatedShareHistory);
@@ -228,6 +222,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
 
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
+      console.log("contact_________",contact);
       let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
 
       if (tcInfo) {
@@ -239,26 +234,27 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
       }
       await AsyncStorage.setItem('TrustedContactsInfo', JSON.stringify(tcInfo));
       dispatch(updateTrustedContactInfoLocally(tcInfo));
+      let contactName = contact.firstName + ' ' + contact.lastName;
       let shareArray = [
         {
           walletId: s3Service.getWalletId().data.walletId,
           shareId: selectedShareId,
           reshareVersion: 0,
           updatedAt: moment(new Date()).valueOf(),
-          name: contact.name,
+          name: contactName,
           shareType: 'device',
           status: 'notAccessible',
         },
       ];
-      dispatch(updateMSharesHealth(shareArray));      
+      dispatch(updateMSharesHealth(shareArray)); 
       let obj = {
         shareId: selectedShareId,
-        name: contact.name,
+        name: contactName,
         uuid: contact.id,
         publicKey: '',
         ephemeralAddress: '',
         type: 'device',
-        data: {}
+        data: {...contact, name: contactName, index}
       };
       dispatch(updatedKeeperInfo(obj));
     },
@@ -320,17 +316,17 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
 
       if (changeKeeper) {
         setSecondaryQR('');
-        dispatch(uploadEncMShare(0, contactInfo, data, changeKeeper));
+        dispatch(uploadEncMShareKeeper(index,selectedShareId, contactInfo, data, changeKeeper));
         updateTrustedContactsInfo({ firstName, lastName });
       } else {
         if (
-          !SHARES_TRANSFER_DETAILS[0] ||
-          Date.now() - SHARES_TRANSFER_DETAILS[0].UPLOADED_AT >
+          !SHARES_TRANSFER_DETAILS[index] ||
+          Date.now() - SHARES_TRANSFER_DETAILS[index].UPLOADED_AT >
           config.TC_REQUEST_EXPIRY
         ) {
-          console.log('!SHARES_TRANSFER_DETAILS[0]', SHARES_TRANSFER_DETAILS)
+          console.log('!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS)
           setSecondaryQR('');
-          dispatch(uploadEncMShare(0, contactInfo, data));
+          dispatch(uploadEncMShareKeeper(index,selectedShareId, contactInfo, data));
           updateTrustedContactsInfo({ firstName, lastName });
         } else if (
           trustedContact &&
@@ -344,7 +340,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
           dispatch(
             updateEphemeralChannel(
               contactInfo,
-              trustedContact.ephemeralChannel.data[0],
+              trustedContact.ephemeralChannel.data[index],
             ),
           );
         }
@@ -424,11 +420,11 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
   }, []);
 
   const renderSecondaryDeviceContents = useCallback(() => {
+    console.log(secondaryQR);
     return (
       <SecondaryDevice
         secondaryQR={secondaryQR}
         onPressOk={async () => {
-          updateAutoHighlightFlags();
           saveInTransitHistory();
           // dispatch(checkMSharesHealth());
           (secondaryDeviceBottomSheet as any).current.snapTo(0);
@@ -509,16 +505,16 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
 
   const updateHistory = (shareHistory) => {
     const updatedSecondaryHistory = [...secondaryDeviceHistory];
-    if (shareHistory[0].createdAt)
-      updatedSecondaryHistory[0].date = shareHistory[0].createdAt;
-    if (shareHistory[0].inTransit)
-      updatedSecondaryHistory[1].date = shareHistory[0].inTransit;
+    if (shareHistory[index].createdAt)
+      updatedSecondaryHistory[0].date = shareHistory[index].createdAt;
+    if (shareHistory[index].inTransit)
+      updatedSecondaryHistory[1].date = shareHistory[index].inTransit;
 
-    if (shareHistory[0].accessible)
-      updatedSecondaryHistory[2].date = shareHistory[0].accessible;
+    if (shareHistory[index].accessible)
+      updatedSecondaryHistory[2].date = shareHistory[index].accessible;
 
-    if (shareHistory[0].notAccessible)
-      updatedSecondaryHistory[3].date = shareHistory[0].notAccessible;
+    if (shareHistory[index].notAccessible)
+      updatedSecondaryHistory[3].date = shareHistory[index].notAccessible;
     setSecondaryDeviceHistory(updatedSecondaryHistory);
   };
 
@@ -527,7 +523,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem('shareHistory'),
       );
-      if (shareHistory[0].inTransit || shareHistory[0].accessible) {
+      if (shareHistory[index].inTransit || shareHistory[index].accessible) {
         setIsReshare(true);
       }
       if (shareHistory) updateHistory(shareHistory);

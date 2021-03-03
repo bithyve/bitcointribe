@@ -138,6 +138,20 @@ const getModifiedData = (keeperInfo, levelHealthVar) => {
             ].data;
         }
         if (
+          keeperInfo.findIndex(
+            (value) =>
+              value.shareId == element.shareId && value.type == 'device',
+          ) > -1
+        ) {
+          element.data =
+            keeperInfo[
+              keeperInfo.findIndex(
+                (value) =>
+                  value.shareId == element.shareId && value.type == 'device',
+              )
+            ].data;
+        }
+        if (
           keeperInfo.findIndex((value) => value.shareId == element.shareId) > -1
         ) {
           element.uuid =

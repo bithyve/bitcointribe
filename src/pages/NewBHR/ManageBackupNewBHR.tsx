@@ -33,19 +33,15 @@ import idx from "idx";
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
 import { timeFormatter } from "../../common/CommonFunctions/timeFormatter";
 import moment from "moment";
-import SetupPrimaryKeeper from "./SetupPrimaryKeeper";
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
 } from "../../common/constants/serviceTypes";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import {
-  CloudData,
-  getKeeperInfoFromShareId,
   getLevelInfo,
 } from "../../common/CommonFunctions";
 import { trustedChannelsSetupSync } from "../../store/actions/trustedContacts";
-import CloudBackup from "../../common/CommonFunctions/CloudBackup";
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -80,7 +76,6 @@ interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
   encryptedCloudDataJson: any;
-  isPrimaryKeeper: any;
   isError: boolean;
   selectedKeeper: {
     shareType: string;
@@ -200,7 +195,6 @@ class ManageBackupNewBHR extends Component<
           id: 3,
         },
       ],
-      isPrimaryKeeper: false,
       encryptedCloudDataJson: [],
       selectedLevelId: 0,
       selectedKeeperType: "",
@@ -232,6 +226,7 @@ class ManageBackupNewBHR extends Component<
       currentLevel,
       keeperInfo
     );
+    console.log("LEVELDATA", levelData)
     this.setState({
       levelData: levelData.levelData,
       isError: levelData.isError,
@@ -286,11 +281,10 @@ class ManageBackupNewBHR extends Component<
       healthLoading,
       trustedChannelsSetupSyncing,
       isBackupProcessing,
+      keeperInfo
     } = this.props;
     console.log(
-      "healthLoading || isBackupProcessing.status",
-      healthLoading,
-      isBackupProcessing.status
+      "keeperInfo",keeperInfo
     );
     if (
       prevProps.healthLoading !== this.props.healthLoading ||
@@ -351,7 +345,6 @@ class ManageBackupNewBHR extends Component<
             data: {},
           },
           isSetup: true,
-          isPrimaryKeeper: false,
         };
         this.setState({
           selectedKeeper: obj.selectedKeeper,
@@ -372,7 +365,6 @@ class ManageBackupNewBHR extends Component<
             data: {},
           },
           isSetup: true,
-          isPrimaryKeeper: false,
         };
         this.setState({
           selectedKeeper: obj.selectedKeeper,
@@ -435,9 +427,8 @@ class ManageBackupNewBHR extends Component<
       let contactLevelInfo = [];
       for (let i = 2; i < levelHealth[2].levelInfo.length - 2; i++) {
         if (
-          levelHealth[2].levelInfo[i].status != "accessible" &&
-          (levelHealth[1].levelInfo[i].shareType == "primaryKeeper" ||
-            levelHealth[1].levelInfo[i].shareType == "device")
+          levelHealth[2].levelInfo[i].status != "accessible" ||
+            levelHealth[1].levelInfo[i].shareType == "device"
         ) {
           let obj = {
             ...levelHealth[1].levelInfo[i],
@@ -464,26 +455,38 @@ class ManageBackupNewBHR extends Component<
   };
 
   goToHistory = (value) => {
-    let { id, selectedKeeper, isSetup, isPrimaryKeeper } = value;
+    let { id, selectedKeeper, isSetup } = value;
+    console.log("VALUE", value)
     let navigationParams = {
       selectedTime: selectedKeeper.updatedAt
         ? this.getTime(selectedKeeper.updatedAt)
         : "never",
       selectedStatus: selectedKeeper.status,
       selectedTitle: selectedKeeper.name,
-      isPrimaryKeeper: isPrimaryKeeper
-        ? isPrimaryKeeper
-        : this.state.isPrimaryKeeper,
       selectedLevelId: id,
       selectedContact: selectedKeeper.data,
       selectedKeeper,
     };
     if (selectedKeeper.shareType == "device") {
-      this.props.navigation.navigate(
-        "SecondaryDeviceHistoryNewBHR",
-        navigationParams
-      );
+      let index = 0;
+      let count = 0;
+      for (let i = 0; i < this.state.levelData.length; i++) {
+        const element = this.state.levelData[i];
+        if (element.keeper1.shareType == "device") count++;
+        if (element.keeper2.shareType == "device") count++;
+      }
+      if (count == 0 && isSetup) index = 0;
+      else if (count == 1 && isSetup) index = 3;
+      else if (count == 2 && isSetup) index = 4;
+      else {
+        index = selectedKeeper.data.index;
+      }
+      this.props.navigation.navigate("SecondaryDeviceHistoryNewBHR", {
+        ...navigationParams,
+        index,
+      });
     } else if (selectedKeeper.shareType == "contact") {
+      console.log("inside selectedKeeper.shareType", selectedKeeper.shareType)
       let index = 1;
       let count = 0;
       for (let i = 0; i < this.state.levelData.length; i++) {
@@ -496,6 +499,7 @@ class ManageBackupNewBHR extends Component<
       else {
         index = selectedKeeper.data.index;
       }
+      console.log("index", index)
       this.props.navigation.navigate("TrustedContactHistoryKeeper", {
         ...navigationParams,
         index,
@@ -564,7 +568,6 @@ class ManageBackupNewBHR extends Component<
     let keeper = number == 1 ? value.keeper1 : value.keeper2;
     this.setState({
       selectedKeeper: keeper,
-      isPrimaryKeeper: value.id === 2 && number == 1 ? true : false,
       selectedLevelId: value.id,
     });
 
@@ -576,7 +579,6 @@ class ManageBackupNewBHR extends Component<
         shareType: value.id === 2 && number == 1 ? "device" : keeper.shareType,
       },
       isSetup: false,
-      isPrimaryKeeper: value.id === 2 && number == 1 ? true : false,
     };
     if (keeper.updatedAt > 0) {
       this.goToHistory(obj);
@@ -1059,13 +1061,10 @@ class ManageBackupNewBHR extends Component<
                                 onPress={() => this.onPressKeeper(value, 1)}
                               >
                                 {value.keeper1.status == "accessible" &&
-                                (value.keeper1.shareType == "device" ||
-                                  value.keeper1.shareType ==
-                                    "primaryKeeper") ? (
+                                (value.keeper1.shareType == "device") ? (
                                   <Image
                                     source={
-                                      value.keeper1.shareType == "device" ||
-                                      value.keeper1.shareType == "primaryKeeper"
+                                      value.keeper1.shareType == "device"
                                         ? require("../../assets/images/icons/icon_ipad_blue.png")
                                         : require("../../assets/images/icons/pexels-photo.png")
                                     }
@@ -1143,13 +1142,10 @@ class ManageBackupNewBHR extends Component<
                                 onPress={() => this.onPressKeeper(value, 2)}
                               >
                                 {value.keeper2.status == "accessible" &&
-                                (value.keeper2.shareType == "device" ||
-                                  value.keeper2.shareType ==
-                                    "primaryKeeper") ? (
+                                (value.keeper2.shareType == "device") ? (
                                   <Image
                                     source={
-                                      value.keeper2.shareType == "device" ||
-                                      value.keeper2.shareType == "primaryKeeper"
+                                      value.keeper2.shareType == "device"
                                         ? require("../../assets/images/icons/icon_ipad_blue.png")
                                         : require("../../assets/images/icons/pexels-photo.png")
                                     }
@@ -1228,19 +1224,16 @@ class ManageBackupNewBHR extends Component<
                   selectedKeeperType: type,
                   selectedKeeperName: name,
                 });
-                let getApproval = true;
                 if (
                   selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2
                 ) {
-                  getApproval = false;
                   this.props.generateMetaShare(selectedLevelId);
                 }
 
-                if (getApproval) {
-                  let obj = {
+                let obj = {
                     id: selectedLevelId,
                     selectedKeeper: {
                       ...selectedKeeper,
@@ -1250,12 +1243,11 @@ class ManageBackupNewBHR extends Component<
                         : type,
                     },
                     isSetup: false,
-                    isPrimaryKeeper: false,
                   };
+                  console.log("obj", obj)
                   this.goToHistory(obj);
                   /** other than ThirdLevel first position */
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
-                }
               }}
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
@@ -1267,65 +1259,6 @@ class ManageBackupNewBHR extends Component<
             <SmallHeaderModal
               onPressHeader={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
-              }
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={"SetupPrimaryKeeperBottomSheet"}
-          snapPoints={[
-            -50,
-            Platform.OS == "ios" && DeviceInfo.hasNotch()
-              ? hp("60%")
-              : hp("70"),
-          ]}
-          renderContent={() => (
-            <SetupPrimaryKeeper
-              title={"Setup Primary Keeper\non a Personal Device"}
-              subText={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
-              }
-              textToCopy={"http://hexawallet.io/keeperapp"}
-              info={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
-              }
-              proceedButtonText={"Proceed"}
-              backButtonText={"Back"}
-              onPressBack={() =>
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
-              }
-              onPressContinue={() => {
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
-                const {
-                  levelData,
-                  selectedLevelId,
-                  selectedKeeper,
-                } = this.state;
-                let PKStatus = levelData[1].keeper1.keeper1Done
-                  ? "accessed"
-                  : "notAccessible";
-                let navigationParams = {
-                  selectedTime: this.getTime(new Date()),
-                  selectedStatus: PKStatus,
-                  selectedTitle: "Primary Keeper",
-                  isPrimaryKeeper: true,
-                  isSetUp: true,
-                  selectedLevelId,
-                  selectedContact: selectedKeeper.data,
-                  selectedKeeper: selectedKeeper,
-                };
-                this.props.navigation.navigate(
-                  "KeeperDeviceHistory",
-                  navigationParams
-                );
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              onPressHeader={() =>
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
               }
             />
           )}

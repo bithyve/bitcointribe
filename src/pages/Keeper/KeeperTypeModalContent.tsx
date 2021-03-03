@@ -156,8 +156,7 @@ export default function KeeperTypeModalContents(props) {
           {keeperTypesData.map((value) => {
             if (
               value.type === "pdf" &&
-              (selectedLevelId == 2 ||
-                completedKeeperType.findIndex((value) => value == "pdf") > -1)
+                completedKeeperType.findIndex((value) => value == "pdf") > -1
             ) {
               return;
             }
