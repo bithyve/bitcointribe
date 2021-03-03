@@ -952,18 +952,20 @@ function* walletCheckInWorker( { payload } ) {
     ( tag ) => underCustody[ tag ].META_SHARE,
   )
 
-  const { synchingContacts } = payload
-  if (
-    synchingContacts &&
-    !Object.keys( trustedContacts.tc.trustedContacts ).length
-  ) {
-    yield put( calculateOverallHealth( s3Service ) )
-    return // aborting checkIn if walletSync is specifically done in context of trusted-contacts
-  }
-
   try{
     if( !walletCheckInLoading ) yield put( switchTCLoading( 'walletCheckIn' ) )
     console.log( 'Wallet Check-In in progress...' )
+
+    const { synchingContacts } = payload
+    if (
+      synchingContacts &&
+      !Object.keys( trustedContacts.tc.trustedContacts ).length
+    ) {
+      yield put( calculateOverallHealth( s3Service ) )
+      yield put( switchTCLoading( 'walletCheckIn' ) )
+      return // aborting checkIn if walletSync is specifically done in context of trusted-contacts
+    }
+
     const preSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
 
     const { metaShares, healthCheckStatus } = s3Service.sss
