@@ -8,7 +8,7 @@ export default function useTrustedContactRecipients(): ContactRecipientDescribin
   const trustedContactsState = useTrustedContactsState()
 
   return useMemo( () => {
-    // return trustedContactsState.trustedContactRecipients;
-    return sampleContactRecipients
+    return trustedContactsState.trustedContactRecipients
+    // return sampleContactRecipients
   }, [ trustedContactsState.trustedContactRecipients ] )
 }
