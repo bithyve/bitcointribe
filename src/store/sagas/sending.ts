@@ -1,13 +1,13 @@
 import { put, call, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed } from '../actions/sending'
+import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
+import { Contacts, DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -18,6 +18,7 @@ import { AccountRecipientDescribing, RecipientDescribing } from '../../common/da
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
+import RelayServices from '../../bitcoin/services/RelayService'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -623,4 +624,52 @@ function* calculateCustomFee( { payload }: {payload: {
 export const calculateCustomFeeWatcher = createWatcher(
   calculateCustomFee,
   CALCULATE_CUSTOM_FEE
+)
+
+
+function* sendTxNotificationWorker() {
+  const sendingState: SendingState = yield select( ( state ) => state.sending )
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const { walletName } = yield select(
+    ( state ) => state.storage.database.WALLET_SETUP,
+  )
+
+  const { selectedRecipients } = sendingState
+  const contacts: Contacts = trustedContacts.tc.trustedContacts
+
+  const notifReceivers = []
+  selectedRecipients.forEach( ( recipient ) => {
+    if ( recipient.displayedName ) { // send notification to TC
+      const contactName = recipient.displayedName.toLowerCase().trim()
+      const contact = contacts[ contactName ]
+      if ( contact.walletID )
+        notifReceivers.push( {
+          walletId: contact.walletID,
+          FCMs: contact.FCMs,
+        } )
+    }
+  } )
+
+  const notification: INotification = {
+    notificationType: notificationType.contact,
+    title: 'Friends and Family notification',
+    body: `You have a new transaction from ${walletName}`,
+    data: {
+    },
+    tag: notificationTag.IMP,
+  }
+
+  if( notifReceivers.length )
+    yield call(
+      RelayServices.sendNotifications,
+      notifReceivers,
+      notification,
+    )
+}
+
+export const sendTxNotificationWatcher = createWatcher(
+  sendTxNotificationWorker,
+  SEND_TX_NOTIFICATION,
 )

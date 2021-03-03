@@ -28,6 +28,7 @@ export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
 export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
 export const CUSTOM_FEE_CALCULATED = 'CUSTOM_FEE_CALCULATED'
 export const CUSTOM_SEND_MAX_CALCULATED = 'CUSTOM_SEND_MAX_CALCULATED'
+export const SEND_TX_NOTIFICATION = 'SEND_TX_NOTIFICATION'
 export interface ResetSendState extends Action {
   type: typeof RESET_SEND_STATE;
 }
@@ -401,3 +402,13 @@ export const customSendMaxUpdated = (
   }
 }
 
+
+export interface SendTxNotificationAction extends Action {
+  type: typeof SEND_TX_NOTIFICATION;
+}
+
+export const sendTxNotification = () => {
+  return {
+    type: SEND_TX_NOTIFICATION,
+  }
+}
