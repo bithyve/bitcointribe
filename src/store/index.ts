@@ -68,7 +68,8 @@ import {
   feeAndExchangeRatesWatcher,
   addNewSecondarySubAccountWatcher,
   autoSyncShellsWatcher,
-  blindRefreshWatcher
+  blindRefreshWatcher,
+  fetchReceiveAddressWatcher
 } from './sagas/accounts'
 
 import {
@@ -181,6 +182,7 @@ const rootSaga = function* () {
     mergeAccountShellsWatcher,
     autoSyncShellsWatcher,
     blindRefreshWatcher,
+    fetchReceiveAddressWatcher,
 
     // sss watchers
     initHCWatcher,
