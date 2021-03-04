@@ -54,7 +54,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }, [ sourceAccountShell ] )
 
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
-
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
   const sourceAccountHeadlineText = useMemo( () => {

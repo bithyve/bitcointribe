@@ -28,33 +28,6 @@ export type Props = {
 };
 
 
-function useBTCAmountConvertedFromFiat( amount: number ) {
-  const exchangeRates = useExchangeRates()
-  const currencyCode = useCurrencyCode()
-
-  return useMemo( () => {
-    return exchangeRates && exchangeRates[ currencyCode ]
-      ? (
-        ( amount / SATOSHIS_IN_BTC ) *
-        exchangeRates[ currencyCode ].last
-      )
-      : 0
-  }, [ exchangeRates, currencyCode, amount ] )
-}
-
-function useFiatAmountConvertedFromSatoshis( amount: Satoshis ) {
-  const exchangeRates = useExchangeRates()
-  const currencyCode = useCurrencyCode()
-
-  return useMemo( () => {
-    const convertedAmount = exchangeRates && exchangeRates[ currencyCode ]
-      ? ( amount / SATOSHIS_IN_BTC ) * exchangeRates[ currencyCode ].last
-      : 0
-
-    return convertedAmount
-  }, [ exchangeRates, currencyCode, amount ] )
-}
-
 const BalanceEntryFormGroup: React.FC<Props> = ( {
   subAccountKind,
   spendableBalance,
@@ -68,16 +41,12 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const totalSpendingAmount = useTotalSpendingAmount()
 
   const [ isSendingMax, setIsSendingMax ] = useState( false )
-  const [ currentBTCAmountTextValue, setCurrentBTCAmountTextValue ] = useState( '' )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( '' )
   const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( '' )
 
-  const currentBTCAmountFormValue = useMemo( () => {
-    return Number( currentBTCAmountTextValue )
-  }, [ currentBTCAmountTextValue, isSendingMax ] )
-
-  const currentFiatAmountFormValue = useMemo( () => {
-    return Number( currentFiatAmountTextValue )
-  }, [ currentFiatAmountTextValue, isSendingMax ] )
+  const currentSatsAmountFormValue = useMemo( () => {
+    return Number( currentSatsAmountTextValue )
+  }, [ currentSatsAmountTextValue, isSendingMax ] )
 
   const sendMaxFee = useMemo( () => {
     return sendingState.sendMaxFee
@@ -88,12 +57,10 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   }, [ totalSpendingAmount, sendMaxFee ] )
 
   const isAmountInvalid = useMemo( () => {
-    return currentBTCAmountFormValue > spendableBalance
-  }, [ currentBTCAmountFormValue, spendableBalance ] )
+    return currentSatsAmountFormValue > spendableBalance
+  }, [ currentSatsAmountFormValue, spendableBalance ] )
 
   const [ currencyKindForEntry, setCurrencyKindForEntry ] = useState( currencyKind )
-  const currentBTCAmount = useBTCAmountConvertedFromFiat( currentFiatAmountFormValue )
-  const currentFiatAmount = useFiatAmountConvertedFromSatoshis( currentBTCAmountFormValue )
 
   const FiatAmountInputLeftIcon: React.FC = () => {
     return (
@@ -122,20 +89,28 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   }
 
   function handleSendMaxPress() {
-    const convertedFiatAmount = exchangeRates && exchangeRates[ currencyCode ]
-      ? remainingSpendableBalance / exchangeRates[ currencyCode ].last
-      : 0
-
-    if ( convertedFiatAmount < 1 ) {
-      convertedFiatAmount * SATOSHIS_IN_BTC
-    }
+    const convertedFiatAmount = convertSatsToFiat( remainingSpendableBalance )
 
     setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
-    setCurrentBTCAmountTextValue( String( remainingSpendableBalance ) )
+    setCurrentSatsAmountTextValue( String( remainingSpendableBalance ) )
     onAmountChanged( remainingSpendableBalance )
 
     setIsSendingMax( true )
     onSendMaxPressed()
+  }
+
+  function convertFiatToSats( fiatAmount: number ) {
+    return exchangeRates && exchangeRates[ currencyCode ]
+      ? (
+        ( fiatAmount / exchangeRates[ currencyCode ].last ) * SATOSHIS_IN_BTC
+      )
+      : 0
+  }
+
+  function convertSatsToFiat( amount: Satoshis ) {
+    return exchangeRates && exchangeRates[ currencyCode ]
+      ? ( amount / SATOSHIS_IN_BTC ) * exchangeRates[ currencyCode ].last
+      : 0
   }
 
   return (
@@ -178,8 +153,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             onChangeText={( value ) => {
               setIsSendingMax( false )
               setCurrentFiatAmountTextValue( value )
-              setCurrentBTCAmountTextValue( String( currentBTCAmount ) )
-              onAmountChanged( currentBTCAmount )
+              setCurrentSatsAmountTextValue( String( convertFiatToSats( Number( value ) ?? 0 ) ) )
+              onAmountChanged( convertFiatToSats( Number( value ) ?? 0 ) )
             }}
             onFocus={() => {
               // this.setState({
@@ -256,15 +231,15 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   : 'Converted amount in sats'
             }
             placeholderTextColor={FormStyles.placeholderText.color}
-            value={currentBTCAmountTextValue}
+            value={currentSatsAmountTextValue}
             returnKeyLabel="Done"
             returnKeyType="done"
             keyboardType={'numeric'}
             onChangeText={( value ) => {
               setIsSendingMax( false )
-              setCurrentBTCAmountTextValue( value )
-              setCurrentFiatAmountTextValue( String( currentFiatAmount ) )
-              onAmountChanged( currentBTCAmount )
+              setCurrentSatsAmountTextValue( value )
+              setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ) ) )
+              onAmountChanged( Number( value ) ?? 0 )
             }}
             onFocus={() => {
               // this.setState({
