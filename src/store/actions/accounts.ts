@@ -55,6 +55,26 @@ export const FETCH_RECEIVE_ADDRESS = 'FETCH_RECEIVE_ADDRESS'
 export const FETCH_RECEIVE_ADDRESS_SUCCEEDED = 'FETCH_RECEIVE_ADDRESS_SUCCEEDED'
 export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 
+export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
+export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
+
+export const getAllAccountsData = () => {
+  return {
+    type: GET_ALL_ACCOUNTS_DATA
+  }
+}
+
+export const setAllAccountsData = (accounts) => {
+  console.log("accounts",accounts)
+  return {
+    type: SET_ALL_ACCOUNTS_DATA, 
+    payload: {
+      accounts
+    }
+  }
+}
+
+
 export const fetchTransactions = ( serviceType, service? ) => {
   return {
     type: FETCH_TRANSACTIONS, payload: {

@@ -43,6 +43,7 @@ import {
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
+  SET_ALL_ACCOUNTS_DATA,
   FETCH_RECEIVE_ADDRESS_SUCCEEDED,
   CLEAR_RECEIVE_ADDRESS
 } from '../actions/accounts'
@@ -179,6 +180,7 @@ export type AccountsState = {
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
+  accounts: any,
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
@@ -218,6 +220,7 @@ const initialState: AccountsState = {
 
   currentWyreSubAccount: null,
   currentRampSubAccount: null,
+  accounts: null,
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
@@ -816,6 +819,14 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
         }
+
+        case SET_ALL_ACCOUNTS_DATA:
+          console.log("SET_ALL_ACCOUNTS_DATA",action.payloads.allAccounts);
+        return {
+          ...state,
+          accounts: action.payloads.accounts,
+        }
+
       case FETCH_RECEIVE_ADDRESS_SUCCEEDED:
         return {
           ...state,

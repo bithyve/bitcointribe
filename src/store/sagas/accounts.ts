@@ -58,6 +58,8 @@ import {
   ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
   BLIND_REFRESH,
+  GET_ALL_ACCOUNTS_DATA,
+  setAllAccountsData,
   fetchReceiveAddressSucceeded,
   FETCH_RECEIVE_ADDRESS,
 } from '../actions/accounts'
@@ -92,6 +94,7 @@ import TransactionDescribing from '../../common/data/models/Transactions/Interfa
 import { rescanSucceeded } from '../actions/wallet-rescanning'
 import { RescannedTransactionData } from '../reducers/wallet-rescanning'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -1621,6 +1624,88 @@ function* mergeAccountShells( { payload: { source, destination }, }: {
 export const mergeAccountShellsWatcher = createWatcher(
   mergeAccountShells,
   MERGE_ACCOUNT_SHELLS
+)
+
+
+function* getAllAccountsData( ) {
+  try {
+    const accountShells: AccountShell[] =  yield select(
+      ( state ) =>state.accounts.accountShells
+    )
+    let service: RegularAccount| SecureAccount;
+    let regularAccountService = yield select(
+      ( state ) => state.accounts[ SubAccountKind.REGULAR_ACCOUNT ].service
+    )
+    let secureAccountService = yield select(
+      ( state ) => state.accounts[ SubAccountKind.SECURE_ACCOUNT ].service
+    )
+    if (accountShells) {
+      let accounts = [];
+      
+      let derivativeAccountKind
+      console.log("AccountShell", accountShells);
+      accountShells.forEach((shell) => {
+        console.log("shell", shell);
+        
+      switch( shell.primarySubAccount.kind ){
+      case SubAccountKind.REGULAR_ACCOUNT:
+        if ( shell.primarySubAccount.instanceNumber )
+          derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        else derivativeAccountKind = shell.primarySubAccount.kind
+        service = regularAccountService
+        break
+      case SubAccountKind.SECURE_ACCOUNT:
+        if ( shell.primarySubAccount.instanceNumber )
+          derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        else derivativeAccountKind = shell.primarySubAccount.kind
+        service = secureAccountService
+        break
+
+      case SubAccountKind.SERVICE:
+        derivativeAccountKind = ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
+        break
+
+      default:
+        derivativeAccountKind = shell.primarySubAccount.kind
+  }
+
+  const derivativeAccountDetails: {
+    type: string;
+    number: number;
+  } = config.EJECTED_ACCOUNTS.includes( derivativeAccountKind ) ?
+    {
+      type: derivativeAccountKind,
+      number: shell.primarySubAccount.instanceNumber,
+    }
+    : null
+
+        let accountData = {
+          accountName: shell.primarySubAccount.customDisplayName ? shell.primarySubAccount.customDisplayName : shell.primarySubAccount.defaultTitle,
+          balance: shell.primarySubAccount.balances.confirmed,
+          receivingAddress: service.getReceivingAddress(
+            derivativeAccountDetails ? derivativeAccountDetails.type : null,
+            derivativeAccountDetails ? derivativeAccountDetails.number : null),
+          accountImage: getAvatarForSubAccount( shell.primarySubAccount )
+        }
+        console.log("accountData", accountData);
+        accounts.push(accountData)
+      })
+
+      yield put( setAllAccountsData( accounts ) )
+    }  
+  } catch ( error ) {
+}
+}
+
+export const getAllAccountsDataWatcher = createWatcher(
+  getAllAccountsData,
+  GET_ALL_ACCOUNTS_DATA
+)
+// TODO: Consider moving the receive address watcher and worker
+// to sending saga or another appropriate saga
+export const fetchReceiveAddressWatcher = createWatcher(
+  fetchReceiveAddressWorker,
+  FETCH_RECEIVE_ADDRESS
 )
 
 

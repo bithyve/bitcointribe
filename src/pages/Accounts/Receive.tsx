@@ -87,13 +87,14 @@ export default function Receive( props ) {
       ? props.navigation.getParam( 'serviceType' )
       : '',
   )
+  console.log("serviceType",serviceType);
   const [ SendViaLinkBottomSheet ] = useState( React.createRef() )
 
   const [ SendViaQRBottomSheet ] = useState( React.createRef() )
 
   const derivativeAccountDetails =
     props.navigation.state.params.derivativeAccountDetails
-
+console.log("derivativeAccountDetails",derivativeAccountDetails);
   const dispatch = useDispatch()
   const [ receiveLink, setReceiveLink ] = useState( '' )
   const [ receiveQR, setReceiveQR ] = useState( '' )
