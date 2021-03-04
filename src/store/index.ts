@@ -174,7 +174,8 @@ import {
   removeUnwantedUnderCustodySharesWatcher,
   uploadSecondaryShareForPKWatcher,
   generateSMMetaSharesWatcher,
-  uploadSMShareKeeperWatcher
+  uploadSMShareKeeperWatcher,
+  uploadRequestedSMShareWatcher
 } from './sagas/health';
 
 import {
@@ -316,6 +317,7 @@ const rootSaga = function* () {
     uploadSecondaryShareForPKWatcher,
     generateSMMetaSharesWatcher,
     uploadSMShareKeeperWatcher,
+    uploadRequestedSMShareWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,

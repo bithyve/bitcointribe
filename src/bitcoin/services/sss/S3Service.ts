@@ -1593,4 +1593,42 @@ export default class S3Service {
       return { status: 510, err: err.message, message: ErrMap[510] };
     }
   };
+
+  public static uploadRequestedSMShare = async (
+    encryptedKey: string,
+    otp?: string,
+    metaShare?: MetaShare,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await LevelHealth.uploadRequestedSMShare(
+          encryptedKey,
+          metaShare,
+          otp,
+          encryptedDynamicNonPMDD,
+        ),
+      }
+    } catch (err) {
+      return {
+        status: 503, err: err.message, message: ErrMap[ 503 ] 
+      }
+    }
+  };
 }

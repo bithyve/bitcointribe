@@ -1718,4 +1718,38 @@ export default class LevelHealth {
     console.log('this.SMMetaSharesKeeper', this.SMMetaSharesKeeper)
     return { metaShares: this.SMMetaSharesKeeper };
   };
+
+  public static uploadRequestedSMShare = async (
+    encryptedKey: string,
+    metaShare: MetaShare,
+    otp?: string,
+    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
+  ): Promise<{ success: boolean }> => {
+    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if (otp) {
+      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    }
+    const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
+      metaShare,
+      key,
+    );
+
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('uploadSecondaryShare', {
+        HEXA_ID,
+        share: encryptedMetaShare,
+        messageId,
+        encryptedDynamicNonPMDD,
+      });
+
+      const { success } = res.data;
+      if (!success) {
+        return { success: false };
+      }
+      return { success };
+    } catch (err) {
+      return { success: false };
+    }
+  };
 }

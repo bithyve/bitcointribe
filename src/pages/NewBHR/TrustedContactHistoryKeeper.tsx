@@ -67,7 +67,6 @@ import HistoryHeaderComponent from './HistoryHeaderComponent';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
 import QRModal from '../Accounts/QRModal';
 import { StackActions } from 'react-navigation';
-import ApproveSetup from './ApproveSetup';
 
 const TrustedContactHistoryKeeper = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -193,7 +192,6 @@ const TrustedContactHistoryKeeper = (props) => {
       : true,
   );
   const [selectedShareId, setSelectedShareId] = useState(props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '');
-  const ApprovePrimaryKeeperBottomSheet = React.createRef();
   const levelHealth:LevelHealthInterface[] = useSelector((state) => state.health.levelHealth);
   const currentLevel = useSelector((state) => state.health.currentLevel);
   const [selectedKeeperType, setSelectedKeeperType] = useState('');
@@ -1063,34 +1061,6 @@ const TrustedContactHistoryKeeper = (props) => {
     }
   }, [chosenContact, trustedQR]);
 
-  const sendApprovalRequestToPK = (type) => {
-    console.log("type",type);
-    let PKShareId =
-      currentLevel == 2 || currentLevel == 1
-        ? levelHealth[1].levelInfo[2].shareId
-        : currentLevel == 3
-        ? levelHealth[2].levelInfo[2].shareId
-        : levelHealth[1].levelInfo[2].shareId;
-    dispatch(
-      sendApprovalRequest(
-        selectedKeeper.shareId,
-        PKShareId,
-        type == "pdf" || type == "contact"
-          ? notificationType.uploadSecondaryShare
-          : notificationType.approveKeeper
-      )
-    );
-    if ((type == "pdf" || type == "contact") && keeperApproveStatus.shareId != selectedKeeper.shareId) {
-      dispatch(onApprovalStatusChange({
-        status: false,
-        initiatedAt: moment(new Date()).valueOf(),
-        shareId: selectedKeeper.shareId,
-      }));
-    }
-    (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
-    (keeperTypeBottomSheet as any).current.snapTo(0);
-  };
-
   const onPressChangeKeeperType = (type, name) => {
     if (type == "contact") {
       (ChangeBottomSheet as any).current.snapTo(1);
@@ -1276,7 +1246,8 @@ const TrustedContactHistoryKeeper = (props) => {
             onPressSetup={async (type, name) =>{
               setSelectedKeeperType(type);
               setSelectedKeeperName(name);
-              sendApprovalRequestToPK(type);
+              onPressChangeKeeperType(type, name);
+              (keeperTypeBottomSheet as any).current.snapTo(0);
             }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}
@@ -1286,36 +1257,6 @@ const TrustedContactHistoryKeeper = (props) => {
         renderHeader={() => (
           <SmallHeaderModal
             onPressHeader={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
-          />
-        )}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            currentTime ={moment(new Date()).valueOf()}
-            isContinueDisabled={
-              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
-                ? !keeperApproveStatus.status
-                : false
-            }
-            onPressContinue={() => {
-              onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
-              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => {
-              (keeperTypeBottomSheet as any).current.snapTo(1);
-              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
-            }}
           />
         )}
       />

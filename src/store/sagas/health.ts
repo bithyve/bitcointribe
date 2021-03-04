@@ -62,6 +62,8 @@ import {
   GENERATE_SM_META_SHARE,
   isSmMetaSharesCreated,
   UPLOAD_SMSHARE_KEEPER,
+  UPLOAD_REQUESTED_SMSHARE,
+  UploadSMSuccessfully,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -2984,3 +2986,69 @@ function* uploadSMShareWorker({ payload }) {
     uploadSMShareKeeperWorker,
     UPLOAD_SMSHARE_KEEPER
   );
+
+  function* uploadRequestedSMShareWorker( { payload } ) {
+    try {
+      // Transfer: Guardian >>> User
+      const { tag, encryptedKey, otp } = payload
+      const { DECENTRALIZED_BACKUP } = yield select(
+        ( state ) => state.storage.database,
+      )
+      const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+  
+      if ( !UNDER_CUSTODY[ tag ] ) {
+        yield put( ErrorSending( true ) )
+        // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
+      }
+  
+      const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS, SECONDARY_SHARE } = UNDER_CUSTODY[tag]
+  
+      // TODO: 10 min removal strategy
+      yield put( switchS3LoaderKeeper( 'uploadRequestedShare' ) )
+  
+      const res = yield call(
+        S3Service.uploadRequestedSMShare,
+        encryptedKey,
+        otp,
+        SECONDARY_SHARE,
+        ENC_DYNAMIC_NONPMDD,
+      )
+  
+      if ( res.status === 200 && res.data.success === true ) {
+        // yield success
+        console.log( 'Upload successful!' )
+        const updatedBackup = {
+          ...DECENTRALIZED_BACKUP,
+          UNDER_CUSTODY: {
+            ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+            [ tag ]: {
+              ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
+              TRANSFER_DETAILS: {
+                KEY: encryptedKey,
+                UPLOADED_AT: Date.now(),
+              },
+            },
+          },
+        }
+  
+        yield call(insertDBWorker, {
+          payload: {
+            DECENTRALIZED_BACKUP: updatedBackup
+          },
+        })
+
+        yield put(UploadSMSuccessfully(true));
+        Toast( `${tag}'s Recovery Key sent.` )
+      } else {
+        if ( res.err === 'ECONNABORTED' ) requestTimedout();
+      }
+    } catch (error) {
+      console.log('RECOVERY error', error)
+      yield put(switchS3LoaderKeeper('uploadRequestedShare'));
+    }
+  }
+  
+  export const uploadRequestedSMShareWatcher = createWatcher(
+    uploadRequestedSMShareWorker,
+    UPLOAD_REQUESTED_SMSHARE,
+  )

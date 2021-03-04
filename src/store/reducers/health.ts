@@ -31,7 +31,8 @@ import {
   SET_PDF_INFO,
   DOWNLOADED_PDFSHARE_HEALTH,
   PUT_KEEPER_INFO,
-  SM_META_SHARE_GENERATE
+  SM_META_SHARE_GENERATE,
+  UPLOAD_SUCCESSFULLY_SM
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -52,6 +53,7 @@ const initialState: {
     pdfDataProcess: Boolean;
     pdfShare: Boolean;
     pdfDataConfirm: Boolean;
+    uploadRequestedShare: Boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -107,6 +109,7 @@ const initialState: {
     privateKey: string;
   },
   isSmMetaSharesCreatedFlag: boolean;
+  uploadSuccessfully: Boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -124,6 +127,7 @@ const initialState: {
     pdfDataProcess: false,
     pdfShare: false,
     pdfDataConfirm: false,
+    uploadRequestedShare: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -153,7 +157,8 @@ const initialState: {
     publicKey: '',
     privateKey: ''
   },
-  isSmMetaSharesCreatedFlag: false
+  isSmMetaSharesCreatedFlag: false,
+  uploadSMSuccessfully: false
 };
 
 export default (state = initialState, action) => {
@@ -383,6 +388,12 @@ export default (state = initialState, action) => {
           ...state,
           isSmMetaSharesCreatedFlag: true,
         };
+      
+      case UPLOAD_SUCCESSFULLY_SM:
+        return {
+          ...state,
+          uploadSMSuccessfully: action.payload.isUploaded,
+        }
   }
   return state;
 };
