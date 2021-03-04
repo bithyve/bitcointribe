@@ -91,7 +91,7 @@ export default function useNewAccountChoices() {
           //     ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
           //     : ''
           // }`,
-          defaultDescription: 'Directly accept donations',
+          defaultDescription: 'Accept donations',
           doneeName: '',
           causeName: '',
         } ),
@@ -101,13 +101,13 @@ export default function useNewAccountChoices() {
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Ramp Account',
-          defaultDescription: 'Buy using Bank Transfer, Apple Pay or Card',
+          defaultDescription: 'Buy with Apple Pay, Bank or Card',
           serviceAccountKind: ServiceAccountKind.RAMP,
         } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
           defaultTitle: 'Wyre Account',
-          defaultDescription: 'Buy using ApplePay or Debit card',
+          defaultDescription: 'Buy with ApplePay or Debit card',
           serviceAccountKind: ServiceAccountKind.WYRE,
         } ),
         new ExternalServiceSubAccountInfo( {

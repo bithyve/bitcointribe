@@ -39,27 +39,27 @@ const AddNewAccountStack = createStackNavigator(
     NewHexaAccountDetails: {
       screen: NewHexaAccountDetailsScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Setup New Account'
       }
     },
     NewWyreAccountDetails: {
       screen: NewWyreAccountDetailsScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Setup Wyre Account'
       }
     },
 
     NewRampAccountDetails: {
       screen: NewRampAccountDetailsScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Setup Ramp Account'
       }
     },
 
     AddNewDonationAccountDetails: {
       screen: AddNewDonationAccountDetailsScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Setup Donation Account'
       }
     },
   },

@@ -40,13 +40,13 @@ const HomeStack = createStackNavigator(
     NewWyreAccountDetails: {
       screen: NewWyreAccountDetailsScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Setup Wyre Account'
       }
     },
     NewRampAccountDetails: {
       screen: NewRampAccountDetailsScreen,
       navigationOptions: {
-        title: 'Account Details'
+        title: 'Setup Ramp Account'
       }
     },
     PlaceWyreOrder: {
