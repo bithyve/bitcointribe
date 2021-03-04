@@ -34,51 +34,50 @@ const HeaderSection: React.FC = () => {
   )
 }
 
-const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
+const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const accountShells: AccountShell[] = useSelector(
-    (state) => state.accounts.accountShells,
+    ( state ) => state.accounts.accountShells,
   )
-  console.log("state.accounts.accountShells",accountShells)
-  function handleBarcodeRecognized({ data: dataString }: { data: string }) {
-    const onCodeScanned = navigation.getParam('onCodeScanned')
-    if (typeof onCodeScanned === 'function') {
-      const data = getFormattedStringFromQRString(dataString)
-      onCodeScanned(data)
+  function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
+    const onCodeScanned = navigation.getParam( 'onCodeScanned' )
+    if ( typeof onCodeScanned === 'function' ) {
+      const data = getFormattedStringFromQRString( dataString )
+      onCodeScanned( data )
     }
 
     navigation.goBack()
   }
 
-  function onSend(address) {
-    let item = {
+  function onSend( address ) {
+    const item = {
       id: address,
     }
-    dispatch(clearTransfer(REGULAR_ACCOUNT));
+    dispatch( clearTransfer( REGULAR_ACCOUNT ) )
 
-    dispatch(addTransferDetails(REGULAR_ACCOUNT, {
+    dispatch( addTransferDetails( REGULAR_ACCOUNT, {
       selectedContact: item,
-    }));
+    } ) )
 
-    let defaultAccountShell: AccountShell;
-    accountShells.forEach((shell: AccountShell) => {
+    let defaultAccountShell: AccountShell
+    accountShells.forEach( ( shell: AccountShell ) => {
       if (
         shell.primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT &&
         !shell.primarySubAccount.instanceNumber
       )
-        defaultAccountShell = shell;
-    });
+        defaultAccountShell = shell
+    } )
 
     navigation.dispatch(
-      resetStackToSend({
+      resetStackToSend( {
         accountShellID: defaultAccountShell.id,
         selectedContact: item,
         serviceType: REGULAR_ACCOUNT,
         isFromAddressBook: true,
-      })
-    );
+      } )
+    )
 
-  };
+  }
 
   return (
     <View style={styles.rootContainer}>
@@ -99,8 +98,8 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
             }}
             placeholder="Enter Address Manually"
             accountKind={REGULAR_ACCOUNT}
-            onAddressSubmitted={(address) => {
-              onSend(address);
+            onAddressSubmitted={( address ) => {
+              onSend( address )
             }}
           />
         </View>
@@ -113,27 +112,29 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
             title="Receive Bitcoins"
             icon={
               <Image
-                source={require('../../assets/images/icons/icon_bitcoin_light.png')}
+                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                 style={{
-                  width: widthPercentageToDP(4),
-                  height: widthPercentageToDP(4),
-                  resizeMode: "contain",
+                  width: widthPercentageToDP( 4 ),
+                  height: widthPercentageToDP( 4 ),
+                  resizeMode: 'contain',
                 }}
               />
             }
             buttonStyle={{
               ...ButtonStyles.floatingActionButton,
               borderRadius: 9999,
-              paddingHorizontal: widthPercentageToDP(5)
+              paddingHorizontal: widthPercentageToDP( 5 )
             }}
             titleStyle={{
               ...ButtonStyles.floatingActionButtonText,
               marginLeft: 8,
             }}
-            onPress={() => { navigation.navigate('ReceiveQR')}}
+            onPress={() => { navigation.navigate( 'ReceiveQR' )}}
           />
         </View>
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{
+          marginTop: 'auto'
+        }}>
           <BottomInfoBox
             style
             title="What can you scan?"
@@ -147,7 +148,7 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1
   },
@@ -159,10 +160,10 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
   },
   floatingActionButtonContainer: {
-    bottom: heightPercentageToDP(1.5),
+    bottom: heightPercentageToDP( 1.5 ),
     right: 0,
     marginLeft: 'auto',
-    padding: heightPercentageToDP(1.5),
+    padding: heightPercentageToDP( 1.5 ),
   },
   // scannerContainer: {
   //   alignSelf: 'center',
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
   //   width: widthPercentageToDP(90),
   //   height: widthPercentageToDP(90),
   // },
-})
+} )
 
 export default HomeQRScannerScreen
 

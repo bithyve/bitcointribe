@@ -64,10 +64,9 @@ export const getAllAccountsData = () => {
   }
 }
 
-export const setAllAccountsData = (accounts) => {
-  console.log("accounts",accounts)
+export const setAllAccountsData = ( accounts ) => {
   return {
-    type: SET_ALL_ACCOUNTS_DATA, 
+    type: SET_ALL_ACCOUNTS_DATA,
     payload: {
       accounts
     }
