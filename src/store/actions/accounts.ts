@@ -808,11 +808,11 @@ export const fetchReceiveAddress = (
   }
 }
 
-export const fetchReceiveAddressSucceeded = ( data ) => {
+export const fetchReceiveAddressSucceeded = ( receiveAddress: string ) => {
   return {
     type: FETCH_RECEIVE_ADDRESS_SUCCEEDED,
     payload: {
-      data
+      receiveAddress
     },
   }
 }

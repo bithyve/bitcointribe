@@ -1747,9 +1747,7 @@ function* fetchReceiveAddressWorker( { payload }: {payload: {subAccountInfo: Sub
   const service : TestAccount | RegularAccount| SecureAccount = accountState[ subAccountInfo.sourceKind ].service
 
   const receiveAddress =  service.getReceivingAddress( accountType, subAccountInfo.instanceNumber )
-  yield put( fetchReceiveAddressSucceeded( {
-    receiveAddress: receiveAddress
-  } ) )
+  yield put( fetchReceiveAddressSucceeded( receiveAddress ) )
 }
 
 // TODO: Consider moving the receive address watcher and worker
