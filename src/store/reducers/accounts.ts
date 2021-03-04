@@ -821,10 +821,9 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case SET_ALL_ACCOUNTS_DATA:
-        console.log( 'SET_ALL_ACCOUNTS_DATA', action.payloads.allAccounts )
-        return {
+          return {
           ...state,
-          accounts: action.payloads.accounts,
+          accounts: action.payload.accounts,
         }
 
       case FETCH_RECEIVE_ADDRESS_SUCCEEDED:

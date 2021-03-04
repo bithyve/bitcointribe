@@ -1,30 +1,26 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { StyleSheet, TouchableOpacity, View, Image, Text } from 'react-native';
+import { StyleSheet, Modal, View, Image, Text, Platform, TextInput } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import QRCode from 'react-native-qrcode-svg';
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/serviceTypes';
-import config from '../../bitcoin/HexaConfig'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { UsNumberFormat } from '../../common/utilities';
-import AccountShell from '../../common/data/models/AccountShell';
-import SubAccountKind from '../../common/data/enums/SubAccountKind';
-import Entypo from 'react-native-vector-icons/Entypo'
 import CopyThisText from '../../components/CopyThisText';
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { ScrollView } from 'react-native-gesture-handler';
-import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface';
-import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces';
+import { getAllAccountsData } from '../../store/actions/accounts';
+import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin';
+import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { getAllAccountsData } from '../../store/actions/accounts';
+import { AccountsState } from '../../store/reducers/accounts';
 
 export type Props = {
   navigation: any;
@@ -34,67 +30,82 @@ const ReceiveQrScreen: React.FC<Props> = ({
   navigation,
 }: Props) => {
   const dispatch = useDispatch();
-  const [receivingAddress, setReceivingAddress] = useState("sdfsfsdfsdf")
   const [hideShow, setHideShow] = useState(false)
-  
+  const [amount, setAmount] = useState('');
   const allAccounts = useSelector(
     (state) => state.accounts.accounts,
   )
-console.log(allAccounts);
-  const [balances, setBalances] = useState({
-    regularBalance: 0,
-    secureBalance: 0,
-  })
   const [selectedAccount, setSelectedAccount] = useState(null)
+  const [receivingAddress, setReceivingAddress] = useState(null)
 
   const [accounts, setAccounts] = useState([]);
-
+  const accountState: AccountsState = useSelector(
+    (state) => state.accounts,
+  )
   useEffect(() => {
-   dispatch(getAllAccountsData());
+    dispatch(getAllAccountsData());
   }, [])
 
-useEffect(() => {
-  console.log("allAccounts",allAccounts, typeof allAccounts);
+  useEffect(() => {
+    if(allAccounts){
     setAccounts(allAccounts);
-    //setSelectedAccount(allAccounts[0]);
-}, [allAccounts])
+    setSelectedAccount(allAccounts[0]);
+    }
+  }, [allAccounts])
+
+  useEffect(() => {
+    let receiveAt = selectedAccount && selectedAccount.receivingAddress ? selectedAccount.receivingAddress : '';
+    if ( amount ) {
+      let service: TestAccount | RegularAccount | SecureAccount = accountState[selectedAccount.shell.primarySubAccount.sourceKind].service
+        receiveAt = service.getPaymentURI( receiveAt, {
+          amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+        } ).paymentURI
+      }
+      setReceivingAddress(receiveAt)
+  }, [amount, selectedAccount])
 
   return (
     <View style={styles.rootContainer}>
       <ScrollView>
         <View style={styles.QRView}>
-          <QRCode value={selectedAccount ? selectedAccount.receivingAddress : 'eert'} size={hp('27%')} />
+          <QRCode value={receivingAddress ? receivingAddress : 'eert'} size={hp('27%')} />
         </View>
 
         <CopyThisText
           backgroundColor={Colors.white}
-          text={selectedAccount ? selectedAccount.receivingAddress : ''}
+          text={receivingAddress}
         />
-
-        <AppBottomSheetTouchableWrapper
-          onPress={() => { }}
-          style={styles.selectedView}
-        >
-          <View
-            style={styles.text}
-          >
-            <Text style={styles.titleText}>{"Enter Amount to Receive"}</Text>
-          </View>
-
-          <View style={{
-            marginLeft: 'auto'
-          }}>
-            <Ionicons
-              name="chevron-forward"
-              color={Colors.textColorGrey}
-              size={15}
-              style={styles.forwardIcon}
+        <View style={styles.textBoxView}>
+          <View style={styles.amountInputImage}>
+            <Image
+              style={styles.textBoxImage}
+              source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
             />
           </View>
-        </AppBottomSheetTouchableWrapper>
+          <TextInput
+            style={{
+              ...styles.textBox, paddingLeft: 10
+            }}
+            placeholder={'Enter amount'}
+            value={amount}
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            keyboardType={'numeric'}
+            onChangeText={(value) => setAmount(value)}
+            placeholderTextColor={Colors.borderColor}
+            autoCorrect={false}
+            autoFocus={false}
+            autoCompleteType="off"
+          />
+        </View>
 
         {hideShow ? (
+        <Modal
+          animationType='fade'
+          transparent={true}
+          visible={true}>
           <View style={styles.dropDownView}>
+            <ScrollView>
             {accounts.map((value) => {
               return (
                 <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => {
@@ -106,8 +117,8 @@ useEffect(() => {
                   }}>
                   <View style={styles.imageView}>
                     <Image source={value.accountImage} style={{
-                        width: wp('8%'), height: wp('8%')
-                      }} />
+                      width: wp('8%'), height: wp('8%')
+                    }} />
 
                   </View>
                   <View style={{
@@ -119,13 +130,15 @@ useEffect(() => {
                 </AppBottomSheetTouchableWrapper>
               )
             })}
+            </ScrollView>
           </View>
+          </Modal>
         ) : null}
 
         <View style={styles.text1}>
           <Text style={styles.titleText}>{"Receiving To: "}</Text>
         </View>
-       {selectedAccount && <View
+        {selectedAccount && <View
           style={{
             marginBottom: hp('2%'),
           }}
@@ -165,17 +178,16 @@ useEffect(() => {
             </View>
           </AppBottomSheetTouchableWrapper>
 
-          </View> }
-      </ScrollView>
-      <View style={{ marginTop: 'auto' }}>
+        </View>}
+        <View style={{ marginTop: 'auto' }}>
         <BottomInfoBox
           backgroundColor={Colors.white}
           title="Note"
-          infoText="
-          Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request, or a restore request
-        "
+          infoText="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
         />
       </View>
+      </ScrollView>
+      
     </View>
   );
 };
@@ -206,13 +218,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: hp('3%')
   },
-  proceedButtonContainer: {
-    zIndex: 2,
-    elevation: 2,
-    position: 'absolute',
-    bottom: 30,
-    alignSelf: 'center',
-  },
   dropDownElement: {
     backgroundColor: Colors.white,
     flexDirection: 'row',
@@ -224,58 +229,15 @@ const styles = StyleSheet.create({
     width: wp('90%'),
 
   },
-  dropDownElementTitleText: {
-    color: Colors.blue,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
-    marginBottom: 5,
-  },
-  cardBitCoinImage: {
-    width: wp('4%'),
-    height: wp('4%'),
-    marginRight: 5,
-    resizeMode: 'contain',
-    marginBottom: wp('1%'),
-  },
-  cardAmountText: {
-    color: Colors.black,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(17),
-    marginRight: 5,
-    marginTop: 'auto',
-    lineHeight: RFValue(17),
-  },
-  cardAmountUnitText: {
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
-    marginTop: 'auto',
-    lineHeight: RFValue(17),
-  },
   dropDownView: {
-    marginBottom: 10,
-    position: 'absolute',
-    bottom: 0,
-    zIndex: 999,
+    flex:1,
+    marginBottom: hp("4%"), marginTop: hp("4%"), 
     backgroundColor: Colors.white,
     marginLeft: wp('5%'),
     marginRight: wp('5%'),
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-    overflow: 'hidden',
-  },
-  selectedView: {
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
-    marginBottom: hp(4),
-    marginTop: hp(2),
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingTop: 15,
-    paddingBottom: 20,
-    borderBottomColor: Colors.borderColor,
-    borderBottomWidth: 1,
   },
   titleText: {
     fontSize: RFValue(13),
@@ -298,7 +260,39 @@ const styles = StyleSheet.create({
   },
   balanceText: {
     color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue(10), marginTop: 5
-  }
+  },
+  textBoxView: {
+    flexDirection: 'row',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+    height: 50,
+    marginLeft: wp('5%'),
+    marginRight: wp('5%'),
+    marginBottom: hp(4),
+    marginTop: hp(2),
+  },
+  textBoxImage: {
+    width: wp('6%'),
+    height: wp('6%'),
+    resizeMode: 'contain',
+  },
+  amountInputImage: {
+    width: 40,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.borderColor,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+  textBox: {
+    flex: 1,
+    paddingLeft: 20,
+    color: Colors.textColorGrey,
+    fontFamily: Fonts.FiraSansMedium,
+    fontSize: RFValue(13),
+  },
 });
 
 
