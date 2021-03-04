@@ -31,11 +31,6 @@ const QRStack = createStackNavigator(
               return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
             },
             headerRight: () => {
-              //
-              // 📝 Hiding this button for now until we have supporting functionality.
-              // (See: https://github.com/bithyve/hexa/issues/2454)
-              //
-  
               return (
                 <NavHeaderSettingsButton
                   onPress={() => {  }}
