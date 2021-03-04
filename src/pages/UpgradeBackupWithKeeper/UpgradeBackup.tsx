@@ -36,9 +36,9 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 import Loader from '../../components/loader';
 import BottomInfoBox from "../../components/BottomInfoBox";
 import RestoreFromICloud from "../RestoreHexaWithKeeper/RestoreFromICloud";
-import SetupPrimaryKeeper from "../Keeper/SetupPrimaryKeeper";
+import SetupPrimaryKeeper from "../NewBHR/SetupPrimaryKeeper";
 import SmallHeaderModal from "../../components/SmallHeaderModal";
-import SecurityQuestion from "../Keeper/SecurityQuestion";
+import SecurityQuestion from "../NewBHR/SecurityQuestion";
 import UpgradingKeeperContact from "./UpgradingKeeperContact";
 import UpgradePdfKeeper from "./UpgradePdfKeeper";
 import Dash from "react-native-dash";
@@ -234,7 +234,7 @@ class UpgradeBackup extends Component<
     if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[0].status == 'accessible') {
       listData[0].status = 'accessible';
       this.props.setIsNewHealthSystemSet(true);
-      this.props.navigation.replace('ManageBackupKeeper');
+      this.props.navigation.replace('ManageBackupNewBHR');
     }
     else{
       (this.refs.RestoreFromICloud as any).snapTo(1);
@@ -257,7 +257,7 @@ class UpgradeBackup extends Component<
     if(JSON.stringify(prevProps.levelHealth) != JSON.stringify(this.props.levelHealth)){
       if(this.props.levelHealth[0] && this.props.levelHealth[0].levelInfo[0] && this.props.levelHealth[0].levelInfo[0].status == 'accessible') {
         this.setState({ showLoader: false });
-        this.props.navigation.replace('ManageBackupKeeper');
+        this.props.navigation.replace('ManageBackupNewBHR');
       }
     }
 

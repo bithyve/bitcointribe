@@ -15,7 +15,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { useDispatch, useSelector } from 'react-redux';
-import { ErrorSending } from '../../store/actions/health';
+import { ErrorSending, uploadSMShareKeeper } from '../../store/actions/health';
 import { checkMSharesHealth, updatedKeeperInfo, updateMSharesHealth } from '../../store/actions/health';
 import Colors from '../../common/Colors';
 import BottomSheet from 'reanimated-bottom-sheet';
@@ -350,6 +350,19 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
   );
 
   useEffect(() => {
+    console.log('change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[index])
+      if (
+        SHARES_TRANSFER_DETAILS[index]
+      ) {
+        console.log('change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[index])
+        console.log('!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS)
+        dispatch(uploadSMShareKeeper(index));
+      }
+    },
+    [SHARES_TRANSFER_DETAILS[index]]
+  );
+
+  useEffect(() => {
     if (uploadMetaShare || updateEphemeralChannelLoader) {
       if (secondaryQR) setSecondaryQR('');
       return;
@@ -380,6 +393,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
               .initiatedAt,
           type: 'secondaryDeviceGuardian',
           ver: DeviceInfo.getVersion(),
+          isFromKeeper: true,
         }),
       );
     }

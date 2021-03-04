@@ -59,6 +59,9 @@ import {
   removeUnwantedUnderCustodyShares,
   REMOVE_UNWANTED_UNDER_CUSTODY,
   UPLOAD_SM_SHARE_FOR_PK,
+  GENERATE_SM_META_SHARE,
+  isSmMetaSharesCreated,
+  UPLOAD_SMSHARE_KEEPER,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -509,6 +512,7 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
 
 function* uploadSecondaryShareWorker({ payload }) {
   let { encryptedKey, metaShare, otp } = payload;
+  console.log('uploadSecondaryShareWorker payload', payload)
   const keeper: KeeperService = yield select((state) => state.keeper.service);
   const result = yield call(
     keeper.uploadSecondaryShare,
@@ -516,6 +520,7 @@ function* uploadSecondaryShareWorker({ payload }) {
     metaShare,
     otp
   );
+  console.log('result', result);
   if (result.status === 200) {
   }
   yield put(updateMSharesLoader(false));
@@ -1488,7 +1493,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
         },
       },
     };
-
+    console.log('Upload STD updatedBackup', updatedBackup);
     // yield call(insertDBWorker, {
     //   payload: {
     //     DECENTRALIZED_BACKUP: updatedBackup,
@@ -2906,4 +2911,76 @@ function* uploadSMShareWorker({ payload }) {
   export const uploadSecondaryShareForPKWatcher = createWatcher(
     uploadSecondaryShareForPKWorker,
     UPLOAD_SM_SHARE_FOR_PK,
+  );
+
+  function* generateSMMetaSharesWorker() {
+    let s3Service: S3Service = yield select((state) => state.health.service);
+    const { walletName } = yield select(
+      (state) => state.storage.database.WALLET_SETUP
+    );
+    const appVersion = DeviceInfo.getVersion();
+    const { answer, questionId } = yield select(
+      (state) => state.storage.database.WALLET_SETUP.security
+    );
+    const secureAccount: SecureAccount = yield select(
+      (state) => state.accounts[SECURE_ACCOUNT].service,
+    )
+  
+    const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '';
+
+    const res = yield call(
+      s3Service.generateSMShares,
+      secondaryMnemonic,
+      answer,
+      walletName,
+      questionId,
+      appVersion,
+    );
+    console.log('generateSMShares res', res);
+    if (res.status === 200) {
+      if(res.data.metaShares && res.data.metaShares.length){
+        yield put(isSmMetaSharesCreated());
+      }
+      console.log('res.data.metaShares', res.data);
+      console.log('s3Service', s3Service.levelhealth);
+      const { SERVICES, DECENTRALIZED_BACKUP } = yield select((state) => state.storage.database);
+      const updatedDECENTRALIZED_BACKUP = {
+        ...DECENTRALIZED_BACKUP,
+        PK_SHARE: res.data.metaShares[0]
+      }
+      console.log('updatedDECENTRALIZED_BACKUP', updatedDECENTRALIZED_BACKUP);
+      console.log('updatedSERVICES s3Service', s3Service);
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify(s3Service),
+      };
+      console.log('updatedSERVICES', updatedSERVICES);
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP } });
+    } else {
+      if (res.err === "ECONNABORTED") requestTimedout();
+      throw new Error(res.err);
+    }
+  }
+  
+  export const generateSMMetaSharesWatcher = createWatcher(
+    generateSMMetaSharesWorker,
+    GENERATE_SM_META_SHARE
+  );
+
+  function* uploadSMShareKeeperWorker({ payload }) {
+    let { index } = payload;
+    let s3Service: S3Service = yield select((state) => state.health.service);
+    console.log('s3Service', s3Service.levelhealth.SMMetaSharesKeeper);
+
+    const { DECENTRALIZED_BACKUP } = yield select(
+      (state) => state.storage.database
+    );
+    let { OTP, ENCRYPTED_KEY, UPLOADED_AT } = DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[index];
+    console.log('DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[index]', DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[index]);
+    yield call(uploadSecondaryShareWorker, {payload: { encryptedKey: ENCRYPTED_KEY, metaShare: s3Service.levelhealth.SMMetaSharesKeeper[1], otp: OTP }});
+  }
+  
+  export const uploadSMShareKeeperWatcher = createWatcher(
+    uploadSMShareKeeperWorker,
+    UPLOAD_SMSHARE_KEEPER
   );

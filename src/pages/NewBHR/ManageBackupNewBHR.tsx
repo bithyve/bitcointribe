@@ -51,16 +51,16 @@ import {
   onApprovalStatusChange,
   reShareWithSameKeeper,
   autoShareContact,
+  generateSMMetaShares,
 } from "../../store/actions/health";
 import { modifyLevelStatus } from "./ManageBackupFunction";
-import ApproveSetup from "./ApproveSetup";
 import {
   LevelHealthInterface,
   MetaShare,
-  notificationType,
 } from "../../bitcoin/utilities/Interface";
 import {
   fetchKeeperTrustedChannel,
+  trustedContactInitialized,
   updateNewFcm,
 } from "../../store/actions/keeper";
 import { nameToInitials } from "../../common/CommonFunctions";
@@ -71,7 +71,6 @@ import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import AccountShell from "../../common/data/models/AccountShell";
 import PersonalNode from "../../common/data/models/PersonalNode";
 import { setCloudData, setCloudBackupStatus } from "../../store/actions/cloud";
-
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
@@ -133,6 +132,8 @@ interface ManageBackupNewBHRPropsTypes {
   updateNewFcm: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
+  isSmMetaSharesCreatedFlag: boolean;
+  generateSMMetaShares: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -327,9 +328,10 @@ class ManageBackupNewBHR extends Component<
         this.autoUploadShare();
       }
     }
+    console.log('this.props.isSmMetaSharesCreatedFlag', this.props.isSmMetaSharesCreatedFlag)
     if (
       JSON.stringify(prevProps.metaSharesKeeper) !==
-      JSON.stringify(this.props.metaSharesKeeper)
+      JSON.stringify(this.props.metaSharesKeeper) && this.props.isSmMetaSharesCreatedFlag
     ) {
       if (this.props.metaSharesKeeper.length == 3) {
         let obj = {
@@ -491,6 +493,9 @@ class ManageBackupNewBHR extends Component<
       let count = 0;
       for (let i = 0; i < this.state.levelData.length; i++) {
         const element = this.state.levelData[i];
+        console.log('element.keeper1.shareType', element.keeper1.shareType);
+        console.log('count', count);
+        console.log('isSetup', isSetup);
         if (element.keeper1.shareType == "contact") count++;
         if (element.keeper2.shareType == "contact") count++;
       }
@@ -500,13 +505,13 @@ class ManageBackupNewBHR extends Component<
         index = selectedKeeper.data.index;
       }
       console.log("index", index)
-      this.props.navigation.navigate("TrustedContactHistoryKeeper", {
+      this.props.navigation.navigate("TrustedContactHistoryNewBHR", {
         ...navigationParams,
         index,
       });
     } else if (selectedKeeper.shareType == "pdf") {
       this.props.navigation.navigate(
-        "PersonalCopyHistoryKeeper",
+        "PersonalCopyHistoryNewBHR",
         navigationParams
       );
     }
@@ -578,7 +583,7 @@ class ManageBackupNewBHR extends Component<
         name: value.id === 2 && number == 1 ? "Secondary Device" : keeper.name,
         shareType: value.id === 2 && number == 1 ? "device" : keeper.shareType,
       },
-      isSetup: false,
+      isSetup: keeper.updatedAt ? false : true,
     };
     if (keeper.updatedAt > 0) {
       this.goToHistory(obj);
@@ -594,6 +599,9 @@ class ManageBackupNewBHR extends Component<
             this.props.generateMetaShare(value.id);
           } else {
             this.goToHistory(obj);
+          }
+          if(!this.props.isSmMetaSharesCreatedFlag){
+            this.props.generateSMMetaShares();
           }
         } else {
           this.setState({
@@ -991,7 +999,7 @@ class ManageBackupNewBHR extends Component<
                                 }}
                                 onPress={() =>
                                   navigation.navigate(
-                                    "SecurityQuestionHistoryKeeper",
+                                    "SecurityQuestionHistoryNewBHR",
                                     {
                                       selectedTime: this.getTime(new Date()),
                                       selectedStatus: "Ugly",
@@ -1242,7 +1250,7 @@ class ManageBackupNewBHR extends Component<
                         ? selectedKeeper.shareType
                         : type,
                     },
-                    isSetup: false,
+                    isSetup: true,
                   };
                   console.log("obj", obj)
                   this.goToHistory(obj);
@@ -1332,6 +1340,7 @@ const mapStateToProps = (state) => {
     activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
     versionHistory: idx(state, (_) => _.versionHistory.versions),
     isNewFCMUpdated: idx(state, (_) => _.keeper.isNewFCMUpdated),
+    isSmMetaSharesCreatedFlag: idx(state, (_) => _.health.isSmMetaSharesCreatedFlag),
   };
 };
 
@@ -1352,6 +1361,7 @@ export default withNavigationFocus(
     trustedChannelsSetupSync,
     updateNewFcm,
     setCloudData,
+    generateSMMetaShares
   })(ManageBackupNewBHR)
 );
 

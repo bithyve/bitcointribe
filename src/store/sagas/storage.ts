@@ -71,6 +71,7 @@ export function* insertDBWorker({ payload }) {
   console.log("*********************************************");
   console.log("insertDBWorker payload", payload);
   console.log("*********************************************");
+  console.log('payload', payload.SERVICES ? JSON.parse(payload.SERVICES.S3_SERVICE) : '')
   try {
     const storage = yield select((state) => state.storage);
     const { database, insertedIntoDB, key } = storage;
@@ -84,6 +85,7 @@ export function* insertDBWorker({ payload }) {
       ...database,
       ...payload,
     };
+    console.log('updatedDB', updatedDB)
 
     const inserted = yield call(
       dataManager.insert,
@@ -110,6 +112,7 @@ export function* insertDBWorker({ payload }) {
 export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
 
 function* servicesEnricherWorker({ payload }) {
+  console.log('servicesEnricherWorker payload', payload.database && payload.database.SERVICES ? JSON.parse(payload.database.SERVICES.S3_SERVICE): 'saas');
   try {
     const database = payload.database
       ? payload.database
@@ -139,6 +142,7 @@ function* servicesEnricherWorker({ payload }) {
       TRUSTED_CONTACTS,
       KEEPERS_INFO,
     } = database.SERVICES;
+    console.log('servicesEnricherWorker S3_SERVICE', JSON.parse(S3_SERVICE))
 
     if (!database.VERSION) {
       dbVersion = "0.7.0";
@@ -234,6 +238,7 @@ function* servicesEnricherWorker({ payload }) {
           : new KeeperService(),
       };
     }
+    console.log('servicesEnriched S3_SERVICE', S3_SERVICE)
     yield put(servicesEnriched(services));
     if (migrated) {
       database.VERSION = DeviceInfo.getVersion();

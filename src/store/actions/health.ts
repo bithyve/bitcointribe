@@ -68,6 +68,9 @@ export const UPDATE_WALLET_IMAGE_HEALTH = 'UPDATE_WALLET_IMAGE_HEALTH';
 export const EMPTY_SHARE_TRANSFER_DETAILS = 'EMPTY_SHARE_TRANSFER_DETAILS';
 export const REMOVE_UNWANTED_UNDER_CUSTODY = 'REMOVE_UNWANTED_UNDER_CUSTODY';
 export const UPLOAD_SM_SHARE_FOR_PK = 'UPLOAD_SM_SHARE_FOR_PK';
+export const GENERATE_SM_META_SHARE = 'GENERATE_SM_META_SHARE';
+export const SM_META_SHARE_GENERATE = 'SM_META_SHARE_GENERATE';
+export const UPLOAD_SMSHARE_KEEPER = 'UPLOAD_SMSHARE_KEEPER';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -443,3 +446,22 @@ export const uploadSecondaryShareForPK = ( tag, encryptedKey, otp? ) => {
     }
   }
 }
+
+export const generateSMMetaShares = () => {
+  return { type: GENERATE_SM_META_SHARE };
+}
+
+export const isSmMetaSharesCreated = () => {
+  return { type: SM_META_SHARE_GENERATE };
+}
+
+export const uploadSMShareKeeper = (
+  index: number,
+) => {
+  return {
+    type: UPLOAD_SMSHARE_KEEPER,
+    payload: {
+      index,
+    },
+  };
+};

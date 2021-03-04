@@ -73,6 +73,7 @@ const HomeHeader = ({
   const dispatch = useDispatch();
   const s3Service: S3Service = useSelector((state) => state.health.service);
   const currencyKind: CurrencyKind = useCurrencyKind();
+  console.log('S3SERVICE healthCheckInitializedKeeper', s3Service.levelhealth.healthCheckInitializedKeeper);
 
   const prefersBitcoin = useMemo(() => {
     return currencyKind === CurrencyKind.BITCOIN;
@@ -303,11 +304,11 @@ const HomeHeader = ({
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            if (s3Service.levelhealth.healthCheckInitializedKeeper) {
+            // if (s3Service.levelhealth.healthCheckInitializedKeeper) {
               navigation.navigate("ManageBackupNewBHR");
-            } else {
-              navigation.navigate("ManageBackup");
-            }
+            // } else {
+            //   navigation.navigate("ManageBackup");
+            // }
           }}
           style={styles.manageBackupMessageView}
         >

@@ -30,7 +30,8 @@ import {
   REMOVE_SN,
   SET_PDF_INFO,
   DOWNLOADED_PDFSHARE_HEALTH,
-  PUT_KEEPER_INFO
+  PUT_KEEPER_INFO,
+  SM_META_SHARE_GENERATE
 } from '../actions/health';
 import { SERVICES_ENRICHED } from '../actions/storage';
 
@@ -104,7 +105,8 @@ const initialState: {
     filePath: string;
     publicKey: string;
     privateKey: string;
-  }
+  },
+  isSmMetaSharesCreatedFlag: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -150,7 +152,8 @@ const initialState: {
     filePath: '',
     publicKey: '',
     privateKey: ''
-  }
+  },
+  isSmMetaSharesCreatedFlag: false
 };
 
 export default (state = initialState, action) => {
@@ -301,6 +304,7 @@ export default (state = initialState, action) => {
       };
 
     case SERVICES_ENRICHED:
+      console.log('action.payload.services[S3_SERVICE]', action.payload.services[S3_SERVICE])
       return {
         ...state,
         service: action.payload.services[S3_SERVICE],
@@ -372,6 +376,12 @@ export default (state = initialState, action) => {
         return {
           ...state,
           pdfInfo: action.payload.data,
+        };
+      
+      case SM_META_SHARE_GENERATE:
+        return {
+          ...state,
+          isSmMetaSharesCreatedFlag: true,
         };
   }
   return state;

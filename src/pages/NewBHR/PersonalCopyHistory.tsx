@@ -48,7 +48,6 @@ import {
   LevelHealthInterface,
   notificationType,
 } from "../../bitcoin/utilities/Interface";
-import ApproveSetup from "./ApproveSetup";
 import { StackActions } from "react-navigation";
 
 const PersonalCopyHistory = (props) => {
@@ -58,10 +57,6 @@ const PersonalCopyHistory = (props) => {
   const [keeperTypeBottomSheet, setkeeperTypeBottomSheet] = useState(
     React.createRef()
   );
-  const [
-    ApprovePrimaryKeeperBottomSheet,
-    setApprovePrimaryKeeperBottomSheet,
-  ] = useState(React.createRef());
   const [selectedKeeperType, setSelectedKeeperType] = useState("");
   const [selectedKeeperName, setSelectedKeeperName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -305,36 +300,6 @@ const PersonalCopyHistory = (props) => {
     );
   };
 
-  const sendApprovalRequestToPK = (type) => {
-    let PKShareId =
-      currentLevel == 2 || currentLevel == 1
-        ? levelHealth[1].levelInfo[2].shareId
-        : currentLevel == 3
-        ? levelHealth[2].levelInfo[2].shareId
-        : levelHealth[1].levelInfo[2].shareId;
-    console.log("PKShareId", PKShareId);
-    dispatch(
-      sendApprovalRequest(
-        selectedKeeper.shareId,
-        PKShareId,
-        type == "pdf" || type == "contact"
-          ? notificationType.uploadSecondaryShare
-          : notificationType.approveKeeper
-      )
-    );
-    if ((type == "pdf" || type == "contact") && keeperApproveStatus.shareId != selectedKeeper.shareId) {
-      dispatch(
-        onApprovalStatusChange({
-          status: false,
-          initiatedAt: moment(new Date()).valueOf(),
-          shareId: selectedKeeper.shareId,
-        })
-      );
-    }
-    (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
-    (keeperTypeBottomSheet as any).current.snapTo(0);
-  };
-
   const onPressChangeKeeperType = (type, name) => {
     if (type == "contact") {
       let levelhealth: LevelHealthInterface[] = [];
@@ -391,7 +356,7 @@ const PersonalCopyHistory = (props) => {
           }
         }
       }
-      props.navigation.navigate("TrustedContactHistoryKeeper", {
+      props.navigation.navigate("TrustedContactHistoryNewBHR", {
         ...props.navigation.state.params,
         selectedTitle: name,
         index: index,
@@ -399,7 +364,7 @@ const PersonalCopyHistory = (props) => {
       });
     }
     if (type == "device") {
-      props.navigation.navigate("KeeperDeviceHistory", {
+      props.navigation.navigate("SecondaryDeviceHistoryNewBHR", {
         ...props.navigation.state.params,
         selectedTitle: name,
         isChangeKeeperType: true,
@@ -488,7 +453,8 @@ const PersonalCopyHistory = (props) => {
             onPressSetup={async (type, name) => {
               setSelectedKeeperType(type);
               setSelectedKeeperName(name);
-              sendApprovalRequestToPK(type);
+              onPressChangeKeeperType(type, name);
+              (keeperTypeBottomSheet as any).current.snapTo(0);
             }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}
@@ -500,35 +466,6 @@ const PersonalCopyHistory = (props) => {
             onPressHeader={() =>
               (keeperTypeBottomSheet as any).current.snapTo(0)
             }
-          />
-        )}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet}
-        snapPoints={[
-          -50,
-          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            isContinueDisabled={
-              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
-                ? !keeperApproveStatus.status
-                : false
-            }
-            onPressContinue={() => {
-              onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
-              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => {
-              (keeperTypeBottomSheet as any).current.snapTo(1);
-              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
-            }}
           />
         )}
       />

@@ -77,13 +77,16 @@ import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey';
 import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup';
 import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys';
 import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity';
-import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
+// import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
 import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR';
-import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
-import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
-import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
-import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
-import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
+// import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
+import SecurityQuestionHistoryNewBHR from '../pages/NewBHR/SecurityQuestionHistory';
+// import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
+// import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
+import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKeeper';
+// import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
+// import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
+import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory';
 
 const SetupNavigator = createStackNavigator(
   {
@@ -184,13 +187,16 @@ const HomeNavigator = createStackNavigator(
     ContactDetails,
     Receive,
     PairNewWallet,
-    ManageBackupKeeper,
+    // ManageBackupKeeper,
     ManageBackupNewBHR,
-    SecurityQuestionHistoryKeeper,
-    KeeperFeatures,
-    TrustedContactHistoryKeeper,
-    KeeperDeviceHistory,
-    PersonalCopyHistoryKeeper,
+    // SecurityQuestionHistoryKeeper,
+    SecurityQuestionHistoryNewBHR,
+    // KeeperFeatures,
+    // TrustedContactHistoryKeeper,
+    TrustedContactHistoryNewBHR,
+    // KeeperDeviceHistory,
+    // PersonalCopyHistoryKeeper,
+    PersonalCopyHistoryNewBHR,
     NewOwnQuestions,
     RestoreWithICloud,
     RestoreWithoutICloud,

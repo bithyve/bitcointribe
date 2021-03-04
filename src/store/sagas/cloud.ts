@@ -132,7 +132,7 @@ function* updateHealthForCloudWorker({ payload }) {
                     shareType: "cloud",
                 },
             ];
-            yield put(updateMSharesHealth(shareArray))
+            yield put(updateMSharesHealth(shareArray));
         }
     }
     catch (error) {

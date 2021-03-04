@@ -476,6 +476,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           break;
 
         case "secondaryDeviceGuardian":
+          console.log('scannedData', scannedData)
           const secondaryDeviceGuardianRequest = {
             isGuardian: scannedData.isGuardian,
             requester: scannedData.requester,
@@ -485,6 +486,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             type: scannedData.type,
             isQR: true,
             version: scannedData.ver,
+            isFromKeeper: true,
           };
 
           this.setState(

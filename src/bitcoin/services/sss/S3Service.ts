@@ -16,6 +16,7 @@ import SecureHDWallet from '../../utilities/accounts/SecureHDWallet';
 export default class S3Service {
   public static fromJSON = (json: string) => {
     const { levelhealth } = JSON.parse(json);
+    console.log('S3Service levelhealth', levelhealth);
     const { sss } = JSON.parse(json)
     const mnemonic = sss.mnemonic ? sss.mnemonic : levelhealth.mnemonic;
     const walletId = sss.walletId ? sss.walletId : levelhealth.walletId;
@@ -42,6 +43,8 @@ export default class S3Service {
       healthCheckInitializedKeeper,
       healthCheckStatusKeeper,
       pdfHealthKeeper,
+      encryptedSMSecretsKeeper,
+      SMMetaSharesKeeper,
     }: {
       encryptedSecretsKeeper: string[];
       shareIDsKeeper: string[];
@@ -49,6 +52,8 @@ export default class S3Service {
       healthCheckInitializedKeeper: boolean;
       healthCheckStatusKeeper: {};
       pdfHealthKeeper: {};
+      encryptedSMSecretsKeeper: string[];
+      SMMetaSharesKeeper: MetaShare[];
     } = levelhealth;
 
     return new S3Service(mnemonic, {
@@ -65,6 +70,8 @@ export default class S3Service {
       healthCheckInitializedKeeper,
       healthCheckStatusKeeper,
       pdfHealthKeeper,
+      encryptedSMSecretsKeeper,
+      SMMetaSharesKeeper,
     })
   };
 
@@ -88,6 +95,8 @@ export default class S3Service {
       healthCheckInitializedKeeper: boolean;
       healthCheckStatusKeeper: {};
       pdfHealthKeeper: {};
+      encryptedSMSecretsKeeper: string[];
+      SMMetaSharesKeeper: MetaShare[];
     },
   ) {
     this.levelhealth = new LevelHealth(mnemonic, stateVars);
@@ -1546,6 +1555,42 @@ export default class S3Service {
       return {
         status: 506, err: err.message, message: ErrMap[ 506 ] 
       }
+    }
+  };
+
+  public generateSMShares = (
+    secondaryMnemonic: string,
+    answer: string,
+    tag: string,
+    questionId: string,
+    version: string,
+  ):
+    | {
+        status: number;
+        data: {
+          encryptedSecrets: string[];
+          metaShares: MetaShare[];
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const { shares } = this.levelhealth.generateSMShares(secondaryMnemonic);
+      console.log('secondaryMnemonic', secondaryMnemonic);
+      console.log('shares', shares);
+      const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer, true);
+      console.log('shares', shares);
+      const { metaShares } = this.levelhealth.createSMMetaSharesKeeper(secondaryMnemonic, tag, questionId, version);
+      console.log("metaShares", metaShares);
+      return { status: config.STATUS.SUCCESS, data: { encryptedSecrets, metaShares } };
+    } catch (err) {
+      return { status: 510, err: err.message, message: ErrMap[510] };
     }
   };
 }

@@ -636,7 +636,9 @@ export default class LevelHealth {
   public walletId: string;
   public shareIDsKeeper: string[];
   public encryptedSecretsKeeper: string[];
+  public encryptedSMSecretsKeeper: string[];
   public metaSharesKeeper: MetaShare[];
+  public SMMetaSharesKeeper: MetaShare[];
   public healthCheckInitializedKeeper: boolean;
   public pdfHealthKeeper: {};
   public healthCheckStatusKeeper: {};
@@ -652,6 +654,8 @@ export default class LevelHealth {
       walletId: string;
       healthCheckStatusKeeper: {};
       pdfHealthKeeper: {};
+      encryptedSMSecretsKeeper: string[];
+      SMMetaSharesKeeper: MetaShare[];
     },
   ) {
     if (bip39.validateMnemonic(mnemonic)) {
@@ -673,6 +677,8 @@ export default class LevelHealth {
       : false;
     this.healthCheckStatusKeeper = stateVars ? stateVars.healthCheckStatusKeeper : {};
     this.pdfHealthKeeper = stateVars ? stateVars.pdfHealthKeeper : {};
+    this.encryptedSMSecretsKeeper = stateVars ? stateVars.encryptedSMSecretsKeeper : [];
+    this.SMMetaSharesKeeper = stateVars ? stateVars.SMMetaSharesKeeper : [];
   }
 
   public stringToHex = (str: string): string => secrets.str2hex(str);
@@ -1373,6 +1379,7 @@ export default class LevelHealth {
   public encryptSecrets = (
     secretsToEncrypt: string[],
     answer: string,
+    isSmShares?: boolean,
   ): {
     encryptedSecrets: string[];
   } => {
@@ -1390,9 +1397,15 @@ export default class LevelHealth {
       encryptedSecretsTmp.push(encrypted);
       shareIDs.push(LevelHealth.getShareId(encrypted));
     }
-    this.encryptedSecretsKeeper = encryptedSecretsTmp;
-    this.shareIDsKeeper = shareIDs; // preserving just the online(relay-transmitted) shareIDs
-    return { encryptedSecrets: this.encryptedSecretsKeeper };
+    if(isSmShares){
+      this.encryptedSMSecretsKeeper = encryptedSecretsTmp;
+      console.log('this.encryptedSMSecretsKeeper', this.encryptedSMSecretsKeeper)
+    }else{
+      this.encryptedSecretsKeeper = encryptedSecretsTmp;
+      this.shareIDsKeeper = shareIDs; // preserving just the online(relay-transmitted) shareIDs
+    }
+    
+    return { encryptedSecrets: encryptedSecretsTmp };
   };
 
   public encryptWI = (
@@ -1640,5 +1653,69 @@ export default class LevelHealth {
     return {
       updationInfo 
     }
+  };
+
+  public generateSMShares = (secondaryMnemonics: string): {
+    shares: string[];
+  } => {
+    // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    const shares = secrets.share(
+      this.stringToHex(secondaryMnemonics),
+      config.SSS_LEVEL1_TOTAL,
+      config.SSS_LEVEL1_THRESHOLD,
+    );
+
+    for (let itr = 0; itr < shares.length; itr++) {
+      const checksum = LevelHealth.calculateChecksum(shares[itr]);
+      shares[itr] = shares[itr] + checksum;
+    }
+
+    return { shares };
+  };
+  public createSMMetaSharesKeeper = (
+    secondaryMnemonic: string,
+    tag: string,
+    questionId: string,
+    version?: string,
+  ): {
+    metaShares: MetaShare[];
+  } => {
+    if (!this.encryptedSMSecretsKeeper.length) {
+      console.log('Can not create MetaShares; missing encryptedSecrets')
+      throw new Error('Can not create MetaShares; missing encryptedSecrets');
+    }
+
+    const timestamp = new Date().toLocaleString(undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    let index = 0;
+    let metaShareArray = [];
+    let metaShare: MetaShare;
+    for (const encryptedSecret of this.encryptedSMSecretsKeeper) {
+        metaShare = {
+          encryptedSecret,
+          shareId: LevelHealth.getShareId(encryptedSecret),
+          meta: {
+            version: version ? version : '0',
+            validator: 'HEXA',
+            index,
+            walletId: this.walletId,
+            tag,
+            timestamp,
+            reshareVersion: 0,
+            questionId
+          },
+        };
+      metaShareArray.push(metaShare);
+      index++;
+    }
+    this.SMMetaSharesKeeper = metaShareArray;
+    console.log('this.SMMetaSharesKeeper', this.SMMetaSharesKeeper)
+    return { metaShares: this.SMMetaSharesKeeper };
   };
 }

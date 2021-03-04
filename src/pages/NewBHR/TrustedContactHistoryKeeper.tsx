@@ -35,6 +35,7 @@ import {
   updatedKeeperInfo,
   sendApprovalRequest,
   onApprovalStatusChange,
+  uploadSMShareKeeper,
 } from '../../store/actions/health';
 import { useDispatch } from 'react-redux';
 import SendShareModal from './SendShareModal';
@@ -685,6 +686,19 @@ const TrustedContactHistoryKeeper = (props) => {
     }
   }, [chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[index]]);
 
+  useEffect(() => {
+    console.log('change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[index])
+      if (
+        SHARES_TRANSFER_DETAILS[index]
+      ) {
+        console.log('change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[index])
+        console.log('!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS)
+        dispatch(uploadSMShareKeeper(index));
+      }
+    },
+    [SHARES_TRANSFER_DETAILS[index]]
+  );
+
   const updateTrustedContactsInfo = useCallback(
     async (contact) => {
       let tcInfo = trustedContactsInfo ? [...trustedContactsInfo] : null;
@@ -1017,7 +1031,7 @@ const TrustedContactHistoryKeeper = (props) => {
               (SendViaLinkBottomSheet as any).current.snapTo(0);
               const popAction = StackActions.pop({ n: 1 });
               props.navigation.dispatch(popAction);
-              props.navigation.replace('ManageBackupKeeper');
+              props.navigation.replace('ManageBackupNewBHR');
             }
           }}
         />
@@ -1082,11 +1096,11 @@ const TrustedContactHistoryKeeper = (props) => {
       (ChangeBottomSheet as any).current.snapTo(1);
     }
     if (type == "device") {
-      props.navigation.navigate("KeeperDeviceHistory", {...props.navigation.state.params, selectedTitle: name, isChangeKeeperType: true, prevKeeperType: 'contact', contactIndex: index});
+      props.navigation.navigate("SecondaryDeviceHistoryNewBHR", {...props.navigation.state.params, selectedTitle: name, isChangeKeeperType: true, prevKeeperType: 'contact', contactIndex: index});
     }
     if (type == "pdf") {
       props.navigation.navigate(
-        'PersonalCopyHistoryKeeper',
+        'PersonalCopyHistoryNewBHR',
         {...props.navigation.state.params, selectedTitle: name, prevKeeperType: 'contact', contactIndex: index}
       );
     }
