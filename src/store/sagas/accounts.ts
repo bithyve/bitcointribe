@@ -60,6 +60,8 @@ import {
   BLIND_REFRESH,
   GET_ALL_ACCOUNTS_DATA,
   setAllAccountsData,
+  fetchReceiveAddressSucceeded,
+  FETCH_RECEIVE_ADDRESS,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -1699,3 +1701,55 @@ export const getAllAccountsDataWatcher = createWatcher(
   getAllAccountsData,
   GET_ALL_ACCOUNTS_DATA
 )
+// TODO: Consider moving the receive address watcher and worker
+// to sending saga or another appropriate saga
+export const fetchReceiveAddressWatcher = createWatcher(
+  fetchReceiveAddressWorker,
+  FETCH_RECEIVE_ADDRESS
+)
+
+// UI should send shell.primarySubAccount
+function* fetchReceiveAddressWorker( { payload }  ) {
+  const { subAccountInfo } = payload
+  let accountType: DerivativeAccountTypes
+
+  switch ( subAccountInfo.kind ) {
+      case SubAccountKind.DONATION_ACCOUNT:
+        accountType = DerivativeAccountTypes.DONATION_ACCOUNT
+        break
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
+        accountType = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        break
+      case SubAccountKind.SERVICE:
+        switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+            case ServiceAccountKind.WYRE:
+              accountType = DerivativeAccountTypes.WYRE
+              break
+            case ServiceAccountKind.RAMP:
+              accountType = DerivativeAccountTypes.RAMP
+              break
+            case ServiceAccountKind.FAST_BITCOINS:
+              accountType = DerivativeAccountTypes.FAST_BITCOINS
+              break
+        }
+        break
+  }
+
+  let service: RegularAccount| SecureAccount
+  switch ( subAccountInfo.sourceKind ) {
+      case SourceAccountKind.SECURE_ACCOUNT:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
+        )
+        break
+      default:
+        service = yield select(
+          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
+        )
+  }
+  const receiveAddress =  service.getReceivingAddress( accountType, subAccountInfo.instanceNumber ? subAccountInfo.instanceNumber : 1 )
+  yield put( fetchReceiveAddressSucceeded( {
+    receiveAddress: receiveAddress
+  } ) )
+}

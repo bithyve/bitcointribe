@@ -69,7 +69,8 @@ import {
   addNewSecondarySubAccountWatcher,
   autoSyncShellsWatcher,
   blindRefreshWatcher,
-  getAllAccountsDataWatcher
+  getAllAccountsDataWatcher,
+  fetchReceiveAddressWatcher
 } from './sagas/accounts'
 
 import {
@@ -183,6 +184,8 @@ const rootSaga = function* () {
     autoSyncShellsWatcher,
     blindRefreshWatcher,
     getAllAccountsDataWatcher,
+    fetchReceiveAddressWatcher,
+
     // sss watchers
     initHCWatcher,
     generateMetaSharesWatcher,

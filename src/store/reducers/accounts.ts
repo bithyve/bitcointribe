@@ -44,6 +44,8 @@ import {
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
   SET_ALL_ACCOUNTS_DATA,
+  FETCH_RECEIVE_ADDRESS_SUCCEEDED,
+  CLEAR_RECEIVE_ADDRESS
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -179,6 +181,9 @@ export type AccountsState = {
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
   accounts: any,
+
+  receiveAddress: string| null;
+  hasReceiveAddressSucceeded: boolean | null;
 };
 
 const initialState: AccountsState = {
@@ -216,6 +221,9 @@ const initialState: AccountsState = {
   currentWyreSubAccount: null,
   currentRampSubAccount: null,
   accounts: null,
+
+  receiveAddress: null,
+  hasReceiveAddressSucceeded: false,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -819,6 +827,18 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           accounts: action.payloads.accounts,
         }
 
+      case FETCH_RECEIVE_ADDRESS_SUCCEEDED:
+        return {
+          ...state,
+          receiveAddress: action.payload.data.rampReceiveAddress,
+          hasReceiveAddressSucceeded: true
+        }
+      case CLEAR_RECEIVE_ADDRESS:
+        return {
+          ...state,
+          receiveAddress: null,
+          hasReceiveAddressSucceeded: null
+        }
       default:
         return state
   }
