@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { StyleSheet, Modal, View, Image, Text, Platform, TextInput } from 'react-native';
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -21,6 +21,9 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount';
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount';
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
 import { AccountsState } from '../../store/reducers/accounts';
+import ReceiveAmountContent from '../../components/home/ReceiveAmountContent';
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 
 export type Props = {
   navigation: any;
@@ -37,6 +40,11 @@ const ReceiveQrScreen: React.FC<Props> = ({
   )
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [receivingAddress, setReceivingAddress] = useState(null)
+ 
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
 
   const [accounts, setAccounts] = useState([]);
   const accountState: AccountsState = useSelector(
@@ -64,6 +72,28 @@ const ReceiveQrScreen: React.FC<Props> = ({
       setReceivingAddress(receiveAt)
   }, [amount, selectedAccount])
 
+  const showReceiveAmountBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <ReceiveAmountContent
+          title={'Receive'}
+          message={'Lorem ipsum dolor sit amet, consectetur adipiscing elit'}
+          onPressConfirm={(amount)=> {
+           setAmount(amount);
+            dismissBottomSheet()
+          }}
+          selectedAmount={amount}
+          onPressBack={()=>{
+            dismissBottomSheet()
+            }
+          }
+        />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '50%' ],
+      },
+    )
+  }, [ presentBottomSheet, dismissBottomSheet, amount ] )
+
   return (
     <View style={styles.rootContainer}>
       <ScrollView>
@@ -75,29 +105,28 @@ const ReceiveQrScreen: React.FC<Props> = ({
           backgroundColor={Colors.white}
           text={receivingAddress}
         />
-        <View style={styles.textBoxView}>
-          <View style={styles.amountInputImage}>
-            <Image
-              style={styles.textBoxImage}
-              source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+
+      <AppBottomSheetTouchableWrapper
+          onPress={() => {showReceiveAmountBottomSheet() }}
+          style={styles.selectedView}
+        >
+          <View
+            style={styles.text}
+          >
+            <Text style={styles.titleText}>{"Enter Amount to Receive"}</Text>
+          </View>
+
+          <View style={{
+            marginLeft: 'auto'
+          }}>
+            <Ionicons
+              name="chevron-forward"
+              color={Colors.textColorGrey}
+              size={15}
+              style={styles.forwardIcon}
             />
           </View>
-          <TextInput
-            style={{
-              ...styles.textBox, paddingLeft: 10
-            }}
-            placeholder={'Enter amount'}
-            value={amount}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            keyboardType={'numeric'}
-            onChangeText={(value) => setAmount(value)}
-            placeholderTextColor={Colors.borderColor}
-            autoCorrect={false}
-            autoFocus={false}
-            autoCompleteType="off"
-          />
-        </View>
+        </AppBottomSheetTouchableWrapper>
 
         {hideShow ? (
         <Modal
@@ -187,7 +216,6 @@ const ReceiveQrScreen: React.FC<Props> = ({
         />
       </View>
       </ScrollView>
-      
     </View>
   );
 };
@@ -261,37 +289,18 @@ const styles = StyleSheet.create({
   balanceText: {
     color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue(10), marginTop: 5
   },
-  textBoxView: {
-    flexDirection: 'row',
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.borderColor,
-    height: 50,
+  
+  selectedView: {
     marginLeft: wp('5%'),
     marginRight: wp('5%'),
     marginBottom: hp(4),
     marginTop: hp(2),
-  },
-  textBoxImage: {
-    width: wp('6%'),
-    height: wp('6%'),
-    resizeMode: 'contain',
-  },
-  amountInputImage: {
-    width: 40,
-    height: 50,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.borderColor,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-  },
-  textBox: {
-    flex: 1,
-    paddingLeft: 20,
-    color: Colors.textColorGrey,
-    fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(13),
+    paddingTop: 15,
+    paddingBottom: 20,
+    borderBottomColor: Colors.borderColor,
+    borderBottomWidth: 1,
   },
 });
 
