@@ -820,8 +820,8 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
         }
 
-        case SET_ALL_ACCOUNTS_DATA:
-          console.log("SET_ALL_ACCOUNTS_DATA",action.payloads.allAccounts);
+      case SET_ALL_ACCOUNTS_DATA:
+        console.log( 'SET_ALL_ACCOUNTS_DATA', action.payloads.allAccounts )
         return {
           ...state,
           accounts: action.payloads.accounts,
@@ -830,15 +830,17 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case FETCH_RECEIVE_ADDRESS_SUCCEEDED:
         return {
           ...state,
-          receiveAddress: action.payload.data.rampReceiveAddress,
+          receiveAddress: action.payload.receiveAddress,
           hasReceiveAddressSucceeded: true
         }
+
       case CLEAR_RECEIVE_ADDRESS:
         return {
           ...state,
           receiveAddress: null,
           hasReceiveAddressSucceeded: null
         }
+
       default:
         return state
   }
