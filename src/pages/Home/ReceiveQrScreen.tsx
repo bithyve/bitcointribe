@@ -74,7 +74,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     presentBottomSheet(
       <ReceiveAmountContent
         title={'Receive'}
-        message={'Lorem ipsum dolor sit amet, consectetur adipiscing elit'}
+        message={'Enter amount in sats'}
         onPressConfirm={( amount )=> {
           setAmount( amount )
           dismissBottomSheet()
@@ -87,7 +87,8 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '50%' ],
+        snapPoints: [ 0, '35%' ],
+        overlayOpacity: 0.9,
       },
     )
   }, [ presentBottomSheet, dismissBottomSheet, amount ] )
@@ -206,15 +207,6 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           </AppBottomSheetTouchableWrapper>
 
         </View>}
-        <View style={{
-          marginTop: 'auto'
-        }}>
-          <BottomInfoBox
-            backgroundColor={Colors.white}
-            title="Note"
-            infoText="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-          />
-        </View>
       </ScrollView>
     </View>
   )
