@@ -1623,15 +1623,9 @@ export const mergeAccountShellsWatcher = createWatcher(
   MERGE_ACCOUNT_SHELLS
 )
 
-// TODO: Consider moving the receive address watcher and worker
-// to sending saga or another appropriate saga
-export const fetchReceiveAddressWatcher = createWatcher(
-  fetchReceiveAddressWorker,
-  FETCH_RECEIVE_ADDRESS
-)
 
 // UI should send shell.primarySubAccount
-function* fetchReceiveAddressWorker( { payload }  ) {
+function* fetchReceiveAddressWorker( { payload }: {payload: {subAccountInfo: SubAccountDescribing}}  ) {
   const { subAccountInfo } = payload
   let accountType: DerivativeAccountTypes
 
@@ -1639,10 +1633,13 @@ function* fetchReceiveAddressWorker( { payload }  ) {
       case SubAccountKind.DONATION_ACCOUNT:
         accountType = DerivativeAccountTypes.DONATION_ACCOUNT
         break
+
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
-        accountType = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        if( subAccountInfo.instanceNumber )
+          accountType = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
         break
+
       case SubAccountKind.SERVICE:
         switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
             case ServiceAccountKind.WYRE:
@@ -1658,20 +1655,21 @@ function* fetchReceiveAddressWorker( { payload }  ) {
         break
   }
 
-  let service: RegularAccount| SecureAccount
-  switch ( subAccountInfo.sourceKind ) {
-      case SourceAccountKind.SECURE_ACCOUNT:
-        service = yield select(
-          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
-        )
-        break
-      default:
-        service = yield select(
-          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
-        )
-  }
-  const receiveAddress =  service.getReceivingAddress( accountType, subAccountInfo.instanceNumber ? subAccountInfo.instanceNumber : 1 )
+
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const service : TestAccount | RegularAccount| SecureAccount = accountState[ subAccountInfo.sourceKind ].service
+
+  const receiveAddress =  service.getReceivingAddress( accountType, subAccountInfo.instanceNumber )
   yield put( fetchReceiveAddressSucceeded( {
     receiveAddress: receiveAddress
   } ) )
 }
+
+// TODO: Consider moving the receive address watcher and worker
+// to sending saga or another appropriate saga
+export const fetchReceiveAddressWatcher = createWatcher(
+  fetchReceiveAddressWorker,
+  FETCH_RECEIVE_ADDRESS
+)
