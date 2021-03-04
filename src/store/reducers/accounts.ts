@@ -43,6 +43,9 @@ import {
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
   TWO_FA_VALID,
+  SET_ALL_ACCOUNTS_DATA,
+  FETCH_RECEIVE_ADDRESS_SUCCEEDED,
+  CLEAR_RECEIVE_ADDRESS
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -177,6 +180,10 @@ export type AccountsState = {
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
+  accounts: any,
+
+  receiveAddress: string| null;
+  hasReceiveAddressSucceeded: boolean | null;
 };
 
 const initialState: AccountsState = {
@@ -213,6 +220,10 @@ const initialState: AccountsState = {
 
   currentWyreSubAccount: null,
   currentRampSubAccount: null,
+  accounts: null,
+
+  receiveAddress: null,
+  hasReceiveAddressSucceeded: false,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -281,7 +292,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case ADD_TRANSFER_DETAILS:
-        console.log( 'state[accountType].transfer', state[ accountType ] )
         return {
           ...state,
           [ accountType ]: {
@@ -781,7 +791,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case ACCOUNT_SHELL_REFRESH_STARTED:
-        console.log( 'ACCOUNT_SHELL_REFRESH_STARTED' )
         state.accountShells.find(
           ( shell ) => shell.id == action.payload.id
         ).syncStatus = SyncStatus.IN_PROGRESS
@@ -789,7 +798,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
         }
       case ACCOUNT_SHELL_REFRESH_COMPLETED:
-        console.log( 'ACCOUNT_SHELL_REFRESH_COMPLETED' )
         // Updating Account Sync State to shell data model
         // This will be used to display sync icon on Home Screen
         state.accountShells.find(
@@ -800,7 +808,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case CLEAR_ACCOUNT_SYNC_CACHE:
-        console.log( 'CLEAR_ACCOUNT_SYNC_CACHE' )
         // This will clear the sync state at the start of each login session
         // This is required in order to ensure sync icon is shown again for each session
         state.accountShells.map(
@@ -808,6 +815,27 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
         }
+
+      case SET_ALL_ACCOUNTS_DATA:
+          return {
+          ...state,
+          accounts: action.payload.accounts,
+        }
+
+      case FETCH_RECEIVE_ADDRESS_SUCCEEDED:
+        return {
+          ...state,
+          receiveAddress: action.payload.receiveAddress,
+          hasReceiveAddressSucceeded: true
+        }
+
+      case CLEAR_RECEIVE_ADDRESS:
+        return {
+          ...state,
+          receiveAddress: null,
+          hasReceiveAddressSucceeded: null
+        }
+
       default:
         return state
   }
