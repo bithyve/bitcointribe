@@ -14,33 +14,26 @@ const QRStack = createStackNavigator(
       screen: HomeQRScannerScreen,
       navigationOptions: ( { navigation } ) => {
         return {
-            title: 'QR',
+          title: 'QR',
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       },
     },
-    
+
     ReceiveQR: {
-        screen: ReceiveQrScreen,
-        navigationOptions: ( { navigation } ) => {
-          return {
-            title: 'Receive',
-            headerLeft: () => {
-              return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-            },
-            headerRight: () => {
-              return (
-                <NavHeaderSettingsButton
-                  onPress={() => {  }}
-                />
-              )
-            },
+      screen: ReceiveQrScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          title: 'Receive',
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
           }
-        },
+        }
+      },
     },
-   
+
   },
   {
     initialRouteName: 'QRRoot',
