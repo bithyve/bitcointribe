@@ -103,7 +103,10 @@ function* processRecipients( accountShell: AccountShell ){
         // TODO: RecipientDescribing should have type and instance/acc number properties
         case RecipientKind.ACCOUNT_SHELL:
           const instanceNumber = ( recipient as AccountRecipientDescribing ).instanceNumber
-          let accountKind = recipient.id
+          let accountKind =  ( ( recipient as AccountRecipientDescribing ).type as string )
+          const serviceType = ( ( recipient as AccountRecipientDescribing ).serviceType as string )
+          if( serviceType ) accountKind = serviceType
+
           if( instanceNumber && [ REGULAR_ACCOUNT, SECURE_ACCOUNT ].includes( accountKind ) ){
             accountKind = SUB_PRIMARY_ACCOUNT
           }
