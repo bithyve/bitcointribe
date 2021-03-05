@@ -112,6 +112,7 @@ export interface MetaShare {
     reshareVersion: number;
     questionId: string;
     guardian?: string;
+    encryptedKeeperInfo?: string;
   };
   encryptedStaticNonPMDD?: string;
 }

@@ -1752,4 +1752,11 @@ export default class LevelHealth {
       return { success: false };
     }
   };
+  public updateKeeperInfoToMetaShare = (keeperInfo: any, answer: string): { metaShares: MetaShare[] } => {
+    let {encryptedString} = LevelHealth.encryptWithAnswer(keeperInfo, answer);
+    for (let i = 0; i < this.metaSharesKeeper.length; i++) {
+      this.metaSharesKeeper[i].meta.encryptedKeeperInfo = encryptedString;
+    }
+    return { metaShares: this.metaSharesKeeper };
+  };
 }

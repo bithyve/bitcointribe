@@ -1412,6 +1412,11 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
     (state) => state.storage.database
   );
+  const keeperInfoData = yield select(
+    (state) => state.health.keeperInfo
+  );
+  const answer = yield select(
+    (state) => state.database.WALLET_SETUP.security.answer)
   let shareIndex = 2;
   if (payload.shareId && s3Service.levelhealth.metaSharesKeeper.length) {
     let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
@@ -1421,7 +1426,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
       );
     }
   }
-
+  let response = yield call(s3Service.updateKeeperInfoToMetaShare, keeperInfoData, answer);
   if (payload.changingGuardian) {
     yield call(s3Service.reshareMetaShareKeeper, shareIndex);
     if (payload.previousGuardianName) {
@@ -2346,30 +2351,40 @@ function* getPDFDataWorker({ payload }) {
     console.log("getPdfData payload", payload);
     yield put(switchS3LoaderKeeper("pdfDataProcess"));
     let { shareId, isReShare } = payload;
-    let { WALLET_SETUP } = yield select((state) => state.storage.database);
     let s3Service: S3Service = yield select((state) => state.health.service);
-    let levelHealth: LevelHealthInterface[] = yield select(
-      (state) => state.health.levelHealth
-    );
-    let currentLevel: number = yield select(
-      (state) => state.health.currentLevel
-    );
+    console.log('s3Service', s3Service.levelhealth.SMMetaSharesKeeper);
+    let { WALLET_SETUP } = yield select((state) => state.storage.database);
+      const keeper: KeeperService = yield select((state) => state.keeper.service);
+      let levelHealth: LevelHealthInterface[] = yield select(
+        (state) => state.health.levelHealth
+      );
+      let currentLevel: number = yield select(
+        (state) => state.health.currentLevel
+      );
     let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
-    const keeper: KeeperService = yield select((state) => state.keeper.service);
+    let secondaryShare;
     // TODO get primaryKeeper shareID
+    if(s3Service.levelhealth.SMMetaSharesKeeper && s3Service.levelhealth.SMMetaSharesKeeper.length){
+      secondaryShare = s3Service.levelhealth.SMMetaSharesKeeper[1];
+    } else {
 
-    let PKShareId =
+      let PKShareId =
       currentLevel == 2 || currentLevel == 1
         ? levelHealth[1].levelInfo[2].shareId
         : levelHealth[1].levelInfo[2].shareId;
-    console.log("PKShareId", PKShareId);
-    const res = yield call(
-      keeper.fetchTrustedChannel,
-      PKShareId,
-      WALLET_SETUP.walletName
-    );
-    if (res.status == 200) {
-      let data: TrustedDataElements = res.data.data;
+      console.log("PKShareId", PKShareId);
+      const res = yield call(
+        keeper.fetchTrustedChannel,
+        PKShareId,
+        WALLET_SETUP.walletName
+      );
+      if (res.status == 200) {
+        let data: TrustedDataElements = res.data.data;
+        secondaryShare = data.pdfShare;
+      }
+    }
+
+    if (secondaryShare) {
       let pdfInfo: {
         filePath: string;
         publicKey: string;

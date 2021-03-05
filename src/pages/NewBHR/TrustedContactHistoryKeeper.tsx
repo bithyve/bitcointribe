@@ -745,17 +745,7 @@ const TrustedContactHistoryKeeper = (props) => {
           status: 'notAccessible',
         },
       ];
-      dispatch(updateMSharesHealth(shareArray));      
-      let obj = {
-        shareId: selectedShareId,
-        name: contact.name,
-        uuid: contact.id,
-        publicKey: '',
-        ephemeralAddress: '',
-        type: 'contact',
-        data: {...contact, index}
-      };
-      dispatch(updatedKeeperInfo(obj));
+      dispatch(updateMSharesHealth(shareArray));
       dispatch(onApprovalStatusChange({
         status: false,
         initiatedAt: 0,
@@ -825,6 +815,16 @@ const TrustedContactHistoryKeeper = (props) => {
       const trustedContact = trustedContacts.tc.trustedContacts[contactName];
       const hasTrustedChannel =
         trustedContact && trustedContact.symmetricKey ? true : false;
+      let obj = {
+        shareId: selectedShareId,
+        name: chosenContact.name,
+        uuid: chosenContact.id,
+        publicKey: '',
+        ephemeralAddress: '',
+        type: 'contact',
+        data: {...chosenContact, index}
+      };
+      dispatch(updatedKeeperInfo(obj));
       if (changeContact) {
         setTrustedLink('');
         setTrustedQR('');

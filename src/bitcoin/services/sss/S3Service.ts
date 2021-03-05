@@ -1631,4 +1631,30 @@ export default class S3Service {
       }
     }
   };
+  public updateKeeperInfoToMetaShare = (
+    keeperInfo: any, answer: string
+  ):
+    | {
+        status: number;
+        data: {
+          metaShares: MetaShare[];
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      const { metaShares } = this.levelhealth.updateKeeperInfoToMetaShare(keeperInfo,answer);
+      return { status: config.STATUS.SUCCESS, data: { metaShares } };
+    } catch (err) {
+      return {
+        status: 520, err: err.message, message: ErrMap[ 520 ] 
+      }
+    }
+  };
 }
