@@ -664,6 +664,7 @@ export default class S3Service {
     tag: string,
     questionId: string,
     version: string,
+    question? :string,
     level?: number
   ):
     | {
@@ -684,7 +685,7 @@ export default class S3Service {
       
       const { shares } = this.levelhealth.generateLevel1Shares();
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets, tag, questionId, version, level);
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets, tag, questionId, version, question, level);
       console.log("metaShares",metaShares);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
@@ -703,6 +704,7 @@ export default class S3Service {
     tag: string,
     questionId: string,
     version: string,
+    question? :string,
     level?: number
   ):
     | {
@@ -722,7 +724,7 @@ export default class S3Service {
     try {
       const { shares } = this.levelhealth.generateLevel2Shares();
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer);
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets, tag,questionId, version, level);
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper(secureAssets, tag,questionId, version,question, level);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets } };
     } catch (err) {
       return { status: 510, err: err.message, message: ErrMap[510] };
@@ -1094,6 +1096,7 @@ export default class S3Service {
     },
     tag: string,
     questionId,
+    question? : string,
     version?: string,
   ):
     | {
@@ -1113,7 +1116,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.sss.createMetaShares(secureAssets, tag, questionId, version),
+        data: this.sss.createMetaShares(secureAssets, tag, questionId, question, version),
       };
     } catch (err) {
       return {
@@ -1564,6 +1567,7 @@ export default class S3Service {
     tag: string,
     questionId: string,
     version: string,
+    question?: string,
   ):
     | {
         status: number;
@@ -1586,7 +1590,7 @@ export default class S3Service {
       console.log('shares', shares);
       const { encryptedSecrets } = this.levelhealth.encryptSecrets(shares, answer, true);
       console.log('shares', shares);
-      const { metaShares } = this.levelhealth.createSMMetaSharesKeeper(secondaryMnemonic, tag, questionId, version);
+      const { metaShares } = this.levelhealth.createSMMetaSharesKeeper(secondaryMnemonic, tag, questionId, version, question);
       console.log("metaShares", metaShares);
       return { status: config.STATUS.SUCCESS, data: { encryptedSecrets, metaShares } };
     } catch (err) {

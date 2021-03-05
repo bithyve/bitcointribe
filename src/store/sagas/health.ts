@@ -182,7 +182,7 @@ function* generateMetaSharesWorker({ payload }) {
   );
   const appVersion = DeviceInfo.getVersion();
   const { level } = payload;
-  const { answer, questionId } = yield select(
+  const { answer, questionId, question } = yield select(
     (state) => state.storage.database.WALLET_SETUP.security
   );
 
@@ -207,6 +207,7 @@ function* generateMetaSharesWorker({ payload }) {
       walletName,
       questionId,
       appVersion,
+      questionId === "0" ? question: '',
       level
     );
     if (res.status === 200) {
@@ -2936,14 +2937,27 @@ function* uploadSMShareWorker({ payload }) {
       (state) => state.storage.database.WALLET_SETUP
     );
     const appVersion = DeviceInfo.getVersion();
-    const { answer, questionId } = yield select(
+    const { answer, questionId, question } = yield select(
       (state) => state.storage.database.WALLET_SETUP.security
     );
     const secureAccount: SecureAccount = yield select(
       (state) => state.accounts[SECURE_ACCOUNT].service,
     )
-  
+   
     const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '';
+      console.log("question",question);
+      console.log("questionId",questionId);
+      // if( questionId === 0 ){
+      //   console.log("inside if questionId",questionId);
+
+      //   question = yield select(
+      //     (state) => state.storage.database.WALLET_SETUP.security
+      //   );
+      //   console.log("inside if question",question);
+
+      // }
+      // console.log("question",question);
+      // console.log("questionId",questionId);
 
     const res = yield call(
       s3Service.generateSMShares,
@@ -2952,6 +2966,7 @@ function* uploadSMShareWorker({ payload }) {
       walletName,
       questionId,
       appVersion,
+      questionId === "0" ? question: '',
     );
     console.log('generateSMShares res', res);
     if (res.status === 200) {

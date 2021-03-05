@@ -986,6 +986,7 @@ export default class SSS {
     },
     tag: string,
     questionId: string,
+    question? : string,
     version?: string,
   ): {
     metaShares: MetaShare[];
@@ -1022,7 +1023,8 @@ export default class SSS {
             tag,
             timestamp,
             reshareVersion: 0,
-            questionId
+            questionId,
+            question
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         }
@@ -1038,7 +1040,8 @@ export default class SSS {
             tag,
             timestamp,
             reshareVersion: 0,
-            questionId
+            questionId,
+            question
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         }
