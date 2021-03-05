@@ -28,8 +28,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
 
   const walletInstance = useMemo(() => {
     if(accountKind){
-    const walletService = accountsState[accountKind].service;
-
+      const walletService = accountsState[accountKind].service;
     return walletService.hdWallet || walletService.secureHDWallet;
     }
   }, [accountKind, accountsState]);
@@ -42,8 +41,8 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
   // and avoid re-rendering the entire send screen on text changes.
   function handleTextChange(newValue: string) {
     setRecipientAddress(newValue);
-
-    if (isAddressInvalid == false) {
+    const isAddressValid = walletInstance.isValidAddress(newValue);
+    if (isAddressValid) {
       onAddressSubmitted(newValue);
     }
   }
@@ -65,6 +64,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ({
         }}
         onBlur={() => {
           const isAddressValid = walletInstance.isValidAddress(recipientAddress);
+          console.log("isAddressValid onBlur",isAddressValid)
           setIsAddressInvalid(!isAddressValid);
         }}
         numberOfLines={1}
