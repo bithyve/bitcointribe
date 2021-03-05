@@ -93,7 +93,6 @@ export default function Receive( props ) {
 
   const derivativeAccountDetails =
     props.navigation.state.params.derivativeAccountDetails
-
   const dispatch = useDispatch()
   const [ receiveLink, setReceiveLink ] = useState( '' )
   const [ receiveQR, setReceiveQR ] = useState( '' )
