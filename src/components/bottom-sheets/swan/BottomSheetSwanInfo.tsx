@@ -140,7 +140,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
         Powered by
             </Text>
             <Image
-              source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
+              source={require( '../../../assets/images/icons/swan_logo_large.png' )}
               style={{
                 marginLeft: 5,
                 width: 62,

@@ -182,6 +182,7 @@ interface HomePropsTypes {
   autoSyncShells: any;
   clearWyreCache: any;
   clearRampCache: any;
+  clearSwanCache: any;
   addNewAccountShell: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -202,7 +203,6 @@ interface HomePropsTypes {
   swanFromBuyMenu: boolean | null;
   swanFromDeepLink: boolean | null;
   setVersion: any;
-  clearSwanCache: any;
   versionHistory: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
@@ -821,7 +821,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // This will sync balances and transactions for all account shells
       this.props.autoSyncShells()
       this.props.setVersion()
-      this.props.clearSwanCache()
     } )
   };
 
@@ -1067,6 +1066,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const splits = url.split( '/' )
     if ( splits.includes( 'swan' ) ) {
+      this.props.clearSwanCache()
       this.setState( {
         swanDeepLinkContent:url,
         swanFromDeepLink: true,
@@ -1345,6 +1345,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
+          this.props.clearSwanCache()
           this.setState( {
             swanFromBuyMenu: true,
             swanFromDeepLink: false,
@@ -2187,6 +2188,7 @@ export default withNavigationFocus(
     autoSyncShells,
     clearWyreCache,
     clearRampCache,
+    clearSwanCache,
     addNewAccountShell,
     addTransferDetails,
     clearPaymentDetails,
@@ -2196,7 +2198,6 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     setVersion,
-    clearSwanCache
   } )( Home ),
 )
 

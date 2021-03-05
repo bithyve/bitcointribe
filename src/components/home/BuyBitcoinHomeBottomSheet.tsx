@@ -48,10 +48,10 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false
   },
   {
-    title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
-    subtitle: 'Fees starting from 0.49%',
-    kind: BuyMenuItemKind.RAMP,
-    imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
+    title: 'Set up automatic buys',
+    subtitle: 'Stack sats with Swan Bitcoin',
+    kind: BuyMenuItemKind.SWAN,
+    imageSource: require( '../../assets/images/icons/swan.png' ),
     disabled: false
   }
 ]
