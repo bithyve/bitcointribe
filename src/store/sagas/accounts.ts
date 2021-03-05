@@ -58,6 +58,10 @@ import {
   ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
   BLIND_REFRESH,
+  GET_ALL_ACCOUNTS_DATA,
+  setAllAccountsData,
+  fetchReceiveAddressSucceeded,
+  FETCH_RECEIVE_ADDRESS,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -90,6 +94,7 @@ import TransactionDescribing from '../../common/data/models/Transactions/Interfa
 import { rescanSucceeded } from '../actions/wallet-rescanning'
 import { RescannedTransactionData } from '../reducers/wallet-rescanning'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -148,7 +153,7 @@ function* fetchTransactionsWorker( { payload } ) {
   if (
     res.status === 200 &&
     JSON.stringify( preFetchTransactions ) !==
-      JSON.stringify( postFetchTransactions )
+    JSON.stringify( postFetchTransactions )
   ) {
     yield put( transactionsFetched( payload.serviceType, postFetchTransactions ) )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
@@ -171,19 +176,22 @@ export const fetchTransactionsWatcher = createWatcher(
   FETCH_TRANSACTIONS
 )
 
-function* fetchBalanceTxWorker( { payload }: {payload: {
-  serviceType: string,
-  options: {
-    service?;
-    loader?: boolean;
-    derivativeAccountsToSync?: string[];
-    hardRefresh?: boolean;
-    blindRefresh?: boolean;
-    shouldNotInsert?: boolean;
-    syncTrustedDerivative?: boolean;
-  }}} ) {
+function* fetchBalanceTxWorker( { payload }: {
+  payload: {
+    serviceType: string,
+    options: {
+      service?;
+      loader?: boolean;
+      derivativeAccountsToSync?: string[];
+      hardRefresh?: boolean;
+      blindRefresh?: boolean;
+      shouldNotInsert?: boolean;
+      syncTrustedDerivative?: boolean;
+    }
+  }
+} ) {
   // delta txs(hard refresh)
-  const txsFound : TransactionDescribing[] = []
+  const txsFound: TransactionDescribing[] = []
 
   if ( payload.options.loader )
     yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
@@ -221,12 +229,12 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
       preFetchTransactions !== postFetchTransactions )
   ) {
     parentSynched = true
-    if( res.data.txsFound && res.data.txsFound.length ) txsFound.push( ...res.data.txsFound )
+    if ( res.data.txsFound && res.data.txsFound.length ) txsFound.push( ...res.data.txsFound )
 
     if (
       payload.serviceType === TEST_ACCOUNT ||
       ( !payload.options.shouldNotInsert &&
-      !payload.options.syncTrustedDerivative )
+        !payload.options.syncTrustedDerivative )
     ) {
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
@@ -262,7 +270,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
           blindRefresh: payload.options.blindRefresh,
         },
       } )
-      if( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
+      if ( dervTxsFound && dervTxsFound.length ) txsFound.push( ...dervTxsFound )
     } catch ( err ) {
       console.log( {
         err
@@ -285,7 +293,7 @@ export const fetchBalanceTxWatcher = createWatcher(
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   let { serviceType, accountNumber, accountType, hardRefresh, blindRefresh } = payload
-  const dervTxsFound : TransactionDescribing[] = []
+  const dervTxsFound: TransactionDescribing[] = []
 
   yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
@@ -318,7 +326,7 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
     res.status === 200
   ) {
     const { txsFound } = res.data
-    if( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
+    if ( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
 
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
@@ -346,8 +354,8 @@ export const fetchDerivativeAccBalanceTxWatcher = createWatcher(
   FETCH_DERIVATIVE_ACC_BALANCE_TX
 )
 
-function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, blindRefresh?: boolean} } ) {
-  const dervTxsFound : TransactionDescribing[] = []
+function* syncDerivativeAccountsWorker( { payload }: { payload: { serviceTypes: string[], parentSynched: boolean, derivativeAccountsToSync?: string[], hardRefresh?: boolean, blindRefresh?: boolean } } ) {
+  const dervTxsFound: TransactionDescribing[] = []
 
   for ( const serviceType of payload.serviceTypes ) {
     console.log( 'Syncing DAs for: ', serviceType )
@@ -363,10 +371,10 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
         : service.secureHDWallet.derivativeAccounts
     )
     const { derivativeAccountsToSync } = payload
-    const accountsToSync = derivativeAccountsToSync && derivativeAccountsToSync.length ? derivativeAccountsToSync: config.DERIVATIVE_ACC_TO_SYNC
+    const accountsToSync = derivativeAccountsToSync && derivativeAccountsToSync.length ? derivativeAccountsToSync : config.DERIVATIVE_ACC_TO_SYNC
 
     const res = yield call(
-      ( service as BaseAccount| SecureAccount ).syncDerivativeAccountsBalanceTxs,
+      ( service as BaseAccount | SecureAccount ).syncDerivativeAccountsBalanceTxs,
       accountsToSync,
       payload.hardRefresh,
       payload.blindRefresh
@@ -380,9 +388,9 @@ function* syncDerivativeAccountsWorker( { payload }: {payload: {serviceTypes: st
 
     if ( res.status === 200 ) {
       // accumulate delta txs(during hard refresh) from derivative accounts(if present)
-      if( res.data ){
+      if ( res.data ) {
         const { txsFound } = res.data
-        if( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
+        if ( txsFound && txsFound.length ) dervTxsFound.push( ...txsFound )
       }
 
       if (
@@ -467,7 +475,7 @@ export const syncViaXpubAgentWatcher = createWatcher(
   SYNC_VIA_XPUB_AGENT
 )
 
-export const processRecipients = async(
+export const processRecipients = async (
   recipients: [
     {
       id: string;
@@ -480,7 +488,7 @@ export const processRecipients = async(
   serviceType: string,
   accounts: AccountsState,
   trustedContactsServices: TrustedContactsService
-)  => {
+) => {
   const addressedRecipients = []
   const testAccount: TestAccount = accounts[ TEST_ACCOUNT ].service
   const regularAccount: RegularAccount = accounts[ REGULAR_ACCOUNT ].service
@@ -603,9 +611,9 @@ function* transferST1Worker( { payload } ) {
   )
 
   const trustedContactsServices: TrustedContactsService =
-  yield select(
-    ( state ) => state.trustedContacts.service
-  )
+    yield select(
+      ( state ) => state.trustedContacts.service
+    )
 
   try {
     recipients = yield call( processRecipients, recipients, payload.serviceType, accounts, trustedContactsServices )
@@ -655,7 +663,7 @@ function* transferST2Worker( { payload } ) {
     ( state ) => state.accounts[ serviceType ]
   )
 
-  const { txPrerequisites } = transfer.stage1? transfer.stage1: {
+  const { txPrerequisites } = transfer.stage1 ? transfer.stage1 : {
     txPrerequisites: null
   }
   if ( !txPrerequisites && !customTxPrerequisites ) {
@@ -836,12 +844,12 @@ function* accumulativeTxAndBalWorker() {
 
   const regularBalance = accounts[ REGULAR_ACCOUNT ].service
     ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance +
-      accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
+    accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.unconfirmedBalance
     : 0
   const secureBalance = accounts[ SECURE_ACCOUNT ].service
     ? accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance +
-      accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances
-        .unconfirmedBalance
+    accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances
+      .unconfirmedBalance
     : 0
   const accumulativeBalance = regularBalance + secureBalance
 
@@ -945,7 +953,7 @@ function* validateTwoFAWorker( { payload } ) {
     yield put( twoFAValid( true ) )
     const { removed } = yield call( service.removeTwoFADetails )
 
-    if( removed ){
+    if ( removed ) {
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
         ...SERVICES,
@@ -1098,7 +1106,7 @@ function* refreshAccountShellWorker( { payload } ) {
   const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
 
   let accountKind
-  switch( primarySubAccount.kind ){
+  switch ( primarySubAccount.kind ) {
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
         if ( primarySubAccount.instanceNumber )
@@ -1157,8 +1165,8 @@ function* refreshAccountShellWorker( { payload } ) {
         payload
       } )
 
-      const rescanTxs : RescannedTransactionData[]= []
-      deltaTxs.forEach( ( deltaTx )=>{
+      const rescanTxs: RescannedTransactionData[] = []
+      deltaTxs.forEach( ( deltaTx ) => {
         rescanTxs.push( {
           details: deltaTx,
           accountShell: shell,
@@ -1185,8 +1193,8 @@ function* refreshAccountShellWorker( { payload } ) {
       payload
     } )
 
-    const rescanTxs : RescannedTransactionData[]= []
-    deltaTxs.forEach( ( deltaTx )=>{
+    const rescanTxs: RescannedTransactionData[] = []
+    deltaTxs.forEach( ( deltaTx ) => {
       rescanTxs.push( {
         details: deltaTx,
         accountShell: shell,
@@ -1213,8 +1221,8 @@ function* autoSyncShellsWorker( { payload } ) {
   const shells = yield select(
     ( state ) => state.accounts.accountShells
   )
-  for( const shell of shells )  {
-    if( shell.syncStatus===SyncStatus.PENDING ) {
+  for ( const shell of shells ) {
+    if ( shell.syncStatus === SyncStatus.PENDING ) {
       yield spawn( refreshAccountShellWorker,
         {
           payload: {
@@ -1236,13 +1244,13 @@ export const autoSyncShellsWatcher = createWatcher(
 
 function* blindRefreshWorker() {
   const netDeltaTxs: TransactionDescribing[] = []
-  for( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ){
+  for ( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ) {
     const payload = {
       serviceType: accountKind,
       options: {
         loader: true,
         syncTrustedDerivative:
-        accountKind === TEST_ACCOUNT ? false : true,
+          accountKind === TEST_ACCOUNT ? false : true,
         derivativeAccountsToSync: Object.keys( config.DERIVATIVE_ACC ),
         hardRefresh: true,
         blindRefresh: true,
@@ -1252,7 +1260,7 @@ function* blindRefreshWorker() {
     const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
-    if( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
+    if ( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
   }
   return netDeltaTxs
 }
@@ -1322,7 +1330,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
         break
 
       case SubAccountKind.SERVICE:
-        switch( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+        switch ( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
             case ServiceAccountKind.WYRE:
               const wyreAccountDetails = {
                 accountName: subAccountInfo.customDisplayName,
@@ -1396,8 +1404,12 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 }
 
 
-function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
-  parentShell: AccountShell}} ) {
+function* addNewSecondarySubAccount( { payload }: {
+  payload: {
+    secondarySubAccount: SubAccountDescribing,
+    parentShell: AccountShell
+  }
+} ) {
   const { secondarySubAccount, parentShell } = payload
 
   let secondarySubAccountId: string
@@ -1409,14 +1421,14 @@ function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccou
 
   switch ( secondarySubAccount.kind ) {
       case SubAccountKind.SERVICE:
-        switch( ( secondarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+        switch ( ( secondarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
             case ServiceAccountKind.FAST_BITCOINS:
               const fastBitcoinsDetails = {
                 accountName: secondarySubAccount.customDisplayName,
                 accountDescription: secondarySubAccount.customDescription,
               }
               const fbtcRes = yield call(
-                ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
+                ( service as BaseAccount | SecureAccount ).setupDerivativeAccount,
                 DerivativeAccountTypes.FAST_BITCOINS,
                 fastBitcoinsDetails
               )
@@ -1528,9 +1540,9 @@ function* updateAccountSettings( { payload: account, }: {
       {
         // for accounts of subAccountKind as SERVICE we need to know which specific
         // service the account belongs to, this is serviceAccountKind of ExternalServiceSubAccountDescribing
-        kind: account.kind===SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
+        kind: account.kind === SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
         instanceNumber: account.instanceNumber,
-        customDisplayName :account.customDisplayName,
+        customDisplayName: account.customDisplayName,
         customDescription: account.customDescription
       }
     )
@@ -1551,7 +1563,7 @@ function* updateAccountSettings( { payload: account, }: {
         account
       } ) )
     }
-  }catch ( error ) {
+  } catch ( error ) {
     yield put( accountSettingsUpdateFailed( {
       account, error
     } ) )
@@ -1619,4 +1631,120 @@ function* mergeAccountShells( { payload: { source, destination }, }: {
 export const mergeAccountShellsWatcher = createWatcher(
   mergeAccountShells,
   MERGE_ACCOUNT_SHELLS
+)
+
+
+function* getAllAccountsData() {
+  try {
+    const accountShells: AccountShell[] = yield select(
+      ( state ) => state.accounts.accountShells
+    )
+    const accountState: AccountsState = yield select(
+      ( state ) => state.accounts
+    )
+    const accounts = []
+    let derivativeAccountKind
+    if ( accountShells ) {
+      accountShells.forEach( ( shell ) => {
+        switch ( shell.primarySubAccount.kind ) {
+            case SubAccountKind.DONATION_ACCOUNT:
+              derivativeAccountKind = DerivativeAccountTypes.DONATION_ACCOUNT
+              break
+            case SubAccountKind.REGULAR_ACCOUNT:
+            case SubAccountKind.SECURE_ACCOUNT:
+              if ( shell.primarySubAccount.instanceNumber )
+                derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+              else derivativeAccountKind = shell.primarySubAccount.kind
+              break
+
+            case SubAccountKind.SERVICE:
+              derivativeAccountKind = ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
+              break
+
+            default:
+              derivativeAccountKind = shell.primarySubAccount.kind
+        }
+        const derivativeAccountDetails: {
+        type: string;
+        number: number;
+      } = config.EJECTED_ACCOUNTS.includes( derivativeAccountKind ) ?
+        {
+          type: derivativeAccountKind,
+          number: shell.primarySubAccount.instanceNumber,
+        }
+        : null
+
+        const service: TestAccount | RegularAccount | SecureAccount = accountState[ shell.primarySubAccount.sourceKind ].service
+
+        const accountData = {
+          accountName: shell.primarySubAccount.customDisplayName ? shell.primarySubAccount.customDisplayName : shell.primarySubAccount.defaultTitle,
+          balance: shell.primarySubAccount.balances.confirmed,
+          receivingAddress: service.getReceivingAddress(
+            derivativeAccountDetails ? derivativeAccountDetails.type : null,
+            derivativeAccountDetails ? derivativeAccountDetails.number : null ),
+          accountImage: getAvatarForSubAccount( shell.primarySubAccount ),
+          shell: shell
+        }
+
+        // Dont Add Test Account to drop down
+        if( !( shell.primarySubAccount.sourceKind===SourceAccountKind.TEST_ACCOUNT ) )
+          accounts.push( accountData )
+      } )
+      yield put( setAllAccountsData( accounts ) )
+    }
+  } catch ( error ) {
+  }
+}
+
+export const getAllAccountsDataWatcher = createWatcher(
+  getAllAccountsData,
+  GET_ALL_ACCOUNTS_DATA
+)
+
+// UI should send shell.primarySubAccount
+function* fetchReceiveAddressWorker( { payload }: { payload: { subAccountInfo: SubAccountDescribing } } ) {
+  const { subAccountInfo } = payload
+  let accountType: DerivativeAccountTypes
+
+  switch ( subAccountInfo.kind ) {
+      case SubAccountKind.DONATION_ACCOUNT:
+        accountType = DerivativeAccountTypes.DONATION_ACCOUNT
+        break
+
+      case SubAccountKind.REGULAR_ACCOUNT:
+      case SubAccountKind.SECURE_ACCOUNT:
+        if ( subAccountInfo.instanceNumber )
+          accountType = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
+        break
+
+      case SubAccountKind.SERVICE:
+        switch ( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
+            case ServiceAccountKind.WYRE:
+              accountType = DerivativeAccountTypes.WYRE
+              break
+            case ServiceAccountKind.RAMP:
+              accountType = DerivativeAccountTypes.RAMP
+              break
+            case ServiceAccountKind.FAST_BITCOINS:
+              accountType = DerivativeAccountTypes.FAST_BITCOINS
+              break
+        }
+        break
+  }
+
+
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const service: TestAccount | RegularAccount | SecureAccount = accountState[ subAccountInfo.sourceKind ].service
+
+  const receiveAddress =  service.getReceivingAddress( accountType, subAccountInfo.instanceNumber )
+  yield put( fetchReceiveAddressSucceeded( receiveAddress ) )
+}
+
+// TODO: Consider moving the receive address watcher and worker
+// to sending saga or another appropriate saga
+export const fetchReceiveAddressWatcher = createWatcher(
+  fetchReceiveAddressWorker,
+  FETCH_RECEIVE_ADDRESS
 )

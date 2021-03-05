@@ -41,7 +41,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     }
   } )
   // eslint-disable-next-line quotes
-  let rampMessage = `\n\nRamp enables purchases of bitcoin using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Ramp Account\n- ${rampReceiveAddress}`
+  let rampMessage = `Ramp enables purchases of bitcoin using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Ramp Account\n- ${rampReceiveAddress}`
   let rampTitle = 'Buy with Ramp'
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
