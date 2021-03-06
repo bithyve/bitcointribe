@@ -38,18 +38,19 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
 
   const customPriorityError = useMemo( () => {
     return sendingState.customPriorityST1.failedErrorMessage
-  }, [ sendingState.customPriorityST1.failedErrorMessage ] )
+  }, [ sendingState.customPriorityST1 ] )
 
-  const showCustomPriorityBottomSheet = useCallback( () => {
-    const network = (
-      config.APP_STAGE === 'dev' ||
+  const network = useMemo( () => {
+    return config.APP_STAGE === 'dev' ||
       sourceSubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
-    ) ? NetworkKind.TESTNET : NetworkKind.MAINNET
+      ? NetworkKind.TESTNET : NetworkKind.MAINNET
+  }, [ sourceSubAccount.sourceKind, config ] )
 
+  const showCustomPriorityErrorBottomSheet = useCallback( ( customPriorityError ) => {
     presentBottomSheet(
       <CustomPriorityContent
         title={'Custom Priority'}
-        info={'Enter the fee rate in sats per byte.'}
+        info={'An error has occurred'}
         err={customPriorityError}
         network={network}
         okButtonText={'Confirm'}
@@ -57,6 +58,34 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
         isCancel={true}
         onPressOk={( amount, customEstimatedBlock ) => {
           Keyboard.dismiss()
+          handleCustomFee( amount, customEstimatedBlock )
+          dismissBottomSheet()
+        }}
+        onPressCancel={() => {
+          Keyboard.dismiss()
+          dismissBottomSheet()
+        }}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '44%' ],
+      },
+    )
+  }, [ presentBottomSheet, dismissBottomSheet ] )
+
+
+  const showCustomPriorityBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <CustomPriorityContent
+        title={'Custom Priority'}
+        info={'Enter the fee rate in sats per byte.'}
+        network={network}
+        okButtonText={'Confirm'}
+        cancelButtonText={'Back'}
+        isCancel={true}
+        onPressOk={( amount, customEstimatedBlock ) => {
+          Keyboard.dismiss()
+          handleCustomFee( amount, customEstimatedBlock )
           handleCustomFee( amount, customEstimatedBlock )
         }}
         onPressCancel={() => {
@@ -69,7 +98,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
         snapPoints: [ 0, '44%' ],
       },
     )
-  }, [ presentBottomSheet, dismissBottomSheet, customPriorityError ] )
+  }, [ presentBottomSheet, dismissBottomSheet ] )
 
 
   const handleCustomFee = ( feePerByte, customEstimatedBlocks ) => {
@@ -81,19 +110,25 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
   }
 
   useEffect( ()=>{
-    const { customPriorityST1 } = sendingState
-    const txPriorites = sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable
-    if( customPriorityST1.hasFailed ) {
-      setTransactionPrioritiesAvailable( txPriorites )
-      setTransactionPriority( TransactionPriority.LOW )
-      onTransactionPriorityChanged( TransactionPriority.LOW )
-    } else if ( customPriorityST1.isSuccessful ) {
-      setTransactionPrioritiesAvailable( [ ...txPriorites, TransactionPriority.CUSTOM ] )
-      setTransactionPriority( TransactionPriority.CUSTOM )
-      onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+    if ( sendingState.customPriorityST1.failedErrorMessage ) {
       dismissBottomSheet()
+      showCustomPriorityErrorBottomSheet( sendingState.customPriorityST1.failedErrorMessage )
+    } else {
+      const { customPriorityST1 } = sendingState
+      const txPriorites = sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable
+      if( customPriorityST1.hasFailed ) {
+        setTransactionPrioritiesAvailable( txPriorites )
+        setTransactionPriority( TransactionPriority.LOW )
+        onTransactionPriorityChanged( TransactionPriority.LOW )
+      } else if ( customPriorityST1.isSuccessful ) {
+        setTransactionPrioritiesAvailable( [ ...txPriorites, TransactionPriority.CUSTOM ] )
+        setTransactionPriority( TransactionPriority.CUSTOM )
+        onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+        dismissBottomSheet()
+      }
     }
   }, [ sendingState.customPriorityST1 ] )
+
 
   return (
     <View style={styles.rootContainer}>
