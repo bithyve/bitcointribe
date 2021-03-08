@@ -81,7 +81,7 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
           </AppBottomSheetTouchableWrapper>
 
           <View style={styles.viewStyle}>
-            <View style={styles.separatorView}/>
+            {/* <View style={styles.separatorView}/> */}
           </View>
         </View>
 
@@ -109,7 +109,7 @@ export default function DonationAccountKnowMoreSheetContents( props ) {
            Your supporters can donate by paying to the addresses these pages generate.
           </Text>
           <View style={styles.viewStyle}>
-            <View style={styles.separatorView}/>
+            {/* <View style={styles.separatorView}/> */}
           </View>
         </View>
       </ScrollView>

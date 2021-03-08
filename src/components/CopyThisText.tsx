@@ -39,7 +39,7 @@ export default function CopyThisText(props) {
         <View
           style={{
             width:wp('78%'),
-            backgroundColor: Colors.backgroundColor,
+            backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.backgroundColor,
             borderBottomLeftRadius: 8,
             borderTopLeftRadius: 8,
             height: wp('13%'),

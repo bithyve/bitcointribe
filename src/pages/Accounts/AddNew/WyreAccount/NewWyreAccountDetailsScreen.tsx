@@ -28,7 +28,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const { wyreHostedUrl } = useWyreIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
+  const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from Wyre' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const canProceed = useMemo( () => {
     return (

@@ -421,9 +421,9 @@ export default class Bitcoin {
         } )
 
         // sort transactions(lastest first)
-        // transactions.transactionDetails.sort( ( tx1, tx2 ) => {
-        //   return tx2.blockTime - tx1.blockTime
-        // } )
+        transactions.transactionDetails.sort( ( tx1, tx2 ) => {
+          return tx2.blockTime - tx1.blockTime
+        } )
 
         synchedAccounts[ accountId ] =  {
           UTXOs,

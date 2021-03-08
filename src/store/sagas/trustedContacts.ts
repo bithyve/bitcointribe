@@ -1184,6 +1184,10 @@ function* walletCheckInWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
+  const walletCheckInLoading: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.loading.walletCheckIn,
+  )
+
   const s3Service: S3Service = yield select( ( state ) => state.sss.service )
 
   const storedExchangeRates = yield select(
@@ -1203,138 +1207,140 @@ function* walletCheckInWorker( { payload } ) {
     ( tag ) => underCustody[ tag ].META_SHARE,
   )
 
-  const { synchingContacts } = payload
-  if (
-    synchingContacts &&
-    !Object.keys( trustedContacts.tc.trustedContacts ).length
-  ) {
-    yield put( calculateOverallHealth( s3Service ) )
-    return // aborting checkIn if walletSync is specifically done in context of trusted-contacts
-  }
+  try{
+    if( !walletCheckInLoading ) yield put( switchTCLoading( 'walletCheckIn' ) )
+    console.log( 'Wallet Check-In in progress...' )
 
-  yield put( switchTCLoading( 'walletCheckIn' ) )
-  console.log( 'Wallet Check-In in progress...' )
-  const preSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
-
-  const { metaShares, healthCheckStatus } = s3Service.sss
-  const preSyncHCStatus = JSON.stringify( {
-    healthCheckStatus
-  } )
-
-  const res = yield call(
-    trustedContacts.walletCheckIn,
-    metaShares.length ? metaShares.slice( 0, 3 ) : null, // metaShares is null during wallet-setup
-    metaShares.length ? healthCheckStatus : {
-    },
-    metaSharesUnderCustody,
-  )
-  console.log( {
-    res
-  } )
-  if ( res.status === 200 ) {
-    const { updationInfo, exchangeRates, averageTxFees } = res.data
-
-    if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
-    } ) )
-    else {
-      if ( JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates ) )
-        yield put( exchangeRatesCalculated( exchangeRates ) )
+    const { synchingContacts } = payload
+    if (
+      synchingContacts &&
+      !Object.keys( trustedContacts.tc.trustedContacts ).length
+    ) {
+      yield put( calculateOverallHealth( s3Service ) )
+      yield put( switchTCLoading( 'walletCheckIn' ) )
+      return // aborting checkIn if walletSync is specifically done in context of trusted-contacts
     }
 
-    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-    else {
-      if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
-        yield put( setAverageTxFee( averageTxFees ) )
-    }
+    const preSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
 
-    let shareRemoved = false
-    if ( updationInfo ) {
-      // removing shares under-custody based on reshare-version@HealthSchema
-      Object.keys( underCustody ).forEach( ( tag ) => {
-        for ( const info of updationInfo ) {
-          if ( info.updated ) {
-            // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-            //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-            //   if (info.encryptedDynamicNonPMDD)
-            //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-            //       info.encryptedDynamicNonPMDD;
-            // }
-          } else {
-            if ( info.removeShare ) {
-              if (
-                info.walletId === underCustody[ tag ].META_SHARE.meta.walletId
-              ) {
-                delete underCustody[ tag ]
-                shareRemoved = true
-                for ( const contactName of Object.keys(
-                  trustedContacts.tc.trustedContacts,
-                ) ) {
-                  const contact =
-                    trustedContacts.tc.trustedContacts[ contactName ]
-                  if ( contact.walletID === info.walletId ) {
-                    contact.isWard = false
+    const { metaShares, healthCheckStatus } = s3Service.sss
+    const preSyncHCStatus = JSON.stringify( {
+      healthCheckStatus
+    } )
+
+    const res = yield call(
+      trustedContacts.walletCheckIn,
+      metaShares.length ? metaShares.slice( 0, 3 ) : null, // metaShares is null during wallet-setup
+      metaShares.length ? healthCheckStatus : {
+      },
+      metaSharesUnderCustody,
+    )
+
+    if ( res.status === 200 ) {
+      const { updationInfo, exchangeRates, averageTxFees } = res.data
+
+      if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
+      } ) )
+      else {
+        if ( JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates ) )
+          yield put( exchangeRatesCalculated( exchangeRates ) )
+      }
+
+      if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
+      else {
+        if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
+          yield put( setAverageTxFee( averageTxFees ) )
+      }
+
+      let shareRemoved = false
+      if ( updationInfo ) {
+        // removing shares under-custody based on reshare-version@HealthSchema
+        Object.keys( underCustody ).forEach( ( tag ) => {
+          for ( const info of updationInfo ) {
+            if ( info.updated ) {
+              // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
+              //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
+              //   if (info.encryptedDynamicNonPMDD)
+              //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
+              //       info.encryptedDynamicNonPMDD;
+              // }
+            } else {
+              if ( info.removeShare ) {
+                if (
+                  info.walletId === underCustody[ tag ].META_SHARE.meta.walletId
+                ) {
+                  delete underCustody[ tag ]
+                  shareRemoved = true
+                  for ( const contactName of Object.keys(
+                    trustedContacts.tc.trustedContacts,
+                  ) ) {
+                    const contact =
+                      trustedContacts.tc.trustedContacts[ contactName ]
+                    if ( contact.walletID === info.walletId ) {
+                      contact.isWard = false
+                    }
                   }
                 }
               }
             }
           }
-        }
+        } )
+      }
+
+      const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
+      const { healthCheckStatus } = res.data
+      const postSyncHCStatus = JSON.stringify( {
+        healthCheckStatus
       } )
-    }
 
-    const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
-    const { healthCheckStatus } = res.data
-    const postSyncHCStatus = JSON.stringify( {
-      healthCheckStatus
-    } )
-
-    if (
-      preSyncTC !== postSyncTC ||
-      preSyncHCStatus !== postSyncHCStatus ||
-      shareRemoved
-    ) {
-      let dbPayload = {
-      }
-      const { SERVICES } = yield select( ( state ) => state.storage.database )
-      let updatedSERVICES = {
-        ...SERVICES,
-        TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-      }
-
-      if ( preSyncHCStatus !== postSyncHCStatus ) {
-        s3Service.sss.healthCheckStatus = healthCheckStatus
-        updatedSERVICES = {
-          ...updatedSERVICES,
-          S3_SERVICE: JSON.stringify( s3Service ),
-        }
-      }
-      dbPayload = {
-        SERVICES: updatedSERVICES,
-      }
-
-      console.log( {
+      if (
+        preSyncTC !== postSyncTC ||
+        preSyncHCStatus !== postSyncHCStatus ||
         shareRemoved
-      } )
-      if ( shareRemoved ) {
-        const updatedBackup = {
-          ...DECENTRALIZED_BACKUP,
-          UNDER_CUSTODY: underCustody,
+      ) {
+        let dbPayload = {
+        }
+        const { SERVICES } = yield select( ( state ) => state.storage.database )
+        let updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+        }
+
+        if ( preSyncHCStatus !== postSyncHCStatus ) {
+          s3Service.sss.healthCheckStatus = healthCheckStatus
+          updatedSERVICES = {
+            ...updatedSERVICES,
+            S3_SERVICE: JSON.stringify( s3Service ),
+          }
         }
         dbPayload = {
-          ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup
+          SERVICES: updatedSERVICES,
         }
+
+        if ( shareRemoved ) {
+          const updatedBackup = {
+            ...DECENTRALIZED_BACKUP,
+            UNDER_CUSTODY: underCustody,
+          }
+          dbPayload = {
+            ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup
+          }
+        }
+
+        yield call( insertDBWorker, {
+          payload: dbPayload,
+        } )
       }
-
-      yield call( insertDBWorker, {
-        payload: dbPayload,
-      } )
+    } else {
+      console.log( 'Check-In failed', res.err )
     }
-  } else {
-    console.log( 'Check-In failed', res.err )
-  }
 
-  if ( metaShares.length ) yield put( calculateOverallHealth( s3Service ) )
-  yield put( switchTCLoading( 'walletCheckIn' ) )
+    if ( metaShares.length ) yield put( calculateOverallHealth( s3Service ) )
+    yield put( switchTCLoading( 'walletCheckIn' ) )
+  } catch( err ){
+    console.log( 'Wallet Check-In failed w/ the following err: ', err )
+    yield put( switchTCLoading( 'walletCheckIn' ) )
+  }
 }
 
 export const walletCheckInWatcher = createWatcher(
