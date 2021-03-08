@@ -253,7 +253,6 @@ export default class HDSegwitWallet extends Bitcoin {
     accountNumber?: number,
   ): string => {
     let receivingAddress
-    let account = null
     switch ( derivativeAccountType ) {
         case DONATION_ACCOUNT:
         case FAST_BITCOINS:
@@ -261,7 +260,7 @@ export default class HDSegwitWallet extends Bitcoin {
         case WYRE:
         case RAMP:
           if( !accountNumber ) throw new Error( 'Failed to generate receiving address: instance number missing' )
-          account = this
+          const account = this
             .derivativeAccounts[ derivativeAccountType ][ accountNumber ]
           receivingAddress = account ? account.receivingAddress : ''
           break

@@ -100,9 +100,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          As only you can access your wallet,{'\n'}it is important to manage
-          your backup health{'\n'}for easy recovery in case you {'\n'}lose your
-          phone
+          As only you can access your wallet, it is important to manage your backup health for easy recovery in case you lose your phone.
         </Text>
       </View>
       <View
@@ -120,8 +118,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          Once backed up,{'\n'}Hexa's automated health check process ensures
-          {'\n'} you have access to the backup anytime
+          Once backed up, Hexa's automated health check process ensures you have access to the backup anytime!
         </Text>
         <Text
           style={{
@@ -132,7 +129,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansMedium,
           }}
         >
-          The Health Shield tells you{'\n'}how ready your backup is
+          The Health Shield tells you{'\n'}how ready your backup is.
         </Text>
       </View>
       <View
@@ -240,7 +237,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          The app creates five Recovery Keys for your wallet
+          The app creates five Recovery Keys for your wallet.
         </Text>
       </View>
       <View
@@ -258,8 +255,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          All you need to do is follow the outlined steps and{'\n'}send these
-          Keys{'\n'}with five independent sources.
+          All you need to do is follow the outlined steps and send these Keys to five different locations, or "Keepers".
         </Text>
       </View>
       <View
@@ -277,8 +273,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          Keepers can only help you recover{'\n'}your wallet and cannot see your
-          balance or use your bitcoin.
+          Keepers can only help you recover your wallet and cannot see your balance or use your bitcoin.
         </Text>
       </View>
       <View
@@ -317,7 +312,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          If you lose your phone,{'\n'}all you have to do is request{' '}
+          If you lose your phone, all you have to do is request{' '}
           <Text
             style={{
               marginTop: 5,
@@ -354,8 +349,7 @@ export default function WalletBackupAndRecoveryContents(props) {
             fontFamily: Fonts.FiraSansRegular,
           }}
         >
-          Once you answer your Security Question,{'\n'}the wallet is recreated and
-          you can use Hexa from your new device
+          Once you answer your Security Question, the wallet is recreated and you can use Hexa from your new device!
         </Text>
       </View>
       <View
