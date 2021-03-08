@@ -43,6 +43,7 @@ import {
   autoDownloadShareContact,
   uploadSecondaryShareForPK,
   downloadSMShard,
+  updateKeeperInfoToUnderCustody,
 } from "../../store/actions/health";
 import { createRandomString } from "../../common/CommonFunctions/timeFormatter";
 import {
@@ -264,6 +265,7 @@ interface HomePropsTypes {
   wyreFromDeepLink: boolean | null;
   updateNewFcm: any;
   setCloudData: any;
+  updateKeeperInfoToUnderCustody: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic();
@@ -1877,6 +1879,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       secureAccount,
       UNDER_CUSTODY,
       database,
+      updateKeeperInfoToUnderCustody
     } = this.props;
     // let asyncNotification = notificationListNew;
     const asyncNotification = JSON.parse(
@@ -1916,6 +1919,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
           } else {
             readStatus = true;
+          }
+        }
+        if (element.notificationType == "newKeeperInfo") {
+          let data = JSON.parse(element.data);
+          if (data.walletName) {
+            updateKeeperInfoToUnderCustody(data.walletName, data.walletId);
           }
         }
         if (element.notificationType == "uploadSecondaryShare") {
@@ -2596,7 +2605,8 @@ export default withNavigationFocus(
     setIsBackupProcessing,
     downloadSMShard,
     updateNewFcm,
-    setCloudData
+    setCloudData,
+    updateKeeperInfoToUnderCustody
   })(Home)
 );
 

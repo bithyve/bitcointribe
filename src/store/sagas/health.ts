@@ -66,6 +66,7 @@ import {
   UploadSMSuccessfully,
   DELETE_SM_AND_SMSHARES,
   UPDATE_KEEPERINFO_TO_TC,
+  UPDATE_KEEPERINFO_UNDER_CUSTODY,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -3166,7 +3167,6 @@ function* uploadSMShareWorker({ payload }) {
           );
           let trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts;
           let keeperInfo = yield select((state) => state.health.keeperInfo);
-          let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
           let walletId = s3Service.getWalletId().data.walletId;
 
           let { encryptedString } = LevelHealth.encryptWithAnswer(keeperInfo, WALLET_SETUP.security.answer)
@@ -3233,4 +3233,69 @@ function* uploadSMShareWorker({ payload }) {
   export const updateKeeperInfoToTrustedChannelWatcher = createWatcher(
     updateKeeperInfoToTrustedChannelWorker,
     UPDATE_KEEPERINFO_TO_TC,
+  )
+
+  function* updateKeeperInfoToUnderCustodyWorker({ payload }) {
+    try {
+      let { walletName, walletId } = payload;
+      // Transfer: Guardian >>> User
+      let { DECENTRALIZED_BACKUP } = yield select((state) => state.storage.database);
+      const trustedContactsService: TrustedContactsService = yield select(
+        (state) => state.trustedContacts.service
+      );
+      let trustedContacts = trustedContactsService.tc.trustedContacts;
+      let TContacts=[];
+      let contactNameArr = [];
+      if (Object.keys(trustedContacts).length) {
+        TContacts = Object.keys(trustedContacts).map((tag) => {
+          contactNameArr.push(tag);
+          return trustedContacts[tag];
+        });
+      }
+      let index = TContacts.findIndex(value => value.walletID == walletId);
+
+      if (
+        index > -1 &&
+        TContacts[index].trustedChannel &&
+        TContacts[index].trustedChannel.address
+      ) {
+       
+        let res = yield call(
+          trustedContactsService.fetchTrustedChannel,
+          contactNameArr[index],
+          walletName
+        );
+        if(res.status == 200){
+          let data: TrustedDataElements = res.data.data;
+          let encryptedKeeperInfo = data.keeperInfo;
+          let underCustody = DECENTRALIZED_BACKUP.UNDER_CUSTODY;
+          let metaShare = {...underCustody[walletName].META_SHARE, meta: { ...underCustody[walletName].META_SHARE, encryptedKeeperInfo }};
+          let updatedBackup = {
+            ...DECENTRALIZED_BACKUP,
+            UNDER_CUSTODY: {
+              ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+              [walletName]: {
+                ...underCustody[walletName],
+                META_SHARE: metaShare,
+              },
+            },
+          };
+          
+          console.log({ updatedBackup });
+          yield call(insertDBWorker, {
+            payload: {
+              DECENTRALIZED_BACKUP: updatedBackup,
+            },
+          });
+        }
+      }
+
+    } catch (error) {
+      console.log('RECOVERY error', error)
+    }
+  }
+  
+  export const updateKeeperInfoToUnderCustodyWatcher = createWatcher(
+    updateKeeperInfoToUnderCustodyWorker,
+    UPDATE_KEEPERINFO_UNDER_CUSTODY,
   )

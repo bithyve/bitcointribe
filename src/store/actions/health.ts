@@ -75,6 +75,7 @@ export const UPLOAD_REQUESTED_SMSHARE = 'UPLOAD_REQUESTED_SMSHARE';
 export const UPLOAD_SUCCESSFULLY_SM = 'UPLOAD_SUCCESSFULLY_SM';
 export const DELETE_SM_AND_SMSHARES = 'DELETE_SM_AND_SMSHARES';
 export const UPDATE_KEEPERINFO_TO_TC = 'UPDATE_KEEPERINFO_TO_TC';
+export const UPDATE_KEEPERINFO_UNDER_CUSTODY = 'UPDATE_KEEPERINFO_UNDER_CUSTODY';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -492,4 +493,8 @@ export const deleteSmSharesAndSM = () => {
 
 export const updateKeeperInfoToTrustedChannel = () => {
   return { type: UPDATE_KEEPERINFO_TO_TC }
+}
+
+export const updateKeeperInfoToUnderCustody = (walletName, walletId) => {
+  return { type: UPDATE_KEEPERINFO_UNDER_CUSTODY, payload: { walletName, walletId } }
 }
