@@ -176,7 +176,7 @@ const SecondaryDeviceHistory = ( props ) => {
         tcInfo[ 2 ] = undefined // securing initial 3 positions for Guardians
         tcInfo[ 0 ] = contact
       }
-      await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
+
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
     },
     [ trustedContactsInfo ],

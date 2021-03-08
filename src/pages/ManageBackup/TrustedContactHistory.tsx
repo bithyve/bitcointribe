@@ -771,7 +771,6 @@ const TrustedContactHistory = ( props ) => {
         tcInfo[ 2 ] = null
         tcInfo[ index ] = contact
       }
-      await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
 
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
     },

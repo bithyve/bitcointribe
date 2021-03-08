@@ -87,7 +87,7 @@ const ContactsListForAssociateContact = ( props ) => {
 
       postAssociation( associatedContact )
     }
-    await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
+
     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 

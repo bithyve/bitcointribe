@@ -317,7 +317,7 @@ export default function Receive( props ) {
       tcInfo[ 2 ] = null
       tcInfo[ 3 ] = contact // initial 3 reserved for Guardians
     }
-    await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
+
     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 

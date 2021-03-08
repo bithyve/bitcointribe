@@ -120,7 +120,7 @@ export default function AddContactSendRequest( props ) {
       tcInfo[ 2 ] = null
       tcInfo[ 3 ] = contact
     }
-    await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
+
     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
