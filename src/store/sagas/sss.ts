@@ -1782,20 +1782,17 @@ const hash = ( element ) => {
 
 const asyncDataToBackup = async () => {
   const [
-    [ , TrustedContactsInfo ],
     [ , personalCopyDetails ],
     [ , FBTCAccount ],
     [ , PersonalNode ]
   ] = await AsyncStorage.multiGet( [
-    'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
     'PersonalNode'
   ] )
   const ASYNC_DATA = {
   }
-  if ( TrustedContactsInfo )
-    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+
   if ( personalCopyDetails )
     ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
   if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
@@ -1807,6 +1804,7 @@ const asyncDataToBackup = async () => {
 function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
+  const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
 
   const versionHistory = yield select(
@@ -1819,8 +1817,12 @@ function* stateDataToBackup() {
 
   const STATE_DATA = {
   }
+
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
+
+  if ( trustedContactsInfo && trustedContactsInfo.length )
+    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
 
   if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
@@ -1994,6 +1996,7 @@ function* fetchWalletImageWorker( { payload } ) {
         yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
 
         if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
+          // supports legacy trustedContactsInfo; backed up as a part of async data(for versions < 1.5.0)
           const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
           yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
         }
@@ -2010,6 +2013,11 @@ function* fetchWalletImageWorker( { payload } ) {
               yield put( restoredAccountShells( {
                 accountShells
               } ) )
+              break
+
+            case 'trustedContactsInfo':
+              const trustedContactsInfo = JSON.parse( STATE_DATA[ key ] )
+              yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
               break
 
             case 'activePersonalNode':
