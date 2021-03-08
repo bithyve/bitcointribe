@@ -47,8 +47,8 @@ import { ListItem } from 'react-native-elements'
 import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import {
   ContactRecipientDescribing,
-  makeContactRecipientDescription,
 } from '../../common/data/models/interfaces/RecipientDescribing'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
 
