@@ -412,8 +412,8 @@ function* removeTrustedContactWorker( { payload } ) {
     delete derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ].contactDetails
   }
 
-  const tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
-  if ( tcInfo ) {
+  const tcInfo = trustedContactsInfo
+  if ( tcInfo.length ) {
     for ( let itr = 0; itr < tcInfo.length; itr++ ) {
       const trustedContact = tcInfo[ itr ]
       if ( trustedContact ) {

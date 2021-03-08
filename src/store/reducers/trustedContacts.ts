@@ -16,6 +16,8 @@ import {
   UPDATE_TRUSTED_CONTACTS_INFO,
 } from '../actions/trustedContacts'
 import {
+  ContactElements,
+  Contacts,
   EphemeralDataElements,
 } from '../../bitcoin/utilities/Interface'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
@@ -235,7 +237,7 @@ function reduceTCInfoIntoRecipientDescriptions( {
   backendTrustedContactsData,
 }: {
   trustedContactsInfo: TrustedContactInfo[];
-  backendTrustedContactsData: Record<string, unknown>;
+  backendTrustedContactsData: Contacts;
 } ): ContactRecipientDescribing[] {
   return trustedContactsInfo.reduce( (
     accumulatedRecipients: ContactRecipientDescribing[],
@@ -248,8 +250,13 @@ function reduceTCInfoIntoRecipientDescriptions( {
     // someone is a guardian.
     const isGuardian = currentIndex < 3 ? true : false
 
-    backendTrustedContactsData[ displayedName.toLowerCase().trim() ] || {
-    }
+    const contactName = `${currentTCInfoObject.firstName} ${
+      currentTCInfoObject.lastName ? currentTCInfoObject.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
+
+    const backendTCInfo: ContactElements = backendTrustedContactsData[ contactName ]
 
     const isWard: boolean = backendTCInfo.isWard || false
     const hasTrustedAddress = Boolean( backendTCInfo.trustedAddress ) || Boolean( backendTCInfo.trustedTestAddress )

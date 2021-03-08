@@ -290,8 +290,8 @@ export default function Receive( props ) {
   ] )
 
   const updateTrustedContactsInfo = async ( contact ) => {
-    let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
-    if ( tcInfo ) {
+    const tcInfo = trustedContactsInfo
+    if ( tcInfo.length ) {
       if (
         tcInfo.findIndex( ( trustedContact ) => {
           if ( !trustedContact ) return false
@@ -311,13 +311,12 @@ export default function Receive( props ) {
         tcInfo.push( contact )
       }
     } else {
-      tcInfo = []
       tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
       tcInfo[ 1 ] = null
       tcInfo[ 2 ] = null
       tcInfo[ 3 ] = contact // initial 3 reserved for Guardians
     }
-    await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
+
     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
