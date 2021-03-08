@@ -1,18 +1,30 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { StyleSheet, FlatList } from 'react-native'
+import { TEST_ACCOUNT } from '../../../common/constants/wallet-service-types'
+import CurrencyKind from '../../../common/data/enums/CurrencyKind'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import SelectedRecipientCarouselItem from '../../../components/send/SelectedRecipientCarouselItem'
+import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
 
 export type Props = {
   recipients: RecipientDescribing[];
+  subAccountKind: SubAccountKind;
   onRemoveSelected?: ( recipient: RecipientDescribing ) => void;
 };
 
 
 const SelectedRecipientsCarousel: React.FC<Props> = ( {
   recipients,
+  subAccountKind,
   onRemoveSelected = () => {},
 }: Props ) => {
+  const currencyKind = useCurrencyKind()
+
+  const prefersBitcoin: boolean = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
+
   return (
     <FlatList
       horizontal
@@ -32,13 +44,13 @@ const SelectedRecipientsCarousel: React.FC<Props> = ( {
               marginHorizontal: 12
             }}
             recipient={recipient}
-            // currencyCode={
-            //   prefersBitcoin
-            //     ? serviceType == TEST_ACCOUNT
-            //       ? ' t-sats'
-            //       : ' sats'
-            //     : ''
-            // }
+            currencyCode={
+              prefersBitcoin
+                ? subAccountKind == SubAccountKind.TEST_ACCOUNT
+                  ? ' t-sats'
+                  : ' sats'
+                : ''
+            }
             onRemove={() => onRemoveSelected( recipient )}
           />
         )

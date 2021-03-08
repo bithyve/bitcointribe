@@ -178,6 +178,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={selectedRecipients}
+          subAccountKind={sourcePrimarySubAccount.kind}
         />
       </View>
 

@@ -155,6 +155,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={orderedRecipients}
+          subAccountKind={sourcePrimarySubAccount.kind}
           onRemoveSelected={handleRecipientRemoval}
         />
       </View>
