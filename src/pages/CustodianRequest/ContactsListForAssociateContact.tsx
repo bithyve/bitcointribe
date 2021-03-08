@@ -56,8 +56,8 @@ const ContactsListForAssociateContact = ( props ) => {
       .trim()
     setApprovingContact( selectedContactName )
 
-    let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
-    if ( tcInfo ) {
+    const tcInfo = trustedContactsInfo
+    if ( tcInfo.length ) {
       if (
         tcInfo.findIndex( ( trustedContact ) => {
           if ( !trustedContact ) return false
@@ -82,9 +82,7 @@ const ContactsListForAssociateContact = ( props ) => {
         return
       }
     } else {
-      tcInfo = []
       tcInfo[ 3 ] = associatedContact
-
       postAssociation( associatedContact )
     }
 

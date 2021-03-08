@@ -167,14 +167,14 @@ const SecondaryDeviceHistory = ( props ) => {
 
   const updateTrustedContactsInfo = useCallback(
     async ( contact ) => {
-      let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
+      const tcInfo = trustedContactsInfo
 
-      if ( tcInfo ) {
+      if ( tcInfo.length ) {
         tcInfo[ 0 ] = contact
       } else {
-        tcInfo = []
-        tcInfo[ 2 ] = undefined // securing initial 3 positions for Guardians
         tcInfo[ 0 ] = contact
+        tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+        tcInfo[ 2 ] = undefined
       }
 
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )

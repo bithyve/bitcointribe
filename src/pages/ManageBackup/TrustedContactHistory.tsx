@@ -740,9 +740,9 @@ const TrustedContactHistory = ( props ) => {
 
   const updateTrustedContactsInfo = useCallback(
     async ( contact ) => {
-      let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
+      const tcInfo = trustedContactsInfo
 
-      if ( tcInfo ) {
+      if ( tcInfo.length ) {
         if ( tcInfo[ index ] ) {
           let found = false
           for ( let i = 3; i < tcInfo.length; i++ ) {
@@ -765,7 +765,6 @@ const TrustedContactHistory = ( props ) => {
 
         tcInfo[ index ] = contact
       } else {
-        tcInfo = []
         tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
         tcInfo[ 1 ] = null
         tcInfo[ 2 ] = null
