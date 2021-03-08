@@ -64,6 +64,8 @@ import {
   UPLOAD_SMSHARE_KEEPER,
   UPLOAD_REQUESTED_SMSHARE,
   UploadSMSuccessfully,
+  DELETE_SM_AND_SMSHARES,
+  UPDATE_KEEPERINFO_TO_TC,
 } from "../actions/health";
 import S3Service from "../../bitcoin/services/sss/S3Service";
 import { updateHealth } from "../actions/health";
@@ -91,6 +93,7 @@ import {
   INotification,
   Keepers,
   LevelHealthInterface,
+  LevelInfo,
   MetaShare,
   notificationTag,
   notificationType,
@@ -2349,31 +2352,33 @@ export const autoDownloadShareContactWatcher = createWatcher(
 
 function* getPDFDataWorker({ payload }) {
   try {
-    console.log("getPdfData payload", payload);
     yield put(switchS3LoaderKeeper("pdfDataProcess"));
     let { shareId, isReShare } = payload;
     let s3Service: S3Service = yield select((state) => state.health.service);
-    console.log('s3Service', s3Service.levelhealth.SMMetaSharesKeeper);
-    let { WALLET_SETUP } = yield select((state) => state.storage.database);
-      const keeper: KeeperService = yield select((state) => state.keeper.service);
-      let levelHealth: LevelHealthInterface[] = yield select(
-        (state) => state.health.levelHealth
-      );
-      let currentLevel: number = yield select(
-        (state) => state.health.currentLevel
-      );
+    let { WALLET_SETUP, SERVICES } = yield select((state) => state.storage.database);
+    const keeper: KeeperService = yield select((state) => state.keeper.service);
+    let levelHealth: LevelHealthInterface[] = yield select((state) => state.health.levelHealth);
+    let currentLevel: number = yield select((state) => state.health.currentLevel);
+    let keeperInfo = yield select((state) => state.health.keeperInfo);
     let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
+    let shareIndex = 3;
+      if (
+        shareId &&
+        s3Service.levelhealth.metaSharesKeeper.length &&
+        metaShare.findIndex((value) => value.shareId == shareId) > -1
+      ) {
+        shareIndex = metaShare.findIndex((value) => value.shareId == shareId);
+      }
+    let response = yield call(s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer);
     let secondaryShare;
     // TODO get primaryKeeper shareID
     if(s3Service.levelhealth.SMMetaSharesKeeper && s3Service.levelhealth.SMMetaSharesKeeper.length){
       secondaryShare = s3Service.levelhealth.SMMetaSharesKeeper[1];
     } else {
-
       let PKShareId =
       currentLevel == 2 || currentLevel == 1
         ? levelHealth[1].levelInfo[2].shareId
         : levelHealth[1].levelInfo[2].shareId;
-      console.log("PKShareId", PKShareId);
       const res = yield call(
         keeper.fetchTrustedChannel,
         PKShareId,
@@ -2393,14 +2398,7 @@ function* getPDFDataWorker({ payload }) {
       } = yield select((state) => state.health.pdfInfo);
       let walletId = s3Service.levelhealth.walletId;
 
-      let shareIndex = 3;
-      if (
-        shareId &&
-        s3Service.levelhealth.metaSharesKeeper.length &&
-        metaShare.findIndex((value) => value.shareId == shareId) > -1
-      ) {
-        shareIndex = metaShare.findIndex((value) => value.shareId == shareId);
-      }
+      
       if (isReShare) {
         yield call(s3Service.reshareMetaShareKeeper, shareIndex);
       }
@@ -2413,10 +2411,10 @@ function* getPDFDataWorker({ payload }) {
         privateKey = keyPair.getPrivate("hex");
       }
 
-      let primaryShare = metaShare[shareIndex];
-      let secondaryShare = data.pdfShare;
+      let primaryShare = s3Service.levelhealth.metaSharesKeeper[shareIndex];
       let primaryShareKey = Keeper.getDerivedKey(privateKey);
       let secondaryShareKey = Keeper.getDerivedKey(walletId);
+      
 
       const secondaryData = LevelHealth.encryptMetaShare(
         secondaryShare,
@@ -2426,6 +2424,16 @@ function* getPDFDataWorker({ payload }) {
         primaryShare,
         primaryShareKey
       );
+      let obj = {
+        shareId: primaryShare.shareId,
+        name: "Keeper PDF",
+        uuid: "",
+        publicKey: "",
+        ephemeralAddress: "",
+        type: "pdf",
+        data: {}
+      };
+      yield put(updatedKeeperInfo(obj));
       let primaryShareObject = JSON.stringify({
         key: primaryShareKey,
         messageId: primaryData.messageId,
@@ -2485,6 +2493,12 @@ function* getPDFDataWorker({ payload }) {
           shareId: '',
         }));
       }
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify(s3Service),
+      };
+      
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
     }
     yield put(switchS3LoaderKeeper("pdfDataProcess"));
   } catch (error) {
@@ -2655,16 +2669,7 @@ function* confirmPDFSharedWorker({ payload }) {
       },
     ];
     yield put(updateMSharesHealth(shareArray));
-    let obj = {
-      shareId: shareId,
-      name: "Keeper PDF",
-      uuid: "",
-      publicKey: "",
-      ephemeralAddress: "",
-      type: "pdf",
-      data: {}
-    };
-    yield put(updatedKeeperInfo(obj));
+    
     yield put(onApprovalStatusChange({
       status: false,
       initiatedAt: 0,
@@ -3081,4 +3086,151 @@ function* uploadSMShareWorker({ payload }) {
   export const uploadRequestedSMShareWatcher = createWatcher(
     uploadRequestedSMShareWorker,
     UPLOAD_REQUESTED_SMSHARE,
+  )
+
+  function* deleteSmSharesAndSMWorker() {
+    try {
+      // Transfer: Guardian >>> User
+      let s3Service: S3Service = yield select((state) => state.health.service);
+      let s3ServiceSecure: SecureAccount = yield select(
+        (state) => state.accounts[SECURE_ACCOUNT].service
+      );
+      // Delete Sm shares
+      s3Service.deleteSmSharesAndSM();
+      
+      // Delete Sm
+      s3ServiceSecure.deleteSecondaryMnemonics();
+      
+      console.log('s3Service.levelhealth.SMMetaSharesKeeper', s3Service.levelhealth.SMMetaSharesKeeper);
+      console.log('s3Service.levelhealth.encryptedSMSecretsKeeper', s3Service.levelhealth.encryptedSMSecretsKeeper);
+      const { SERVICES } = yield select((state) => state.storage.database);
+      const updatedSERVICES = {
+        ...SERVICES,
+        SECURE_ACCOUNT: JSON.stringify(s3ServiceSecure),
+        S3_SERVICE: JSON.stringify(s3Service),
+      };
+      yield call(insertDBWorker, { payload: { SERVICES: updatedSERVICES } });
+    } catch (error) {
+      console.log('RECOVERY error', error)
+    }
+  }
+  
+  export const deleteSmSharesAndSMWatcher = createWatcher(
+    deleteSmSharesAndSMWorker,
+    DELETE_SM_AND_SMSHARES,
+  )
+
+  function* updateKeeperInfoToTrustedChannelWorker() {
+    try {
+      // Transfer: Guardian >>> User
+      let levelHealth: LevelHealthInterface[] = yield select((state) => state.health.levelHealth);
+      let currentLevel = yield select((state) => state.health.currentLevel);
+      let s3Service: S3Service = yield select((state) => state.health.service);
+      let contactKeeper: LevelInfo[] = [];
+      let pdfKeeper: LevelInfo[] = [];
+      let levelHealthVar: LevelInfo[];
+      if(currentLevel == 1 && levelHealth[1] && levelHealth[1].levelInfo.length) {
+        levelHealthVar = levelHealth[1].levelInfo;
+      }
+      else if(currentLevel == 2 && !levelHealth[2]) {
+        levelHealthVar = levelHealth[1].levelInfo;
+      }
+      else if(currentLevel == 2 && levelHealth[2] && levelHealth[2].levelInfo.length) {
+        levelHealthVar = [...levelHealth[1].levelInfo, ...levelHealth[2].levelInfo];
+      }
+      else if(currentLevel == 3 && levelHealth[2] && levelHealth[2].levelInfo.length) {
+        levelHealthVar = levelHealth[2].levelInfo;
+      }
+      else if(currentLevel == 3) {
+        levelHealthVar = levelHealth[2].levelInfo;
+      }
+
+      for (let i = 0; i < levelHealthVar.length; i++) {
+        const element = levelHealthVar[i];
+        if((element.shareType == 'contact' || element.shareType == 'device') && element.status == 'accessible') {
+          contactKeeper.push(element);
+        }
+        if(element.shareType == 'pdf' && element.status == 'accessible') {
+          contactKeeper.push(element);
+        }
+      }
+
+      if(contactKeeper.length) {
+        for (let i = 0; i < contactKeeper.length; i++) {
+          const element = contactKeeper[i];
+          let selectedShareId = element.shareId;
+          let name: string = element.name;
+          let { WALLET_SETUP } = yield select((state) => state.storage.database);
+          const trustedContacts: TrustedContactsService = yield select(
+            (state) => state.trustedContacts.service
+          );
+          let trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts;
+          let keeperInfo = yield select((state) => state.health.keeperInfo);
+          let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
+          let walletId = s3Service.getWalletId().data.walletId;
+
+          let { encryptedString } = LevelHealth.encryptWithAnswer(keeperInfo, WALLET_SETUP.security.answer)
+
+          let oldKeeperInfo = trustedContactsInfo[name.toLowerCase()];
+          const data: TrustedDataElements = { keeperInfo: encryptedString };
+          const res = yield call(
+            trustedContacts.updateTrustedChannel,
+            name,
+            data,
+            false
+          );
+          if (res.status == 200) {             
+            const notification: INotification = {
+              notificationType: notificationType.newKeeperInfo,
+              title: "New keeper info uploaded",
+              body: "New keeper info uploaded.",
+              data: JSON.stringify({ selectedShareId, walletId: walletId, walletName: WALLET_SETUP.walletName }),
+              tag: notificationTag.IMP,
+              date: new Date(),
+            };
+            let ress = yield call(
+              RelayServices.sendNotifications,
+              [{ walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs }],
+              notification
+            );
+          }
+          
+        }
+      }
+
+      if(pdfKeeper.length) {
+        let pdfKeeperElement = pdfKeeper[0];
+        let pdfInfo: {
+          filePath: string;
+          publicKey: string;
+          privateKey: string;
+        } = yield select((state) => state.health.pdfInfo);
+
+        let publicKey = pdfInfo.publicKey;
+        let privateKey = pdfInfo.privateKey;
+  
+        let primaryShare = s3Service.levelhealth.metaSharesKeeper[pdfKeeperElement.shareId];
+        let primaryShareKey = Keeper.getDerivedKey(privateKey);
+
+        const primaryData = LevelHealth.encryptMetaShare(
+          primaryShare,
+          primaryShareKey
+        );
+  
+        // TODO upload Data
+        let res1 = yield call(
+          LevelHealth.uploadPDFPrimaryShare,
+          primaryData.encryptedMetaShare,
+          primaryData.messageId
+        );
+      }
+      
+    } catch (error) {
+      console.log('RECOVERY error', error)
+    }
+  }
+  
+  export const updateKeeperInfoToTrustedChannelWatcher = createWatcher(
+    updateKeeperInfoToTrustedChannelWorker,
+    UPDATE_KEEPERINFO_TO_TC,
   )

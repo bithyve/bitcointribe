@@ -247,16 +247,6 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
         },
       ];
       dispatch(updateMSharesHealth(shareArray)); 
-      let obj = {
-        shareId: selectedShareId,
-        name: contactName,
-        uuid: contact.id,
-        publicKey: '',
-        ephemeralAddress: '',
-        type: 'device',
-        data: {...contact, name: contactName, index}
-      };
-      dispatch(updatedKeeperInfo(obj));
     },
     [trustedContactsInfo],
   );
@@ -313,6 +303,17 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
         contactName,
         info,
       };
+
+      let obj = {
+        shareId: selectedShareId,
+        name: contactName,
+        uuid: '',
+        publicKey: '',
+        ephemeralAddress: '',
+        type: 'device',
+        data: {name: contactName, index}
+      };
+      dispatch(updatedKeeperInfo(obj));
 
       if (changeKeeper) {
         setSecondaryQR('');

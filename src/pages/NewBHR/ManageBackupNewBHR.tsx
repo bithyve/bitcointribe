@@ -52,11 +52,14 @@ import {
   reShareWithSameKeeper,
   autoShareContact,
   generateSMMetaShares,
+  deleteSmSharesAndSM,
+  updateKeeperInfoToTrustedChannel
 } from "../../store/actions/health";
 import { modifyLevelStatus } from "./ManageBackupFunction";
 import {
   LevelHealthInterface,
   MetaShare,
+  notificationType,
 } from "../../bitcoin/utilities/Interface";
 import {
   fetchKeeperTrustedChannel,
@@ -134,6 +137,8 @@ interface ManageBackupNewBHRPropsTypes {
   setCloudData: any;
   isSmMetaSharesCreatedFlag: boolean;
   generateSMMetaShares: any;
+  deleteSmSharesAndSM: any;
+  updateKeeperInfoToTrustedChannel: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -328,7 +333,11 @@ class ManageBackupNewBHR extends Component<
         this.autoUploadShare();
       }
     }
-    console.log('this.props.isSmMetaSharesCreatedFlag', this.props.isSmMetaSharesCreatedFlag)
+    
+    if(prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 2) {
+      this.props.deleteSmSharesAndSM();
+    }
+
     if (
       JSON.stringify(prevProps.metaSharesKeeper) !==
       JSON.stringify(this.props.metaSharesKeeper) && this.props.isSmMetaSharesCreatedFlag
@@ -373,6 +382,10 @@ class ManageBackupNewBHR extends Component<
         });
         this.goToHistory(obj);
       }
+    }
+
+    if(JSON.stringify(prevProps.keeperInfo) != JSON.stringify(keeperInfo)){
+      this.props.updateKeeperInfoToTrustedChannel();
     }
   };
 
@@ -1361,7 +1374,9 @@ export default withNavigationFocus(
     trustedChannelsSetupSync,
     updateNewFcm,
     setCloudData,
-    generateSMMetaShares
+    generateSMMetaShares,
+    deleteSmSharesAndSM,
+    updateKeeperInfoToTrustedChannel
   })(ManageBackupNewBHR)
 );
 

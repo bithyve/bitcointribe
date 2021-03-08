@@ -1187,6 +1187,10 @@ export default class SecureAccount {
     return this.secureHDWallet.setSecureXpubs(secondary, bh);
   };
 
+  public deleteSecondaryMnemonics = () => {
+    return this.secureHDWallet.deleteSecondaryMnemonics();
+  };
+
   // public getSecondaryMnemonics = () => {
   //   return this.secureHDWallet.getSecondaryMnemonic()
   // };

@@ -256,7 +256,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   useEffect( ()=>{
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     const serviceType = primarySubAccount.sourceKind
-    if ( serviceType === SECURE_ACCOUNT && !s3Service.levelhealth.healthCheckInitializedKeeper && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
+    if ( serviceType === SECURE_ACCOUNT && accountsState[ serviceType ].service.secureHDWallet.secondaryMnemonic && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
       navigation.navigate( 'TwoFASetup', {
         twoFASetup:
           accountsState[ serviceType ].service.secureHDWallet

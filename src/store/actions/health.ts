@@ -73,6 +73,8 @@ export const SM_META_SHARE_GENERATE = 'SM_META_SHARE_GENERATE';
 export const UPLOAD_SMSHARE_KEEPER = 'UPLOAD_SMSHARE_KEEPER';
 export const UPLOAD_REQUESTED_SMSHARE = 'UPLOAD_REQUESTED_SMSHARE';
 export const UPLOAD_SUCCESSFULLY_SM = 'UPLOAD_SUCCESSFULLY_SM';
+export const DELETE_SM_AND_SMSHARES = 'DELETE_SM_AND_SMSHARES';
+export const UPDATE_KEEPERINFO_TO_TC = 'UPDATE_KEEPERINFO_TO_TC';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -476,10 +478,18 @@ export const uploadRequestedSMShare = (tag, encryptedKey, otp?) => {
   }
 }
 
-export const UploadSMSuccessfully = ( isUploaded ) => {
+export const UploadSMSuccessfully = (isUploaded) => {
   return {
     type: UPLOAD_SUCCESSFULLY_SM, payload: {
       isUploaded
     }
   }
+}
+
+export const deleteSmSharesAndSM = () => {
+  return { type: DELETE_SM_AND_SMSHARES }
+}
+
+export const updateKeeperInfoToTrustedChannel = () => {
+  return { type: UPDATE_KEEPERINFO_TO_TC }
 }

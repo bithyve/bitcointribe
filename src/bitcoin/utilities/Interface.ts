@@ -306,6 +306,7 @@ export enum notificationType {
   reShareResponse = 'reShareResponse',
   smUploadedForPK = 'smUploadedForPK',
   newFCM = 'newFCM',
+  newKeeperInfo = 'newKeeperInfo',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -396,6 +397,7 @@ export interface TrustedDataElements {
       secret: string;
   };
   secondaryShare?: MetaShare[];
+  keeperInfo?: string;
 }
 export interface TrustedData {
   publicKey: string;

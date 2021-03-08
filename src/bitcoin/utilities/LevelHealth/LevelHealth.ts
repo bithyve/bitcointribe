@@ -1757,6 +1757,13 @@ export default class LevelHealth {
       return { success: false };
     }
   };
+
+  public deleteSmSharesAndSM = async (): Promise<{ success: boolean }> => {
+    this.SMMetaSharesKeeper = [];
+    this.encryptedSMSecretsKeeper = [];
+    return { success: true };
+  };
+
   public updateKeeperInfoToMetaShare = (keeperInfo: any, answer: string): { metaShares: MetaShare[] } => {
     let {encryptedString} = LevelHealth.encryptWithAnswer(keeperInfo, answer);
     for (let i = 0; i < this.metaSharesKeeper.length; i++) {

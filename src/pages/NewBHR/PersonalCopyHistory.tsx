@@ -1,27 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
-  Text,
   StyleSheet,
-  Image,
   SafeAreaView,
   StatusBar,
-  TouchableOpacity,
   AsyncStorage,
   Platform,
-  Alert,
 } from "react-native";
-import Fonts from "../../common/Fonts";
-import BackupStyles from "./Styles";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from "react-native-responsive-screen";
-import { getIconByStatus } from "./utils";
 import { useDispatch, useSelector } from "react-redux";
 import Colors from "../../common/Colors";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { RFValue } from "react-native-responsive-fontsize";
 import BottomSheet from "reanimated-bottom-sheet";
 import ModalHeader from "../../components/ModalHeader";
 import HistoryPageComponent from "./HistoryPageComponent";
@@ -30,9 +21,6 @@ import moment from "moment";
 import _ from "underscore";
 import DeviceInfo, { getFirstInstallTime } from "react-native-device-info";
 import ErrorModalContents from "../../components/ErrorModalContents";
-import KnowMoreButton from "../../components/KnowMoreButton";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import { SECURE_ACCOUNT } from "../../common/constants/serviceTypes";
 import SmallHeaderModal from "../../components/SmallHeaderModal";
 import PersonalCopyHelpContents from "../../components/Helper/PersonalCopyHelpContents";
 import HistoryHeaderComponent from "./HistoryHeaderComponent";

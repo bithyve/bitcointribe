@@ -1635,6 +1635,31 @@ export default class S3Service {
       }
     }
   };
+
+  public deleteSmSharesAndSM = async (): Promise<
+    | {
+        status: number;
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+      }
+  > => {
+    try {
+      await this.levelhealth.deleteSmSharesAndSM();
+      return {
+        status: config.STATUS.SUCCESS
+      }
+    } catch (err) {
+      return {
+        status: 503, err: err.message, message: ErrMap[ 503 ] 
+      }
+    }
+  }
+  
   public updateKeeperInfoToMetaShare = (
     keeperInfo: any, answer: string
   ):

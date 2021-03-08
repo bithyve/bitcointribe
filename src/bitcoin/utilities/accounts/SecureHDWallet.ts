@@ -2708,6 +2708,10 @@ if(this.xpubs.secondary && this.xpubs.bh){
     }
   };
 
+  public deleteSecondaryMnemonics = () => {
+    this.secondaryMnemonic = '';
+  };
+
   // public getSecondaryMnemonic = () => {
   //   return this.secondaryMnemonic;
   // };

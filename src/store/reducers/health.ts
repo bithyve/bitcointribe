@@ -109,7 +109,7 @@ const initialState: {
     privateKey: string;
   },
   isSmMetaSharesCreatedFlag: boolean;
-  uploadSuccessfully: Boolean;
+  uploadSMSuccessfully: Boolean;
 } = {
   mnemonic: '',
   service: null,
