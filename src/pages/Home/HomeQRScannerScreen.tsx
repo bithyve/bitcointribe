@@ -15,6 +15,7 @@ import { Button } from 'react-native-elements'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { ScrollView } from 'react-native-gesture-handler'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 // TODO: The patterns here are meant to be the starting point for the way other
 // other screens that render QRCode scanners should lay out their components and
@@ -97,8 +98,8 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               margin: 0, padding: 0
             }}
             placeholder="Enter Address Manually"
-            accountKind={REGULAR_ACCOUNT}
-            onAddressSubmitted={( address ) => {
+            sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
+            onAddressEntered={( address ) => {
               onSend( address )
             }}
           />

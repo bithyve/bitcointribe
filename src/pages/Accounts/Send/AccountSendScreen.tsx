@@ -104,7 +104,7 @@ const AccountSendScreen: React.FC<Props> = ( {
                     ...styles.viewSectionContentContainer, margin: 0
                   }}
                   placeholder="Enter Address Manually"
-                  subAccountKind={primarySubAccount.kind}
+                  sourceAccountKind={primarySubAccount.sourceKind}
                   onAddressEntered={onAddressSubmitted}
                   onPaymentURIEntered={onPaymentURIEntered}
                 />

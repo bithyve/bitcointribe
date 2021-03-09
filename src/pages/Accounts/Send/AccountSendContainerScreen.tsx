@@ -9,12 +9,11 @@ import { removeTwoFA, clearTransfer } from '../../../store/actions/accounts'
 import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
-import useTrustedContactRecipients from '../../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContactRecipients'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import KnowMoreButton from '../../../components/KnowMoreButton'
 import { BarCodeReadEvent } from 'react-native-camera'
-import useWalletServiceForSubAccountKind from '../../../utils/hooks/state-selectors/accounts/UseWalletServiceForSubAccountKind'
+import useWalletServiceForSourceAccountKind from '../../../utils/hooks/state-selectors/accounts/UseWalletServiceForSourceAccountKind'
 import { ScannedAddressKind } from '../../../bitcoin/utilities/Interface'
 import Toast from '../../../components/Toast'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
@@ -39,7 +38,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   // const sendableAccountShells = useCompatibleAccountShells( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
-  const walletService = useWalletServiceForSubAccountKind( primarySubAccount.kind )
+  const walletService = useWalletServiceForSourceAccountKind( primarySubAccount.sourceKind )
 
   const sendingState = useSendingState()
 
