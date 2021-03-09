@@ -2,16 +2,16 @@ import React, { useState, useMemo } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { Input } from 'react-native-elements'
 import FormStyles from '../../common/Styles/FormStyles'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import useWalletServiceForSubAccountKind from '../../utils/hooks/state-selectors/accounts/UseWalletServiceForSubAccountKind'
+import useWalletServiceForSourceAccountKind from '../../utils/hooks/state-selectors/accounts/UseWalletServiceForSourceAccountKind'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 
 const SAMPLE_ADDRESS = '2N1TSArdd2pt9RoqE3LXY55ixpRE9e5aot8'
 
 export type Props = {
   placeholder: string;
   containerStyle?: Record<string, unknown>;
-  subAccountKind: SubAccountKind;
+  sourceAccountKind: SourceAccountKind;
   onAddressEntered: ( address: string ) => void;
   onPaymentURIEntered: ( uri: string ) => void;
 };
@@ -20,14 +20,14 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   placeholder = 'Enter Address Manually',
   containerStyle = {
   },
-  subAccountKind,
+  sourceAccountKind,
   onAddressEntered,
   onPaymentURIEntered,
 }: Props ) => {
   const [ recipientAddress, setRecipientAddress ] = useState( '' )
   const [ isAddressInvalid, setIsAddressInvalid ] = useState( false )
 
-  const walletService = useWalletServiceForSubAccountKind( subAccountKind )
+  const walletService = useWalletServiceForSourceAccountKind( sourceAccountKind )
 
   const walletInstance = useMemo( () => {
     return walletService.hdWallet || walletService.secureHDWallet
@@ -77,7 +77,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         numberOfLines={1}
       />
 
-      {subAccountKind == SubAccountKind.TEST_ACCOUNT && (
+      {sourceAccountKind == SourceAccountKind.TEST_ACCOUNT && (
         <TouchableOpacity
           onPress={() => {
             handleTextChange( SAMPLE_ADDRESS )

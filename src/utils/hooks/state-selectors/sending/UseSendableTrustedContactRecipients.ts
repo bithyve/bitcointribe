@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { ContactRecipientDescribing } from '../../../../common/data/models/interfaces/RecipientDescribing'
-import useTrustedContactsState from './UseTrustedContactsState'
+import useTrustedContactsState from '../trusted-contacts/UseTrustedContactsState'
 
 
 export default function useSendableTrustedContactRecipients(): ContactRecipientDescribing[] {
