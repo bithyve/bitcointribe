@@ -16,7 +16,7 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
+import useSendingState from '../utils/hooks/state-selectors/sending/UseSendingState'
 
 export default function CustomPriorityContent( props ) {
   const [ amount, setAmount ] = useState( '' )
