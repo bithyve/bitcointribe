@@ -309,7 +309,6 @@ export default (state = initialState, action) => {
       };
 
     case SERVICES_ENRICHED:
-      console.log('action.payload.services[S3_SERVICE]', action.payload.services[S3_SERVICE])
       return {
         ...state,
         service: action.payload.services[S3_SERVICE],

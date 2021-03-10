@@ -74,6 +74,7 @@ import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import AccountShell from "../../common/data/models/AccountShell";
 import PersonalNode from "../../common/data/models/PersonalNode";
 import { setCloudData, setCloudBackupStatus } from "../../store/actions/cloud";
+import ApproveSetup from "./ApproveSetup";
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
@@ -685,6 +686,33 @@ class ManageBackupNewBHR extends Component<
 
   closeErrorModal = () => {
     (this.refs.ErrorBottomSheet as any).snapTo(0);
+  };
+
+  sendApprovalRequestToPK = (type) => {
+    let { currentLevel, levelHealth, sendApprovalRequest, keeperApproveStatus, onApprovalStatusChange } = this.props;
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : currentLevel == 3
+        ? levelHealth[2].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+    console.log("PKShareId", PKShareId);
+      sendApprovalRequest(
+        this.state.selectedKeeper.shareId,
+        PKShareId,
+        type == "pdf" || type == "contact"
+          ? notificationType.uploadSecondaryShare
+          : notificationType.approveKeeper
+      );
+    if (keeperApproveStatus.shareId != this.state.selectedKeeper.shareId) {
+      onApprovalStatusChange({
+        status: false,
+        initiatedAt: moment(new Date()).valueOf(),
+        shareId: this.state.selectedKeeper.shareId,
+      })
+    }
+    (this.refs.ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+    (this.refs.keeperTypeBottomSheet as any).current.snapTo(0);
   };
 
   render() {
@@ -1304,6 +1332,46 @@ class ManageBackupNewBHR extends Component<
             bottomImage={require("../../assets/images/icons/errorImage.png")}
           />}
           renderHeader={()=><ModalHeader onPressHeader={() => this.closeErrorModal()} />}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={'ApprovePrimaryKeeperBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
+          ]}
+          renderContent={() => (
+            <ApproveSetup
+              isContinueDisabled={
+                selectedKeeperType == "pdf" || selectedKeeperType == "contact"
+                  ? !keeperApproveStatus.status
+                  : false
+              }
+              onPressContinue={() => {
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
+                let {
+                  selectedKeeper,
+                  selectedLevelId,
+                  selectedKeeperType,
+                  selectedKeeperName,
+                } = this.state;
+                let obj = {
+                  id: selectedLevelId,
+                  selectedKeeper: selectedKeeper,
+                  isSetup: true,
+                };
+                this.goToHistory(obj);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              onPressHeader={() => {
+                (this.refs.keeperTypeBottomSheet as any).current.snapTo(1);
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+              }}
+            />
+          )}
         />
       </View>
     );

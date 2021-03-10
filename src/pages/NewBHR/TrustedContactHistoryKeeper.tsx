@@ -67,6 +67,7 @@ import HistoryHeaderComponent from './HistoryHeaderComponent';
 import KeeperTypeModalContents from './KeeperTypeModalContent';
 import QRModal from '../Accounts/QRModal';
 import { StackActions } from 'react-navigation';
+import ApproveSetup from "./ApproveSetup";
 
 const TrustedContactHistoryKeeper = (props) => {
   const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
@@ -200,6 +201,10 @@ const TrustedContactHistoryKeeper = (props) => {
     (state) => state.health.keeperApproveStatus
   );
   const [isChange, setIsChange] = useState(false);
+  const [
+    ApprovePrimaryKeeperBottomSheet,
+    setApprovePrimaryKeeperBottomSheet,
+  ] = useState(React.createRef());
   useEffect(() => {
     setSelectedLevelId(props.navigation.state.params.selectedLevelId);
     setSelectedKeeper(props.navigation.state.params.selectedKeeper);
@@ -1076,6 +1081,37 @@ const TrustedContactHistoryKeeper = (props) => {
     }
   };
 
+  const sendApprovalRequestToPK = (type) => {
+    let PKShareId =
+      currentLevel == 2 || currentLevel == 1
+        ? levelHealth[1].levelInfo[2].shareId
+        : currentLevel == 3
+        ? levelHealth[2].levelInfo[2].shareId
+        : levelHealth[1].levelInfo[2].shareId;
+    console.log("PKShareId", PKShareId);
+    dispatch(
+      sendApprovalRequest(
+        selectedKeeper.shareId,
+        PKShareId,
+        type == "pdf" || type == "contact"
+          ? notificationType.uploadSecondaryShare
+          : notificationType.approveKeeper
+      )
+    );
+    if (keeperApproveStatus.shareId != selectedKeeper.shareId) {
+      dispatch(
+        onApprovalStatusChange({
+          status: false,
+          initiatedAt: moment(new Date()).valueOf(),
+          shareId: selectedKeeper.shareId,
+        })
+      );
+    }
+    (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+    (keeperTypeBottomSheet as any).current.snapTo(0);
+  };
+
+
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
       <SafeAreaView
@@ -1235,7 +1271,7 @@ const TrustedContactHistoryKeeper = (props) => {
         )}
       />
       <BottomSheet
-        enabledInnerScrolling={true}
+         enabledInnerScrolling={true}
         ref={keeperTypeBottomSheet as any}
         snapPoints={[
           -50,
@@ -1246,8 +1282,9 @@ const TrustedContactHistoryKeeper = (props) => {
             onPressSetup={async (type, name) =>{
               setSelectedKeeperType(type);
               setSelectedKeeperName(name);
-              onPressChangeKeeperType(type, name);
-              (keeperTypeBottomSheet as any).current.snapTo(0);
+              sendApprovalRequestToPK(type);
+              // onPressChangeKeeperType(type, name);
+              // (keeperTypeBottomSheet as any).current.snapTo(0);
             }}
             onPressBack={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
             selectedLevelId={selectedLevelId}
@@ -1257,6 +1294,35 @@ const TrustedContactHistoryKeeper = (props) => {
         renderHeader={() => (
           <SmallHeaderModal
             onPressHeader={() => (keeperTypeBottomSheet as any).current.snapTo(0)}
+          />
+        )}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ApprovePrimaryKeeperBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
+        ]}
+        renderContent={() => (
+          <ApproveSetup
+            isContinueDisabled={
+              selectedKeeperType == "pdf" || selectedKeeperType == "contact"
+                ? !keeperApproveStatus.status
+                : false
+            }
+            onPressContinue={() => {
+              onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
+              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            onPressHeader={() => {
+              (keeperTypeBottomSheet as any).current.snapTo(1);
+              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+            }}
           />
         )}
       />

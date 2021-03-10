@@ -736,6 +736,7 @@ export default class LevelHealth {
     if (!this.metaSharesKeeper.length) {
       throw new Error('Generate MetaShares prior uploading');
     }
+    console.log("prepareShareUploadablesKeeper this.metaSharesKeeper", this.metaSharesKeeper);
 
     // let res: AxiosResponse;
     this.metaSharesKeeper[
@@ -1765,10 +1766,11 @@ export default class LevelHealth {
   };
 
   public updateKeeperInfoToMetaShare = (keeperInfo: any, answer: string): { metaShares: MetaShare[] } => {
-    let {encryptedString} = LevelHealth.encryptWithAnswer(keeperInfo, answer);
+    let {encryptedString} = LevelHealth.encryptWithAnswer(JSON.stringify(keeperInfo), answer);
     for (let i = 0; i < this.metaSharesKeeper.length; i++) {
       this.metaSharesKeeper[i].meta.encryptedKeeperInfo = encryptedString;
     }
+    console.log('updateKeeperInfoToMetaShare this.metaSharesKeeper', this.metaSharesKeeper);
     return { metaShares: this.metaSharesKeeper };
   };
 }

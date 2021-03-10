@@ -661,6 +661,7 @@ export const downloadShareWatcher = createWatcher(
 );
 
 export function* downloadMetaShareWorker({ payload }) {
+  console.log('downloadMetaShareWorker payload', payload)
   yield put(switchS3LoadingStatus("downloadMetaShare"));
 
   const { encryptedKey, otp, walletName, walletID } = payload; // OTP is missing when the encryptedKey isn't OTP encrypted
@@ -1399,6 +1400,7 @@ export const fetchWalletImageHealthWatcher = createWatcher(
 );
 
 function* uploadEncMetaShareKeeperWorker({ payload }) {
+  try {
   // Transfer: User >>> Guardian
   yield put(switchS3LoaderKeeper("uploadMetaShare"));
   let { index } = payload;
@@ -1421,7 +1423,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     (state) => state.health.keeperInfo
   );
   const answer = yield select(
-    (state) => state.database.WALLET_SETUP.security.answer)
+    (state) => state.storage.database.WALLET_SETUP.security.answer)
   let shareIndex = 2;
   if (payload.shareId && s3Service.levelhealth.metaSharesKeeper.length) {
     let metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper;
@@ -1432,6 +1434,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     }
   }
   let response = yield call(s3Service.updateKeeperInfoToMetaShare, keeperInfoData, answer);
+  console.log('updateKeeperInfoToMetaShare response', response);
   if (payload.changingGuardian) {
     yield call(s3Service.reshareMetaShareKeeper, shareIndex);
     if (payload.previousGuardianName) {
@@ -1471,6 +1474,9 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     shareIndex,
     payload.contactInfo.contactName
   ); // contact injection (requires database insertion)
+
+  console.log('prepareShareUploadablesKeeper s3Service', s3Service);
+  console.log('prepareShareUploadablesKeeper res', res);
 
   if (res.status === 200) {
     const {
@@ -1531,6 +1537,7 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
           encryptedKey,
         },
       };
+      console.log('TrustedDataElements data', data)
       yield put(
         updateTrustedChannel(
           payload.contactInfo,
@@ -1552,6 +1559,8 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
         },
       };
 
+      console.log('EphemeralDataElements data', data)
+
       yield put(
         updateEphemeralChannel(
           payload.contactInfo,
@@ -1572,6 +1581,10 @@ function* uploadEncMetaShareKeeperWorker({ payload }) {
     console.log({ err: res.err });
   }
   yield put(switchS3LoaderKeeper("uploadMetaShare"));
+} catch (error) {
+    console.log('uploadMetaShare error', error);
+    yield put(switchS3LoaderKeeper("uploadMetaShare"));
+}
 }
 
 export const uploadEncMetaShareKeeperWatcher = createWatcher(
@@ -3244,7 +3257,7 @@ function* uploadSMShareWorker({ payload }) {
         (state) => state.trustedContacts.service
       );
       let trustedContacts = trustedContactsService.tc.trustedContacts;
-      let TContacts=[];
+      let TContacts = [];
       let contactNameArr = [];
       if (Object.keys(trustedContacts).length) {
         TContacts = Object.keys(trustedContacts).map((tag) => {
@@ -3252,6 +3265,7 @@ function* uploadSMShareWorker({ payload }) {
           return trustedContacts[tag];
         });
       }
+      
       let index = TContacts.findIndex(value => value.walletID == walletId);
 
       if (

@@ -1678,7 +1678,7 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { metaShares } = this.levelhealth.updateKeeperInfoToMetaShare(keeperInfo,answer);
+      const { metaShares } = this.levelhealth.updateKeeperInfoToMetaShare(keeperInfo, answer);
       return { status: config.STATUS.SUCCESS, data: { metaShares } };
     } catch (err) {
       return {
