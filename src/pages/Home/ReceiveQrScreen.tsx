@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react'
-import { StyleSheet, Modal, View, Image, Text, Platform, TextInput } from 'react-native'
+import { StyleSheet, Modal, View, Image, Text, Platform, TextInput, TouchableOpacity } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
@@ -53,7 +53,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }, [] )
 
   useEffect( () => {
-    if( allAccounts ){
+    if ( allAccounts ) {
       setAccounts( allAccounts )
       setSelectedAccount( allAccounts[ 0 ] )
     }
@@ -75,19 +75,19 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       <ReceiveAmountContent
         title={'Receive'}
         message={'Enter amount in sats'}
-        onPressConfirm={( amount )=> {
+        onPressConfirm={( amount ) => {
           setAmount( amount )
           dismissBottomSheet()
         }}
         selectedAmount={amount}
-        onPressBack={()=>{
+        onPressBack={() => {
           dismissBottomSheet()
         }
         }
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '35%' ],
+        snapPoints: [ 0, '65%' ],
         overlayOpacity: 0.9,
       },
     )
@@ -106,7 +106,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         />
 
         <AppBottomSheetTouchableWrapper
-          onPress={() => {showReceiveAmountBottomSheet() }}
+          onPress={() => { showReceiveAmountBottomSheet() }}
           style={styles.selectedView}
         >
           <View
@@ -131,35 +131,43 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <Modal
             animationType='fade'
             transparent={true}
-            visible={true}>
-            <View style={styles.dropDownView}>
-              <ScrollView>
-                {accounts.map( ( value ) => {
-                  return (
-                    <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => {
-                      setHideShow( false )
-                      setSelectedAccount( value )
-                    }}
-                    style={{
-                      ...styles.dropDownElement,
-                    }}>
-                      <View style={styles.imageView}>
-                        <Image source={value.accountImage} style={{
-                          width: wp( '8%' ), height: wp( '8%' )
-                        }} />
+            visible={hideShow}
+            onRequestClose={() => { setHideShow( false ) }}>
+            <TouchableOpacity style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }} onPress={() => { setHideShow( false ) }}>
 
-                      </View>
-                      <View style={{
-                        marginLeft: wp( '2%' ), alignSelf: 'center',
+              <View style={styles.dropDownView}>
+                <ScrollView>
+                  {accounts.map( ( value ) => {
+                    return (
+                      <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => {
+                        setHideShow( false )
+                        setSelectedAccount( value )
+                      }}
+                      style={{
+                        ...styles.dropDownElement,
                       }}>
-                        <Text style={styles.accountName}>{value.accountName}</Text>
-                        <Text style={styles.balanceText}>Balance {UsNumberFormat( value.balance )} sats</Text>
-                      </View>
-                    </AppBottomSheetTouchableWrapper>
-                  )
-                } )}
-              </ScrollView>
-            </View>
+                        <View style={styles.imageView}>
+                          <Image source={value.accountImage} style={{
+                            width: wp( '8%' ), height: wp( '8%' )
+                          }} />
+
+                        </View>
+                        <View style={{
+                          marginLeft: wp( '2%' ), alignSelf: 'center',
+                        }}>
+                          <Text style={styles.accountName}>{value.accountName}</Text>
+                          <Text style={styles.balanceText}>Balance {UsNumberFormat( value.balance )} sats</Text>
+                        </View>
+                      </AppBottomSheetTouchableWrapper>
+                    )
+                  } )}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
           </Modal>
         ) : null}
 
@@ -183,7 +191,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             }}>
             <View style={styles.imageView}>
               <Image source={selectedAccount && selectedAccount.accountImage} style={{
-                width: wp( '10%' ), height: wp( '10%' )
+                width: wp( '9%' ), height: wp( '9%' )
               }} />
             </View>
             <View style={{
@@ -247,10 +255,9 @@ const styles = StyleSheet.create( {
     paddingLeft: wp( '3%' ),
     paddingRight: wp( '3%' ),
     width: wp( '90%' ),
-
   },
   dropDownView: {
-    flex:1,
+    flex: 1,
     marginBottom: hp( '4%' ), marginTop: hp( '60%' ),
     backgroundColor: Colors.white,
     marginLeft: wp( '5%' ),
@@ -260,12 +267,12 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
   },
   titleText: {
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
   imageView: {
-    width: wp( '17%' ), height: wp( '17%' ), backgroundColor: Colors.backgroundColor, borderRadius: wp( '17%' ) / 2, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: Colors.white,
+    width: wp( '15%' ), height: wp( '15%' ), backgroundColor: Colors.backgroundColor, borderRadius: wp( '15%' ) / 2, justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: Colors.white,
     shadowOffset: {
       width: 0,
       height: 5,
@@ -276,7 +283,7 @@ const styles = StyleSheet.create( {
     elevation: 10
   },
   accountName: {
-    color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
+    color: Colors.black, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 16 )
   },
   balanceText: {
     color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic, fontSize: RFValue( 10 ), marginTop: 5

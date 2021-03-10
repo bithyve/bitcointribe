@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, Image, TextInput } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
@@ -8,7 +8,10 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../common/Fonts'
-
+import {
+  TouchableOpacity,
+} from '@gorhom/bottom-sheet';
+import BottomInfoBox from '../BottomInfoBox'
 const ReceiveAmountContent = ( {
   title,
   message,
@@ -19,6 +22,14 @@ const ReceiveAmountContent = ( {
   const [ amount, setAmount ] = useState( selectedAmount )
 
   return (
+    <KeyboardAvoidingView
+      style={{
+        height: '100%',
+        backgroundColor: Colors.white,
+      }}
+      behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
+      enabled
+    >
     <View style={styles.modalContentContainer}>
       <View style={{
         flex: 1
@@ -52,26 +63,27 @@ const ReceiveAmountContent = ( {
             autoCompleteType="off"
           />
         </View>
-        <View style={styles.successModalHeaderView}>
-
-        </View>
+        <View style={{ marginTop: 'auto',}}>
+        <BottomInfoBox
+          title="Note"
+          infoText="Enter an amount in sats and click the Receive button"
+        />
         <View
           style={{
             flexDirection: 'row',
-            marginTop: 'auto',
             alignItems: 'center',
             marginBottom: hp( '4%' ),
           }}
         >
-          <AppBottomSheetTouchableWrapper
+          <TouchableOpacity
             onPress={() => {
               onPressConfirm( amount )
             }}
             style={styles.successModalButtonView}
           >
             <Text style={styles.proceedButtonText}>Receive</Text>
-          </AppBottomSheetTouchableWrapper>
-          <AppBottomSheetTouchableWrapper
+          </TouchableOpacity>
+          <TouchableOpacity
             onPress={() => onPressBack()}
             style={styles.backButton}
           >
@@ -80,10 +92,12 @@ const ReceiveAmountContent = ( {
             }}>
             Back
             </Text>
-          </AppBottomSheetTouchableWrapper>
+          </TouchableOpacity>
         </View>
       </View>
+      </View>
     </View>
+    </KeyboardAvoidingView>
   )
 }
 
@@ -146,7 +160,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
     marginBottom: hp( 4 ),
-    marginTop: hp( 2 ),
+    marginTop: hp( 4 ),
   },
   textBoxImage: {
     width: wp( '6%' ),
