@@ -40,7 +40,7 @@ import ICloudBackupNotFound from "./ICloudBackupNotFound";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { requestTimedout } from "../../store/utils/utilities";
 import RestoreWallet from "./RestoreWallet";
-import { REGULAR_ACCOUNT } from "../../common/constants/serviceTypes";
+import { REGULAR_ACCOUNT } from "../../common/constants/wallet-service-types";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import { isEmpty } from "../../common/CommonFunctions";
 import CloudBackup from "../../common/CommonFunctions/CloudBackup";

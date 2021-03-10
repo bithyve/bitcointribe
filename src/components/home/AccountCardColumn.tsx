@@ -5,10 +5,10 @@ import {
   StyleSheet,
 } from 'react-native'
 
-import AddNewAccountCard from '../../pages/Home/AddNewAccountCard';
-import HomeAccountsListCard from './HomeAccountsListCard';
-import AccountShell from '../../common/data/models/AccountShell';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import AddNewAccountCard from '../../pages/Home/AddNewAccountCard'
+import HomeAccountsListCard from './HomeAccountsListCard'
+import AccountShell from '../../common/data/models/AccountShell'
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 
 export type Props = {
   cardData: AccountShell[];
@@ -16,7 +16,7 @@ export type Props = {
   onAccountCardSelected: ( accountShell: AccountShell ) => void;
   onAddNewAccountPressed: () => void;
   currentLevel: number;
-  onCardLongPressed: (accountShell: AccountShell) => void;
+  onCardLongPressed: ( accountShell: AccountShell ) => void;
 };
 
 const AccountCardColumn: React.FC<Props> = ( {
@@ -26,7 +26,7 @@ const AccountCardColumn: React.FC<Props> = ( {
   onAddNewAccountPressed,
   onCardLongPressed,
   currentLevel
-}: Props) => {
+}: Props ) => {
   return (
     <View style={styles.rootContainer}>
       {prependsAddButton && (
@@ -36,8 +36,8 @@ const AccountCardColumn: React.FC<Props> = ( {
         />
       )}
 
-      {cardData.map((accountShell) => {
-        let disabled = false;
+      {cardData.map( ( accountShell ) => {
+        const disabled = false
         // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
         return (
           <TouchableOpacity

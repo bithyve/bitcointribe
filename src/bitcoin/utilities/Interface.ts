@@ -530,7 +530,7 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
-};
+}
 //VersionHistory
 export interface VersionHistory {
   id: string;

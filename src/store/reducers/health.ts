@@ -1,6 +1,6 @@
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import { MetaShare } from '../../bitcoin/utilities/Interface';
-import { S3_SERVICE } from '../../common/constants/serviceTypes';
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import { MetaShare } from '../../bitcoin/utilities/Interface'
+import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED,
   HEALTH_CHECK_INITIALIZE,
@@ -33,8 +33,8 @@ import {
   PUT_KEEPER_INFO,
   SM_META_SHARE_GENERATE,
   UPLOAD_SUCCESSFULLY_SM
-} from '../actions/health';
-import { SERVICES_ENRICHED } from '../actions/storage';
+} from '../actions/health'
+import { SERVICES_ENRICHED } from '../actions/storage'
 
 const initialState: {
   mnemonic: string;
@@ -100,7 +100,7 @@ const initialState: {
     transferDetails?: {
       key: string;
       otp: string;
-    } 
+    }
   }
   secondaryShareDownloaded: any;
   pdfInfo: {
@@ -141,8 +141,10 @@ const initialState: {
   shares: null,
   keeperInfo: [],
   metaShare: null,
-  downloadedMShare: {},
-  downloadedPdfShare: {},
+  downloadedMShare: {
+  },
+  downloadedPdfShare: {
+  },
   errorReceiving: false,
   keeperApproveStatus: {
     status: false,
@@ -159,240 +161,240 @@ const initialState: {
   },
   isSmMetaSharesCreatedFlag: false,
   uploadSMSuccessfully: false
-};
+}
 
-export default (state = initialState, action) => {
-  switch (action.type) {
-    case HEALTH_CHECK_INITIALIZED:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          levelHealthCheck: false,
-        },
-      };
-
-    case HEALTH_CHECK_INITIALIZE:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          levelHealthCheck: true,
-        },
-      };
-
-    case HEALTH_UPDATE:
-      return {
-        ...state,
-        levelHealth: action.payload.health,
-        currentLevel: action.payload.currentLevel,
-      };
-
-    case GET_HEALTH_OBJECT:
-      return {
-        ...state,
-        levelHealth: action.payload.health,
-      };
-
-    case ERROR_SENDING:
-      return {
-        ...state,
-        errorSending: action.payload.isFailed,
-      };
-
-    case S3_LOADING_STATUS:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          checkMSharesHealth: action.payload.beingLoaded,
-        },
-      };
-
-    case INIT_LOADING_STATUS:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          initLoader: action.payload.beingLoaded,
-        },
-      };
-
-    case UPDATE_MSHARE_LOADING_STATUS:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          updateMSharesHealth: action.payload.beingLoaded,
-        },
-      };
-
-    case MSHARES:
-      return {
-        ...state,
-        shares: action.payload.shares,
-      };
-
-    case UPDATE_EFCHANNEL_LOADING_STATUS:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          updateEFChannelStatus: action.payload.beingLoaded,
-        },
-      };
-
-    case IS_LEVEL_TWO_METASHARE:
-      return {
-        ...state,
-        isLevelTwoMetaShareCreated: action.payload.beingLoaded,
-      };
-
-    case IS_LEVEL_THREE_METASHARE:
-      return {
-        ...state,
-        isLevelThreeMetaShareCreated: action.payload.beingLoaded,
-      };
-
-    case PUT_KEEPER_INFO:
-      return {
-      ...state,
-      keeperInfo: action.payload.info,
-    };
-
-    case IS_LEVEL2_INITIALIZED:
-      return {
-        ...state,
-        isLevel2Initialized: true,
-      };
-
-    case IS_LEVEL3_INITIALIZED:
-      return {
-        ...state,
-        isLevel3Initialized: true,
-      };
-
-    case SHARE_RECEIVED:
-      return {
-        ...state,
-        metaShare: action.payload.metaShare,
-      };
-
-    case DOWNLOADED_MSHARE_HEALTH:
-      return {
-        ...state,
-        downloadedMShare: {
-          ...state.downloadedMShare,
-          [action.payload.otp]: {
-            status: action.payload.status,
-            err: action.payload.err,
+export default ( state = initialState, action ) => {
+  switch ( action.type ) {
+      case HEALTH_CHECK_INITIALIZED:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            levelHealthCheck: false,
           },
-        },
-      };
+        }
+
+      case HEALTH_CHECK_INITIALIZE:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            levelHealthCheck: true,
+          },
+        }
+
+      case HEALTH_UPDATE:
+        return {
+          ...state,
+          levelHealth: action.payload.health,
+          currentLevel: action.payload.currentLevel,
+        }
+
+      case GET_HEALTH_OBJECT:
+        return {
+          ...state,
+          levelHealth: action.payload.health,
+        }
+
+      case ERROR_SENDING:
+        return {
+          ...state,
+          errorSending: action.payload.isFailed,
+        }
+
+      case S3_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            checkMSharesHealth: action.payload.beingLoaded,
+          },
+        }
+
+      case INIT_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            initLoader: action.payload.beingLoaded,
+          },
+        }
+
+      case UPDATE_MSHARE_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            updateMSharesHealth: action.payload.beingLoaded,
+          },
+        }
+
+      case MSHARES:
+        return {
+          ...state,
+          shares: action.payload.shares,
+        }
+
+      case UPDATE_EFCHANNEL_LOADING_STATUS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            updateEFChannelStatus: action.payload.beingLoaded,
+          },
+        }
+
+      case IS_LEVEL_TWO_METASHARE:
+        return {
+          ...state,
+          isLevelTwoMetaShareCreated: action.payload.beingLoaded,
+        }
+
+      case IS_LEVEL_THREE_METASHARE:
+        return {
+          ...state,
+          isLevelThreeMetaShareCreated: action.payload.beingLoaded,
+        }
+
+      case PUT_KEEPER_INFO:
+        return {
+          ...state,
+          keeperInfo: action.payload.info,
+        }
+
+      case IS_LEVEL2_INITIALIZED:
+        return {
+          ...state,
+          isLevel2Initialized: true,
+        }
+
+      case IS_LEVEL3_INITIALIZED:
+        return {
+          ...state,
+          isLevel3Initialized: true,
+        }
+
+      case SHARE_RECEIVED:
+        return {
+          ...state,
+          metaShare: action.payload.metaShare,
+        }
+
+      case DOWNLOADED_MSHARE_HEALTH:
+        return {
+          ...state,
+          downloadedMShare: {
+            ...state.downloadedMShare,
+            [ action.payload.otp ]: {
+              status: action.payload.status,
+              err: action.payload.err,
+            },
+          },
+        }
 
       case DOWNLOADED_PDFSHARE_HEALTH:
-      return {
-        ...state,
-        downloadedPdfShare: {
-          ...state.downloadedPdfShare,
-          [action.payload.otp]: {
-            status: action.payload.status,
-            err: action.payload.err,
+        return {
+          ...state,
+          downloadedPdfShare: {
+            ...state.downloadedPdfShare,
+            [ action.payload.otp ]: {
+              status: action.payload.status,
+              err: action.payload.err,
+            },
           },
-        },
-      };
+        }
 
-    case ERROR_RECEIVING_HEALTH:
-      return {
-        ...state,
-        errorReceiving: action.payload.isFailed,
-      };
+      case ERROR_RECEIVING_HEALTH:
+        return {
+          ...state,
+          errorReceiving: action.payload.isFailed,
+        }
 
-    case SERVICES_ENRICHED:
-      return {
-        ...state,
-        service: action.payload.services[S3_SERVICE],
-        serviceEnriched: true,
-      };
+      case SERVICES_ENRICHED:
+        return {
+          ...state,
+          service: action.payload.services[ S3_SERVICE ],
+          serviceEnriched: true,
+        }
 
-    case WALLET_RECOVERY_FAILED_HEALTH:
-      return {
-        ...state,
-        walletRecoveryFailed: action.payload.isFailed,
-      };
+      case WALLET_RECOVERY_FAILED_HEALTH:
+        return {
+          ...state,
+          walletRecoveryFailed: action.payload.isFailed,
+        }
 
-    case WALLET_IMAGE_HEALTH_CHECKED:
-      return {
-        ...state,
-        walletImageChecked: action.payload.checked,
-      };
+      case WALLET_IMAGE_HEALTH_CHECKED:
+        return {
+          ...state,
+          walletImageChecked: action.payload.checked,
+        }
 
-    case S3_LOADING_KEEPER:
-      return {
-        ...state,
-        loading: {
-          ...state.loading,
-          [action.payload.beingLoaded]: !state.loading[
-            action.payload.beingLoaded
-          ],
-        },
-      };
+      case S3_LOADING_KEEPER:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            [ action.payload.beingLoaded ]: !state.loading[
+              action.payload.beingLoaded
+            ],
+          },
+        }
 
-    case PDF_GENERATED:
-      return {
-        ...state,
-        pdfGenerated: {
-          ...action.payload.generated,
-        },
-      };
+      case PDF_GENERATED:
+        return {
+          ...state,
+          pdfGenerated: {
+            ...action.payload.generated,
+          },
+        }
 
-    case ON_APPROVAL_STATUS_CHANGE:
-      return {
-        ...state,
-        keeperApproveStatus: {
-          status: action.payload.status,
-          initiatedAt: action.payload.initiatedAt,
-          shareId: action.payload.shareId,
-          secondaryShare: action.payload.secondaryShare,
-          transferDetails: action.payload.transferDetails,
-        },
-      };
+      case ON_APPROVAL_STATUS_CHANGE:
+        return {
+          ...state,
+          keeperApproveStatus: {
+            status: action.payload.status,
+            initiatedAt: action.payload.initiatedAt,
+            shareId: action.payload.shareId,
+            secondaryShare: action.payload.secondaryShare,
+            transferDetails: action.payload.transferDetails,
+          },
+        }
 
       case MNEMONIC_RECOVERED_HEALTH:
         return {
           ...state,
           mnemonic: action.payload.mnemonic,
-        };
+        }
 
-        case REMOVE_SN:
+      case REMOVE_SN:
         return {
           ...state,
           mnemonic: '',
-        };
+        }
 
       case DOWNLOADED_SM_SHARES:
         return {
           ...state,
           secondaryShareDownloaded: action.payload.metaShare,
-        };
+        }
 
       case SET_PDF_INFO:
         return {
           ...state,
           pdfInfo: action.payload.data,
-        };
-      
+        }
+
       case SM_META_SHARE_GENERATE:
         return {
           ...state,
           isSmMetaSharesCreatedFlag: true,
-        };
-      
+        }
+
       case UPLOAD_SUCCESSFULLY_SM:
         return {
           ...state,
           uploadSMSuccessfully: action.payload.isUploaded,
         }
   }
-  return state;
-};
+  return state
+}

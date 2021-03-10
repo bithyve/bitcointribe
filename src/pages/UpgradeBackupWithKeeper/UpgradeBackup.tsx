@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component } from 'react'
 import {
   View,
   Text,
@@ -11,49 +11,49 @@ import {
   Platform,
   ImageBackground,
   Keyboard,
-} from "react-native";
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import { withNavigationFocus } from "react-navigation";
-import { connect } from "react-redux";
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { withNavigationFocus } from 'react-navigation'
+import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
   clearPaymentDetails,
-} from "../../store/actions/trustedContacts";
-import idx from "idx";
-import { timeFormatter } from "../../common/CommonFunctions/timeFormatter";
-import moment from "moment";
-import BottomSheet from "reanimated-bottom-sheet";
-import ModalHeader from "../../components/ModalHeader";
-import DeviceInfo from "react-native-device-info";
-import AntDesign from "react-native-vector-icons/AntDesign";
-import Loader from '../../components/loader';
-import BottomInfoBox from "../../components/BottomInfoBox";
-import RestoreFromICloud from "../RestoreHexaWithKeeper/RestoreFromICloud";
-import SetupPrimaryKeeper from "../NewBHR/SetupPrimaryKeeper";
-import SmallHeaderModal from "../../components/SmallHeaderModal";
-import SecurityQuestion from "../NewBHR/SecurityQuestion";
-import UpgradingKeeperContact from "./UpgradingKeeperContact";
-import UpgradePdfKeeper from "./UpgradePdfKeeper";
-import Dash from "react-native-dash";
-import S3Service from "../../bitcoin/services/sss/S3Service";
+} from '../../store/actions/trustedContacts'
+import idx from 'idx'
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
+import moment from 'moment'
+import BottomSheet from 'reanimated-bottom-sheet'
+import ModalHeader from '../../components/ModalHeader'
+import DeviceInfo from 'react-native-device-info'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import Loader from '../../components/loader'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import RestoreFromICloud from '../RestoreHexaWithKeeper/RestoreFromICloud'
+import SetupPrimaryKeeper from '../NewBHR/SetupPrimaryKeeper'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import SecurityQuestion from '../NewBHR/SecurityQuestion'
+import UpgradingKeeperContact from './UpgradingKeeperContact'
+import UpgradePdfKeeper from './UpgradePdfKeeper'
+import Dash from 'react-native-dash'
+import S3Service from '../../bitcoin/services/sss/S3Service'
 import {
   initializeHealthSetup,
   updateMSharesHealth,
-} from "../../store/actions/health";
-import { REGULAR_ACCOUNT } from "../../common/constants/serviceTypes";
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import { LevelHealthInterface } from "../../bitcoin/utilities/Interface";
-import AccountShell from "../../common/data/models/AccountShell";
-import PersonalNode from "../../common/data/models/PersonalNode";
-import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth';
-import { setCloudData, setCloudBackupStatus,} from "../../store/actions/cloud";
+} from '../../store/actions/health'
+import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import AccountShell from '../../common/data/models/AccountShell'
+import PersonalNode from '../../common/data/models/PersonalNode'
+import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth'
+import { setCloudData, setCloudBackupStatus, } from '../../store/actions/cloud'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -99,51 +99,51 @@ class UpgradeBackup extends Component<
   UpgradeBackupPropsTypes,
   UpgradeBackupStateTypes
 > {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
     this.state = {
       isCloudBackupProcessing: false,
       selectedIds: [],
       encryptedCloudDataJson: [],
       listData: [
         {
-          title: "App Backup",
-          info: "Lorem ipsum dolor sit",
-          subTitle: "Lorem ipsum dolor sit amet",
-          type: "backup",
-          image: require("../../assets/images/icons/icon_backup.png"),
+          title: 'App Backup',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'backup',
+          image: require( '../../assets/images/icons/icon_backup.png' ),
           status: 'setup'
         },
         {
-          title: "Primary Keeper",
-          info: "Lorem ipsum dolor sit",
-          subTitle: "Lorem ipsum dolor sit amet",
-          type: "primary",
-          image: require("../../assets/images/icons/icon_secondarydevice.png"),
+          title: 'Primary Keeper',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'primary',
+          image: require( '../../assets/images/icons/icon_secondarydevice.png' ),
           status: 'setup'
         },
         {
-          title: "Keeper Contacts",
-          info: "Lorem ipsum dolor sit",
-          subTitle: "Lorem ipsum dolor sit amet",
-          type: "contact",
-          image: require("../../assets/images/icons/icon_contact.png"),
+          title: 'Keeper Contacts',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'contact',
+          image: require( '../../assets/images/icons/icon_contact.png' ),
           status: 'setup'
         },
         {
-          title: "Keeper Device & PDF Keepers",
-          info: "Lorem ipsum dolor sit",
-          subTitle: "Lorem ipsum dolor sit amet",
-          type: "devicePDF",
-          image: require("../../assets/images/icons/files-and-folders-2.png"),
+          title: 'Keeper Device & PDF Keepers',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'devicePDF',
+          image: require( '../../assets/images/icons/files-and-folders-2.png' ),
           status: 'setup'
         },
         {
-          title: "Security Question",
-          info: "Lorem ipsum dolor sit",
-          subTitle: "Lorem ipsum dolor sit amet",
-          type: "securityQuestion",
-          image: require("../../assets/images/icons/icon_question.png"),
+          title: 'Security Question',
+          info: 'Lorem ipsum dolor sit',
+          subTitle: 'Lorem ipsum dolor sit amet',
+          type: 'securityQuestion',
+          image: require( '../../assets/images/icons/icon_question.png' ),
           status: 'setup'
         },
       ],
@@ -221,73 +221,83 @@ class UpgradeBackup extends Component<
       ],
       showLoader: false,
 
-    };
+    }
   }
 
   componentDidMount = () => {
-    this.upgradeProcess();
+    this.upgradeProcess()
   };
 
   upgradeProcess = () => {
-    let { levelHealth } = this.props;
-    let { listData } = this.state;
-    if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[0].status == 'accessible') {
-      listData[0].status = 'accessible';
-      this.props.setIsNewHealthSystemSet(true);
-      this.props.navigation.replace('ManageBackupNewBHR');
+    const { levelHealth } = this.props
+    const { listData } = this.state
+    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
+      listData[ 0 ].status = 'accessible'
+      this.props.setIsNewHealthSystemSet( true )
+      this.props.navigation.replace( 'ManageBackupNewBHR' )
     }
     else{
-      (this.refs.RestoreFromICloud as any).snapTo(1);
+      ( this.refs.RestoreFromICloud as any ).snapTo( 1 )
     }
-    if(levelHealth[0] && levelHealth[0].levelInfo[0] && levelHealth[0].levelInfo[1].status == 'accessible'){
-      listData[4].status = 'accessible';
-      (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
+    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ] && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' ){
+      listData[ 4 ].status = 'accessible';
+      ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 1 )
     }
-    this.setState({listData});
+    this.setState( {
+      listData
+    } )
   }
 
-  componentDidUpdate = (prevProps, prevState) => {
+  componentDidUpdate = ( prevProps, prevState ) => {
     if (
       prevProps.s3Service.levelhealth.healthCheckInitializedKeeper !=
         this.props.s3Service.levelhealth.healthCheckInitializedKeeper &&
       this.props.s3Service.levelhealth.healthCheckInitializedKeeper
     ) {
-      this.props.setCloudData(this.setCloudBackupStatus);
+      this.props.setCloudData( this.setCloudBackupStatus )
     }
-    if(JSON.stringify(prevProps.levelHealth) != JSON.stringify(this.props.levelHealth)){
-      if(this.props.levelHealth[0] && this.props.levelHealth[0].levelInfo[0] && this.props.levelHealth[0].levelInfo[0].status == 'accessible') {
-        this.setState({ showLoader: false });
-        this.props.navigation.replace('ManageBackupNewBHR');
+    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) ){
+      if( this.props.levelHealth[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
+        this.setState( {
+          showLoader: false
+        } )
+        this.props.navigation.replace( 'ManageBackupNewBHR' )
       }
     }
 
-    if(prevProps.isBackupProcessing.status != this.props.isBackupProcessing.status && !this.props.isBackupProcessing.status){
-      (this.refs.RestoreFromICloud as any).snapTo(0);
+    if( prevProps.isBackupProcessing.status != this.props.isBackupProcessing.status && !this.props.isBackupProcessing.status ){
+      ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
     }
 
   };
 
-  setCloudBackupStatus = (share) =>{
-    this.props.setCloudBackupStatus(share);
+  setCloudBackupStatus = ( share ) =>{
+    this.props.setCloudBackupStatus( share )
   }
 
   cloudBackup = () => {
-    let { s3Service, initializeHealthSetup } = this.props;
-    const { healthCheckInitializedKeeper } = s3Service.levelhealth;
-    if (!healthCheckInitializedKeeper) {
-      initializeHealthSetup();
+    const { s3Service, initializeHealthSetup } = this.props
+    const { healthCheckInitializedKeeper } = s3Service.levelhealth
+    if ( !healthCheckInitializedKeeper ) {
+      initializeHealthSetup()
     }
   };
 
   render() {
-    const { listData, selectedIds, selectedContact, isCloudBackupProcessing, showLoader } = this.state;
-    const { navigation } = this.props;
+    const { listData, selectedIds, selectedContact, isCloudBackupProcessing, showLoader } = this.state
+    const { navigation } = this.props
     return (
-      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
-        <SafeAreaView style={{ flex: 0 }} />
+      <View style={{
+        flex: 1, backgroundColor: Colors.backgroundColor1
+      }}>
+        <SafeAreaView style={{
+          flex: 0
+        }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ flex: 1, flexDirection: "row" }}>
+          <View style={{
+            flex: 1, flexDirection: 'row'
+          }}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.headerBackArrowView}
@@ -298,9 +308,11 @@ class UpgradeBackup extends Component<
                 size={17}
               />
             </TouchableOpacity>
-            <View style={{ justifyContent: "center", width: wp("80%") }}>
+            <View style={{
+              justifyContent: 'center', width: wp( '80%' )
+            }}>
               <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
-                {"Upgrade Backup"}
+                {'Upgrade Backup'}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
                 Lorem ipsum dolor sit amet consetetur sadipscing
@@ -308,56 +320,64 @@ class UpgradeBackup extends Component<
             </View>
           </View>
         </View>
-        <ScrollView style={{ flex: 1 }}>
-          {listData.map((item, index) => (
+        <ScrollView style={{
+          flex: 1
+        }}>
+          {listData.map( ( item, index ) => (
             <View style={styles.greyBox}>
               <View>
                 <ImageBackground
-                  source={require("../../assets/images/icons/Ellipse.png")}
-                  style={{ ...styles.cardsImageView }}
+                  source={require( '../../assets/images/icons/Ellipse.png' )}
+                  style={{
+                    ...styles.cardsImageView
+                  }}
                 >
                   <Image source={item.image} style={styles.cardImage} />
                 </ImageBackground>
                 {index != listData.length - 1 && (
                   <Dash
                     dashStyle={{
-                      width: wp("1%"),
-                      height: wp("1%"),
-                      borderRadius: wp("1%") / 2,
-                      overflow: "hidden",
+                      width: wp( '1%' ),
+                      height: wp( '1%' ),
+                      borderRadius: wp( '1%' ) / 2,
+                      overflow: 'hidden',
                     }}
                     dashColor={Colors.borderColor}
                     style={{
                       height: 75,
-                      width: wp("1%"),
-                      flexDirection: "column",
-                      marginLeft: wp("7%"),
+                      width: wp( '1%' ),
+                      flexDirection: 'column',
+                      marginLeft: wp( '7%' ),
                     }}
                     dashThickness={10}
                     dashGap={5}
                   />
                 )}
               </View>
-              <View style={{ flex: 1, marginLeft: 5 }}>
+              <View style={{
+                flex: 1, marginLeft: 5
+              }}>
                 <View
                   style={{
                     borderRadius: 10,
-                    paddingLeft: wp("3%"),
-                    paddingRight: wp("3%"),
+                    paddingLeft: wp( '3%' ),
+                    paddingRight: wp( '3%' ),
                     height: 50,
-                    justifyContent: "center",
+                    justifyContent: 'center',
                   }}
                 >
                   <Text
                     numberOfLines={1}
                     style={{
                       ...styles.greyBoxText,
-                      fontSize: RFValue(13),
-                      marginBottom: wp("1.5%"),
+                      fontSize: RFValue( 13 ),
+                      marginBottom: wp( '1.5%' ),
                     }}
                   >
-                    Upgrade{" "}
-                    <Text style={{ fontFamily: Fonts.FiraSansMedium }}>
+                    Upgrade{' '}
+                    <Text style={{
+                      fontFamily: Fonts.FiraSansMedium
+                    }}>
                       {item.title}
                     </Text>
                   </Text>
@@ -368,11 +388,11 @@ class UpgradeBackup extends Component<
                     borderWidth: 1,
                     borderColor: Colors.borderColor,
                     borderRadius: 10,
-                    paddingLeft: wp("3%"),
-                    paddingRight: wp("3%"),
+                    paddingLeft: wp( '3%' ),
+                    paddingRight: wp( '3%' ),
                     height: 50,
-                    alignItems: "center",
-                    flexDirection: "row",
+                    alignItems: 'center',
+                    flexDirection: 'row',
                     backgroundColor: Colors.white,
                   }}
                 >
@@ -380,21 +400,23 @@ class UpgradeBackup extends Component<
                     style={{
                       color: Colors.textColorGrey,
                       fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
+                      fontSize: RFValue( 10 ),
                     }}
                   >
                     {item.subTitle}
                   </Text>
-                  <View style={{ flexDirection: "row", marginLeft: "auto" }}>
+                  <View style={{
+                    flexDirection: 'row', marginLeft: 'auto'
+                  }}>
                     <View
                       style={{
-                        height: wp("6%"),
-                        width: "auto",
-                        paddingLeft: wp("5%"),
-                        paddingRight: wp("5%"),
+                        height: wp( '6%' ),
+                        width: 'auto',
+                        paddingLeft: wp( '5%' ),
+                        paddingRight: wp( '5%' ),
                         backgroundColor: item.status == 'accessible' ? Colors.lightGreen : Colors.borderColor,
-                        justifyContent: "center",
-                        alignItems: "center",
+                        justifyContent: 'center',
+                        alignItems: 'center',
                         borderRadius: 5,
                       }}
                     >
@@ -402,29 +424,31 @@ class UpgradeBackup extends Component<
                         style={{
                           color: item.status == 'accessible' ? Colors.darkGreen : Colors.textColorGrey,
                           fontFamily: Fonts.FiraSansRegular,
-                          fontSize: RFValue(9),
+                          fontSize: RFValue( 9 ),
                         }}
                       >
                         {item.status == 'accessible' ? 'Complete' : 'Not Setup' }
                       </Text>
                     </View>
-                    {item.status != 'setup' && 
+                    {item.status != 'setup' &&
                       <View
                         style={{
-                          height: wp("6%"),
-                          width: wp("6%"),
-                          borderRadius: wp("6%") / 2,
-                          justifyContent: "center",
-                          alignItems: "center",
+                          height: wp( '6%' ),
+                          width: wp( '6%' ),
+                          borderRadius: wp( '6%' ) / 2,
+                          justifyContent: 'center',
+                          alignItems: 'center',
                           backgroundColor: Colors.lightGreen,
-                          marginLeft: wp("2.5%"),
+                          marginLeft: wp( '2.5%' ),
                         }}
                       >
                         <AntDesign
-                          style={{ marginTop: 1 }}
-                          size={RFValue(15)}
+                          style={{
+                            marginTop: 1
+                          }}
+                          size={RFValue( 15 )}
                           color={Colors.darkGreen}
-                          name={"check"}
+                          name={'check'}
                         />
                       </View>
                     }
@@ -432,130 +456,132 @@ class UpgradeBackup extends Component<
                 </View>
               </View>
             </View>
-          ))}
+          ) )}
         </ScrollView>
         {showLoader ? <Loader isLoading={true} /> : null}
 
         <BottomInfoBox
           backgroundColor={Colors.white}
-          title={"Note"}
+          title={'Note'}
           infoText={
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna."
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.'
           }
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={"RestoreFromICloud"}
+          ref={'RestoreFromICloud'}
           snapPoints={[
             -50,
-            Platform.OS == "ios" && DeviceInfo.hasNotch()
-              ? hp("50%")
-              : hp("60%"),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp( '50%' )
+              : hp( '60%' ),
           ]}
           renderContent={() => {
-            let name;
-            if (Platform.OS == "ios") name = "iCloud";
-            else name = "GDrive";
+            let name
+            if ( Platform.OS == 'ios' ) name = 'iCloud'
+            else name = 'GDrive'
             return (
               <RestoreFromICloud
                 isLoading={isCloudBackupProcessing}
-                title={"Keeper on " + name}
+                title={'Keeper on ' + name}
                 subText={
-                  "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
+                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
                 }
                 info={
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
                 }
-                cardInfo={"Store Backup"}
-                cardTitle={"Hexa Wallet Backup"}
-                cardSubInfo={name + " backup"}
-                proceedButtonText={"Backup"}
-                backButtonText={"Back"}
+                cardInfo={'Store Backup'}
+                cardTitle={'Hexa Wallet Backup'}
+                cardSubInfo={name + ' backup'}
+                proceedButtonText={'Backup'}
+                backButtonText={'Back'}
                 modalRef={this.refs.RestoreFromICloud}
                 onPressProceed={() => {
-                  this.setState({isCloudBackupProcessing: true, showLoader: true})
-                  this.cloudBackup();
+                  this.setState( {
+                    isCloudBackupProcessing: true, showLoader: true
+                  } )
+                  this.cloudBackup()
                   // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
                 }}
                 onPressBack={() => {
-                  (this.refs.RestoreFromICloud as any).snapTo(0);
+                  ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
                 }}
               />
-            );
+            )
           }}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                (this.refs.RestoreFromICloud as any).snapTo(0)
+                ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={"SetupPrimaryKeeperBottomSheet"}
+          ref={'SetupPrimaryKeeperBottomSheet'}
           snapPoints={[
             -50,
-            Platform.OS == "ios" && DeviceInfo.hasNotch()
-              ? hp("60%")
-              : hp("70"),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp( '60%' )
+              : hp( '70' ),
           ]}
           renderContent={() => (
             <SetupPrimaryKeeper
-              title={"Setup Primary Keeper\non a Personal Device"}
+              title={'Setup Primary Keeper\non a Personal Device'}
               subText={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
               }
-              textToCopy={"http://hexawallet.io/keeperapp"}
+              textToCopy={'http://hexawallet.io/keeperapp'}
               info={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
               }
-              proceedButtonText={"Proceed"}
-              backButtonText={"Back"}
+              proceedButtonText={'Proceed'}
+              backButtonText={'Back'}
               onPressBack={() => {
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
+                ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 0 )
               }}
               onPressContinue={() => {
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0);
-                (this.refs.UpgradingKeeperContact as any).snapTo(1);
+                ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 0 );
+                ( this.refs.UpgradingKeeperContact as any ).snapTo( 1 )
               }}
             />
           )}
           renderHeader={() => (
             <SmallHeaderModal
               onPressHeader={() =>
-                (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(0)
+                ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={"SecurityQuestionBottomSheet"}
-          snapPoints={[-30, hp("75%"), hp("90%")]}
+          ref={'SecurityQuestionBottomSheet'}
+          snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
           renderContent={() => (
             <SecurityQuestion
               onFocus={() => {
-                if (Platform.OS == "ios")
-                  (this.refs.SecurityQuestionBottomSheet as any).snapTo(2);
+                if ( Platform.OS == 'ios' )
+                  ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 2 )
               }}
               onBlur={() => {
-                if (Platform.OS == "ios")
-                  (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
+                if ( Platform.OS == 'ios' )
+                  ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 1 )
               }}
               onPressConfirm={async () => {
-                Keyboard.dismiss();
-                navigation.navigate("ConfirmKeys");
-                setTimeout(() => {
-                  (this.refs.SecurityQuestionBottomSheet as any).snapTo(0);
-                }, 2);
+                Keyboard.dismiss()
+                navigation.navigate( 'ConfirmKeys' )
+                setTimeout( () => {
+                  ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 0 )
+                }, 2 )
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                (this.refs.SecurityQuestionBottomSheet as any).snapTo(0);
+                ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 0 )
               }}
             />
           )}
@@ -563,120 +589,121 @@ class UpgradeBackup extends Component<
 
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={"UpgradingKeeperContact"}
+          ref={'UpgradingKeeperContact'}
           snapPoints={[
             -50,
-            Platform.OS == "ios" && DeviceInfo.hasNotch()
-              ? hp("70%")
-              : hp("80%"),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp( '70%' )
+              : hp( '80%' ),
           ]}
           renderContent={() => {
-            if(selectedContact.length){
-              return (<UpgradingKeeperContact
-              title={"Upgrading Keeper Contacts"}
-              subText={
-                "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
-              }
-              info={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
-              }
-              selectedContactArray={selectedContact}
-              proceedButtonText={"Proceed"}
-              onPressProceed={() => {
-                (this.refs.UpgradingKeeperContact as any).snapTo(0);
-                (this.refs.UpgradePdfKeeper as any).snapTo(1);
-              }}
-            />)
-          }}}
+            if( selectedContact.length ){
+              return ( <UpgradingKeeperContact
+                title={'Upgrading Keeper Contacts'}
+                subText={
+                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
+                }
+                info={
+                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                }
+                selectedContactArray={selectedContact}
+                proceedButtonText={'Proceed'}
+                onPressProceed={() => {
+                  ( this.refs.UpgradingKeeperContact as any ).snapTo( 0 );
+                  ( this.refs.UpgradePdfKeeper as any ).snapTo( 1 )
+                }}
+              /> )
+            }}}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                (this.refs.UpgradingKeeperContact as any).snapTo(0)
+                ( this.refs.UpgradingKeeperContact as any ).snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={"UpgradePdfKeeper"}
+          ref={'UpgradePdfKeeper'}
           snapPoints={[
             -50,
-            Platform.OS == "ios" && DeviceInfo.hasNotch()
-              ? hp("50%")
-              : hp("60%"),
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp( '50%' )
+              : hp( '60%' ),
           ]}
           renderContent={() => (
             <UpgradePdfKeeper
-              title={"Upgrade PDF Keeper"}
+              title={'Upgrade PDF Keeper'}
               subText={
-                "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
+                'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
               }
               info={
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
               }
               modalRef={this.refs.UpgradePdfKeeper}
               onPressSetup={() => {
-                (this.refs.UpgradePdfKeeper as any).snapTo(0);
-                (this.refs.SecurityQuestionBottomSheet as any).snapTo(1);
+                ( this.refs.UpgradePdfKeeper as any ).snapTo( 0 );
+                ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 1 )
               }}
               onPressBack={() => {
-                (this.refs.UpgradePdfKeeper as any).snapTo(0);
+                ( this.refs.UpgradePdfKeeper as any ).snapTo( 0 )
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                (this.refs.UpgradePdfKeeper as any).snapTo(0)
+                ( this.refs.UpgradePdfKeeper as any ).snapTo( 0 )
               }
             />
           )}
         />
       </View>
-    );
+    )
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
     walletName:
-      idx(state, (_) => _.storage.database.WALLET_SETUP.walletName) || "",
-    overallHealth: idx(state, (_) => _.sss.overallHealth),
-    trustedContacts: idx(state, (_) => _.trustedContacts.service),
-    s3Service: idx(state, (_) => _.health.service),
-    regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
-    database: idx(state, (_) => _.storage.database) || {},
+      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+    overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
+    s3Service: idx( state, ( _ ) => _.health.service ),
+    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
+    database: idx( state, ( _ ) => _.storage.database ) || {
+    },
     cloudBackupStatus:
-      idx(state, (_) => _.preferences.cloudBackupStatus) || false,
-    levelHealth: idx(state, (_) => _.health.levelHealth),
-    currentLevel: idx(state, (_) => _.health.currentLevel),
-    keeperInfo: idx(state, (_) => _.health.keeperInfo),
-    isLevel2Initialized: idx(state, (_) => _.health.isLevel2Initialized),
-    isLevel3Initialized: idx(state, (_) => _.health.isLevel3Initialized),
-    accountShells: idx(state, (_) => _.accounts.accountShells),
-    activePersonalNode: idx(state, (_) => _.nodeSettings.activePersonalNode),
-    isBackupProcessing: idx(state, (_) => _.preferences.isBackupProcessing) || false,
+      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    isLevel2Initialized: idx( state, ( _ ) => _.health.isLevel2Initialized ),
+    isLevel3Initialized: idx( state, ( _ ) => _.health.isLevel3Initialized ),
+    accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
+    activePersonalNode: idx( state, ( _ ) => _.nodeSettings.activePersonalNode ),
+    isBackupProcessing: idx( state, ( _ ) => _.preferences.isBackupProcessing ) || false,
     versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
 
-  };
-};
+  }
+}
 
 export default withNavigationFocus(
-  connect(mapStateToProps, {
+  connect( mapStateToProps, {
     fetchEphemeralChannel,
     initializeHealthSetup,
     setCloudBackupStatus,
     updateMSharesHealth,
     setIsNewHealthSystemSet,
     setCloudData
-  })(UpgradeBackup)
-);
+  } )( UpgradeBackup )
+)
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderTitleView: {
-    alignItems: "center",
-    flexDirection: "row",
+    alignItems: 'center',
+    flexDirection: 'row',
     paddingRight: 5,
     paddingBottom: 5,
     paddingTop: 10,
@@ -685,75 +712,75 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: hp("0.7%"),
-    marginBottom: hp("0.7%"),
+    marginTop: hp( '0.7%' ),
+    marginBottom: hp( '0.7%' ),
   },
   headerBackArrowView: {
     height: 30,
     width: 30,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   buttonInnerView: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-    width: wp("30%"),
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
     height: 20,
-    resizeMode: "contain",
+    resizeMode: 'contain',
     tintColor: Colors.white,
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
   cardsInfoText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
   cardsView: {
     padding: 15,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderBottomColor: Colors.backgroundColor,
   },
   cardsImageView: {
-    width: wp("15%"),
-    height: wp("15%"),
-    justifyContent: "center",
-    alignItems: "center",
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   cardImage: {
-    width: wp("5%"),
-    height: wp("5%"),
-    resizeMode: "contain",
+    width: wp( '5%' ),
+    height: wp( '5%' ),
+    resizeMode: 'contain',
     //marginBottom: wp('1%'),
   },
   statusTextView: {
-    height: wp("5%"),
+    height: wp( '5%' ),
     backgroundColor: Colors.backgroundColor,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 5,
-    marginLeft: "auto",
+    marginLeft: 'auto',
     paddingLeft: 10,
     paddingRight: 10,
   },
   statusText: {
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
@@ -761,17 +788,17 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.backgroundColor1,
     paddingLeft: 10,
     paddingRight: 10,
-    flexDirection: "row",
+    flexDirection: 'row',
     //  marginTop: wp('2%'),
     //  marginBottom: wp('2%'),
   },
   greyBoxImage: {
-    width: wp("15%"),
-    height: wp("15%"),
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: wp("15%") / 2,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp( '15%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 1,
     shadowOffset: {
@@ -786,13 +813,13 @@ const styles = StyleSheet.create({
   greyBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
   },
   successModalImage: {
-    width: wp("30%"),
-    height: wp("35%"),
-    marginLeft: "auto",
-    resizeMode: "stretch",
+    width: wp( '30%' ),
+    height: wp( '35%' ),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
     marginRight: -5,
   },
-});
+} )
