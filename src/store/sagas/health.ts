@@ -3072,7 +3072,7 @@ function* uploadSMShareWorker({ payload }) {
             ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
             [ tag ]: {
               ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
-              TRANSFER_DETAILS: {
+              SM_TRANSFER_DETAILS: {
                 KEY: encryptedKey,
                 UPLOADED_AT: Date.now(),
               },

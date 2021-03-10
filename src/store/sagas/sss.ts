@@ -543,6 +543,7 @@ function* uploadRequestedShareWorker( { payload } ) {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
       yield put( requestedShareUploaded( tag, false, res.err ) )
     }
+    yield put( switchS3Loader( 'uploadRequestedShare' ) )
   } catch (error) {
     console.log('RECOVERY error', error)
     yield put( switchS3Loader( 'uploadRequestedShare' ) )

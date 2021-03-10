@@ -21,7 +21,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 
 export default function QRModal( props ) {
-  const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
+  const [ openCameraFlag, setOpenCameraFlag ] = useState( false );
 
   const barcodeRecognized = async ( barcodes ) => {
     if ( barcodes.data ) {
@@ -283,7 +283,7 @@ export default function QRModal( props ) {
           />}
         </View>
       </ScrollView>
-      {/* {props.isFromKeeperDeviceHistory && <View style={styles.bottomButtonView}>
+      {props.isFromKeeperDeviceHistory && <View style={styles.bottomButtonView}>
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressContinue()}
               style={{
@@ -301,7 +301,7 @@ export default function QRModal( props ) {
                 Continue
               </Text>
             </AppBottomSheetTouchableWrapper>
-          </View>} */}
+          </View>}
     </View>
   )
 }
