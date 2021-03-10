@@ -36,17 +36,18 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serviceTypes'
+import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
 import S3Service from '../../../bitcoin/services/sss/S3Service'
+import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
+import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 
 export type Props = {
   navigation: any;
 };
-
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -59,7 +60,7 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const s3Service: S3Service = useSelector((state) => state.health.service);
+  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
@@ -68,9 +69,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountTransactions = AccountShell.getAllTransactions( accountShell )
+  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
+  let derivativeAccountKind: any = primarySubAccount.kind
 
-  let derivativeAccountKind
   switch( primarySubAccount.kind ){
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
@@ -130,7 +132,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }
 
   function navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType ) {
-
     navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,
@@ -334,12 +335,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
+                    dispatch( sourceAccountSelectedForSending( accountShell ) )
+
                     navigation.navigate( 'Send', {
-                      serviceType: primarySubAccount.sourceKind,
-                      averageTxFees,
-                      spendableBalance: AccountShell.getSpendableBalance( accountShell ),
-                      derivativeAccountDetails,
-                      accountShellID,
+                      subAccountKind: primarySubAccount.kind,
                     } )
                   }}
                   onReceivePressed={() => {

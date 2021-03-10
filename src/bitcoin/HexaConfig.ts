@@ -13,7 +13,7 @@ import {
   SUB_PRIMARY_ACCOUNT,
   WYRE,
   RAMP
-} from '../common/constants/serviceTypes'
+} from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
 class HexaConfig {
@@ -21,8 +21,8 @@ class HexaConfig {
   public RAMP_BASE_URL: string = Config.RAMP_BASE_URL || 'https://buy.ramp.network/'
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE || 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
-  public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'demo-web-client'
-  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'https://dev-api.swanbitcoin.com'
+  public SWAN_CLIENT_ID: string = Config.SWAN_CLIENT_ID || 'demo-web-client'
+  public SWAN_BASE_URL: string = Config.SWAN_AUTH_URL || 'https://dev-api.swanbitcoin.com'
   public TESTNET_BASE_URL: string = Config.BIT_TESTNET_BASE_URL ? Config.BIT_TESTNET_BASE_URL.trim() : 'https://testapi.bithyve.com'
   public MAINNET_BASE_URL: string = Config.BIT_MAINNET_BASE_URL ? Config.BIT_MAINNET_BASE_URL.trim() : 'https://api.bithyve.com'
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
@@ -265,22 +265,22 @@ class HexaConfig {
     }
   };
 
-  public connectToPersonalNode =  async ( personalNode: PersonalNode ) => {
+  public connectToPersonalNode = async ( personalNode: PersonalNode ) => {
     const personalNodeURL = personalNode.urlPath
-    if( personalNodeURL && personalNode.isConnectionActive ){
+    if ( personalNodeURL && personalNode.isConnectionActive ) {
       const personalNodeEPs = {
         MULTIBALANCE: personalNodeURL + '/balances',
-        MULTIUTXO:  personalNodeURL + '/utxos',
+        MULTIUTXO: personalNodeURL + '/utxos',
         MULTITXN: personalNodeURL + '/data',
         MULTIBALANCETXN: personalNodeURL + '/baltxs',
         MULTIUTXOTXN: personalNodeURL + '/utxotxs',
         NEWMULTIUTXOTXN: personalNodeURL + '/nutxotxs',
-        TXN_FEE: personalNodeURL  + 'fee-estimates',
+        TXN_FEE: personalNodeURL + 'fee-estimates',
         TXNDETAILS: personalNodeURL + '/tx',
         BROADCAST_TX: personalNodeURL + '/tx',
       }
 
-      if( this.ENVIRONMENT === 'MAIN' )
+      if ( this.ENVIRONMENT === 'MAIN' )
         this.ESPLORA_API_ENDPOINTS = {
           ...this.ESPLORA_API_ENDPOINTS,
           MAINNET: personalNodeEPs
@@ -295,7 +295,7 @@ class HexaConfig {
     }
   }
 
-  public connectToBitHyveNode =  async () => {
+  public connectToBitHyveNode = async () => {
     this.ESPLORA_API_ENDPOINTS = _.cloneDeep( this.BITHYVE_ESPLORA_API_ENDPOINTS )
     this.USE_ESPLORA_FALLBACK = false
   }

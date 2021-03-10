@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import {
   View,
   Image,
@@ -6,16 +6,17 @@ import {
   StyleSheet,
   TextInput,
   TouchableOpacity,
-} from 'react-native';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
+import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
 
 export default function CustomPriorityContent( props ) {
   const [ amount, setAmount ] = useState( '' )
@@ -23,6 +24,12 @@ export default function CustomPriorityContent( props ) {
   const averageTxFees = useSelector(
     ( state ) => state.accounts.averageTxFees,
   )
+
+  const sendingState = useSendingState()
+
+  const customPriorityError = useMemo( () => {
+    return sendingState.customPriorityST1.failedErrorMessage
+  }, [ sendingState.customPriorityST1 ] )
 
   const onCustomFeeChange = useCallback(
     ( value ) => {
@@ -93,7 +100,7 @@ export default function CustomPriorityContent( props ) {
         <View style={styles.amountInputImage}>
           <Image
             style={styles.textBoxImage}
-            source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+            source={require( '../assets/images/icons/icon_bitcoin_gray.png' )}
           />
         </View>
         <View style={styles.enterAmountView} />
@@ -116,11 +123,11 @@ export default function CustomPriorityContent( props ) {
           autoCompleteType="off"
         />
       </TouchableOpacity>
-      {props.err ? (
+      {customPriorityError ? (
         <View style={{
           marginRight: wp( '8%' ), marginLeft: wp( '8%' )
         }}>
-          <Text style={styles.errorText}>{props.err}</Text>
+          <Text style={styles.errorText}>{customPriorityError}</Text>
         </View>
       ) : null}
       <View

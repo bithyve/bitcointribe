@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react'
 import {
   View,
   Text,
@@ -7,64 +7,63 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
-} from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import ModalHeader from '../../components/ModalHeader';
+} from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import BottomSheet from 'reanimated-bottom-sheet'
+import DeviceInfo from 'react-native-device-info'
+import ModalHeader from '../../components/ModalHeader'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Fonts from '../../common/Fonts';
-import CommonStyles from '../../common/Styles/Styles';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import QRModal from './QRModal';
-import ResetTwoFASuccess from './ResetTwoFASuccess';
-import ServerErrorModal from './ServerErrorModal';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import QRModal from './QRModal'
+import ResetTwoFASuccess from './ResetTwoFASuccess'
+import ServerErrorModal from './ServerErrorModal'
 import {
   // resetTwoFA,
   // generateSecondaryXpriv,
   clearTransfer,
   // twoFAResetted,
   // secondaryXprivGenerated,
-} from '../../store/actions/accounts';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+} from '../../store/actions/accounts'
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 
-const ResetTwoFAHelp = (props) => {
-  const [QrBottomSheet, setQrBottomSheet] = useState(React.createRef());
-  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
-  const [QRModalHeader, setQRModalHeader] = useState('');
+export type Props = {
+  navigation: any;
+};
+
+const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
+  const [ QrBottomSheet ] = useState( React.createRef() )
+  const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
+  const [ QRModalHeader, setQRModalHeader ] = useState( '' )
   const [
     ResetTwoFASuccessBottomSheet,
-    setResetTwoFASuccessBottomSheet,
-  ] = useState(React.createRef());
-  const [successMessage, setSuccessMessage] = useState('');
-  const [successMessageHeader, setSuccessMessageHeader] = useState('');
+  ] = useState( React.createRef() )
+  const [ successMessage, setSuccessMessage ] = useState( '' )
+  const [ successMessageHeader, setSuccessMessageHeader ] = useState( '' )
   const [
     ServerNotRespondingBottomSheet,
-    setServerNotRespondingBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState( React.createRef() )
 
-  const additional = useSelector((state) => state.accounts.additional);
+  const additional = useSelector( ( state ) => state.accounts.additional )
   const service = useSelector(
-    (state) => state.accounts[SECURE_ACCOUNT].service,
-  );
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+  )
 
-  let generatedSecureXPriv;
+  let generatedSecureXPriv
   // let resettedTwoFA;
 
-  if (additional && additional.secure) {
-    generatedSecureXPriv = additional.secure.xprivGenerated;
+  if ( additional && additional.secure ) {
+    generatedSecureXPriv = additional.secure.xprivGenerated
     // resettedTwoFA = additional.secure.twoFAResetted;
   }
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   // useEffect(() => {
   //   if (resettedTwoFA) {
@@ -114,19 +113,19 @@ const ResetTwoFAHelp = (props) => {
   //   })();
   // }, [generatedSecureXPriv]);
 
-  const getQrCodeData = (qrData) => {
-    setTimeout(() => {
-      setQrBottomSheetsFlag(false);
-    }, 2);
+  const getQrCodeData = ( qrData ) => {
+    setTimeout( () => {
+      setQrBottomSheetsFlag( false )
+    }, 2 )
 
-    if (QRModalHeader === 'Reset 2FA') {
+    if ( QRModalHeader === 'Reset 2FA' ) {
       // dispatch(resetTwoFA(qrData));
-    } else if (QRModalHeader === 'Sweep Funds') {
+    } else if ( QRModalHeader === 'Sweep Funds' ) {
       // dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
     }
-  };
+  }
 
-  const renderQrContent = useCallback(() => {
+  const renderQrContent = useCallback( () => {
     return (
       <QRModal
         QRModalHeader={QRModalHeader}
@@ -136,63 +135,63 @@ const ResetTwoFAHelp = (props) => {
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={(qrData) => {
-          if (QRModalHeader == 'Sweep Funds') {
-            QrBottomSheet.current?.snapTo(0);
+        onQrScan={( qrData ) => {
+          if ( QRModalHeader == 'Sweep Funds' ) {
+            QrBottomSheet.current?.snapTo( 0 )
           }
-          getQrCodeData(qrData);
+          getQrCodeData( qrData )
         }}
         onBackPress={() => {
-          (QrBottomSheet as any).current.snapTo(0);
+          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, [QRModalHeader, QrBottomSheetsFlag]);
+    )
+  }, [ QRModalHeader, QrBottomSheetsFlag ] )
 
-  const renderQrHeader = useCallback(() => {
+  const renderQrHeader = useCallback( () => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          setTimeout(() => {
-            setQrBottomSheetsFlag(false);
-          }, 2);
-          (QrBottomSheet as any).current.snapTo(0);
+          setTimeout( () => {
+            setQrBottomSheetsFlag( false )
+          }, 2 );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
-  const renderErrorModalContent = useCallback(() => {
+  const renderErrorModalContent = useCallback( () => {
     return (
       <ResetTwoFASuccess
         modalRef={ResetTwoFASuccessBottomSheet}
         title={successMessageHeader}
-        note={""
+        note={''
           // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
         }
         info={successMessage}
         proceedButtonText={'Proceed'}
         onPressProceed={() => {
-          (ResetTwoFASuccessBottomSheet as any).current.snapTo(0);
-          props.navigation.navigate('NewTwoFASecret');
+          ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
+          props.navigation.navigate( 'NewTwoFASecret' )
         }}
         isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/icon_twoFASuccess.png')}
+        bottomImage={require( '../../assets/images/icons/icon_twoFASuccess.png' )}
       />
-    );
-  }, [successMessage, successMessageHeader]);
+    )
+  }, [ successMessage, successMessageHeader ] )
 
-  const renderErrorModalHeader = useCallback(() => {
+  const renderErrorModalHeader = useCallback( () => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (ResetTwoFASuccessBottomSheet as any).current.snapTo(0);
+          ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
-  const renderServerNotRespondingContent = useCallback(() => {
+  const renderServerNotRespondingContent = useCallback( () => {
     return (
       <ServerErrorModal
         modalRef={ServerNotRespondingBottomSheet}
@@ -202,42 +201,50 @@ const ResetTwoFAHelp = (props) => {
         }
         proceedButtonText={'Try Again'}
         onPressProceed={() => {
-          (ServerNotRespondingBottomSheet as any).current.snapTo(0);
+          ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
         }}
         isIgnoreButton={true}
         cancelButtonText={'Sweep Funds'}
         onPressIgnore={() => {
-          setTimeout(() => {
-            setQRModalHeader('Sweep Funds');
-          }, 2);
-          props.navigation.navigate("SweepFundUseExitKey");
+          setTimeout( () => {
+            setQRModalHeader( 'Sweep Funds' )
+          }, 2 )
+          props.navigation.navigate( 'SweepFundUseExitKey' );
           //if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(1);
-          (ServerNotRespondingBottomSheet as any).current.snapTo(0);
+          ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
-  const renderServerNotRespondingHeader = useCallback(() => {
+  const renderServerNotRespondingHeader = useCallback( () => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (ServerNotRespondingBottomSheet as any).current.snapTo(0);
+          ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalContainer}>
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center'
+          }}>
             <AppBottomSheetTouchableWrapper
               onPress={() => props.navigation.goBack()}
-              hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
-              style={{ height: 30, width: 30 }}
+              hitSlop={{
+                top: 20, left: 20, bottom: 20, right: 20
+              }}
+              style={{
+                height: 30, width: 30
+              }}
             >
               <FontAwesome
                 name="long-arrow-left"
@@ -255,7 +262,9 @@ const ResetTwoFAHelp = (props) => {
             </View>
           </View>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{
+          flex: 1
+        }}>
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               setTimeout(() => {
@@ -306,15 +315,17 @@ const ResetTwoFAHelp = (props) => {
 
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              (ServerNotRespondingBottomSheet as any).current.snapTo(1);
+              ( ServerNotRespondingBottomSheet as any ).current.snapTo( 1 )
             }}
-            style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}
+            style={{
+              ...styles.selectedContactsView, marginBottom: hp( '3%' )
+            }}
           >
             <Image
-              source={require('../../assets/images/icons/icon_gear.png')}
+              source={require( '../../assets/images/icons/icon_gear.png' )}
               style={{
-                width: wp('7%'),
-                height: wp('7%'),
+                width: wp( '7%' ),
+                height: wp( '7%' ),
                 resizeMode: 'contain',
                 marginLeft: 0,
                 marginRight: 10,
@@ -328,7 +339,7 @@ const ResetTwoFAHelp = (props) => {
             </View>
             <View
               style={{
-                width: wp('17%'),
+                width: wp( '17%' ),
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginLeft: 'auto',
@@ -353,7 +364,7 @@ const ResetTwoFAHelp = (props) => {
           marginRight: 30,
           marginLeft: 30,
           marginTop: 'auto',
-          marginBottom: hp('5%'),
+          marginBottom: hp( '5%' ),
         }}
       >
         {/* <Text style={{ ...styles.modalHeaderInfoText }}>
@@ -363,18 +374,18 @@ const ResetTwoFAHelp = (props) => {
       </View>
       <BottomSheet
         onOpenEnd={() => {
-          setQrBottomSheetsFlag(true);
+          setQrBottomSheetsFlag( true )
         }}
         onCloseEnd={() => {
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet as any).current.snapTo(0);
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onCloseStart={() => {}}
         enabledInnerScrolling={true}
         ref={QrBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('92%') : hp('91%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '92%' ) : hp( '91%' ),
         ]}
         renderContent={renderQrContent}
         renderHeader={renderQrHeader}
@@ -384,7 +395,7 @@ const ResetTwoFAHelp = (props) => {
         ref={ResetTwoFASuccessBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
@@ -395,16 +406,16 @@ const ResetTwoFAHelp = (props) => {
         ref={ServerNotRespondingBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
         ]}
         renderContent={renderServerNotRespondingContent}
         renderHeader={renderServerNotRespondingHeader}
       />
     </SafeAreaView>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   screen: {
     flex: 1,
     justifyContent: 'center',
@@ -430,12 +441,12 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContentView: {
@@ -480,16 +491,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   titleText: {
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.blue,
   },
   infoText: {
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
     marginTop: 5,
   },
-});
+} )
 
-export default ResetTwoFAHelp;
+export default SubAccountTFAHelpScreen

@@ -15,13 +15,15 @@ export interface OutputUTXOs {
   address: string;
 }
 
+export interface TransactionPrerequisiteElements {
+  inputs?: InputUTXOs[];
+  outputs?: OutputUTXOs[];
+  fee?: number;
+  estimatedBlocks?: number;
+}
+
 export interface TransactionPrerequisite {
-  [txnPriority: string]: {
-    inputs?: InputUTXOs[];
-    outputs: OutputUTXOs[];
-    fee: number;
-    estimatedBlocks: number;
-  };
+  [txnPriority: string]: TransactionPrerequisiteElements
 }
 
 export interface TransactionDetails {
@@ -413,33 +415,34 @@ export interface EncryptedTrustedData {
   dataHash?: string; // hash of the encrypted TrustedData (TrustedData's encDataHash = dataHash)
 }
 
-export interface Contacts {
-  [contactName: string]: {
-    privateKey: string;
-    publicKey: string;
-    encKey: string;
-    otp?: string;
-    symmetricKey?: string;
-    secondaryKey?: string;
-    contactsPubKey?: string;
-    contactsWalletName?: string;
-    isWard?: boolean;
-    isGuardian?: boolean;
-    walletID?: string;
-    FCMs?: string[];
-    ephemeralChannel?: {
-      address: string;
-      initiatedAt?: number;
-      data?: EphemeralDataElements[];
-    };
-    trustedChannel?: {
-      address: string;
-      data?: TrustedData[];
-    };
-    lastSeen?: number;
-    trustedAddress?: string;
-    trustedTestAddress?: string;
+export interface ContactElements {
+  privateKey: string;
+  publicKey: string;
+  encKey: string;
+  otp?: string;
+  symmetricKey?: string;
+  secondaryKey?: string;
+  contactsPubKey?: string;
+  contactsWalletName?: string;
+  isWard?: boolean;
+  isGuardian?: boolean;
+  walletID?: string;
+  FCMs?: string[];
+  ephemeralChannel?: {
+    address: string;
+    initiatedAt?: number;
+    data?: EphemeralDataElements[];
   };
+  trustedChannel?: {
+    address: string;
+    data?: TrustedData[];
+  };
+  lastSeen?: number;
+  trustedAddress?: string;
+  trustedTestAddress?: string;
+}
+export interface Contacts {
+  [contactName: string]: ContactElements
 }
 
 export interface WalletImage {
@@ -538,6 +541,10 @@ export interface VersionHistory {
   date: Date;
 }
 
+export enum ScannedAddressKind {
+  ADDRESS = 'address',
+  PAYMENT_URI = 'paymentURI',
+}
 
 export interface AverageTxFees {
   [priority: string]: {

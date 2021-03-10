@@ -35,6 +35,7 @@ const initialState = ip.freeze( {
   isSendHelperDoneValue: false,
   isTwoFASetupDone: false,
   hasShownInitialKnowMoreSendSheet: false,
+  hasCompletedTFASetup: false,
   isContactOpen: false,
   isMigrated: false,
   applicationStatus: null,

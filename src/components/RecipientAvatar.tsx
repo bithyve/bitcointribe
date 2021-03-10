@@ -1,35 +1,36 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import Colors from '../common/Colors';
-import ImageStyles from '../common/Styles/ImageStyles';
-import { nameToInitials } from '../common/CommonFunctions';
-import { ContactRecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing';
-import RecipientKind from '../common/data/enums/RecipientKind';
+import React from 'react'
+import { View, Text, Image } from 'react-native'
+import Colors from '../common/Colors'
+import ImageStyles from '../common/Styles/ImageStyles'
+import { nameToInitials } from '../common/CommonFunctions'
+import { RecipientDescribing } from '../common/data/models/interfaces/RecipientDescribing'
+import RecipientKind from '../common/data/enums/RecipientKind'
 
 export type Props = {
-  contact: ContactRecipientDescribing;
+  recipient: RecipientDescribing;
   containerStyle?: Record<string, unknown>;
   contentContainerStyle?: Record<string, unknown>;
 };
 
-const ContactAvatar: React.FC<Props> = ({
-  contact,
-  containerStyle = {},
+const RecipientAvatar: React.FC<Props> = ( {
+  recipient,
+  containerStyle = {
+  },
   contentContainerStyle = {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageMedium,
   },
-}: Props) => {
-  if (contact.avatarImageSource) {
+}: Props ) => {
+  if ( recipient.avatarImageSource ) {
     return (
       <View style={containerStyle}>
         <Image
-          source={contact.avatarImageSource}
+          source={recipient.avatarImageSource}
           style={contentContainerStyle}
           resizeMode="contain"
         />
       </View>
-    );
+    )
   } else {
     return (
       <View
@@ -47,12 +48,12 @@ const ContactAvatar: React.FC<Props> = ({
           }}
         >
           {nameToInitials(
-            contact.kind == RecipientKind.ADDRESS ? '@' : (contact.displayedName || '')
+            recipient.kind == RecipientKind.ADDRESS ? '@' : ( recipient.displayedName || '' )
           )}
         </Text>
       </View>
-    );
+    )
   }
-};
+}
 
-export default ContactAvatar;
+export default RecipientAvatar

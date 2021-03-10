@@ -27,171 +27,171 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
-import { useDispatch, useSelector } from 'react-redux';
-import { initializeSetup } from '../store/actions/setupAndAuth';
-import BottomSheet from 'reanimated-bottom-sheet';
-import LoaderModal from '../components/LoaderModal';
-import {
-  getTestcoins,
-} from '../store/actions/accounts';
-import {
-  TEST_ACCOUNT,
-} from '../common/constants/serviceTypes';
+import { useDispatch, useSelector } from 'react-redux'
+import { initializeSetup } from '../store/actions/setupAndAuth'
+import BottomSheet from 'reanimated-bottom-sheet'
+import LoaderModal from '../components/LoaderModal'
+import { getTestcoins, accountsSynched } from '../store/actions/accounts'
+import { TEST_ACCOUNT } from '../common/constants/wallet-service-types'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import CloudBackup from '../common/CommonFunctions/CloudBackup';
+import CloudBackup from '../common/CommonFunctions/CloudBackup'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
 
-function validateAllowedCharacters(answer: string): boolean {
-  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test(answer)
+function validateAllowedCharacters( answer: string ): boolean {
+  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
 
-export default function NewOwnQuestions(props) {
-  const [message, setMessage] = useState('Creating your wallet')
-  const [subTextMessage, setSubTextMessage] = useState(
+export default function NewOwnQuestions( props ) {
+  const [ message, setMessage ] = useState( 'Creating your wallet' )
+  const [ subTextMessage, setSubTextMessage ] = useState(
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
-  );
-  const [Elevation, setElevation] = useState(10);
-  const [isLoaderStart, setIsLoaderStart] = useState(false);
-  const [question, setQuestion] = useState('');
-  const [questionInputStyle, setQuestionInputStyle] = useState(styles.inputBox);
-  const [answerInputStyle, setAnswerInputStyle] = useState(styles.inputBox);
-  const [confirmInputStyle, setConfirmAnswerInputStyle] = useState(
+  )
+  const [ Elevation, setElevation ] = useState( 10 )
+  const [ isLoaderStart, setIsLoaderStart ] = useState( false )
+  const [ question, setQuestion ] = useState( '' )
+  const [ questionInputStyle, setQuestionInputStyle ] = useState( styles.inputBox )
+  const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
+  const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
   )
-  const [confirmAnswer, setConfirmAnswer] = useState('')
-  const [answer, setAnswer] = useState('')
-  const [answerMasked, setAnswerMasked] = useState('')
-  const [confirmAnswerMasked, setConfirmAnswerMasked] = useState('')
-  const [hideShowConfirmAnswer, setHideShowConfirmAnswer] = useState(true)
-  const [hideShowAnswer, setHdeShowAnswer] = useState(true)
+  const [ confirmAnswer, setConfirmAnswer ] = useState( '' )
+  const [ answer, setAnswer ] = useState( '' )
+  const [ answerMasked, setAnswerMasked ] = useState( '' )
+  const [ confirmAnswerMasked, setConfirmAnswerMasked ] = useState( '' )
+  const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
+  const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam('walletName')
-  const [answerError, setAnswerError] = useState('')
-  const [tempAns, setTempAns] = useState('')
-  const [isEditable, setIsEditable] = useState(true)
-  const [isDisabled, setIsDisabled] = useState(false)
-  const { isInitialized } = useSelector((state) => state.setupAndAuth)
-  const [loaderBottomSheet] = useState(React.createRef())
-  const [confirmAnswerTextInput] = useState(
+  const walletName = props.navigation.getParam( 'walletName' )
+  const [ answerError, setAnswerError ] = useState( '' )
+  const [ tempAns, setTempAns ] = useState( '' )
+  const [ isEditable, setIsEditable ] = useState( true )
+  const [ isDisabled, setIsDisabled ] = useState( false )
+  const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
+  const [ loaderBottomSheet ] = useState( React.createRef() )
+  const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
   )
-  const [visibleButton, setVisibleButton] = useState(false)
-  const accounts = useSelector((state) => state.accounts)
-  const testAccService = accounts[TEST_ACCOUNT].service
+  const [ visibleButton, setVisibleButton ] = useState( false )
+  const accounts = useSelector( ( state ) => state.accounts )
+  const testAccService = accounts[ TEST_ACCOUNT ].service
 
-  useEffect(() => {
-    (async () => {
-      if (testAccService) {
+  useEffect( () => {
+    ( async () => {
+      if ( testAccService ) {
         const { balances } = testAccService.hdWallet
         const netBalance = testAccService
           ? balances.balance + balances.unconfirmedBalance
           : 0
-        if (!netBalance) {
-          dispatch(getTestcoins(TEST_ACCOUNT))
+        if ( !netBalance ) {
+          dispatch( getTestcoins( TEST_ACCOUNT ) )
         }
       }
-    })()
-  }, [testAccService])
+    } )()
+  }, [ testAccService ] )
 
-  useEffect(() => {
-    (async () => {
-      if (isLoaderStart) {
+  useEffect( () => {
+    ( async () => {
+      if ( isLoaderStart ) {
         const security = {
-          questionId: "0",
+          questionId: '0',
           question: question,
           answer,
         }
-        dispatch(initializeSetup(walletName, security));
-        dispatch(setVersion('Current'));
+        dispatch( initializeSetup( walletName, security ) )
+        dispatch( setVersion( 'Current' ) )
         const current = Date.now()
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
-          JSON.stringify(current),
+          JSON.stringify( current ),
         )
         const securityQuestionHistory = {
           created: current,
         }
         await AsyncStorage.setItem(
           'securityQuestionHistory',
-          JSON.stringify(securityQuestionHistory),
+          JSON.stringify( securityQuestionHistory ),
         )
       }
-    })()
-  }, [isLoaderStart])
+    } )()
+  }, [ isLoaderStart ] )
 
-  useEffect(() => {
+  useEffect( () => {
     if (
       isInitialized
       // exchangeRates &&
       // balances.testBalance &&
       // transactions.length > 0
     ) {
-      (loaderBottomSheet as any).current.snapTo(0)
+      ( loaderBottomSheet as any ).current.snapTo( 0 )
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
-      dispatch(walletCheckIn()) // fetches exchange rates
+      dispatch( walletCheckIn() ) // fetches exchange rates
 
-      props.navigation.navigate('HomeNav')
+      props.navigation.navigate( 'HomeNav' )
     }
-  }, [isInitialized])
+  }, [ isInitialized ] )
 
 
   const handleSubmit = () => {
-    setConfirmAnswer(tempAns)
+    setConfirmAnswer( tempAns )
 
-    if (answer && confirmAnswer && confirmAnswer != answer) {
-      setAnswerError('Answers do not match')
+    if ( answer && confirmAnswer && confirmAnswer != answer ) {
+      setAnswerError( 'Answers do not match' )
     } else if (
-      validateAllowedCharacters(answer) == false ||
-      validateAllowedCharacters(tempAns) == false
+      validateAllowedCharacters( answer ) == false ||
+      validateAllowedCharacters( tempAns ) == false
     ) {
-      setAnswerError('Answers must only contain lowercase characters (a-z) and digits (0-9)')
+      setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
     } else {
-      setTimeout(() => {
-        setAnswerError('')
-      }, 2)
+      setTimeout( () => {
+        setAnswerError( '' )
+      }, 2 )
     }
   }
 
-  useEffect(() => {
-    if (answer.trim() == confirmAnswer.trim() && answer && confirmAnswer && answerError.length == 0) {
-      setVisibleButton(true)
+  useEffect( () => {
+    if ( answer.trim() == confirmAnswer.trim() && answer && confirmAnswer && answerError.length == 0 ) {
+      setVisibleButton( true )
     } else {
-      setVisibleButton(false)
+      setVisibleButton( false )
 
-      if (answer && confirmAnswer && confirmAnswer != answer) {
-        setAnswerError('Answers do not match')
+      if ( answer && confirmAnswer && confirmAnswer != answer ) {
+        setAnswerError( 'Answers do not match' )
       } else if (
-        validateAllowedCharacters(answer) == false ||
-        validateAllowedCharacters(confirmAnswer) == false
+        validateAllowedCharacters( answer ) == false ||
+        validateAllowedCharacters( confirmAnswer ) == false
       ) {
-        setAnswerError('Answers must only contain lowercase characters (a-z) and digits (0-9)')
+        setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
       }
     }
-  }, [confirmAnswer])
+  }, [ confirmAnswer ] )
 
   const googleCloudLoginCallback = () => {
-    (loaderBottomSheet as any).current.snapTo(1);
-    seLoaderMessages();
-    setTimeout(() => {
-      setElevation(0);
-    }, 0.2);
-    setTimeout(() => {
-      setIsLoaderStart(true);
-      setIsEditable(false);
-      setIsDisabled(true);
-    }, 2);
+    ( loaderBottomSheet as any ).current.snapTo( 1 )
+    seLoaderMessages()
+    setTimeout( () => {
+      setElevation( 0 )
+    }, 0.2 )
+    setTimeout( () => {
+      setIsLoaderStart( true )
+      setIsEditable( false )
+      setIsDisabled( true )
+    }, 2 )
   }
 
   const onPressConfirm = () => {
-    if (Platform.OS === 'android') {
-      let cloudObject = new CloudBackup({ googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback, });
-      cloudObject.GoogleDriveLogin({ googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback });
+    if ( Platform.OS === 'android' ) {
+      const cloudObject = new CloudBackup( {
+        googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback,
+      } )
+      cloudObject.GoogleDriveLogin( {
+        googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback
+      } )
     }
     else {
       googleCloudLoginCallback()
@@ -202,7 +202,9 @@ export default function NewOwnQuestions(props) {
     return (
       <TouchableOpacity
         onPress={() => walletName ? onPressConfirm() : null}
-        style={{ ...styles.buttonView, elevation: Elevation }}
+        style={{
+          ...styles.buttonView, elevation: Elevation
+        }}
       >
         {/* {!loading.initializing ? ( */}
         <Text style={styles.buttonText}>{'Confirm & Proceed'}</Text>
@@ -214,29 +216,29 @@ export default function NewOwnQuestions(props) {
   }
 
   const seLoaderMessages = () => {
-    setTimeout(() => {
-      setMessage('Bootstrapping Accounts')
+    setTimeout( () => {
+      setMessage( 'Bootstrapping Accounts' )
       setSubTextMessage(
         'Hexa has a multi-account model which lets you better manage your Bitcoin (sats)',
       )
-      setTimeout(() => {
-        setMessage('Filling Test Account with test sats')
+      setTimeout( () => {
+        setMessage( 'Filling Test Account with test sats' )
         setSubTextMessage(
           'Preloaded Test Account is the best place to start your Bitcoin journey',
         )
-        setTimeout(() => {
-          setMessage('Generating Recovery Keys')
+        setTimeout( () => {
+          setMessage( 'Generating Recovery Keys' )
           setSubTextMessage(
             'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
           )
-        }, 3000)
-      }, 3000)
-    }, 3000)
+        }, 3000 )
+      }, 3000 )
+    }, 3000 )
   }
 
-  const renderLoaderModalContent = useCallback(() => {
+  const renderLoaderModalContent = useCallback( () => {
     return <LoaderModal headerText={message} messageText={subTextMessage} />
-  }, [message, subTextMessage])
+  }, [ message, subTextMessage ] )
 
   const renderLoaderModalHeader = () => {
     return (
@@ -245,7 +247,7 @@ export default function NewOwnQuestions(props) {
           marginTop: 'auto',
           flex: 1,
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp('75%'),
+          height: hp( '75%' ),
           zIndex: 9999,
           justifyContent: 'center',
           alignItems: 'center',
@@ -333,19 +335,21 @@ export default function NewOwnQuestions(props) {
                   keyboardType={
                     Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                   }
-                  onChangeText={(text) => {
-                    setQuestion(text)
+                  onChangeText={( text ) => {
+                    setQuestion( text )
                   }}
                   onFocus={() => {
-                    setQuestionInputStyle(styles.inputBoxFocused)
+                    setQuestionInputStyle( styles.inputBoxFocused )
                   }}
                   onBlur={() => {
-                    setQuestionInputStyle(styles.inputBox)
+                    setQuestionInputStyle( styles.inputBox )
                   }}
                 />
               </View>
               {question ?
-                (<View style={{ marginTop: 15 }}>
+                ( <View style={{
+                  marginTop: 15
+                }}>
                   <View
                     style={{
                       ...answerInputStyle,
@@ -367,39 +371,39 @@ export default function NewOwnQuestions(props) {
                       editable={isEditable}
                       autoCapitalize="none"
                       onSubmitEditing={() =>
-                        (confirmAnswerTextInput as any).current.focus()
+                        ( confirmAnswerTextInput as any ).current.focus()
                       }
                       keyboardType={
                         Platform.OS == 'ios'
                           ? 'ascii-capable'
                           : 'visible-password'
                       }
-                      onChangeText={(text) => {
+                      onChangeText={( text ) => {
 
-                        setAnswer(text);
-                        setAnswerMasked(text);
+                        setAnswer( text )
+                        setAnswerMasked( text )
                       }}
                       onFocus={() => {
-                        setAnswerInputStyle(styles.inputBoxFocused)
-                        if (answer.length > 0) {
-                          setAnswer('')
-                          setAnswerMasked('')
+                        setAnswerInputStyle( styles.inputBoxFocused )
+                        if ( answer.length > 0 ) {
+                          setAnswer( '' )
+                          setAnswerMasked( '' )
                         }
                       }}
                       onBlur={() => {
-                        setAnswerInputStyle(styles.inputBox)
+                        setAnswerInputStyle( styles.inputBox )
                         let temp = ''
-                        for (let i = 0; i < answer.length; i++) {
+                        for ( let i = 0; i < answer.length; i++ ) {
                           temp += '*'
                         }
-                        setAnswerMasked(temp)
+                        setAnswerMasked( temp )
                         handleSubmit()
                       }}
                     />
                     {answer ? (
                       <TouchableWithoutFeedback
                         onPress={() => {
-                          setHdeShowAnswer(!hideShowAnswer)
+                          setHdeShowAnswer( !hideShowAnswer )
                         }}
                       >
                         <Feather
@@ -443,34 +447,34 @@ export default function NewOwnQuestions(props) {
                       autoCorrect={false}
                       editable={isEditable}
                       autoCapitalize="none"
-                      onChangeText={(text) => {
-                        setTempAns(text)
-                        setConfirmAnswerMasked(text)
+                      onChangeText={( text ) => {
+                        setTempAns( text )
+                        setConfirmAnswerMasked( text )
                       }}
                       onSubmitEditing={handleSubmit}
                       onFocus={() => {
-                        setConfirmAnswerInputStyle(styles.inputBoxFocused)
-                        if (tempAns.length > 0) {
-                          setTempAns('')
-                          setAnswerError('')
-                          setConfirmAnswer('')
-                          setConfirmAnswerMasked('')
+                        setConfirmAnswerInputStyle( styles.inputBoxFocused )
+                        if ( tempAns.length > 0 ) {
+                          setTempAns( '' )
+                          setAnswerError( '' )
+                          setConfirmAnswer( '' )
+                          setConfirmAnswerMasked( '' )
                         }
                       }}
                       onBlur={() => {
-                        setConfirmAnswerInputStyle(styles.inputBox)
+                        setConfirmAnswerInputStyle( styles.inputBox )
                         let temp = ''
-                        for (let i = 0; i < tempAns.length; i++) {
+                        for ( let i = 0; i < tempAns.length; i++ ) {
                           temp += '*'
                         }
-                        setConfirmAnswerMasked(temp)
+                        setConfirmAnswerMasked( temp )
                         handleSubmit()
                       }}
                     />
                     {tempAns ? (
                       <TouchableWithoutFeedback
                         onPress={() => {
-                          setHideShowConfirmAnswer(!hideShowConfirmAnswer)
+                          setHideShowConfirmAnswer( !hideShowConfirmAnswer )
                         }}
                       >
                         <Feather
@@ -503,7 +507,7 @@ export default function NewOwnQuestions(props) {
                   style={{
                     color: Colors.red,
                     fontFamily: Fonts.FiraSansMediumItalic,
-                    fontSize: RFValue(10),
+                    fontSize: RFValue( 10 ),
                     marginLeft: 'auto',
                   }}
                 >
@@ -513,51 +517,51 @@ export default function NewOwnQuestions(props) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        </KeyboardAvoidingView>
-        <View style={{
-          ...styles.bottomButtonView
-        }}>
-          {(
-            answer.trim() == confirmAnswer.trim() &&
+      </KeyboardAvoidingView>
+      <View style={{
+        ...styles.bottomButtonView
+      }}>
+        {(
+          answer.trim() == confirmAnswer.trim() &&
             confirmAnswer.trim() &&
             answer.trim() && answerError.length == 0
-          ) && (
-              setButtonVisible()
-            ) || null}
-          <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View>
+        ) && (
+          setButtonVisible()
+        ) || null}
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
-        {!visibleButton ? (
-          <View
-            style={{
-              marginBottom:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp('1%') : 0,
-            }}
-          >
-            <BottomInfoBox
-              title={'This answer is used to encrypt your wallet'}
-              infoText={'It is extremely important that only you'}
-              italicText={' know and remember the answer'}
-            />
-          </View>
-        ) : null}
-        <BottomSheet
-          onCloseEnd={() => { }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[-50, hp('100%')]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
-      
+      </View>
+      {!visibleButton ? (
+        <View
+          style={{
+            marginBottom:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
+          }}
+        >
+          <BottomInfoBox
+            title={'This answer is used to encrypt your wallet'}
+            infoText={'It is extremely important that only you'}
+            italicText={' know and remember the answer'}
+          />
+        </View>
+      ) : null}
+      <BottomSheet
+        onCloseEnd={() => { }}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[ -50, hp( '100%' ) ]}
+        renderContent={renderLoaderModalContent}
+        renderHeader={renderLoaderModalHeader}
+      />
+
     </View>
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   dropdownBox: {
     flexDirection: 'row',
     borderColor: Colors.borderColor,
@@ -592,8 +596,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
@@ -606,7 +610,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   bottomButtonView: {
@@ -660,7 +664,7 @@ const styles = StyleSheet.create({
   modalInputBox: {
     flex: 1,
     height: 50,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
@@ -668,7 +672,7 @@ const styles = StyleSheet.create({
   dropdownBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     marginRight: 15,
   },
   dropdownBoxModal: {
@@ -691,8 +695,8 @@ const styles = StyleSheet.create({
   },
 
   helpText: {
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
     paddingHorizontal: 24,
   }
-})
+} )

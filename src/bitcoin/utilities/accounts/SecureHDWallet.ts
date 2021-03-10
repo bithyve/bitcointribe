@@ -17,6 +17,7 @@ import {
   DerivativeAccountElements,
   InputUTXOs,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -27,7 +28,7 @@ import {
   SECURE_ACCOUNT,
   WYRE,
   RAMP
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
 const {  HEXA_ID } = config
@@ -1155,7 +1156,7 @@ export default class SecureHDWallet extends Bitcoin {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ): {
     accountId: string;
     accountNumber: number;
@@ -1175,8 +1176,8 @@ export default class SecureHDWallet extends Bitcoin {
             .derivativeAccounts[ accountType ][ accountNumber ]
           const updatedDervInstance = {
             ...derivativeInstance,
-            accountName: accountDetails.accountName,
-            accountDescription: accountDetails.accountDescription,
+            accountName: accountDetails? accountDetails.accountName: null,
+            accountDescription:accountDetails? accountDetails.accountDescription: null,
           }
           this.derivativeAccounts[ accountType ][
             accountNumber
@@ -1853,7 +1854,7 @@ export default class SecureHDWallet extends Bitcoin {
     }[],
     customTxFeePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
-  ) => {
+  ): TransactionPrerequisiteElements => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
@@ -1884,10 +1885,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
     // console.log({ inputUTXOs });
 
-    let confirmedBalance = 0
-    inputUTXOs.forEach( ( confirmedUtxo ) => {
-      confirmedBalance += confirmedUtxo.value
-    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
@@ -1895,10 +1892,10 @@ export default class SecureHDWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance
+      fee,
     }
     return {
-      inputs, outputs, fee, balance: confirmedBalance
+      inputs, outputs, fee,
     }
   };
 
@@ -2045,7 +2042,7 @@ export default class SecureHDWallet extends Bitcoin {
   public createHDTransaction = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<{

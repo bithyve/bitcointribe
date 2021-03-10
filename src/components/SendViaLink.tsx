@@ -25,7 +25,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../common/constants/serviceTypes';
+} from '../common/constants/wallet-service-types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 //var isPackageInstalled = require('NativeModules').CheckPackageInstallation.isPackageInstalled;
 
@@ -35,7 +35,7 @@ export default function SendViaLink(props) {
   const [shareLink, setShareLink] = useState('');
   const [infoText, setInfoText] = useState('');
   const [stateUpdate, setStateUpdate] = useState(false);
-  
+
   const [serviceType, setServiceType] = useState(
     props.serviceType ? props.serviceType : '',
   );
@@ -116,10 +116,10 @@ export default function SendViaLink(props) {
     }
     Toast('Copied Successfully');
   }
- 
+
   const checkPackageName = (packagename) => {
     return new Promise(async (resolve, reject) => {
-      
+
       NativeModules.CheckPackageInstallation.isPackageInstalled(packagename, (isInstalled) => {
         // console.log("RESOLVE", packagename, resolve);
             resolve(isInstalled);
@@ -223,7 +223,7 @@ function isAppInstalledIOS(key) {
     number = number.slice(number.length - 10); // last 10 digits only
     return number;
   }
-  
+
   return (
     <View style={styles.modalContainer}>
       <View

@@ -1,14 +1,16 @@
 import axios, { AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
+import * as bip39 from 'bip39'
+import bip65 from 'bip65'
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
-import { TransactionDetails, Transactions } from '../Interface'
+import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interface'
 import {
   SUB_PRIMARY_ACCOUNT,
   TRUSTED_CONTACTS,
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
@@ -547,19 +549,21 @@ export default class Bitcoin {
 
   public addressDiff = (
     scannedStr: string,
-  ): {
-    type: string;
-  } => {
+  ): { type: ScannedAddressKind | null } => {
     if ( this.isPaymentURI( scannedStr ) ) {
       const { address } = this.decodePaymentURI( scannedStr )
-      if ( this.isValidAddress( address ) ) return {
-        type: 'paymentURI'
+
+      if ( this.isValidAddress( address ) ) {
+        return {
+          type: ScannedAddressKind.PAYMENT_URI
+        }
       }
     } else if ( this.isValidAddress( scannedStr ) ) {
       return {
-        type: 'address'
+        type: ScannedAddressKind.ADDRESS
       }
     }
+
     return {
       type: null
     }
@@ -572,7 +576,7 @@ export default class Bitcoin {
     txid: string;
   }> => {
     let res: AxiosResponse
-    try{
+    try {
       if ( this.network === bitcoinJS.networks.testnet ) {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
@@ -597,12 +601,12 @@ export default class Bitcoin {
       return {
         txid: res.data
       }
-    } catch( err ){
+    } catch ( err ) {
       console.log(
         `An error occurred while broadcasting via current node. ${err}`,
       )
 
-      if( config.USE_ESPLORA_FALLBACK ){
+      if ( config.USE_ESPLORA_FALLBACK ) {
         console.log( 'using Hexa node as fallback(tx-broadcast)' )
         try {
           if ( this.network === bitcoinJS.networks.testnet ) {
@@ -632,7 +636,7 @@ export default class Bitcoin {
             txid: res.data
           }
         } catch ( err ) {
-        // console.log(err.message);
+          // console.log(err.message);
           throw new Error( 'Transaction broadcasting failed' )
         }
       } else {
@@ -708,7 +712,6 @@ export default class Bitcoin {
 
     outputs.forEach( ( output ) => {
       if ( !output.addresses && !output.scriptpubkey_address ) {
-        // skip
       } else {
         const address = output.addresses
           ? output.addresses[ 0 ]
