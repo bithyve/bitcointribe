@@ -3136,6 +3136,7 @@ function* uploadSMShareWorker({ payload }) {
 
   function* updateKeeperInfoToTrustedChannelWorker() {
     try {
+      console.log('KEEPER INFO CHANGE updateKeeperInfoToTrustedChannelWorker');
       // Transfer: Guardian >>> User
       let levelHealth: LevelHealthInterface[] = yield select((state) => state.health.levelHealth);
       let currentLevel = yield select((state) => state.health.currentLevel);
@@ -3159,6 +3160,8 @@ function* uploadSMShareWorker({ payload }) {
         levelHealthVar = levelHealth[2].levelInfo;
       }
 
+      console.log('KEEPER INFO CHANGE levelHealthVar', levelHealthVar);
+
       for (let i = 0; i < levelHealthVar.length; i++) {
         const element = levelHealthVar[i];
         if((element.shareType == 'contact' || element.shareType == 'device') && element.status == 'accessible') {
@@ -3168,6 +3171,8 @@ function* uploadSMShareWorker({ payload }) {
           contactKeeper.push(element);
         }
       }
+
+      console.log('KEEPER INFO CHANGE contactKeeper', contactKeeper);
 
       if(contactKeeper.length) {
         for (let i = 0; i < contactKeeper.length; i++) {
@@ -3182,9 +3187,11 @@ function* uploadSMShareWorker({ payload }) {
           let keeperInfo = yield select((state) => state.health.keeperInfo);
           let walletId = s3Service.getWalletId().data.walletId;
 
-          let { encryptedString } = LevelHealth.encryptWithAnswer(keeperInfo, WALLET_SETUP.security.answer)
-
+          let { encryptedString } = LevelHealth.encryptWithAnswer(JSON.stringify(keeperInfo), WALLET_SETUP.security.answer)
+          console.log('oldKeeperInfo', encryptedString);
           let oldKeeperInfo = trustedContactsInfo[name.toLowerCase()];
+          console.log('name.toLowerCase()', name.toLowerCase());
+          console.log('oldKeeperInfo', oldKeeperInfo);
           const data: TrustedDataElements = { keeperInfo: encryptedString };
           const res = yield call(
             trustedContacts.updateTrustedChannel,
@@ -3192,6 +3199,7 @@ function* uploadSMShareWorker({ payload }) {
             data,
             false
           );
+          console.log('res', res);
           if (res.status == 200) {             
             const notification: INotification = {
               notificationType: notificationType.newKeeperInfo,
@@ -3239,7 +3247,7 @@ function* uploadSMShareWorker({ payload }) {
       }
       
     } catch (error) {
-      console.log('RECOVERY error', error)
+      console.log('KEEPER INFO CHANGE', error)
     }
   }
   
@@ -3283,7 +3291,7 @@ function* uploadSMShareWorker({ payload }) {
           let data: TrustedDataElements = res.data.data;
           let encryptedKeeperInfo = data.keeperInfo;
           let underCustody = DECENTRALIZED_BACKUP.UNDER_CUSTODY;
-          let metaShare = {...underCustody[walletName].META_SHARE, meta: { ...underCustody[walletName].META_SHARE, encryptedKeeperInfo }};
+          let metaShare = {...underCustody[walletName].META_SHARE, meta: { ...underCustody[walletName].META_SHARE.meta, encryptedKeeperInfo }};
           let updatedBackup = {
             ...DECENTRALIZED_BACKUP,
             UNDER_CUSTODY: {
