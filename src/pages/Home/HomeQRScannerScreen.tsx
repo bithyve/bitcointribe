@@ -5,7 +5,7 @@ import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStr
 import ListStyles from '../../common/Styles/ListStyles'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
+import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { useDispatch, useSelector } from 'react-redux'
