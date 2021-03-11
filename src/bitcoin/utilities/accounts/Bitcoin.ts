@@ -671,7 +671,7 @@ export default class Bitcoin {
       message?: string;
     };
   } => {
-    return bip21.decode( paymentURI )
+    return bip21.decode( paymentURI.toLowerCase() )
   };
 
   public categorizeTx = (
