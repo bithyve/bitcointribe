@@ -16,7 +16,7 @@ import {
   FAST_BITCOINS,
   REGULAR_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types';
 import { TransactionDetails } from '../../bitcoin/utilities/Interface';
 import EmptyListInfoBox from '../empty-states/EmptyListInfoBox';
 

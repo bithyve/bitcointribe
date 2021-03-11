@@ -7,7 +7,9 @@ import {
   TransactionDetails,
   TransactionPrerequisite,
   InputUTXOs,
+  ScannedAddressKind,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -451,7 +453,7 @@ export default class SecureAccount {
   public addressDiff = (
     scannedStr: string,
   ): {
-    type: string;
+      type: ScannedAddressKind | null
   } => this.secureHDWallet.addressDiff( scannedStr );
 
   public decodePaymentURI = (
@@ -592,7 +594,7 @@ export default class SecureAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ):
     | {
         status: number;
@@ -898,7 +900,7 @@ export default class SecureAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
@@ -927,9 +929,10 @@ export default class SecureAccount {
       }
   > => {
     try {
+      txnPriority = txnPriority.toLowerCase()
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
-        txnPriority.toLowerCase(),
+        txnPriority,
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,

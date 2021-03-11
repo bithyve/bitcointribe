@@ -1,4 +1,4 @@
-import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP } from '../../../common/constants/serviceTypes'
+import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP } from '../../../common/constants/wallet-service-types'
 
 export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
   // determines account icon

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import ContactAvatar from '../ContactAvatar'
+import RecipientAvatar from '../RecipientAvatar'
 import ListStyles from '../../common/Styles/ListStyles'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -42,7 +42,17 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
 
 
   const hasExpirationBadge = useMemo( () => {
-    return contact.isPendingRequestAcceptance
+    // TODO: Establish more clarity about what this logic is supposed to mean.
+    return (
+      (
+        contact.hasTrustedChannelWithUser == false
+        || contact.trustKind != ContactTrustKind.USER_IS_KEEPING
+      ) &&
+      (
+        contact.hasXPub ||
+        contact.hasTrustedAddress
+      ) == false
+    )
   }, [ contact ] )
 
   const secondsUntilTrustedContactRequestExpiration = useMemo( () => {
@@ -62,14 +72,14 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
   return (
     <>
       <ListItem.Content style={{
-        flex: 0 
+        flex: 0
       }}>
         <View style={styles.avatarContainer}>
-          <ContactAvatar contact={contact} contentContainerStyle={styles.avatarImage} />
+          <RecipientAvatar recipient={contact} contentContainerStyle={styles.avatarImage} />
 
           <LastSeenActiveIndicator
             style={{
-              position: 'absolute', right: -2, top: -2 
+              position: 'absolute', right: -2, top: -2
             }}
             timeSinceActive={contact.lastSeenActive}
           />
@@ -77,7 +87,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
       </ListItem.Content>
 
       <ListItem.Content style={{
-        flex: 1 
+        flex: 1
       }}>
         {Number.isFinite( contact.lastSeenActive ) && (
           <ListItem.Subtitle
@@ -86,7 +96,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
           >
             <Text>Last seen </Text>
             <Text style={{
-              fontFamily: Fonts.FiraSansMediumItalic 
+              fontFamily: Fonts.FiraSansMediumItalic
             }}>
               {agoTextForLastSeen( contact.lastSeenActive )}
             </Text>
@@ -116,7 +126,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
 
       {hasExpirationBadge && (
         <ListItem.Content style={{
-          flex: 0, marginRight: 6 
+          flex: 0, marginRight: 6
         }}>
           {isTrustedContactRequestExpired && (
             <View
@@ -148,11 +158,11 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
                 fontFamily: Fonts.FiraSansRegular,
               }}
               separatorStyle={{
-                color: Colors.textColorGrey 
+                color: Colors.textColorGrey
               }}
               timeToShow={[ 'H', 'M', 'S' ]}
               timeLabels={{
-                h: null, m: null, s: null 
+                h: null, m: null, s: null
               }}
               showSeparator
             />

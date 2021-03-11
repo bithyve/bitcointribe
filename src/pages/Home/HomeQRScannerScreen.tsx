@@ -5,7 +5,7 @@ import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStr
 import ListStyles from '../../common/Styles/ListStyles'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
-import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes'
+import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,6 +15,7 @@ import { Button } from 'react-native-elements'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { ScrollView } from 'react-native-gesture-handler'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 
@@ -137,8 +138,8 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               margin: 0, padding: 0
             }}
             placeholder="Enter Address Manually"
-            accountKind={REGULAR_ACCOUNT}
-            onAddressSubmitted={( address ) => {
+            sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
+            onAddressEntered={( address ) => {
               onSend( address )
             }}
           />

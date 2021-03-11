@@ -79,92 +79,162 @@ export const UPDATE_KEEPERINFO_UNDER_CUSTODY = 'UPDATE_KEEPERINFO_UNDER_CUSTODY'
 export const AUTO_SHARE_LEVEL2_KEEPER = 'AUTO_SHARE_LEVEL2_KEEPER';
 
 export const initHealthCheck = () => {
-  return { type: INIT_HEALTH_CHECK };
-};
+  return {
+    type: INIT_HEALTH_CHECK
+  }
+}
 
 export const initializeHealthSetup = () => {
-  return { type: INIT_HEALTH_SETUP };
-};
+  return {
+    type: INIT_HEALTH_SETUP
+  }
+}
 
-export const updateHealth = (health, currentLevel) => {
-  return { type: HEALTH_UPDATE, payload: { health, currentLevel } };
-};
+export const updateHealth = ( health, currentLevel ) => {
+  return {
+    type: HEALTH_UPDATE, payload: {
+      health, currentLevel
+    }
+  }
+}
 
 export const healthInitialize = () => {
-  return { type: HEALTH_CHECK_INITIALIZE };
-};
+  return {
+    type: HEALTH_CHECK_INITIALIZE
+  }
+}
 
-export const recoverWalletUsingIcloud = (icloudData) => {
-  return { type: RECOVER_WALLET_USING_ICLOUD, payload: { icloudData } };
-};
+export const recoverWalletUsingIcloud = ( icloudData ) => {
+  return {
+    type: RECOVER_WALLET_USING_ICLOUD, payload: {
+      icloudData
+    }
+  }
+}
 
 export const healthInitialized = () => {
-  return { type: HEALTH_CHECK_INITIALIZED };
-};
+  return {
+    type: HEALTH_CHECK_INITIALIZED
+  }
+}
 
-export const switchS3LoadingStatus = (beingLoaded) => {
-  return { type: S3_LOADING_STATUS, payload: { beingLoaded } };
-};
+export const switchS3LoadingStatus = ( beingLoaded ) => {
+  return {
+    type: S3_LOADING_STATUS, payload: {
+      beingLoaded
+    }
+  }
+}
 
-export const walletRecoveryFailed = (isFailed) => {
-  return { type: WALLET_RECOVERY_FAILED_HEALTH, payload: { isFailed } };
-};
+export const walletRecoveryFailed = ( isFailed ) => {
+  return {
+    type: WALLET_RECOVERY_FAILED_HEALTH, payload: {
+      isFailed
+    }
+  }
+}
 
-export const initLoader = (beingLoaded) => {
-  return { type: INIT_LOADING_STATUS, payload: { beingLoaded } };
-};
+export const initLoader = ( beingLoaded ) => {
+  return {
+    type: INIT_LOADING_STATUS, payload: {
+      beingLoaded
+    }
+  }
+}
 
 export const healthCheckInitialized = () => {
-  return { type: HEALTH_CHECK_INITIALIZED };
-};
+  return {
+    type: HEALTH_CHECK_INITIALIZED
+  }
+}
 
 export const prepareMShares = () => {
-  return { type: PREPARE_MSHARES };
-};
+  return {
+    type: PREPARE_MSHARES
+  }
+}
 
 export const getHealth = () => {
-  return { type: GET_HEALTH_OBJECT };
-};
+  return {
+    type: GET_HEALTH_OBJECT
+  }
+}
 
 export const checkMSharesHealth = () => {
-  return { type: CHECK_SHARES_HEALTH };
-};
+  return {
+    type: CHECK_SHARES_HEALTH
+  }
+}
 
-export const ErrorSending = (isFailed) => {
-  return { type: ERROR_SENDING, payload: { isFailed } };
-};
+export const ErrorSending = ( isFailed ) => {
+  return {
+    type: ERROR_SENDING, payload: {
+      isFailed
+    }
+  }
+}
 
-export const updateMSharesHealth = (shares) => {
-  return { type: UPDATE_SHARES_HEALTH, payload: { shares } };
-};
+export const updateMSharesHealth = ( shares ) => {
+  return {
+    type: UPDATE_SHARES_HEALTH, payload: {
+      shares
+    }
+  }
+}
 
 export const updateWalletImageHealth = () => {
-  return { type: UPDATE_WALLET_IMAGE_HEALTH };
-};
+  return {
+    type: UPDATE_WALLET_IMAGE_HEALTH
+  }
+}
 
-export const walletImageChecked = (checked) => {
-  return { type: WALLET_IMAGE_HEALTH_CHECKED, payload: { checked } };
-};
+export const walletImageChecked = ( checked ) => {
+  return {
+    type: WALLET_IMAGE_HEALTH_CHECKED, payload: {
+      checked
+    }
+  }
+}
 
-export const updateMSharesLoader = (beingLoaded) => {
-  return { type: UPDATE_MSHARE_LOADING_STATUS, payload: { beingLoaded } };
-};
+export const updateMSharesLoader = ( beingLoaded ) => {
+  return {
+    type: UPDATE_MSHARE_LOADING_STATUS, payload: {
+      beingLoaded
+    }
+  }
+}
 
-export const generateMetaShare = (level) => {
-  return { type: GENERATE_META_SHARE, payload: { level } };
-};
+export const generateMetaShare = ( level ) => {
+  return {
+    type: GENERATE_META_SHARE, payload: {
+      level
+    }
+  }
+}
 
-export const sharesGenerated = (shares) => {
-  return { type: MSHARES, payload: { shares } };
-};
+export const sharesGenerated = ( shares ) => {
+  return {
+    type: MSHARES, payload: {
+      shares
+    }
+  }
+}
 
-export const downloadShares = (encryptedKey) => {
-  return { type: DOWNLOAD_SHARES, payload: { encryptedKey } };
-};
+export const downloadShares = ( encryptedKey ) => {
+  return {
+    type: DOWNLOAD_SHARES, payload: {
+      encryptedKey
+    }
+  }
+}
 
-export const shareReceived = (metaShare) => {
-  return { type: SHARE_RECEIVED, payload: { metaShare } };
-};
+export const shareReceived = ( metaShare ) => {
+  return {
+    type: SHARE_RECEIVED, payload: {
+      metaShare
+    }
+  }
+}
 
 export const createAndUploadOnEFChannel = (
   scannedData,
@@ -179,40 +249,70 @@ export const createAndUploadOnEFChannel = (
 ) => {
   return {
     type: CREATE_N_UPLOAD_ON_EF_CHANNEL,
-    payload: { scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare, level, isChange },
-  };
-};
-
-export const updateEFChannelLoader = (beingLoaded) => {
-  return { type: UPDATE_EFCHANNEL_LOADING_STATUS, payload: { beingLoaded } };
-};
-
-export const updateLevelTwoMetaShareStatus = (beingLoaded) => {
-  return { type: IS_LEVEL_TWO_METASHARE, payload: { beingLoaded } };
-};
-
-export const updateLevelThreeMetaShareStatus = (beingLoaded) => {
-  return { type: IS_LEVEL_THREE_METASHARE, payload: { beingLoaded } };
-};
-
-export const initLevelTwo = (level) => {
-  return { type: INIT_LEVEL_TWO, payload: { level } };
-};
-
-export const isLevel2InitializedStatus = () => {
-  return { type: IS_LEVEL2_INITIALIZED };
-};
-
-export const isLevel3InitializedStatus = () => {
-  return { type: IS_LEVEL3_INITIALIZED };
-};
-
-export const updatedKeeperInfo = (keeperData) =>{
-  return { type: KEEPER_INFO, payload: { keeperData } };
+    payload: {
+      scannedData, featuresList, isPrimaryKeeper, selectedShareId, share, type, isReshare, level, isChange
+    },
+  }
 }
 
-export const putKeeperInfo = (info) =>{
-  return { type: PUT_KEEPER_INFO, payload: { info } };
+export const updateEFChannelLoader = ( beingLoaded ) => {
+  return {
+    type: UPDATE_EFCHANNEL_LOADING_STATUS, payload: {
+      beingLoaded
+    }
+  }
+}
+
+export const updateLevelTwoMetaShareStatus = ( beingLoaded ) => {
+  return {
+    type: IS_LEVEL_TWO_METASHARE, payload: {
+      beingLoaded
+    }
+  }
+}
+
+export const updateLevelThreeMetaShareStatus = ( beingLoaded ) => {
+  return {
+    type: IS_LEVEL_THREE_METASHARE, payload: {
+      beingLoaded
+    }
+  }
+}
+
+export const initLevelTwo = ( level ) => {
+  return {
+    type: INIT_LEVEL_TWO, payload: {
+      level
+    }
+  }
+}
+
+export const isLevel2InitializedStatus = () => {
+  return {
+    type: IS_LEVEL2_INITIALIZED
+  }
+}
+
+export const isLevel3InitializedStatus = () => {
+  return {
+    type: IS_LEVEL3_INITIALIZED
+  }
+}
+
+export const updatedKeeperInfo = ( keeperData ) =>{
+  return {
+    type: KEEPER_INFO, payload: {
+      keeperData
+    }
+  }
+}
+
+export const putKeeperInfo = ( info ) =>{
+  return {
+    type: PUT_KEEPER_INFO, payload: {
+      info
+    }
+  }
 }
 
 export const downloadMShare = (
@@ -224,12 +324,14 @@ export const downloadMShare = (
     walletName?: string;
   }
 ) => {
-  let { otp, encryptedKey, downloadType, replaceIndex, walletName } = payload;
+  const { otp, encryptedKey, downloadType, replaceIndex, walletName } = payload
   return {
     type: DOWNLOAD_MSHARE_HEALTH,
-    payload: { otp, encryptedKey, downloadType, replaceIndex, walletName },
-  };
-};
+    payload: {
+      otp, encryptedKey, downloadType, replaceIndex, walletName
+    },
+  }
+}
 
 export const downloadPdfShare = (
   payload: {
@@ -239,40 +341,70 @@ export const downloadPdfShare = (
     replaceIndex?: string;
   }
 ) => {
-  let { otp, encryptedKey, downloadType, replaceIndex} = payload;
-  console.log("INSIDE action", otp, encryptedKey, downloadType, replaceIndex);
+  const { otp, encryptedKey, downloadType, replaceIndex } = payload
+  console.log( 'INSIDE action', otp, encryptedKey, downloadType, replaceIndex )
   return {
     type: DOWNLOAD_PDFSHARE_HEALTH,
-    payload: { otp, encryptedKey, downloadType, replaceIndex },
-  };
-};
+    payload: {
+      otp, encryptedKey, downloadType, replaceIndex
+    },
+  }
+}
 
-export const downloadedPdfShare = (otp, status, err?) => {
-  return { type: DOWNLOADED_PDFSHARE_HEALTH, payload: { otp, status, err } };
-};
+export const downloadedPdfShare = ( otp, status, err? ) => {
+  return {
+    type: DOWNLOADED_PDFSHARE_HEALTH, payload: {
+      otp, status, err
+    }
+  }
+}
 
-export const downloadedMShare = (otp, status, err?) => {
-  return { type: DOWNLOADED_MSHARE_HEALTH, payload: { otp, status, err } };
-};
+export const downloadedMShare = ( otp, status, err? ) => {
+  return {
+    type: DOWNLOADED_MSHARE_HEALTH, payload: {
+      otp, status, err
+    }
+  }
+}
 
-export const ErrorReceiving = (isFailed) => {
-  return { type: ERROR_RECEIVING_HEALTH, payload: { isFailed } };
-};
+export const ErrorReceiving = ( isFailed ) => {
+  return {
+    type: ERROR_RECEIVING_HEALTH, payload: {
+      isFailed
+    }
+  }
+}
 
-export const recoverWallet = (level?, keeperData?, decryptedCloudDataJson?) => {
-  return { type: RECOVER_WALLET_HEALTH, payload: {level, keeperData, decryptedCloudDataJson} };
-};
+export const recoverWallet = ( level?, keeperData?, decryptedCloudDataJson? ) => {
+  return {
+    type: RECOVER_WALLET_HEALTH, payload: {
+      level, keeperData, decryptedCloudDataJson
+    }
+  }
+}
 
-export const fetchWalletImage = (walletImage: WalletImage) => {
-  return { type: FETCH_WALLET_IMAGE_HEALTH, payload: { walletImage } };
-};
-export const updateCloudMShare = (metaShare, replaceIndex?) => {
-  return { type: CLOUD_MSHARE, payload: { metaShare, replaceIndex } };
-};
+export const fetchWalletImage = ( walletImage: WalletImage ) => {
+  return {
+    type: FETCH_WALLET_IMAGE_HEALTH, payload: {
+      walletImage
+    }
+  }
+}
+export const updateCloudMShare = ( metaShare, replaceIndex? ) => {
+  return {
+    type: CLOUD_MSHARE, payload: {
+      metaShare, replaceIndex
+    }
+  }
+}
 
-export const switchS3LoaderKeeper = (beingLoaded) => {
-  return { type: S3_LOADING_KEEPER, payload: { beingLoaded } };
-};
+export const switchS3LoaderKeeper = ( beingLoaded ) => {
+  return {
+    type: S3_LOADING_KEEPER, payload: {
+      beingLoaded
+    }
+  }
+}
 
 export const uploadEncMShareKeeper = (
   index: number,
@@ -292,40 +424,52 @@ export const uploadEncMShareKeeper = (
       changingGuardian,
       previousGuardianName,
     },
-  };
-};
+  }
+}
 
-export const sendApprovalRequest = (shareID, PkShareId, notificationType) => {
-  return { type: SEND_APPROVAL_REQUEST, payload: { shareID, PkShareId, notificationType } };
-};
+export const sendApprovalRequest = ( shareID, PkShareId, notificationType ) => {
+  return {
+    type: SEND_APPROVAL_REQUEST, payload: {
+      shareID, PkShareId, notificationType
+    }
+  }
+}
 
 export const uploadSecondaryShare = () => {
-  return { type: UPLOAD_SECONDARY_SHARE };
+  return {
+    type: UPLOAD_SECONDARY_SHARE
+  }
 }
 
 export const generatePDF = () => {
   return {
     type: GENERATE_PDF
-  };
-};
+  }
+}
 
-export const pdfGenerated = (generated: Boolean) => {
+export const pdfGenerated = ( generated: Boolean ) => {
   return {
     type: PDF_GENERATED,
-    payload: { generated },
-  };
-};
+    payload: {
+      generated
+    },
+  }
+}
 
-export const onApprovalStatusChange = (payload: {
+export const onApprovalStatusChange = ( payload: {
   status: boolean;
   initiatedAt: any;
   shareId: string;
   secondaryShare?: MetaShare
   transferDetails?: {key: string; otp: string};
-}) => {
-  let { status, initiatedAt, shareId, secondaryShare, transferDetails} = payload;
-  return { type: ON_APPROVAL_STATUS_CHANGE, payload: { status, initiatedAt, shareId, secondaryShare, transferDetails }, };
-};
+} ) => {
+  const { status, initiatedAt, shareId, secondaryShare, transferDetails } = payload
+  return {
+    type: ON_APPROVAL_STATUS_CHANGE, payload: {
+      status, initiatedAt, shareId, secondaryShare, transferDetails
+    },
+  }
+}
 
 export const uploadPdfShare = (
   selectedShareId,
@@ -333,56 +477,74 @@ export const uploadPdfShare = (
 ) => {
   return {
     type: UPLOAD_PDF_SHARE,
-    payload: { selectedShareId, isReshare },
-  };
-};
+    payload: {
+      selectedShareId, isReshare
+    },
+  }
+}
 
-export const downloadSMShard = (encryptedKey: string,
-  otp?: string) => {
+export const downloadSMShard = ( encryptedKey: string,
+  otp?: string ) => {
   return {
     type: DOWNLOAD_SM_SHARES,
-    payload: { encryptedKey, otp },
-  };
-};
+    payload: {
+      encryptedKey, otp
+    },
+  }
+}
 
-export const secondaryShareDownloaded = (metaShare) => {
+export const secondaryShareDownloaded = ( metaShare ) => {
   return {
     type: DOWNLOADED_SM_SHARES,
-    payload: { metaShare },
-  };
-};
+    payload: {
+      metaShare
+    },
+  }
+}
 
-export const recoverMmnemonic = (metaShares, securityAns) => {
-  return { type: RECOVER_MNEMONIC_HEALTH, payload: { metaShares, securityAns } };
-};
+export const recoverMmnemonic = ( metaShares, securityAns ) => {
+  return {
+    type: RECOVER_MNEMONIC_HEALTH, payload: {
+      metaShares, securityAns
+    }
+  }
+}
 
 
 export const removeSecondaryMnemonic = () => {
   return {
     type: REMOVE_SN
-  };
-};
+  }
+}
 
-export const mnemonicRecoveredHealth = (mnemonic) => {
-  return { type: MNEMONIC_RECOVERED_HEALTH, payload: { mnemonic } };
-};
+export const mnemonicRecoveredHealth = ( mnemonic ) => {
+  return {
+    type: MNEMONIC_RECOVERED_HEALTH, payload: {
+      mnemonic
+    }
+  }
+}
 export const reShareWithSameKeeper = (
   deviceLevelInfo,
 ) => {
   return {
     type: RESHARE_WITH_SAME_KEEPER,
-    payload: { deviceLevelInfo },
-  };
-};
+    payload: {
+      deviceLevelInfo
+    },
+  }
+}
 
 export const autoShareContact = (
   contactLevelInfo,
 ) => {
   return {
     type: AUTO_SHARE_CONTACT,
-    payload: { contactLevelInfo },
-  };
-};
+    payload: {
+      contactLevelInfo
+    },
+  }
+}
 
 export const autoShareToLevel2Keepers = (
   contactLevelInfo, pdfLevelInfo
@@ -399,24 +561,30 @@ export const autoDownloadShareContact = (
 ) => {
   return {
     type: AUTO_DOWNLOAD_SHARE_CONTACT,
-    payload: { shareId, walletId },
-  };
-};
+    payload: {
+      shareId, walletId
+    },
+  }
+}
 
 
-export const getPDFData = (shareId) => {
+export const getPDFData = ( shareId ) => {
   return {
     type: GET_PDF_DATA,
-    payload: { shareId },
-  };
-};
+    payload: {
+      shareId
+    },
+  }
+}
 
-export const setPDFInfo = (data) => {
+export const setPDFInfo = ( data ) => {
   return {
     type: SET_PDF_INFO,
-    payload: { data },
-  };
-};
+    payload: {
+      data
+    },
+  }
+}
 
 export const sharePDF = (
   shareVia: string,
@@ -424,34 +592,46 @@ export const sharePDF = (
 ) => {
   return {
     type: SHARE_PDF,
-    payload: { shareVia, isEmailOtherOptions },
-  };
-};
+    payload: {
+      shareVia, isEmailOtherOptions
+    },
+  }
+}
 
 export const confirmPDFShared = (
   shareId: string,
 ) => {
   return {
     type: CONFIRM_PDF_SHARED,
-    payload: { shareId },
-  };
-};
+    payload: {
+      shareId
+    },
+  }
+}
 
 export const uploadSMShare = (
   encryptedKey, otp
 ) => {
   return {
     type: UPLOAD_SM_SHARE,
-    payload: { encryptedKey, otp },
-  };
-};
+    payload: {
+      encryptedKey, otp
+    },
+  }
+}
 
-export const emptyShareTransferDetailsForContactChange = (index) => {
-  return { type: EMPTY_SHARE_TRANSFER_DETAILS, payload: { index } };
-};
+export const emptyShareTransferDetailsForContactChange = ( index ) => {
+  return {
+    type: EMPTY_SHARE_TRANSFER_DETAILS, payload: {
+      index
+    }
+  }
+}
 
 export const removeUnwantedUnderCustodyShares = () => {
-  return { type: REMOVE_UNWANTED_UNDER_CUSTODY };
+  return {
+    type: REMOVE_UNWANTED_UNDER_CUSTODY
+  }
 }
 
 export const uploadSecondaryShareForPK = ( tag, encryptedKey, otp? ) => {
@@ -463,11 +643,15 @@ export const uploadSecondaryShareForPK = ( tag, encryptedKey, otp? ) => {
 }
 
 export const generateSMMetaShares = () => {
-  return { type: GENERATE_SM_META_SHARE };
+  return {
+    type: GENERATE_SM_META_SHARE
+  }
 }
 
 export const isSmMetaSharesCreated = () => {
-  return { type: SM_META_SHARE_GENERATE };
+  return {
+    type: SM_META_SHARE_GENERATE
+  }
 }
 
 export const uploadSMShareKeeper = (
@@ -478,10 +662,10 @@ export const uploadSMShareKeeper = (
     payload: {
       index,
     },
-  };
-};
+  }
+}
 
-export const uploadRequestedSMShare = (tag, encryptedKey, otp?) => {
+export const uploadRequestedSMShare = ( tag, encryptedKey, otp? ) => {
   return {
     type: UPLOAD_REQUESTED_SMSHARE, payload: {
       tag, encryptedKey, otp
@@ -489,7 +673,7 @@ export const uploadRequestedSMShare = (tag, encryptedKey, otp?) => {
   }
 }
 
-export const UploadSMSuccessfully = (isUploaded) => {
+export const UploadSMSuccessfully = ( isUploaded ) => {
   return {
     type: UPLOAD_SUCCESSFULLY_SM, payload: {
       isUploaded
@@ -498,13 +682,21 @@ export const UploadSMSuccessfully = (isUploaded) => {
 }
 
 export const deleteSmSharesAndSM = () => {
-  return { type: DELETE_SM_AND_SMSHARES }
+  return {
+    type: DELETE_SM_AND_SMSHARES
+  }
 }
 
 export const updateKeeperInfoToTrustedChannel = () => {
-  return { type: UPDATE_KEEPERINFO_TO_TC }
+  return {
+    type: UPDATE_KEEPERINFO_TO_TC
+  }
 }
 
-export const updateKeeperInfoToUnderCustody = (walletName, walletId) => {
-  return { type: UPDATE_KEEPERINFO_UNDER_CUSTODY, payload: { walletName, walletId } }
+export const updateKeeperInfoToUnderCustody = ( walletName, walletId ) => {
+  return {
+    type: UPDATE_KEEPERINFO_UNDER_CUSTODY, payload: {
+      walletName, walletId
+    }
+  }
 }

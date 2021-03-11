@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   View,
   Image,
@@ -13,39 +13,39 @@ import {
   StatusBar,
   BackHandler,
   ScrollView,
-} from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import DeviceInfo from 'react-native-device-info';
-import BottomSheet from 'reanimated-bottom-sheet';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { UsNumberFormat } from '../../common/utilities';
-import { getCurrencyImageName } from '../../common/CommonFunctions/index';
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import DeviceInfo from 'react-native-device-info'
+import BottomSheet from 'reanimated-bottom-sheet'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { UsNumberFormat } from '../../common/utilities'
+import { getCurrencyImageName } from '../../common/CommonFunctions/index'
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types'
 
-import config from '../../bitcoin/HexaConfig';
-import { connect } from 'react-redux';
-import { withNavigationFocus } from 'react-navigation';
-import idx from 'idx';
-import ModalHeader from '../../components/ModalHeader';
-import RemoveSelectedAcoount from './RemoveSelectedAccount';
-import BottomInfoBox from '../../components/BottomInfoBox';
-import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch';
-import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index';
-import AccountSelectionModalContents from '../Accounts/AccountSelectionModalContents';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
+import config from '../../bitcoin/HexaConfig'
+import { connect } from 'react-redux'
+import { withNavigationFocus } from 'react-navigation'
+import idx from 'idx'
+import ModalHeader from '../../components/ModalHeader'
+import RemoveSelectedAcoount from './RemoveSelectedAccount'
+import BottomInfoBox from '../../components/BottomInfoBox'
+import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
+import { getCurrencyImageByRegion } from '../../common/CommonFunctions/index'
+import AccountSelectionModalContents from '../Accounts/AccountSelectionModalContents'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
 
 const currencyCode = [
   'BRL',
@@ -57,7 +57,7 @@ const currencyCode = [
   'TRY',
   'INR',
   'EUR',
-];
+]
 interface SweepFundsEnterAmountPropsTypes {
   navigation: any;
   service: any;
@@ -105,14 +105,15 @@ class SweepFundsEnterAmount extends Component<
   SweepFundsEnterAmountPropsTypes,
   SweepFundsEnterAmountStateTypes
 > {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
     this.state = {
       RegularAccountBalance: 0,
       SavingAccountBalance: 0,
       exchangeRates: null,
-      address: this.props.navigation.getParam('address'),
-      removeItem: {},
+      address: this.props.navigation.getParam( 'address' ),
+      removeItem: {
+      },
       recipients: [],
       spendableBalances: {
         testBalance: 0,
@@ -126,21 +127,21 @@ class SweepFundsEnterAmount extends Component<
           account_name: 'Checking Account',
           type: REGULAR_ACCOUNT,
           checked: false,
-          image: require('../../assets/images/icons/icon_regular_account.png'),
+          image: require( '../../assets/images/icons/icon_regular_account.png' ),
         },
         {
           id: 2,
           account_name: 'Savings Account',
           type: SECURE_ACCOUNT,
           checked: false,
-          image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+          image: require( '../../assets/images/icons/icon_secureaccount_white.png' ),
         },
       ],
       switchOn: true,
       CurrencyCode: 'USD',
       CurrencySymbol: '$',
-      bitcoinAmount: props.navigation.getParam('bitcoinAmount')
-        ? props.navigation.getParam('bitcoinAmount')
+      bitcoinAmount: props.navigation.getParam( 'bitcoinAmount' )
+        ? props.navigation.getParam( 'bitcoinAmount' )
         : '',
       currencyAmount: '',
       isOpen: false,
@@ -152,76 +153,76 @@ class SweepFundsEnterAmount extends Component<
       isInvalidBalance: false,
       averageTxFees: 0,
       spendableBalance: 0,
-    };
+    }
   }
 
   componentDidMount = () => {
-    this.getBalance();
-    BackHandler.addEventListener('hardwareBackPress', () => {});
+    this.getBalance()
+    BackHandler.addEventListener( 'hardwareBackPress', () => {} )
   };
 
-  componentDidUpdate = (prevProps, prevState) => {};
+  componentDidUpdate = ( prevProps, prevState ) => {};
 
   getBalance = () => {
-    const { accounts } = this.props;
-    const testBalance = accounts[TEST_ACCOUNT].service
-      ? accounts[TEST_ACCOUNT].service.hdWallet.balances.balance
+    const { accounts } = this.props
+    const testBalance = accounts[ TEST_ACCOUNT ].service
+      ? accounts[ TEST_ACCOUNT ].service.hdWallet.balances.balance
       : // +  accounts[TEST_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0
 
-    let regularBalance = accounts[REGULAR_ACCOUNT].service
-      ? accounts[REGULAR_ACCOUNT].service.hdWallet.balances.balance
+    let regularBalance = accounts[ REGULAR_ACCOUNT ].service
+      ? accounts[ REGULAR_ACCOUNT ].service.hdWallet.balances.balance
       : // +  accounts[REGULAR_ACCOUNT].service.hdWallet.balances.unconfirmedBalance
-        0;
+      0
 
     // regular derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
+    for ( const dAccountType of Object.keys( config.DERIVATIVE_ACC ) ) {
       const derivativeAccount =
-        accounts[REGULAR_ACCOUNT].service.hdWallet.derivativeAccounts[
+        accounts[ REGULAR_ACCOUNT ].service.hdWallet.derivativeAccounts[
           dAccountType
-        ];
-      if (derivativeAccount.instance.using) {
+        ]
+      if ( derivativeAccount.instance.using ) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          if (derivativeAccount[accountNumber].balances) {
-            regularBalance += derivativeAccount[accountNumber].balances.balance;
+          if ( derivativeAccount[ accountNumber ].balances ) {
+            regularBalance += derivativeAccount[ accountNumber ].balances.balance
             // + derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
         }
       }
     }
 
-    let secureBalance = accounts[SECURE_ACCOUNT].service
-      ? accounts[SECURE_ACCOUNT].service.secureHDWallet.balances.balance
+    let secureBalance = accounts[ SECURE_ACCOUNT ].service
+      ? accounts[ SECURE_ACCOUNT ].service.secureHDWallet.balances.balance
       : // + accounts[SECURE_ACCOUNT].service.secureHDWallet.balances
-        //      .unconfirmedBalance
-        0;
+    //      .unconfirmedBalance
+      0
 
     // secure derivative accounts
-    for (const dAccountType of Object.keys(config.DERIVATIVE_ACC)) {
-      if (dAccountType === TRUSTED_CONTACTS) continue;
+    for ( const dAccountType of Object.keys( config.DERIVATIVE_ACC ) ) {
+      if ( dAccountType === TRUSTED_CONTACTS ) continue
 
       const derivativeAccount =
-        accounts[SECURE_ACCOUNT].service.secureHDWallet.derivativeAccounts[
+        accounts[ SECURE_ACCOUNT ].service.secureHDWallet.derivativeAccounts[
           dAccountType
-        ];
-      if (derivativeAccount.instance.using) {
+        ]
+      if ( derivativeAccount.instance.using ) {
         for (
           let accountNumber = 1;
           accountNumber <= derivativeAccount.instance.using;
           accountNumber++
         ) {
-          if (derivativeAccount[accountNumber].balances) {
-            secureBalance += derivativeAccount[accountNumber].balances.balance;
+          if ( derivativeAccount[ accountNumber ].balances ) {
+            secureBalance += derivativeAccount[ accountNumber ].balances.balance
             // +derivativeAccount[accountNumber].balances.unconfirmedBalance;
           }
         }
       }
     }
-    this.setState({
+    this.setState( {
       spendableBalances: {
         testBalance,
         regularBalance,
@@ -229,7 +230,7 @@ class SweepFundsEnterAmount extends Component<
       },
       RegularAccountBalance: regularBalance,
       SavingAccountBalance: secureBalance,
-    });
+    } )
   };
 
   getBalanceText = () => {
@@ -241,22 +242,22 @@ class SweepFundsEnterAmount extends Component<
       exchangeRates,
       CurrencyCode,
       spendableBalances,
-    } = this.state;
-    let balance = 0;
-    if (serviceType == REGULAR_ACCOUNT) balance = RegularAccountBalance;
-    if (serviceType == SECURE_ACCOUNT) balance = SavingAccountBalance;
-    if (serviceType == REGULAR_ACCOUNT)
-      balance = spendableBalances.regularBalance;
-    if (serviceType == SECURE_ACCOUNT)
-      balance = spendableBalances.secureBalance;
+    } = this.state
+    let balance = 0
+    if ( serviceType == REGULAR_ACCOUNT ) balance = RegularAccountBalance
+    if ( serviceType == SECURE_ACCOUNT ) balance = SavingAccountBalance
+    if ( serviceType == REGULAR_ACCOUNT )
+      balance = spendableBalances.regularBalance
+    if ( serviceType == SECURE_ACCOUNT )
+      balance = spendableBalances.secureBalance
 
     return serviceType == TEST_ACCOUNT
-      ? UsNumberFormat(balance)
+      ? UsNumberFormat( balance )
       : switchOn
-      ? UsNumberFormat(balance)
-      : exchangeRates
-      ? ((balance / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-      : null;
+        ? UsNumberFormat( balance )
+        : exchangeRates
+          ? ( ( balance / 1e8 ) * exchangeRates[ CurrencyCode ].last ).toFixed( 2 )
+          : null
   };
 
   sendMaxHandler = () => {
@@ -302,23 +303,25 @@ class SweepFundsEnterAmount extends Component<
     // }
   };
 
-  convertBitCoinToCurrency = (value) => {
-    const { switchOn, exchangeRates, CurrencyCode } = this.state;
-    let temp = value;
-    if (switchOn) {
-      let result = exchangeRates
-        ? ((value / 1e8) * exchangeRates[CurrencyCode].last).toFixed(2)
-        : 0;
-      this.setState({ bitcoinAmount: temp, currencyAmount: result.toString() });
+  convertBitCoinToCurrency = ( value ) => {
+    const { switchOn, exchangeRates, CurrencyCode } = this.state
+    const temp = value
+    if ( switchOn ) {
+      const result = exchangeRates
+        ? ( ( value / 1e8 ) * exchangeRates[ CurrencyCode ].last ).toFixed( 2 )
+        : 0
+      this.setState( {
+        bitcoinAmount: temp, currencyAmount: result.toString()
+      } )
     } else {
       let currency = exchangeRates
-        ? value / exchangeRates[CurrencyCode].last
-        : 0;
-      currency = currency < 1 ? currency * 1e8 : currency;
-      this.setState({
+        ? value / exchangeRates[ CurrencyCode ].last
+        : 0
+      currency = currency < 1 ? currency * 1e8 : currency
+      this.setState( {
         currencyAmount: temp,
-        bitcoinAmount: currency.toFixed(0),
-      });
+        bitcoinAmount: currency.toFixed( 0 ),
+      } )
     }
   };
 
@@ -341,22 +344,24 @@ class SweepFundsEnterAmount extends Component<
       currencyAmount,
       isInvalidBalance,
       bitcoinAmount,
-    } = this.state;
-    const { transfer } = this.props;
+    } = this.state
+    const { transfer } = this.props
     return (
       <View
         style={{
-          height: hp('100%'),
+          height: hp( '100%' ),
           backgroundColor: Colors.white,
         }}
       >
-        <SafeAreaView style={{ flex: 0 }} />
+        <SafeAreaView style={{
+          flex: 0
+        }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
           <View style={styles.view}>
             <TouchableOpacity
               onPress={() => {
-                this.props.navigation.goBack();
+                this.props.navigation.goBack()
               }}
               style={styles.backArrow}
             >
@@ -367,7 +372,9 @@ class SweepFundsEnterAmount extends Component<
               />
             </TouchableOpacity>
 
-            <View style={{ marginLeft: wp('2.5%') }}>
+            <View style={{
+              marginLeft: wp( '2.5%' )
+            }}>
               <Text style={styles.modalHeaderTitleText}>{'Sweep Funds'}</Text>
               <Text style={styles.sendText}>
                 {'Sweeping to: '}
@@ -394,26 +401,28 @@ class SweepFundsEnterAmount extends Component<
           <TouchableOpacity
             activeOpacity={10}
             onPress={() => {
-              (this.refs.AccountSelectionBottomSheet as any).snapTo(1);
+              ( this.refs.AccountSelectionBottomSheet as any ).snapTo( 1 )
             }}
-            style={{ flexDirection: 'row', alignItems: 'center' }}
+            style={{
+              flexDirection: 'row', alignItems: 'center'
+            }}
           >
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(12),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansItalic,
               }}
             >
               {serviceType == 'TEST_ACCOUNT'
                 ? ' Test Account'
                 : serviceType == 'SECURE_ACCOUNT'
-                ? ' Savings Account'
-                : serviceType == 'REGULAR_ACCOUNT'
-                ? ' Checking Account'
-                : serviceType == 'S3_SERVICE'
-                ? ' S3 Service'
-                : ''}
+                  ? ' Savings Account'
+                  : serviceType == 'REGULAR_ACCOUNT'
+                    ? ' Checking Account'
+                    : serviceType == 'S3_SERVICE'
+                      ? ' S3 Service'
+                      : ''}
             </Text>
             <Text style={styles.availableToSpendText}>
               {' (Available to spend '}
@@ -425,31 +434,39 @@ class SweepFundsEnterAmount extends Component<
               </Text>
             </Text>
             <Ionicons
-              style={{ marginLeft: 5 }}
+              style={{
+                marginLeft: 5
+              }}
               name={isOpen ? 'ios-arrow-up' : 'ios-arrow-down'}
-              size={RFValue(15)}
+              size={RFValue( 15 )}
               color={Colors.blue}
             />
           </TouchableOpacity>
         </View>
 
         <KeyboardAvoidingView
-          style={{ flex: 1 }}
+          style={{
+            flex: 1
+          }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
           <View style={styles.parentView}>
             <ScrollView>
-              <View style={{ flex: 1, flexDirection: 'row' }}>
-                <View style={{ flex: 1, flexDirection: 'column' }}>
+              <View style={{
+                flex: 1, flexDirection: 'row'
+              }}>
+                <View style={{
+                  flex: 1, flexDirection: 'column'
+                }}>
                   <TouchableOpacity
                     style={{
                       ...InputStyle1,
-                      marginBottom: wp('1.5%'),
-                      marginTop: wp('1.5%'),
+                      marginBottom: wp( '1.5%' ),
+                      marginTop: wp( '1.5%' ),
                       flexDirection: 'row',
-                      width: wp('70%'),
-                      height: wp('13%'),
+                      width: wp( '70%' ),
+                      height: wp( '13%' ),
                       alignItems: 'center',
                       backgroundColor: !switchOn
                         ? Colors.white
@@ -458,12 +475,12 @@ class SweepFundsEnterAmount extends Component<
                     onPress={this.sendMaxHandler}
                   >
                     <View style={styles.amountInputImage}>
-                      {currencyCode.includes(CurrencyCode) ? (
+                      {currencyCode.includes( CurrencyCode ) ? (
                         <View style={styles.currencyImageView}>
                           <MaterialCommunityIcons
-                            name={getCurrencyImageName(CurrencyCode)}
+                            name={getCurrencyImageName( CurrencyCode )}
                             color={Colors.currencyGray}
-                            size={wp('6%')}
+                            size={wp( '6%' )}
                           />
                         </View>
                       ) : (
@@ -488,8 +505,8 @@ class SweepFundsEnterAmount extends Component<
                         ...styles.textBox,
                         paddingLeft: 10,
                         flex: 1,
-                        height: wp('13%'),
-                        width: wp('45%'),
+                        height: wp( '13%' ),
+                        width: wp( '45%' ),
                       }}
                       editable={!switchOn}
                       placeholder={
@@ -501,24 +518,32 @@ class SweepFundsEnterAmount extends Component<
                       returnKeyLabel="Done"
                       returnKeyType="done"
                       keyboardType={'numeric'}
-                      onChangeText={(value) => {
-                        if (this.state.isSendMax) {
-                          this.setState({ isSendMax: false });
+                      onChangeText={( value ) => {
+                        if ( this.state.isSendMax ) {
+                          this.setState( {
+                            isSendMax: false
+                          } )
                         }
-                        this.convertBitCoinToCurrency(value);
+                        this.convertBitCoinToCurrency( value )
                       }}
                       placeholderTextColor={Colors.borderColor}
                       onFocus={() => {
-                        this.setState({ InputStyle1: styles.inputBoxFocused });
+                        this.setState( {
+                          InputStyle1: styles.inputBoxFocused
+                        } )
                       }}
                       onBlur={() => {
-                        this.setState({ InputStyle1: styles.textBoxView });
+                        this.setState( {
+                          InputStyle1: styles.textBoxView
+                        } )
                       }}
-                      onKeyPress={(e) => {
-                        if (e.nativeEvent.key === 'Backspace') {
-                          setTimeout(() => {
-                            this.setState({ isInvalidBalance: false });
-                          }, 10);
+                      onKeyPress={( e ) => {
+                        if ( e.nativeEvent.key === 'Backspace' ) {
+                          setTimeout( () => {
+                            this.setState( {
+                              isInvalidBalance: false
+                            } )
+                          }, 10 )
                         }
                       }}
                     />
@@ -528,7 +553,7 @@ class SweepFundsEnterAmount extends Component<
                           color: Colors.blue,
                           textAlign: 'center',
                           paddingHorizontal: 10,
-                          fontSize: RFValue(10),
+                          fontSize: RFValue( 10 ),
                           fontFamily: Fonts.FiraSansItalic,
                         }}
                       >
@@ -538,19 +563,21 @@ class SweepFundsEnterAmount extends Component<
                   </TouchableOpacity>
                   {/* {renderUSDInputText()} */}
                   {isInvalidBalance ? (
-                    <View style={{ marginLeft: 'auto' }}>
+                    <View style={{
+                      marginLeft: 'auto'
+                    }}>
                       <Text style={styles.errorText}>Insufficient balance</Text>
                     </View>
                   ) : null}
                   <TouchableOpacity
                     style={{
                       ...InputStyle,
-                      marginBottom: wp('1.5%'),
-                      marginTop: wp('1.5%'),
+                      marginBottom: wp( '1.5%' ),
+                      marginTop: wp( '1.5%' ),
                       flexDirection: 'row',
                       alignItems: 'center',
-                      width: wp('70%'),
-                      height: wp('13%'),
+                      width: wp( '70%' ),
+                      height: wp( '13%' ),
                       backgroundColor: switchOn
                         ? Colors.white
                         : Colors.backgroundColor,
@@ -560,7 +587,7 @@ class SweepFundsEnterAmount extends Component<
                     <View style={styles.amountInputImage}>
                       <Image
                         style={styles.textBoxImage}
-                        source={require('../../assets/images/icons/icon_bitcoin_gray.png')}
+                        source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
                       />
                     </View>
                     <View style={styles.enterAmountView} />
@@ -569,8 +596,8 @@ class SweepFundsEnterAmount extends Component<
                         ...styles.textBox,
                         flex: 1,
                         paddingLeft: 10,
-                        height: wp('13%'),
-                        width: wp('45%'),
+                        height: wp( '13%' ),
+                        width: wp( '45%' ),
                       }}
                       placeholder={
                         switchOn
@@ -578,32 +605,40 @@ class SweepFundsEnterAmount extends Component<
                             ? 'Enter amount in t-sats'
                             : 'Enter amount in sats'
                           : serviceType == TEST_ACCOUNT
-                          ? 'Converted amount in t-sats'
-                          : 'Converted amount in sats'
+                            ? 'Converted amount in t-sats'
+                            : 'Converted amount in sats'
                       }
                       editable={switchOn}
                       value={bitcoinAmount}
                       returnKeyLabel="Done"
                       returnKeyType="done"
                       keyboardType={'numeric'}
-                      onChangeText={(value) => {
-                        if (this.state.isSendMax) {
-                          this.setState({ isSendMax: false });
+                      onChangeText={( value ) => {
+                        if ( this.state.isSendMax ) {
+                          this.setState( {
+                            isSendMax: false
+                          } )
                         }
-                        this.convertBitCoinToCurrency(value);
+                        this.convertBitCoinToCurrency( value )
                       }}
                       placeholderTextColor={Colors.borderColor}
                       onFocus={() => {
-                        this.setState({ InputStyle: styles.inputBoxFocused });
+                        this.setState( {
+                          InputStyle: styles.inputBoxFocused
+                        } )
                       }}
                       onBlur={() => {
-                        this.setState({ InputStyle: styles.textBoxView });
+                        this.setState( {
+                          InputStyle: styles.textBoxView
+                        } )
                       }}
-                      onKeyPress={(e) => {
-                        if (e.nativeEvent.key === 'Backspace') {
-                          setTimeout(() => {
-                            this.setState({ isInvalidBalance: false });
-                          }, 10);
+                      onKeyPress={( e ) => {
+                        if ( e.nativeEvent.key === 'Backspace' ) {
+                          setTimeout( () => {
+                            this.setState( {
+                              isInvalidBalance: false
+                            } )
+                          }, 10 )
                         }
                       }}
                     />
@@ -613,7 +648,7 @@ class SweepFundsEnterAmount extends Component<
                           color: Colors.blue,
                           textAlign: 'center',
                           paddingHorizontal: 10,
-                          fontSize: RFValue(10),
+                          fontSize: RFValue( 10 ),
                           fontFamily: Fonts.FiraSansItalic,
                         }}
                       >
@@ -627,9 +662,11 @@ class SweepFundsEnterAmount extends Component<
                   <CurrencyKindToggleSwitch
                     fiatCurrencyCode={CurrencyCode}
                     onpress={async () => {
-                      this.setState({ switchOn: !switchOn });
-                      let temp = !switchOn ? 'true' : '';
-                      this.props.setCurrencyToggleValue(temp);
+                      this.setState( {
+                        switchOn: !switchOn
+                      } )
+                      const temp = !switchOn ? 'true' : ''
+                      this.props.setCurrencyToggleValue( temp )
 
                       //await AsyncStorage.setItem('currencyToggleValue', temp);
                     }}
@@ -646,50 +683,54 @@ class SweepFundsEnterAmount extends Component<
                     paddingBottom: 10,
                     paddingTop: 10,
                   }}
-                  onPress={() => {this.props.navigation.replace('SweepFunds')}}
+                  onPress={() => {this.props.navigation.replace( 'SweepFunds' )}}
                 >
                   <Text
                     style={{
                       fontFamily: Fonts.FiraSansMediumItalic,
                       fontWeight: 'bold',
                       fontStyle: 'italic',
-                      fontSize: RFValue(13),
+                      fontSize: RFValue( 13 ),
                       color: Colors.blue,
                     }}
-                    onPress={() => {this.props.navigation.replace('SweepFunds')}}
+                    onPress={() => {this.props.navigation.replace( 'SweepFunds' )}}
                   >
                     or Use Available Funds
                   </Text>
                   <Text
                     style={{
                       fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(12),
+                      fontSize: RFValue( 12 ),
                       color: Colors.textColorGrey,
                     }}
                   >
                     Lorem ipsum dolor sit
                   </Text>
                 </TouchableOpacity>
-               
+
+              </View>
+              <View style={{
+                marginTop: hp( '4%' )
+              }}>
+                <View style={styles.confirmView}>
+                  <TouchableOpacity
+                    onPress={() => {}}
+                    style={{
+                      ...styles.confirmButtonView,
+                      backgroundColor: Colors.blue,
+                      elevation: 10,
+                      shadowColor: Colors.shadowBlue,
+                      shadowOpacity: 1,
+                      shadowOffset: {
+                        width: 15, height: 15
+                      },
+                    }}
+                  >
+                    <Text style={styles.buttonText}>
+                      {'Confirm & Proceed'}
+                    </Text>
+                  </TouchableOpacity>
                 </View>
-                <View style={{ marginTop: hp('4%') }}>
-                  <View style={styles.confirmView}>
-                    <TouchableOpacity
-                      onPress={() => {}}
-                      style={{
-                        ...styles.confirmButtonView,
-                        backgroundColor: Colors.blue,
-                        elevation: 10,
-                        shadowColor: Colors.shadowBlue,
-                        shadowOpacity: 1,
-                        shadowOffset: { width: 15, height: 15 },
-                      }}
-                    >
-                      <Text style={styles.buttonText}>
-                        {'Confirm & Proceed'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
               </View>
             </ScrollView>
           </View>
@@ -701,17 +742,17 @@ class SweepFundsEnterAmount extends Component<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('55%')
-              : hp('60%'),
+              ? hp( '55%' )
+              : hp( '60%' ),
           ]}
           renderContent={() => (
             <AccountSelectionModalContents
               RegularAccountBalance={spendableBalances.regularBalance}
               SavingAccountBalance={spendableBalances.secureBalance}
               onPressBack={() => {
-                (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
+                ( this.refs.AccountSelectionBottomSheet as any ).snapTo( 0 )
               }}
-              onPressConfirm={(type) => {
+              onPressConfirm={( type ) => {
                 // if (transfer.details && transfer.details.length) {
                 //   for (let i = 0; i < transfer.details.length; i++) {
                 //     if (
@@ -725,10 +766,12 @@ class SweepFundsEnterAmount extends Component<
                 //       break;
                 //     }
                 //  }
-                (this.refs.AccountSelectionBottomSheet as any).snapTo(0);
-                setTimeout(() => {
-                  this.setState({ serviceType: type });
-                }, 2);
+                ( this.refs.AccountSelectionBottomSheet as any ).snapTo( 0 )
+                setTimeout( () => {
+                  this.setState( {
+                    serviceType: type
+                  } )
+                }, 2 )
               }}
             />
           )}
@@ -741,28 +784,29 @@ class SweepFundsEnterAmount extends Component<
           )}
         />
       </View>
-    );
+    )
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ( state ) => {
   return {
-    service: idx(state, (_) => _.accounts),
-    transfer: idx(state, (_) => _.accounts),
-    loading: idx(state, (_) => _.accounts),
+    service: idx( state, ( _ ) => _.accounts ),
+    transfer: idx( state, ( _ ) => _.accounts ),
+    loading: idx( state, ( _ ) => _.accounts ),
     accounts: state.accounts || [],
-    averageTxFees: idx(state, (_) => _.accounts.averageTxFees),
-  };
-};
+    averageTxFees: idx( state, ( _ ) => _.accounts.averageTxFees ),
+  }
+}
 
 export default withNavigationFocus(
-  connect(mapStateToProps, {})(SweepFundsEnterAmount),
-);
+  connect( mapStateToProps, {
+  } )( SweepFundsEnterAmount ),
+)
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   view: {
@@ -774,31 +818,31 @@ const styles = StyleSheet.create({
     marginRight: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('15%'),
+    width: wp( '15%' ),
   },
   name: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'center',
     marginTop: 5,
-    width: wp('15%'),
+    width: wp( '15%' ),
   },
   amountText: {
     color: Colors.black,
-    fontSize: RFValue(21),
+    fontSize: RFValue( 21 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   balanceText: {
     color: Colors.blue,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansItalic,
   },
   parentView: {
     flex: 1,
-    marginRight: wp('6%'),
-    marginLeft: wp('6%'),
-    paddingTop: wp('5%'),
+    marginRight: wp( '6%' ),
+    marginLeft: wp( '6%' ),
+    paddingTop: wp( '5%' ),
   },
   backArrow: {
     height: 30,
@@ -808,16 +852,16 @@ const styles = StyleSheet.create({
   sendText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginTop: 5,
   },
   confirmView: {
     flexDirection: 'row',
-    marginTop: hp('2%'),
+    marginTop: hp( '2%' ),
   },
   currencyImageView: {
-    width: wp('6%'),
-    height: wp('6%'),
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -843,40 +887,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   bottomInfoView: {
-    marginTop: wp('1.5%'),
+    marginTop: wp( '1.5%' ),
     marginBottom: -25,
     padding: -20,
     marginLeft: -20,
     marginRight: -20,
   },
   availableToSpendView: {
-    marginRight: wp('6%'),
-    marginLeft: wp('6%'),
-    marginBottom: hp('0.5%'),
+    marginRight: wp( '6%' ),
+    marginLeft: wp( '6%' ),
+    marginBottom: hp( '0.5%' ),
     marginTop: 5,
     flexDirection: 'row',
   },
   availableToSpendText: {
     color: Colors.blue,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansItalic,
     lineHeight: 15,
     textAlign: 'center',
   },
   addessText: {
     color: Colors.blue,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansItalic,
   },
   textTsats: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(7),
+    fontSize: RFValue( 7 ),
     fontFamily: Fonts.FiraSansMediumItalic,
   },
   errorText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     color: Colors.red,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontStyle: 'italic',
     marginRight: 10,
   },
@@ -885,10 +929,10 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     flexDirection: 'row',
     paddingRight: 10,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1%'),
-    marginBottom: hp('0.5%'),
-    width: wp('90%'),
+    paddingBottom: hp( '1.5%' ),
+    paddingTop: hp( '1%' ),
+    marginBottom: hp( '0.5%' ),
+    width: wp( '90%' ),
   },
   textBoxView: {
     borderWidth: 0.5,
@@ -909,39 +953,39 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
   },
   textBoxImage: {
-    width: wp('6%'),
-    height: wp('6%'),
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     resizeMode: 'contain',
   },
   amountInputImage: {
     width: 40,
-    height: wp('13%'),
+    height: wp( '13%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
   },
   textBox: {
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
   },
   confirmButtonView: {
-    width: wp('50%'),
-    height: wp('13%'),
+    width: wp( '50%' ),
+    height: wp( '13%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 10,
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   circleShapeView: {
-    width: wp('14%'),
-    height: wp('14%'),
-    borderRadius: wp('14%') / 2,
+    width: wp( '14%' ),
+    height: wp( '14%' ),
+    borderRadius: wp( '14%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 2,
     alignItems: 'center',
@@ -965,28 +1009,28 @@ const styles = StyleSheet.create({
   totalMountView: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp('2%'),
+    marginTop: hp( '2%' ),
     marginBottom: 5,
-    marginRight: wp('6%'),
-    marginLeft: wp('6%'),
-    paddingBottom: hp('1%'),
+    marginRight: wp( '6%' ),
+    marginLeft: wp( '6%' ),
+    paddingBottom: hp( '1%' ),
     // paddingTop: hp('1.5%'),
   },
   totalAmountText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
   totalAmountSubText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
   sweepingFromText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 5,
   },
@@ -1010,8 +1054,8 @@ const styles = StyleSheet.create({
   },
   amountUnitText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     marginRight: 5,
   },
-});
+} )

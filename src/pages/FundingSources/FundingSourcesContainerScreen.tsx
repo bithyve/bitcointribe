@@ -18,7 +18,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types';
 import moment from 'moment';
 import BottomInfoBox from '../../components/BottomInfoBox';
 import { useSelector } from 'react-redux';

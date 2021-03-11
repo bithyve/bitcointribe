@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   View,
   Text,
@@ -10,36 +10,36 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { withNavigationFocus } from 'react-navigation';
-import { connect } from 'react-redux';
+} from 'react-native-responsive-screen'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { withNavigationFocus } from 'react-navigation'
+import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
   clearPaymentDetails,
-} from '../../store/actions/trustedContacts';
-import idx from 'idx';
-import BottomSheet from 'reanimated-bottom-sheet';
-import ModalHeader from '../../components/ModalHeader';
-import DeviceInfo from 'react-native-device-info';
-import ConfirmSweepFunds from './ConfirmSweepFunds';
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
-import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner';
-import AntDesign from 'react-native-vector-icons/AntDesign';
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter';
-import moment from 'moment';
-import {downloadSMShard,recoverMmnemonic, removeSecondaryMnemonic} from "../../store/actions/health";
-import { combine } from 'secrets.js-grempe';
-import {generateSecondaryXpriv, clearTransfer, secondaryXprivGenerated} from "../../store/actions/accounts";
-import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess';
-import LoaderModal from '../../components/LoaderModal';
+} from '../../store/actions/trustedContacts'
+import idx from 'idx'
+import BottomSheet from 'reanimated-bottom-sheet'
+import ModalHeader from '../../components/ModalHeader'
+import DeviceInfo from 'react-native-device-info'
+import ConfirmSweepFunds from './ConfirmSweepFunds'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
+import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
+import AntDesign from 'react-native-vector-icons/AntDesign'
+import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
+import moment from 'moment'
+import { downloadSMShard, recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/health'
+import { combine } from 'secrets.js-grempe'
+import { generateSecondaryXpriv, clearTransfer, secondaryXprivGenerated } from '../../store/actions/accounts'
+import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess'
+import LoaderModal from '../../components/LoaderModal'
 
 interface SweepFundUseExitKeyStateTypes {
   listData: any[];
@@ -74,8 +74,8 @@ class SweepFundUseExitKey extends Component<
 SweepFundUseExitKeyPropsTypes,
   SweepFundUseExitKeyStateTypes
 > {
-  constructor(props) {
-    super(props);
+  constructor( props ) {
+    super( props )
     this.state = {
       selectedIds: [],
       listData: [],
@@ -112,7 +112,7 @@ SweepFundUseExitKeyPropsTypes,
           balance: 2000,
           type: REGULAR_ACCOUNT,
           checked: false,
-          image: require('../../assets/images/icons/icon_regular_account.png'),
+          image: require( '../../assets/images/icons/icon_regular_account.png' ),
         },
         {
           id: 2,
@@ -120,129 +120,146 @@ SweepFundUseExitKeyPropsTypes,
           balance: 3000,
           type: SECURE_ACCOUNT,
           checked: false,
-          image: require('../../assets/images/icons/icon_secureaccount_white.png'),
+          image: require( '../../assets/images/icons/icon_secureaccount_white.png' ),
         },
       ],
       openCameraFlag: false,
       SuccessMessageHeader: '',
       SuccessMessage: '',
       barcodeData:null
-    };
+    }
   }
 
   componentDidMount(){
-   // this.props.removeSecondaryMnemonic();
-   // this.props.secondaryXprivGenerated(null);
+    // this.props.removeSecondaryMnemonic();
+    // this.props.secondaryXprivGenerated(null);
 
-    this.setList();
+    this.setList()
   }
 
   setList = () =>{
-    const { keeper, decentralizedBackup, levelHealth, currentLevel } = this.props;
-    console.log("levelHealth",levelHealth,currentLevel);
-    let metaShares = [];
-    let listDataArray = [];
-    let obj;
-    metaShares.push(decentralizedBackup.PK_SHARE);
-    if(keeper && keeper.keeper && Object.keys(keeper.keeper.keepers).length){
-      let keepers = keeper.keeper.keepers;
-      for (var key in keepers) {
-        console.log("keeper i",keepers[key])
+    const { keeper, decentralizedBackup, levelHealth, currentLevel } = this.props
+    console.log( 'levelHealth', levelHealth, currentLevel )
+    const metaShares = []
+    const listDataArray = []
+    let obj
+    metaShares.push( decentralizedBackup.PK_SHARE )
+    if( keeper && keeper.keeper && Object.keys( keeper.keeper.keepers ).length ){
+      const keepers = keeper.keeper.keepers
+      for ( const key in keepers ) {
+        console.log( 'keeper i', keepers[ key ] )
 
         obj = {
-          type:  keepers[key].shareType,
-          title: keepers[key].walletName,
+          type:  keepers[ key ].shareType,
+          title: keepers[ key ].walletName,
           info: '',
           //time: timeFormatter(moment(new Date()), moment(selectedBackup.dateTime).valueOf()),
           status: 'waiting',
           image: null,
           //shareId: KeeperData[i].shareId
         }
-        listDataArray.push(obj);
-       }
-       console.log("decentralizedBackup.PK_SHARE", decentralizedBackup.PK_SHARE);
+        listDataArray.push( obj )
+      }
+      console.log( 'decentralizedBackup.PK_SHARE', decentralizedBackup.PK_SHARE )
 
-       this.setState({listData: listDataArray, selectedIds: metaShares});
+      this.setState( {
+        listData: listDataArray, selectedIds: metaShares
+      } )
+    }
   }
-}
 
-  componentDidUpdate(prevProps){
-    let secondaryArray =[];
-    let listDataArray = [...this.state.listData];
-    if(prevProps.secondaryShareDownloaded != this.props.secondaryShareDownloaded){
-      for(var i = 0 ; i < Object.keys(listDataArray).length; i++){
-        if(this.state.barcodeData.name == listDataArray[i].title)  
-        listDataArray[i].status = "received";
+  componentDidUpdate( prevProps ){
+    let secondaryArray =[]
+    const listDataArray = [ ...this.state.listData ]
+    if( prevProps.secondaryShareDownloaded != this.props.secondaryShareDownloaded ){
+      for( let i = 0 ; i < Object.keys( listDataArray ).length; i++ ){
+        if( this.state.barcodeData.name == listDataArray[ i ].title )
+          listDataArray[ i ].status = 'received'
       }
-      this.setState({listData: listDataArray});
-      secondaryArray = [...this.state.selectedIds];
-      secondaryArray.push(this.props.secondaryShareDownloaded);
+      this.setState( {
+        listData: listDataArray
+      } )
+      secondaryArray = [ ...this.state.selectedIds ]
+      secondaryArray.push( this.props.secondaryShareDownloaded )
       //console.log("secondaryArray", secondaryArray, secondaryArray.length);
-      if(secondaryArray.length == 2){
-        this.recoverMnemonics(secondaryArray);
+      if( secondaryArray.length == 2 ){
+        this.recoverMnemonics( secondaryArray )
       }
-      this.setState({selectedIds: secondaryArray});
+      this.setState( {
+        selectedIds: secondaryArray
+      } )
     }
-  
-    
-    if(prevProps.mnemonic != this.props.mnemonic){
-     // console.log("mnemonic",this.props.mnemonic);
-      if(this.props.mnemonic) this.props.generateSecondaryXpriv(SECURE_ACCOUNT, this.props.mnemonic.split('_')[0]);
+
+
+    if( prevProps.mnemonic != this.props.mnemonic ){
+      // console.log("mnemonic",this.props.mnemonic);
+      if( this.props.mnemonic ) this.props.generateSecondaryXpriv( SECURE_ACCOUNT, this.props.mnemonic.split( '_' )[ 0 ] )
     }
-    
-    if(this.props.additional && this.props.additional.secure && prevProps.additional.secure.xprivGenerated != this.props.additional.secure.xprivGenerated){
-      if (this.props.additional.secure.xprivGenerated) {
-            this.props.removeSecondaryMnemonic();
-              this.props.clearTransfer(SECURE_ACCOUNT);
-              (this.refs.loaderBottomSheet as any).snapTo(0);
-              this.props.navigation.navigate('Send', {
-                serviceType: SECURE_ACCOUNT,
-                sweepSecure: true,
-                netBalance:
+
+    if( this.props.additional && this.props.additional.secure && prevProps.additional.secure.xprivGenerated != this.props.additional.secure.xprivGenerated ){
+      if ( this.props.additional.secure.xprivGenerated ) {
+        this.props.removeSecondaryMnemonic()
+        this.props.clearTransfer( SECURE_ACCOUNT );
+        ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
+        this.props.navigation.navigate( 'Send', {
+          serviceType: SECURE_ACCOUNT,
+          sweepSecure: true,
+          netBalance:
                 this.props.service.secureHDWallet.balances.balance +
                 this.props.service.secureHDWallet.balances.unconfirmedBalance,
-              });
-              this.props.secondaryXprivGenerated(null);
-            } else if (this.props.additional.secure.xprivGenerated === false) {
-              (this.refs.loaderBottomSheet as any).snapTo(0);
-              this.setState({ SuccessMessage: 'Invalid Exit Key, please try again',
-                SuccessMessageHeader: 'Invalid Exit Key'
-              });
-              (this.refs.ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
-              this.props.secondaryXprivGenerated(null);
-              this.props.removeSecondaryMnemonic();
-              this.setState({selectedIds: [], listData: []});
-              this.setList();
-            }
+        } )
+        this.props.secondaryXprivGenerated( null )
+      } else if ( this.props.additional.secure.xprivGenerated === false ) {
+        ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
+        this.setState( {
+          SuccessMessage: 'Invalid Exit Key, please try again',
+          SuccessMessageHeader: 'Invalid Exit Key'
+        } );
+        ( this.refs.ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
+        this.props.secondaryXprivGenerated( null )
+        this.props.removeSecondaryMnemonic()
+        this.setState( {
+          selectedIds: [], listData: []
+        } )
+        this.setList()
+      }
     }
   }
 
-  recoverMnemonics = (secondaryArray) => {
-    const {security, recoverMmnemonic} = this.props;
-    console.log("recoverMnemonics secondaryArray",secondaryArray, security.answer);
-    recoverMmnemonic(secondaryArray, security.answer)
+  recoverMnemonics = ( secondaryArray ) => {
+    const { security, recoverMmnemonic } = this.props
+    console.log( 'recoverMnemonics secondaryArray', secondaryArray, security.answer )
+    recoverMmnemonic( secondaryArray, security.answer )
   }
-  
-  barcodeRecognized = async (barcodeData) => {
-    const {downloadSMShard} = this.props;
-    console.log('barcodes', barcodeData);
-    if (barcodeData) {
-      (this.refs.loaderBottomSheet as any).snapTo(1);
-      downloadSMShard(barcodeData.key);
-      this.setState({barcodeData: barcodeData})
+
+  barcodeRecognized = async ( barcodeData ) => {
+    const { downloadSMShard } = this.props
+    console.log( 'barcodes', barcodeData )
+    if ( barcodeData ) {
+      ( this.refs.loaderBottomSheet as any ).snapTo( 1 )
+      downloadSMShard( barcodeData.key )
+      this.setState( {
+        barcodeData: barcodeData
+      } )
     }
   }
 
 
   render() {
-    const { listData, SuccessMessage, SuccessMessageHeader, accountData } = this.state;
-    const { navigation } = this.props;
+    const { listData, SuccessMessage, SuccessMessageHeader, accountData } = this.state
+    const { navigation } = this.props
     return (
-      <View style={{ flex: 1, backgroundColor: Colors.backgroundColor1 }}>
-        <SafeAreaView style={{ flex: 0 }} />
+      <View style={{
+        flex: 1, backgroundColor: Colors.backgroundColor1
+      }}>
+        <SafeAreaView style={{
+          flex: 0
+        }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
-          <View style={{ flex: 1, flexDirection: 'row' }}>
+          <View style={{
+            flex: 1, flexDirection: 'row'
+          }}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               style={styles.headerBackArrowView}
@@ -253,7 +270,9 @@ SweepFundUseExitKeyPropsTypes,
                 size={17}
               />
             </TouchableOpacity>
-            <View style={{ justifyContent: 'center', width: wp('80%') }}>
+            <View style={{
+              justifyContent: 'center', width: wp( '80%' )
+            }}>
               <Text numberOfLines={2} style={styles.modalHeaderTitleText}>
                 {'Use Exit Key'}
               </Text>
@@ -264,45 +283,49 @@ SweepFundUseExitKeyPropsTypes,
             </View>
           </View>
         </View>
-        <ScrollView style={{ flex: 1 }}>
-        <CoveredQRCodeScanner onCodeScanned={this.barcodeRecognized} />
+        <ScrollView style={{
+          flex: 1
+        }}>
+          <CoveredQRCodeScanner onCodeScanned={this.barcodeRecognized} />
 
-        
-          {listData.map((item, index) => {
-            if(item.type == 'device' || item.type == 'primaryKeeper')
-            return (
-              <TouchableOpacity
-                style={{
-                  ...styles.cardsView,
-                  borderBottomWidth: index == 2 ? 0 : 4,
-                }}
-                onPress={() => {
-                    (this.refs.ConfirmSweepFunds as any).snapTo(1);
-                }}
-              >
-                <ImageBackground
-                  source={require('../../assets/images/icons/Ellipse.png')}
-                  style={styles.cardsImageView}
+
+          {listData.map( ( item, index ) => {
+            if( item.type == 'device' || item.type == 'primaryKeeper' )
+              return (
+                <TouchableOpacity
+                  style={{
+                    ...styles.cardsView,
+                    borderBottomWidth: index == 2 ? 0 : 4,
+                  }}
+                  onPress={() => {
+                    ( this.refs.ConfirmSweepFunds as any ).snapTo( 1 )
+                  }}
                 >
-                  <Image
-                        source={require('../../assets/images/icons/icon_secondarydevice.png')
-                        }
-                        style={styles.cardImage}
-                      />
-                </ImageBackground>
-                <View style={{ marginLeft: 10 }}>
-                  <Text
-                    style={{
-                      ...styles.cardsInfoText,
-                      fontSize: RFValue(18),
-                    }}
+                  <ImageBackground
+                    source={require( '../../assets/images/icons/Ellipse.png' )}
+                    style={styles.cardsImageView}
                   >
-                    {item.title}
-                  </Text>
-                  <Text style={styles.cardsInfoText}>{item.type}</Text>
-                  <Text style={styles.cardsInfoText}>{item.info}</Text>
-                </View>
-                {item.status == 'received' ? (
+                    <Image
+                      source={require( '../../assets/images/icons/icon_secondarydevice.png' )
+                      }
+                      style={styles.cardImage}
+                    />
+                  </ImageBackground>
+                  <View style={{
+                    marginLeft: 10
+                  }}>
+                    <Text
+                      style={{
+                        ...styles.cardsInfoText,
+                        fontSize: RFValue( 18 ),
+                      }}
+                    >
+                      {item.title}
+                    </Text>
+                    <Text style={styles.cardsInfoText}>{item.type}</Text>
+                    <Text style={styles.cardsInfoText}>{item.info}</Text>
+                  </View>
+                  {item.status == 'received' ? (
                     <View
                       style={{
                         flexDirection: 'row',
@@ -321,9 +344,9 @@ SweepFundUseExitKeyPropsTypes,
                       <View
                         style={{
                           backgroundColor: Colors.lightGreen,
-                          width: wp('5%'),
-                          height: wp('5%'),
-                          borderRadius: wp('5%') / 2,
+                          width: wp( '5%' ),
+                          height: wp( '5%' ),
+                          borderRadius: wp( '5%' ) / 2,
                           justifyContent: 'center',
                           alignItems: 'center',
                           marginLeft: 5,
@@ -331,7 +354,7 @@ SweepFundUseExitKeyPropsTypes,
                       >
                         <AntDesign
                           name={'check'}
-                          size={RFValue(10)}
+                          size={RFValue( 10 )}
                           color={Colors.darkGreen}
                         />
                       </View>
@@ -341,12 +364,12 @@ SweepFundUseExitKeyPropsTypes,
                       <Text style={styles.statusText}>Waiting for Key</Text>
                     </View>
                   )}
-                {/* <View style={styles.statusTextView}>
+                  {/* <View style={styles.statusTextView}>
                   <Text style={styles.statusText}>Waiting for Key</Text>
                 </View> */}
-              </TouchableOpacity>
-            );
-          })}
+                </TouchableOpacity>
+              )
+          } )}
         </ScrollView>
         <BottomSheet
           enabledInnerScrolling={true}
@@ -355,82 +378,84 @@ SweepFundUseExitKeyPropsTypes,
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('80%')
-              : hp('80%'),
+              ? hp( '80%' )
+              : hp( '80%' ),
           ]}
           renderContent={() => {
             return (
-                <ConfirmSweepFunds
-                  selectedAccount={accountData}
-                  onPressBack={() => {
-                    if (this.refs.ConfirmSweepFunds)
-                      (this.refs.ConfirmSweepFunds as any).snapTo(0);
-                  }}
-                  onPressDone={() => {
-                    (this.refs.ConfirmSweepFunds as any).snapTo(0);
-                    navigation.navigate('SweepConfirmation', {accountData});
-                  }}
-                />
-              );
-            }}
-          renderHeader={() => {
-              return (
-                <ModalHeader
-                onPressHeader={() => {
-                  if (this.refs.RemoveBottomSheet)
-                    (this.refs.RemoveBottomSheet as any).snapTo(0);
+              <ConfirmSweepFunds
+                selectedAccount={accountData}
+                onPressBack={() => {
+                  if ( this.refs.ConfirmSweepFunds )
+                    ( this.refs.ConfirmSweepFunds as any ).snapTo( 0 )
                 }}
-                />
-              );
-            }
-        }
+                onPressDone={() => {
+                  ( this.refs.ConfirmSweepFunds as any ).snapTo( 0 )
+                  navigation.navigate( 'SweepConfirmation', {
+                    accountData
+                  } )
+                }}
+              />
+            )
+          }}
+          renderHeader={() => {
+            return (
+              <ModalHeader
+                onPressHeader={() => {
+                  if ( this.refs.RemoveBottomSheet )
+                    ( this.refs.RemoveBottomSheet as any ).snapTo( 0 )
+                }}
+              />
+            )
+          }
+          }
         />
         <BottomSheet
-        enabledInnerScrolling={true}
-        enabledGestureInteraction={false}
-        ref={'ResetTwoFASuccessBottomSheet'}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
-        ]}
-        renderContent={()=>{
-          return (
-            <ResetTwoFASuccess
-              modalRef={'ResetTwoFASuccessBottomSheet'}
-              title={SuccessMessageHeader}
-              note={""
+          enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
+          ref={'ResetTwoFASuccessBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
+          ]}
+          renderContent={()=>{
+            return (
+              <ResetTwoFASuccess
+                modalRef={'ResetTwoFASuccessBottomSheet'}
+                title={SuccessMessageHeader}
+                note={''
                 // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
-              }
-              info={SuccessMessage}
-              proceedButtonText={'Proceed'}
-              onPressProceed={() => {
-                (this.refs.ResetTwoFASuccessBottomSheet as any).current.snapTo(0);
-              }}
-              isBottomImage={true}
-              bottomImage={require('../../assets/images/icons/icon_twoFASuccess.png')}
-            />
-          );
-        }}
-        renderHeader={()=>{
-          return (
-            <ModalHeader
-              onPressHeader={() => {
-                if (this.refs.ResetTwoFASuccessBottomSheet)
-                (this.refs.ResetTwoFASuccessBottomSheet as any).current.snapTo(0);
-              }}
-            />
-          );
-        }}
-      />
-      <BottomSheet
+                }
+                info={SuccessMessage}
+                proceedButtonText={'Proceed'}
+                onPressProceed={() => {
+                  ( this.refs.ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
+                }}
+                isBottomImage={true}
+                bottomImage={require( '../../assets/images/icons/icon_twoFASuccess.png' )}
+              />
+            )
+          }}
+          renderHeader={()=>{
+            return (
+              <ModalHeader
+                onPressHeader={() => {
+                  if ( this.refs.ResetTwoFASuccessBottomSheet )
+                    ( this.refs.ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
+                }}
+              />
+            )
+          }}
+        />
+        <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={'loaderBottomSheet'}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp('100%')
-              : hp('100%'),
+              ? hp( '100%' )
+              : hp( '100%' ),
           ]}
           renderContent={() => (
             <LoaderModal
@@ -446,7 +471,7 @@ SweepFundUseExitKeyPropsTypes,
                 marginTop: 'auto',
                 flex: 1,
                 backgroundColor: 'rgba(0, 0, 0, 0.3)',
-                height: hp('75%'),
+                height: hp( '75%' ),
                 zIndex: 9999,
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -455,26 +480,26 @@ SweepFundUseExitKeyPropsTypes,
           )}
         />
       </View>
-    );
+    )
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = ( state ) => {
   return {
-    keeper: idx(state, (_) => _.keeper.service),
-    decentralizedBackup: idx(state, (_) => _.storage.database.DECENTRALIZED_BACKUP),
-    secondaryShareDownloaded: idx(state, (_) => _.health.secondaryShareDownloaded),
-    security: idx(state, (_) => _.storage.database.WALLET_SETUP.security) || '', 
-    mnemonic: idx(state, (_) => _.health.mnemonic),
-    additional: idx(state, (_) => _.accounts.additional),
-    service: idx(state, (_) => _.accounts[SECURE_ACCOUNT].service),
-    levelHealth: idx(state, (_) => _.health.levelHealth),
-    currentLevel: idx(state, (_) => _.health.currentLevel),
-  };
-};
+    keeper: idx( state, ( _ ) => _.keeper.service ),
+    decentralizedBackup: idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP ),
+    secondaryShareDownloaded: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
+    security: idx( state, ( _ ) => _.storage.database.WALLET_SETUP.security ) || '',
+    mnemonic: idx( state, ( _ ) => _.health.mnemonic ),
+    additional: idx( state, ( _ ) => _.accounts.additional ),
+    service: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
+    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+  }
+}
 
 export default withNavigationFocus(
-  connect(mapStateToProps, {
+  connect( mapStateToProps, {
     fetchEphemeralChannel,
     downloadSMShard,
     recoverMmnemonic,
@@ -482,10 +507,10 @@ export default withNavigationFocus(
     clearTransfer,
     secondaryXprivGenerated,
     removeSecondaryMnemonic
-  })(SweepFundUseExitKey),
-);
+  } )( SweepFundUseExitKey ),
+)
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderTitleView: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -497,15 +522,15 @@ const styles = StyleSheet.create({
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: hp('0.7%'),
-    marginBottom: hp('1.5%'),
+    marginTop: hp( '0.7%' ),
+    marginBottom: hp( '1.5%' ),
   },
   headerBackArrowView: {
     height: 30,
@@ -517,7 +542,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
@@ -527,12 +552,12 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
   cardsInfoText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
@@ -543,16 +568,16 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.backgroundColor,
   },
   cardsImageView: {
-    width: wp('20%'),
-    height: wp('20%'),
+    width: wp( '20%' ),
+    height: wp( '20%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
   cardImage: {
-    width: wp('7%'),
-    height: wp('7%'),
+    width: wp( '7%' ),
+    height: wp( '7%' ),
     resizeMode: 'contain',
-    marginBottom: wp('1%'),
+    marginBottom: wp( '1%' ),
   },
   statusTextView: {
     padding: 5,
@@ -565,8 +590,8 @@ const styles = StyleSheet.create({
     paddingRight: 10
   },
   statusText: {
-    fontSize: RFValue(9),
+    fontSize: RFValue( 9 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.textColorGrey,
   },
-});
+} )

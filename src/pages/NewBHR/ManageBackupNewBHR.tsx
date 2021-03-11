@@ -36,7 +36,7 @@ import moment from "moment";
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-} from "../../common/constants/serviceTypes";
+} from "../../common/constants/wallet-service-types";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import {
   getLevelInfo,

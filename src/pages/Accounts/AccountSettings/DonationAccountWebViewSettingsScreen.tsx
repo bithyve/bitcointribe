@@ -18,13 +18,13 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import CurrencyKindToggleSwitch from '../../../components/CurrencyKindToggleSwitch'
-import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import Toast from '../../../components/Toast'
 import { updateDonationPreferences } from '../../../store/actions/accounts'
 import { useDispatch } from 'react-redux'
 import { SafeAreaView } from 'react-navigation'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import { BaseNavigationProp } from '../../../navigation/Navigator'
 
 export type NavigationParams = {
   account: Record<string, unknown>;
@@ -34,8 +34,7 @@ export type NavigationParams = {
 
 export type NavigationProp = {
   params: NavigationParams;
-  getParam: ( param: string ) => any;
-} & Record<string, unknown>;
+} & BaseNavigationProp;
 
 export type Props = {
   navigation: NavigationProp;

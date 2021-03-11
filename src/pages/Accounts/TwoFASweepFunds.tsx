@@ -27,7 +27,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import Slider from 'react-native-slider';
 import { clearTransfer, transferST1 } from '../../store/actions/accounts';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types';
 
 export default function TwoFASweepFunds(props) {
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(true);

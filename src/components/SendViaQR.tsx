@@ -16,7 +16,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../common/constants/serviceTypes';
+} from '../common/constants/wallet-service-types';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 export default function SendViaQR(props) {

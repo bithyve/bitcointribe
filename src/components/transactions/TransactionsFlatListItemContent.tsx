@@ -1,16 +1,16 @@
 import React, { useMemo } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, Image } from 'react-native'
 import { ListItem, Icon } from 'react-native-elements'
-import TransactionKind from '../../common/data/enums/TransactionKind'
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import moment from 'moment'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import TransactionKind from '../../common/data/enums/TransactionKind'
+import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
 
 export type Props = {
   transaction: TransactionDescribing;

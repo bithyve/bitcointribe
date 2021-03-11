@@ -27,33 +27,30 @@ import {
   pdfHealthChecked,
   pdfHealthCheckFailed,
   calculateOverallHealth,
-} from '../../store/actions/sss';
-import {
-  checkMSharesHealth,
-} from '../../store/actions/health';
-import Colors from '../../common/Colors';
-import NavStyles from '../../common/Styles/NavStyles';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import BottomSheet from 'reanimated-bottom-sheet';
-import ModalHeader from '../../components/ModalHeader';
-import HistoryPageComponent from '../../components/HistoryPageComponent';
-import PersonalCopyShareModal from '../../components/PersonalCopyShareModal';
-import moment from 'moment';
-import _ from 'underscore';
-import Toast from '../../components/Toast';
-import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import KnowMoreButton from '../../components/KnowMoreButton';
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount';
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes';
-import QRModal from '../Accounts/QRModal';
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import SmallHeaderModal from '../../components/SmallHeaderModal';
-import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents';
+} from '../../store/actions/sss'
+import Colors from '../../common/Colors'
+import NavStyles from '../../common/Styles/NavStyles'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import BottomSheet from 'reanimated-bottom-sheet'
+import ModalHeader from '../../components/ModalHeader'
+import HistoryPageComponent from '../../components/HistoryPageComponent'
+import PersonalCopyShareModal from '../../components/PersonalCopyShareModal'
+import moment from 'moment'
+import _ from 'underscore'
+import Toast from '../../components/Toast'
+import DeviceInfo from 'react-native-device-info'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
+import QRModal from '../Accounts/QRModal'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
 
-const PersonalCopyHistory = (props) => {
-  const [ErrorBottomSheet] = useState(React.createRef());
-  const [HelpBottomSheet] = useState(React.createRef());
+const PersonalCopyHistory = ( props ) => {
+  const [ ErrorBottomSheet ] = useState( React.createRef() )
+  const [ HelpBottomSheet ] = useState( React.createRef() )
   const storagePermissionBottomSheet = useRef<BottomSheet>()
   const [ hasStoragePermission, setHasStoragePermission ] = useState( false )
   const [ errorMessage, setErrorMessage ] = useState( '' )
@@ -152,29 +149,29 @@ const PersonalCopyHistory = (props) => {
       props.navigation.goBack()
       Toast( 'PDF scanned Successfully' )
     }
-  }, [healthChecked]);
+  }, [ healthChecked ] )
 
-  useEffect(() => {
-    (async () => {
-      const blockPCShare = await AsyncStorage.getItem('blockPCShare');
-      if (blockPCShare) {
-        setBlockReshare(blockPCShare);
-      } 
+  useEffect( () => {
+    ( async () => {
+      const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
+      if ( blockPCShare ) {
+        setBlockReshare( blockPCShare )
+      }
       // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
       //   AsyncStorage.setItem('blockPCShare', 'true');
       //   setBlockReshare(blockPCShare);
       // }
-    })();
-  }, []);
+    } )()
+  }, [] )
 
-  useEffect(() => {
-    if (healthCheckFailed) {
-      setTimeout(() => {
-        setErrorMessageHeader('Invalid QR!');
-        setErrorMessage('The scanned QR is wrong, please try again');
-      }, 2);
-      (ErrorBottomSheet as any).current.snapTo(1);
-      dispatch(pdfHealthCheckFailed(false));
+  useEffect( () => {
+    if ( healthCheckFailed ) {
+      setTimeout( () => {
+        setErrorMessageHeader( 'Invalid QR!' )
+        setErrorMessage( 'The scanned QR is wrong, please try again' )
+      }, 2 );
+      ( ErrorBottomSheet as any ).current.snapTo( 1 )
+      dispatch( pdfHealthCheckFailed( false ) )
     }
   }, [ healthCheckFailed ] )
 
@@ -504,14 +501,14 @@ const PersonalCopyHistory = (props) => {
             const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4
             dispatch( checkPDFHealth( qrData, index ) )
           } else if ( QRModalHeader === 'Reshare Personal Copy' ) {
-            let restored = false
+            const restored = false
             try {
               qrData = JSON.parse( qrData )
               if ( qrData.type && qrData.type === 'encryptedExitKey' ) {
                 const res = s3Service.decryptStaticNonPMDD(
                   qrData.encryptedExitKey,
-                );
-                if (res.status === 200) {
+                )
+                if ( res.status === 200 ) {
                   // restored = secureAccount.restoreSecondaryMnemonic(
                   //   res.data.decryptedStaticNonPMDD.secondaryMnemonic,
                   // ).restored;
@@ -525,9 +522,11 @@ const PersonalCopyHistory = (props) => {
                 // restored = secureAccount.restoreSecondaryMnemonic(qrData)
                 //   .restored;
               }
-            } catch (err) {
+            } catch ( err ) {
               // if secondary mnemonic parsing fails
-              console.log({ err });
+              console.log( {
+                err
+              } )
               // restored = secureAccount.restoreSecondaryMnemonic(qrData)
               //   .restored;
             }

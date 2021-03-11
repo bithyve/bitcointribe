@@ -1,24 +1,23 @@
-import { applyMiddleware, createStore, combineReducers } from 'redux';
-import { AsyncStorage as storage } from 'react-native';
-import thunk from 'redux-thunk';
-import createSagaMiddleware from 'redux-saga';
-import { call, all, spawn } from 'redux-saga/effects';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { applyMiddleware, createStore, combineReducers } from 'redux'
+import { AsyncStorage as storage } from 'react-native'
+import thunk from 'redux-thunk'
+import createSagaMiddleware from 'redux-saga'
+import { call, all, spawn } from 'redux-saga/effects'
+import { composeWithDevTools } from 'redux-devtools-extension'
 
-import storageReducer from './reducers/storage';
-import setupAndAuthReducer from './reducers/setupAndAuth';
-import accountsReducer from './reducers/accounts';
-import sssReducer from './reducers/sss';
-import healthReducer from './reducers/health';
-import fBTCReducers from './reducers/fbtc';
-import notificationsReducer from './reducers/notifications';
-import trustedContactsReducer from './reducers/trustedContacts';
-import { persistStore, persistReducer } from 'redux-persist';
-import preferencesReducer from './reducers/preferences';
-import loaders from './reducers/loaders';
-import keeper from './reducers/keeper';
-
-
+import storageReducer from './reducers/storage'
+import setupAndAuthReducer from './reducers/setupAndAuth'
+import accountsReducer from './reducers/accounts'
+import sendingReducer from './reducers/sending'
+import sssReducer from './reducers/sss'
+import healthReducer from './reducers/health'
+import fBTCReducers from './reducers/fbtc'
+import notificationsReducer from './reducers/notifications'
+import trustedContactsReducer from './reducers/trustedContacts'
+import { persistStore, persistReducer } from 'redux-persist'
+import preferencesReducer from './reducers/preferences'
+import loaders from './reducers/loaders'
+import keeper from './reducers/keeper'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
 import rampIntegrationReducer from './reducers/RampIntegration'
@@ -48,19 +47,12 @@ import {
 } from './sagas/setupAndAuth'
 
 import {
-  fetchTransactionsWatcher,
-  transferST1Watcher,
-  transferST2Watcher,
   testcoinsWatcher,
-  transferST3Watcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
-  alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
-  fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  validateTwoFAWatcher,
   removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
@@ -114,7 +106,6 @@ import {
 } from './sagas/notifications'
 
 import {
-  initializedTrustedContactWatcher,
   approveTrustedContactWatcher,
   fetchTrustedChannelWatcher,
   fetchEphemeralChannelWatcher,
@@ -187,7 +178,7 @@ import {
 import {
   fetchKeeperTrustedChannelWatcher,
   updateNewFCMWatcher
-} from './sagas/keeper';
+} from './sagas/keeper'
 
 import {
   cloudWatcher,
@@ -195,9 +186,10 @@ import {
   updateHealthForCloudWatcher
 } from './sagas/cloud'
 
-import { fromPrivateKey } from 'bip32';
-import reducer from './reducers/fbtc';
+import { fromPrivateKey } from 'bip32'
+import reducer from './reducers/fbtc'
 
+import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -214,19 +206,12 @@ const rootSaga = function* () {
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
-    transferST1Watcher,
-    transferST2Watcher,
-    alternateTransferST2Watcher,
-    transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    validateTwoFAWatcher,
     removeTwoFAWatcher,
-    fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
@@ -281,7 +266,6 @@ const rootSaga = function* () {
     fetchNotificationsWatcher,
 
     // Trusted Contacts
-    initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
     removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
@@ -292,8 +276,8 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
-    
-    // Health 
+
+    // Health
     initHealthWatcher,
     checkSharesHealthWatcher,
     updateSharesHealthWatcher,
@@ -351,8 +335,18 @@ const rootSaga = function* () {
     //cloud Integration
     cloudWatcher,
     setCloudBackupStatusWatcher,
-    updateHealthForCloudWatcher
-  ];
+    updateHealthForCloudWatcher,
+
+    // Sending
+    executeSendStage1Watcher,
+    executeSendStage2Watcher,
+    executeAlternateSendStage2Watcher,
+    executeSendStage3Watcher,
+    calculateSendMaxFeeWatcher,
+    calculateCustomFeeWatcher,
+    sendTxNotificationWatcher,
+    sendDonationNoteWatcher,
+  ]
 
   yield all(
     sagas.map( ( saga ) =>
@@ -379,6 +373,7 @@ const rootReducer = combineReducers( {
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
+  sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   loaders,
@@ -389,7 +384,7 @@ const rootReducer = combineReducers( {
   rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
-});
+} )
 
 export default function makeStore() {
   const sagaMiddleware = createSagaMiddleware()
