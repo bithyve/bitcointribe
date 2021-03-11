@@ -18,11 +18,11 @@ import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
 class HexaConfig {
   //RAMP details
-  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL || 'https://buy.ramp.network/'
-  public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE || 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
+  public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://buy.ramp.network/'
+  public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE ? Config.RAMP_REFERRAL_CODE.trim() : 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
-  public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa-dev'
-  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'https://dev-api.swanbitcoin.com'
+  public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID ? Config.SWAN_CLIENT_ID.trim() : 'hexa-dev'
+  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL ? Config.SWAN_AUTH_URL.trim() : 'https://dev-api.swanbitcoin.com'
   public WALLET_SLUG: string = Config.WALLET_SLUG ? Config.WALLET_SLUG.trim() : 'WALLET_SLUG'
   public FBTC_REGISTRATION_URL: string = Config.FBTC_REGISTRATION_URL ? Config.FBTC_REGISTRATION_URL.trim() : 'https://fastbitcoins.com/create-account/hexa'
   public FBTC_URL: string = Config.FBTC_URL ? Config.FBTC_URL.trim() : 'https://wallet-api.fastbitcoins.com/v2/'
@@ -219,7 +219,7 @@ class HexaConfig {
   );
 
   constructor( env: string ) {
-    this.ENVIRONMENT = env || 'MAIN'
+    this.ENVIRONMENT = env.trim() || 'MAIN'
     this.RELAY = this.BH_SERVERS.RELAY
     this.SIGNING_SERVER = this.BH_SERVERS.SIGNING_SERVER
     this.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT1 = Config.BIT_SHARE_HEALTH_TIME_SLOT1 ? parseInt( Config.BIT_SHARE_HEALTH_TIME_SLOT1.trim(), 10 ) : 20160
@@ -236,7 +236,7 @@ class HexaConfig {
       password: 'noUsed',
       host: 'notUsed',
     } )
-    const BIT_SERVER_MODE = Config.BIT_SERVER_MODE.trim() || 'PROD'
+    const BIT_SERVER_MODE = Config.BIT_SERVER_MODE ? Config.BIT_SERVER_MODE.trim() : 'PROD'
     if ( BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV' ) {
       this.APP_STAGE = 'dev'
     } else if ( BIT_SERVER_MODE === 'STA' ) {
@@ -290,4 +290,4 @@ class HexaConfig {
   }
 }
 
-export default new HexaConfig( Config.BIT_ENVIRONMENT.trim() || 'MAIN' )
+export default new HexaConfig( Config.BIT_ENVIRONMENT || 'MAIN' )
