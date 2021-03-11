@@ -506,39 +506,49 @@ class ContactDetails extends PureComponent<
       return
     }
 
-    const requester =
-      trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
-    const appVersion = DeviceInfo.getVersion()
-    if (
-      UNDER_CUSTODY[ requester ] &&
-      UNDER_CUSTODY[ requester ].TRANSFER_DETAILS &&
-      Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT <
-        config.TC_REQUEST_EXPIRY
-    ) {
-      const { KEY, UPLOADED_AT } = UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
-      const qrString = JSON.stringify( {
-        requester: requester,
-        publicKey: KEY,
-        uploadedAt: UPLOADED_AT,
-        type: 'ReverseRecoveryQR',
-        ver: appVersion,
-      } )
-      if( isSmKey ){
-        this.setState( {
-          SMShareQR: qrString
-        } )
-        setTimeout( () => {
-          ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
-        }, 2 )
-        UploadSMSuccessfully( null )
-      }else{
-        this.setState( {
-          trustedQR: qrString
-        } )
-        setTimeout( () => {
-          ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
-        }, 2 )
-        UploadSuccessfully( null )
+    const requester = trustedContacts.tc.trustedContacts[contactName].contactsWalletName;
+    const appVersion = DeviceInfo.getVersion();
+    if(isSmKey){
+      if (
+        UNDER_CUSTODY[requester] &&
+        UNDER_CUSTODY[requester].SM_TRANSFER_DETAILS &&
+        Date.now() - UNDER_CUSTODY[requester].SM_TRANSFER_DETAILS.UPLOADED_AT <
+          config.TC_REQUEST_EXPIRY
+      ) {
+        const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].SM_TRANSFER_DETAILS;
+        let qrString = JSON.stringify({
+          requester: requester,
+          publicKey: KEY,
+          uploadedAt: UPLOADED_AT,
+          type: "ReverseRecoveryQR",
+          ver: appVersion,
+        })
+        this.setState({trustedQR: qrString});
+        setTimeout(() => {
+          (this.SendViaQRBottomSheet as any).current.snapTo(1);
+        }, 2);
+        UploadSMSuccessfully(null);
+      }
+    } else {
+      if (
+        UNDER_CUSTODY[requester] &&
+        UNDER_CUSTODY[requester].TRANSFER_DETAILS &&
+        Date.now() - UNDER_CUSTODY[requester].TRANSFER_DETAILS.UPLOADED_AT <
+          config.TC_REQUEST_EXPIRY
+      ) {
+        const { KEY, UPLOADED_AT } = UNDER_CUSTODY[requester].TRANSFER_DETAILS;
+        let qrString = JSON.stringify({
+          requester: requester,
+          publicKey: KEY,
+          uploadedAt: UPLOADED_AT,
+          type: "ReverseRecoveryQR",
+          ver: appVersion,
+        })
+        this.setState({trustedQR: qrString});
+        setTimeout(() => {
+          (this.SendViaQRBottomSheet as any).current.snapTo(1);
+        }, 2);
+        UploadSuccessfully(null);
       }
     }
   };
@@ -604,12 +614,12 @@ class ContactDetails extends PureComponent<
     const encryptionKey = S3Service.generateRequestCreds().key
     if( isSmKey ){
       if (
-        !UNDER_CUSTODY[ requester ] ||
-        !UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
+        !UNDER_CUSTODY[requester] ||
+        !UNDER_CUSTODY[requester].SM_TRANSFER_DETAILS
       ) {
         uploadRequestedSMShare( requester, encryptionKey )
       } else if (
-        Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT >
+        Date.now() - UNDER_CUSTODY[requester].SM_TRANSFER_DETAILS.UPLOADED_AT >
         config.TC_REQUEST_EXPIRY
       ) {
         uploadRequestedSMShare( requester, encryptionKey )

@@ -1927,10 +1927,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             readStatus = true
           }
         }
-        if ( element.notificationType == 'newKeeperInfo' ) {
-          const data = JSON.parse( element.data )
-          if ( data.walletName ) {
-            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
+
+        if (element.notificationType == "newKeeperInfo") {
+          let data = JSON.parse(element.data);
+          if (data.walletName && data.walletId) {
+            updateKeeperInfoToUnderCustody(data.walletName, data.walletId);
           }
         }
         if ( element.notificationType == 'uploadSecondaryShare' ) {

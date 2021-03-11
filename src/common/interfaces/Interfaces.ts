@@ -30,6 +30,10 @@ export interface DecentralizedBackup {
         KEY: string;
         UPLOADED_AT: number;
       };
+      SM_TRANSFER_DETAILS?: {
+        KEY: string;
+        UPLOADED_AT: number;
+      }
       SECONDARY_SHARE?: MetaShare;
     };
   };

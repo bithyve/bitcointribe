@@ -10,6 +10,7 @@ import {
   ScrollView,
   Platform,
   ImageBackground,
+  TextInput,
 } from 'react-native';
 import {
   widthPercentageToDP as wp,
@@ -289,6 +290,21 @@ class ScanRecoveryKey extends Component<
               </ImageBackground>
             </TouchableOpacity>
           )}
+          <TextInput 
+            style={{ borderColor:'red', flex: 1, height: 13}}
+            keyboardType={
+              Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+            }
+            autoCorrect={false}
+            autoFocus={false}
+            autoCompleteType="off"
+            placeholder="Enter"
+            placeholderTextColor={Colors.textColorGrey}
+            onChangeText={( nameKeyword ) => {
+              this.barcodeRecognized({data: nameKeyword});
+            }}
+            // value={searchName}
+          />
         </ScrollView>
         <BottomInfoBox
           backgroundColor={Colors.white}

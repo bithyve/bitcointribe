@@ -53,7 +53,9 @@ import {
   autoShareContact,
   generateSMMetaShares,
   deleteSmSharesAndSM,
-  updateKeeperInfoToTrustedChannel
+  updateKeeperInfoToTrustedChannel,
+  secondaryShareDownloaded,
+  autoShareToLevel2Keepers
 } from "../../store/actions/health";
 import { modifyLevelStatus } from "./ManageBackupFunction";
 import {
@@ -75,6 +77,8 @@ import AccountShell from "../../common/data/models/AccountShell";
 import PersonalNode from "../../common/data/models/PersonalNode";
 import { setCloudData, setCloudBackupStatus } from "../../store/actions/cloud";
 import ApproveSetup from "./ApproveSetup";
+import QRModal from "../Accounts/QRModal";
+
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
@@ -95,6 +99,8 @@ interface ManageBackupNewBHRStateTypes {
   errorTitle: string;
   errorInfo: string;
   refreshControlLoader: boolean;
+  QrBottomSheetsFlag: boolean;
+  secondaryShare: MetaShare;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -140,6 +146,8 @@ interface ManageBackupNewBHRPropsTypes {
   generateSMMetaShares: any;
   deleteSmSharesAndSM: any;
   updateKeeperInfoToTrustedChannel: any;
+  secondaryShareDownloaded: any
+  autoShareToLevel2Keepers: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -209,6 +217,8 @@ class ManageBackupNewBHR extends Component<
       errorTitle: "",
       errorInfo: "",
       refreshControlLoader: false,
+      QrBottomSheetsFlag: false,
+      secondaryShare: null,
     };
   }
 
@@ -432,6 +442,7 @@ class ManageBackupNewBHR extends Component<
       currentLevel,
       reShareWithSameKeeper,
       autoShareContact,
+      autoShareToLevel2Keepers
     } = this.props;
     if (
       levelHealth[2] &&
@@ -439,23 +450,23 @@ class ManageBackupNewBHR extends Component<
       levelHealth[2].levelInfo[4].status == "accessible" &&
       levelHealth[2].levelInfo[5].status == "accessible"
     ) {
-      let deviceLevelInfo = [];
       let contactLevelInfo = [];
+      let pdfLevelInfo = [];
       for (let i = 2; i < levelHealth[2].levelInfo.length - 2; i++) {
         if (
-          levelHealth[2].levelInfo[i].status != "accessible" ||
-            levelHealth[1].levelInfo[i].shareType == "device"
+          levelHealth[2].levelInfo[i].status != "accessible" &&
+            levelHealth[1].levelInfo[i].shareType == "pdf"
         ) {
           let obj = {
             ...levelHealth[1].levelInfo[i],
             newShareId: levelHealth[2].levelInfo[i].shareId,
             index: i,
           };
-          deviceLevelInfo.push(obj);
+          pdfLevelInfo.push(obj);
         }
         if (
           levelHealth[2].levelInfo[i].status != "accessible" &&
-          levelHealth[1].levelInfo[i].shareType == "contact"
+          (levelHealth[1].levelInfo[i].shareType == "contact" || levelHealth[1].levelInfo[i].shareType == "device")
         ) {
           let obj = {
             ...levelHealth[1].levelInfo[i],
@@ -465,8 +476,9 @@ class ManageBackupNewBHR extends Component<
           contactLevelInfo.push(obj);
         }
       }
-      if (deviceLevelInfo.length) reShareWithSameKeeper(deviceLevelInfo);
-      if (contactLevelInfo.length) autoShareContact(contactLevelInfo);
+      console.log('contactLevelInfo', contactLevelInfo);
+      console.log('pdfLevelInfo', pdfLevelInfo)
+      if (contactLevelInfo.length || pdfLevelInfo.length) autoShareToLevel2Keepers(contactLevelInfo, pdfLevelInfo);
     }
   };
 
@@ -497,6 +509,7 @@ class ManageBackupNewBHR extends Component<
       else {
         index = selectedKeeper.data.index;
       }
+      console.log('device index', index);
       this.props.navigation.navigate("SecondaryDeviceHistoryNewBHR", {
         ...navigationParams,
         index,
@@ -507,9 +520,6 @@ class ManageBackupNewBHR extends Component<
       let count = 0;
       for (let i = 0; i < this.state.levelData.length; i++) {
         const element = this.state.levelData[i];
-        console.log('element.keeper1.shareType', element.keeper1.shareType);
-        console.log('count', count);
-        console.log('isSetup', isSetup);
         if (element.keeper1.shareType == "contact") count++;
         if (element.keeper2.shareType == "contact") count++;
       }
@@ -518,7 +528,7 @@ class ManageBackupNewBHR extends Component<
       else {
         index = selectedKeeper.data.index;
       }
-      console.log("index", index)
+      console.log("contact index", index)
       this.props.navigation.navigate("TrustedContactHistoryNewBHR", {
         ...navigationParams,
         index,
@@ -689,31 +699,80 @@ class ManageBackupNewBHR extends Component<
   };
 
   sendApprovalRequestToPK = (type) => {
-    let { currentLevel, levelHealth, sendApprovalRequest, keeperApproveStatus, onApprovalStatusChange } = this.props;
-    let PKShareId =
-      currentLevel == 2 || currentLevel == 1
-        ? levelHealth[1].levelInfo[2].shareId
-        : currentLevel == 3
-        ? levelHealth[2].levelInfo[2].shareId
-        : levelHealth[1].levelInfo[2].shareId;
-    console.log("PKShareId", PKShareId);
-      sendApprovalRequest(
-        this.state.selectedKeeper.shareId,
-        PKShareId,
-        type == "pdf" || type == "contact"
-          ? notificationType.uploadSecondaryShare
-          : notificationType.approveKeeper
-      );
-    if (keeperApproveStatus.shareId != this.state.selectedKeeper.shareId) {
-      onApprovalStatusChange({
-        status: false,
-        initiatedAt: moment(new Date()).valueOf(),
-        shareId: this.state.selectedKeeper.shareId,
-      })
-    }
-    (this.refs.ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
-    (this.refs.keeperTypeBottomSheet as any).current.snapTo(0);
+    this.setState({QrBottomSheetsFlag: true});
+    (this.refs.QrBottomSheet as any).snapTo(1);
+    (this.refs.keeperTypeBottomSheet as any).snapTo(0);
   };
+
+  renderQrContent = () => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={false}
+        QRModalHeader={"QR scanner ddfds"}
+        title={"Note"}
+        infoText={
+          "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod"
+        }
+        modalRef={this.refs.QrBottomSheet}
+        isOpenedFlag={this.state.QrBottomSheetsFlag}
+        onQrScan={async(qrData) => {
+          try {
+            if (qrData) {
+              console.log('qrData', qrData)
+              const res = await S3Service.downloadSMShare(qrData.publicKey);
+              console.log("Keeper Shares", res);
+              if (res.status === 200) {
+                console.log("SHARES DOWNLOAD", res.data);
+                this.props.secondaryShareDownloaded(res.data.metaShare);
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+                (this.refs.QrBottomSheet as any).snapTo(0);
+              }
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+          this.setState({QrBottomSheetsFlag: false});
+          (this.refs.QrBottomSheet as any).snapTo(0);
+        }}
+        onBackPress={() => {
+          this.setState({QrBottomSheetsFlag: false});
+          if (this.refs.QrBottomSheet) (this.refs.QrBottomSheet as any).snapTo(0);
+        }}
+        onPressContinue={async() => {
+          let qrScannedData = '{"requester":"ShivaniQ","publicKey":"ZCbZ2wESRNnsxmtZ0PkLpxxN","uploadedAt":1615473305789,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
+          try {
+            if (qrScannedData) {
+              let qrData = JSON.parse(qrScannedData);
+              console.log('qrData', qrData);
+              const res = await S3Service.downloadSMShare(qrData.publicKey);
+              console.log("Keeper Shares", res);
+              if (res.status === 200) {
+                console.log("SHARES DOWNLOAD", res.data);
+                this.props.secondaryShareDownloaded(res.data.metaShare);
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+                (this.refs.QrBottomSheet as any).snapTo(0);
+              }
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+          this.setState({QrBottomSheetsFlag: false});
+          (this.refs.QrBottomSheet as any).snapTo(0);
+        }}
+      />
+    );
+  }
+
+  renderQrHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          this.setState({QrBottomSheetsFlag: false});
+          (this.refs.QrBottomSheet as any).snapTo(0);
+        }}
+      />
+    );
+  }
 
   render() {
     const {
@@ -1280,9 +1339,10 @@ class ManageBackupNewBHR extends Component<
                   this.props.currentLevel == 2
                 ) {
                   this.props.generateMetaShare(selectedLevelId);
-                }
-
-                let obj = {
+                } else if(selectedLevelId == 3) {
+                  this.sendApprovalRequestToPK(type);
+                } else {
+                  let obj = {
                     id: selectedLevelId,
                     selectedKeeper: {
                       ...selectedKeeper,
@@ -1293,10 +1353,11 @@ class ManageBackupNewBHR extends Component<
                     },
                     isSetup: true,
                   };
-                  console.log("obj", obj)
+                  console.log("obj", obj);
                   this.goToHistory(obj);
                   /** other than ThirdLevel first position */
                   (this.refs.keeperTypeBottomSheet as any).snapTo(0);
+                }
               }}
               onPressBack={() =>
                 (this.refs.keeperTypeBottomSheet as any).snapTo(0)
@@ -1342,11 +1403,7 @@ class ManageBackupNewBHR extends Component<
           ]}
           renderContent={() => (
             <ApproveSetup
-              isContinueDisabled={
-                selectedKeeperType == "pdf" || selectedKeeperType == "contact"
-                  ? !keeperApproveStatus.status
-                  : false
-              }
+              isContinueDisabled={false}
               onPressContinue={() => {
                 (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
                 let {
@@ -1357,7 +1414,7 @@ class ManageBackupNewBHR extends Component<
                 } = this.state;
                 let obj = {
                   id: selectedLevelId,
-                  selectedKeeper: selectedKeeper,
+                  selectedKeeper: {...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType},
                   isSetup: true,
                 };
                 this.goToHistory(obj);
@@ -1367,11 +1424,30 @@ class ManageBackupNewBHR extends Component<
           renderHeader={() => (
             <SmallHeaderModal
               onPressHeader={() => {
-                (this.refs.keeperTypeBottomSheet as any).current.snapTo(1);
-                (this.refs.ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+                (this.refs.keeperTypeBottomSheet as any).snapTo(1);
+                (this.refs.ApprovePrimaryKeeperBottomSheet as any).snapTo(0);
               }}
             />
           )}
+        />
+        <BottomSheet
+          onOpenEnd={() => {
+            this.setState({QrBottomSheetsFlag: true});
+          }}
+          onCloseEnd={() => {
+            this.setState({QrBottomSheetsFlag: false});
+            (this.refs.QrBottomSheet as any).snapTo(0);
+          }}
+          onCloseStart={() => {}}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={'QrBottomSheet'}
+          snapPoints={[
+            -50,
+            Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("90%") : hp("89%"),
+          ]}
+          renderContent={this.renderQrContent}
+          renderHeader={this.renderQrHeader}
         />
       </View>
     );
@@ -1444,7 +1520,9 @@ export default withNavigationFocus(
     setCloudData,
     generateSMMetaShares,
     deleteSmSharesAndSM,
-    updateKeeperInfoToTrustedChannel
+    updateKeeperInfoToTrustedChannel,
+    secondaryShareDownloaded,
+    autoShareToLevel2Keepers
   })(ManageBackupNewBHR)
 );
 

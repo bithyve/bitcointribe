@@ -172,7 +172,8 @@ import {
   deleteSmSharesAndSMWatcher,
   updateKeeperInfoToTrustedChannelWatcher,
   updateKeeperInfoToUnderCustodyWatcher,
-} from './sagas/health'
+  autoShareLevel2KeepersWatcher,
+} from './sagas/health';
 
 import {
   fetchKeeperTrustedChannelWatcher,
@@ -312,6 +313,7 @@ const rootSaga = function* () {
     deleteSmSharesAndSMWatcher,
     updateKeeperInfoToTrustedChannelWatcher,
     updateKeeperInfoToUnderCustodyWatcher,
+    autoShareLevel2KeepersWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,
