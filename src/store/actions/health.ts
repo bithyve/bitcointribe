@@ -76,6 +76,7 @@ export const UPLOAD_SUCCESSFULLY_SM = 'UPLOAD_SUCCESSFULLY_SM';
 export const DELETE_SM_AND_SMSHARES = 'DELETE_SM_AND_SMSHARES';
 export const UPDATE_KEEPERINFO_TO_TC = 'UPDATE_KEEPERINFO_TO_TC';
 export const UPDATE_KEEPERINFO_UNDER_CUSTODY = 'UPDATE_KEEPERINFO_UNDER_CUSTODY';
+export const AUTO_SHARE_LEVEL2_KEEPER = 'AUTO_SHARE_LEVEL2_KEEPER';
 
 export const initHealthCheck = () => {
   return { type: INIT_HEALTH_CHECK };
@@ -380,6 +381,15 @@ export const autoShareContact = (
   return {
     type: AUTO_SHARE_CONTACT,
     payload: { contactLevelInfo },
+  };
+};
+
+export const autoShareToLevel2Keepers = (
+  contactLevelInfo, pdfLevelInfo
+) => {
+  return {
+    type: AUTO_SHARE_LEVEL2_KEEPER,
+    payload: { contactLevelInfo, pdfLevelInfo },
   };
 };
 

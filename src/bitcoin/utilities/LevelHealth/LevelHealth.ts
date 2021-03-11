@@ -1767,6 +1767,7 @@ export default class LevelHealth {
 
   public updateKeeperInfoToMetaShare = (keeperInfo: any, answer: string): { metaShares: MetaShare[] } => {
     let {encryptedString} = LevelHealth.encryptWithAnswer(JSON.stringify(keeperInfo), answer);
+    console.log("ENCRYPTED KEEPERINFO", encryptedString);
     for (let i = 0; i < this.metaSharesKeeper.length; i++) {
       this.metaSharesKeeper[i].meta.encryptedKeeperInfo = encryptedString;
     }

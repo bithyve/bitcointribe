@@ -1923,7 +1923,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
         if (element.notificationType == "newKeeperInfo") {
           let data = JSON.parse(element.data);
-          if (data.walletName) {
+          if (data.walletName && data.walletId) {
             updateKeeperInfoToUnderCustody(data.walletName, data.walletId);
           }
         }
