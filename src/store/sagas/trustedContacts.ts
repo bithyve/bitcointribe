@@ -270,6 +270,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
     }
   }
+}
 
 function* approveTrustedContactWorker( { payload } ) {
   try {
