@@ -16,7 +16,6 @@ export const TRANSACTION_HELPER_DONE = 'TRANSACTION_HELPER_DONE'
 export const RECEIVE_HELPER_DONE = 'RECEIVE_HELPER_DONE'
 export const INITIAL_KNOW_MORE_SEND_SHEET_SHOWN = 'INITIAL_KNOW_MORE_SEND_SHEET_SHOWN'
 export const SAVING_WARNING = 'SAVING_WARNING'
-export const TWO_FA_SETUP = 'TWO_FA_SETUP'
 export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST'
 export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS'
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
@@ -111,15 +110,6 @@ export const setSavingWarning = ( data ) => {
     type: SAVING_WARNING,
     payload: {
       savingWarning: data
-    },
-  }
-}
-
-export const setTwoFASetup = ( data ) => {
-  return {
-    type: TWO_FA_SETUP,
-    payload: {
-      hasCompletedTFASetup: data
     },
   }
 }
