@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
-import { removeTwoFA, clearTransfer } from '../../../store/actions/accounts'
+import { clearTransfer } from '../../../store/actions/accounts'
 import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
@@ -44,10 +44,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
 
-  const {
-    hasCompletedTFASetup,
-    hasShownInitialKnowMoreSendSheet,
-  } = usePreferencesState()
+  const { hasShownInitialKnowMoreSendSheet, } = usePreferencesState()
 
   const isRecipientSelectedForSending = useCallback( ( recipient: RecipientDescribing ) => {
     return (
@@ -151,22 +148,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       },
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
-
-
-
-  useEffect( () => {
-    if ( hasCompletedTFASetup == false && primarySubAccount.isTFAEnabled ) {
-      dispatch( removeTwoFA() )
-
-      // TODO: How do we pass the right data here using the latest account structure?
-      navigation.navigate( 'TwoFASetup', {
-        twoFASetup:
-          accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-            .twoFASetup,
-      } )
-    }
-  }, [ hasCompletedTFASetup, primarySubAccount ] )
-
 
   useEffect( () => {
     if ( primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT && hasShownInitialKnowMoreSendSheet == false ) {
