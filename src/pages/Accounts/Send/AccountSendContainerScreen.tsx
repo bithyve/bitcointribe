@@ -24,6 +24,8 @@ import AccountSendScreen from './AccountSendScreen'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
 import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
+import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 
 export type Props = {
   navigation: any;
@@ -35,11 +37,11 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const accountShell = useSourceAccountShellForSending()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  // const sendableAccountShells = useCompatibleAccountShells( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
   const walletService = useWalletServiceForSourceAccountKind( primarySubAccount.sourceKind )
 
+  const accountsState = useAccountsState()
   const sendingState = useSendingState()
 
   const {
@@ -151,15 +153,20 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
 
+
   useEffect( () => {
     if ( hasCompletedTFASetup == false && primarySubAccount.isTFAEnabled ) {
       dispatch( removeTwoFA() )
+
+      // TODO: How do we pass the right data here using the latest account structure?
       navigation.navigate( 'TwoFASetup', {
-        // TODO: Figure out how `service.secureHDWallet.twoFASetup` fits in on this screen 👇.
-        // twoFASetup: accountsState[this.state.serviceType].service.secureHDWallet.twoFASetup,
+        twoFASetup:
+          accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
+            .twoFASetup,
       } )
     }
   }, [ hasCompletedTFASetup, primarySubAccount ] )
+
 
   useEffect( () => {
     if ( primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT && hasShownInitialKnowMoreSendSheet == false ) {
