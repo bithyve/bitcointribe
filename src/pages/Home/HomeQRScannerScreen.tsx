@@ -145,8 +145,8 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               margin: 0, padding: 0
             }}
             placeholder="Enter Address Manually"
-            accountKind={REGULAR_ACCOUNT}
-            onAddressSubmitted={( address ) => {
+            sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
+            onAddressEntered={( address ) => {
               onSend( address, null, null )
             }}
           />

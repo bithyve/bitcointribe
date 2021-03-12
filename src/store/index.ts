@@ -13,6 +13,7 @@ import sssReducer from './reducers/sss'
 import healthReducer from './reducers/health'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
+import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
 import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
@@ -53,7 +54,6 @@ import {
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
   addNewAccountShellWatcher,
@@ -67,7 +67,8 @@ import {
   autoSyncShellsWatcher,
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
-  fetchReceiveAddressWatcher
+  fetchReceiveAddressWatcher,
+  validateTwoFAWatcher
 } from './sagas/accounts'
 
 import {
@@ -173,7 +174,7 @@ import {
   updateKeeperInfoToTrustedChannelWatcher,
   updateKeeperInfoToUnderCustodyWatcher,
   autoShareLevel2KeepersWatcher,
-} from './sagas/health';
+} from './sagas/health'
 
 import {
   fetchKeeperTrustedChannelWatcher,
@@ -211,7 +212,6 @@ const rootSaga = function* () {
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    removeTwoFAWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
@@ -227,6 +227,7 @@ const rootSaga = function* () {
     blindRefreshWatcher,
     getAllAccountsDataWatcher,
     fetchReceiveAddressWatcher,
+    validateTwoFAWatcher,
 
     // sss watchers
     initHCWatcher,

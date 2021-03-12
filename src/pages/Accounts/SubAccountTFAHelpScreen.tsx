@@ -26,11 +26,11 @@ import QRModal from './QRModal'
 import ResetTwoFASuccess from './ResetTwoFASuccess'
 import ServerErrorModal from './ServerErrorModal'
 import {
-  // resetTwoFA,
-  // generateSecondaryXpriv,
+  resetTwoFA,
+  generateSecondaryXpriv,
   clearTransfer,
-  // twoFAResetted,
-  // secondaryXprivGenerated,
+  twoFAResetted,
+  secondaryXprivGenerated,
 } from '../../store/actions/accounts'
 import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 
@@ -57,61 +57,63 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   )
 
   let generatedSecureXPriv
-  // let resettedTwoFA;
+  let resettedTwoFA
 
   if ( additional && additional.secure ) {
     generatedSecureXPriv = additional.secure.xprivGenerated
-    // resettedTwoFA = additional.secure.twoFAResetted;
+    resettedTwoFA = additional.secure.twoFAResetted
   }
   const dispatch = useDispatch()
 
-  // useEffect(() => {
-  //   if (resettedTwoFA) {
-  //     props.navigation.navigate('TwoFASetup', {
-  //       twoFASetup: '', //service.secureHDWallet.twoFASetup,
-  //       onPressBack: () => {
-  //         dispatch(clearTransfer(SECURE_ACCOUNT));
-  //         props.navigation.navigate('AccountDetails', {
-  //           serviceType: SECURE_ACCOUNT,
-  //           index: 2,
-  //         });
-  //       },
-  //     });
-  //     dispatch(twoFAResetted(null)); //resetting to monitor consecutive change
-  //   } else if (resettedTwoFA === false) {
-  //     setTimeout(() => {
-  //       setSuccessMessageHeader('Failed to reset 2FA');
-  //       setSuccessMessage(
-  //         'The QR you have scanned seems to be invalid, pls try again',
-  //       );
-  //     }, 2);
-  //     (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
-  //     dispatch(twoFAResetted(null));
-  //   }
-  // }, [resettedTwoFA]);
+  useEffect( () => {
+    if ( resettedTwoFA ) {
+      props.navigation.navigate( 'TwoFASetup', {
+        twoFASetup: service.secureHDWallet.twoFASetup,
+        onPressBack: () => {
+          dispatch( clearTransfer( SECURE_ACCOUNT ) )
+          props.navigation.navigate( 'AccountDetails', {
+            serviceType: SECURE_ACCOUNT,
+            index: 2,
+          } )
+        },
+      } )
+      dispatch( twoFAResetted( null ) ) //resetting to monitor consecutive change
+    } else if ( resettedTwoFA === false ) {
+      setTimeout( () => {
+        setSuccessMessageHeader( 'Failed to reset 2FA' )
+        setSuccessMessage(
+          'The QR you have scanned seems to be invalid, pls try again',
+        )
+      }, 2 );
+      ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
+      dispatch( twoFAResetted( null ) )
+    }
+  }, [ resettedTwoFA ] )
 
-  // useEffect(() => {
-  //   (async () => {
-  //     if (generatedSecureXPriv) {
-  //       dispatch(clearTransfer(SECURE_ACCOUNT));
-  //       props.navigation.navigate('Send', {
-  //         serviceType: SECURE_ACCOUNT,
-  //         sweepSecure: true,
-  //         netBalance:
-  //           service.secureHDWallet.balances.balance +
-  //           service.secureHDWallet.balances.unconfirmedBalance,
-  //       });
-  //       dispatch(secondaryXprivGenerated(null));
-  //     } else if (generatedSecureXPriv === false) {
-  //       setTimeout(() => {
-  //         setSuccessMessageHeader('Invalid Exit Key');
-  //         setSuccessMessage('Invalid Exit Key, please try again');
-  //       }, 2);
-  //       (ResetTwoFASuccessBottomSheet as any).current.snapTo(1);
-  //       dispatch(secondaryXprivGenerated(null));
-  //     }
-  //   })();
-  // }, [generatedSecureXPriv]);
+  useEffect( () => {
+    ( async () => {
+      if ( generatedSecureXPriv ) {
+        dispatch( clearTransfer( SECURE_ACCOUNT ) )
+
+        props.navigation.navigate( 'Send', {
+          serviceType: SECURE_ACCOUNT,
+          sweepSecure: true,
+          netBalance:
+            service.secureHDWallet.balances.balance +
+            service.secureHDWallet.balances.unconfirmedBalance,
+        } )
+        dispatch( secondaryXprivGenerated( null ) )
+
+      } else if ( generatedSecureXPriv === false ) {
+        setTimeout( () => {
+          setSuccessMessageHeader( 'Invalid Exit Key' )
+          setSuccessMessage( 'Invalid Exit Key, please try again' )
+        }, 2 );
+        ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
+        dispatch( secondaryXprivGenerated( null ) )
+      }
+    } )()
+  }, [ generatedSecureXPriv ] )
 
   const getQrCodeData = ( qrData ) => {
     setTimeout( () => {
@@ -119,9 +121,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     }, 2 )
 
     if ( QRModalHeader === 'Reset 2FA' ) {
-      // dispatch(resetTwoFA(qrData));
+      dispatch( resetTwoFA( qrData ) )
     } else if ( QRModalHeader === 'Sweep Funds' ) {
-      // dispatch(generateSecondaryXpriv(SECURE_ACCOUNT, qrData));
+      dispatch( generateSecondaryXpriv( SECURE_ACCOUNT, qrData ) )
     }
   }
 
@@ -209,8 +211,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           setTimeout( () => {
             setQRModalHeader( 'Sweep Funds' )
           }, 2 )
-          props.navigation.navigate( 'SweepFundUseExitKey' );
-          //if (QrBottomSheet.current) (QrBottomSheet as any).current.snapTo(1);
+          if ( QrBottomSheet.current ) ( QrBottomSheet as any ).current.snapTo( 1 );
           ( ServerNotRespondingBottomSheet as any ).current.snapTo( 0 )
         }}
       />
@@ -265,22 +266,24 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         <View style={{
           flex: 1
         }}>
-          {/* <AppBottomSheetTouchableWrapper
+          <AppBottomSheetTouchableWrapper
             onPress={() => {
-              setTimeout(() => {
-                setQRModalHeader('Reset 2FA');
-              }, 2);
-              if (QrBottomSheet.current) {
-                (QrBottomSheet as any).current.snapTo(1);
+              setTimeout( () => {
+                setQRModalHeader( 'Reset 2FA' )
+              }, 2 )
+              if ( QrBottomSheet.current ) {
+                ( QrBottomSheet as any ).current.snapTo( 1 )
               }
             }}
-            style={{ ...styles.selectedContactsView, marginBottom: hp('3%') }}
+            style={{
+              ...styles.selectedContactsView, marginBottom: hp( '3%' )
+            }}
           >
             <Image
-              source={require('../../assets/images/icons/icon_power.png')}
+              source={require( '../../assets/images/icons/icon_power.png' )}
               style={{
-                width: wp('7%'),
-                height: wp('7%'),
+                width: wp( '7%' ),
+                height: wp( '7%' ),
                 resizeMode: 'contain',
                 marginLeft: 0,
                 marginRight: 10,
@@ -294,7 +297,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
             </View>
             <View
               style={{
-                width: wp('17%'),
+                width: wp( '17%' ),
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginLeft: 'auto',
@@ -311,7 +314,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
                 }}
               />
             </View>
-          </AppBottomSheetTouchableWrapper> */}
+          </AppBottomSheetTouchableWrapper>
 
           <AppBottomSheetTouchableWrapper
             onPress={() => {

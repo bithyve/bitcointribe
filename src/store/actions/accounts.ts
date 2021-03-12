@@ -167,15 +167,6 @@ export const validateTwoFA = ( token: number ) => {
   }
 }
 
-export const removeTwoFA = () => {
-  return {
-    type: REMOVE_TWO_FA,
-  };
-};
-
-// export const calculateExchangeRate = () => {
-//   return { type: EXCHANGE_RATE };
-// };
 export const fetchFeeAndExchangeRates = () => {
   return {
     type: FETCH_FEE_AND_EXCHANGE_RATES
@@ -191,12 +182,14 @@ export const generateSecondaryXpriv = ( serviceType, secondaryMnemonic ) => {
   }
 }
 
-export const resetTwoFA = (secondaryMnemonic) => {
+export const resetTwoFA = ( secondaryMnemonic ) => {
   return {
     type: RESET_TWO_FA,
-    payload: { secondaryMnemonic },
-  };
-};
+    payload: {
+      secondaryMnemonic
+    },
+  }
+}
 
 export const runTest = () => {
   return {

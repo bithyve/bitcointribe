@@ -1927,10 +1927,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         }
 
-        if (element.notificationType == "newKeeperInfo") {
-          let data = JSON.parse(element.data);
-          if (data.walletName && data.walletId) {
-            updateKeeperInfoToUnderCustody(data.walletName, data.walletId);
+        if ( element.notificationType == 'newKeeperInfo' ) {
+          const data = JSON.parse( element.data )
+          if ( data.walletName && data.walletId ) {
+            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
           }
         }
         if ( element.notificationType == 'uploadSecondaryShare' ) {
@@ -2051,9 +2051,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ( value ) => value.notificationId == element.notificationId
               )
             ]
-          if ( element.notificationType == releaseNotificationTopic ) {
-            readStatus = readStatus
-          } else {
+          if ( element.notificationType != releaseNotificationTopic ) {
             readStatus = temp.read
           }
 

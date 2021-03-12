@@ -123,11 +123,11 @@ function* generateMetaSharesWorker() {
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
-  const twoFASecret = secureAccount.secureHDWallet.twoFASetup ? secureAccount.secureHDWallet.twoFASetup.secret : ''
-  // if (!secondaryMnemonic || !twoFASecret) {
-  //   throw new Error('secure assets missing; staticNonPMDD');
-  // }
+  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic
+  const twoFASecret = secureAccount.secureHDWallet.twoFASetup.secret
+  if ( !secondaryMnemonic || !twoFASecret ) {
+    throw new Error( 'secure assets missing; staticNonPMDD' )
+  }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs
 
   const secureAssets = {
@@ -172,7 +172,6 @@ export const generateMetaSharesWatcher = createWatcher(
 function* initHCWorker() {
   let s3Service: S3Service = yield select( ( state ) => state.sss.service )
   const initialized = s3Service.sss.healthCheckInitialized
-  console.log( 'initHCWorker initialized', initialized )
   if ( initialized ) return
 
   yield put( switchS3Loader( 'initHC' ) )
@@ -210,7 +209,7 @@ export const initHCWatcher = createWatcher( initHCWorker, INIT_HEALTH_CHECK )
 
 function* uploadEncMetaShareWorker( { payload } ) {
   // Transfer: User >>> Guardian
-  try{
+  
     yield put( switchS3Loader( 'uploadMetaShare' ) )
 
     const s3Service: S3Service = yield select( ( state ) => state.sss.service )
@@ -305,11 +304,7 @@ function* uploadEncMetaShareWorker( { payload } ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
           yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-          return
-        }
-      }
     }
-
     // TODO: reactivate DNP Transportation for Hexa Premium
     // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
     // let dynamicNonPMDD;
@@ -425,9 +420,7 @@ function* uploadEncMetaShareWorker( { payload } ) {
       } )
     }
     yield put( switchS3Loader( 'uploadMetaShare' ) )
-  } catch( e ){
-    console.log( 'error, e', e )
-  }
+  } 
 }
 
 export const uploadEncMetaShareWatcher = createWatcher(
@@ -729,13 +722,13 @@ function* generatePersonalCopyWorker( { payload } ) {
   const secureAccount: SecureAccount = yield select(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
-  // const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic;
-  // if (!secondaryMnemonic) {
-  //   throw new Error(
-  //     'Personal copies generation failed; secondary mnemonic missing',
-  //   );
-  // }
-  // const { secondary, bh } = secureAccount.secureHDWallet.xpubs;
+  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic
+  if ( !secondaryMnemonic ) {
+    throw new Error(
+      'Personal copies generation failed; secondary mnemonic missing',
+    )
+  }
+  const { secondary, bh } = secureAccount.secureHDWallet.xpubs
   const secureAssets = {
     secondaryMnemonic: secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '',
     secondaryXpub: secureAccount.secureHDWallet.xpubs && secureAccount.secureHDWallet.xpubs.secondary ? secureAccount.secureHDWallet.xpubs.secondary : '',

@@ -589,35 +589,6 @@ export const validateTwoFAWatcher = createWatcher(
   VALIDATE_TWO_FA
 )
 
-function* removeTwoFAWorker() {
-  const service: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
-  )
-
-  const { removed } = yield call( service.removeTwoFADetails )
-
-  if ( removed ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ SECURE_ACCOUNT ]: JSON.stringify( service ),
-    }
-
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    console.log( 'Failed to remove 2FA details' )
-  }
-}
-
-export const removeTwoFAWatcher = createWatcher(
-  removeTwoFAWorker,
-  REMOVE_TWO_FA
-)
-
 function* setupDonationAccountWorker( { payload } ) {
   const {
     serviceType,
