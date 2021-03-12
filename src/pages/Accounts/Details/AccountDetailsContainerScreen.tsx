@@ -59,7 +59,6 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
