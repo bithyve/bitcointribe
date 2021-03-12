@@ -209,218 +209,219 @@ export const initHCWatcher = createWatcher( initHCWorker, INIT_HEALTH_CHECK )
 
 function* uploadEncMetaShareWorker( { payload } ) {
   // Transfer: User >>> Guardian
-  
-    yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-    const s3Service: S3Service = yield select( ( state ) => state.sss.service )
-    console.log( 's3Service', s3Service )
-    if ( !s3Service.sss.metaShares.length ) return
-    const trustedContacts: TrustedContactsService = yield select(
-      ( state ) => state.trustedContacts.service,
-    )
-    const keepersInfo: KeeperService = yield select(
-      ( state ) => state.keeper.service,
-    )
-    const regularService: RegularAccount = yield select(
-      ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-    )
+  yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-    const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-      ( state ) => state.storage.database,
-    )
+  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
+  console.log( 's3Service', s3Service )
+  if ( !s3Service.sss.metaShares.length ) return
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const keepersInfo: KeeperService = yield select(
+    ( state ) => state.keeper.service,
+  )
+  const regularService: RegularAccount = yield select(
+    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  )
 
-    if ( payload.changingGuardian ) {
-      if ( payload.contactInfo.contactName === 'secondary device' ) {
-        delete trustedContacts.tc.trustedContacts[
-          payload.contactInfo.contactName
-        ] // removing secondary device's TC
-        const accountNumber =
+  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+    ( state ) => state.storage.database,
+  )
+
+  if ( payload.changingGuardian ) {
+    if ( payload.contactInfo.contactName === 'secondary device' ) {
+      delete trustedContacts.tc.trustedContacts[
+        payload.contactInfo.contactName
+      ] // removing secondary device's TC
+      const accountNumber =
         regularService.hdWallet.trustedContactToDA[
           payload.contactInfo.contactName
         ]
-        if ( accountNumber ) {
-          delete regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
-            accountNumber
-          ].contactDetails // removing previous SDs xpub
-        }
+      if ( accountNumber ) {
+        delete regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
+          accountNumber
+        ].contactDetails // removing previous SDs xpub
       }
+    }
 
-      yield call( s3Service.reshareMetaShare, payload.shareIndex )
-      if ( payload.previousGuardianName ) {
-        trustedContacts.tc.trustedContacts[
-          payload.previousGuardianName
-        ].isGuardian = false
+    yield call( s3Service.reshareMetaShare, payload.shareIndex )
+    if ( payload.previousGuardianName ) {
+      trustedContacts.tc.trustedContacts[
+        payload.previousGuardianName
+      ].isGuardian = false
 
-        const {
-          walletID,
-          FCMs,
-          trustedChannel,
-        } = trustedContacts.tc.trustedContacts[ payload.previousGuardianName ]
+      const {
+        walletID,
+        FCMs,
+        trustedChannel,
+      } = trustedContacts.tc.trustedContacts[ payload.previousGuardianName ]
 
-        if ( trustedChannel ) {
+      if ( trustedChannel ) {
         // dispatching remove share action to the previous guardian
-          const dataElements = {
-            removeGuardian: true
-          }
+        const dataElements = {
+          removeGuardian: true
+        }
 
-          const res = yield call(
-            trustedContacts.updateTrustedChannel,
-            payload.previousGuardianName,
-            dataElements,
-          )
+        const res = yield call(
+          trustedContacts.updateTrustedChannel,
+          payload.previousGuardianName,
+          dataElements,
+        )
 
-          if ( res.status === 200 ) {
-            if ( walletID && FCMs ) {
-              const recipient = {
-                walletID,
-                FCMs,
-              }
-              const { walletName } = yield select(
-                ( state ) => state.storage.database.WALLET_SETUP,
-              )
-
-              const notification: INotification = {
-                notificationType: notificationType.contact,
-                title: 'Friends and Family notification',
-                body: `Removed as a Keeper by ${walletName}`,
-                data: {
-                },
-                tag: notificationTag.IMP,
-              }
-              sendNotification( recipient, notification )
+        if ( res.status === 200 ) {
+          if ( walletID && FCMs ) {
+            const recipient = {
+              walletID,
+              FCMs,
             }
+            const { walletName } = yield select(
+              ( state ) => state.storage.database.WALLET_SETUP,
+            )
+
+            const notification: INotification = {
+              notificationType: notificationType.contact,
+              title: 'Friends and Family notification',
+              body: `Removed as a Keeper by ${walletName}`,
+              data: {
+              },
+              tag: notificationTag.IMP,
+            }
+            sendNotification( recipient, notification )
           }
         }
       }
-    } else {
+    }
+  } else {
     // preventing re-uploads till expiry
-      if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ] ) {
-        if (
-          Date.now() -
+    if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ] ) {
+      if (
+        Date.now() -
         DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ]
           .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
-        ) {
+      ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
-          yield put( switchS3Loader( 'uploadMetaShare' ) )
+        yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-    }
-    // TODO: reactivate DNP Transportation for Hexa Premium
-    // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
-    // let dynamicNonPMDD;
-    // if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
-
-    // const res = yield call(
-    //   s3Service.uploadShare,
-    //   payload.shareIndex,
-    //   dynamicNonPMDD,
-    // );
-
-    const res = yield call(
-      s3Service.prepareShareUploadables,
-      payload.shareIndex,
-      payload.contactInfo.contactName,
-    ) // contact injection (requires database insertion)
-
-    if ( res.status === 200 ) {
-      const {
-        otp,
-        encryptedKey,
-        encryptedMetaShare,
-        messageId,
-        encryptedDynamicNonPMDD,
-      } = res.data
-
-      const shareUploadables: ShareUploadables = {
-        encryptedMetaShare,
-        messageId,
-        encryptedDynamicNonPMDD,
       }
-      const updatedSERVICES = {
-        ...SERVICES,
-        REGULAR_ACCOUNT: JSON.stringify( regularService ),
-        S3_SERVICE: JSON.stringify( s3Service ),
-        TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-        KEEPERS_INFO: JSON.stringify( keepersInfo ),
-      }
+      // TODO: reactivate DNP Transportation for Hexa Premium
+      // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+      // let dynamicNonPMDD;
+      // if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
 
-      const updatedBackup = {
-        ...DECENTRALIZED_BACKUP,
-        SHARES_TRANSFER_DETAILS: {
-          ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-          [ payload.shareIndex ]: {
-            OTP: otp,
-            ENCRYPTED_KEY: encryptedKey,
-            UPLOADED_AT: Date.now(),
+      // const res = yield call(
+      //   s3Service.uploadShare,
+      //   payload.shareIndex,
+      //   dynamicNonPMDD,
+      // );
+
+      const res = yield call(
+        s3Service.prepareShareUploadables,
+        payload.shareIndex,
+        payload.contactInfo.contactName,
+      ) // contact injection (requires database insertion)
+
+      if ( res.status === 200 ) {
+        const {
+          otp,
+          encryptedKey,
+          encryptedMetaShare,
+          messageId,
+          encryptedDynamicNonPMDD,
+        } = res.data
+
+        const shareUploadables: ShareUploadables = {
+          encryptedMetaShare,
+          messageId,
+          encryptedDynamicNonPMDD,
+        }
+        const updatedSERVICES = {
+          ...SERVICES,
+          REGULAR_ACCOUNT: JSON.stringify( regularService ),
+          S3_SERVICE: JSON.stringify( s3Service ),
+          TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+          KEEPERS_INFO: JSON.stringify( keepersInfo ),
+        }
+
+        const updatedBackup = {
+          ...DECENTRALIZED_BACKUP,
+          SHARES_TRANSFER_DETAILS: {
+            ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+            [ payload.shareIndex ]: {
+              OTP: otp,
+              ENCRYPTED_KEY: encryptedKey,
+              UPLOADED_AT: Date.now(),
+            },
           },
-        },
-      }
+        }
 
-      // yield call(insertDBWorker, {
-      //   payload: {
-      //     DECENTRALIZED_BACKUP: updatedBackup,
-      //     SERVICES: updatedSERVICES,
-      //   },
-      // });
+        // yield call(insertDBWorker, {
+        //   payload: {
+        //     DECENTRALIZED_BACKUP: updatedBackup,
+        //     SERVICES: updatedSERVICES,
+        //   },
+        // });
 
-      const updatedDB = {
-        DECENTRALIZED_BACKUP: updatedBackup,
-        SERVICES: updatedSERVICES,
-      }
+        const updatedDB = {
+          DECENTRALIZED_BACKUP: updatedBackup,
+          SERVICES: updatedSERVICES,
+        }
 
-      const contact =
+        const contact =
       trustedContacts.tc.trustedContacts[ payload.contactInfo.contactName ]
-      if ( contact && contact.symmetricKey ) {
-      // has trusted channel
-        const data: TrustedDataElements = {
-        // won't include elements from payload.data
-          shareTransferDetails: {
-            otp,
-            encryptedKey,
-          },
+        if ( contact && contact.symmetricKey ) {
+          // has trusted channel
+          const data: TrustedDataElements = {
+            // won't include elements from payload.data
+            shareTransferDetails: {
+              otp,
+              encryptedKey,
+            },
+          }
+          yield put(
+            updateTrustedChannel(
+              payload.contactInfo,
+              data,
+              null,
+              shareUploadables,
+              updatedDB,
+            ),
+          )
+        } else {
+          // adding transfer details to he ephemeral data
+
+          const data: EphemeralDataElements = {
+            ...payload.data,
+            shareTransferDetails: {
+              otp,
+              encryptedKey,
+            },
+          }
+
+          yield put(
+            updateEphemeralChannel(
+              payload.contactInfo,
+              data,
+              null,
+              null,
+              null,
+              shareUploadables,
+              updatedDB,
+            ),
+          )
         }
-        yield put(
-          updateTrustedChannel(
-            payload.contactInfo,
-            data,
-            null,
-            shareUploadables,
-            updatedDB,
-          ),
-        )
       } else {
-      // adding transfer details to he ephemeral data
-
-        const data: EphemeralDataElements = {
-          ...payload.data,
-          shareTransferDetails: {
-            otp,
-            encryptedKey,
-          },
-        }
-
-        yield put(
-          updateEphemeralChannel(
-            payload.contactInfo,
-            data,
-            null,
-            null,
-            null,
-            shareUploadables,
-            updatedDB,
-          ),
-        )
+        if ( res.err === 'ECONNABORTED' ) requestTimedout()
+        yield put( ErrorSending( true ) )
+        // Alert.alert('Upload Failed!', res.err);
+        console.log( {
+          err: res.err
+        } )
       }
-    } else {
-      if ( res.err === 'ECONNABORTED' ) requestTimedout()
-      yield put( ErrorSending( true ) )
-      // Alert.alert('Upload Failed!', res.err);
-      console.log( {
-        err: res.err
-      } )
+      yield put( switchS3Loader( 'uploadMetaShare' ) )
     }
-    yield put( switchS3Loader( 'uploadMetaShare' ) )
-  } 
+  }
 }
 
 export const uploadEncMetaShareWatcher = createWatcher(
@@ -537,8 +538,8 @@ function* uploadRequestedShareWorker( { payload } ) {
       yield put( requestedShareUploaded( tag, false, res.err ) )
     }
     yield put( switchS3Loader( 'uploadRequestedShare' ) )
-  } catch (error) {
-    console.log('RECOVERY error', error)
+  } catch ( error ) {
+    console.log( 'RECOVERY error', error )
     yield put( switchS3Loader( 'uploadRequestedShare' ) )
   }
 }
