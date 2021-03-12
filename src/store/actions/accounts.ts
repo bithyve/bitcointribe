@@ -167,11 +167,6 @@ export const validateTwoFA = ( token: number ) => {
   }
 }
 
-export const removeTwoFA = () => {
-  return {
-    type: REMOVE_TWO_FA,
-  }
-}
 export const fetchFeeAndExchangeRates = () => {
   return {
     type: FETCH_FEE_AND_EXCHANGE_RATES
