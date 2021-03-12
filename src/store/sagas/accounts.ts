@@ -852,6 +852,11 @@ export const blindRefreshWatcher = createWatcher(
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   let subAccountId: string
   let subAccountInstanceNum: number
+
+  const service = yield select(
+    ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
+  )
+
   switch ( subAccountInfo.kind ) {
       case SubAccountKind.DONATION_ACCOUNT:
         const donationInstance = yield call( setupDonationAccountWorker, {
@@ -874,10 +879,6 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
-        const service = yield select(
-          ( state ) => state.accounts[ subAccountInfo.kind ].service
-        )
-
         const accountDetails = {
           accountName: subAccountInfo.customDisplayName,
           accountDescription: subAccountInfo.customDescription,
