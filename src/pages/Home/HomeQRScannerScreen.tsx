@@ -18,6 +18,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 // TODO: The patterns here are meant to be the starting point for the way other
 // other screens that render QRCode scanners should lay out their components and
@@ -122,7 +123,13 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   return (
     <View style={styles.rootContainer}>
-      <ScrollView>
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        style={styles.rootContainer}
+      >
         <HeaderSection />
 
         <CoveredQRCodeScanner
@@ -140,7 +147,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             placeholder="Enter Address Manually"
             sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
             onAddressEntered={( address ) => {
-              onSend( address )
+              onSend( address, null, null )
             }}
           />
         </View>
@@ -184,7 +191,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         "
           />
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
     </View>
   )
 }
