@@ -50,7 +50,6 @@ import {
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
   addNewAccountShellWatcher,
@@ -64,7 +63,8 @@ import {
   autoSyncShellsWatcher,
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
-  fetchReceiveAddressWatcher
+  fetchReceiveAddressWatcher,
+  validateTwoFAWatcher
 } from './sagas/accounts'
 
 import {
@@ -155,7 +155,6 @@ const rootSaga = function* () {
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    removeTwoFAWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
@@ -171,6 +170,7 @@ const rootSaga = function* () {
     blindRefreshWatcher,
     getAllAccountsDataWatcher,
     fetchReceiveAddressWatcher,
+    validateTwoFAWatcher,
 
     // sss watchers
     initHCWatcher,
