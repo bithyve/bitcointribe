@@ -33,8 +33,15 @@ import {
   notificationTag,
   trustedChannelActions,
 } from '../../bitcoin/utilities/Interface'
-import { calculateOverallHealth, downloadMShare, uploadEncMShare } from '../actions/sss'
+import {
+  calculateOverallHealth,
+  updateWalletImage,
+  downloadMShare as downloadMShareSSS,
+  uploadEncMShare
+} from '../actions/sss'
+import { downloadMShare as downloadMShareHealth } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+//import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
@@ -48,6 +55,7 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import Toast from '../../components/Toast'
 import { downloadMetaShareWorker } from './sss'
+import { downloadMetaShareWorker as downloadMetaShareWorkerKeeper } from './health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
 import { ContactInfo, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
@@ -262,61 +270,70 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
     }
   }
-}
 
 function* approveTrustedContactWorker( { payload } ) {
-  const trustedContacts: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
-  )
+  try {
+    const trustedContacts: TrustedContactsService = yield select(
+      ( state ) => state.trustedContacts.service,
+    )
 
-  const {
-    contactInfo,
-    contactsPublicKey,
-    contactsWalletName,
-    isGuardian,
-  } = payload
+    const {
+      contactInfo,
+      contactsPublicKey,
+      contactsWalletName,
+      isGuardian,
+      isFromKeeper
+    } = payload
 
-  let encKey
-  if ( contactInfo.info ) encKey = SSS.strechKey( contactInfo.info )
-  const res = yield call(
-    trustedContacts.finalizeContact,
-    contactInfo.contactName,
-    contactsPublicKey,
-    encKey,
-    contactsWalletName,
-    isGuardian,
-  )
-  if ( res.status === 200 ) {
-    if ( payload.updateEphemeralChannel ) {
-      const uploadXpub = true
-      const data = {
-        DHInfo: {
-          publicKey: res.data.publicKey,
-        },
-      }
-      yield put(
-        updateEphemeralChannel(
-          contactInfo,
-          data,
-          true,
-          trustedContacts,
-          uploadXpub,
-        ),
-      )
-    } else {
-      const { SERVICES } = yield select( ( state ) => state.storage.database )
-      const updatedSERVICES = {
-        ...SERVICES,
-        TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-      }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
+    let encKey
+    if ( contactInfo.info ) encKey = SSS.strechKey( contactInfo.info )
+    const res = yield call(
+      trustedContacts.finalizeContact,
+      contactInfo.contactName,
+      contactsPublicKey,
+      encKey,
+      contactsWalletName,
+      isGuardian,
+    )
+    if ( res.status === 200 ) {
+      if ( payload.updateEphemeralChannel ) {
+        const uploadXpub = true
+        const data = {
+          DHInfo: {
+            publicKey: res.data.publicKey,
+          },
         }
-      } )
+        yield put(
+          updateEphemeralChannel(
+            {
+              ...contactInfo, walletName: contactsWalletName
+            },
+            data,
+            true,
+            trustedContacts,
+            uploadXpub,
+            null,
+            null,
+            isFromKeeper,
+          ),
+        )
+      } else {
+        const { SERVICES } = yield select( ( state ) => state.storage.database )
+        const updatedSERVICES = {
+          ...SERVICES,
+          TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+        }
+        yield call( insertDBWorker, {
+          payload: {
+            SERVICES: updatedSERVICES
+          }
+        } )
+      }
+    } else {
+      console.log( res.err )
     }
-  } else {
-    console.log( res.err )
+  } catch ( error ) {
+    console.log( 'error', error )
   }
 }
 
@@ -732,6 +749,7 @@ function* fetchEphemeralChannelWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
+  const isNewHealthSystemSet = yield select( ( state ) => state.setupAndAuth.isNewHealthSystemSet )
 
   const { contactInfo, approveTC, publicKey } = payload // if publicKey: fetching just the payment details
   const encKey = SSS.strechKey( contactInfo.info )
@@ -758,7 +776,12 @@ function* fetchEphemeralChannelWorker( { payload } ) {
 
     if ( data && data.shareTransferDetails ) {
       const { otp, encryptedKey } = data.shareTransferDetails
-      downloadMShare( encryptedKey, otp )
+      if( isNewHealthSystemSet ) downloadMShareHealth( {
+        encryptedKey, otp
+      } )
+      else downloadMShareSSS( {
+        encryptedKey, otp
+      } )
     }
 
     yield put( ephemeralChannelFetched( contactInfo.contactName, data ) )
@@ -854,6 +877,7 @@ function* fetchTrustedChannelWorker( { payload } ) {
     const data: TrustedDataElements = res.data.data
     yield put( trustedChannelFetched( contactInfo.contactName, data ) )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const isNewHealthSystemSet = yield select( ( state ) => state.setupAndAuth.isNewHealthSystemSet )
     const updatedSERVICES = {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
@@ -869,7 +893,12 @@ function* fetchTrustedChannelWorker( { payload } ) {
         Toast( 'You have been successfully added as a Keeper' )
         const { otp, encryptedKey } = data.shareTransferDetails
         // yield delay(1000); // introducing delay in order to evade database insertion collision
-        yield put( downloadMShare( encryptedKey, otp ) )
+        if( isNewHealthSystemSet ) yield put( downloadMShareHealth( {
+          encryptedKey, otp, walletName: contactsWalletName
+        } ) )
+        else yield put( downloadMShareSSS( {
+          encryptedKey, otp, walletName: contactsWalletName
+        } ) )
       }
     }
   } else {
@@ -1187,8 +1216,7 @@ function* walletCheckInWorker( { payload } ) {
   const walletCheckInLoading: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.loading.walletCheckIn,
   )
-
-  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
+  const s3Service: S3Service = yield select( ( state ) => state.health.service )
 
   const storedExchangeRates = yield select(
     ( state ) => state.accounts.exchangeRates,

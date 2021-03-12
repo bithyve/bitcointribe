@@ -968,7 +968,7 @@ const VoucherScanner = ( props ) => {
                 }}
               >
                 <ImageBackground
-                  source={require( '../../assets/images/icons/iPhone-QR.jpg' )}
+                  source={require( '../../assets/images/icons/iPhone-QR.png' )}
                   style={styles.cameraImage}
                 >
                   <View style={{

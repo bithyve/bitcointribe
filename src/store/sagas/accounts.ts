@@ -8,7 +8,6 @@ import {
   accountsSynched,
   settedDonationAccount,
   FETCH_BALANCE_TX,
-  secondaryXprivGenerated,
   GENERATE_SECONDARY_XPRIV,
   RESET_TWO_FA,
   twoFAResetted,
@@ -17,6 +16,7 @@ import {
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
+  secondaryXprivGenerated,
   ADD_NEW_ACCOUNT_SHELL,
   newAccountShellAdded,
   newAccountShellAddFailed,
@@ -384,11 +384,12 @@ function* generateSecondaryXprivWorker( { payload } ) {
   const service = yield select(
     ( state ) => state.accounts[ payload.serviceType ].service
   )
+  console.log( 'service', service )
 
   const { generated } = service.generateSecondaryXpriv(
     payload.secondaryMnemonic
   )
-
+  console.log( 'generated', generated )
   if ( generated ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
@@ -532,7 +533,7 @@ export const feeAndExchangeRatesWatcher = createWatcher(
 
 function* resetTwoFAWorker( { payload } ) {
   const service = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
   const res = yield call( service.resetTwoFA, payload.secondaryMnemonic )
@@ -551,7 +552,7 @@ export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
 
 function* validateTwoFAWorker( { payload } ) {
   const service: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
   const res = yield call( service.validate2FASetup, payload.token )

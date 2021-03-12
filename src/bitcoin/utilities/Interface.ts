@@ -112,9 +112,14 @@ export interface MetaShare {
     tag: string;
     timestamp: string;
     reshareVersion: number;
+    questionId: string;
+    question?: string;
+    keeper?:string;
+    keeperInfo?: string;
     guardian?: string;
+    encryptedKeeperInfo?: string;
   };
-  encryptedStaticNonPMDD: string;
+  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {
@@ -139,7 +144,7 @@ export interface BuddyStaticNonPMDD {
 export interface ShareUploadables {
   encryptedMetaShare: string;
   messageId: string;
-  encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
 }
 
 export interface DerivativeAccountElements {
@@ -297,6 +302,13 @@ export interface DerivativeAccounts {
 
 export enum notificationType {
   contact = 'contact',
+  approveKeeper = 'approveKeeper',
+  uploadSecondaryShare = 'uploadSecondaryShare',
+  reShare = 'reShare',
+  reShareResponse = 'reShareResponse',
+  smUploadedForPK = 'smUploadedForPK',
+  newFCM = 'newFCM',
+  newKeeperInfo = 'newKeeperInfo',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -339,6 +351,7 @@ export interface EphemeralDataElements {
   };
   trustedAddress?: string;
   trustedTestAddress?: string;
+  restoreOf?: string;
 }
 
 export interface EphemeralData {
@@ -374,6 +387,19 @@ export interface TrustedDataElements {
   removeGuardian?: boolean;
   remove?: boolean;
   version?: string;
+  isPrimary?: boolean;
+  featuresList?: any;
+  xPub?: any;
+  securityQuestion?: any;
+  metaShare? : MetaShare;
+  pdfShare? : MetaShare;
+  secondaryMnemonics?: string;
+  twoFASetup?: {
+      qrData: string;
+      secret: string;
+  };
+  secondaryShare?: MetaShare[];
+  keeperInfo?: string;
 }
 export interface TrustedData {
   publicKey: string;
@@ -436,6 +462,74 @@ export interface EncryptedImage {
   SERVICES?: string;
   ASYNC_DATA?: string;
   STATE_DATA?: string;
+}
+
+export interface Keepers {
+  [shareId: string]: {
+    shareType?: string;
+    privateKey?: string;
+    publicKey?: string;
+    shareTransferDetails?: {
+      otp?: string;
+      encryptedKey?: string;
+    };
+    symmetricKey?: string;
+    secondaryKey?: string;
+    keeperPubKey?: string;
+    walletName?: string;
+    walletID?: string;
+    FCMs?: string[];
+    ephemeralChannel?: {
+      address: string;
+      initiatedAt?: number;
+      data?: EphemeralDataElements[];
+    };
+    trustedChannel?: {
+      address: string;
+      data?: TrustedData[];
+    };
+    keeperUUID?: string;
+    keeperFeatureList?: any[],
+    isPrimary?: Boolean
+  }
+}
+
+// TRUSTED Keeper
+export interface EphemeralDataElementsForKeeper {
+  publicKey?: string;
+  walletID?: string;
+  hexaID?: string;
+  FCM?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
+  xPub? : any;
+  securityQuestion?: any;
+  featuresList?: any;
+  isPrimary?: boolean;
+}
+
+export interface EphemeralDataForKeeper {
+  publicKey: string;
+  data: EphemeralDataElementsForKeeper;
+}
+
+export interface LevelHealthInterface {
+  levelInfo: LevelInfo[];
+}
+
+export interface LevelInfo {
+  shareType: string;
+  updatedAt: number;
+  status: string;
+  shareId: string;
+  reshareVersion?: number;
+  name?: string;
 }
 //VersionHistory
 export interface VersionHistory {

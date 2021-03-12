@@ -44,6 +44,7 @@ import {
   UploadSuccessfully,
   uploadEncMShare,
 } from '../../store/actions/sss'
+import {  uploadRequestedSMShare, UploadSMSuccessfully } from '../../store/actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import config from '../../bitcoin/HexaConfig'
@@ -129,6 +130,9 @@ interface ContactDetailsPropTypes {
   uploadRequestedShare: any;
   addNewSecondarySubAccount: any;
   removeTrustedContact: any;
+  uploadRequestedSMShare: any;
+  uploadSMSuccessfullyFlag: Boolean;
+  UploadSMSuccessfully: any;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -143,6 +147,7 @@ interface ContactDetailsStateTypes {
   encryptedExitKey: string;
   key: string;
   trustedContactHistory: any;
+  SMShareQR: string;
 }
 
 class ContactDetails extends PureComponent<
@@ -181,6 +186,7 @@ class ContactDetails extends PureComponent<
       errorMessageHeader: '',
       trustedLink: '',
       trustedQR: '',
+      SMShareQR: '',
       encryptedExitKey: '',
       trustedContactHistory: [
         {
@@ -257,6 +263,9 @@ class ContactDetails extends PureComponent<
     }
     if ( prevProps.uploadSuccessfull !== this.props.uploadSuccessfull ) {
       this.generateHelpRestoreQR()
+    }
+    if ( prevProps.uploadSMSuccessfullyFlag !== this.props.uploadSMSuccessfullyFlag ) {
+      this.generateHelpRestoreQR( true )
     }
     if ( prevProps.errorSending !== this.props.errorSending ) {
       this.setState( {
@@ -473,8 +482,8 @@ class ContactDetails extends PureComponent<
     }
   };
 
-  generateHelpRestoreQR = () => {
-    const { trustedContacts, UNDER_CUSTODY, UploadSuccessfully } = this.props
+  generateHelpRestoreQR = ( isSmKey? ) => {
+    const { trustedContacts, UNDER_CUSTODY, UploadSuccessfully, UploadSMSuccessfully } = this.props
     if ( !this.Contact ) {
       Alert.alert( 'Contact details missing' )
       return
@@ -497,32 +506,54 @@ class ContactDetails extends PureComponent<
       return
     }
 
-    const requester =
-      trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
+    const requester = trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
     const appVersion = DeviceInfo.getVersion()
-    if (
-      UNDER_CUSTODY[ requester ] &&
-      UNDER_CUSTODY[ requester ].TRANSFER_DETAILS &&
-      Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT <
-        config.TC_REQUEST_EXPIRY
-    ) {
-      const { KEY, UPLOADED_AT } = UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
-
-      this.setState( {
-        trustedQR: JSON.stringify( {
+    if( isSmKey ){
+      if (
+        UNDER_CUSTODY[ requester ] &&
+        UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS &&
+        Date.now() - UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS.UPLOADED_AT <
+          config.TC_REQUEST_EXPIRY
+      ) {
+        const { KEY, UPLOADED_AT } = UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS
+        const qrString = JSON.stringify( {
           requester: requester,
           publicKey: KEY,
           uploadedAt: UPLOADED_AT,
           type: 'ReverseRecoveryQR',
           ver: appVersion,
-        } ),
-      } )
-
-      setTimeout( () => {
-        ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
-      }, 2 )
-
-      UploadSuccessfully( null )
+        } )
+        this.setState( {
+          trustedQR: qrString
+        } )
+        setTimeout( () => {
+          ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
+        }, 2 )
+        UploadSMSuccessfully( null )
+      }
+    } else {
+      if (
+        UNDER_CUSTODY[ requester ] &&
+        UNDER_CUSTODY[ requester ].TRANSFER_DETAILS &&
+        Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT <
+          config.TC_REQUEST_EXPIRY
+      ) {
+        const { KEY, UPLOADED_AT } = UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
+        const qrString = JSON.stringify( {
+          requester: requester,
+          publicKey: KEY,
+          uploadedAt: UPLOADED_AT,
+          type: 'ReverseRecoveryQR',
+          ver: appVersion,
+        } )
+        this.setState( {
+          trustedQR: qrString
+        } )
+        setTimeout( () => {
+          ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
+        }, 2 )
+        UploadSuccessfully( null )
+      }
     }
   };
 
@@ -559,8 +590,8 @@ class ContactDetails extends PureComponent<
     }
   };
 
-  onHelpRestore = () => {
-    const { trustedContacts, UNDER_CUSTODY, uploadRequestedShare } = this.props
+  onHelpRestore = ( isSmKey? ) => {
+    const { trustedContacts, UNDER_CUSTODY, uploadRequestedShare, uploadRequestedSMShare } = this.props
     if ( !this.Contact ) {
       console.log( 'Err: Contact missing' )
       return
@@ -585,19 +616,35 @@ class ContactDetails extends PureComponent<
     const requester =
       trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
     const encryptionKey = S3Service.generateRequestCreds().key
-
-    if (
-      !UNDER_CUSTODY[ requester ] ||
-      !UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
-    ) {
-      uploadRequestedShare( requester, encryptionKey )
-    } else if (
-      Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT >
-      config.TC_REQUEST_EXPIRY
-    ) {
-      uploadRequestedShare( requester, encryptionKey )
-    } else {
-      this.generateHelpRestoreQR()
+    if( isSmKey ){
+      if (
+        !UNDER_CUSTODY[ requester ] ||
+        !UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS
+      ) {
+        uploadRequestedSMShare( requester, encryptionKey )
+      } else if (
+        Date.now() - UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS.UPLOADED_AT >
+        config.TC_REQUEST_EXPIRY
+      ) {
+        uploadRequestedSMShare( requester, encryptionKey )
+      } else {
+        this.generateHelpRestoreQR( true )
+      }
+    }
+    else{
+      if (
+        !UNDER_CUSTODY[ requester ] ||
+        !UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
+      ) {
+        uploadRequestedShare( requester, encryptionKey )
+      } else if (
+        Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT >
+        config.TC_REQUEST_EXPIRY
+      ) {
+        uploadRequestedShare( requester, encryptionKey )
+      } else {
+        this.generateHelpRestoreQR()
+      }
     }
   };
 
@@ -863,6 +910,7 @@ class ContactDetails extends PureComponent<
       />
     )
   };
+
   renderSendViaQRContents = () => {
     return (
       <SendViaQR
@@ -882,6 +930,7 @@ class ContactDetails extends PureComponent<
       />
     )
   };
+
   renderSendViaQRHeader = () => {
     return (
       <ModalHeader
@@ -892,6 +941,7 @@ class ContactDetails extends PureComponent<
       />
     )
   };
+
   renderExitKeyQRContents = () => {
     return (
       <SendViaQR
@@ -1212,7 +1262,7 @@ class ContactDetails extends PureComponent<
                   ...styles.bottomButton,
                   opacity: this.Contact.isWard ? 1 : 0.5,
                 }}
-                onPress={this.onHelpRestore}
+                onPress={()=>this.onHelpRestore()}
               >
                 <Image
                   source={require( '../../assets/images/icons/icon_restore.png' )}
@@ -1227,6 +1277,22 @@ class ContactDetails extends PureComponent<
                   {/* <Text numberOfLines={1} style={styles.buttonInfo}>
                     Lorem ipsum dolor
                   </Text> */}
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{
+                  ...styles.bottomButton,
+                }}
+                onPress={() => this.onHelpRestore( true )}
+              >
+                <Image
+                  source={require( '../../assets/images/icons/icon_restore.png' )}
+                  style={styles.buttonImage}
+                />
+                <View>
+                  <Text style={styles.buttonText}>
+                    Help SM Key
+                  </Text>
                 </View>
               </TouchableOpacity>
               {encryptedExitKey ? (
@@ -1401,6 +1467,7 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
     ),
+    uploadSMSuccessfullyFlag: idx( state, ( _ ) => _.health.uploadSMSuccessfullyFlag ),
   }
 }
 export default connect( mapStateToProps, {
@@ -1411,6 +1478,8 @@ export default connect( mapStateToProps, {
   uploadRequestedShare,
   ErrorSending,
   removeTrustedContact,
+  uploadRequestedSMShare,
+  UploadSMSuccessfully
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {

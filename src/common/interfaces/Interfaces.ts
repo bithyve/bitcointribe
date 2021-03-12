@@ -30,9 +30,15 @@ export interface DecentralizedBackup {
         KEY: string;
         UPLOADED_AT: number;
       };
+      SM_TRANSFER_DETAILS?: {
+        KEY: string;
+        UPLOADED_AT: number;
+      }
+      SECONDARY_SHARE?: MetaShare;
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;
+  PK_SHARE?: MetaShare
 }
 
 export interface ServicesJSON {
@@ -41,6 +47,7 @@ export interface ServicesJSON {
   SECURE_ACCOUNT: string;
   S3_SERVICE: string;
   TRUSTED_CONTACTS: string;
+  KEEPERS_INFO?: string;
 }
 
 export interface Database {
@@ -50,5 +57,5 @@ export interface Database {
   };
   DECENTRALIZED_BACKUP: DecentralizedBackup;
   SERVICES?: ServicesJSON;
-  VERSION: string;
+  VERSION?: String;
 }

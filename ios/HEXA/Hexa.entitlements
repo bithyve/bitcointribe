@@ -14,8 +14,8 @@
 	</array>
 	<key>com.apple.developer.icloud-services</key>
 	<array>
-		<string>CloudKit</string>
 		<string>CloudDocuments</string>
+		<string>CloudKit</string>
 	</array>
 	<key>com.apple.developer.ubiquity-container-identifiers</key>
 	<array>

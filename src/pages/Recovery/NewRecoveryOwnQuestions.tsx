@@ -54,12 +54,13 @@ export default function NewRecoveryOwnQuestions( props ) {
 
   const [ visibleButton, setVisibleButton ] = useState( false )
 
-  const { insertedIntoDB } = useSelector( ( state ) => state.storage )
-  useEffect( () => {
-    ( async () => {
-      if ( insertedIntoDB ) {
-        await AsyncStorage.setItem( 'recoveryExists', 'true' )
-        props.navigation.navigate( 'RestoreSelectedContactsList' )
+  const { insertedIntoDB } = useSelector((state) => state.storage);
+  useEffect(() => {
+    (async () => {
+      if (insertedIntoDB) {
+        await AsyncStorage.setItem('recoveryExists', 'true');
+        props.navigation.navigate('RestoreWithICloud');
+        // props.navigation.navigate('RestoreSelectedContactsList');
       }
     } )()
   }, [ insertedIntoDB ] )

@@ -37,12 +37,13 @@ export default function RecoveryQuestionScreen( props ) {
   const [ answer, setAnswer ] = useState( '' )
   const [ dropdownBoxList ] = useState( QuestionList )
 
-  const { insertedIntoDB } = useSelector( state => state.storage )
-  useEffect( () => {
-    ( async () => {
-      if ( insertedIntoDB ) {
-        await AsyncStorage.setItem( 'recoveryExists', 'true' )
-        props.navigation.navigate( 'RestoreSelectedContactsList' )
+  const { insertedIntoDB } = useSelector(state => state.storage);
+  useEffect(() => {
+    (async () => {
+      if (insertedIntoDB) {
+        await AsyncStorage.setItem('recoveryExists', 'true');
+        props.navigation.navigate('RestoreWithICloud');
+        //props.navigation.navigate('RestoreSelectedContactsList');
       }
     } )()
   }, [ insertedIntoDB ] )

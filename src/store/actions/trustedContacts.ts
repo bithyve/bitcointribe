@@ -35,6 +35,7 @@ export const approveTrustedContact = (
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
   isGuardian?: boolean,
+  isFromKeeper?: boolean,
 ) => {
   return {
     type: APPROVE_TRUSTED_CONTACT,
@@ -44,6 +45,7 @@ export const approveTrustedContact = (
       updateEphemeralChannel,
       contactsWalletName,
       isGuardian,
+      isFromKeeper,
     },
   }
 }
@@ -59,13 +61,14 @@ export const removeTrustedContact = ( contactName, shareIndex? ) => {
 }
 
 export const updateEphemeralChannel = (
-  contactInfo: { contactName: string; info: string },
+  contactInfo: { contactName: string; info: string, walletName?: string; },
   data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
   shareUploadables?: ShareUploadables,
   updatedDB?: any,
+  isFromKeeper?: boolean
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
@@ -77,6 +80,7 @@ export const updateEphemeralChannel = (
       uploadXpub,
       shareUploadables,
       updatedDB,
+      isFromKeeper,
     },
   }
 }

@@ -37,7 +37,7 @@ import { TEST_ACCOUNT } from '../common/constants/wallet-service-types'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-
+import CloudBackup from '../common/CommonFunctions/CloudBackup'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -99,11 +99,12 @@ export default function NewOwnQuestions( props ) {
     ( async () => {
       if ( isLoaderStart ) {
         const security = {
+          questionId: '0',
           question: question,
           answer,
         }
-        dispatch( initializeSetup( walletName, security ) );
-        dispatch(setVersion('Current'));
+        dispatch( initializeSetup( walletName, security ) )
+        dispatch( setVersion( 'Current' ) )
         const current = Date.now()
         await AsyncStorage.setItem(
           'SecurityAnsTimestamp',
@@ -170,21 +171,37 @@ export default function NewOwnQuestions( props ) {
     }
   }, [ confirmAnswer ] )
 
+  const googleCloudLoginCallback = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 1 )
+    seLoaderMessages()
+    setTimeout( () => {
+      setElevation( 0 )
+    }, 0.2 )
+    setTimeout( () => {
+      setIsLoaderStart( true )
+      setIsEditable( false )
+      setIsDisabled( true )
+    }, 2 )
+  }
+
+  const onPressConfirm = () => {
+    if ( Platform.OS === 'android' ) {
+      const cloudObject = new CloudBackup( {
+        googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback,
+      } )
+      cloudObject.GoogleDriveLogin( {
+        googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback
+      } )
+    }
+    else {
+      googleCloudLoginCallback()
+    }
+  }
+
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={() => {
-          ( loaderBottomSheet as any ).current.snapTo( 1 )
-          seLoaderMessages()
-          setTimeout( () => {
-            setElevation( 0 )
-          }, 0.2 )
-          setTimeout( () => {
-            setIsLoaderStart( true )
-            setIsEditable( false )
-            setIsDisabled( true )
-          }, 2 )
-        }}
+        onPress={() => walletName ? onPressConfirm() : null}
         style={{
           ...styles.buttonView, elevation: Elevation
         }}
@@ -329,8 +346,8 @@ export default function NewOwnQuestions( props ) {
                   }}
                 />
               </View>
-              {question ? (
-                <View style={{
+              {question ?
+                ( <View style={{
                   marginTop: 15
                 }}>
                   <View
@@ -362,6 +379,7 @@ export default function NewOwnQuestions( props ) {
                           : 'visible-password'
                       }
                       onChangeText={( text ) => {
+
                         setAnswer( text )
                         setAnswerMasked( text )
                       }}
@@ -477,7 +495,7 @@ export default function NewOwnQuestions( props ) {
                     </Text>
                   )}
                 </View>
-              ) : null}
+                ) : null}
               <View
                 style={{
                   marginLeft: 20,
@@ -499,46 +517,46 @@ export default function NewOwnQuestions( props ) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        </KeyboardAvoidingView>
-        <View style={{
-          ...styles.bottomButtonView
-        }}>
-          {(
-            answer.trim() == confirmAnswer.trim() &&
+      </KeyboardAvoidingView>
+      <View style={{
+        ...styles.bottomButtonView
+      }}>
+        {(
+          answer.trim() == confirmAnswer.trim() &&
             confirmAnswer.trim() &&
             answer.trim() && answerError.length == 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View>
+        ) && (
+          setButtonVisible()
+        ) || null}
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
-        {!visibleButton ? (
-          <View
-            style={{
-              marginBottom:
+      </View>
+      {!visibleButton ? (
+        <View
+          style={{
+            marginBottom:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-            }}
-          >
-            <BottomInfoBox
-              title={'This answer is used to encrypt your wallet'}
-              infoText={'It is extremely important that only you'}
-              italicText={' know and remember the answer'}
-            />
-          </View>
-        ) : null}
-        <BottomSheet
-          onCloseEnd={() => {}}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
-      
+          }}
+        >
+          <BottomInfoBox
+            title={'This answer is used to encrypt your wallet'}
+            infoText={'It is extremely important that only you'}
+            italicText={' know and remember the answer'}
+          />
+        </View>
+      ) : null}
+      <BottomSheet
+        onCloseEnd={() => { }}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[ -50, hp( '100%' ) ]}
+        renderContent={renderLoaderModalContent}
+        renderHeader={renderLoaderModalHeader}
+      />
+
     </View>
   )
 }

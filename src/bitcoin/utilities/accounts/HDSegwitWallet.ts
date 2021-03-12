@@ -2207,9 +2207,9 @@ export default class HDSegwitWallet extends Bitcoin {
     throw new Error( 'Could not find private key for: ' + address )
   };
 
-  private getXpub = () => {
-    if ( this.xpub ) {
-      return this.xpub
+  public getXpub = () => {
+    if (this.xpub) {
+      return this.xpub;
     }
     const seed = bip39.mnemonicToSeedSync( this.mnemonic, this.passphrase )
     const root = bip32.fromSeed( seed, this.network )

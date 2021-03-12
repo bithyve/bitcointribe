@@ -85,6 +85,7 @@ import Toast from '../../components/Toast'
 import Mailer from 'react-native-mail'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
+import KeeperService from '../../bitcoin/services/KeeperService'
 import {
   remapAccountShells,
   restoredAccountShells,
@@ -115,6 +116,9 @@ function* generateMetaSharesWorker() {
   const { walletName } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP,
   )
+  const { questionId, question } = yield select(
+    ( state ) => state.storage.database.WALLET_SETUP.security,
+  )
   const secureAccount: SecureAccount = yield select(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
@@ -136,23 +140,27 @@ function* generateMetaSharesWorker() {
   const appVersion = DeviceInfo.getVersion()
 
   if ( s3Service.sss.metaShares.length ) return
-  const res = yield call(
-    s3Service.createMetaShares,
-    secureAssets,
-    walletName,
-    appVersion,
-  )
-  if ( res.status === 200 ) {
-    return s3Service
-    // const { SERVICES } = yield select(state => state.storage.database);
-    // const updatedSERVICES = {
-    //   ...SERVICES,
-    //   S3_SERVICE: JSON.stringify(s3Service)
-    // };
-    // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( res.err )
+  if( secondaryMnemonic ) {
+    const res = yield call(
+      s3Service.createMetaShares,
+      secureAssets,
+      walletName,
+      questionId,
+      appVersion,
+      questionId === '0' ? question: '',
+    )
+    if ( res.status === 200 ) {
+      return s3Service
+      // const { SERVICES } = yield select(state => state.storage.database);
+      // const updatedSERVICES = {
+      //   ...SERVICES,
+      //   S3_SERVICE: JSON.stringify(s3Service)
+      // };
+      // yield put(insertIntoDB({ SERVICES: updatedSERVICES }));
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      throw new Error( res.err )
+    }
   }
 }
 
@@ -168,29 +176,32 @@ function* initHCWorker() {
 
   yield put( switchS3Loader( 'initHC' ) )
   if ( !s3Service.sss.metaShares.length ) {
+    console.log( 'initHCWorker s3Service.sss.metaShares.length', s3Service.sss.metaShares )
     s3Service = yield call( generateMetaSharesWorker ) // executes once (during initial setup)
   }
-  const res = yield call( s3Service.initializeHealthcheck )
-  if ( res.status === 200 ) {
-    yield put( healthCheckInitialized() )
+  if( s3Service ) {
+    const res = yield call( s3Service.initializeHealth )
+    if ( res.status === 200 ) {
+      yield put( healthCheckInitialized() )
 
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      S3_SERVICE: JSON.stringify( s3Service ),
-    }
-    console.log( 'Health Check Initialized' )
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
+      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const updatedSERVICES = {
+        ...SERVICES,
+        S3_SERVICE: JSON.stringify( s3Service ),
       }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    console.log( {
-      err: res.err
-    } )
-    yield put( switchS3Loader( 'initHC' ) )
+      console.log( 'Health Check Initialized' )
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES
+        }
+      } )
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      console.log( {
+        err: res.err
+      } )
+      yield put( switchS3Loader( 'initHC' ) )
+    }
   }
 }
 
@@ -198,215 +209,218 @@ export const initHCWatcher = createWatcher( initHCWorker, INIT_HEALTH_CHECK )
 
 function* uploadEncMetaShareWorker( { payload } ) {
   // Transfer: User >>> Guardian
-  yield put( switchS3Loader( 'uploadMetaShare' ) )
+  
+    yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-  const s3Service: S3Service = yield select( ( state ) => state.sss.service )
-  if ( !s3Service.sss.metaShares.length ) return
-  const trustedContacts: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
-  )
-  const regularService: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
+    const s3Service: S3Service = yield select( ( state ) => state.sss.service )
+    console.log( 's3Service', s3Service )
+    if ( !s3Service.sss.metaShares.length ) return
+    const trustedContacts: TrustedContactsService = yield select(
+      ( state ) => state.trustedContacts.service,
+    )
+    const keepersInfo: KeeperService = yield select(
+      ( state ) => state.keeper.service,
+    )
+    const regularService: RegularAccount = yield select(
+      ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+    )
 
-  const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
-    ( state ) => state.storage.database,
-  )
+    const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
+      ( state ) => state.storage.database,
+    )
 
-  if ( payload.changingGuardian ) {
-    if ( payload.contactInfo.contactName === 'secondary device' ) {
-      delete trustedContacts.tc.trustedContacts[
-        payload.contactInfo.contactName
-      ] // removing secondary device's TC
-      const accountNumber =
+    if ( payload.changingGuardian ) {
+      if ( payload.contactInfo.contactName === 'secondary device' ) {
+        delete trustedContacts.tc.trustedContacts[
+          payload.contactInfo.contactName
+        ] // removing secondary device's TC
+        const accountNumber =
         regularService.hdWallet.trustedContactToDA[
           payload.contactInfo.contactName
         ]
-      if ( accountNumber ) {
-        delete regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
-          accountNumber
-        ].contactDetails // removing previous SDs xpub
-      }
-    }
-
-    yield call( s3Service.reshareMetaShare, payload.shareIndex )
-    if ( payload.previousGuardianName ) {
-      trustedContacts.tc.trustedContacts[
-        payload.previousGuardianName
-      ].isGuardian = false
-
-      const {
-        walletID,
-        FCMs,
-        trustedChannel,
-      } = trustedContacts.tc.trustedContacts[ payload.previousGuardianName ]
-
-      if ( trustedChannel ) {
-        // dispatching remove share action to the previous guardian
-        const dataElements = {
-          removeGuardian: true
+        if ( accountNumber ) {
+          delete regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
+            accountNumber
+          ].contactDetails // removing previous SDs xpub
         }
+      }
 
-        const res = yield call(
-          trustedContacts.updateTrustedChannel,
-          payload.previousGuardianName,
-          dataElements,
-        )
+      yield call( s3Service.reshareMetaShare, payload.shareIndex )
+      if ( payload.previousGuardianName ) {
+        trustedContacts.tc.trustedContacts[
+          payload.previousGuardianName
+        ].isGuardian = false
 
-        if ( res.status === 200 ) {
-          if ( walletID && FCMs ) {
-            const recipient = {
-              walletID,
-              FCMs,
+        const {
+          walletID,
+          FCMs,
+          trustedChannel,
+        } = trustedContacts.tc.trustedContacts[ payload.previousGuardianName ]
+
+        if ( trustedChannel ) {
+        // dispatching remove share action to the previous guardian
+          const dataElements = {
+            removeGuardian: true
+          }
+
+          const res = yield call(
+            trustedContacts.updateTrustedChannel,
+            payload.previousGuardianName,
+            dataElements,
+          )
+
+          if ( res.status === 200 ) {
+            if ( walletID && FCMs ) {
+              const recipient = {
+                walletID,
+                FCMs,
+              }
+              const { walletName } = yield select(
+                ( state ) => state.storage.database.WALLET_SETUP,
+              )
+
+              const notification: INotification = {
+                notificationType: notificationType.contact,
+                title: 'Friends and Family notification',
+                body: `Removed as a Keeper by ${walletName}`,
+                data: {
+                },
+                tag: notificationTag.IMP,
+              }
+              sendNotification( recipient, notification )
             }
-            const { walletName } = yield select(
-              ( state ) => state.storage.database.WALLET_SETUP,
-            )
-
-            const notification: INotification = {
-              notificationType: notificationType.contact,
-              title: 'Friends and Family notification',
-              body: `Removed as a Keeper by ${walletName}`,
-              data: {
-              },
-              tag: notificationTag.IMP,
-            }
-            sendNotification( recipient, notification )
           }
         }
       }
-    }
-  } else {
+    } else {
     // preventing re-uploads till expiry
-    if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ] ) {
-      if (
-        Date.now() -
+      if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ] ) {
+        if (
+          Date.now() -
         DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ payload.shareIndex ]
           .UPLOADED_AT <
         config.TC_REQUEST_EXPIRY
-      ) {
+        ) {
         // re-upload after 10 minutes (removal sync w/ relayer)
-        yield put( switchS3Loader( 'uploadMetaShare' ) )
+          yield put( switchS3Loader( 'uploadMetaShare' ) )
 
-        return
+    }
+    // TODO: reactivate DNP Transportation for Hexa Premium
+    // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
+    // let dynamicNonPMDD;
+    // if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
+
+    // const res = yield call(
+    //   s3Service.uploadShare,
+    //   payload.shareIndex,
+    //   dynamicNonPMDD,
+    // );
+
+    const res = yield call(
+      s3Service.prepareShareUploadables,
+      payload.shareIndex,
+      payload.contactInfo.contactName,
+    ) // contact injection (requires database insertion)
+
+    if ( res.status === 200 ) {
+      const {
+        otp,
+        encryptedKey,
+        encryptedMetaShare,
+        messageId,
+        encryptedDynamicNonPMDD,
+      } = res.data
+
+      const shareUploadables: ShareUploadables = {
+        encryptedMetaShare,
+        messageId,
+        encryptedDynamicNonPMDD,
       }
-    }
-  }
+      const updatedSERVICES = {
+        ...SERVICES,
+        REGULAR_ACCOUNT: JSON.stringify( regularService ),
+        S3_SERVICE: JSON.stringify( s3Service ),
+        TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+        KEEPERS_INFO: JSON.stringify( keepersInfo ),
+      }
 
-  // TODO: reactivate DNP Transportation for Hexa Premium
-  // const { DYNAMIC_NONPMDD } = DECENTRALIZED_BACKUP;
-  // let dynamicNonPMDD;
-  // if (Object.keys(DYNAMIC_NONPMDD).length) dynamicNonPMDD = DYNAMIC_NONPMDD; // Nothing in DNP
-
-  // const res = yield call(
-  //   s3Service.uploadShare,
-  //   payload.shareIndex,
-  //   dynamicNonPMDD,
-  // );
-
-  const res = yield call(
-    s3Service.prepareShareUploadables,
-    payload.shareIndex,
-    payload.contactInfo.contactName,
-  ) // contact injection (requires database insertion)
-
-  if ( res.status === 200 ) {
-    const {
-      otp,
-      encryptedKey,
-      encryptedMetaShare,
-      messageId,
-      encryptedDynamicNonPMDD,
-    } = res.data
-
-    const shareUploadables: ShareUploadables = {
-      encryptedMetaShare,
-      messageId,
-      encryptedDynamicNonPMDD,
-    }
-    const updatedSERVICES = {
-      ...SERVICES,
-      REGULAR_ACCOUNT: JSON.stringify( regularService ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-    }
-
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      SHARES_TRANSFER_DETAILS: {
-        ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-        [ payload.shareIndex ]: {
-          OTP: otp,
-          ENCRYPTED_KEY: encryptedKey,
-          UPLOADED_AT: Date.now(),
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        SHARES_TRANSFER_DETAILS: {
+          ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
+          [ payload.shareIndex ]: {
+            OTP: otp,
+            ENCRYPTED_KEY: encryptedKey,
+            UPLOADED_AT: Date.now(),
+          },
         },
-      },
-    }
+      }
 
-    // yield call(insertDBWorker, {
-    //   payload: {
-    //     DECENTRALIZED_BACKUP: updatedBackup,
-    //     SERVICES: updatedSERVICES,
-    //   },
-    // });
+      // yield call(insertDBWorker, {
+      //   payload: {
+      //     DECENTRALIZED_BACKUP: updatedBackup,
+      //     SERVICES: updatedSERVICES,
+      //   },
+      // });
 
-    const updatedDB = {
-      DECENTRALIZED_BACKUP: updatedBackup,
-      SERVICES: updatedSERVICES,
-    }
+      const updatedDB = {
+        DECENTRALIZED_BACKUP: updatedBackup,
+        SERVICES: updatedSERVICES,
+      }
 
-    const contact =
+      const contact =
       trustedContacts.tc.trustedContacts[ payload.contactInfo.contactName ]
-    if ( contact && contact.symmetricKey ) {
+      if ( contact && contact.symmetricKey ) {
       // has trusted channel
-      const data: TrustedDataElements = {
+        const data: TrustedDataElements = {
         // won't include elements from payload.data
-        shareTransferDetails: {
-          otp,
-          encryptedKey,
-        },
-      }
-      yield put(
-        updateTrustedChannel(
-          payload.contactInfo,
-          data,
-          null,
-          shareUploadables,
-          updatedDB,
-        ),
-      )
-    } else {
+          shareTransferDetails: {
+            otp,
+            encryptedKey,
+          },
+        }
+        yield put(
+          updateTrustedChannel(
+            payload.contactInfo,
+            data,
+            null,
+            shareUploadables,
+            updatedDB,
+          ),
+        )
+      } else {
       // adding transfer details to he ephemeral data
 
-      const data: EphemeralDataElements = {
-        ...payload.data,
-        shareTransferDetails: {
-          otp,
-          encryptedKey,
-        },
-      }
+        const data: EphemeralDataElements = {
+          ...payload.data,
+          shareTransferDetails: {
+            otp,
+            encryptedKey,
+          },
+        }
 
-      yield put(
-        updateEphemeralChannel(
-          payload.contactInfo,
-          data,
-          null,
-          null,
-          null,
-          shareUploadables,
-          updatedDB,
-        ),
-      )
+        yield put(
+          updateEphemeralChannel(
+            payload.contactInfo,
+            data,
+            null,
+            null,
+            null,
+            shareUploadables,
+            updatedDB,
+          ),
+        )
+      }
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      yield put( ErrorSending( true ) )
+      // Alert.alert('Upload Failed!', res.err);
+      console.log( {
+        err: res.err
+      } )
     }
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( ErrorSending( true ) )
-    // Alert.alert('Upload Failed!', res.err);
-    console.log( {
-      err: res.err
-    } )
-  }
-  yield put( switchS3Loader( 'uploadMetaShare' ) )
+    yield put( switchS3Loader( 'uploadMetaShare' ) )
+  } 
 }
 
 export const uploadEncMetaShareWatcher = createWatcher(
@@ -425,18 +439,19 @@ function* requestShareWorker( { payload } ) {
   // } // capping to 3 shares reception
 
   const { key } = yield call( S3Service.generateRequestCreds )
-
-  const updatedBackup = {
-    ...DECENTRALIZED_BACKUP,
-    RECOVERY_SHARES: {
-      ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
-      [ payload.shareIndex ]: {
-        REQUEST_DETAILS: {
-          TAG: WALLET_SETUP.walletName,
-          KEY: key,
-        },
+  const recoveryShares = {
+    ...DECENTRALIZED_BACKUP.RECOVERY_SHARES,
+    [ payload.shareIndex ]: {
+      ...DECENTRALIZED_BACKUP.RECOVERY_SHARES[ payload.shareIndex ],
+      REQUEST_DETAILS: {
+        TAG: WALLET_SETUP.walletName,
+        KEY: key,
       },
     },
+  }
+  const updatedBackup = {
+    ...DECENTRALIZED_BACKUP,
+    RECOVERY_SHARES: recoveryShares
   }
 
   yield call( insertDBWorker, {
@@ -452,75 +467,80 @@ export const requestShareWatcher = createWatcher(
 )
 
 function* uploadRequestedShareWorker( { payload } ) {
-  // Transfer: Guardian >>> User
-  const { tag, encryptedKey, otp } = payload
-  const { DECENTRALIZED_BACKUP } = yield select(
-    ( state ) => state.storage.database,
-  )
-  const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
+  try {
+    // Transfer: Guardian >>> User
+    const { tag, encryptedKey, otp } = payload
+    const { DECENTRALIZED_BACKUP } = yield select(
+      ( state ) => state.storage.database,
+    )
+    const { UNDER_CUSTODY } = DECENTRALIZED_BACKUP
 
-  if ( !UNDER_CUSTODY[ tag ] ) {
-    yield put( ErrorSending( true ) )
-    // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
-  }
-
-  const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS } = UNDER_CUSTODY[
-    tag
-  ]
-
-  // preventing re-uploads till expiry
-  // if (TRANSFER_DETAILS) {
-  //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
-  //     return;
-  //   }
-  // }
-
-  // TODO: 10 min removal strategy
-  yield put( switchS3Loader( 'uploadRequestedShare' ) )
-
-  const res = yield call(
-    S3Service.uploadRequestedShare,
-    encryptedKey,
-    otp,
-    META_SHARE,
-    ENC_DYNAMIC_NONPMDD,
-  )
-
-  if ( res.status === 200 && res.data.success === true ) {
-    // yield success
-    console.log( 'Upload successful!' )
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      UNDER_CUSTODY: {
-        ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
-        [ tag ]: {
-          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
-          TRANSFER_DETAILS: {
-            KEY: encryptedKey,
-            UPLOADED_AT: Date.now(),
-          },
-        },
-      },
+    if ( !UNDER_CUSTODY[ tag ] ) {
+      yield put( ErrorSending( true ) )
+      // Alert.alert('Upload failed!', 'No share under custody for this wallet.');
     }
 
-    yield call( insertDBWorker, {
-      payload: {
-        DECENTRALIZED_BACKUP: updatedBackup
-      },
-    } )
+    const { META_SHARE, ENC_DYNAMIC_NONPMDD, TRANSFER_DETAILS } = UNDER_CUSTODY[
+      tag
+    ]
 
-    yield put( requestedShareUploaded( tag, true ) )
-    yield put( UploadSuccessfully( true ) )
-    // Alert.alert(
-    //   'Upload successful!',
-    //   "Requester's share has been uploaded to the relay.",
-    // );
-    Toast( `${tag}'s Recovery Key sent.` )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( requestedShareUploaded( tag, false, res.err ) )
+    // preventing re-uploads till expiry
+    // if (TRANSFER_DETAILS) {
+    //   if (Date.now() - TRANSFER_DETAILS.UPLOADED_AT < config.TC_REQUEST_EXPIRY) {
+    //     return;
+    //   }
+    // }
+
+    // TODO: 10 min removal strategy
+    yield put( switchS3Loader( 'uploadRequestedShare' ) )
+
+    const res = yield call(
+      S3Service.uploadRequestedShare,
+      encryptedKey,
+      otp,
+      META_SHARE,
+      ENC_DYNAMIC_NONPMDD,
+    )
+
+    if ( res.status === 200 && res.data.success === true ) {
+      // yield success
+      console.log( 'Upload successful!' )
+      const updatedBackup = {
+        ...DECENTRALIZED_BACKUP,
+        UNDER_CUSTODY: {
+          ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+          [ tag ]: {
+            ...DECENTRALIZED_BACKUP.UNDER_CUSTODY[ tag ],
+            TRANSFER_DETAILS: {
+              KEY: encryptedKey,
+              UPLOADED_AT: Date.now(),
+            },
+          },
+        },
+      }
+
+      yield call( insertDBWorker, {
+        payload: {
+          DECENTRALIZED_BACKUP: updatedBackup
+        },
+      } )
+
+      yield put( requestedShareUploaded( tag, true ) )
+      yield put( UploadSuccessfully( true ) )
+      // Alert.alert(
+      //   'Upload successful!',
+      //   "Requester's share has been uploaded to the relay.",
+      // );
+      Toast( `${tag}'s Recovery Key sent.` )
+    } else {
+      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+      yield put( requestedShareUploaded( tag, false, res.err ) )
+    }
+    yield put( switchS3Loader( 'uploadRequestedShare' ) )
+  } catch (error) {
+    console.log('RECOVERY error', error)
+    yield put( switchS3Loader( 'uploadRequestedShare' ) )
   }
-  yield put( switchS3Loader( 'uploadRequestedShare' ) )
 }
 
 export const uploadRequestedShareWatcher = createWatcher(
@@ -710,9 +730,9 @@ function* generatePersonalCopyWorker( { payload } ) {
   }
   const { secondary, bh } = secureAccount.secureHDWallet.xpubs
   const secureAssets = {
-    secondaryMnemonic,
-    secondaryXpub: secondary,
-    bhXpub: bh,
+    secondaryMnemonic: secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '',
+    secondaryXpub: secureAccount.secureHDWallet.xpubs && secureAccount.secureHDWallet.xpubs.secondary ? secureAccount.secureHDWallet.xpubs.secondary : '',
+    bhXpub: secureAccount.secureHDWallet.xpubs && secureAccount.secureHDWallet.xpubs.bh ? secureAccount.secureHDWallet.xpubs.bh : '',
   }
 
   const pdfData = {

@@ -7,16 +7,16 @@ import {
   TextInput,
   TouchableOpacity,
 } from 'react-native'
-import { useSelector } from 'react-redux'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import useSendingState from '../../utils/hooks/state-selectors/sending/UseSendingState'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import { useSelector } from 'react-redux'
+import useSendingState from '../utils/hooks/state-selectors/sending/UseSendingState'
 
 export default function CustomPriorityContent( props ) {
   const [ amount, setAmount ] = useState( '' )
@@ -100,7 +100,7 @@ export default function CustomPriorityContent( props ) {
         <View style={styles.amountInputImage}>
           <Image
             style={styles.textBoxImage}
-            source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
+            source={require( '../assets/images/icons/icon_bitcoin_gray.png' )}
           />
         </View>
         <View style={styles.enterAmountView} />
@@ -276,3 +276,7 @@ const styles = StyleSheet.create( {
     fontStyle: 'italic',
   },
 } )
+// function useSelector(arg0: (state: any) => any) {
+//   throw new Error('Function not implemented.');
+// }
+

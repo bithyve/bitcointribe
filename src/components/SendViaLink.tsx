@@ -145,7 +145,7 @@ const isAppInstalled = (key) => {
     ios: () => { return isAppInstalledIOS(key); },
     android: () => { return isAppInstalledAndroid(key); }
 })();
-console.log("isAppInstalled", isAppInstalled)
+// console.log("isAppInstalled", isAppInstalled)
   return isAppInstalled;
 }
 

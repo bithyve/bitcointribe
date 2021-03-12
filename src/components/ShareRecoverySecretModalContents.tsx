@@ -62,7 +62,7 @@ export default function ShareRecoverySecretModalContents( props ) {
           <View style={{
             backgroundColor: Colors.white, width: 80, height: 80, borderRadius: 80 / 2, position: 'absolute', justifyContent: 'center', alignItems: 'center'
           }}>
-            <Image source={require( '../assets/images/icons/pexels-photo.jpg' )} style={styles.contactProfileImage} />
+            <Image source={require( '../assets/images/icons/pexels-photo.png' )} style={styles.contactProfileImage} />
           </View>
         </View>
       </View>

@@ -6,7 +6,7 @@ export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
-
+export const IS_NEW_HEALTH_SYSTEM = 'IS_NEW_HEALTH_SYSTEM';
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 
@@ -119,6 +119,13 @@ export const pinChangedFailed = isFailed => {
   }
 }
 
+export const setIsNewHealthSystemSet = isNewHealthSystemSet => {
+  return {
+    type: IS_NEW_HEALTH_SYSTEM, payload: {
+      isNewHealthSystemSet
+    }
+  }
+}
 
 // handle thunk way
 export const validatePin = ( passcode ) => {

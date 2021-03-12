@@ -54,6 +54,7 @@ import org.unimodules.core.interfaces.SingletonModule;
 import java.util.List;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
+import io.hexawallet.hexa.GoogleDrivePackage; 
 
 import android.content.Context;
 import com.facebook.react.PackageList;
@@ -88,6 +89,7 @@ public class MainApplication extends Application implements ShareApplication, Re
             // packages.add(new MyReactNativePackage());
 
             packages.add(new PdfPasswordPackage());
+            packages.add(new GoogleDrivePackage());
             // Add unimodules
             List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
                     new ModuleRegistryAdapter(mModuleRegistryProvider)
