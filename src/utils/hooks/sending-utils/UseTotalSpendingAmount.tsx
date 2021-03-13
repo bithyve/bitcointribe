@@ -10,7 +10,7 @@ export default function useTotalSpendingAmount(): Satoshis {
     return sendingState
       .selectedRecipients
       .reduce( ( accumulated, recipient ) => {
-        return accumulated + recipient.amount ?? 0
+        return accumulated + ( recipient.amount ? recipient.amount : 0 )
       }, 0 )
   }, [ sendingState.selectedRecipients ] )
 }

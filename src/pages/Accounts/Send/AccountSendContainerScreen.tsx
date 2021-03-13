@@ -157,7 +157,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [ hasShownInitialKnowMoreSendSheet, primarySubAccount.kind ] )
 
 
-
   useEffect( () => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     if ( primarySubAccount.isTFAEnabled ) {
