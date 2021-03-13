@@ -869,22 +869,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.bootStrapNotifications()
     this.setUpFocusListener()
     this.getNewTransactionNotifications()
-    console.log( 's3Service', s3Service )
-    // if (this.props.isNewHealthSystemSet) {
-    const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( !healthCheckInitializedKeeper ) {
-      initializeHealthSetup()
-    }
-    // } else if (
-    //   !s3Service.levelhealth.healthCheckInitializedKeeper &&
-    //   this.props.isNewHealthSystemSet
-    // ) {
-    //   const { healthCheckInitialized } = s3Service.sss;
-    //   console.log("healthCheckInitialized", healthCheckInitialized);
-    //   if (!healthCheckInitialized) {
-    //     initHealthCheck();
-    //   }
-    // }
 
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( this.handleDeepLinking )

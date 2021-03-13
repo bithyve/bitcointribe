@@ -26,6 +26,7 @@ import useSendableTrustedContactRecipients from '../../../utils/hooks/state-sele
 import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
 import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import idx from 'idx'
 
 export type Props = {
   navigation: any;
@@ -154,6 +155,21 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       showKnowMoreBottomSheet()
     }
   }, [ hasShownInitialKnowMoreSendSheet, primarySubAccount.kind ] )
+
+
+
+  useEffect( () => {
+    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
+    if ( primarySubAccount.isTFAEnabled ) {
+      const twoFASetupDetails = idx( accountsState, ( _ ) => _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      const twoFAValid = idx( accountsState, ( _ ) => _.additional.secure.twoFAValid )
+
+      if ( twoFASetupDetails && !twoFAValid )
+        navigation.navigate( 'TwoFASetup', {
+          twoFASetup: twoFASetupDetails,
+        } )
+    }
+  }, [ primarySubAccount.sourceKind ] )
 
 
   return (
