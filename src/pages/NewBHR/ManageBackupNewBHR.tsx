@@ -860,9 +860,9 @@ class ManageBackupNewBHR extends Component<
               paddingBottom: wp("7%"),
             }}
           >
-            {levelData.map((value) => {
+            {levelData.map((value, index) => {
               return (
-                <TouchableOpacity onPress={() => this.selectId(value.id)}>
+                <TouchableOpacity key={index} onPress={() => this.selectId(value.id)}>
                   <View
                     style={{
                       borderRadius: 10,

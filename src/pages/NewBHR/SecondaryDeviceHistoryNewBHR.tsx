@@ -367,19 +367,6 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
   )
 
   useEffect( () => {
-    console.log( 'change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[ index ] )
-    if (
-      SHARES_TRANSFER_DETAILS[ index ]
-    ) {
-      console.log( 'change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[ index ] )
-      console.log( '!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS )
-      dispatch( uploadSMShareKeeper( index ) )
-    }
-  },
-  [ SHARES_TRANSFER_DETAILS[ index ] ]
-  )
-
-  useEffect( () => {
     if ( uploadMetaShare || updateEphemeralChannelLoader ) {
       if ( secondaryQR ) setSecondaryQR( '' )
       return

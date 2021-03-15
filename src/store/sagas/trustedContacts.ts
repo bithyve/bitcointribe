@@ -534,7 +534,7 @@ function* updateEphemeralChannelWorker( { payload } ) {
     ( state ) => state.accounts[ TEST_ACCOUNT ].service,
   )
 
-  const { contactInfo, data, fetch } = payload
+  const { contactInfo, data, fetch, isFromKeeper } = payload;
 
   let generatedKey = false
   if (
@@ -726,11 +726,11 @@ function* updateEphemeralChannelWorker( { payload } ) {
     if ( data && data.shareTransferDetails ) {
       const { otp, encryptedKey } = data.shareTransferDetails
       // yield delay(1000); // introducing delay in order to evade database insertion collision
-      yield call( downloadMetaShareWorker, {
-        payload: {
-          encryptedKey, otp
-        }
-      } )
+      if(isFromKeeper){
+        yield call(downloadMetaShareWorkerKeeper, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+      } else {
+        yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+      }
       Toast( 'You have been successfully added as a Keeper' )
       yield put( trustedContactApproved( contactInfo.contactName, true ) )
     } else if ( payload.uploadXpub ) {

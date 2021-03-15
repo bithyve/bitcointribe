@@ -258,12 +258,12 @@ function reduceTCInfoIntoRecipientDescriptions( {
 
     const backendTCInfo: ContactElements = backendTrustedContactsData[ contactName ]
 
-    const isWard: boolean = backendTCInfo.isWard || false
-    const hasTrustedAddress = Boolean( backendTCInfo.trustedAddress ) || Boolean( backendTCInfo.trustedTestAddress )
-    const walletName: string | null = backendTCInfo.contactsWalletName || null
-    const lastSeenActive: number | null = backendTCInfo.lastSeen || null
+    const isWard: boolean = backendTCInfo && backendTCInfo.isWard || false
+    const hasTrustedAddress = Boolean( backendTCInfo && backendTCInfo.trustedAddress ) || Boolean( backendTCInfo && backendTCInfo.trustedTestAddress )
+    const walletName: string | null = backendTCInfo && backendTCInfo.contactsWalletName || null
+    const lastSeenActive: number | null = backendTCInfo && backendTCInfo.lastSeen || null
     const initiatedAt: number | null = backendTCInfo?.ephemeralChannel?.initiatedAt || null
-    const hasTrustedChannelWithUser = Boolean( backendTCInfo.symmetricKey )
+    const hasTrustedChannelWithUser = Boolean( backendTCInfo && backendTCInfo.symmetricKey )
 
 
     let trustKind: ContactTrustKind
