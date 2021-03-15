@@ -7,26 +7,26 @@ import { doTorRequest } from '../../utils/TorUtils'
 const URL = '';
 
 interface callReq {
-    method: string;
-    url: string;
-    data?: any;
+  method: string;
+  url: string;
+  data?: any;
 }
 
 export const BH_AXIOS = (request: callReq) => {
-      const activeTor: Tor = yield select( state => state.torSettings.activeTor )
-      const { method, data } = request;
-      const url = `${RELAY}/${request.url}`
+    const activeTor: Tor = yield select( state => state.torSettings.activeTor )
+    const { method, data } = request;
+    const url = `${RELAY}/${request.url}`
 
-      if (activeTor) {
-          return doTorRequest(url, method, data)
-      }
+    if (activeTor) {
+      return doTorRequest(url, method, data)
+    }
 
-      return axios({
-          url,
-          method,
-          data,
-          timeout: REQUEST_TIMEOUT
-      })
+    return axios({
+      url,
+      method,
+      data,
+      timeout: REQUEST_TIMEOUT,
+    })
 };
 
 export const SIGNING_AXIOS: AxiosInstance = axios.create({
