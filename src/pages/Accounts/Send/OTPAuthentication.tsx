@@ -70,7 +70,6 @@ export default function OTPAuthenticationScreen( { navigation } ) {
       <SendConfirmationContent
         title={'Sent Successfully to Contact'}
         info={'Transaction(s) successfully submitted'}
-        userInfo={[]}
         infoText={'Bitcoins successfully sent to Contact'}
         isFromContact={false}
         okButtonText={'View Account'}
@@ -106,7 +105,6 @@ export default function OTPAuthenticationScreen( { navigation } ) {
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={String( errorMessage )}
-        userInfo={[]}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
