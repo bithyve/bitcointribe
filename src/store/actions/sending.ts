@@ -24,6 +24,7 @@ export const SENDING_FAILED = 'SENDING_FAILED'
 export const SENDING_SUCCEEDED = 'SENDING_SUCCEEDED'
 export const SENDING_COMPLETED = 'SENDING_COMPLETED'
 export const CALCULATE_SEND_MAX_FEE = 'CALCULATE_SEND_MAX_FEE'
+export const CLEAR_SEND_MAX_FEE = 'CLEAR_SEND_MAX_FEE'
 export const SEND_MAX_FEE_CALCULATED = 'SEND_MAX_FEE_CALCULATED'
 export const CALCULATE_CUSTOM_FEE = 'CALCULATE_CUSTOM_FEE'
 export const CUSTOM_FEE_CALCULATED = 'CUSTOM_FEE_CALCULATED'
@@ -323,6 +324,13 @@ export const calculateSendMaxFee = (
   return {
     type: CALCULATE_SEND_MAX_FEE,
     payload,
+  }
+}
+
+export const clearSendMaxFee = (
+) => {
+  return {
+    type: CLEAR_SEND_MAX_FEE,
   }
 }
 

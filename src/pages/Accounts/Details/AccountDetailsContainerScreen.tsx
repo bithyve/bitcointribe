@@ -27,7 +27,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShell, removeTwoFA } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -40,10 +40,9 @@ import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wall
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
-import { useSelector } from 'react-redux'
-import S3Service from '../../../bitcoin/services/sss/S3Service'
 import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+import idx from 'idx'
 
 export type Props = {
   navigation: any;
@@ -60,7 +59,6 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
-  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
@@ -256,14 +254,14 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   useEffect( ()=>{
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    const serviceType = primarySubAccount.sourceKind
-    if ( serviceType === SECURE_ACCOUNT && accountsState[ serviceType ].service.secureHDWallet.secondaryMnemonic && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
-      navigation.navigate( 'TwoFASetup', {
-        twoFASetup:
-          accountsState[ serviceType ].service.secureHDWallet
-            .twoFASetup,
-      } )
-      // dispatch( removeTwoFA() )
+    if ( primarySubAccount.isTFAEnabled ) {
+      const twoFASetupDetails = idx( accountsState, ( _ )=> _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      const twoFAValid = idx( accountsState, ( _ )=> _.additional.secure.twoFAValid )
+
+      if( twoFASetupDetails && !twoFAValid )
+        navigation.navigate( 'TwoFASetup', {
+          twoFASetup: twoFASetupDetails,
+        } )
     }
   }, [ primarySubAccount.sourceKind ] )
 

@@ -16,15 +16,14 @@ export const TRANSACTION_HELPER_DONE = 'TRANSACTION_HELPER_DONE'
 export const RECEIVE_HELPER_DONE = 'RECEIVE_HELPER_DONE'
 export const INITIAL_KNOW_MORE_SEND_SHEET_SHOWN = 'INITIAL_KNOW_MORE_SEND_SHEET_SHOWN'
 export const SAVING_WARNING = 'SAVING_WARNING'
-export const TWO_FA_SETUP = 'TWO_FA_SETUP'
 export const INIT_ASYNC_MIGRATION_REQUEST = 'INIT_ASYNC_MIGRATION_REQUEST'
 export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS'
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
 
-export const CLOUD_BACKUP_DATA_STATUS = 'CLOUD_BACKUP_DATA_STATUS';
-export const IS_BACKUP_PROCESSING = 'IS_BACKUP_PROCESSING';
+export const CLOUD_BACKUP_DATA_STATUS = 'CLOUD_BACKUP_DATA_STATUS'
+export const IS_BACKUP_PROCESSING = 'IS_BACKUP_PROCESSING'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -118,15 +117,6 @@ export const setSavingWarning = ( data ) => {
   }
 }
 
-export const setTwoFASetup = ( data ) => {
-  return {
-    type: TWO_FA_SETUP,
-    payload: {
-      hasCompletedTFASetup: data
-    },
-  }
-}
-
 const updatePereferenceRequest = createAction( UPDATE_APP_PREFERENCE )
 export const updatePreference = ( payload ) => ( dispatch ) =>
   dispatch( updatePereferenceRequest( payload ) )
@@ -171,35 +161,45 @@ export const initMigration = () => {
 export const updateApplicationStatus = ( data ) => {
   return {
     type: UPDATE_APPLICATION_STATUS,
-    payload: { status: data },
-  };
-};
+    payload: {
+      status: data
+    },
+  }
+}
 
-export const updateLastSeen = (data) => {
-  AsyncStorage.setItem("lastSeen", String(new Date()))
+export const updateLastSeen = ( data ) => {
+  AsyncStorage.setItem( 'lastSeen', String( new Date() ) )
   return {
     type: UPDATE_LAST_SEEN,
-    payload: { lastSeen: data },
-  };
-};
+    payload: {
+      lastSeen: data
+    },
+  }
+}
 
-export const setCloudBackupStatus = (data) => {
+export const setCloudBackupStatus = ( data ) => {
   return {
     type: CLOUD_BACKUP_DATA_STATUS,
-    payload: { status: data },
-  };
-};
+    payload: {
+      status: data
+    },
+  }
+}
 
-export const setCardData = (data) => {
+export const setCardData = ( data ) => {
   return {
     type: CARD_DATA,
-    payload: { cardData: data },
-  };
-};
+    payload: {
+      cardData: data
+    },
+  }
+}
 
-export const setIsBackupProcessing = (data) => {
+export const setIsBackupProcessing = ( data ) => {
   return {
     type: IS_BACKUP_PROCESSING,
-    payload: { status: data },
-  };
-};
+    payload: {
+      status: data
+    },
+  }
+}

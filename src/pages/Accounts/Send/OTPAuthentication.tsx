@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -8,8 +8,6 @@ import {
   ActivityIndicator,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
-  Platform,
 } from 'react-native'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -27,21 +25,29 @@ import SendConfirmationContent from '../SendConfirmationContent'
 import { createRandomString } from '../../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
 import DeviceInfo from 'react-native-device-info'
-import { executeSendStage3 } from '../../../store/actions/sending'
+import { executeSendStage3, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import useAccountSendST3CompletionEffect from '../../../utils/sending/useAccountSendST3CompletionEffect'
+import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import {  refreshAccountShell } from '../../../store/actions/accounts'
+import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
+import { useBottomSheetModal } from '@gorhom/bottom-sheet'
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 
-export default function TwoFAToken( props ) {
+
+export default function OTPAuthenticationScreen( { navigation } ) {
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )
-  const serviceType = props.navigation.getParam( 'serviceType' )
-  const [ SendUnSuccessBottomSheet ] = useState(
-    React.createRef<BottomSheet>(),
-  )
-  const { transfer, loading } = useSelector(
-    ( state ) => state.accounts[ serviceType ],
-  )
   const sourceAccountShell = useSourceAccountShellForSending()
+  const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
+  const dispatch = useDispatch()
+  const sendingState = useSendingState()
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
 
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
@@ -58,118 +64,100 @@ export default function TwoFAToken( props ) {
     }
   }
 
-  const dispatch = useDispatch()
 
-  const storeTrustedContactsHistory = async ( details ) => {
-    if ( details && details.length > 0 ) {
-      let IMKeeperOfHistory = JSON.parse(
-        await AsyncStorage.getItem( 'IMKeeperOfHistory' ),
-      )
-      let OtherTrustedContactsHistory = JSON.parse(
-        await AsyncStorage.getItem( 'OtherTrustedContactsHistory' ),
-      )
-      for ( let i = 0; i < details.length; i++ ) {
-        const element = details[ i ]
-        if ( element.selectedContact.contactName ) {
-          const obj = {
-            id: createRandomString( 36 ),
-            title: 'Sent Amount',
-            date: moment( Date.now() ).valueOf(),
-            info: '',
-            // 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-            selectedContactInfo: element,
-          }
-          if ( element.selectedContact.isWard ) {
-            if ( !IMKeeperOfHistory ) IMKeeperOfHistory = []
-            IMKeeperOfHistory.push( obj )
-            await AsyncStorage.setItem(
-              'IMKeeperOfHistory',
-              JSON.stringify( IMKeeperOfHistory ),
-            )
-          }
-          if (
-            !element.selectedContact.isWard &&
-            !element.selectedContact.isGuardian
-          ) {
-            if ( !OtherTrustedContactsHistory ) OtherTrustedContactsHistory = []
-            OtherTrustedContactsHistory.push( obj )
-            await AsyncStorage.setItem(
-              'OtherTrustedContactsHistory',
-              JSON.stringify( OtherTrustedContactsHistory ),
-            )
-          }
-        }
-      }
-    }
-  }
+  const showSendSuccessBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <SendConfirmationContent
+        title={'Sent Successfully to Contact'}
+        info={'Transaction(s) successfully submitted'}
+        userInfo={[]}
+        infoText={'Bitcoins successfully sent to Contact'}
+        isFromContact={false}
+        okButtonText={'View Account'}
+        cancelButtonText={'Back'}
+        isCancel={false}
+        onPressOk={() => {
+          dismissBottomSheet()
+          // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
+          dispatch( refreshAccountShell( sourceAccountShell, {
+            autoSync: false,
+            hardRefresh: false,
+          } ) )
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
+        }}
+        onPressCancel={dismissBottomSheet}
+        isSuccess={true}
+        accountKind={sourcePrimarySubAccount.kind}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '67%' ],
+      },
+    )
+  },
+  [ presentBottomSheet, dismissBottomSheet ] )
 
-  useEffect( () => {
-    if ( !transfer.txid && transfer.stage3.failed ) {
-      setTimeout( () => {
-        setElevation( 0 )
-      }, 4 )
-      setTimeout( () => {
-        SendUnSuccessBottomSheet.current.snapTo( 1 )
-      }, 2 )
-    }
-    if ( transfer.txid ) {
-      storeTrustedContactsHistory( transfer.details )
-    }
-  }, [ transfer ] )
-
-  const renderSendUnSuccessContents = () => {
-    return (
+  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
+    presentBottomSheet(
       <SendConfirmationContent
         title={'Send Unsuccessful'}
-        info={
-          transfer && transfer.stage3
-            ? 'There seems to be a problem' + '\n' + transfer.stage3.err
-            : 'Something went wrong, please try again.'
-        }
-        userInfo={transfer.details}
+        info={String( errorMessage )}
+        userInfo={[]}
         isFromContact={false}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={() => {
-          if ( SendUnSuccessBottomSheet.current )
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
-        }}
+        onPressOk={dismissBottomSheet}
         onPressCancel={() => {
-          // dispatch( clearTransfer( serviceType ) )
-          if ( SendUnSuccessBottomSheet.current )
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
-          props.navigation.navigate( 'AccountDetails' )
+          dismissBottomSheet()
+
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
         }}
         isUnSuccess={true}
-        accountKind={serviceType}
-      />
+        accountKind={sourcePrimarySubAccount.kind}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '67%' ],
+      },
     )
-  }
+  },
+  [ presentBottomSheet, dismissBottomSheet ] )
 
-  const renderSendUnSuccessHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          //  dispatch(clearTransfer(serviceType));
-          if ( SendUnSuccessBottomSheet.current )
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
-        }}
-      />
-    )
-  }
+  useAccountSendST3CompletionEffect( {
+    onSuccess: ( txid: string | null ) => {
+      if ( txid ) {
+        dispatch( sendTxNotification() )
 
-  if ( transfer.txid ) {
-    if ( props.navigation.state.params.onTransactionSuccess )
-      props.navigation.state.params.onTransactionSuccess()
-    props.navigation.goBack()
-  }
+        //dispatch donation note action during donation tx
+        if( sendingState.donationDetails.donationId ){
+          const { donationId, donationNote } = sendingState.donationDetails
+          dispatch( sendDonationNote( {
+            txid,
+            donationId: donationId,
+            donationNote: donationNote,
+          } ) )
+        }
+
+        showSendSuccessBottomSheet()
+      }
+    },
+    onFailure: showSendFailureBottomSheet,
+  } )
 
   useEffect( () => {
-    if ( !loading.transfer ) {
+    if ( !sendingState.sendST3.inProgress ) {
       setIsConfirmDisabled( false )
     }
-  }, [ loading.transfer ] )
+  }, [ sendingState.sendST3 ] )
 
   return (
     <SafeAreaView style={{
@@ -181,7 +169,7 @@ export default function TwoFAToken( props ) {
         <TouchableOpacity
           style={commonStyle.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            navigation.goBack()
           }}
           hitSlop={{
             top: 20, left: 20, bottom: 20, right: 20
@@ -412,8 +400,8 @@ export default function TwoFAToken( props ) {
                   : Colors.blue,
               }}
             >
-              {( !isConfirmDisabled && loading.transfer ) ||
-              ( isConfirmDisabled && loading.transfer ) ? (
+              {( !isConfirmDisabled && sendingState.sendST3.inProgress ) ||
+              ( isConfirmDisabled && sendingState.sendST3.inProgress ) ? (
                   <ActivityIndicator size="small" />
                 ) : (
                   <Text style={styles.confirmButtonText}>Confirm</Text>
@@ -422,7 +410,7 @@ export default function TwoFAToken( props ) {
 
             <TouchableOpacity
               onPress={() => {
-                props.navigation.navigate( 'SubAccountTFAHelp' )
+                navigation.navigate( 'SubAccountTFAHelp' )
               }}
               style={{
                 width: wp( '30%' ),
@@ -445,23 +433,6 @@ export default function TwoFAToken( props ) {
             </TouchableOpacity>
           </View>
         </View>
-
-        <BottomSheet
-          onCloseStart={() => {
-            SendUnSuccessBottomSheet.current.snapTo( 0 )
-          }}
-          onCloseEnd={() => setElevation( 10 )}
-          enabledInnerScrolling={true}
-          ref={SendUnSuccessBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '65%' )
-              : hp( '70%' ),
-          ]}
-          renderContent={renderSendUnSuccessContents}
-          renderHeader={renderSendUnSuccessHeader}
-        />
       </View>
     </SafeAreaView>
   )

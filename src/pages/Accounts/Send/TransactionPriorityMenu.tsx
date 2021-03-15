@@ -19,9 +19,8 @@ import NetworkKind from '../../../common/data/enums/NetworkKind'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import config from '../../../bitcoin/HexaConfig'
 import { calculateCustomFee } from '../../../store/actions/sending'
+import useAvailableTransactionPriorities from '../../../utils/hooks/sending-utils/UseAvailableTransactionPriorities'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-
-const defaultTransactionPrioritiesAvailable = [ TransactionPriority.LOW, TransactionPriority.MEDIUM, TransactionPriority.HIGH ]
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing
@@ -31,10 +30,11 @@ export type Props = {
 const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransactionPriorityChanged }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
-  const sendingState  = useSendingState()
-  const [ transactionPrioritiesAvailable, setTransactionPrioritiesAvailable ] = useState( sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable )
+  const availableTransactionPriorities = useAvailableTransactionPriorities()
+  const [ transactionPriorities, setTransactionPriorities ] = useState( availableTransactionPriorities )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
   const dispatch = useDispatch()
+  const sendingState = useSendingState()
 
   const network = useMemo( () => {
     return config.APP_STAGE === 'dev' ||
@@ -78,18 +78,22 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
     } ) )
   }
 
-  useEffect( ()=>{
+  const setCustomTransactionPriority = () => {
     const { customPriorityST1 } = sendingState
-    const txPriorites = sendingState.feeIntelMissing? []: defaultTransactionPrioritiesAvailable
+    const txPriorites = availableTransactionPriorities
     if( customPriorityST1.hasFailed ) {
-      setTransactionPrioritiesAvailable( txPriorites )
+      setTransactionPriorities( txPriorites )
       setTransactionPriority( TransactionPriority.LOW )
       onTransactionPriorityChanged( TransactionPriority.LOW )
     } else if ( customPriorityST1.isSuccessful ) {
-      setTransactionPrioritiesAvailable( [ ...txPriorites, TransactionPriority.CUSTOM ] )
+      setTransactionPriorities( [ ...txPriorites, TransactionPriority.CUSTOM ] )
       setTransactionPriority( TransactionPriority.CUSTOM )
       onTransactionPriorityChanged( TransactionPriority.CUSTOM )
     }
+  }
+
+  useEffect( ()=>{
+    setCustomTransactionPriority()
   }, [ sendingState.customPriorityST1 ] )
 
 
@@ -116,7 +120,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
           <Text style={styles.headingLabelText}>Fee</Text>
         </View>
 
-        {transactionPrioritiesAvailable.map( priority => {
+        {transactionPriorities.map( priority => {
           return (
             <View style={styles.priorityRowContainer} key={priority}>
               <View style={{

@@ -5,7 +5,7 @@ import { useDispatch } from 'react-redux'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import SendHelpContents from '../../../components/Helper/SendHelpContents'
-import { removeTwoFA, clearTransfer } from '../../../store/actions/accounts'
+import { clearTransfer } from '../../../store/actions/accounts'
 import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
@@ -24,6 +24,9 @@ import AccountSendScreen from './AccountSendScreen'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
 import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
+import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import idx from 'idx'
 
 export type Props = {
   navigation: any;
@@ -35,17 +38,14 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const accountShell = useSourceAccountShellForSending()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  // const sendableAccountShells = useCompatibleAccountShells( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
   const walletService = useWalletServiceForSourceAccountKind( primarySubAccount.sourceKind )
 
+  const accountsState = useAccountsState()
   const sendingState = useSendingState()
 
-  const {
-    hasCompletedTFASetup,
-    hasShownInitialKnowMoreSendSheet,
-  } = usePreferencesState()
+  const { hasShownInitialKnowMoreSendSheet, } = usePreferencesState()
 
   const isRecipientSelectedForSending = useCallback( ( recipient: RecipientDescribing ) => {
     return (
@@ -150,22 +150,25 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
-
-  useEffect( () => {
-    if ( hasCompletedTFASetup == false && primarySubAccount.isTFAEnabled ) {
-      dispatch( removeTwoFA() )
-      navigation.navigate( 'TwoFASetup', {
-        // TODO: Figure out how `service.secureHDWallet.twoFASetup` fits in on this screen 👇.
-        // twoFASetup: accountsState[this.state.serviceType].service.secureHDWallet.twoFASetup,
-      } )
-    }
-  }, [ hasCompletedTFASetup, primarySubAccount ] )
-
   useEffect( () => {
     if ( primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT && hasShownInitialKnowMoreSendSheet == false ) {
       showKnowMoreBottomSheet()
     }
   }, [ hasShownInitialKnowMoreSendSheet, primarySubAccount.kind ] )
+
+
+  useEffect( () => {
+    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
+    if ( primarySubAccount.isTFAEnabled ) {
+      const twoFASetupDetails = idx( accountsState, ( _ ) => _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      const twoFAValid = idx( accountsState, ( _ ) => _.additional.secure.twoFAValid )
+
+      if ( twoFASetupDetails && !twoFAValid )
+        navigation.navigate( 'TwoFASetup', {
+          twoFASetup: twoFASetupDetails,
+        } )
+    }
+  }, [ primarySubAccount.sourceKind ] )
 
 
   return (

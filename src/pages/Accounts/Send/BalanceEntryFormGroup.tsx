@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
+import { useDispatch } from 'react-redux'
 import { Input } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../../components/MaterialCurrencyCodeIcon'
@@ -19,8 +20,11 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useTotalSpendingAmount from '../../../utils/hooks/sending-utils/UseTotalSpendingAmount'
+import { clearSendMaxFee } from '../../../store/actions/sending'
+import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 
 export type Props = {
+  currentRecipient: RecipientDescribing,
   subAccountKind: SubAccountKind;
   spendableBalance: Satoshis;
   onAmountChanged: ( amount: Satoshis ) => void;
@@ -29,6 +33,7 @@ export type Props = {
 
 
 const BalanceEntryFormGroup: React.FC<Props> = ( {
+  currentRecipient,
   subAccountKind,
   spendableBalance,
   onAmountChanged,
@@ -38,7 +43,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const currencyCode = useCurrencyCode()
   const currencyKind = useCurrencyKind()
   const sendingState = useSendingState()
-  const totalSpendingAmount = useTotalSpendingAmount()
+  const totalSpendingAmount = useTotalSpendingAmount( currentRecipient )
+  const dispatch = useDispatch()
 
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( '' )
@@ -89,15 +95,22 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   }
 
   function handleSendMaxPress() {
-    const convertedFiatAmount = convertSatsToFiat( remainingSpendableBalance )
-
-    setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
-    setCurrentSatsAmountTextValue( String( remainingSpendableBalance ) )
-    onAmountChanged( remainingSpendableBalance )
-
     setIsSendingMax( true )
     onSendMaxPressed()
   }
+
+  useEffect( ()=>{
+    if( isSendingMax && sendMaxFee ){
+      const sendMaxAmount = remainingSpendableBalance
+      const convertedFiatAmount = convertSatsToFiat( sendMaxAmount )
+
+      setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
+      setCurrentSatsAmountTextValue( String( sendMaxAmount ) )
+      onAmountChanged( sendMaxAmount )
+    }
+    else if( !isSendingMax && sendMaxFee ) dispatch( clearSendMaxFee() )
+
+  }, [ sendMaxFee, isSendingMax ] )
 
   function convertFiatToSats( fiatAmount: number ) {
     return exchangeRates && exchangeRates[ currencyCode ]
@@ -151,7 +164,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             returnKeyType="done"
             keyboardType={'numeric'}
             onChangeText={( value ) => {
-              setIsSendingMax( false )
+              if( isSendingMax ) setIsSendingMax( false )
               setCurrentFiatAmountTextValue( value )
               setCurrentSatsAmountTextValue( String( convertFiatToSats( Number( value ) ?? 0 ) ) )
               onAmountChanged( convertFiatToSats( Number( value ) ?? 0 ) )

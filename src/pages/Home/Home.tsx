@@ -869,22 +869,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.bootStrapNotifications()
     this.setUpFocusListener()
     this.getNewTransactionNotifications()
-    console.log( 's3Service', s3Service )
-    // if (this.props.isNewHealthSystemSet) {
-    const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( !healthCheckInitializedKeeper ) {
-      initializeHealthSetup()
-    }
-    // } else if (
-    //   !s3Service.levelhealth.healthCheckInitializedKeeper &&
-    //   this.props.isNewHealthSystemSet
-    // ) {
-    //   const { healthCheckInitialized } = s3Service.sss;
-    //   console.log("healthCheckInitialized", healthCheckInitialized);
-    //   if (!healthCheckInitialized) {
-    //     initHealthCheck();
-    //   }
-    // }
 
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( this.handleDeepLinking )
@@ -1927,10 +1911,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
         }
 
-        if (element.notificationType == "newKeeperInfo") {
-          let data = JSON.parse(element.data);
-          if (data.walletName && data.walletId) {
-            updateKeeperInfoToUnderCustody(data.walletName, data.walletId);
+        if ( element.notificationType == 'newKeeperInfo' ) {
+          const data = JSON.parse( element.data )
+          if ( data.walletName && data.walletId ) {
+            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
           }
         }
         if ( element.notificationType == 'uploadSecondaryShare' ) {
@@ -2051,9 +2035,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 ( value ) => value.notificationId == element.notificationId
               )
             ]
-          if ( element.notificationType == releaseNotificationTopic ) {
-            readStatus = readStatus
-          } else {
+          if ( element.notificationType != releaseNotificationTopic ) {
             readStatus = temp.read
           }
 

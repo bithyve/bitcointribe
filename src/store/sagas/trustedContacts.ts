@@ -274,8 +274,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
 
 function* approveTrustedContactWorker( { payload } ) {
   try {
-
-
     const trustedContacts: TrustedContactsService = yield select(
       ( state ) => state.trustedContacts.service,
     )

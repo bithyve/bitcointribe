@@ -185,6 +185,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
       <View style={styles.formBodySection}>
         <BalanceEntryFormGroup
+          currentRecipient={currentRecipient}
           subAccountKind={sourcePrimarySubAccount.kind}
           spendableBalance={spendableBalance}
           onAmountChanged={( amount: Satoshis ) => {
@@ -232,6 +233,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
         <TouchableOpacity
           onPress={handleAddRecipientButtonPress}
+          disabled={!!sendingState.sendMaxFee}
           style={{
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
@@ -240,7 +242,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         >
           <Text style={{
             ...ButtonStyles.actionButtonText,
-            color: Colors.blue,
+            color: sendingState.sendMaxFee? Colors.lightBlue: Colors.blue,
           }}>
               Add Recipient
           </Text>
