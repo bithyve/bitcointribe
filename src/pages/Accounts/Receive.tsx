@@ -63,6 +63,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/accounts'
+import KnowMoreButton from '../../components/KnowMoreButton'
 
 export default function Receive( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -525,7 +526,7 @@ export default function Receive( props ) {
             <View style={NavStyles.modalHeaderTitleView}>
               <View
                 style={{
-                  flex: 1, flexDirection: 'row', alignItems: 'center'
+                  flex: 1, flexDirection: 'row', alignItems: 'stretch'
                 }}
               >
                 <TouchableOpacity
@@ -564,15 +565,17 @@ export default function Receive( props ) {
                     }
                   </Text>
                 </View>
-                {serviceType == TEST_ACCOUNT ? (
-                  <Text
-                    onPress={() => onPressKnowMore()}
-                    style={styles.knowMoreTouchable}
-                  >
-                    Know more
-                  </Text>
-                ) : null}
               </View>
+              {serviceType == TEST_ACCOUNT ? (
+                <KnowMoreButton
+                  onpress={() => onPressKnowMore()}
+                  containerStyle={{
+                    marginTop: 'auto',
+                    marginBottom: 'auto',
+                    marginRight: 10,
+                  }}
+                />
+              ) : null}
             </View>
             <ScrollView>
               <View style={{
