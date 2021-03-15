@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import { Input } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
@@ -89,15 +89,20 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   }
 
   function handleSendMaxPress() {
-    const convertedFiatAmount = convertSatsToFiat( remainingSpendableBalance )
-
-    setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
-    setCurrentSatsAmountTextValue( String( remainingSpendableBalance ) )
-    onAmountChanged( remainingSpendableBalance )
-
     setIsSendingMax( true )
     onSendMaxPressed()
   }
+
+  useEffect( ()=>{
+    if( sendMaxFee && isSendingMax ){
+      const sendMaxAmount = remainingSpendableBalance
+      const convertedFiatAmount = convertSatsToFiat( sendMaxAmount )
+
+      setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
+      setCurrentSatsAmountTextValue( String( sendMaxAmount ) )
+      onAmountChanged( sendMaxAmount )
+    }
+  }, [ sendMaxFee, isSendingMax ] )
 
   function convertFiatToSats( fiatAmount: number ) {
     return exchangeRates && exchangeRates[ currencyCode ]
