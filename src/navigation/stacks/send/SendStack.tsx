@@ -6,6 +6,7 @@ import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpSc
 import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
 import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
 import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
+import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 
 
 const SubAccountTFAHelpStack = createStackNavigator( {
@@ -31,6 +32,12 @@ const SendStack = createStackNavigator(
       screen: AccountSendConfirmationContainerScreen,
       navigationOptions: {
         title: 'Send Confirmation'
+      },
+    },
+    OTPAuthentication: {
+      screen: OTPAuthenticationScreen,
+      navigationOptions: {
+        header: null,
       },
     },
     SubAccountTFAHelp: {
