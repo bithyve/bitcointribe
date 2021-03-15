@@ -17,13 +17,13 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
-import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing'
+import { RecipientDescribing, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP } from '../../common/constants/wallet-service-types'
 
 export default function SendConfirmationContent( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
 
-  const renderContacts = ( item: unknown ) => {
+  const renderRecipientItem = ( item: RecipientDescribing ) => {
     const selectedContactData = {
       ...item.selectedContact,
       amount: item.selectedContact.bitcoinAmount || item.bitcoinAmount, // https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605722649345500?thread_ts=1605718686.340700&cid=CEBLWDEKH
@@ -87,7 +87,7 @@ export default function SendConfirmationContent( props ) {
       <ScrollView style={{
         marginTop: hp( '1.5%' ), marginBottom: hp( '2%' )
       }}>
-        {props.userInfo.map( ( item ) => renderContacts( item ) )}
+        {props.recipients.map( ( item ) => renderRecipientItem( item ) )}
       </ScrollView>
 
       {props.infoText && (
