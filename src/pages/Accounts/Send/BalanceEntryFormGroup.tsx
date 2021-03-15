@@ -52,6 +52,10 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
     return sendingState.sendMaxFee
   }, [ sendingState.sendMaxFee ] )
 
+  const remainingSpendableBalance = useMemo( () => {
+    return spendableBalance - totalSpendingAmount - sendingState.sendMaxFee
+  }, [ totalSpendingAmount, sendMaxFee ] )
+
   const isAmountInvalid = useMemo( () => {
     return currentSatsAmountFormValue > spendableBalance
   }, [ currentSatsAmountFormValue, spendableBalance ] )
@@ -91,7 +95,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
 
   useEffect( ()=>{
     if( sendMaxFee && isSendingMax ){
-      const sendMaxAmount = spendableBalance - sendMaxFee
+      const sendMaxAmount = remainingSpendableBalance
       const convertedFiatAmount = convertSatsToFiat( sendMaxAmount )
 
       setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
