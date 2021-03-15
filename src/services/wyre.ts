@@ -11,11 +11,14 @@ export const fetchWyreReservation = ( amount, receiveAddress, currencyCode, coun
       receiveAddress,
       referenceId: Date.now()
     }
-    return BH_AXIOS.post( 'fetchWyreReservation', {
-      HEXA_ID,
-      ...body
-    } )
-
+    return BH_AXIOS({
+      method: 'post',
+      url: 'fetchWyreReservation',
+      data: {
+        HEXA_ID,
+        ...body
+      },
+    })
   } catch ( error ) {
     console.log( 'error calling wyre ', error )
     return {

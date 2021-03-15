@@ -1050,12 +1050,16 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'fetchXpubInfo', {
-        HEXA_ID,
-        xpubId: this.derivativeAccounts[ accountType ][ accountNumber ].xpubId,
-        accountType,
-        accountDetails,
-      } )
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'fetchXpubInfo',
+        data: {
+          HEXA_ID,
+          xpubId: this.derivativeAccounts[ accountType ][ accountNumber ].xpubId,
+          accountType,
+          accountDetails,
+        },
+      })
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
@@ -1298,19 +1302,23 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'setupDonationAccount', {
-        HEXA_ID,
-        donationId: id,
-        walletID: this.getWalletId().walletId,
-        details: {
-          donee,
-          subject,
-          description,
-          xpubs: [ xpub, this.xpubs.secondary, this.xpubs.bh ],
-          xpubId,
-          configuration,
-        },
-      } )
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'setupDonationAccount',
+        data: {
+          HEXA_ID,
+          donationId: id,
+          walletID: this.getWalletId().walletId,
+          details: {
+            donee,
+            subject,
+            description,
+            xpubs: [ xpub, this.xpubs.secondary, this.xpubs.bh ],
+            xpubId,
+            configuration,
+          },
+        }
+      })
     } catch ( err ) {
       delete this.derivativeAccounts[ accountType ][ accountNumber ]
       if ( err.response ) throw new Error( err.response.data.err )
@@ -1421,12 +1429,16 @@ export default class SecureHDWallet extends Bitcoin {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post( 'updatePreferences', {
-        HEXA_ID,
-        donationId: donationAcc.id,
-        walletID: this.getWalletId().walletId,
-        preferences,
-      } )
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'updatePreferences'
+        data: {
+          HEXA_ID,
+          donationId: donationAcc.id,
+          walletID: this.getWalletId().walletId,
+          preferences,
+        },
+      })
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )

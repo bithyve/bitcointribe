@@ -70,7 +70,7 @@ export default class TrustedContacts {
     encryptedPub += cipher.final( 'hex' )
 
     return {
-      encryptedPub 
+      encryptedPub
     }
   };
 
@@ -96,7 +96,7 @@ export default class TrustedContacts {
     }
 
     return {
-      decryptedPub: decryptedPub.slice( 5 ) 
+      decryptedPub: decryptedPub.slice( 5 )
     }
   };
 
@@ -118,7 +118,7 @@ export default class TrustedContacts {
     let encrypted = cipher.update( JSON.stringify( dataPacket ), 'utf8', 'hex' )
     encrypted += cipher.final( 'hex' )
     return {
-      encryptedData: encrypted 
+      encryptedData: encrypted
     }
   };
 
@@ -139,7 +139,7 @@ export default class TrustedContacts {
       )
     }
     return {
-      data 
+      data
     }
   };
 
@@ -194,12 +194,12 @@ export default class TrustedContacts {
       encKey,
       otp,
       ephemeralChannel: {
-        address: ephemeralAddress 
+        address: ephemeralAddress
       },
     }
 
     return {
-      publicKey, ephemeralAddress 
+      publicKey, ephemeralAddress
     }
   };
 
@@ -309,7 +309,7 @@ export default class TrustedContacts {
 
     this.trustedContacts[ contactName ].ephemeralChannel.data = ephemeralData
     return {
-      updatedEphemeralDataElements 
+      updatedEphemeralDataElements
     }
   };
 
@@ -374,13 +374,17 @@ export default class TrustedContacts {
       let res: AxiosResponse
       if ( !encKey ) {
         // supporting versions prior to 1.1.0
-        res = await BH_AXIOS.post( 'updateEphemeralChannel', {
-          HEXA_ID,
-          address: ephemeralChannel.address,
-          data: dataElements,
-          fetch,
-          legacy: true,
-        } )
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'updateEphemeralChannel',
+          data: {
+            HEXA_ID,
+            address: ephemeralChannel.address,
+            data: dataElements,
+            fetch,
+            legacy: true,
+          },
+        })
       } else {
         let encryptedDataPacket: EncryptedEphemeralData
         if ( dataElements.DHInfo ) {
@@ -408,24 +412,32 @@ export default class TrustedContacts {
         }
 
         if ( shareUploadables && Object.keys( shareUploadables ).length ) {
-          res = await BH_AXIOS.post( 'updateShareAndEC', {
-            // EC update params
-            HEXA_ID,
-            address: ephemeralChannel.address,
-            data: encryptedDataPacket,
-            fetch,
-            // upload share params
-            share: shareUploadables.encryptedMetaShare,
-            messageId: shareUploadables.messageId,
-            encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
-          } )
+          res = await BH_AXIOS({
+            method: 'post',
+            url: 'updateShareAndEC',
+            data: {
+              // EC update params
+              HEXA_ID,
+              address: ephemeralChannel.address,
+              data: encryptedDataPacket,
+              fetch,
+              // upload share params
+              share: shareUploadables.encryptedMetaShare,
+              messageId: shareUploadables.messageId,
+              encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+            },
+         })
         } else {
-          res = await BH_AXIOS.post( 'updateEphemeralChannel', {
-            HEXA_ID,
-            address: ephemeralChannel.address,
-            data: encryptedDataPacket,
-            fetch,
-          } )
+          res = await BH_AXIOS({
+            method: 'post',
+            url: 'updateEphemeralChannel',
+            data: {
+              HEXA_ID,
+              address: ephemeralChannel.address,
+              data: encryptedDataPacket,
+              fetch,
+            },
+          })
         }
       }
 
@@ -452,7 +464,7 @@ export default class TrustedContacts {
       }
 
       return {
-        updated, publicKey 
+        updated, publicKey
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -479,22 +491,30 @@ export default class TrustedContacts {
 
         const { ephemeralChannel } = this.trustedContacts[ contactName ]
 
-        res = await BH_AXIOS.post( 'fetchEphemeralChannel', {
-          HEXA_ID,
-          address: ephemeralChannel.address,
-          identifier: this.trustedContacts[ contactName ].publicKey,
-        } )
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'fetchEphemeralChannel',
+          data: {
+            HEXA_ID,
+            address: ephemeralChannel.address,
+            identifier: this.trustedContacts[ contactName ].publicKey,
+          },
+        })
       } else {
         // if publicKey; fetch data without any storage
         const address = crypto
           .createHash( 'sha256' )
           .update( publicKey )
           .digest( 'hex' )
-        res = await BH_AXIOS.post( 'fetchEphemeralChannel', {
-          HEXA_ID,
-          address,
-          identifier: `!${publicKey}`, // anti-counterparty's pub
-        } )
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'fetchEphemeralChannel',
+          data: {
+            HEXA_ID,
+            address,
+            identifier: `!${publicKey}`, // anti-counterparty's pub
+          },
+        })
       }
       let { data } = res.data
 
@@ -525,7 +545,7 @@ export default class TrustedContacts {
       }
 
       return {
-        data 
+        data
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -583,7 +603,7 @@ export default class TrustedContacts {
 
     // this.trustedContacts[contactName].trustedChannel.data = trustedData; save post updation
     return {
-      updatedTrustedData, overallTrustedData: trustedData 
+      updatedTrustedData, overallTrustedData: trustedData
     }
   };
 
@@ -673,24 +693,32 @@ export default class TrustedContacts {
 
       let res: AxiosResponse
       if ( shareUploadables && Object.keys( shareUploadables ).length ) {
-        res = await BH_AXIOS.post( 'updateShareAndTC', {
-          // EC update params
-          HEXA_ID,
-          address: trustedChannel.address,
-          data: encryptedDataPacket,
-          fetch,
-          // upload share params
-          share: shareUploadables.encryptedMetaShare,
-          messageId: shareUploadables.messageId,
-          encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
-        } )
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'updateShareAndTC',
+          data: {
+            // EC update params
+            HEXA_ID,
+            address: trustedChannel.address,
+            data: encryptedDataPacket,
+            fetch,
+            // upload share params
+            share: shareUploadables.encryptedMetaShare,
+            messageId: shareUploadables.messageId,
+            encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
+          },
+        })
       } else {
-        res = await BH_AXIOS.post( 'updateTrustedChannel', {
-          HEXA_ID,
-          address: trustedChannel.address,
-          data: encryptedDataPacket,
-          fetch,
-        } )
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'updateTrustedChannel',
+          data: {
+            HEXA_ID,
+            address: trustedChannel.address,
+            data: encryptedDataPacket,
+            fetch,
+          },
+        })
       }
 
       let { updated, data } = res.data
@@ -702,7 +730,7 @@ export default class TrustedContacts {
       if ( data ) {
         data = this.processTrustedChannelData( contactName, data, symmetricKey )
         const { walletName } = data.data ? data.data : {
-          walletName: null 
+          walletName: null
         }
         if ( walletName ) {
           this.trustedContacts[ contactName ] = {
@@ -711,11 +739,11 @@ export default class TrustedContacts {
           }
         }
         return {
-          updated, data 
+          updated, data
         }
       }
       return {
-        updated 
+        updated
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -748,11 +776,15 @@ export default class TrustedContacts {
         contactName
       ]
 
-      const res = await BH_AXIOS.post( 'fetchTrustedChannel', {
-        HEXA_ID,
-        address: trustedChannel.address,
-        identifier: publicKey,
-      } )
+      const res = await BH_AXIOS({
+        method: 'post',
+        url: 'fetchTrustedChannel',
+        data: {
+          HEXA_ID,
+          address: trustedChannel.address,
+          identifier: publicKey,
+        },
+      })
       // console.log({ res });
 
       let { data } = res.data
@@ -794,16 +826,20 @@ export default class TrustedContacts {
       const { trustedChannel, publicKey } = contact
       if ( trustedChannel ) {
         channelsToUpdate[ trustedChannel.address ] = {
-          publicKey 
+          publicKey
         }
       }
     }
 
     if ( Object.keys( channelsToUpdate ).length ) {
-      const res = await BH_AXIOS.post( 'syncLastSeens', {
-        HEXA_ID,
-        channelsToUpdate,
-      } )
+      const res = await BH_AXIOS({
+        method: 'post',
+        url: 'syncLastSeens',
+        data: {
+          HEXA_ID,
+          channelsToUpdate,
+        },
+      })
 
       const { updated, updatedLastSeens } = res.data
       // console.log({ updatedLastSeens });
@@ -825,7 +861,7 @@ export default class TrustedContacts {
       }
 
       return {
-        updated 
+        updated
       }
     } else {
       throw new Error( 'No trusted channels to update' )
@@ -856,7 +892,7 @@ export default class TrustedContacts {
       const { trustedChannel, publicKey } = contact
       if ( trustedChannel ) {
         channelsToUpdate[ trustedChannel.address ] = {
-          publicKey 
+          publicKey
         }
       }
     }
@@ -870,15 +906,19 @@ export default class TrustedContacts {
       } )
     }
 
-    const res = await BH_AXIOS.post( 'walletCheckIn', {
-      HEXA_ID,
-      walletID: metaShares ? metaShares[ 0 ].meta.walletId : null,
-      shareIDs: metaShares
-        ? metaShares.map( ( metaShare ) => metaShare.shareId )
-        : null, // legacy HC
-      channelsToUpdate, // LS update
-      toUpdate, // share under-custody update
-    } )
+    const res = await BH_AXIOS({
+      method: 'post',
+      url: 'walletCheckIn',
+      data: {
+        HEXA_ID,
+        walletID: metaShares ? metaShares[ 0 ].meta.walletId : null,
+        shareIDs: metaShares
+          ? metaShares.map( ( metaShare ) => metaShare.shareId )
+          : null, // legacy HC
+        channelsToUpdate, // LS update
+        toUpdate, // share under-custody update
+      },
+    })
 
     const {
       updated,
@@ -985,17 +1025,21 @@ export default class TrustedContacts {
             dataHash = subChan.encDataHash
           }
           channelsToSync[ trustedChannel.address ] = {
-            publicKey: pub, dataHash 
+            publicKey: pub, dataHash
           }
         } )
       }
     }
     // console.log({ channelsToSync });
     if ( Object.keys( channelsToSync ).length ) {
-      const res = await BH_AXIOS.post( 'syncTrustedChannels', {
-        HEXA_ID,
-        channelsToSync,
-      } )
+      const res = await BH_AXIOS({
+        method: 'post',
+        url: 'syncTrustedChannels',
+        data: {
+          HEXA_ID,
+          channelsToSync,
+        },
+      })
 
       const { synched, synchedChannels } = res.data
       // console.log({ synched, synchedChannels });
@@ -1038,8 +1082,8 @@ export default class TrustedContacts {
                   } else {
                     this.trustedContacts[ contactName ].FCMs = [ decryptedData.FCM ]
                   }
-                } 
-                 
+                }
+
               }
             } )
           }
@@ -1047,7 +1091,7 @@ export default class TrustedContacts {
       }
 
       return {
-        synched, contactsToRemove, guardiansToRemove 
+        synched, contactsToRemove, guardiansToRemove
       }
     } else {
       throw new Error( 'No trusted channels to update' )

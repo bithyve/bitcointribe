@@ -39,7 +39,7 @@ export default class SSS {
 
       const recoveredMnemonicHex = secrets.combine(secretsArray)
       return {
-        mnemonic: SSS.hexToString(recoveredMnemonicHex) 
+        mnemonic: SSS.hexToString(recoveredMnemonicHex)
       }
     } else {
       throw new Error(
@@ -68,7 +68,7 @@ export default class SSS {
       decryptedSecrets.push(decrypted)
     }
     return {
-      decryptedSecrets 
+      decryptedSecrets
     }
   };
 
@@ -94,9 +94,13 @@ export default class SSS {
     const messageId: string = SSS.getMessageId(key, config.MSG_ID_LENGTH)
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadShare', {
-        HEXA_ID,
-        messageId,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'downloadShare',
+        data: {
+          HEXA_ID,
+          messageId,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -106,7 +110,7 @@ export default class SSS {
     const { share, encryptedDynamicNonPMDD } = res.data
     const metaShare = SSS.decryptMetaShare(share, key).decryptedMetaShare
     return {
-      metaShare, encryptedDynamicNonPMDD, messageId 
+      metaShare, encryptedDynamicNonPMDD, messageId
     }
   };
 
@@ -117,9 +121,13 @@ export default class SSS {
   }> => {
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadDynamicNonPMDD', {
-        HEXA_ID,
-        walletID,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'downloadDynamicNonPMDD',
+        data: {
+          HEXA_ID,
+          walletID,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -171,9 +179,13 @@ export default class SSS {
     let res: AxiosResponse
 
     try {
-      res = await BH_AXIOS.post('affirmDecryption', {
-        HEXA_ID,
-        messageId,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'affirmDecryption',
+        data: {
+          HEXA_ID,
+          messageId,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -181,7 +193,7 @@ export default class SSS {
     }
 
     return {
-      deleted: res.data.deleted 
+      deleted: res.data.deleted
     }
   };
 
@@ -212,7 +224,7 @@ export default class SSS {
     const key = SSS.generateKey(SSS.cipherSpec.keyLength)
     // const { otp, otpEncryptedData } = SSS.encryptViaOTP(key);
     return {
-      key 
+      key
     }
   };
 
@@ -233,11 +245,15 @@ export default class SSS {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('uploadShare', {
-        HEXA_ID,
-        share: encryptedMetaShare,
-        messageId,
-        encryptedDynamicNonPMDD,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'uploadShare',
+        data: {
+          HEXA_ID,
+          share: encryptedMetaShare,
+          messageId,
+          encryptedDynamicNonPMDD,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -249,7 +265,7 @@ export default class SSS {
       throw new Error('Unable to upload share')
     }
     return {
-      success 
+      success
     }
   };
 
@@ -274,7 +290,7 @@ export default class SSS {
       //  console.log('Unable to remove the share from the server');
       // }
       return {
-        metaShare, encryptedDynamicNonPMDD 
+        metaShare, encryptedDynamicNonPMDD
       }
     }
   };
@@ -302,7 +318,7 @@ export default class SSS {
       decrypted += decipher.final('utf8')
       const decryptedData = JSON.parse(decrypted)
       return {
-        decryptedData 
+        decryptedData
       }
     } catch (err) {
       throw new Error(
@@ -346,7 +362,7 @@ export default class SSS {
       }
 
       return {
-        decryptedMetaShare 
+        decryptedMetaShare
       }
     } catch (err) {
       throw new Error(
@@ -372,7 +388,7 @@ export default class SSS {
     }
     const metaShare = JSON.parse(recoveredQRData)
     return {
-      metaShare 
+      metaShare
     }
   };
 
@@ -407,9 +423,13 @@ export default class SSS {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('updateSharesHealth', {
-        HEXA_ID,
-        toUpdate,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'updateSharesHealth',
+        data: {
+          HEXA_ID,
+          toUpdate,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -418,7 +438,7 @@ export default class SSS {
 
     const { updationInfo } = res.data
     return {
-      updationInfo 
+      updationInfo
     }
   };
 
@@ -592,7 +612,7 @@ export default class SSS {
     }
 
     return {
-      shares 
+      shares
     }
   };
 
@@ -654,10 +674,14 @@ export default class SSS {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('sharesHealthCheckInit', {
-        HEXA_ID,
-        walletID: this.walletId,
-        shareIDs,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'sharesHealthCheckInit',
+        data: {
+          HEXA_ID,
+          walletID: this.walletId,
+          shareIDs,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -692,10 +716,14 @@ export default class SSS {
     const metaShares = this.metaShares.slice(0, 3)
 
     try {
-      res = await BH_AXIOS.post('checkSharesHealth', {
-        HEXA_ID,
-        walletID: this.walletId,
-        shareIDs: this.shareIDs,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'checkSharesHealth',
+        data: {
+          HEXA_ID,
+          walletID: this.walletId,
+          shareIDs: this.shareIDs,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -749,10 +777,14 @@ export default class SSS {
       if (shareIndex > 2 || !this.metaShares[ shareIndex ])
         throw new Error('Share index out of bounds')
 
-      res = await BH_AXIOS.post('resetSharesHealth', {
-        HEXA_ID,
-        walletID: this.walletId,
-        shareIDs: [ this.metaShares[ shareIndex ].shareId ],
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'resetSharesHealth',
+        data: {
+          HEXA_ID,
+          walletID: this.walletId,
+          shareIDs: [ this.metaShares[ shareIndex ].shareId ],
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -761,7 +793,7 @@ export default class SSS {
 
     const { resetted } = res.data
     return {
-      resetted 
+      resetted
     }
   };
 
@@ -826,7 +858,7 @@ export default class SSS {
     let encrypted = cipher.update(JSON.stringify(staticNonPMDD), 'utf8', 'hex')
     encrypted += cipher.final('hex')
     return {
-      encryptedStaticNonPMDD: encrypted 
+      encryptedStaticNonPMDD: encrypted
     }
   };
 
@@ -854,7 +886,7 @@ export default class SSS {
 
     const decryptedStaticNonPMDD = JSON.parse(decrypted)
     return {
-      decryptedStaticNonPMDD 
+      decryptedStaticNonPMDD
     }
   };
 
@@ -883,7 +915,7 @@ export default class SSS {
     encrypted += cipher.final('hex')
 
     return {
-      encryptedDynamicNonPMDD: encrypted 
+      encryptedDynamicNonPMDD: encrypted
     }
   };
 
@@ -915,7 +947,7 @@ export default class SSS {
 
     const decryptedDynamicNonPMDD = JSON.parse(decrypted)
     return {
-      decryptedDynamicNonPMDD 
+      decryptedDynamicNonPMDD
     }
   };
 
@@ -940,7 +972,7 @@ export default class SSS {
 
     const { decryptedDynamicNonPMDD } = this.decryptDynamicNonPMDD(latestDNP)
     return {
-      decryptedDynamicNonPMDD 
+      decryptedDynamicNonPMDD
     }
   };
 
@@ -957,10 +989,14 @@ export default class SSS {
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('updateDynamicNonPMDD', {
-        HEXA_ID,
-        walletID: this.walletId,
-        encryptedDynamicNonPMDD,
+      res = await BH_AXIOS({
+        method: 'post',
+        url: 'updateDynamicNonPMDD',
+        data: {
+          HEXA_ID,
+          walletID: this.walletId,
+          encryptedDynamicNonPMDD,
+        },
       })
     } catch (err) {
       if (err.response) throw new Error(err.response.data.err)
@@ -1050,7 +1086,7 @@ export default class SSS {
     }
 
     return {
-      metaShares: this.metaShares 
+      metaShares: this.metaShares
     }
   };
 
@@ -1104,7 +1140,7 @@ export default class SSS {
     }
 
     return {
-      restored: true 
+      restored: true
     }
   };
 
@@ -1140,7 +1176,7 @@ export default class SSS {
       }
     }
     return {
-      qrData 
+      qrData
     }
   };
 
@@ -1165,7 +1201,7 @@ export default class SSS {
     }
     this.shareIDs = shareIDs.slice(0, 3) // preserving just the online(relay-transmitted) shareIDs
     return {
-      encryptedSecrets: this.encryptedSecrets 
+      encryptedSecrets: this.encryptedSecrets
     }
   };
 
@@ -1197,7 +1233,7 @@ export default class SSS {
     }
 
     return {
-      encryptedImage 
+      encryptedImage
     }
   };
 
@@ -1225,7 +1261,7 @@ export default class SSS {
     }
 
     return {
-      walletImage 
+      walletImage
     }
   };
 
@@ -1239,10 +1275,14 @@ export default class SSS {
       try {
         const { encryptedImage } = this.encryptWI(walletImage)
 
-        res = await BH_AXIOS.post('updateWalletImage', {
-          HEXA_ID,
-          walletID: this.walletId,
-          encryptedImage,
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'updateWalletImage',
+          data: {
+            HEXA_ID,
+            walletID: this.walletId,
+            encryptedImage,
+          },
         })
       } catch (err) {
         if (err.response) throw new Error(err.response.data.err)
@@ -1252,7 +1292,7 @@ export default class SSS {
       if (!updated) throw new Error()
 
       return {
-        updated 
+        updated
       }
     } catch (err) {
       throw new Error('Failed to update Wallet Image')
@@ -1265,9 +1305,13 @@ export default class SSS {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post('fetchWalletImage', {
-          HEXA_ID,
-          walletID: this.walletId,
+        res = await BH_AXIOS({
+          method: 'post',
+          url: 'fetchWalletImage',
+          data: {
+            HEXA_ID,
+            walletID: this.walletId,
+          },
         })
       } catch (err) {
         if (err.response) throw new Error(err.response.data.err)
@@ -1280,7 +1324,7 @@ export default class SSS {
       const { walletImage } = this.decryptWI(encryptedImage)
       // console.log({ walletImage });
       return {
-        walletImage 
+        walletImage
       }
     } catch (err) {
       throw new Error('Failed to fetch Wallet Image')
