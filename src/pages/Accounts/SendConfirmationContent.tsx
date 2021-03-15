@@ -17,44 +17,13 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
-import { RecipientDescribing, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP } from '../../common/constants/wallet-service-types'
 
 export default function SendConfirmationContent( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
 
-  const renderRecipientItem = ( item: RecipientDescribing ) => {
-    const selectedContactData = {
-      ...item.selectedContact,
-      amount: item.selectedContact.bitcoinAmount || item.bitcoinAmount, // https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605722649345500?thread_ts=1605718686.340700&cid=CEBLWDEKH
-    }
-
-    // TODO: This should already be computed
-    // ahead of time in the data passed to this screen.
-    let recipient: RecipientDescribing
-
-    // 🔑 This seems to be the way the backend is defining the "account kind".
-    // This should be refactored to leverage the new accounts structure
-    // in https://github.com/bithyve/hexa/tree/feature/account-management
-    const accountKind = {
-      'Checking Account': REGULAR_ACCOUNT,
-      'Savings Account': SECURE_ACCOUNT,
-      'Test Account': TEST_ACCOUNT,
-      'Donation Account': DONATION_ACCOUNT,
-      'Wyre': WYRE,
-      'Ramp': RAMP
-    }[ selectedContactData.account_name || 'Checking Account' ]
-
-    // 🔑 This seems to be the way the backend is distinguishing between
-    // accounts and contacts.
-    if ( selectedContactData.account_name != null ) {
-      recipient = makeAccountRecipientDescriptionFromUnknownData(
-        selectedContactData,
-        accountKind,
-      )
-    } else {
-      recipient = makeContactRecipientDescription( selectedContactData )
-    }
+  const renderRecipientItem = ( recipient: RecipientDescribing ) => {
 
     return (
       <RecipientComponent
