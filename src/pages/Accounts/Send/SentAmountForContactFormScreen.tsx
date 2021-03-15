@@ -185,6 +185,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
       <View style={styles.formBodySection}>
         <BalanceEntryFormGroup
+          currentRecipient={currentRecipient}
           subAccountKind={sourcePrimarySubAccount.kind}
           spendableBalance={spendableBalance}
           onAmountChanged={( amount: Satoshis ) => {

@@ -21,8 +21,10 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useTotalSpendingAmount from '../../../utils/hooks/sending-utils/UseTotalSpendingAmount'
 import { clearSendMaxFee } from '../../../store/actions/sending'
+import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 
 export type Props = {
+  currentRecipient: RecipientDescribing,
   subAccountKind: SubAccountKind;
   spendableBalance: Satoshis;
   onAmountChanged: ( amount: Satoshis ) => void;
@@ -31,6 +33,7 @@ export type Props = {
 
 
 const BalanceEntryFormGroup: React.FC<Props> = ( {
+  currentRecipient,
   subAccountKind,
   spendableBalance,
   onAmountChanged,
@@ -40,7 +43,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const currencyCode = useCurrencyCode()
   const currencyKind = useCurrencyKind()
   const sendingState = useSendingState()
-  const totalSpendingAmount = useTotalSpendingAmount()
+  const totalSpendingAmount = useTotalSpendingAmount( currentRecipient )
   const dispatch = useDispatch()
 
   const [ isSendingMax, setIsSendingMax ] = useState( false )
