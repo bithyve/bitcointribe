@@ -476,8 +476,8 @@ class ManageBackupNewBHR extends Component<
           contactLevelInfo.push(obj);
         }
       }
-      console.log('contactLevelInfo', contactLevelInfo);
-      console.log('pdfLevelInfo', pdfLevelInfo)
+      console.log('**** contactLevelInfo', contactLevelInfo);
+      console.log('**** pdfLevelInfo', pdfLevelInfo);
       if (contactLevelInfo.length || pdfLevelInfo.length) autoShareToLevel2Keepers(contactLevelInfo, pdfLevelInfo);
     }
   };
@@ -707,7 +707,7 @@ class ManageBackupNewBHR extends Component<
   renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={false}
+        isFromKeeperDeviceHistory={true}
         QRModalHeader={"QR scanner ddfds"}
         title={"Note"}
         infoText={
@@ -739,7 +739,7 @@ class ManageBackupNewBHR extends Component<
           if (this.refs.QrBottomSheet) (this.refs.QrBottomSheet as any).snapTo(0);
         }}
         onPressContinue={async() => {
-          let qrScannedData = '{"requester":"ShivaniQ","publicKey":"ZCbZ2wESRNnsxmtZ0PkLpxxN","uploadedAt":1615473305789,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
+          let qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
           try {
             if (qrScannedData) {
               let qrData = JSON.parse(qrScannedData);
@@ -860,9 +860,9 @@ class ManageBackupNewBHR extends Component<
               paddingBottom: wp("7%"),
             }}
           >
-            {levelData.map((value) => {
+            {levelData.map((value, index) => {
               return (
-                <TouchableOpacity onPress={() => this.selectId(value.id)}>
+                <TouchableOpacity key={index} onPress={() => this.selectId(value.id)}>
                   <View
                     style={{
                       borderRadius: 10,

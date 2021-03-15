@@ -30,10 +30,10 @@ const HistoryPageComponent = (props) => {
       {props.data && props.data.length ? (
         <View style={{ flex: 1 }}>
           <ScrollView>
-            {props.data.map((value) => {
+            {props.data.map((value, index) => {
               return (
                 <TouchableOpacity
-                  key={value.id}
+                  key={index}
                   onPress={() => SelectOption(value.id)}
                   style={
                     SelectedOption == value.id

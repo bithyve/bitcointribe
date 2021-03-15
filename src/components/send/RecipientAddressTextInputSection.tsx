@@ -30,7 +30,9 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   const walletService = useWalletServiceForSourceAccountKind( sourceAccountKind )
 
   const walletInstance = useMemo( () => {
-    return walletService.hdWallet || walletService.secureHDWallet
+    if(walletService){
+      return walletService.hdWallet || walletService.secureHDWallet
+    }
   }, [ walletService ] )
 
 

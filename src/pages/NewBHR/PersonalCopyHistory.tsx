@@ -30,6 +30,7 @@ import {
   sendApprovalRequest,
   onApprovalStatusChange,
   emptyShareTransferDetailsForContactChange,
+  secondaryShareDownloaded,
 } from "../../store/actions/health";
 import KeeperTypeModalContents from "./KeeperTypeModalContent";
 import {
@@ -37,6 +38,9 @@ import {
   notificationType,
 } from "../../bitcoin/utilities/Interface";
 import { StackActions } from "react-navigation";
+import QRModal from "../Accounts/QRModal";
+import S3Service from "../../bitcoin/services/sss/S3Service";
+import ApproveSetup from "./ApproveSetup";
 
 const PersonalCopyHistory = (props) => {
   const dispatch = useDispatch();
@@ -49,9 +53,11 @@ const PersonalCopyHistory = (props) => {
   const [selectedKeeperName, setSelectedKeeperName] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [errorMessageHeader, setErrorMessageHeader] = useState("");
-
+  const [QrBottomSheet, setQrBottomSheet] = useState(React.useRef());
+  const [QrBottomSheetsFlag, setQrBottomSheetsFlag] = useState(false);
   const [blockReshare, setBlockReshare] = useState("");
-
+  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
+  const [ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet] = useState(React.createRef());
   const [personalCopyHistory, setPersonalCopyHistory] = useState([
     {
       id: 1,
@@ -289,65 +295,57 @@ const PersonalCopyHistory = (props) => {
   };
 
   const onPressChangeKeeperType = (type, name) => {
-    if (type == "contact") {
-      let levelhealth: LevelHealthInterface[] = [];
-      if (
-        levelHealth[1] &&
-        levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
-      )
-        levelhealth = [levelHealth[1]];
-      if (
-        levelHealth[2] &&
-        levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1
-      )
-        levelhealth = [levelHealth[1], levelHealth[2]];
-      let index = 1;
-      let contactCount = 0;
-      for (let i = 0; i < levelhealth.length; i++) {
-        const element = levelhealth[i];
-        for (let j = 0; j < element.levelInfo.length; j++) {
-          const element2 = element.levelInfo[j];
-          if (
-            levelhealth[i] &&
-            element2.shareType == "contact" &&
-            props.keeper &&
-            props.keeper.shareId != element2.shareId &&
-            levelhealth[i] &&
-            element2.shareType == "contact" &&
-            props.keeper.shareType == "contact"
-          ) {
-            contactCount++;
-          } else if (
-            !props.keeper &&
-            levelhealth[i] &&
-            element2.shareType == "contact"
-          )
-            contactCount++;
-          if (element2.shareType == "contact" && contactCount < 2) {
-            if (
-              keeperInfo.findIndex(
-                (value) =>
-                  value.shareId == element2.shareId && value.type == "contact"
-              ) > -1
-            ) {
-              if (
-                keeperInfo[
-                  keeperInfo.findIndex(
-                    (value) =>
-                      value.shareId == element2.shareId &&
-                      value.type == "contact"
-                  )
-                ].data.index == 1
-              )
-                index = 2;
-            }
-          }
+    let levelhealth: LevelHealthInterface[] = [];
+    if (levelHealth[1] && levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1)
+      levelhealth = [levelHealth[1]];
+    if (levelHealth[2] && levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1)
+      levelhealth = [levelHealth[1], levelHealth[2]];
+    if (currentLevel == 3 && levelHealth[2])
+      levelhealth = [levelHealth[2]];
+    let changeIndex = 1;
+    let contactCount = 0;
+    let deviceCount = 0;
+    for (let i = 0; i < levelhealth.length; i++) {
+      const element = levelhealth[i];
+      for (let j = 2; j < element.levelInfo.length; j++) {
+        const element2 = element.levelInfo[j];
+        if (
+          element2.shareType == "contact" &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          selectedKeeper.shareType == "contact"
+        ) {
+          contactCount++;
+        }
+        if (
+          element2.shareType == "device" &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          selectedKeeper.shareType == "device"
+        ) {
+          deviceCount++;
+        }
+        let kpInfoContactIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "contact");
+        let kpInfoDeviceIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "device");
+        if (element2.shareType == "contact" && contactCount < 2) {
+          if (kpInfoContactIndex > -1 && keeperInfo[kpInfoContactIndex].data.index == 1) {
+            changeIndex = 2;
+          } else changeIndex = 1;
+        }
+        if (element2.shareType == "device" && deviceCount == 1) {
+          changeIndex = 3;
+        } else if(element2.shareType == "device" && deviceCount == 2){
+          changeIndex = 4;
         }
       }
+    }
+    if (type == "contact") {
       props.navigation.navigate("TrustedContactHistoryNewBHR", {
         ...props.navigation.state.params,
         selectedTitle: name,
-        index: index,
+        index: changeIndex,
         isChangeKeeperType: true,
       });
     }
@@ -355,6 +353,7 @@ const PersonalCopyHistory = (props) => {
       props.navigation.navigate("SecondaryDeviceHistoryNewBHR", {
         ...props.navigation.state.params,
         selectedTitle: name,
+        index: changeIndex,
         isChangeKeeperType: true,
       });
     }
@@ -362,6 +361,81 @@ const PersonalCopyHistory = (props) => {
       (PersonalCopyShareBottomSheet as any).current.snapTo(1);
     }
   };
+  const sendApprovalRequestToPK = (type) => {
+    setQrBottomSheetsFlag(true);
+    (QrBottomSheet as any).snapTo(1);
+    (keeperTypeBottomSheet as any).current.snapTo(0);
+  };
+
+  const renderQrContent = () => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={true}
+        QRModalHeader={"QR scanner ddfds"}
+        title={"Note"}
+        infoText={
+          "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod"
+        }
+        modalRef={QrBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={async(qrData) => {
+          try {
+            if (qrData) {
+              console.log('qrData', qrData)
+              const res = await S3Service.downloadSMShare(qrData.publicKey);
+              console.log("Keeper Shares", res);
+              if (res.status === 200) {
+                console.log("SHARES DOWNLOAD", res.data);
+                dispatch(secondaryShareDownloaded(res.data.metaShare));
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+                (QrBottomSheet as any).current.snapTo(0);
+              }
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onBackPress={() => {
+          setQrBottomSheetsFlag(false);
+          if (QrBottomSheet) (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onPressContinue={async() => {
+          let qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
+          try {
+            if (qrScannedData) {
+              let qrData = JSON.parse(qrScannedData);
+              console.log('qrData', qrData);
+              const res = await S3Service.downloadSMShare(qrData.publicKey);
+              console.log("Keeper Shares", res);
+              if (res.status === 200) {
+                console.log("SHARES DOWNLOAD", res.data);
+                dispatch(secondaryShareDownloaded(res.data.metaShare));
+                (ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+                (QrBottomSheet as any).current.snapTo(0);
+              }
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
+
+  const renderQrHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.backgroundColor }}>
@@ -457,6 +531,57 @@ const PersonalCopyHistory = (props) => {
           />
         )}
       />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag( true )
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
+        }}
+        onCloseStart={() => { }}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={QrBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '92%' ) : hp( '91%' ),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
+      />
+      <BottomSheet
+          enabledInnerScrolling={true}
+          ref={ApprovePrimaryKeeperBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == "ios" && DeviceInfo.hasNotch() ? hp("60%") : hp("70"),
+          ]}
+          renderContent={() => (
+            <ApproveSetup
+              isContinueDisabled={false}
+              onPressContinue={() => {
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+                let obj = {
+                  id: selectedLevelId,
+                  selectedKeeper: {...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType},
+                  isSetup: true,
+                };
+                // goToHistory(obj);
+                onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+              }}
+            />
+          )}
+          renderHeader={() => (
+            <SmallHeaderModal
+              onPressHeader={() => {
+                (keeperTypeBottomSheet as any).current.snapTo(1);
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+              }}
+            />
+          )}
+        />
     </View>
   );
 };

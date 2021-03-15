@@ -695,19 +695,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
 
-  useEffect( () => {
-    console.log( 'change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[ index ] )
-    if (
-      SHARES_TRANSFER_DETAILS[ index ]
-    ) {
-      console.log( 'change SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[ index ] )
-      console.log( '!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS )
-      dispatch( uploadSMShareKeeper( index ) )
-    }
-  },
-  [ SHARES_TRANSFER_DETAILS[ index ] ]
-  )
-
   const updateTrustedContactsInfo = useCallback(
     async ( contact ) => {
       let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
@@ -801,7 +788,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       let accountNumber = regularAccount.hdWallet.trustedContactToDA[ contactName ]
       if ( !accountNumber ) {
         // initialize a trusted derivative account against the following account
-        const res = regularAccount.getDerivativeAccXpub(
+        const res = regularAccount.setupDerivativeAccount(
           TRUSTED_CONTACTS,
           null,
           contactName,
@@ -1080,24 +1067,73 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, trustedQR ] )
 
-  const onPressChangeKeeperType = ( type, name ) => {
-    if ( type == 'contact' ) {
-      ( ChangeBottomSheet as any ).current.snapTo( 1 )
-    }
-    if ( type == 'device' ) {
-      props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
-        ...props.navigation.state.params, selectedTitle: name, isChangeKeeperType: true, prevKeeperType: 'contact', contactIndex: index
-      } )
-    }
-    if ( type == 'pdf' ) {
-      props.navigation.navigate(
-        'PersonalCopyHistoryNewBHR',
-        {
-          ...props.navigation.state.params, selectedTitle: name, prevKeeperType: 'contact', contactIndex: index
+  const onPressChangeKeeperType = (type, name) => {
+    let levelhealth: LevelHealthInterface[] = [];
+    if (levelHealth[1] && levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1)
+      levelhealth = [levelHealth[1]];
+    if (levelHealth[2] && levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1)
+      levelhealth = [levelHealth[1], levelHealth[2]];
+    if (currentLevel == 3 && levelHealth[2])
+      levelhealth = [levelHealth[2]];
+    let changeIndex = 1;
+    let contactCount = 0;
+    let deviceCount = 0;
+    for (let i = 0; i < levelhealth.length; i++) {
+      const element = levelhealth[i];
+      for (let j = 2; j < element.levelInfo.length; j++) {
+        const element2 = element.levelInfo[j];
+        if (
+          element2.shareType == "contact" &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          selectedKeeper.shareType == "contact"
+        ) {
+          contactCount++;
         }
-      )
+        if (
+          element2.shareType == "device" &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelhealth[i] &&
+          selectedKeeper.shareType == "device"
+        ) {
+          deviceCount++;
+        }
+        let kpInfoContactIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "contact");
+        let kpInfoDeviceIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "device");
+        if (type == 'contact' && element2.shareType == "contact" && contactCount < 2) {
+          if (kpInfoContactIndex > -1 && keeperInfo[kpInfoContactIndex].data.index == 1) {
+            changeIndex = 2;
+          } else changeIndex = 1;
+        }
+        if(type == 'device'){
+          if (element2.shareType == "device" && deviceCount == 1) {
+            changeIndex = 3;
+          } else if(element2.shareType == "device" && deviceCount == 2){
+            changeIndex = 4;
+          }
+        }
+      }
     }
-  }
+    if (type == "contact") {
+      (ChangeBottomSheet as any).current.snapTo(1);
+    }
+    if (type == "device") {
+      props.navigation.navigate("KeeperDeviceHistory", {
+        ...props.navigation.state.params,
+        selectedTitle: name,
+        isChangeKeeperType: true,
+      });
+    }
+    if (type == "pdf") {
+      props.navigation.navigate("PersonalCopyHistoryNewBHR", {
+        ...props.navigation.state.params,
+        selectedTitle: name,
+        isChangeKeeperType: true,
+      });
+    }
+  };
 
   const sendApprovalRequestToPK = ( type ) => {
     const PKShareId =

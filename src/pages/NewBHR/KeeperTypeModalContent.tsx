@@ -153,7 +153,7 @@ export default function KeeperTypeModalContents(props) {
             flex: 1,
           }}
         >
-          {keeperTypesData.map((value) => {
+          {keeperTypesData.map((value, index) => {
             if (
               value.type === "pdf" &&
               completedKeeperType.findIndex((value) => value == "pdf") > -1
@@ -177,6 +177,7 @@ export default function KeeperTypeModalContents(props) {
                 activeOpacity={10}
                 onPress={() => onKeeperSelect(value)}
                 style={styles.keeperTypeElementView}
+                key={index}
               >
                 <View style={styles.typeRadioButtonView}>
                   <RadioButton

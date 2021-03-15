@@ -108,29 +108,29 @@ import moment from 'moment'
 import {
   updateEphemeralChannel,
   updateTrustedChannel,
-  updateTrustedContactInfoLocally,
-} from '../actions/trustedContacts'
-import crypto from 'crypto'
-import { Alert } from 'react-native'
-import { ErrorSending } from '../actions/health'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import RelayServices from '../../bitcoin/services/RelayService'
-import generatePDFKeeper from '../utils/generatePDFKeeper'
-import { getKeeperInfoFromShareId } from '../../common/CommonFunctions'
-import Keeper from '../../bitcoin/utilities/Keeper'
-import { ec as EC } from 'elliptic'
-const ec = new EC( 'curve25519' )
-import Mailer from 'react-native-mail'
-import Share from 'react-native-share'
-import RNPrint from 'react-native-print'
-import idx from 'idx'
-import { DecentralizedBackup } from '../../common/interfaces/Interfaces'
-import AccountShell from '../../common/data/models/AccountShell'
-import { remapAccountShells, restoredAccountShells } from '../actions/accounts'
-import PersonalNode from '../../common/data/models/PersonalNode'
-import { personalNodeConfigurationSet } from '../actions/nodeSettings'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import Toast from '../../components/Toast'
+  updateTrustedContactsInfoLocally,
+} from "../actions/trustedContacts";
+import crypto from "crypto";
+import { Alert } from "react-native";
+import { ErrorSending } from "../actions/health";
+import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
+import RelayServices from "../../bitcoin/services/RelayService";
+import generatePDFKeeper from "../utils/generatePDFKeeper";
+import { getKeeperInfoFromShareId } from "../../common/CommonFunctions";
+import Keeper from "../../bitcoin/utilities/Keeper";
+import { ec as EC } from "elliptic";
+var ec = new EC("curve25519");
+import Mailer from "react-native-mail";
+import Share from "react-native-share";
+import RNPrint from "react-native-print";
+import idx from "idx";
+import { DecentralizedBackup } from "../../common/interfaces/Interfaces";
+import AccountShell from "../../common/data/models/AccountShell";
+import { remapAccountShells, restoredAccountShells } from "../actions/accounts";
+import PersonalNode from "../../common/data/models/PersonalNode";
+import { personalNodeConfigurationSet } from "../actions/nodeSettings";
+import TestAccount from "../../bitcoin/services/accounts/TestAccount";
+import Toast from "../../components/Toast";
 
 function* initHealthWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -603,14 +603,14 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
   } = payload.icloudData.walletImage
 
   try {
-    if ( ASYNC_DATA ) {
-      for ( const key of Object.keys( ASYNC_DATA ) ) {
-        console.log( 'restoring to async: ', key )
-        yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
+    if (ASYNC_DATA) {
+      for (const key of Object.keys(ASYNC_DATA)) {
+        console.log("restoring to async: ", key);
+        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
 
-        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
-          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactInfoLocally( trustedContactsInfo ) )
+        if (key === "TrustedContactsInfo" && ASYNC_DATA[key]) {
+          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
+          yield put(updateTrustedContactsInfoLocally(trustedContactsInfo));
         }
       }
     }
@@ -1375,7 +1375,7 @@ function* fetchWalletImageWorker( { payload } ) {
 
         if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
           const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactInfoLocally( trustedContactsInfo ) )
+          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
         }
       }
     }
