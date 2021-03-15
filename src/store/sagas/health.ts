@@ -108,7 +108,7 @@ import moment from "moment";
 import {
   updateEphemeralChannel,
   updateTrustedChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
 } from "../actions/trustedContacts";
 import crypto from "crypto";
 import { Alert } from "react-native";
@@ -139,7 +139,7 @@ function* initHealthWorker() {
   if (initialized) return;
   yield put(initLoader(true));
   const res = yield call(s3Service.initializeHealthKeeper);
-
+console.log('initializeHealthKeeper res', res)
   if (res.status === 200) {
     // Update Initial Health to reducer
     let obj = [
@@ -597,7 +597,7 @@ function* recoverWalletFromIcloudWorker({ payload }) {
 
         if (key === "TrustedContactsInfo" && ASYNC_DATA[key]) {
           const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
-          yield put(updateTrustedContactInfoLocally(trustedContactsInfo));
+          yield put(updateTrustedContactsInfoLocally(trustedContactsInfo));
         }
       }
     }
@@ -1326,7 +1326,7 @@ function* fetchWalletImageWorker({ payload }) {
 
         if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
           const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactInfoLocally( trustedContactsInfo ) )
+          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
         }
       }
     }
@@ -3383,11 +3383,11 @@ function* uploadSMShareWorker({ payload }) {
         }
       }
       let s3Service: S3Service = yield select((state) => state.health.service);
-      const keeperInfoData = yield select(
-        (state) => state.health.keeperInfo
-      );
+      const keeperInfoData = yield select((state) => state.health.keeperInfo);
+      console.log('keeperInfoData', keeperInfoData);
       const answer = yield select((state) => state.storage.database.WALLET_SETUP.security.answer);
       let response = yield call(s3Service.updateKeeperInfoToMetaShare, keeperInfoData, answer);
+      console.log('response', response);
       if(contactLevelInfo.length) {
         for (let i = 0; i < contactLevelInfo.length; i++) {
           const element = contactLevelInfo[i];
