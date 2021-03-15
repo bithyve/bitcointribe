@@ -11,7 +11,7 @@ export default function useTotalSpendingAmount( currentRecipient?: RecipientDesc
     return sendingState
       .selectedRecipients
       .reduce( ( accumulated, recipient ) => {
-        if( currentRecipient && currentRecipient.id === recipient.id ) return 0
+        if( currentRecipient && currentRecipient.id === recipient.id ) return accumulated + 0
         else return accumulated + ( recipient.amount ? recipient.amount : 0 )
       }, 0 )
   }, [ sendingState.selectedRecipients ] )
