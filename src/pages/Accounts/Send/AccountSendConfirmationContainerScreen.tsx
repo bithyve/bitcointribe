@@ -165,7 +165,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
         showSendSuccessBottomSheet()
       } else {
-        navigation.navigate( 'TwoFAToken' )
+        navigation.navigate( 'OTPAuthentication' )
       }
     },
     onFailure: showSendFailureBottomSheet,
