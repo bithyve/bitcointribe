@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
+import { useDispatch } from 'react-redux'
 import { Input } from 'react-native-elements'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import MaterialCurrencyCodeIcon, { materialIconCurrencyCodes } from '../../../components/MaterialCurrencyCodeIcon'
@@ -19,6 +20,7 @@ import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useTotalSpendingAmount from '../../../utils/hooks/sending-utils/UseTotalSpendingAmount'
+import { clearSendMaxFee } from '../../../store/actions/sending'
 
 export type Props = {
   subAccountKind: SubAccountKind;
@@ -39,6 +41,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const currencyKind = useCurrencyKind()
   const sendingState = useSendingState()
   const totalSpendingAmount = useTotalSpendingAmount()
+  const dispatch = useDispatch()
 
   const [ isSendingMax, setIsSendingMax ] = useState( false )
   const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( '' )
@@ -94,7 +97,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   }
 
   useEffect( ()=>{
-    if( sendMaxFee && isSendingMax ){
+    if( isSendingMax && sendMaxFee ){
       const sendMaxAmount = remainingSpendableBalance
       const convertedFiatAmount = convertSatsToFiat( sendMaxAmount )
 
@@ -102,6 +105,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
       setCurrentSatsAmountTextValue( String( sendMaxAmount ) )
       onAmountChanged( sendMaxAmount )
     }
+    else if( !isSendingMax && sendMaxFee ) dispatch( clearSendMaxFee() )
+
   }, [ sendMaxFee, isSendingMax ] )
 
   function convertFiatToSats( fiatAmount: number ) {
@@ -156,7 +161,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             returnKeyType="done"
             keyboardType={'numeric'}
             onChangeText={( value ) => {
-              setIsSendingMax( false )
+              if( isSendingMax ) setIsSendingMax( false )
               setCurrentFiatAmountTextValue( value )
               setCurrentSatsAmountTextValue( String( convertFiatToSats( Number( value ) ?? 0 ) ) )
               onAmountChanged( convertFiatToSats( Number( value ) ?? 0 ) )

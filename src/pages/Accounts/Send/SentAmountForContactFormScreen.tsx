@@ -232,6 +232,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
         <TouchableOpacity
           onPress={handleAddRecipientButtonPress}
+          disabled={!!sendingState.sendMaxFee}
           style={{
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
@@ -240,7 +241,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         >
           <Text style={{
             ...ButtonStyles.actionButtonText,
-            color: Colors.blue,
+            color: sendingState.sendMaxFee? Colors.lightBlue: Colors.blue,
           }}>
               Add Recipient
           </Text>
