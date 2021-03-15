@@ -852,7 +852,7 @@ export default function Receive( props ) {
               receiveLink.includes( 'https://hexawallet.io' )
                 ? `Click here to accept contact request from ${
                   WALLET_SETUP.walletName
-                } Hexa wallet - link will expire in ${
+                }' Hexa wallet - link will expire in ${
                   config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
                 } hours`
                 : null

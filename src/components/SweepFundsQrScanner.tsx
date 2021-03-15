@@ -116,7 +116,7 @@ export default function SweepFundsQrScanner( props ) {
 
           <TextInput
             style={styles.textBox}
-            placeholder={'or Enter Address Manually'}
+            placeholder={'or Enter address manually'}
             keyboardType={
               Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
             }
