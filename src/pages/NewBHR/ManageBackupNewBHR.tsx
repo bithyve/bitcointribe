@@ -391,7 +391,7 @@ class ManageBackupNewBHR extends Component<
         this.setState({
           selectedKeeper: obj.selectedKeeper,
         });
-        this.goToHistory(obj);
+        this.sendApprovalRequestToPK(this.state.selectedKeeperType);
       }
     }
 
@@ -739,7 +739,7 @@ class ManageBackupNewBHR extends Component<
           if (this.refs.QrBottomSheet) (this.refs.QrBottomSheet as any).snapTo(0);
         }}
         onPressContinue={async() => {
-          let qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
+          let qrScannedData = '{"requester":"Sdfsdf","publicKey":"6E6KImumgSQoh7GjpJqQe0EM","uploadedAt":1615816353302,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
           try {
             if (qrScannedData) {
               let qrData = JSON.parse(qrScannedData);
