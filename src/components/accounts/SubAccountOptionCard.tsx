@@ -107,8 +107,8 @@ const SubAccountOptionCard: React.FC<Props> = ( {
         />
 
         <View style={descriptionTextContainerStyle}>
-          <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.defaultTitle}</Card.Title>
-          <Card.Title style={subtitleTextStyle}>{subAccountInfo.defaultDescription}</Card.Title>
+          <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: subAccountInfo.defaultTitle}</Card.Title>
+          <Card.Title style={subtitleTextStyle}>{subAccountInfo.customDescription? subAccountInfo.customDescription: subAccountInfo.defaultDescription}</Card.Title>
         </View>
 
         {isDisabled == false && (
