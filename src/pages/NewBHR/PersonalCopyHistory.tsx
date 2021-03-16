@@ -328,7 +328,6 @@ const PersonalCopyHistory = (props) => {
           deviceCount++;
         }
         let kpInfoContactIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "contact");
-        let kpInfoDeviceIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "device");
         if (element2.shareType == "contact" && contactCount < 2) {
           if (kpInfoContactIndex > -1 && keeperInfo[kpInfoContactIndex].data.index == 1) {
             changeIndex = 2;
@@ -561,13 +560,6 @@ const PersonalCopyHistory = (props) => {
             <ApproveSetup
               isContinueDisabled={false}
               onPressContinue={() => {
-                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
-                let obj = {
-                  id: selectedLevelId,
-                  selectedKeeper: {...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType},
-                  isSetup: true,
-                };
-                // goToHistory(obj);
                 onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
                 (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
               }}

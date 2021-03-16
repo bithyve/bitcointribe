@@ -7,7 +7,7 @@ import { MetaShare } from '../../bitcoin/utilities/Interface';
 
 export const INIT_HEALTH_SETUP = 'INIT_HEALTH_SETUP';
 export const HEALTH_UPDATE = 'HEALTH_UPDATE';
-export const HEALTH_CHECK_INITIALIZED = 'HEALTH_CHECK_INITIALIZED';
+export const HEALTH_CHECK_INITIALIZED_KEEPER = 'HEALTH_CHECK_INITIALIZED_KEEPER';
 export const HEALTH_CHECK_INITIALIZE = 'HEALTH_CHECK_INITIALIZE';
 export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK';
 export const S3_LOADING_STATUS = 'S3_LOADING_STATUS';
@@ -114,7 +114,7 @@ export const recoverWalletUsingIcloud = ( icloudData ) => {
 
 export const healthInitialized = () => {
   return {
-    type: HEALTH_CHECK_INITIALIZED
+    type: HEALTH_CHECK_INITIALIZED_KEEPER
   }
 }
 
@@ -144,7 +144,7 @@ export const initLoader = ( beingLoaded ) => {
 
 export const healthCheckInitialized = () => {
   return {
-    type: HEALTH_CHECK_INITIALIZED
+    type: HEALTH_CHECK_INITIALIZED_KEEPER
   }
 }
 

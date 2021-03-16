@@ -3,7 +3,8 @@ import {
   createWatcher,
   requestTimedout,
   serviceGenerator2,
-} from '../utils/utilities'
+  serviceGeneratorForNewBHR,
+} from "../utils/utilities";
 import {
   INIT_HEALTH_SETUP,
   CHECK_SHARES_HEALTH,
@@ -101,6 +102,7 @@ import {
   notificationType,
   ShareUploadables,
   TrustedDataElements,
+  VersionHistory,
   WalletImage,
 } from '../../bitcoin/utilities/Interface'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
@@ -131,6 +133,7 @@ import PersonalNode from "../../common/data/models/PersonalNode";
 import { personalNodeConfigurationSet } from "../actions/nodeSettings";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 import Toast from "../../components/Toast";
+import { restoredVersionHistory } from "../actions/versionHistory";
 
 function* initHealthWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -1053,7 +1056,7 @@ function* recoverWalletWorker( { payload } ) {
       //   decryptedCloudDataJson
       // );
       const { s3Service, } = yield call(
-        serviceGenerator2,
+        serviceGeneratorForNewBHR,
         security.answer,
         mnemonic,
         restorationShares,
@@ -1368,40 +1371,6 @@ function* fetchWalletImageWorker( { payload } ) {
       STATE_DATA,
     } = walletImage
 
-    if ( ASYNC_DATA ) {
-      for ( const key of Object.keys( ASYNC_DATA ) ) {
-        console.log( 'restoring to async: ', key )
-        yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
-
-        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
-          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
-        }
-      }
-    }
-
-    if ( STATE_DATA ) {
-      for ( const key of Object.keys( STATE_DATA ) ) {
-        if( !STATE_DATA[ key ] ) continue
-
-        switch( key ){
-            case 'accountShells':
-              const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
-              yield put( restoredAccountShells( {
-                accountShells
-              } ) )
-              break
-
-            case 'activePersonalNode':
-              const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
-              yield put( personalNodeConfigurationSet(
-                activePersonalNode
-              ) )
-              break
-        }
-      }
-    }
-
     const payload = {
       SERVICES, DECENTRALIZED_BACKUP
     }
@@ -1426,10 +1395,56 @@ function* fetchWalletImageWorker( { payload } ) {
       TRUSTED_CONTACTS: TRUSTED_CONTACTS
         ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
         : new TrustedContactsService(),
-      KEEPERS_INFO: KeeperService.fromJSON( KEEPERS_INFO )
+      KEEPERS_INFO: KeeperService.fromJSON(KEEPERS_INFO) 
     }
     yield put( remapAccountShells( services ) )
-    console.log( 'services', services )
+    console.log( 'services',services );
+
+    if ( ASYNC_DATA ) {
+      for ( const key of Object.keys( ASYNC_DATA ) ) {
+        console.log( 'restoring to async: ', key )
+        yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
+
+        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
+          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
+          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
+        }
+      }
+    }
+
+    if ( STATE_DATA ) {
+      for ( const key of Object.keys( STATE_DATA ) ) {
+        if( !STATE_DATA[ key ] ) continue
+
+        switch( key ){
+            case 'accountShells':
+              const accountShells: AccountShell[] = JSON.parse( STATE_DATA[ key ] )
+              yield put( restoredAccountShells( {
+                accountShells
+              } ) )
+              break
+
+              case 'trustedContactsInfo':
+                const trustedContactsInfo = JSON.parse( STATE_DATA[ key ] )
+                yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
+                break
+
+            case 'activePersonalNode':
+              const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )
+              yield put( personalNodeConfigurationSet(
+                activePersonalNode
+              ) )
+              break
+
+              case 'versionHistory':
+                const versions: VersionHistory[] = JSON.parse( STATE_DATA[ key ] )
+                yield put( restoredVersionHistory( {
+                  versions
+                } ) )
+                break
+        }
+      }
+    }
 
     // update hashes
     const hashesWI = {
