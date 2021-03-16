@@ -479,7 +479,7 @@ export default class HDSegwitWallet extends Bitcoin {
       if( blindRefresh ){
         if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
           // blind derv-account generation
-          this.getDerivativeAccXpub( accountType, accountNumber, contactName );
+          this.generateDerivativeXpub( accountType, accountNumber, contactName );
           ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
         }
         await this.syncDerivativeAccGapLimit( accountType, accountNumber )
@@ -2208,8 +2208,8 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public getXpub = () => {
-    if (this.xpub) {
-      return this.xpub;
+    if ( this.xpub ) {
+      return this.xpub
     }
     const seed = bip39.mnemonicToSeedSync( this.mnemonic, this.passphrase )
     const root = bip32.fromSeed( seed, this.network )

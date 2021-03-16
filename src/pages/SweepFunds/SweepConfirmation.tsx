@@ -570,6 +570,7 @@ class SweepConfirmation extends Component<
                 'The transaction has been submitted to the Bitcoin network. View transactions on the account screen for details'
               }
               isFromContact={false}
+              recipients={[]}
               okButtonText={'View Account'}
               cancelButtonText={'Back'}
               isCancel={false}

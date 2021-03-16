@@ -13,7 +13,7 @@ const SubAccountTFAHelpStack = createStackNavigator( {
   SubAccountTFAHelpRoot: {
     screen: SubAccountTFAHelpScreen,
     navigationOptions: {
-      title: '2FA Help'
+      header: null
     },
   },
 } )

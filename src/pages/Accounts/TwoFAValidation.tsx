@@ -75,6 +75,7 @@ export default function TwoFAValidation( props ) {
           'Invalid 2FA token, please retry.'
         }
         isFromContact={false}
+        recipients={[]}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}
