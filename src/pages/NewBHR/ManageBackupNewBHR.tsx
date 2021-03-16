@@ -319,10 +319,6 @@ class ManageBackupNewBHR extends Component<
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)
     ) {
-      // if (
-      //  prevProps.levelHealth !==
-      //   this.props.levelHealth
-      // ) {
       if (
         this.props.levelHealth.findIndex(
           (value) =>
@@ -708,17 +704,18 @@ class ManageBackupNewBHR extends Component<
     return (
       <QRModal
         isFromKeeperDeviceHistory={true}
-        QRModalHeader={"QR scanner ddfds"}
+        QRModalHeader={"QR scanner"}
         title={"Note"}
         infoText={
           "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod"
         }
         modalRef={this.refs.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
-        onQrScan={async(qrData) => {
+        onQrScan={async(qrScannedData) => {
           try {
-            if (qrData) {
-              console.log('qrData', qrData)
+            if (qrScannedData) {
+              let qrData = JSON.parse(qrScannedData);
+              console.log('qrData', qrData);
               const res = await S3Service.downloadSMShare(qrData.publicKey);
               console.log("Keeper Shares", res);
               if (res.status === 200) {

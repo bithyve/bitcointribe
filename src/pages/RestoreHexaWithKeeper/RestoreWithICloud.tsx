@@ -307,6 +307,9 @@ class RestoreWithICloud extends Component<
       }));
       (this.refs.RestoreFromICloud as any).snapTo(1);
     } else {
+      this.setState((state) => ({
+        showLoader: false,
+      }));
       (this.refs.BackupNotFound as any).snapTo(1);
     }
   };
@@ -983,6 +986,7 @@ class RestoreWithICloud extends Component<
               modalRef={this.refs.BackupNotFound}
               onPressProceed={() => {
                 (this.refs.BackupNotFound as any).snapTo(0);
+                navigation.navigate('RestoreSelectedContactsList');
               }}
               onPressBack={() => {
                 (this.refs.BackupNotFound as any).snapTo(0);

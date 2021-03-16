@@ -114,8 +114,6 @@ export interface MetaShare {
     reshareVersion: number;
     questionId: string;
     question?: string;
-    keeper?:string;
-    keeperInfo?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
   };

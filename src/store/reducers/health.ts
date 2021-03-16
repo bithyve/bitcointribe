@@ -2,7 +2,7 @@ import S3Service from '../../bitcoin/services/sss/S3Service'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
-  HEALTH_CHECK_INITIALIZED,
+  HEALTH_CHECK_INITIALIZED_KEEPER,
   HEALTH_CHECK_INITIALIZE,
   HEALTH_UPDATE,
   GET_HEALTH_OBJECT,
@@ -165,7 +165,7 @@ const initialState: {
 
 export default ( state = initialState, action ) => {
   switch ( action.type ) {
-      case HEALTH_CHECK_INITIALIZED:
+      case HEALTH_CHECK_INITIALIZED_KEEPER:
         return {
           ...state,
           loading: {
