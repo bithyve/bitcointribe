@@ -14,7 +14,7 @@ export default function ICloudBackupNotFound(props) {
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerTitleText}>
-            iCloud backup{'\n'}not found
+            iCloud backup not found
         </Text>
         <Text style={styles.headerInfoText}>
             Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod

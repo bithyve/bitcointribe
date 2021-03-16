@@ -36,6 +36,7 @@ import {
   sendApprovalRequest,
   onApprovalStatusChange,
   uploadSMShareKeeper,
+  secondaryShareDownloaded,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
 import SendShareModal from './SendShareModal'
@@ -67,7 +68,8 @@ import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import QRModal from '../Accounts/QRModal'
 import { StackActions } from 'react-navigation'
-import ApproveSetup from './ApproveSetup'
+import ApproveSetup from './ApproveSetup';
+import S3Service from '../../bitcoin/services/sss/S3Service'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -141,7 +143,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
   const [ isOTPType, setIsOTPType ] = useState( false )
   const [ trustedLink, setTrustedLink ] = useState( '' )
-  const [ trustedQR, setTrustedQR ] = useState( '' )
+  const [ trustedQR, setTrustedQR ] = useState( '' );
+  const [QrBottomSheet] = useState(React.createRef());
   const [ trustedContactHistory, setTrustedContactHistory ] = useState( [
     {
       id: 1,
@@ -179,7 +182,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     props.navigation.getParam( 'selectedTitle' ),
   )
   const [ index, setIndex ] = useState( props.navigation.state.params.index )
-  const s3Service = useSelector( ( state ) => state.health.service )
+  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
   const [ selectedLevelId, setSelectedLevelId ] = useState(
     props.navigation.state.params.selectedLevelId,
@@ -1101,7 +1104,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           deviceCount++;
         }
         let kpInfoContactIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "contact");
-        let kpInfoDeviceIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "device");
         if (type == 'contact' && element2.shareType == "contact" && contactCount < 2) {
           if (kpInfoContactIndex > -1 && keeperInfo[kpInfoContactIndex].data.index == 1) {
             changeIndex = 2;
@@ -1135,36 +1137,81 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   };
 
-  const sendApprovalRequestToPK = ( type ) => {
-    const PKShareId =
-      currentLevel == 2 || currentLevel == 1
-        ? levelHealth[ 1 ].levelInfo[ 2 ].shareId
-        : currentLevel == 3
-          ? levelHealth[ 2 ].levelInfo[ 2 ].shareId
-          : levelHealth[ 1 ].levelInfo[ 2 ].shareId
-    console.log( 'PKShareId', PKShareId )
-    dispatch(
-      sendApprovalRequest(
-        selectedKeeper.shareId,
-        PKShareId,
-        type == 'pdf' || type == 'contact'
-          ? notificationType.uploadSecondaryShare
-          : notificationType.approveKeeper
-      )
-    )
-    if ( keeperApproveStatus.shareId != selectedKeeper.shareId ) {
-      dispatch(
-        onApprovalStatusChange( {
-          status: false,
-          initiatedAt: moment( new Date() ).valueOf(),
-          shareId: selectedKeeper.shareId,
-        } )
-      )
-    }
-    ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-    ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+  const sendApprovalRequestToPK = (type) => {
+    setQrBottomSheetsFlag(true);
+    (QrBottomSheet as any).current.snapTo(1);
+    (keeperTypeBottomSheet as any).current.snapTo(0);
+  };
+
+  const renderQrContent = () => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={true}
+        QRModalHeader={"QR scanner ddfds"}
+        title={"Note"}
+        infoText={
+          "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod"
+        }
+        modalRef={QrBottomSheet}
+        isOpenedFlag={QrBottomSheetsFlag}
+        onQrScan={async(qrData) => {
+          try {
+            if (qrData) {
+              console.log('qrData', qrData)
+              const res = await S3Service.downloadSMShare(qrData.publicKey);
+              console.log("Keeper Shares", res);
+              if (res.status === 200) {
+                console.log("SHARES DOWNLOAD", res.data);
+                dispatch(secondaryShareDownloaded(res.data.metaShare));
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
+                (QrBottomSheet as any).current.snapTo(0);
+              }
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onBackPress={() => {
+          setQrBottomSheetsFlag(false);
+          if (QrBottomSheet) (QrBottomSheet as any).current.snapTo(0);
+        }}
+        onPressContinue={async() => {
+          let qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
+          try {
+            if (qrScannedData) {
+              let qrData = JSON.parse(qrScannedData);
+              console.log('qrData', qrData);
+              const res = await S3Service.downloadSMShare(qrData.publicKey);
+              console.log("Keeper Shares", res);
+              if (res.status === 200) {
+                console.log("SHARES DOWNLOAD", res.data);
+                dispatch(secondaryShareDownloaded(res.data.metaShare));
+                (ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+                (QrBottomSheet as any).current.snapTo(0);
+              }
+            }
+          } catch (err) {
+            console.log({ err });
+          }
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
   }
 
+  const renderQrHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          setQrBottomSheetsFlag(false);
+          (QrBottomSheet as any).current.snapTo(0);
+        }}
+      />
+    );
+  }
 
   return (
     <View style={{
@@ -1366,14 +1413,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ]}
         renderContent={() => (
           <ApproveSetup
-            isContinueDisabled={
-              selectedKeeperType == 'pdf' || selectedKeeperType == 'contact'
-                ? !keeperApproveStatus.status
-                : false
-            }
+            isContinueDisabled={false}
             onPressContinue={() => {
-              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
+              onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
+              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
             }}
           />
         )}
@@ -1385,6 +1428,25 @@ const TrustedContactHistoryKeeper = ( props ) => {
             }}
           />
         )}
+      />
+      <BottomSheet
+        onOpenEnd={() => {
+          setQrBottomSheetsFlag( true )
+        }}
+        onCloseEnd={() => {
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
+        }}
+        onCloseStart={() => { }}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={QrBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '92%' ) : hp( '91%' ),
+        ]}
+        renderContent={renderQrContent}
+        renderHeader={renderQrHeader}
       />
     </View>
   )
