@@ -61,6 +61,11 @@ export interface TransactionDetails {
    */
   primaryAccType?: string;
 
+   /**
+   * Name of the account(custom) to which the transaction belongs
+   */
+  accountName?: string;
+
   /**
    * Name of the contact in case of an inbound transaction from trusted-contact
    */

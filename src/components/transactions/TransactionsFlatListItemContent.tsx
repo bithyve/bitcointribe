@@ -70,7 +70,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
 
       <ListItem.Content style={styles.titleSection}>
         <ListItem.Title style={styles.titleText} numberOfLines={1}>
-          {transaction.accountType}
+          {transaction.accountName? transaction.accountName: transaction.accountType}
         </ListItem.Title>
         <ListItem.Subtitle style={styles.subtitleText}>
           {formattedDateText}
