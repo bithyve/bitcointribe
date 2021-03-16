@@ -18,7 +18,6 @@ import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP } from '../../common/constants/wallet-service-types'
 
 export default function SendConfirmationContent( props ) {
   const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
