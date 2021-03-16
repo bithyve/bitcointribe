@@ -13,6 +13,7 @@ import {
   AsyncStorage,
   Alert,
   RefreshControl,
+  Modal,
 } from "react-native";
 import {
   widthPercentageToDP as wp,
@@ -792,6 +793,17 @@ class RestoreWithICloud extends Component<
         </View>
         {showLoader ? <Loader isLoading={true} /> : null}
         {hideShow ? (
+          <Modal
+          animationType='fade'
+          transparent={true}
+          visible={hideShow}
+          onRequestClose={() => { this.setState({ hideShow: false }); }}>
+          <AppBottomSheetTouchableWrapper style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }} onPress={() => { this.setState({ hideShow: false }); }}>
+
           <View style={styles.dropDownView}>
             <ScrollView>
               {walletsArray.map((value) => {
@@ -854,6 +866,8 @@ class RestoreWithICloud extends Component<
               })}
             </ScrollView>
           </View>
+          </AppBottomSheetTouchableWrapper>
+          </Modal>
         ) : null}
         <BottomSheet
           enabledInnerScrolling={true}
