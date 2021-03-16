@@ -18,6 +18,8 @@ import {
   InputUTXOs,
   AverageTxFees,
   TransactionPrerequisiteElements,
+  WyreDerivativeAccountElements,
+  RampDerivativeAccountElements,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -589,6 +591,7 @@ export default class SecureHDWallet extends Bitcoin {
         lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
         accountType: 'Savings Account',
+        accountName: this.accountName,
       }
     }
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
@@ -897,6 +900,15 @@ export default class SecureHDWallet extends Bitcoin {
         internalAddresses
       }
 
+      let accountName: string = accountType
+      switch ( accountType ) {
+          case SUB_PRIMARY_ACCOUNT:
+          case WYRE:
+          case RAMP:
+            accountName = ( this.derivativeAccounts[ accountType ][ accountNumber ] as SubPrimaryDerivativeAccountElements | WyreDerivativeAccountElements | RampDerivativeAccountElements ).accountName
+            break
+      }
+
       accounts[ xpubId ] = {
         externalAddressSet,
         internalAddressSet,
@@ -914,6 +926,7 @@ export default class SecureHDWallet extends Bitcoin {
         accountType: accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
         contactName: null,
         primaryAccType: accountType === SUB_PRIMARY_ACCOUNT ? 'Savings Account' : null,
+        accountName
       }
     }
 
