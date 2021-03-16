@@ -526,7 +526,7 @@ export const createAndUploadOnEFChannelWatcher = createWatcher(
 function* uploadSecondaryShareWorker( { payload } ) {
   const { encryptedKey, metaShare, otp } = payload
   console.log( 'uploadSecondaryShareWorker payload', payload )
-  const keeper: KeeperService = yield select( ( state ) => state.keeper.service )
+  const keeper: KeeperService = yield select( ( state ) => state.keeper.service );
   const result = yield call(
     keeper.uploadSecondaryShare,
     encryptedKey,

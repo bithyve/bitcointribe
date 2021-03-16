@@ -1034,11 +1034,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
             }
             else {
               ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-              const popAction = StackActions.pop( {
-                n: 1
-              } )
-              props.navigation.dispatch( popAction )
-              props.navigation.replace( 'ManageBackupNewBHR' )
+              const popAction = StackActions.pop({ n: isChange ? 2 : 1 });
+              props.navigation.dispatch(popAction);
+              // props.navigation.replace( 'ManageBackupNewBHR' )
             }
           }}
         />
@@ -1154,10 +1152,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={async(qrData) => {
+        onQrScan={async(qrScannedData) => {
           try {
-            if (qrData) {
-              console.log('qrData', qrData)
+            if (qrScannedData) {
+              let qrData = JSON.parse(qrScannedData);
+              console.log('qrData', qrData);
               const res = await S3Service.downloadSMShare(qrData.publicKey);
               console.log("Keeper Shares", res);
               if (res.status === 200) {
@@ -1178,7 +1177,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
           if (QrBottomSheet) (QrBottomSheet as any).current.snapTo(0);
         }}
         onPressContinue={async() => {
-          let qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}';
+          console.log('JHGUYFGYUBJ')
+          let qrScannedData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
           try {
             if (qrScannedData) {
               let qrData = JSON.parse(qrScannedData);
@@ -1188,7 +1188,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
               if (res.status === 200) {
                 console.log("SHARES DOWNLOAD", res.data);
                 dispatch(secondaryShareDownloaded(res.data.metaShare));
-                (ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
                 (QrBottomSheet as any).current.snapTo(0);
               }
             }
