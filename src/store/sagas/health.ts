@@ -126,7 +126,6 @@ import Mailer from "react-native-mail";
 import Share from "react-native-share";
 import RNPrint from "react-native-print";
 import idx from "idx";
-import { DecentralizedBackup } from "../../common/interfaces/Interfaces";
 import AccountShell from "../../common/data/models/AccountShell";
 import { remapAccountShells, restoredAccountShells } from "../actions/accounts";
 import PersonalNode from "../../common/data/models/PersonalNode";
@@ -142,29 +141,11 @@ function* initHealthWorker() {
   if ( initialized ) return
   yield put( initLoader( true ) )
   const res = yield call( s3Service.initializeHealthKeeper )
-
+  console.log("healt initHealthWorker", res);
   if ( res.status === 200 ) {
-    // Update Initial Health to reducer
-    const obj = [
-      {
-        level: 1,
-        levelInfo: res.data.levelInfo,
-      },
-    ]
-    yield put( updateHealth( obj, 0 ) )
+   
     // Update status
     yield put( healthCheckInitialized() )
-
-    // walletID globalization (in-app)
-    const walletID = yield call( AsyncStorage.getItem, 'walletID' )
-    if ( !walletID ) {
-      yield call(
-        AsyncStorage.setItem,
-        'walletID',
-        s3Service.levelhealth.walletId
-      )
-    }
-
     const { SERVICES } = yield select( ( state ) => state.storage.database )
     const updatedSERVICES = {
       ...SERVICES,
@@ -175,6 +156,14 @@ function* initHealthWorker() {
         SERVICES: updatedSERVICES
       }
     } )
+     // Update Initial Health to reducer
+     const obj = [
+      {
+        level: 1,
+        levelInfo: res.data.levelInfo,
+      },
+    ]
+    yield put( updateHealth( obj, 0 ) )
     yield put( initLoader( false ) )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()

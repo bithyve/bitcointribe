@@ -72,7 +72,10 @@ const HomeHeader = ( {
   )
   const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
-
+  
+  const s3Service: S3Service = useSelector(
+    ( state ) => state.health.service
+  )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
@@ -320,11 +323,11 @@ const HomeHeader = ( {
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            // if (s3Service.levelhealth.healthCheckInitializedKeeper) {
+            if (s3Service.levelhealth.healthCheckInitializedKeeper) {
             navigation.navigate( 'ManageBackupNewBHR' )
-            // } else {
-            //   navigation.navigate("ManageBackup");
-            // }
+            } else {
+              navigation.navigate("ManageBackup");
+            }
           }}
           style={styles.manageBackupMessageView}
         >

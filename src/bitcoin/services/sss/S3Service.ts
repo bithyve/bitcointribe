@@ -16,7 +16,6 @@ import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
 export default class S3Service {
   public static fromJSON = ( json: string ) => {
     const { levelhealth } = JSON.parse( json )
-    console.log( 'S3Service levelhealth', levelhealth )
     const { sss } = JSON.parse( json )
     const mnemonic = sss.mnemonic ? sss.mnemonic : levelhealth.mnemonic
     const walletId = sss.walletId ? sss.walletId : levelhealth.walletId
