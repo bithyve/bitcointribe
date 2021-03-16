@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -19,6 +19,7 @@ import { RecipientDescribing } from '../../common/data/models/interfaces/Recipie
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import RecipientKind from '../../common/data/enums/RecipientKind'
 
 export type Props = {
   recipient: RecipientDescribing;
@@ -36,6 +37,14 @@ function RecipientComponent( {
   const unitText = useFormattedUnitText( {
     bitcoinUnit: accountKind == TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS
   } )
+
+  const displayedNameText = useMemo( () => {
+    if ( recipient.kind === RecipientKind.ADDRESS ) {
+      return `${recipient.displayedName}${recipient.id}`
+    } else {
+      return recipient.displayedName
+    }
+  }, [ recipient ] )
 
   return (
     <TouchableOpacity
@@ -80,7 +89,7 @@ function RecipientComponent( {
           </Text>
 
           <Text style={styles.contactNameText} numberOfLines={1}>
-            {recipient.displayedName}
+            {displayedNameText}
           </Text>
 
           <Text
@@ -88,20 +97,10 @@ function RecipientComponent( {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {recipient.availableBalance} {unitText}
+            {recipient.amount} {unitText}
           </Text>
         </View>
 
-        {/* <Ionicons
-          style={{ marginLeft: 'auto', marginRight: 10 }}
-          name={
-            selectedContactId == recipient.id
-              ? 'ios-arrow-up'
-              : 'ios-arrow-down'
-          }
-          size={20}
-          color={Colors.borderColor}
-        />  */}
       </View>
 
       {selectedContactId == recipient.id && (
