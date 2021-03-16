@@ -63,6 +63,7 @@ const RecipientSelectionStrip: React.FC<Props> = ( {
               <SubAccountOptionCard
                 subAccountInfo={getSubAccountForRecipient( ( recipient as AccountRecipientDescribing ) )}
                 isSelected={isSelected( recipient )}
+                showsBalance
                 containerStyle={styles.accountShellListItemContainer}
               />
             ) )}
