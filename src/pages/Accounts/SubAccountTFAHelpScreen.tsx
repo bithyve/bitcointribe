@@ -28,11 +28,16 @@ import ServerErrorModal from './ServerErrorModal'
 import {
   resetTwoFA,
   generateSecondaryXpriv,
-  clearTransfer,
   twoFAResetted,
   secondaryXprivGenerated,
 } from '../../store/actions/accounts'
 import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
+import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
+import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
+import idx from 'idx'
+import { AccountsState } from '../../store/reducers/accounts'
+import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import { resetSendState } from '../../store/actions/sending'
 
 export type Props = {
   navigation: any;
@@ -52,9 +57,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   ] = useState( React.createRef() )
 
   const additional = useSelector( ( state ) => state.accounts.additional )
-  const service = useSelector(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
+  const accountsState: AccountsState = useAccountsState()
+  const sourceAccountShell = useSourceAccountShellForSending()
+  const dispatch = useDispatch()
 
   let generatedSecureXPriv
   let resettedTwoFA
@@ -63,18 +68,18 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     generatedSecureXPriv = additional.secure.xprivGenerated
     resettedTwoFA = additional.secure.twoFAResetted
   }
-  const dispatch = useDispatch()
 
   useEffect( () => {
     if ( resettedTwoFA ) {
-      props.navigation.navigate( 'TwoFASetup', {
-        twoFASetup: service.secureHDWallet.twoFASetup,
+      const twoFASetupDetails = idx( accountsState, ( _ )=> _[ sourceAccountShell.primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      navigation.navigate( 'TwoFASetup', {
+        twoFASetup: twoFASetupDetails,
         onPressBack: () => {
-          dispatch( clearTransfer( SECURE_ACCOUNT ) )
-          props.navigation.navigate( 'AccountDetails', {
-            serviceType: SECURE_ACCOUNT,
-            index: 2,
-          } )
+          navigation.dispatch(
+            resetStackToAccountDetails( {
+              accountShellID: sourceAccountShell.id,
+            } )
+          )
         },
       } )
       dispatch( twoFAResetted( null ) ) //resetting to monitor consecutive change
@@ -93,14 +98,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   useEffect( () => {
     ( async () => {
       if ( generatedSecureXPriv ) {
-        dispatch( clearTransfer( SECURE_ACCOUNT ) )
-
-        props.navigation.navigate( 'Send', {
-          serviceType: SECURE_ACCOUNT,
-          sweepSecure: true,
-          netBalance:
-            service.secureHDWallet.balances.balance +
-            service.secureHDWallet.balances.unconfirmedBalance,
+        dispatch( resetSendState() )
+        navigation.navigate( 'Send', {
+          subAccountKind: sourceAccountShell.primarySubAccount.kind,
         } )
         dispatch( secondaryXprivGenerated( null ) )
 
@@ -175,7 +175,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         proceedButtonText={'Proceed'}
         onPressProceed={() => {
           ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.navigate( 'NewTwoFASecret' )
+          navigation.navigate( 'NewTwoFASecret' )
         }}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/icon_twoFASuccess.png' )}
@@ -239,7 +239,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
             flexDirection: 'row', alignItems: 'center'
           }}>
             <AppBottomSheetTouchableWrapper
-              onPress={() => props.navigation.goBack()}
+              onPress={()=>{ navigation.navigate( 'OTPAuthentication' ) }}
               hitSlop={{
                 top: 20, left: 20, bottom: 20, right: 20
               }}
