@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -8,7 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  Alert
 } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -25,7 +26,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 export default function WalletNameRecovery( props ) {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ walletName, setWalletName ] = useState( '' )
-
+  
   return (
     <SafeAreaView style={{
       flex: 1 
@@ -67,7 +68,7 @@ export default function WalletNameRecovery( props ) {
                 marginLeft: 20,
               }}
             >
-              Type in the name{'\n'}of your wallet
+              Type in the name of your wallet
             </Text>
             <Text style={{
               ...styles.modalInfoText, marginTop: 7, marginLeft: 20,  
@@ -114,6 +115,11 @@ export default function WalletNameRecovery( props ) {
             <View style={styles.bottomButtonView}>
               <TouchableOpacity
                 onPress={() =>
+                  // props.navigation.navigate("ScanRecoveryKey", {
+                  //   walletName: walletName,
+                  //   scannedData: (scannedData) =>
+                  //     this.handleScannedData(scannedData),
+                  // })
                   props.navigation.navigate( 'RecoveryQuestion', {
                     walletName 
                   } )
@@ -232,3 +238,5 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   }
 } )
+
+

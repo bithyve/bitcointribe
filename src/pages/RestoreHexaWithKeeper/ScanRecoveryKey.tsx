@@ -111,7 +111,7 @@ class ScanRecoveryKey extends Component<
               <Text style={{ ...styles.greyBoxText, fontSize: RFValue(11) }}>
                 Recovering Wallet
               </Text>
-              <Text style={styles.greyBoxText}>{this.props.walletName + "’s Wallet"}</Text>
+              <Text style={styles.greyBoxText}>{`${this.props.walletName ? this.props.walletName : this.props.navigation.state.params.walletName ? this.props.navigation.state.params.walletName : ''}` + "’s Wallet"}</Text>
               <Text style={{ ...styles.greyBoxText, fontSize: RFValue(10) }}>
                 Lorem ipsum dolor
               </Text>

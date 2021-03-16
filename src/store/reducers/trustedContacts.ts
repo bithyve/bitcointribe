@@ -262,7 +262,7 @@ function reduceTCInfoIntoRecipientDescriptions( {
     const hasTrustedAddress = Boolean( backendTCInfo && backendTCInfo.trustedAddress ) || Boolean( backendTCInfo && backendTCInfo.trustedTestAddress )
     const walletName: string | null = backendTCInfo && backendTCInfo.contactsWalletName || null
     const lastSeenActive: number | null = backendTCInfo && backendTCInfo.lastSeen || null
-    const initiatedAt: number | null = backendTCInfo?.ephemeralChannel?.initiatedAt || null
+    const initiatedAt: number | null = backendTCInfo && backendTCInfo?.ephemeralChannel?.initiatedAt || null
     const hasTrustedChannelWithUser = Boolean( backendTCInfo && backendTCInfo.symmetricKey )
 
 

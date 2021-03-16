@@ -37,7 +37,7 @@ export default function SecondaryDeviceModelContents(props) {
       <View style={NavStyles.modalContentView}>
         {!props.secondaryQR ? (
           <View style={{ height: hp('27%'), justifyContent: 'center' }}>
-            <ActivityIndicator size="large" />
+            <ActivityIndicator size="large" animating color={Colors.gray1}/>
           </View>
         ) : (
             <QRCode value={props.secondaryQR} size={hp('27%')} />

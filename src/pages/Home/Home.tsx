@@ -865,7 +865,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       'change',
       this.onAppStateChange
     )
+    console.log( 's3Service', s3Service )
+    const { healthCheckInitializedKeeper } = s3Service.levelhealth
+    if ( !healthCheckInitializedKeeper ) {
+      initializeHealthSetup()
+    }
 
+    //const { healthCheckInitialized } = s3Service.sss;
+    //   console.log("healthCheckInitialized", healthCheckInitialized);
+    //   if (!healthCheckInitialized) {
+    //     initHealthCheck();
+    //   }
+    // }
     this.bootStrapNotifications()
     this.setUpFocusListener()
     this.getNewTransactionNotifications()
