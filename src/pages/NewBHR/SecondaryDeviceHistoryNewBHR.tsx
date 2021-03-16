@@ -709,7 +709,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
 
   const sendApprovalRequestToPK = (type) => {
     setQrBottomSheetsFlag(true);
-    (QrBottomSheet as any).snapTo(1);
+    (QrBottomSheet as any).current.snapTo(1);
     (keeperTypeBottomSheet as any).current.snapTo(0);
   };
 
@@ -724,10 +724,11 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={async(qrData) => {
+        onQrScan={async(qrScannedData) => {
           try {
-            if (qrData) {
-              console.log('qrData', qrData)
+            if (qrScannedData) {
+              let qrData = JSON.parse(qrScannedData);
+              console.log('qrData', qrData);
               const res = await S3Service.downloadSMShare(qrData.publicKey);
               console.log("Keeper Shares", res);
               if (res.status === 200) {
@@ -758,7 +759,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
               if (res.status === 200) {
                 console.log("SHARES DOWNLOAD", res.data);
                 dispatch(secondaryShareDownloaded(res.data.metaShare));
-                (ApprovePrimaryKeeperBottomSheet as any).snapTo(1);
+                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
                 (QrBottomSheet as any).current.snapTo(0);
               }
             }
@@ -886,7 +887,7 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
           }}
           changeButtonText={'Change Keeper'}
           onPressChange={() => {
-            (keeperTypeBottomSheet as any).snapTo(1);
+            (keeperTypeBottomSheet as any).current.snapTo(1);
             // (ChangeBottomSheet as any).current.snapTo(1);
           }}
         />
