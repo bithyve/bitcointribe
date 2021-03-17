@@ -230,7 +230,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
             flexDirection: 'row', alignItems: 'center'
           }}>
             <AppBottomSheetTouchableWrapper
-              onPress={()=>{ navigation.navigate( 'OTPAuthentication' ) }}
+              onPress={()=>{ navigation.goBack()}}
               hitSlop={{
                 top: 20, left: 20, bottom: 20, right: 20
               }}
