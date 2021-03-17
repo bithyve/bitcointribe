@@ -568,11 +568,12 @@ export const autoDownloadShareContact = (
 }
 
 
-export const getPDFData = ( shareId ) => {
+export const getPDFData = ( shareId, isReShare ) => {
   return {
     type: GET_PDF_DATA,
     payload: {
-      shareId
+      shareId,
+      isReShare
     },
   }
 }

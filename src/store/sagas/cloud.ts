@@ -9,6 +9,10 @@ import { setCloudBackupStatus } from '../actions/preferences'
 import { createWatcher } from '../utils/utilities'
 
 function* cloudWorker( { payload } ) {
+  try{
+  yield put( setCloudBackupStatus( {
+    status: true
+  } ) )
   const { kpInfo, level, share, callback } = payload
   const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
   const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
@@ -18,6 +22,8 @@ function* cloudWorker( { payload } ) {
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
   const versionHistory = yield select( ( state ) => state.versionHistory.versions )
+  const cloudBackupStatus = yield select( ( state ) => state.preferences.cloudBackupStatus )
+
   console.log( 'PAYLOAD cloudWorker', payload )
   let encryptedCloudDataJson
   const shares =
@@ -52,7 +58,7 @@ function* cloudWorker( { payload } ) {
     keeperData: kpInfo ? JSON.stringify( kpInfo ) : JSON.stringify( keeperData ),
   }
   console.log( 'data cloudWorker', data )
-
+  console.log( 'cloudBackupStatus cloudWorker', cloudBackupStatus )
   const cloudObject = new CloudBackup( {
     dataObject: data,
     callBack: callback,
@@ -61,6 +67,14 @@ function* cloudWorker( { payload } ) {
   console.log( 'cloudObject cloudWorker', cloudObject )
 
   cloudObject.CloudDataBackup( data, callback, share )
+
+}
+catch ( error ) {
+  yield put( setCloudBackupStatus( {
+    status: false
+  } ) )
+  console.log( 'ERROR cloudWorker', error )
+}
 }
 
 export const cloudWatcher = createWatcher(

@@ -40,6 +40,7 @@ import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
+import { initializeHealthSetup } from '../store/actions/health'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -83,7 +84,10 @@ export default function NewWalletQuestion( props ) {
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
+  const s3service = useSelector( ( state ) => state.health.service );
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth );
 
+  
   useEffect( () => {
     ( async () => {
       if ( testAccService ) {
@@ -138,7 +142,16 @@ export default function NewWalletQuestion( props ) {
     }
   }, [ isInitialized ] )
 
+  useEffect( () => {
+    if(s3service){
+    const { healthCheckInitializedKeeper } = s3service.levelhealth
+    if ( !healthCheckInitializedKeeper ) {
+      dispatch(initializeHealthSetup());
+    }
+  }
+  }, [ s3service ] );
 
+  
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
 

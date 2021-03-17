@@ -51,6 +51,7 @@ export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
+export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
 
 export const getAllAccountsData = () => {
   return {
@@ -664,5 +665,16 @@ export const fetchReceiveAddressSucceeded = ( receiveAddress: string ) => {
 export const clearReceiveAddress = ( ) => {
   return {
     type: CLEAR_RECEIVE_ADDRESS,
+  }
+}
+
+export const getSMAndReSetTFAOrGenerateSXpriv = (qrdata, QRModalHeader, serviceType) => {
+  return {
+    type: CREATE_SM_N_RESETTFA_OR_XPRIV,
+    payload: {
+      qrdata,
+      QRModalHeader,
+      serviceType
+    },
   }
 }

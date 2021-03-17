@@ -1745,4 +1745,41 @@ export default class S3Service {
       }
     }
   };
+
+  public static downloadSMPDFShare = async (
+    messageId: string,
+    key: string
+  ): Promise<
+    | {
+        status: number;
+        data:
+          | {
+              metaShare: MetaShare;
+              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+            }
+          | {
+              metaShare: MetaShare;
+              encryptedDynamicNonPMDD?: undefined;
+            };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await LevelHealth.downloadSMPDFShare( messageId, key ),
+      }
+    } catch ( err ) {
+      return {
+        status: 502, err: err.message, message: ErrMap[ 502 ]
+      }
+    }
+  };
 }

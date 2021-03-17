@@ -63,8 +63,6 @@ export default class CloudBackup {
   public CloudDataBackup = (data, callback, share?) => {
     //console.log('share inside cloud', share);
     try{
-
-    
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};

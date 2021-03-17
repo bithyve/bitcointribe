@@ -38,6 +38,7 @@ import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
+import { initializeHealthSetup } from '../store/actions/health'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -73,6 +74,8 @@ export default function NewOwnQuestions( props ) {
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
+  const s3service = useSelector( ( state ) => state.health.service );
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth );
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
@@ -170,6 +173,13 @@ export default function NewOwnQuestions( props ) {
       }
     }
   }, [ confirmAnswer ] )
+
+  useEffect( () => {
+    const { healthCheckInitializedKeeper } = s3service.levelhealth
+    if ( !healthCheckInitializedKeeper ) {
+      dispatch(initializeHealthSetup());
+    }
+  }, [ s3service ] );
 
   const googleCloudLoginCallback = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )

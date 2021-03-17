@@ -188,8 +188,9 @@ const PersonalCopyHistory = (props) => {
 
   useEffect(() => {
     (async () => {
+      console.log('isChange', isChange);
       console.log("useEffect pdfInfo", pdfInfo);
-      dispatch(getPDFData(selectedKeeper.shareId));
+      dispatch(getPDFData(selectedKeeper.shareId, isChange));
       const shareHistory = JSON.parse(
         await AsyncStorage.getItem("shareHistory")
       );

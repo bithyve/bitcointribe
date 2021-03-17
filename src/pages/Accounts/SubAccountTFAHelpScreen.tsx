@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
@@ -30,6 +30,7 @@ import {
   generateSecondaryXpriv,
   twoFAResetted,
   secondaryXprivGenerated,
+  getSMAndReSetTFAOrGenerateSXpriv,
 } from '../../store/actions/accounts'
 import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
@@ -111,17 +112,21 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     setTimeout( () => {
       setQrBottomSheetsFlag( false )
     }, 2 )
-
-    if ( QRModalHeader === 'Reset 2FA' ) {
-      dispatch( resetTwoFA( qrData ) )
-    } else if ( QRModalHeader === 'Sweep Funds' ) {
-      dispatch( generateSecondaryXpriv( SECURE_ACCOUNT, qrData ) )
+    if(qrData.includes("{")) {
+      dispatch(getSMAndReSetTFAOrGenerateSXpriv(qrData, QRModalHeader, SECURE_ACCOUNT))
+    } else {
+      if ( QRModalHeader === 'Reset 2FA' ) {
+        dispatch( resetTwoFA( qrData ) )
+      } else if ( QRModalHeader === 'Sweep Funds' ) {
+        dispatch( generateSecondaryXpriv( SECURE_ACCOUNT, qrData ) )
+      }
     }
   }
 
   const renderQrContent = useCallback( () => {
     return (
       <QRModal
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={QRModalHeader}
         title={'Scan the Regenerate/Exit Key'}
         infoText={
@@ -137,6 +142,15 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}
         onBackPress={() => {
           ( QrBottomSheet as any ).current.snapTo( 0 )
+        }}
+        onPressContinue={async() => {
+          let qrData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
+          if (qrData) {
+            if ( QRModalHeader == 'Sweep Funds' ) {
+              ( QrBottomSheet as any ).current.snapTo( 0 )
+            }
+            getQrCodeData( qrData )
+          }
         }}
       />
     )
