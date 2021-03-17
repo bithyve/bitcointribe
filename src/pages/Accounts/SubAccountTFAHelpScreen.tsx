@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
@@ -23,7 +23,7 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import QRModal from './QRModal'
-import ResetTwoFASuccess from './ResetTwoFASuccess'
+import ResetTwoFAFailure from './ResetTwoFASuccess'
 import ServerErrorModal from './ServerErrorModal'
 import {
   resetTwoFA,
@@ -50,26 +50,19 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const [
     ResetTwoFASuccessBottomSheet,
   ] = useState( React.createRef() )
-  const [ successMessage, setSuccessMessage ] = useState( '' )
-  const [ successMessageHeader, setSuccessMessageHeader ] = useState( '' )
+  const [ failureMessage, setFailureMessage ] = useState( '' )
+  const [ failureMessageHeader, setFailureMessageHeader ] = useState( '' )
   const [
     ServerNotRespondingBottomSheet,
   ] = useState( React.createRef() )
 
-  const additional = useSelector( ( state ) => state.accounts.additional )
   const accountsState: AccountsState = useAccountsState()
   const sourceAccountShell = useSourceAccountShellForSending()
   const dispatch = useDispatch()
 
-  let generatedSecureXPriv
-  let resettedTwoFA
-
-  if ( additional && additional.secure ) {
-    generatedSecureXPriv = additional.secure.xprivGenerated
-    resettedTwoFA = additional.secure.twoFAResetted
-  }
-
   useEffect( () => {
+    const resettedTwoFA = idx( accountsState.additional, ( _ ) => _.secure.twoFAResetted )
+
     if ( resettedTwoFA ) {
       const twoFASetupDetails = idx( accountsState, ( _ )=> _[ sourceAccountShell.primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
       navigation.navigate( 'TwoFASetup', {
@@ -85,35 +78,34 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       dispatch( twoFAResetted( null ) ) //resetting to monitor consecutive change
     } else if ( resettedTwoFA === false ) {
       setTimeout( () => {
-        setSuccessMessageHeader( 'Failed to reset 2FA' )
-        setSuccessMessage(
+        setFailureMessageHeader( 'Failed to reset 2FA' )
+        setFailureMessage(
           'The QR you have scanned seems to be invalid, pls try again',
         )
       }, 2 );
       ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
       dispatch( twoFAResetted( null ) )
     }
-  }, [ resettedTwoFA ] )
+  }, [ accountsState.additional ] )
 
   useEffect( () => {
-    ( async () => {
-      if ( generatedSecureXPriv ) {
-        dispatch( resetSendState() )
-        navigation.navigate( 'Send', {
-          subAccountKind: sourceAccountShell.primarySubAccount.kind,
-        } )
-        dispatch( secondaryXprivGenerated( null ) )
+    const generatedSecureXPriv = idx( accountsState.additional, ( _ ) => _.secure.xprivGenerated )
+    if ( generatedSecureXPriv ) {
+      dispatch( resetSendState() )
+      navigation.navigate( 'Send', {
+        subAccountKind: sourceAccountShell.primarySubAccount.kind,
+      } )
+      dispatch( secondaryXprivGenerated( null ) )
 
-      } else if ( generatedSecureXPriv === false ) {
-        setTimeout( () => {
-          setSuccessMessageHeader( 'Invalid Exit Key' )
-          setSuccessMessage( 'Invalid Exit Key, please try again' )
-        }, 2 );
-        ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
-        dispatch( secondaryXprivGenerated( null ) )
-      }
-    } )()
-  }, [ generatedSecureXPriv ] )
+    } else if ( generatedSecureXPriv === false ) {
+      setTimeout( () => {
+        setFailureMessageHeader( 'Invalid Exit Key' )
+        setFailureMessage( 'Invalid Exit Key, please try again' )
+      }, 2 );
+      ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
+      dispatch( secondaryXprivGenerated( null ) )
+    }
+  }, [ accountsState.additional ] )
 
   const getQrCodeData = ( qrData ) => {
     setTimeout( () => {
@@ -165,23 +157,22 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
 
   const renderErrorModalContent = useCallback( () => {
     return (
-      <ResetTwoFASuccess
+      <ResetTwoFAFailure
         modalRef={ResetTwoFASuccessBottomSheet}
-        title={successMessageHeader}
+        title={failureMessageHeader}
         note={''
           // 'Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt ut labore et dolore'
         }
-        info={successMessage}
-        proceedButtonText={'Proceed'}
+        info={failureMessage}
+        proceedButtonText={'Try Again'}
         onPressProceed={() => {
           ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 0 )
-          navigation.navigate( 'NewTwoFASecret' )
         }}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/icon_twoFASuccess.png' )}
       />
     )
-  }, [ successMessage, successMessageHeader ] )
+  }, [ failureMessage, failureMessageHeader ] )
 
   const renderErrorModalHeader = useCallback( () => {
     return (
@@ -239,7 +230,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
             flexDirection: 'row', alignItems: 'center'
           }}>
             <AppBottomSheetTouchableWrapper
-              onPress={()=>{ navigation.navigate( 'OTPAuthentication' ) }}
+              onPress={()=>{ navigation.goBack()}}
               hitSlop={{
                 top: 20, left: 20, bottom: 20, right: 20
               }}
