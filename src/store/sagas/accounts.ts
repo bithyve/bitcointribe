@@ -700,22 +700,6 @@ function* refreshAccountShellWorker( { payload } ) {
         accountKind = primarySubAccount.kind
   }
 
-  if ( options && options.autoSync ) {
-    // auto-refresh the account-shell once per-session
-    const autoAccountSync = yield select(
-      ( state ) => state.loaders.autoAccountSync
-    )
-
-    if (
-      autoAccountSync &&
-      autoAccountSync[ `${accountKind + primarySubAccount.instanceNumber}` ]
-    ) {
-      // account-shell already synched
-      yield put( accountShellRefreshCompleted( shell ) )
-      return
-    }
-  }
-
   const nonDerivativeAccounts = [
     SubAccountKind.TEST_ACCOUNT,
     SubAccountKind.REGULAR_ACCOUNT,
