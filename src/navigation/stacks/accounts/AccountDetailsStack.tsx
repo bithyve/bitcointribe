@@ -8,7 +8,6 @@ import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHe
 import SubAccountSettingsStack from './SubAccountSettingsStack'
 import DonationAccountWebViewSettingsScreen from '../../../pages/Accounts/AccountSettings/DonationAccountWebViewSettingsScreen'
 import SendStack from '../send/SendStack'
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 
 
@@ -41,6 +40,12 @@ const AccountDetailsStack = createStackNavigator(
     },
     SubAccountSettings: {
       screen: SubAccountSettingsStack,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    SubAccountTFAHelp: {
+      screen: SubAccountTFAHelpScreen,
       navigationOptions: {
         header: null,
       },

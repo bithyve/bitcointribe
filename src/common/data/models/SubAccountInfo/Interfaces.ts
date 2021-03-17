@@ -12,7 +12,7 @@ interface SubAccountDescribing {
   id: string;
   accountShellID: string | null;
 
-  readonly kind: SubAccountKind; 
+  readonly kind: SubAccountKind;
 
   /**
    * Instance number(backend) for a particular SubAccountKind

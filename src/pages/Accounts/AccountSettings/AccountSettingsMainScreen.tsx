@@ -61,7 +61,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         {
           title: '2FA Settings',
           subtitle: 'Reset 2FA or no server response',
-          screenName: 'ResetTwoFAHelp',
+          screenName: 'SubAccountTFAHelp',
           imageSource: require( '../../../assets/images/icons/icon_merge_blue.png' ),
         }
       ] : [] )

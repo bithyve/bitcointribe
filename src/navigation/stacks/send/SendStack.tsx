@@ -2,22 +2,10 @@ import React from 'react'
 import { createStackNavigator } from 'react-navigation-stack'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import SubAccountTFAHelpScreen from '../../../pages/Accounts/SubAccountTFAHelpScreen'
 import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
 import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
 import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
 import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
-
-
-const SubAccountTFAHelpStack = createStackNavigator( {
-  SubAccountTFAHelpRoot: {
-    screen: SubAccountTFAHelpScreen,
-    navigationOptions: {
-      title: '2FA Help'
-    },
-  },
-} )
-
 
 const SendStack = createStackNavigator(
   {
@@ -39,13 +27,7 @@ const SendStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
-    },
-    SubAccountTFAHelp: {
-      screen: SubAccountTFAHelpStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
+    }
   },
   {
     initialRouteName: 'SendRoot',

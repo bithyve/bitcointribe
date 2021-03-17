@@ -66,21 +66,6 @@ export default function TwoFAValidation( props ) {
   }
 
   const dispatch = useDispatch()
-  // const renderSuccessStatusContents = () => (
-  //   <SendStatusModalContents
-  //     title1stLine={'Sent Successfully'}
-  //     title2ndLine={''}
-  //     info1stLine={'bitcoin successfully sent to'}
-  //     info2ndLine={''}
-  //     userName={''}
-  //     // modalRef={SendSuccessBottomSheet}
-  //     isSuccess={true}
-  //     onPressViewAccount={() => {
-  //       props.navigation.goBack()
-  //     }}
-  //     transactionDateTime={Date()}
-  //   />
-  // )
 
   const renderSendUnSuccessContents = () => {
     return (
@@ -89,8 +74,8 @@ export default function TwoFAValidation( props ) {
         info={
           'Invalid 2FA token, please retry.'
         }
-        userInfo={[]}
         isFromContact={false}
+        recipients={[]}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}

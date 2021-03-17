@@ -65,10 +65,10 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(
       <SendConfirmationContent
-        title={'Sent Successfully to Contact'}
+        title={'Sent Successfully'}
         info={'Transaction(s) successfully submitted'}
-        userInfo={[]}
-        infoText={'Bitcoins successfully sent to Contact'}
+        infoText={'Bitcoins successfully sent from your account'}
+        recipients={sendingState.selectedRecipients}
         isFromContact={false}
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
@@ -92,7 +92,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
+        snapPoints: [ 0, '52%' ],
       },
     )
   },
@@ -103,8 +103,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={String( errorMessage )}
-        userInfo={[]}
         isFromContact={false}
+        recipients={sendingState.selectedRecipients}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}

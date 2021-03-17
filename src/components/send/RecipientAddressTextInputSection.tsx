@@ -17,7 +17,7 @@ export type Props = {
 };
 
 const RecipientAddressTextInputSection: React.FC<Props> = ( {
-  placeholder = 'Enter Address Manually',
+  placeholder = 'Enter address manually',
   containerStyle = {
   },
   sourceAccountKind,
@@ -30,7 +30,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   const walletService = useWalletServiceForSourceAccountKind( sourceAccountKind )
 
   const walletInstance = useMemo( () => {
-    if(walletService){
+    if( walletService ){
       return walletService.hdWallet || walletService.secureHDWallet
     }
   }, [ walletService ] )

@@ -479,7 +479,7 @@ export default class HDSegwitWallet extends Bitcoin {
       if( blindRefresh ){
         if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
           // blind derv-account generation
-          this.getDerivativeAccXpub( accountType, accountNumber, contactName );
+          this.generateDerivativeXpub( accountType, accountNumber, contactName );
           ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
         }
         await this.syncDerivativeAccGapLimit( accountType, accountNumber )
@@ -602,6 +602,22 @@ export default class HDSegwitWallet extends Bitcoin {
         internalAddresses
       }
 
+      let accountName: string = accountType
+      switch ( accountType ) {
+          case TRUSTED_CONTACTS:
+            accountName = contactName
+              .split( ' ' )
+              .map( ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ) )
+              .join( ' ' )
+            break
+
+          case SUB_PRIMARY_ACCOUNT:
+          case WYRE:
+          case RAMP:
+            accountName = ( this.derivativeAccounts[ accountType ][ accountNumber ] as SubPrimaryDerivativeAccountElements | WyreDerivativeAccountElements | RampDerivativeAccountElements ).accountName
+            break
+      }
+
       accounts[ xpubId ] = {
         externalAddressSet,
         internalAddressSet,
@@ -618,7 +634,8 @@ export default class HDSegwitWallet extends Bitcoin {
           .nextFreeChangeAddressIndex - 1,
         accountType,
         contactName,
-        primaryAccType: accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null
+        primaryAccType: accountType === SUB_PRIMARY_ACCOUNT ? 'Checking Account' : null,
+        accountName
       }
     }
 
@@ -1232,7 +1249,8 @@ export default class HDSegwitWallet extends Bitcoin {
           cachedAQL: this.addressQueryList,
           lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
           lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
-          accountType: 'Test Account'
+          accountType: 'Test Account',
+          accountName: this.accountName,
         }
       }
       const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
@@ -1454,7 +1472,8 @@ export default class HDSegwitWallet extends Bitcoin {
         cachedAQL,
         lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
-        accountType: this.isTest ? 'Test Account' : 'Checking Account'
+        accountType: this.isTest ? 'Test Account' : 'Checking Account',
+        accountName: this.accountName,
       }
     }
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
@@ -2208,8 +2227,8 @@ export default class HDSegwitWallet extends Bitcoin {
   };
 
   public getXpub = () => {
-    if (this.xpub) {
-      return this.xpub;
+    if ( this.xpub ) {
+      return this.xpub
     }
     const seed = bip39.mnemonicToSeedSync( this.mnemonic, this.passphrase )
     const root = bip32.fromSeed( seed, this.network )

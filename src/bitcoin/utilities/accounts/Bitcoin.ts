@@ -106,6 +106,7 @@ export default class Bitcoin {
     accountType: string,
     contactName?: string,
     primaryAccType?: string,
+    accountName?: string,
     }}
   ): Promise<
   {
@@ -219,7 +220,7 @@ export default class Bitcoin {
       const synchedAccounts = {
       }
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, contactName } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
         const UTXOs = cachedUTXOs
@@ -343,21 +344,7 @@ export default class Bitcoin {
                     ...[ outgoingTx, incomingTx ],
                   )
                 } else {
-                  let accType = accountType
-                  switch ( accType ) {
-                      case TRUSTED_CONTACTS:
-                        accType = contactName
-                          .split( ' ' )
-                          .map( ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ) )
-                          .join( ' ' )
-                        break
-
-                      case SUB_PRIMARY_ACCOUNT:
-                        accType = primaryAccType
-                        break
-                  }
-
-                  const transaction = {
+                  const transaction : TransactionDetails = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -367,8 +354,9 @@ export default class Bitcoin {
                       : new Date( Date.now() ).toUTCString(),
                     transactionType: tx.TransactionType,
                     amount: tx.Amount,
-                    accountType: accType,
+                    accountType,
                     primaryAccType,
+                    accountName: accountName? accountName: accountType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
@@ -712,6 +700,7 @@ export default class Bitcoin {
 
     outputs.forEach( ( output ) => {
       if ( !output.addresses && !output.scriptpubkey_address ) {
+        // do nothing
       } else {
         const address = output.addresses
           ? output.addresses[ 0 ]

@@ -107,8 +107,8 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={String( errorMessage )}
-        userInfo={[]}
         isFromContact={false}
+        recipients={sendingState.selectedRecipients}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}

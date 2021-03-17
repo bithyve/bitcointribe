@@ -319,7 +319,7 @@ export default function AddContactSendRequest( props ) {
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
             WALLET_SETUP.walletName
-          } Hexa wallet - link will expire in ${
+          }' Hexa wallet - link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`}
           link={trustedLink}

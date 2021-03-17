@@ -17,14 +17,9 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../../components/ModalHeader'
 import SendConfirmationContent from '../SendConfirmationContent'
-import { createRandomString } from '../../../common/CommonFunctions/timeFormatter'
-import moment from 'moment'
-import DeviceInfo from 'react-native-device-info'
 import { executeSendStage3, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useAccountSendST3CompletionEffect from '../../../utils/sending/useAccountSendST3CompletionEffect'
@@ -70,9 +65,9 @@ export default function OTPAuthenticationScreen( { navigation } ) {
       <SendConfirmationContent
         title={'Sent Successfully to Contact'}
         info={'Transaction(s) successfully submitted'}
-        userInfo={[]}
         infoText={'Bitcoins successfully sent to Contact'}
         isFromContact={false}
+        recipients={sendingState.selectedRecipients}
         okButtonText={'View Account'}
         cancelButtonText={'Back'}
         isCancel={false}
@@ -106,8 +101,8 @@ export default function OTPAuthenticationScreen( { navigation } ) {
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={String( errorMessage )}
-        userInfo={[]}
         isFromContact={false}
+        recipients={sendingState.selectedRecipients}
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}
