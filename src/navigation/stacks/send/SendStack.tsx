@@ -53,7 +53,7 @@ const SendStack = createStackNavigator(
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.goBack() }} />
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
         },
       }
     },
