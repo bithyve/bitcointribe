@@ -59,7 +59,6 @@ import {
 import {
   DerivativeAccountTypes,
 } from '../../bitcoin/utilities/Interface'
-import { setAutoAccountSync } from '../actions/loaders'
 import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
@@ -753,10 +752,6 @@ function* refreshAccountShellWorker( { payload } ) {
       } )
       yield put( rescanSucceeded( rescanTxs ) )
     }
-
-    yield put(
-      setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
-    )
   } else {
     const payload = {
       serviceType: accountKind,
@@ -780,10 +775,6 @@ function* refreshAccountShellWorker( { payload } ) {
       } )
     } )
     yield put( rescanSucceeded( rescanTxs ) )
-
-    yield put(
-      setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
-    )
   }
 
   yield put( accountShellRefreshCompleted( shell ) )
