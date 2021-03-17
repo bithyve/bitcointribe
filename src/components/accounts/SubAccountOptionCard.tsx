@@ -7,12 +7,16 @@ import CardStyles from '../../common/Styles/Cards.js'
 import LinearGradient from 'react-native-linear-gradient'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
   isDisabled?: boolean;
   isSelected?: boolean;
   specialTag?: string | null;
+  showsBalance?: boolean;
   containerStyle?: Record<string, unknown>;
 }
 
@@ -21,6 +25,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
   isDisabled = false,
   isSelected = false,
   specialTag = null,
+  showsBalance = false,
   containerStyle = {
   },
 }: Props ) => {
@@ -64,7 +69,17 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     }
   }, [ isSelected ] )
 
+  const unitText = useFormattedUnitText( {
+    bitcoinUnit: subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS
+  } )
 
+  const subtitleText = useMemo( () => {
+    if ( showsBalance ) {
+      return `${subAccountInfo.balances.confirmed} ${unitText}`
+    } else {
+      return subAccountInfo.customDescription ? subAccountInfo.customDescription : subAccountInfo.defaultDescription
+    }
+  }, [ showsBalance, subAccountInfo ] )
 
 
   return (
@@ -107,8 +122,12 @@ const SubAccountOptionCard: React.FC<Props> = ( {
         />
 
         <View style={descriptionTextContainerStyle}>
-          <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: subAccountInfo.defaultTitle}</Card.Title>
-          <Card.Title style={subtitleTextStyle}>{subAccountInfo.customDescription? subAccountInfo.customDescription: subAccountInfo.defaultDescription}</Card.Title>
+          <Card.Title style={titleTextStyle} numberOfLines={1}>
+            {subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: subAccountInfo.defaultTitle}
+          </Card.Title>
+          <Card.Title style={subtitleTextStyle}>
+            {subtitleText}
+          </Card.Title>
         </View>
 
         {isDisabled == false && (
