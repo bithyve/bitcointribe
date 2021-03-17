@@ -1686,7 +1686,7 @@ export default function ManageBackup(props) {
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               props.navigation.navigate("UpgradeBackup");
             }}
@@ -1712,7 +1712,7 @@ export default function ManageBackup(props) {
             >
               Upgrade
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <View
           style={{
