@@ -39,7 +39,6 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
-import { setCloudBackupStatus, setCloudData } from '../store/actions/cloud'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -181,16 +180,6 @@ export default function NewOwnQuestions( props ) {
       dispatch(initializeHealthSetup());
     }
   }, [ s3service ] );
-
-  useEffect( () => {
-    if (levelHealth.length == 1) {
-      dispatch(setCloudData( setCloudBackupStatuss ));
-    }
-  }, [ levelHealth ] );
-
-  const setCloudBackupStatuss = ( share ) => {
-    dispatch(setCloudBackupStatus( share ))
-  }
 
   const googleCloudLoginCallback = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )

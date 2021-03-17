@@ -399,8 +399,7 @@ class RestoreWithICloud extends Component<
       if (Date.now() - recoveryRequest.uploadedAt > config.TC_REQUEST_EXPIRY) {
         Alert.alert(
           `${recoveryRequest.isQR ? "QR" : "Link"} expired!`,
-          `Please ask your Guardian to initiate a new ${
-            recoveryRequest.isQR ? "QR" : "Link"
+          `Please ask your Guardian to initiate a new ${recoveryRequest.isQR ? "QR" : "Link"
           }`
         );
       }
@@ -588,7 +587,7 @@ class RestoreWithICloud extends Component<
     return (
       <View
         style={{
-          flex: 1,
+          flex:1,
           backgroundColor: Colors.backgroundColor1,
           position: "relative",
         }}
@@ -677,8 +676,8 @@ class RestoreWithICloud extends Component<
                           item.type == "contact"
                             ? require("../../assets/images/icons/icon_contact.png")
                             : item.type == "device"
-                            ? require("../../assets/images/icons/icon_secondarydevice.png")
-                            : require("../../assets/images/icons/icon_contact.png")
+                              ? require("../../assets/images/icons/icon_secondarydevice.png")
+                              : require("../../assets/images/icons/icon_contact.png")
                         }
                         style={styles.cardImage}
                       />
@@ -794,79 +793,84 @@ class RestoreWithICloud extends Component<
         {showLoader ? <Loader isLoading={true} /> : null}
         {hideShow ? (
           <Modal
-          animationType='fade'
-          transparent={true}
-          visible={hideShow}
-          onRequestClose={() => { this.setState({ hideShow: false }); }}>
-          <AppBottomSheetTouchableWrapper style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }} onPress={() => { this.setState({ hideShow: false }); }}>
+            animationType='fade'
+            transparent={true}
+            visible={hideShow}
+            onRequestClose={() => { 
+              console.log("onRequestClose");
+              this.setState({ hideShow: false }); }}>
+            <TouchableOpacity style={{
+               flex:1,
+               alignItems: 'center',
+               justifyContent: 'center',
+            }} onPress={() => { 
+              console.log("onRequestClose");
+              this.setState({ hideShow: false }); }}>
 
-          <View style={styles.dropDownView}>
-            <ScrollView>
-              {walletsArray.map((value) => {
-                return (
-                  <AppBottomSheetTouchableWrapper
-                    activeOpacity={10}
-                    onPress={() => {
-                      this.setState({ hideShow: false });
-                      this.setState({ selectedBackup: value });
-                    }}
-                    style={styles.dropDownElement}
-                  >
-                    {value.data && (
-                      <View style={styles.greyBox}>
-                        <View style={styles.greyBoxImage}>
-                          <MaterialCommunityIcons
-                            name={"restore"}
-                            size={RFValue(25)}
-                            color={Colors.blue}
-                          />
-                        </View>
-                        <View style={{ marginLeft: 10 }}>
-                          <Text style={styles.greyBoxText}>
-                            {"Restoring Wallet from"}
-                          </Text>
-                          <Text
-                            style={{
-                              ...styles.greyBoxText,
-                              fontSize: RFValue(20),
-                            }}
-                          >
-                            {value.walletName}
-                          </Text>
-                          <Text
-                            style={{
-                              ...styles.greyBoxText,
-                              fontSize: RFValue(10),
-                            }}
-                          >
-                            {"Last backup : " +
-                              timeFormatter(
-                                moment(new Date()),
-                                moment(value.dateTime).valueOf()
-                              )}
-                          </Text>
+              <View style={styles.dropDownView}>
+                <ScrollView>
+                  {walletsArray.map((value) => {
+                    return (
+                      <TouchableOpacity
+                        activeOpacity={10}
+                        onPress={() => {
+                          console.log("onPress")
+                          this.setState({ hideShow: false });
+                          this.setState({ selectedBackup: value });
+                        }}
+                        style={styles.dropDownElement}
+                      >
+                        {value.data && (
+                          <View style={styles.greyBox}>
+                            <View style={styles.greyBoxImage}>
+                              <MaterialCommunityIcons
+                                name={"restore"}
+                                size={RFValue(25)}
+                                color={Colors.blue}
+                              />
+                            </View>
+                            <View style={{ marginLeft: 10 }}>
+                              <Text style={styles.greyBoxText}>
+                                {"Restoring Wallet from"}
+                              </Text>
+                              <Text
+                                style={{
+                                  ...styles.greyBoxText,
+                                  fontSize: RFValue(20),
+                                }}
+                              >
+                                {value.walletName}
+                              </Text>
+                              <Text
+                                style={{
+                                  ...styles.greyBoxText,
+                                  fontSize: RFValue(10),
+                                }}
+                              >
+                                {"Last backup : " +
+                                  timeFormatter(
+                                    moment(new Date()),
+                                    moment(value.dateTime).valueOf()
+                                  )}
+                              </Text>
 
-                          <Text
-                            style={{
-                              ...styles.greyBoxText,
-                              fontSize: RFValue(10),
-                            }}
-                          >
-                            {"Backup at level : " + value.levelStatus}
-                          </Text>
-                        </View>
-                      </View>
-                    )}
-                  </AppBottomSheetTouchableWrapper>
-                );
-              })}
-            </ScrollView>
-          </View>
-          </AppBottomSheetTouchableWrapper>
+                              <Text
+                                style={{
+                                  ...styles.greyBoxText,
+                                  fontSize: RFValue(10),
+                                }}
+                              >
+                                {"Backup at level : " + value.levelStatus}
+                              </Text>
+                            </View>
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+              </View>
+            </TouchableOpacity>
           </Modal>
         ) : null}
         <BottomSheet
@@ -909,6 +913,7 @@ class RestoreWithICloud extends Component<
                   (this.refs.RestoreFromICloud as any).snapTo(0);
                 }}
                 onPressCard={() => {
+                  console.log("ajfjkh asd", hideShow)
                   this.setState({ hideShow: !hideShow });
                 }}
               />
@@ -1122,11 +1127,9 @@ class RestoreWithICloud extends Component<
               contactText={"Requesting for recovery:"}
               contact={selectedContact.data ? selectedContact.data : null}
               contactEmail={""}
-              infoText={`Click here to accept Keeper request for ${
-                database.WALLET_SETUP.walletName
-              } Hexa wallet- link will expire in ${
-                config.TC_REQUEST_EXPIRY / (60000 * 60)
-              } hours`}
+              infoText={`Click here to accept Keeper request for ${database.WALLET_SETUP.walletName
+                } Hexa wallet- link will expire in ${config.TC_REQUEST_EXPIRY / (60000 * 60)
+                } hours`}
               link={linkToRequest}
               onPressBack={() => {
                 if (this.refs.SendViaLinkBottomSheet)
@@ -1145,7 +1148,7 @@ class RestoreWithICloud extends Component<
           renderHeader={() => <ModalHeader />}
         />
         <BottomSheet
-          onCloseEnd={() => {}}
+          onCloseEnd={() => { }}
           enabledInnerScrolling={true}
           ref={"shareOtpWithTrustedContactBottomSheet"}
           snapPoints={[-30, hp("65%")]}

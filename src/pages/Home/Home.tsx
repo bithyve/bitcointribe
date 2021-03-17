@@ -992,7 +992,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0
+        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus.status === false
       ) {
         this.props.setCloudData( this.setCloudBackupStatus )
       }

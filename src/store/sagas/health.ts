@@ -1089,7 +1089,7 @@ function* recoverWalletWorker( { payload } ) {
       // const payload = { SERVICES, DECENTRALIZED_BACKUP };
       // yield call(insertDBWorker, { payload });
       //yield delay(2000); // seconds delay prior to Wallet Image check
-      yield put( fetchWalletImage( decryptedCloudDataJson.walletImage ) )
+      yield put( fetchWalletImage( s3Service ) )
 
       yield call(
         AsyncStorage.setItem,
@@ -1335,19 +1335,16 @@ export const updateWalletImageHealthWatcher = createWatcher(
 )
 
 function* fetchWalletImageWorker( { payload } ) {
-  // const s3Service: S3Service = payload.s3Service
+  const s3Service: S3Service = payload.s3Service
 
-  // const res = yield call( s3Service.fetchWalletImageKeeper )
-  // console.log( {
-  //   res
-  // } )
-  const { walletImage } = payload
-
-  if ( walletImage ) {
-    //const walletImage: WalletImage = res.data.walletImage
-    console.log( {
-      walletImage
-    } )
+  const res = yield call( s3Service.fetchWalletImageKeeper )
+  console.log( {
+    res
+  } )
+  //const { walletImage } = payload
+  if ( res.status === 200 ) {
+    const walletImage: WalletImage = res.data.walletImage
+     console.log({ walletImage });
 
     if ( !Object.keys( walletImage ).length )
       console.log( 'Failed fetch: Empty Wallet Image' )

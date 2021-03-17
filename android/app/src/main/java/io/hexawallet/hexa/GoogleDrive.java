@@ -257,7 +257,8 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         if (mDriveServiceHelper == null) {
             return;
         }
-        final Activity activity = getCurrentActivity();
+        try {
+            final Activity activity = getCurrentActivity();
             mDriveServiceHelper.uploadFile(activity, metaData)
                     .addOnSuccessListener(new OnSuccessListener<GoogleDriveFileHolder>() {
                         @Override
@@ -271,12 +272,12 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                          //  Log.d(TAG, "onFailure uploadFile: " + e.getMessage());
-                            if(e instanceof UserRecoverableAuthIOException){
-                               // Log.d(TAG, " onFailure UseUserRecoverableAuthIOException: " + e.getMessage());
+                            //  Log.d(TAG, "onFailure uploadFile: " + e.getMessage());
+                            if (e instanceof UserRecoverableAuthIOException) {
+                                // Log.d(TAG, " onFailure UseUserRecoverableAuthIOException: " + e.getMessage());
                                 // map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
                                 activity.startActivityForResult(((UserRecoverableAuthIOException) e).getIntent(), REQUEST_AUTHORIZATION);
-                            }   else{
+                            } else {
                                 WritableMap map = Arguments.createMap();
                                 map.putString(EVENT_KEY, ON_FAILURE);
                                 uploadFileCallback.invoke(null, map);
@@ -285,6 +286,14 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
 
                         }
                     });
+        }
+        catch (Exception e) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            uploadFileCallback.invoke(null, map);
+            Log.d(TAG, " uploadFileCallback Exception: " + e.getMessage());
+        }
+
     }
 
     @ReactMethod
@@ -361,6 +370,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         if (mDriveServiceHelper == null) {
             return;
         }
+        try {
         mDriveServiceHelper.saveFile(getReactApplicationContext(), metaData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
@@ -380,6 +390,12 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         updateFileCallback.invoke(null, map);
                     }
                 });
+        } catch (Exception e) {
+            WritableMap map = Arguments.createMap();
+            map.putString(EVENT_KEY, ON_FAILURE);
+            updateFileCallback.invoke(null, map);
+            Log.d(TAG, " updateFileCallback Exception: " + e.getMessage());
+        }
     }
 
     @ReactMethod
