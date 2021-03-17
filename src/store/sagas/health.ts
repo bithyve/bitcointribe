@@ -1490,8 +1490,10 @@ function* uploadEncMetaShareKeeperWorker( { payload } ) {
     }
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfoData, answer )
     console.log( 'updateKeeperInfoToMetaShare response', response )
-    if ( payload.changingGuardian ) {
+    if(payload.changingGuardian){
       yield call( s3Service.reshareMetaShareKeeper, shareIndex )
+    }
+    if ( payload.previousGuardianName ) {
       if ( payload.previousGuardianName ) {
         trustedContacts.tc.trustedContacts[
           payload.previousGuardianName

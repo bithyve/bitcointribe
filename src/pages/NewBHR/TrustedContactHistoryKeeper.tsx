@@ -830,7 +830,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
       dispatch( updatedKeeperInfo( obj ) )
-      if ( changeContact ) {
+      if ( changeContact || isChange ) {
         setTrustedLink( '' )
         setTrustedQR( '' )
         // remove the previous TC
@@ -855,7 +855,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             selectedShareId,
             contactInfo,
             data,
-            true,
+            changeContact || isChange,
             previousGuardianName,
           ),
         )

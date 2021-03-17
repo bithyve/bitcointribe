@@ -298,7 +298,9 @@ class ManageBackupNewBHR extends Component<
       healthLoading,
       trustedChannelsSetupSyncing,
       isBackupProcessing,
-      keeperInfo
+      keeperInfo,
+      levelHealth,
+      currentLevel
     } = this.props;
     console.log(
       "keeperInfo",keeperInfo
@@ -329,6 +331,13 @@ class ManageBackupNewBHR extends Component<
         this.props.trustedChannelsSetupSync();
       }
       this.modifyLevelData();
+    }
+    if (
+      JSON.stringify(prevProps.levelHealth) !==
+      JSON.stringify(this.props.levelHealth) || 
+      currentLevel == 1 && levelHealth[1] && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[0].status == 'notAccessible'|| 
+      currentLevel == 2 && levelHealth[2] && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[0].status == 'notAccessible'
+    ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
