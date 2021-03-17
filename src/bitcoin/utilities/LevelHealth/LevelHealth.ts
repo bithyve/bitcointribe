@@ -602,7 +602,7 @@ export default class LevelHealth {
 
   private static hexToString = (hex: string): string => secrets.hex2str(hex);
 
-  private static getDerivedKey = (psuedoKey: string): string => {
+  public static getDerivedKey = (psuedoKey: string): string => {
     const hashRounds = 1048;
     let key = psuedoKey;
     for (let itr = 0; itr < hashRounds; itr++) {
@@ -1773,5 +1773,37 @@ export default class LevelHealth {
     }
     console.log('updateKeeperInfoToMetaShare this.metaSharesKeeper', this.metaSharesKeeper);
     return { metaShares: this.metaSharesKeeper };
+  };
+
+  public static getSecondaryMnemonics = (secretsArray) => {
+    const recoveredMnemonicHex = secrets.combine(secretsArray);
+    return { mnemonic: LevelHealth.hexToString(recoveredMnemonicHex) };
+  }
+
+  public static downloadSMPDFShare = async (messageId: string, key: string): Promise<
+    | {
+        status: number;
+        metaShare: MetaShare;
+      }
+    | {
+        status: number;
+        metaShare: MetaShare;
+      }
+  > => {
+    let res: AxiosResponse;
+    try {
+      res = await BH_AXIOS.post('downloadPDFSecondaryShare', {
+        HEXA_ID,
+        messageId,
+      });
+    } catch (err) {
+      if (err.response) throw new Error(err.response.data.err);
+      if (err.code) throw new Error(err.code);
+    }
+    console.log('downloadSMPDFShare res', res);
+    let { decryptedMetaShare } = LevelHealth.decryptMetaShare(res.data.share,key);
+
+    const { share } = res.data;
+    return { status: 200, metaShare: decryptedMetaShare };
   };
 }

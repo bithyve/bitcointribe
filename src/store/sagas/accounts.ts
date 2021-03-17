@@ -49,6 +49,9 @@ import {
   setAllAccountsData,
   fetchReceiveAddressSucceeded,
   FETCH_RECEIVE_ADDRESS,
+  CREATE_SM_N_RESETTFA_OR_XPRIV,
+  resetTwoFA,
+  generateSecondaryXpriv,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -81,6 +84,8 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth';
+import S3Service from '../../bitcoin/services/sss/S3Service'
 
 const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
@@ -1320,4 +1325,44 @@ function* fetchReceiveAddressWorker( { payload }: { payload: { subAccountInfo: S
 export const fetchReceiveAddressWatcher = createWatcher(
   fetchReceiveAddressWorker,
   FETCH_RECEIVE_ADDRESS
+)
+
+function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrData: string, QRModalHeader: string, serviceType: string } } ) {
+  const { qrData, QRModalHeader, serviceType } = payload;
+  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select( ( state ) => state.storage.database );
+  const s3Service = yield select( ( state ) => state.health.service )
+  let secondaryMnemonic;
+  let sharesArray = [DECENTRALIZED_BACKUP.PK_SHARE];
+  let qrDataObj = JSON.parse(qrData);
+  if(qrDataObj.type == 'pdf') {
+    const walletId = s3Service.levelhealth.walletId
+    const key = LevelHealth.getDerivedKey( walletId )
+    qrData;
+    const data = yield LevelHealth.decryptWithAnswer( qrDataObj.encryptedData, WALLET_SETUP.security.answer )
+    const data1 = JSON.parse( data.decryptedString )
+    const res = yield call( S3Service.downloadSMPDFShare, data1.messageId, key )
+    if (res.status === 200) {
+      console.log("SHARES DOWNLOAD pdf", res.data);
+      sharesArray.push(res.data.metaShare);
+    }
+  } else {
+    const res = yield call(S3Service.downloadSMShare, qrDataObj.publicKey);
+    if (res.status === 200) {
+      console.log("SHARES DOWNLOAD", res.data);
+      sharesArray.push(res.data.metaShare);
+    }
+  }
+  if(sharesArray.length>1){
+    secondaryMnemonic = LevelHealth.getSecondaryMnemonics(sharesArray);
+  }
+  if ( QRModalHeader === 'Reset 2FA' ) {
+    yield put(resetTwoFA( secondaryMnemonic ));
+  } else if ( QRModalHeader === 'Sweep Funds' ) {
+    yield put(generateSecondaryXpriv( SECURE_ACCOUNT, secondaryMnemonic ) )
+  }
+}
+
+export const createSmNResetTFAOrXPrivWatcher = createWatcher(
+  createSmNResetTFAOrXPrivWorker,
+  CREATE_SM_N_RESETTFA_OR_XPRIV
 )
