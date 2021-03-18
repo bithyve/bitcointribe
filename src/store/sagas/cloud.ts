@@ -3,36 +3,33 @@ import { call, put, select } from 'redux-saga/effects'
 import { CloudData } from '../../common/CommonFunctions'
 import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { SET_CLOUD_BACKUP_STATUS, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH } from '../actions/cloud'
+import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH } from '../actions/cloud'
 import { updateMSharesHealth } from '../actions/health'
 import { setCloudBackupStatus } from '../actions/preferences'
 import { createWatcher } from '../utils/utilities'
 
-function* cloudWorker({ payload }) {
-  try {
+function* cloudWorker( { payload } ) {
+  try{
     const cloudBackupStatus = yield select((state) => state.preferences.cloudBackupStatus)
     if (cloudBackupStatus === false) {
-      yield put(setCloudBackupStatus({
-        status: true
-      }))
+      yield put(setCloudBackupStatus(true))
       const { kpInfo, level, share, callback } = payload
-      const walletName = yield select((state) => state.storage.database.WALLET_SETUP.walletName)
-      const questionId = yield select((state) => state.storage.database.WALLET_SETUP.security.questionId)
-      const question = yield select((state) => state.storage.database.WALLET_SETUP.security.question)
-      const regularAccount = yield select((state) => state.accounts[REGULAR_ACCOUNT].service)
-      const database = yield select((state) => state.storage.database)
-      const accountShells = yield select((state) => state.accounts.accountShells)
-      const activePersonalNode = yield select((state) => state.nodeSettings.activePersonalNode)
-      const versionHistory = yield select((state) => state.versionHistory.versions)
+      const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
+      const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
+      const question = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.question )
+      const regularAccount = yield select( ( state ) => state.accounts[ REGULAR_ACCOUNT ].service )
+      const database = yield select( ( state ) => state.storage.database )
+      const accountShells = yield select( ( state ) => state.accounts.accountShells )
+      const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+      const versionHistory = yield select( ( state ) => state.versionHistory.versions )
 
-      console.log('PAYLOAD cloudWorker', payload)
       let encryptedCloudDataJson
       const shares =
-        share &&
-          !(Object.keys(share).length === 0 && share.constructor === Object)
-          ? JSON.stringify(share)
-          : ''
-      encryptedCloudDataJson = yield call(CloudData,
+            share &&
+                !( Object.keys( share ).length === 0 && share.constructor === Object )
+              ? JSON.stringify( share )
+              : ''
+      encryptedCloudDataJson = yield call( CloudData,
         database,
         accountShells,
         activePersonalNode,
@@ -54,27 +51,22 @@ function* cloudWorker({ payload }) {
         encryptedCloudDataJson: encryptedCloudDataJson,
         walletName: walletName,
         questionId: questionId,
-        question: questionId === '0' ? question : '',
+        question: questionId === '0' ? question: '',
         regularAccount: regularAccount,
-        keeperData: kpInfo ? JSON.stringify(kpInfo) : JSON.stringify(keeperData),
+        keeperData: kpInfo ? JSON.stringify( kpInfo ) : JSON.stringify( keeperData ),
       }
-      console.log('data cloudWorker', data)
-      console.log('cloudBackupStatus cloudWorker', cloudBackupStatus)
-      const cloudObject = new CloudBackup({
+      const cloudObject = new CloudBackup( {
         dataObject: data,
         callBack: callback,
         share,
-      })
-      console.log('cloudObject cloudWorker', cloudObject)
+      } )
 
-      cloudObject.CloudDataBackup(data, callback, share)
+      cloudObject.CloudDataBackup( data, callback, share )
     }
   }
-  catch (error) {
-    yield put(setCloudBackupStatus({
-      status: false
-    }))
-    console.log('ERROR cloudWorker', error)
+  catch ( error ) {
+    yield put( setCloudBackupStatus(false))
+    console.log( 'ERROR cloudWorker', error )
   }
 }
 
@@ -83,44 +75,37 @@ export const cloudWatcher = createWatcher(
   SET_CLOUD_DATA,
 )
 
-function* setCloudBackupStatusWorker({ payload }) {
+function* updateHealthForCloudStatusWorker({ payload }) {
   console.log('setCloudBackupStatusWorker', payload)
   try {
     const { share } = payload
-    yield put(setCloudBackupStatus({
-      status: true
-    }))
-    const cloudBackupStatus = yield select((state) => state.preferences.cloudBackupStatus)
+    yield put( setCloudBackupStatus(false))
 
     const currentLevel = yield select((state) => state.health.currentLevel)
 
-    if (cloudBackupStatus.status && currentLevel == 0) {
+    if (currentLevel == 0) {
       yield call(updateHealthForCloudWorker, {
         payload: {
         }
       })
-    } else if ((cloudBackupStatus.status && currentLevel == 1) || currentLevel == 2) {
+    } else if (currentLevel == 1 || currentLevel == 2) {
       yield call(updateHealthForCloudWorker, {
         payload: {
           share
         }
       })
     }
-    yield put(setCloudBackupStatus({
-      status: false
-    }))
+    yield put(setCloudBackupStatus(false))
   }
   catch (error) {
-    yield put(setCloudBackupStatus({
-      status: false
-    }))
+    yield put(setCloudBackupStatus(false))
     console.log('ERRORsf', error)
   }
 }
 
-export const setCloudBackupStatusWatcher = createWatcher(
-  setCloudBackupStatusWorker,
-  SET_CLOUD_BACKUP_STATUS,
+export const updateHealthForCloudStatusWatcher = createWatcher(
+  updateHealthForCloudStatusWorker,
+  UPDATE_HEALTH_FOR_CLOUD,
 )
 
 
@@ -128,7 +113,6 @@ function* updateHealthForCloudWorker({ payload }) {
   try {
     const { share } = payload
     const levelHealth = yield select((state) => state.health.levelHealth)
-    const cloudBackupStatus = yield select((state) => state.preferences.cloudBackupStatus)
     const isLevel2Initialized = yield select((state) => state.health.isLevel2Initialized)
     const s3Service = yield select((state) => state.health.service)
 
@@ -142,7 +126,6 @@ function* updateHealthForCloudWorker({ payload }) {
     }
     // health update for 1st upload to cloud
     if (
-      cloudBackupStatus &&
       levelHealth.length &&
       levelHealthVar.status != 'accessible'
     ) {
@@ -166,9 +149,7 @@ function* updateHealthForCloudWorker({ payload }) {
     }
   }
   catch (error) {
-    yield put(setCloudBackupStatus({
-      status: false
-    }))
+    yield put(setCloudBackupStatus(false))
     console.log('ERRORsf', error)
     throw error
   }

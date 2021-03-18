@@ -45,7 +45,6 @@ import { REGULAR_ACCOUNT } from "../../common/constants/wallet-service-types";
 import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
 import { isEmpty } from "../../common/CommonFunctions";
 import CloudBackup from "../../common/CommonFunctions/CloudBackup";
-import { setCloudBackupStatus } from "../../store/actions/preferences";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import SSS from "../../bitcoin/utilities/sss/SSS";
 import { decrypt, decrypt1 } from "../../common/encryption";
@@ -99,7 +98,6 @@ interface RestoreWithICloudPropsTypes {
   s3Service: any;
   cloudBackupStatus: any;
   database: any;
-  setCloudBackupStatus: any;
   security: any;
   recoverWalletUsingIcloud: any;
   accounts: any;
@@ -1212,7 +1210,6 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
-    setCloudBackupStatus,
     recoverWalletUsingIcloud,
     checkMSharesHealth,
     initializeHealthSetup,

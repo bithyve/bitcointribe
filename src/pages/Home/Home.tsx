@@ -140,7 +140,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData, setCloudBackupStatus, } from '../../store/actions/cloud'
+import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -240,8 +240,7 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  setCloudBackupStatus: any;
-  cloudBackupStatus: any;
+  updateHealthForCloud: any;
   regularAccount: RegularAccount;
   database: any;
   updateMSharesHealth: any;
@@ -985,17 +984,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = ( prevProps, prevState ) => {
-    if (
-      JSON.stringify( prevProps.levelHealth ) !==
-      JSON.stringify( this.props.levelHealth )
-    ) {
-      if (
-        this.props.levelHealth.length > 0 &&
-        this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0
-      ) {
-        this.props.setCloudData( this.setCloudBackupStatus )
-      }
+    if (this.props.levelHealth.length == 1 && this.props.currentLevel == 0) {
+      this.props.setCloudData( this.setCloudBackupStatusCallBack )
     }
 
     if (
@@ -1069,8 +1059,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  setCloudBackupStatus = ( share ) =>{
-    this.props.setCloudBackupStatus( share )
+  setCloudBackupStatusCallBack = ( share ) =>{
+    this.props.updateHealthForCloud( share )
   }
 
   handleDeepLinkModal = () => {
@@ -2555,8 +2545,6 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.preferences.secondaryDeviceAddressValue
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
@@ -2596,7 +2584,7 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    setCloudBackupStatus,
+    updateHealthForCloud,
     updateMSharesHealth,
     setCardData,
     fetchKeeperTrustedChannel,

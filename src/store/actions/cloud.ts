@@ -1,5 +1,5 @@
 export const SET_CLOUD_DATA = 'SET_CLOUD_DATA'
-export const SET_CLOUD_BACKUP_STATUS = 'SET_CLOUD_BACKUP_STATUS'
+export const UPDATE_HEALTH_FOR_CLOUD = 'UPDATE_HEALTH_FOR_CLOUD'
 export const UPDATE_CLOUD_HEALTH = 'UPDATE_CLOUD_HEALTH'
 
 export const setCloudData = (callback, kpInfo?, level?, share? ) => {
@@ -11,9 +11,9 @@ export const setCloudData = (callback, kpInfo?, level?, share? ) => {
   }
 }
 
-export const setCloudBackupStatus = (share?) => {
+export const updateHealthForCloud = (share?) => {
   return {
-    type: SET_CLOUD_BACKUP_STATUS,
+    type: UPDATE_HEALTH_FOR_CLOUD,
     payload: {
         share
     },
