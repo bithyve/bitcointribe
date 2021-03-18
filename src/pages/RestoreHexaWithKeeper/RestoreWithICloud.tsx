@@ -286,7 +286,7 @@ class RestoreWithICloud extends Component<
   };
 
   getData = (result) => {
-    //console.log('FILE DATA', result);
+    console.log('FILE DATA', result);
     if (result) {
       var arr = [];
       var newArray = [];
@@ -300,7 +300,7 @@ class RestoreWithICloud extends Component<
           newArray.push(arr[i]);
         }
       }
-      //console.log('ARR', newArray);
+      console.log('ARR', newArray);
       this.setState((state) => ({
         selectedBackup: newArray[0],
         walletsArray: newArray,
