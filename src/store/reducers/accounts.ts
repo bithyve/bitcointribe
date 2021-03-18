@@ -1,17 +1,10 @@
 import {
-  TRANSFER_ST1_EXECUTED,
-  TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER,
-  TRANSFER_ST3_EXECUTED,
   ACCOUNTS_LOADING,
-  TRANSFER_ST1_FAILED,
-  TRANSFER_ST2_FAILED,
-  TRANSFER_ST3_FAILED,
   TESTCOINS_RECEIVED,
   ACCOUNTS_SYNCHED,
   EXCHANGE_RATE_CALCULATED,
   SECONDARY_XPRIV_GENERATED,
-  ALTERNATE_TRANSFER_ST2_EXECUTED,
   TWO_FA_RESETTED,
   ADD_TRANSFER_DETAILS,
   REMOVE_TRANSFER_DETAILS,
@@ -238,45 +231,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           },
         }
 
-      case TRANSFER_ST1_EXECUTED:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            transfer: {
-              ...state[ accountType ].transfer,
-              stage1: {
-                ...action.payload.result
-              },
-              executed: 'ST1',
-            },
-            loading: {
-              ...state[ accountType ].loading,
-              transfer: false,
-            },
-          },
-        }
-
-      case TRANSFER_ST1_FAILED:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            transfer: {
-              ...state[ accountType ].transfer,
-              stage1: {
-                ...state[ accountType ].transfer.stage1,
-                failed: true,
-                ...action.payload.errorDetails,
-              },
-            },
-            loading: {
-              ...state[ accountType ].loading,
-              transfer: false,
-            },
-          },
-        }
-
       case ADD_TRANSFER_DETAILS:
         return {
           ...state,
@@ -361,123 +315,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
                 stage3: {
                 },
                 executed: 'ST2',
-              },
-            },
-          }
-
-      case TRANSFER_ST2_EXECUTED:
-        switch ( action.payload.serviceType ) {
-            case REGULAR_ACCOUNT || TEST_ACCOUNT:
-              return {
-                ...state,
-                [ accountType ]: {
-                  ...state[ accountType ],
-                  transfer: {
-                    ...state[ accountType ].transfer,
-                    txid: action.payload.result,
-                    executed: 'ST2',
-                  },
-                  loading: {
-                    ...state[ accountType ].loading,
-                    transfer: false,
-                  },
-                },
-              }
-
-            case SECURE_ACCOUNT:
-              return {
-                ...state,
-                [ accountType ]: {
-                  ...state[ accountType ],
-                  transfer: {
-                    ...state[ accountType ].transfer,
-                    stage2: {
-                      ...action.payload.result
-                    },
-                    executed: 'ST2',
-                  },
-                  loading: {
-                    ...state[ accountType ].loading,
-                    transfer: false,
-                  },
-                },
-              }
-        }
-
-      case ALTERNATE_TRANSFER_ST2_EXECUTED:
-        if ( state[ accountType ] && state[ accountType ].transfer )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                txid: action.payload.result,
-                executed: 'ST2',
-              },
-              loading: {
-                ...state[ accountType ].loading,
-                transfer: false,
-              },
-            },
-          }
-
-      case TRANSFER_ST2_FAILED:
-        if ( state[ accountType ] && state[ accountType ].transfer )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                stage2: {
-                  ...state[ accountType ].transfer.stage2,
-                  failed: true,
-                  ...action.payload.errorDetails,
-                },
-              },
-              loading: {
-                ...state[ accountType ].loading,
-                transfer: false,
-              },
-            },
-          }
-
-      case TRANSFER_ST3_EXECUTED:
-        if ( state[ accountType ] && state[ accountType ].transfer )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                txid: action.payload.result,
-                executing: false,
-              },
-              loading: {
-                ...state[ accountType ].loading,
-                transfer: false,
-              },
-            },
-          }
-
-      case TRANSFER_ST3_FAILED:
-        if ( state[ accountType ] && state[ accountType ].transfer )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                stage3: {
-                  ...state[ accountType ].transfer.stage3,
-                  failed: true,
-                  ...action.payload.errorDetails,
-                },
-              },
-              loading: {
-                ...state[ accountType ].loading,
-                transfer: false,
               },
             },
           }
@@ -803,7 +640,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case SET_ALL_ACCOUNTS_DATA:
-          return {
+        return {
           ...state,
           accounts: action.payload.accounts,
         }
