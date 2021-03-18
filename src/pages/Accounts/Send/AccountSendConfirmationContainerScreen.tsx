@@ -209,6 +209,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
       <TransactionPriorityMenu
         sourceSubAccount={sourcePrimarySubAccount}
+        bitcoinDisplayUnit={sourceAccountShell.unit}
         onTransactionPriorityChanged={setTransactionPriority}
       />
 
