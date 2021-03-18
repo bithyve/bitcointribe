@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -14,7 +14,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, resetSendState, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -173,7 +173,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
 
   return (
-    <View style={styles.rootContainer}>
+    <ScrollView style={styles.rootContainer}>
 
       <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
@@ -236,7 +236,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   )
 }
 

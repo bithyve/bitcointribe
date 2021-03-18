@@ -20,14 +20,11 @@ import DeviceInfo from 'react-native-device-info'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 export default function SendConfirmationContent( props ) {
-  const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
-
   const renderRecipientItem = ( recipient: RecipientDescribing ) => {
-
     return (
       <RecipientComponent
         recipient={recipient}
-        selectedContactId={String( SelectedContactId )}
+        selectedContactId={'0'}
         accountKind={props.accountKind}
       />
     )
