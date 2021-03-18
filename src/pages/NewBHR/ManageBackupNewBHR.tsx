@@ -270,7 +270,7 @@ class ManageBackupNewBHR extends Component<
       level = levelData[index > -1 ? index - 1 : 2].id;
     }
     let value = 1;
-    if (this.state.levelData[0].status == "notSetup") value = 1;
+    if (this.state.levelData[0].status == "notSetup" || this.state.levelData[0].status == "bad") value = 1;
     else if (level === 3) value = 0;
     else if (level) value = level + 1;
     this.setState({ selectedId: value });

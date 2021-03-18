@@ -147,7 +147,7 @@ export const CloudData = async (database, accountShells, activePersonalNode,vers
         walletImage,
         keeperInfo: [],
       };
-      console.log("walletImage", walletImage);
+      // console.log("walletImage", walletImage);
       encryptedCloudDataJson = await encrypt(CloudDataJson, key);
       // console.log('encryptedDatabase', encryptedCloudDataJson);
       return encryptedCloudDataJson;
