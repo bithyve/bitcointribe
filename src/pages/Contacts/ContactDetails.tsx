@@ -60,7 +60,7 @@ import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
-import { makeAddressRecipientDescription, makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 const getImageIcon = ( item ) => {
   if ( item ) {
@@ -115,6 +115,7 @@ const getImageIcon = ( item ) => {
 interface ContactDetailsPropTypes {
   navigation: any;
   trustedContacts: TrustedContactsService;
+  trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
   uploading: any;
   errorSending: any;
@@ -341,14 +342,9 @@ class ContactDetails extends PureComponent<
 
     const contactName = `${this.Contact.firstName} ${this.Contact.lastName ? this.Contact.lastName : ''
     }`
-      .toLowerCase()
-      .trim()
 
-    const trustedContactData = this.props.trustedContacts.tc.trustedContacts[ contactName ]
+    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.displayedName ===  contactName )
 
-    const recipient = makeContactRecipientDescription( trustedContactData )
-
-    this.props.clearTransfer( REGULAR_ACCOUNT )
     this.props.sourceAccountSelectedForSending(
       this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
     )
@@ -1460,6 +1456,7 @@ const mapStateToProps = ( state ) => {
     errorSending: idx( state, ( _ ) => _.sss.errorSending ),
     uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
+    trustedContactRecipients: idx( state, ( _ ) => _.trustedContacts.trustedContactRecipients ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     UNDER_CUSTODY: idx(
       state,
