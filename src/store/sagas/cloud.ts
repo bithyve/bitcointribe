@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { call, put, select } from 'redux-saga/effects'
+import { call, fork, put, select, spawn } from 'redux-saga/effects'
 import { CloudData } from '../../common/CommonFunctions'
 import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
@@ -10,9 +10,9 @@ import { createWatcher } from '../utils/utilities'
 
 function* cloudWorker( { payload } ) {
   try{
-    const cloudBackupStatus = yield select((state) => state.preferences.cloudBackupStatus)
-    if (cloudBackupStatus === false) {
-      yield put(setCloudBackupStatus(true))
+    const cloudBackupStatus = yield select( ( state ) => state.preferences.cloudBackupStatus )
+    if ( cloudBackupStatus === false ) {
+      yield put( setCloudBackupStatus( true ) )
       const { kpInfo, level, share, callback } = payload
       const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
       const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
@@ -61,11 +61,12 @@ function* cloudWorker( { payload } ) {
         share,
       } )
 
-      cloudObject.CloudDataBackup( data, callback, share )
+      // cloudObject.CloudDataBackup( data, callback, share )
+      yield fork( cloudObject.CloudDataBackup, data, callback, share )
     }
   }
   catch ( error ) {
-    yield put( setCloudBackupStatus(false))
+    yield put( setCloudBackupStatus( false ) )
     console.log( 'ERROR cloudWorker', error )
   }
 }
@@ -75,31 +76,31 @@ export const cloudWatcher = createWatcher(
   SET_CLOUD_DATA,
 )
 
-function* updateHealthForCloudStatusWorker({ payload }) {
-  console.log('setCloudBackupStatusWorker', payload)
+function* updateHealthForCloudStatusWorker( { payload } ) {
+  console.log( 'setCloudBackupStatusWorker', payload )
   try {
     const { share } = payload
-    yield put( setCloudBackupStatus(false))
+    yield put( setCloudBackupStatus( false ) )
 
-    const currentLevel = yield select((state) => state.health.currentLevel)
+    const currentLevel = yield select( ( state ) => state.health.currentLevel )
 
-    if (currentLevel == 0) {
-      yield call(updateHealthForCloudWorker, {
+    if ( currentLevel == 0 ) {
+      yield call( updateHealthForCloudWorker, {
         payload: {
         }
-      })
-    } else if (currentLevel == 1 || currentLevel == 2) {
-      yield call(updateHealthForCloudWorker, {
+      } )
+    } else if ( currentLevel == 1 || currentLevel == 2 ) {
+      yield call( updateHealthForCloudWorker, {
         payload: {
           share
         }
-      })
+      } )
     }
-    yield put(setCloudBackupStatus(false))
+    yield put( setCloudBackupStatus( false ) )
   }
-  catch (error) {
-    yield put(setCloudBackupStatus(false))
-    console.log('ERRORsf', error)
+  catch ( error ) {
+    yield put( setCloudBackupStatus( false ) )
+    console.log( 'ERRORsf', error )
   }
 }
 
@@ -109,28 +110,28 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 )
 
 
-function* updateHealthForCloudWorker({ payload }) {
+function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
-    const levelHealth = yield select((state) => state.health.levelHealth)
-    const isLevel2Initialized = yield select((state) => state.health.isLevel2Initialized)
-    const s3Service = yield select((state) => state.health.service)
+    const levelHealth = yield select( ( state ) => state.health.levelHealth )
+    const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
+    const s3Service = yield select( ( state ) => state.health.service )
 
-    let levelHealthVar = levelHealth[0].levelInfo[0]
+    let levelHealthVar = levelHealth[ 0 ].levelInfo[ 0 ]
     if (
       share &&
-      !(Object.keys(share).length === 0 && share.constructor === Object) &&
+      !( Object.keys( share ).length === 0 && share.constructor === Object ) &&
       levelHealth.length > 0
     ) {
-      levelHealthVar = levelHealth[levelHealth.length - 1].levelInfo[0]
+      levelHealthVar = levelHealth[ levelHealth.length - 1 ].levelInfo[ 0 ]
     }
     // health update for 1st upload to cloud
     if (
       levelHealth.length &&
       levelHealthVar.status != 'accessible'
     ) {
-      if (levelHealthVar.shareType == 'cloud') {
-        levelHealthVar.updatedAt = moment(new Date()).valueOf()
+      if ( levelHealthVar.shareType == 'cloud' ) {
+        levelHealthVar.updatedAt = moment( new Date() ).valueOf()
         levelHealthVar.status = 'accessible'
         levelHealthVar.reshareVersion = 0
         levelHealthVar.name = 'Cloud'
@@ -140,17 +141,17 @@ function* updateHealthForCloudWorker({ payload }) {
           walletId: s3Service.getWalletId().data.walletId,
           shareId: levelHealthVar.shareId,
           reshareVersion: levelHealthVar.reshareVersion,
-          updatedAt: moment(new Date()).valueOf(),
+          updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'cloud',
         },
       ]
-      yield put(updateMSharesHealth(shareArray))
+      yield put( updateMSharesHealth( shareArray ) )
     }
   }
-  catch (error) {
-    yield put(setCloudBackupStatus(false))
-    console.log('ERRORsf', error)
+  catch ( error ) {
+    yield put( setCloudBackupStatus( false ) )
+    console.log( 'ERRORsf', error )
     throw error
   }
 }
