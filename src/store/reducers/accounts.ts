@@ -1,13 +1,10 @@
 import {
-  CLEAR_TRANSFER,
   ACCOUNTS_LOADING,
   TESTCOINS_RECEIVED,
   ACCOUNTS_SYNCHED,
   EXCHANGE_RATE_CALCULATED,
   SECONDARY_XPRIV_GENERATED,
   TWO_FA_RESETTED,
-  ADD_TRANSFER_DETAILS,
-  REMOVE_TRANSFER_DETAILS,
   AVERAGE_TX_FEE,
   SETTED_DONATION_ACC,
   SETUP_DONATION_ACCOUNT,
@@ -30,7 +27,6 @@ import {
   ACCOUNT_SHELL_ORDERED_TO_FRONT,
   ACCOUNT_SHELL_REFRESH_COMPLETED,
   ACCOUNT_SHELL_REFRESH_STARTED,
-  REFRESH_ACCOUNT_SHELL,
   CLEAR_ACCOUNT_SYNC_CACHE,
   RESTORED_ACCOUNT_SHELLS,
   REMAP_ACCOUNT_SHELLS,
@@ -62,14 +58,6 @@ export type AccountVars = {
     unconfirmedBalance: number;
   };
   transactions: any;
-  transfer: {
-    details: any[];
-    executed: string;
-    stage1: any;
-    stage2: any;
-    stage3: any;
-    txid: string;
-  };
   loading: {
     receivingAddress: boolean;
     balances: boolean;
@@ -94,17 +82,6 @@ const ACCOUNT_VARS: AccountVars  = {
     unconfirmedBalance: 0,
   },
   transactions: {
-  },
-  transfer: {
-    details: [],
-    executed: '',
-    stage1: {
-    },
-    stage2: {
-    },
-    stage3: {
-    },
-    txid: '',
   },
   loading: {
     receivingAddress: false,
@@ -230,94 +207,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             service: action.payload.service,
           },
         }
-
-      case ADD_TRANSFER_DETAILS:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            transfer: {
-              ...state[ accountType ].transfer,
-              details: [
-                ...state[ accountType ].transfer.details,
-                action.payload.recipientData,
-              ],
-            },
-          },
-        }
-
-
-
-      case REMOVE_TRANSFER_DETAILS:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            transfer: {
-              ...state[ accountType ].transfer,
-              details: [ ...state[ accountType ].transfer.details ].filter(
-                ( item ) => item !== action.payload.recipientData
-              ),
-            },
-          },
-        }
-
-      case CLEAR_TRANSFER:
-        if ( !action.payload.stage && initialState[ accountType ] )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...initialState[ accountType ].transfer,
-              },
-            },
-          }
-        else if ( action.payload.stage === 'stage1' )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                stage1: {
-                },
-                stage2: {
-                },
-                stage3: {
-                },
-                executed: '',
-              },
-            },
-          }
-        else if ( action.payload.stage === 'stage2' )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                stage2: {
-                },
-                stage3: {
-                },
-                executed: 'ST1',
-              },
-            },
-          }
-        else if ( action.payload.stage === 'stage3' )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              transfer: {
-                ...state[ accountType ].transfer,
-                stage3: {
-                },
-                executed: 'ST2',
-              },
-            },
-          }
 
       case SERVICES_ENRICHED:
         const { services } = action.payload
