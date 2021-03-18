@@ -1918,6 +1918,7 @@ export default class HDSegwitWallet extends Bitcoin {
             if (
               derivativeInstance.confirmedUTXOs
             )
+            {
               derivativeInstance.confirmedUTXOs.forEach( ( confirmedUTXO ) => {
                 let include = true
                 if( consumedUTXOs[ confirmedUTXO.txId ] ) {
@@ -1928,8 +1929,9 @@ export default class HDSegwitWallet extends Bitcoin {
               } )
 
 
-            derivativeInstance.balances.balance -= consumedBalance
-            derivativeInstance.confirmedUTXOs = updatedUTXOSet
+              derivativeInstance.balances.balance -= consumedBalance
+              derivativeInstance.confirmedUTXOs = updatedUTXOSet
+            }
           }
         }
       }
