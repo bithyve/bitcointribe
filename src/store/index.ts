@@ -181,7 +181,7 @@ import {
 
 import {
   cloudWatcher,
-  setCloudBackupStatusWatcher,
+  updateHealthForCloudStatusWatcher,
   updateHealthForCloudWatcher
 } from './sagas/cloud'
 
@@ -333,7 +333,7 @@ const rootSaga = function* () {
 
     //cloud Integration
     cloudWatcher,
-    setCloudBackupStatusWatcher,
+    updateHealthForCloudStatusWatcher,
     updateHealthForCloudWatcher,
 
     // Sending

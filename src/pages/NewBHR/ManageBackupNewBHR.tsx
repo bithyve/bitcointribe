@@ -75,7 +75,7 @@ import ErrorModalContents from "../../components/ErrorModalContents";
 import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
 import AccountShell from "../../common/data/models/AccountShell";
 import PersonalNode from "../../common/data/models/PersonalNode";
-import { setCloudData, setCloudBackupStatus } from "../../store/actions/cloud";
+import { setCloudData, updateHealthForCloud } from "../../store/actions/cloud";
 import ApproveSetup from "./ApproveSetup";
 import QRModal from "../Accounts/QRModal";
 
@@ -105,9 +105,8 @@ interface ManageBackupNewBHRStateTypes {
 
 interface ManageBackupNewBHRPropsTypes {
   navigation: any;
-  setCloudBackupStatus: any;
+  updateHealthForCloud: any;
   setIsBackupProcessing: any;
-  isBackupProcessing: any;
   cloudBackupStatus: any;
   walletName: string;
   regularAccount: RegularAccount;
@@ -289,30 +288,27 @@ class ManageBackupNewBHR extends Component<
       : timeFormatter(moment(new Date()), item);
   };
 
-  setCloudBackupStatus = (share) => {
-    this.props.setCloudBackupStatus(share);
+  setCloudBackupStatusCallBack = (share) => {
+    this.props.updateHealthForCloud(share);
   };
 
   componentDidUpdate = (prevProps, prevState) => {
     const {
       healthLoading,
       trustedChannelsSetupSyncing,
-      isBackupProcessing,
+      cloudBackupStatus,
       keeperInfo,
       currentLevel,
       levelHealth
     } = this.props;
-    console.log(
-      "keeperInfo",keeperInfo
-    );
     if (
       prevProps.healthLoading !== this.props.healthLoading ||
-      prevProps.isBackupProcessing.status !==
-        this.props.isBackupProcessing.status
+      prevProps.cloudBackupStatus !==
+      this.props.cloudBackupStatus
     ) {
-      if (healthLoading || isBackupProcessing.status) {
+      if (healthLoading || cloudBackupStatus) {
         this.setState({ refreshControlLoader: true });
-      } else if (!healthLoading && !isBackupProcessing.status) {
+      } else if (!healthLoading && !cloudBackupStatus) {
         this.setState({ refreshControlLoader: false });
       }
     }
@@ -331,19 +327,21 @@ class ManageBackupNewBHR extends Component<
       }
       this.modifyLevelData();
     }
-
+    console.log('currentLevel', currentLevel);
+    console.log('levelHealth', levelHealth[1])
+    console.log('this.props.cloudBackupStatus', this.props.cloudBackupStatus)
     if (
       JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth) || 
-      currentLevel == 1 && levelHealth[1] && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[0].status == 'notAccessible'|| 
-      currentLevel == 2 && levelHealth[2] && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[0].status == 'notAccessible'
+      currentLevel == 1 && levelHealth[1] && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[3].status == 'accessible' && levelHealth[1].levelInfo[0].status == 'notAccessible'|| 
+      currentLevel == 2 && levelHealth[2] && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[3].status == 'accessible' && levelHealth[2].levelInfo[0].status == 'notAccessible'
     ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus.status === false
+        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === false
       ) {
-        this.props.setCloudData(this.setCloudBackupStatus);
+        this.props.setCloudData(this.setCloudBackupStatusCallBack);
       } else {
         this.updateCloudData();
         this.autoUploadShare();
@@ -406,8 +404,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateCloudData = () => {
-    console.log("inside updateCloudData", this.props.cloudBackupStatus.status)
-    if(this.props.cloudBackupStatus.status === true) return;
+    if(this.props.cloudBackupStatus === true) return;
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let secretShare = {};
     if (levelHealth.length > 0) {
@@ -436,7 +433,7 @@ class ManageBackupNewBHR extends Component<
       }
     }
     this.props.setCloudData(
-      this.setCloudBackupStatus,
+      this.setCloudBackupStatusCallBack,
       keeperInfo,
       currentLevel,
       secretShare
@@ -1064,13 +1061,13 @@ class ManageBackupNewBHR extends Component<
                                       ? 0
                                       : 1,
                                 }}
-                                disabled={this.props.cloudBackupStatus.status}
+                                disabled={this.props.cloudBackupStatus}
                                 onPress={() => {
                                   console.log(
-                                    "this.props.cloudBackupStatus.status",
-                                    this.props.cloudBackupStatus.status, typeof this.props.cloudBackupStatus.status
+                                    "this.props.cloudBackupStatus",
+                                    this.props.cloudBackupStatus, typeof this.props.cloudBackupStatus
                                   );
-                                  if (this.props.cloudBackupStatus.status === false) {
+                                  if (this.props.cloudBackupStatus === false) {
                                     this.updateCloudData();
                                   }
                                 }}
@@ -1476,8 +1473,6 @@ const mapStateToProps = (state) => {
     trustedContacts: idx(state, (_) => _.trustedContacts.service),
     cloudBackupStatus:
       idx(state, (_) => _.preferences.cloudBackupStatus) || false,
-    isBackupProcessing:
-      idx(state, (_) => _.preferences.isBackupProcessing) || false,
     regularAccount: idx(state, (_) => _.accounts[REGULAR_ACCOUNT].service),
     database: idx(state, (_) => _.storage.database) || {},
     levelHealth: idx(state, (_) => _.health.levelHealth),
@@ -1513,7 +1508,7 @@ const mapStateToProps = (state) => {
 export default withNavigationFocus(
   connect(mapStateToProps, {
     fetchEphemeralChannel,
-    setCloudBackupStatus,
+    updateHealthForCloud,
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
