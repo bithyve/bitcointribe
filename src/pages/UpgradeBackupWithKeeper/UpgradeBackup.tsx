@@ -53,7 +53,7 @@ import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth'
-import { setCloudData, setCloudBackupStatus, } from '../../store/actions/cloud'
+import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -79,7 +79,7 @@ interface UpgradeBackupPropsTypes {
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
-  setCloudBackupStatus: any;
+  updateHealthForCloud: any;
   cloudBackupStatus: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -254,7 +254,7 @@ class UpgradeBackup extends Component<
         this.props.s3Service.levelhealth.healthCheckInitializedKeeper &&
       this.props.s3Service.levelhealth.healthCheckInitializedKeeper
     ) {
-      this.props.setCloudData( this.setCloudBackupStatus )
+      this.props.setCloudData( this.setCloudBackupStatusCallBack )
     }
     if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) ){
       if( this.props.levelHealth[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
@@ -271,8 +271,8 @@ class UpgradeBackup extends Component<
 
   };
 
-  setCloudBackupStatus = ( share ) =>{
-    this.props.setCloudBackupStatus( share )
+  setCloudBackupStatusCallBack = ( share ) =>{
+    this.props.updateHealthForCloud( share )
   }
 
   cloudBackup = () => {
@@ -693,7 +693,7 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     fetchEphemeralChannel,
     initializeHealthSetup,
-    setCloudBackupStatus,
+    updateHealthForCloud,
     updateMSharesHealth,
     setIsNewHealthSystemSet,
     setCloudData

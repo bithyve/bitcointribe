@@ -113,8 +113,10 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       setQrBottomSheetsFlag( false )
     }, 2 )
     if(qrData.includes("{")) {
+      console.log('qrData in IF', qrData);
       dispatch(getSMAndReSetTFAOrGenerateSXpriv(qrData, QRModalHeader, SECURE_ACCOUNT))
     } else {
+      console.log('qrData in ELSE', qrData);
       if ( QRModalHeader === 'Reset 2FA' ) {
         dispatch( resetTwoFA( qrData ) )
       } else if ( QRModalHeader === 'Sweep Funds' ) {

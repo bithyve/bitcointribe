@@ -39,24 +39,28 @@ export default class CloudBackup {
       console.log("userResponse",userResponse);
       return userResponse;
     } catch (err) {
+      throw new Error( err )
       console.log(err);
     }
-    return null;
   };
 
   public CheckCloudDataBackup = (recoveryCallback1) => {
-    this.recoveryCallback = recoveryCallback1;
-    if (Platform.OS == 'ios') {
-      // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
-      iCloud.downloadBackup().then((backedJson) => {
-        //console.log('BackedUp JSON: DONE', backedJson);
-        if (backedJson) this.recoveryCallback(backedJson);
-        else this.recoveryCallback(null);
-      });
-    } else {
-      console.log('isNotReading', this.isNotReading);
-      let checkDataIsBackedup = true;
-      this.GoogleDriveLogin({ checkDataIsBackedup });
+    try {
+      this.recoveryCallback = recoveryCallback1;
+      if (Platform.OS == 'ios') {
+        // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
+        iCloud.downloadBackup().then((backedJson) => {
+          //console.log('BackedUp JSON: DONE', backedJson);
+          if (backedJson) this.recoveryCallback(backedJson);
+          else this.recoveryCallback(null);
+        });
+      } else {
+        console.log('isNotReading', this.isNotReading);
+        let checkDataIsBackedup = true;
+        this.GoogleDriveLogin({ checkDataIsBackedup });
+      }
+    } catch (error) {
+      throw new Error( error )
     }
   };
 
@@ -84,8 +88,9 @@ export default class CloudBackup {
       console.log('isNotReading', this.isNotReading);
       this.GoogleDriveLogin({ share: this.share });
     }
-  } catch(e){
-    console.log("CloudDataBackup error", e);
+  } catch(error){
+    console.log("CloudDataBackup error", error);
+    throw new Error( error )
   }
   };
 
@@ -95,6 +100,7 @@ export default class CloudBackup {
     googlePermissionCall? : any,
     googleCloudLoginCallback? : any,
   }) => {
+    try {
     let { checkDataIsBackedup, share, googlePermissionCall, googleCloudLoginCallback } = params;
     this.googleCloudLoginCallback = googleCloudLoginCallback;
     GoogleDrive.setup()
@@ -107,28 +113,18 @@ export default class CloudBackup {
             console.log('GOOGLE ReSULT', data);
             console.log('Error', err);
             if (result.eventName == 'onLogin') {
-              // if (!(await this.checkPermission())) {
-              //  console.log('Storage Permission Denied');
-              // }
               this.googleCloudLoginCallback('success');
-            //   let usersPermissions = await this.checkPermission();
-            //   if (usersPermissions['android.permission.READ_EXTERNAL_STORAGE']
-            //   && usersPermissions['android.permission.WRITE_EXTERNAL_STORAGE'] === 'granted') {
-            //     console.log("INSIDE dsfsd");
-            //     this.googleCloudLoginCallback('success');
-            //     //throw new Error('Storage Permission Denied');
-            //   } else {
-            //     console.log("INSIDE Elese");
-            //     this.googleCloudLoginCallback('fail');
-
-            // }
           }
           }
         });
       })
       .catch((err) => {
         console.log('GOOGLE SetupFail', err);
+        throw new Error( err )
       });
+    } catch (error) {
+      throw new Error( error )
+    }
   };
 
   public handleLogin = async (params: {
@@ -137,21 +133,20 @@ export default class CloudBackup {
     checkDataIsBackedup?: boolean;
     share?: any;
   }) => {
-    console.log('isNotReading handleLogin', this.isNotReading);
-    let { err, data, checkDataIsBackedup, share } = params;
-    const result = err || data;
-    console.log('handleLogin err', err);
-    console.log('GOOGLE ReSULT', data);
-    // console.log('Error', e);
-    if (result.eventName == 'onLogin') {
-      // if (!(await this.checkPermission())) {
-      //   throw new Error('Storage Permission Denied');
-      // }
-      //this.createFile();
-      this.checkFileIsAvailable({
-        checkDataIsBackedup: params.checkDataIsBackedup,
-        share,
-      });
+    try {
+      console.log('isNotReading handleLogin', this.isNotReading);
+      let { err, data, checkDataIsBackedup, share } = params;
+      const result = err || data;
+      console.log('handleLogin err', err);
+      console.log('GOOGLE ReSULT', data);
+      if (result.eventName == 'onLogin') {
+        this.checkFileIsAvailable({
+          checkDataIsBackedup: params.checkDataIsBackedup,
+          share,
+        });
+      }
+    } catch (error) {
+      throw new Error( error )
     }
   };
 
@@ -163,90 +158,95 @@ export default class CloudBackup {
      * TODO: Check if file exist if not then create new file having name HexaWalletBackup.json
      * If file exist then call
      */
-    console.log('isNotReading checkFileIsAvailable', this.isNotReading);
-    let { checkDataIsBackedup, share } = params;
-    const metaData = {
-      name: 'HexaWalletBackup.json',
-      description: 'Backup data for my app',
-      mimeType: 'application/json',
-    };
-    console.log('checkFileIsAvailable err', share);
-    await GoogleDrive.checkIfFileExist(
-      JSON.stringify(metaData),
-      (err, data) => {
-        // console.log('err, data', data, err);
-        const result = err || data;
-        console.log('checkFileIsAvailable', result);
-        if (!checkDataIsBackedup) {
-          if (result && result.eventName == 'listEmpty') {
-            console.log('createFile');
-            this.createFile({ share });
-          } else if (result.eventName == 'failure') {
-            console.log('FAILURE');
-          } else if(result.eventName === 'UseUserRecoverableAuthIOException')
-          {
-            this.checkFileIsAvailable({ share: this.share });
-           // console.log('UseUserRecoverableAuthIOException Failure');
-          } else {
-            console.log(
-              'readFile isNotReading checkFileIsAvailable if',
-              this.isNotReading,
-            );
-            this.readFile({ result, share });
-          }
-        } else {
-          console.log(
-            'isNotReading checkFileIsAvailable else',
-            this.isNotReading,
-          );
-          this.readFile({ result, checkDataIsBackedup, share });
-        }
-      },
-    );
-  };
-
-  public createFile = (params: { share?: any }) => {
-    let { share } = params;
-    let WalletData = [];
-    const { data } = this.dataObject.regularAccount.getWalletId();
-    let tempData = {
-      levelStatus: this.dataObject.levelStatus,
-      walletName: this.dataObject.walletName,
-      questionId: this.dataObject.questionId,
-      question: this.dataObject.question,
-      walletId: data.walletId,
-      data: this.dataObject.encryptedCloudDataJson,
-      shares: this.dataObject.shares,
-      keeperData: this.dataObject.keeperData,
-      dateTime: moment(new Date()),
-    };
-    WalletData.push(tempData);
-
-    if (Platform.OS === 'ios') {
-      iCloud.startBackup(JSON.stringify(WalletData));
-      this.callBack(share);
-    } else {
+    try {
+      console.log('isNotReading checkFileIsAvailable', this.isNotReading);
+      let { checkDataIsBackedup, share } = params;
       const metaData = {
         name: 'HexaWalletBackup.json',
         description: 'Backup data for my app',
         mimeType: 'application/json',
-        data: JSON.stringify(WalletData),
       };
-
-      try {
-        GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
-          console.log('DATA', data, err);
+      console.log('checkFileIsAvailable err', share);
+      await GoogleDrive.checkIfFileExist(
+        JSON.stringify(metaData),
+        (err, data) => {
+          // console.log('err, data', data, err);
           const result = err || data;
-          if (result && result.eventName == 'successFullyUpload') {
-            this.callBack(share);
-          } else if (result && result.eventName === 'UseUserRecoverableAuthIOException') {
-            this.checkFileIsAvailable({ share: this.share });
-          } 
-        });
-        // uploadFile(JSON.stringify(content))
-      } catch (error) {
-        console.log('error', error);
+          console.log('checkFileIsAvailable', result);
+          if (!checkDataIsBackedup) {
+            if (result && result.eventName == 'listEmpty') {
+              console.log('createFile');
+              this.createFile({ share });
+            } else if (result.eventName == 'failure') {
+              console.log('FAILURE');
+            } else if(result.eventName === 'UseUserRecoverableAuthIOException')
+            {
+              this.checkFileIsAvailable({ share: this.share });
+            // console.log('UseUserRecoverableAuthIOException Failure');
+            } else {
+              console.log(
+                'readFile isNotReading checkFileIsAvailable if',
+                this.isNotReading,
+              );
+              this.readFile({ result, share });
+            }
+          } else {
+            console.log(
+              'isNotReading checkFileIsAvailable else',
+              this.isNotReading,
+            );
+            this.readFile({ result, checkDataIsBackedup, share });
+          }
+        },
+      );
+    } catch (error) {
+      throw new Error( error )
+    }
+  };
+
+  public createFile = (params: { share?: any }) => {
+    try {
+      let { share } = params;
+      let WalletData = [];
+      const { data } = this.dataObject.regularAccount.getWalletId();
+      let tempData = {
+        levelStatus: this.dataObject.levelStatus,
+        walletName: this.dataObject.walletName,
+        questionId: this.dataObject.questionId,
+        question: this.dataObject.question,
+        walletId: data.walletId,
+        data: this.dataObject.encryptedCloudDataJson,
+        shares: this.dataObject.shares,
+        keeperData: this.dataObject.keeperData,
+        dateTime: moment(new Date()),
+      };
+      WalletData.push(tempData);
+
+      if (Platform.OS === 'ios') {
+        iCloud.startBackup(JSON.stringify(WalletData));
+        this.callBack(share);
+      } else {
+        const metaData = {
+          name: 'HexaWalletBackup.json',
+          description: 'Backup data for my app',
+          mimeType: 'application/json',
+          data: JSON.stringify(WalletData),
+        };
+
+          GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
+            console.log('DATA', data, err);
+            const result = err || data;
+            if (result && result.eventName == 'successFullyUpload') {
+              this.callBack(share);
+            } else if (result && result.eventName === 'UseUserRecoverableAuthIOException') {
+              this.checkFileIsAvailable({ share: this.share });
+            } 
+          });
+          // uploadFile(JSON.stringify(content))
+      
       }
+    } catch (error) {
+      throw new Error( error )
     }
   };
 
@@ -264,6 +264,7 @@ export default class CloudBackup {
       });
     } catch (error) {
       console.log('error', error);
+      throw new Error( error )
     }
   };
 
@@ -292,6 +293,7 @@ export default class CloudBackup {
       }
     } catch (error) {
       console.log('error', error);
+      throw new Error( error )
     }
   };
 
@@ -300,61 +302,61 @@ export default class CloudBackup {
     googleData: any;
     share?: any;
   }) => {
-    let { result1, googleData, share } = params;
-    console.log('updateData share', share);
-    const { data } = this.dataObject.regularAccount.getWalletId();
-    var arr = [];
-    var newArray = [];
-    if (result1) {
-      try {
+    try {
+      let { result1, googleData, share } = params;
+      console.log('updateData share', share);
+      const { data } = this.dataObject.regularAccount.getWalletId();
+      var arr = [];
+      var newArray = [];
+      if (result1) {
         arr = JSON.parse(result1);
-      } catch (error) {
-        console.log('ERROR', error);
-      }
-      if (arr && arr.length) {
-        for (var i = 0; i < arr.length; i++) {
-          newArray.push(arr[i]);
+        if (arr && arr.length) {
+          for (var i = 0; i < arr.length; i++) {
+            newArray.push(arr[i]);
+          }
         }
+        var index = newArray.findIndex((x) => x.walletId == data.walletId);
+        //console.log('sdgsdg', index);
+        if (index === -1) {
+          let tempData = {
+            levelStatus: this.dataObject.levelStatus,
+            walletName: this.dataObject.walletName,
+            questionId: this.dataObject.questionId,
+            question: this.dataObject.question,
+            walletId: data.walletId,
+            data: this.dataObject.encryptedCloudDataJson,
+            shares: this.dataObject.shares,
+            keeperData: this.dataObject.keeperData,
+            dateTime: moment(new Date()),
+          };
+          newArray.push(tempData);
+        } else {
+          newArray[index].questionId = this.dataObject.questionId,
+          newArray[index].question = this.dataObject.question,
+          newArray[index].levelStatus = this.dataObject.levelStatus;
+          newArray[index].data = this.dataObject.encryptedCloudDataJson;
+          newArray[index].shares = this.dataObject.shares ? this.dataObject.shares : newArray[index].shares;
+          newArray[index].keeperData = this.dataObject.keeperData;
+          newArray[index].dateTime = moment(new Date());
+        }
+        console.log('ARR', newArray);
       }
-      var index = newArray.findIndex((x) => x.walletId == data.walletId);
-      //console.log('sdgsdg', index);
-      if (index === -1) {
-        let tempData = {
-          levelStatus: this.dataObject.levelStatus,
-          walletName: this.dataObject.walletName,
-          questionId: this.dataObject.questionId,
-          question: this.dataObject.question,
-          walletId: data.walletId,
-          data: this.dataObject.encryptedCloudDataJson,
-          shares: this.dataObject.shares,
-          keeperData: this.dataObject.keeperData,
-          dateTime: moment(new Date()),
-        };
-        newArray.push(tempData);
+      if (Platform.OS == 'ios') {
+        iCloud.startBackup(JSON.stringify(newArray));
+        this.callBack(share);
+        // console.log('Platform.OS share', share)
       } else {
-        newArray[index].questionId = this.dataObject.questionId,
-        newArray[index].question = this.dataObject.question,
-        newArray[index].levelStatus = this.dataObject.levelStatus;
-        newArray[index].data = this.dataObject.encryptedCloudDataJson;
-        newArray[index].shares = this.dataObject.shares ? this.dataObject.shares : newArray[index].shares;
-        newArray[index].keeperData = this.dataObject.keeperData;
-        newArray[index].dateTime = moment(new Date());
+        console.log("GOOGLEDATA", googleData);
+        const metaData = {
+          name: googleData.name,
+          mimeType: googleData.mimeType,
+          data: JSON.stringify(newArray),
+          id: googleData.id,
+        };
+        this.UpdateFile({ metaData, share });
       }
-      console.log('ARR', newArray);
-    }
-    if (Platform.OS == 'ios') {
-      iCloud.startBackup(JSON.stringify(newArray));
-      this.callBack(share);
-      // console.log('Platform.OS share', share)
-    } else {
-      console.log("GOOGLEDATA", googleData);
-      const metaData = {
-        name: googleData.name,
-        mimeType: googleData.mimeType,
-        data: JSON.stringify(newArray),
-        id: googleData.id,
-      };
-      this.UpdateFile({ metaData, share });
+    } catch (error) {
+      throw new Error( error )
     }
   };
 }
