@@ -69,15 +69,31 @@ const checkLevelHealth = (
       levelData[index-1].keeper2.name = index == 0 ? 'Security Question' : levelHealthVar[currentLevel - 1].levelInfo[1].name;;
       levelData[index-1].status = checkStatus(levelHealthVar, currentLevel - 1, 0);
     }
+    else if(index == 0 && currentLevel == 0){
+      levelData[index].keeper1 = levelHealthVar[0] && levelHealthVar[0].levelInfo ? levelHealthVar[0].levelInfo[0] : levelData[0].keeper1;
+      levelData[index].keeper1.name = 'Cloud';
+      levelData[index].keeper2 = levelHealthVar[0] && levelHealthVar[0].levelInfo[1] ? levelHealthVar[0].levelInfo[1] : levelData[0].keeper2;
+      levelData[index].keeper2.name = 'Security Question';
+      levelData[index].status = checkStatus(levelHealthVar, 0, 0);
+    }
     levelData[index].status = 'notSetup';
     return levelData;
   } else {
     const status = checkStatus(levelHealthVar, index, index2);
-    levelData[0].keeper1 = levelHealthVar[currentLevel - 1] && levelHealthVar[currentLevel - 1].levelInfo ? levelHealthVar[currentLevel - 1].levelInfo[0] : levelData[0].keeper1;
-    levelData[0].keeper1.name = 'Cloud';
-    levelData[0].keeper2 = levelHealthVar[currentLevel - 1] && levelHealthVar[currentLevel - 1].levelInfo[1] ? levelHealthVar[currentLevel - 1].levelInfo[1] : levelData[0].keeper2;
-    levelData[0].keeper2.name = 'Security Question';
-    levelData[0].status = checkStatus(levelHealthVar, currentLevel - 1, 0);
+    if(levelHealthVar[0] && currentLevel > 0){
+      levelData[0].keeper1 = levelHealthVar[currentLevel - 1] && levelHealthVar[currentLevel - 1].levelInfo ? levelHealthVar[currentLevel - 1].levelInfo[0] : levelData[0].keeper1;
+      levelData[0].keeper1.name = 'Cloud';
+      levelData[0].keeper2 = levelHealthVar[currentLevel - 1] && levelHealthVar[currentLevel - 1].levelInfo[1] ? levelHealthVar[currentLevel - 1].levelInfo[1] : levelData[0].keeper2;
+      levelData[0].keeper2.name = 'Security Question';
+      levelData[0].status = checkStatus(levelHealthVar, currentLevel - 1, 0);
+    }
+    if (levelHealthVar[0] && currentLevel == 0) {
+      levelData[0].keeper1 = levelHealthVar[currentLevel] && levelHealthVar[currentLevel].levelInfo ? levelHealthVar[currentLevel].levelInfo[0] : levelData[0].keeper1;
+      levelData[0].keeper1.name = 'Cloud';
+      levelData[0].keeper2 = levelHealthVar[currentLevel] && levelHealthVar[currentLevel].levelInfo[1] ? levelHealthVar[currentLevel].levelInfo[1] : levelData[0].keeper2;
+      levelData[0].keeper2.name = 'Security Question';
+      levelData[0].status = checkStatus(levelHealthVar, 0, 0);
+    }
     if (levelHealthVar[1]) {
       if (currentLevel === 3) {
         levelData[1].keeper1 = levelHealthVar[2].levelInfo[2];
@@ -102,18 +118,17 @@ const checkLevelHealth = (
 
 const checkStatus = (levelHealthVar: any[], index: number, index2: number) => {
   let status = 'notSetup';
+  let goodCount = 0; let badCount = 0;
   if(levelHealthVar[index] && levelHealthVar[index].levelInfo) {
     for (let i = 0; i < levelHealthVar[index].levelInfo.length; i++) {
       const element = levelHealthVar[index].levelInfo[i];
-      if(element.status == 'accessible'){
-        status = 'good';
-      }
-      if(element.status == 'notAccessible'){
-        status = 'bad';
-        return status;
-      }
+      if(element.status == 'accessible') goodCount++;
+      if(element.status == 'notAccessible') badCount++;
     }
-  }
+    if(goodCount == levelHealthVar[index].levelInfo.length) status = 'good';
+    else if(goodCount < levelHealthVar[index].levelInfo.length) status = 'bad';
+    return status;
+  } 
   return status;
 };
 

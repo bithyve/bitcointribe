@@ -66,13 +66,14 @@ export default class CloudBackup {
 
   public CloudDataBackup = (data, callback, share?) => {
     //console.log('share inside cloud', share);
+    console.log('CheckCloudDataBackup STARTED');
     try{
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};
     if (Platform.OS == 'ios') {
       iCloud.downloadBackup().then((backedJson) => {
-        console.log('BackedUp JSON: DONE', backedJson);
+        // console.log('BackedUp JSON: DONE', backedJson);
         if (backedJson) {
           this.updateData({
             result1: backedJson,
@@ -179,6 +180,7 @@ export default class CloudBackup {
               this.createFile({ share });
             } else if (result.eventName == 'failure') {
               console.log('FAILURE');
+              throw new Error( result.eventName );
             } else if(result.eventName === 'UseUserRecoverableAuthIOException')
             {
               this.checkFileIsAvailable({ share: this.share });
