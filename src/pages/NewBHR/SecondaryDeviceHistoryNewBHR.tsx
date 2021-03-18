@@ -327,9 +327,9 @@ const SecondaryDeviceHistoryNewBHR = (props) => {
       }
       dispatch( updatedKeeperInfo( obj ) )
 
-      if ( changeKeeper ) {
+      if ( changeKeeper || isChange ) {
         setSecondaryQR( '' )
-        dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper ) )
+        dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
         updateTrustedContactsInfo( {
           firstName, lastName
         } )

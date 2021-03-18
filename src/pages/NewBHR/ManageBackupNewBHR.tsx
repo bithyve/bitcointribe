@@ -298,7 +298,9 @@ class ManageBackupNewBHR extends Component<
       healthLoading,
       trustedChannelsSetupSyncing,
       isBackupProcessing,
-      keeperInfo
+      keeperInfo,
+      currentLevel,
+      levelHealth
     } = this.props;
     console.log(
       "keeperInfo",keeperInfo
@@ -317,8 +319,7 @@ class ManageBackupNewBHR extends Component<
 
     if (
       JSON.stringify(prevProps.levelHealth) !==
-      JSON.stringify(this.props.levelHealth)
-    ) {
+      JSON.stringify(this.props.levelHealth)) {
       if (
         this.props.levelHealth.findIndex(
           (value) =>
@@ -329,10 +330,18 @@ class ManageBackupNewBHR extends Component<
         this.props.trustedChannelsSetupSync();
       }
       this.modifyLevelData();
+    }
+
+    if (
+      JSON.stringify(prevProps.levelHealth) !==
+      JSON.stringify(this.props.levelHealth) || 
+      currentLevel == 1 && levelHealth[1] && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[0].status == 'notAccessible'|| 
+      currentLevel == 2 && levelHealth[2] && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[0].status == 'notAccessible'
+    ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0
+        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus.status === false
       ) {
         this.props.setCloudData(this.setCloudBackupStatus);
       } else {
@@ -397,6 +406,8 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateCloudData = () => {
+    console.log("inside updateCloudData", this.props.cloudBackupStatus.status)
+    if(this.props.cloudBackupStatus.status === true) return;
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let secretShare = {};
     if (levelHealth.length > 0) {
@@ -1053,12 +1064,13 @@ class ManageBackupNewBHR extends Component<
                                       ? 0
                                       : 1,
                                 }}
+                                disabled={this.props.cloudBackupStatus.status}
                                 onPress={() => {
                                   console.log(
                                     "this.props.cloudBackupStatus.status",
-                                    this.props.cloudBackupStatus.status
+                                    this.props.cloudBackupStatus.status, typeof this.props.cloudBackupStatus.status
                                   );
-                                  if (!this.props.cloudBackupStatus.status) {
+                                  if (this.props.cloudBackupStatus.status === false) {
                                     this.updateCloudData();
                                   }
                                 }}

@@ -95,8 +95,10 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   }
 
   function handleSendMaxPress() {
-    setIsSendingMax( true )
-    onSendMaxPressed()
+    if( spendableBalance ){
+      setIsSendingMax( true )
+      onSendMaxPressed()
+    }
   }
 
   useEffect( ()=>{

@@ -28,7 +28,6 @@ import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
 import _ from 'underscore'
 import moment from 'moment'
 import {
-  addTransferDetails,
   clearTransfer,
   addNewSecondarySubAccount
 } from '../../store/actions/accounts'
@@ -60,6 +59,8 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 const getImageIcon = ( item ) => {
   if ( item ) {
@@ -114,6 +115,7 @@ const getImageIcon = ( item ) => {
 interface ContactDetailsPropTypes {
   navigation: any;
   trustedContacts: TrustedContactsService;
+  trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
   uploading: any;
   errorSending: any;
@@ -125,7 +127,10 @@ interface ContactDetailsPropTypes {
   updateEphemeralChannelLoader: any;
   ErrorSending: any;
   clearTransfer: any;
-  addTransferDetails: any;
+  sourceAccountSelectedForSending: any;
+  addRecipientForSending: any;
+  recipientSelectedForAmountSetting: any;
+  amountForRecipientUpdated: any;
   UploadSuccessfully: any;
   uploadRequestedShare: any;
   addNewSecondarySubAccount: any;
@@ -334,28 +339,27 @@ class ContactDetails extends PureComponent<
     if ( this.contactsType == 'My Keepers' ) {
       this.saveInTransitHistory( 'isSent' )
     }
-    this.props.addTransferDetails( REGULAR_ACCOUNT, {
-      selectedContact: this.Contact,
+
+    const contactName = `${this.Contact.firstName} ${this.Contact.lastName ? this.Contact.lastName : ''
+    }`
+
+    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.displayedName ===  contactName )
+
+    this.props.sourceAccountSelectedForSending(
+      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
+    )
+    this.props.addRecipientForSending( recipient )
+    this.props.recipientSelectedForAmountSetting( recipient )
+    this.props.amountForRecipientUpdated( {
+      recipient,
+      amount: 0
     } )
 
-    let defaultAccountShell: AccountShell
-    const { accountShells } = this.props
-    accountShells.forEach( ( shell: AccountShell ) => {
-      if (
-        shell.primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT &&
-        !shell.primarySubAccount.instanceNumber
-      )
-        defaultAccountShell = shell
-    } )
-
-    this.props.navigation.navigate( 'SentAmountForContactForm', {
-      accountShellID: defaultAccountShell.id,
-      spendableBalance: AccountShell.getSpendableBalance( defaultAccountShell ),
-      selectedContact: this.Contact,
-      serviceType: REGULAR_ACCOUNT,
-      isFromAddressBook: true,
-    } )
-
+    this.props.navigation.dispatch(
+      resetStackToSend( {
+        selectedRecipientID: recipient.id,
+      } )
+    )
   };
 
   onPressResendRequest = () => {
@@ -1452,6 +1456,7 @@ const mapStateToProps = ( state ) => {
     errorSending: idx( state, ( _ ) => _.sss.errorSending ),
     uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
+    trustedContactRecipients: idx( state, ( _ ) => _.trustedContacts.trustedContactRecipients ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     UNDER_CUSTODY: idx(
       state,
@@ -1471,8 +1476,11 @@ const mapStateToProps = ( state ) => {
   }
 }
 export default connect( mapStateToProps, {
-  addTransferDetails,
   clearTransfer,
+  sourceAccountSelectedForSending,
+  addRecipientForSending,
+  recipientSelectedForAmountSetting,
+  amountForRecipientUpdated,
   UploadSuccessfully,
   addNewSecondarySubAccount,
   uploadRequestedShare,
