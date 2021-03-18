@@ -21,13 +21,20 @@ import config from '../../../bitcoin/HexaConfig'
 import { calculateCustomFee } from '../../../store/actions/sending'
 import useAvailableTransactionPriorities from '../../../utils/hooks/sending-utils/UseAvailableTransactionPriorities'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 
 export type Props = {
-  sourceSubAccount: SubAccountDescribing
-  onTransactionPriorityChanged: ( priority: TransactionPriority ) => void
+  sourceSubAccount: SubAccountDescribing;
+  bitcoinDisplayUnit: BitcoinUnit;
+  onTransactionPriorityChanged: ( priority: TransactionPriority ) => void;
 };
 
-const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransactionPriorityChanged }: Props ) => {
+const TransactionPriorityMenu: React.FC<Props> = ( {
+  sourceSubAccount,
+  bitcoinDisplayUnit,
+  onTransactionPriorityChanged,
+}: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
   const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
   const availableTransactionPriorities = useAvailableTransactionPriorities()
@@ -42,6 +49,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
       ? NetworkKind.TESTNET : NetworkKind.MAINNET
   }, [ sourceSubAccount.sourceKind, config ] )
 
+  const formattedUnitText = useMemo( () => {
+    return bitcoinDisplayUnit === BitcoinUnit.SATS ? 'Sats' : 'T-Sats'
+  }, [ bitcoinDisplayUnit ] )
 
   const showCustomPriorityBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -127,6 +137,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingVertical: 14,
+                flex: 1,
               }}>
                 <RadioButton
                   size={20}
@@ -146,7 +157,10 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
                 </Text>
               </View>
 
-              <Text style={styles.priorityTableText}>
+              <Text style={{
+                ...styles.priorityTableText,
+                flex: 1,
+              }}>
                 ~
                 {timeConvertNear30(
                   ( transactionFeeInfo[ priority ].estimatedBlocksBeforeConfirmation + 1 )
@@ -154,8 +168,11 @@ const TransactionPriorityMenu: React.FC<Props> = ( { sourceSubAccount, onTransac
                 )}
               </Text>
 
-              <Text style={styles.priorityTableText}>
-                {transactionFeeInfo[ priority ].amount} $
+              <Text style={{
+                ...styles.priorityTableText,
+                flex: 1,
+              }}>
+                {transactionFeeInfo[ priority ].amount} {formattedUnitText}
               </Text>
             </View>
           )
