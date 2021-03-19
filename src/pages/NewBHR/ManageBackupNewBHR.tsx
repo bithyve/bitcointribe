@@ -1053,6 +1053,8 @@ class ManageBackupNewBHR extends Component<
                                     value.keeper1.status == "accessible"
                                       ? 0
                                       : 1,
+                                      paddingLeft: wp("3%"),
+                                      paddingRight: wp("3%"),
                                 }}
                                 disabled={this.props.cloudBackupStatus}
                                 onPress={() => {
@@ -1073,6 +1075,7 @@ class ManageBackupNewBHR extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     fontSize: RFValue(11),
+                                    marginLeft: wp("2%"),
                                   }}
                                 >
                                   {value.keeper1.status == "accessible"
@@ -1094,6 +1097,8 @@ class ManageBackupNewBHR extends Component<
                                       ? 0
                                       : 0.5,
                                   marginLeft: "auto",
+                                  paddingLeft: wp("3%"),
+                                  paddingRight: wp("3%"),
                                 }}
                                 onPress={() =>
                                   navigation.navigate(
@@ -1130,6 +1135,7 @@ class ManageBackupNewBHR extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     fontSize: RFValue(11),
+                                    marginLeft: wp("2%"),
                                   }}
                                 >
                                   Security Question
@@ -1292,7 +1298,7 @@ class ManageBackupNewBHR extends Component<
                                       value.status == "notSetup"
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    marginLeft: wp("3%"),
+                                        marginLeft: wp("3%"),
                                   }}
                                   numberOfLines={1}
                                 >
@@ -1610,7 +1616,6 @@ const styles = StyleSheet.create({
     fontSize: RFValue(10),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
-    flexWrap: 'wrap'
   },
   levelText: {
     fontSize: RFValue(18),
@@ -1637,7 +1642,6 @@ const styles = StyleSheet.create({
   appBackupButton: {
     flexDirection: "row",
     backgroundColor: Colors.deepBlue,
-    justifyContent: "space-evenly",
     alignItems: "center",
     borderRadius: 8,
     width: wp("35%"),
