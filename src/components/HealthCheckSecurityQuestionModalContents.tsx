@@ -99,7 +99,7 @@ export default function HealthCheckSecurityQuestionModalContents(props) {
                     }
                     <TextInput
                         style={{ ...styles.inputBox, width: '100%', marginTop: 15, marginBottom: hp('1%'), borderColor: errorText == "Answer is incorrect" ? Colors.red : Colors.borderColor, }}
-                        placeholder={'Enter Answer'}
+                        placeholder={'Enter answer'}
                         placeholderTextColor={Colors.borderColor}
                         value={answer}
                         textContentType='none'

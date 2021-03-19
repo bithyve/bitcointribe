@@ -298,7 +298,7 @@ class RestoreWithICloud extends Component<
           newArray.push(arr[i]);
         }
       }
-      console.log('ARR', newArray);
+     // console.log('ARR', newArray);
       this.setState((state) => ({
         selectedBackup: newArray[0],
         walletsArray: newArray,
@@ -611,8 +611,7 @@ class RestoreWithICloud extends Component<
                 {"Recover using keys"}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-                Lorem ipsum dolor sit amet, consetetur Lorem ipsum dolor sit
-                amet, consetetur Lorem ipsum dolor sit amet, consetetur
+              The status of your Recovery Key request is visible below.
               </Text>
             </View>
           </View>
@@ -888,10 +887,7 @@ class RestoreWithICloud extends Component<
               <RestoreFromICloud
                 title={"Restore from " + name}
                 subText={
-                  "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod"
-                }
-                info={
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore."
+                  "Clicking on Restore would source your Recovery Key from iCloud"
                 }
                 cardInfo={"Restoring Wallet from"}
                 cardTitle={selectedBackup.walletName}
