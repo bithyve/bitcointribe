@@ -702,7 +702,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const updateTrustedContactsInfo = useCallback(
     async ( contact ) => {
-      let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
+      const tcInfo = trustedContactsInfo
 
       if ( tcInfo ) {
         if ( tcInfo[ index ] ) {
@@ -727,15 +727,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
         tcInfo[ index ] = contact
       } else {
-        tcInfo = []
         tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
         tcInfo[ 1 ] = null
         tcInfo[ 2 ] = null
         tcInfo[ index ] = contact
       }
-      await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+
       console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
       const shareArray = [
         {
