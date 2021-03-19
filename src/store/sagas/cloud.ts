@@ -10,9 +10,9 @@ import { createWatcher } from '../utils/utilities'
 
 function* cloudWorker( { payload } ) {
   try{
-    const cloudBackupStatus = yield select( ( state ) => state.preferences.cloudBackupStatus )
-    if ( cloudBackupStatus === false ) {
-      yield put( setCloudBackupStatus( true ) )
+    const cloudBackupStatus = yield select((state) => state.preferences.cloudBackupStatus)
+    if (cloudBackupStatus === false) {
+      yield put(setCloudBackupStatus(true))
       const { kpInfo, level, share, callback } = payload
       const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
       const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
@@ -22,7 +22,7 @@ function* cloudWorker( { payload } ) {
       const accountShells = yield select( ( state ) => state.accounts.accountShells )
       const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
       const versionHistory = yield select( ( state ) => state.versionHistory.versions )
-
+      
       let encryptedCloudDataJson
       const shares =
             share &&

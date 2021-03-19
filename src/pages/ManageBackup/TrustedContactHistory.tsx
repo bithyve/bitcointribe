@@ -826,6 +826,7 @@ const TrustedContactHistory = ( props ) => {
       isGuardian: true,
       shareIndex: index,
       changeContact,
+      legacy: true, // legacy mode(uploadEncMShare)
     }
 
     let parentShell: AccountShell

@@ -326,11 +326,11 @@ export const addNewAccountShell = (
   }
 }
 
-export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, paymentDetails?: {amount: string, address: string}}
+export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, paymentDetails?: {amount: string, address: string}, legacy?: boolean}
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,
-  contactInfo?: ContactInfo
+  contactInfo?: ContactInfo,
 ) => {
   return {
     type: ADD_NEW_SECONDARY_SUBACCOUNT,

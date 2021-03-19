@@ -142,7 +142,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
 
   if( contactInfo.isGuardian ){
     // Trusted Contact: Guardian
-    const { changeContact, shareIndex, shareId } = contactInfo
+    const { changeContact, shareIndex, shareId, legacy } = contactInfo
     const { SHARES_TRANSFER_DETAILS } = yield select(
       ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
     )
@@ -166,20 +166,24 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
 
       // upload share for the new contact(guardian)
-      // yield put(
-      //   uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
-      // )
-      yield put(
-        uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
-      )
+      if( legacy )
+        yield put(
+          uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
+        )
+      else
+        yield put(
+          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
+        )
     } else if( shareExpired ) {
       // share expired, re-upload (creates ephermeal channel as well)
-      // yield put(
-      //   uploadEncMShare( shareIndex, contactInfo, data ),
-      // )
-      yield put(
-        uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
-      )
+      if( legacy )
+        yield put(
+          uploadEncMShare( shareIndex, contactInfo, data ),
+        )
+      else
+        yield put(
+          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
+        )
     } else {
       // re-initiating expired Ephemeral Channel
       const hasTrustedChannel = trustedContact.symmetricKey ? true : false

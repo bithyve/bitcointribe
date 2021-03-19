@@ -321,7 +321,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                             if(googleDriveFileHolders.size() == 0) {
                                map.putString(EVENT_KEY, LIST_IS_EMPTY);
                             } else {
-                                for(int i   = 0 ; i < googleDriveFileHolders.size() ; i++) {
+                                for(int i = 0 ; i < googleDriveFileHolders.size() ; i++) {
                                     map.putString("id", googleDriveFileHolders.get(i).getId());
                                     map.putString("name", googleDriveFileHolders.get(i).getName());
                                     map.putString("modifiedTime", String.valueOf(googleDriveFileHolders.get(i).getModifiedTime()));
@@ -331,7 +331,6 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                                     map.putDouble("size", googleDriveFileHolders.get(i).getSize());
                                 }
                             }
-
                             listOfFilesAvailable.invoke(map, null);
                         }
                         })
@@ -339,18 +338,14 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.d(TAG, "onFailure sdfdfdsaf: " + e.getMessage());
-
                             if(e instanceof UserRecoverableAuthIOException){
                                 Log.d(TAG, " onFailure UseUserRecoverableAuthIOException: " + e.getMessage());
-                               // map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
                                 activity.startActivityForResult(((UserRecoverableAuthIOException) e).getIntent(), REQUEST_AUTHORIZATION);
                             }   else{
                                 WritableMap map = Arguments.createMap();
                                 map.putString(EVENT_KEY, ON_FAILURE);
                                 listOfFilesAvailable.invoke(null, map);
                             }
-
-
                         }
                     });
 
