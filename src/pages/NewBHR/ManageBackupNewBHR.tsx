@@ -313,9 +313,11 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if (
-      JSON.stringify(prevProps.levelHealth) !==
+    console.log('currentLevel', currentLevel);
+    console.log('this.props.cloudBackupStatus', this.props.cloudBackupStatus)
+    if (JSON.stringify(prevProps.levelHealth) !==
       JSON.stringify(this.props.levelHealth)) {
+      console.log('second condition')
       if (
         this.props.levelHealth.findIndex(
           (value) =>
@@ -326,16 +328,6 @@ class ManageBackupNewBHR extends Component<
         this.props.trustedChannelsSetupSync();
       }
       this.modifyLevelData();
-    }
-    console.log('currentLevel', currentLevel);
-    console.log('levelHealth', levelHealth[1])
-    console.log('this.props.cloudBackupStatus', this.props.cloudBackupStatus)
-    if (
-      JSON.stringify(prevProps.levelHealth) !==
-      JSON.stringify(this.props.levelHealth) || 
-      currentLevel == 1 && levelHealth[1] && levelHealth[1].levelInfo[2].status == 'accessible' && levelHealth[1].levelInfo[3].status == 'accessible' && levelHealth[1].levelInfo[0].status == 'notAccessible'|| 
-      currentLevel == 2 && levelHealth[2] && levelHealth[2].levelInfo[2].status == 'accessible' && levelHealth[2].levelInfo[3].status == 'accessible' && levelHealth[2].levelInfo[0].status == 'notAccessible'
-    ) {
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -404,6 +396,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateCloudData = () => {
+    console.log("updateCloudData",this.props.cloudBackupStatus);
     if(this.props.cloudBackupStatus === true) return;
     let { currentLevel, keeperInfo, levelHealth, s3Service } = this.props;
     let secretShare = {};
@@ -1060,6 +1053,8 @@ class ManageBackupNewBHR extends Component<
                                     value.keeper1.status == "accessible"
                                       ? 0
                                       : 1,
+                                      paddingLeft: wp("3%"),
+                                      paddingRight: wp("3%"),
                                 }}
                                 disabled={this.props.cloudBackupStatus}
                                 onPress={() => {
@@ -1080,6 +1075,7 @@ class ManageBackupNewBHR extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     fontSize: RFValue(11),
+                                    marginLeft: wp("2%"),
                                   }}
                                 >
                                   {value.keeper1.status == "accessible"
@@ -1090,7 +1086,6 @@ class ManageBackupNewBHR extends Component<
                               <TouchableOpacity
                                 style={{
                                   ...styles.appBackupButton,
-                                  width: wp("41%"),
                                   borderColor:
                                     value.keeper2.status == "accessible"
                                       ? value.status == "notSetup"
@@ -1102,6 +1097,8 @@ class ManageBackupNewBHR extends Component<
                                       ? 0
                                       : 0.5,
                                   marginLeft: "auto",
+                                  paddingLeft: wp("3%"),
+                                  paddingRight: wp("3%"),
                                 }}
                                 onPress={() =>
                                   navigation.navigate(
@@ -1138,6 +1135,7 @@ class ManageBackupNewBHR extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     fontSize: RFValue(11),
+                                    marginLeft: wp("2%"),
                                   }}
                                 >
                                   Security Question
@@ -1158,7 +1156,6 @@ class ManageBackupNewBHR extends Component<
                                     value.status == "notSetup"
                                       ? Colors.white
                                       : Colors.deepBlue,
-                                  width: "auto",
                                   paddingLeft: wp("3%"),
                                   paddingRight: wp("3%"),
                                   borderColor:
@@ -1221,7 +1218,8 @@ class ManageBackupNewBHR extends Component<
                                         : Colors.white,
                                     fontSize: RFValue(11),
                                     marginLeft: wp("3%"),
-                                  }}
+                                  } }
+                                  numberOfLines={1}
                                 >
                                   {value.status == "good" ||
                                   (value.status == "bad" && value.keeper1.name)
@@ -1238,7 +1236,6 @@ class ManageBackupNewBHR extends Component<
                                     value.status == "notSetup"
                                       ? Colors.white
                                       : Colors.deepBlue,
-                                  width: "auto",
                                   paddingLeft: wp("3%"),
                                   paddingRight: wp("3%"),
                                   borderColor:
@@ -1301,8 +1298,9 @@ class ManageBackupNewBHR extends Component<
                                       value.status == "notSetup"
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    marginLeft: wp("3%"),
+                                        marginLeft: wp("3%"),
                                   }}
+                                  numberOfLines={1}
                                 >
                                   {(value.status == "bad" ||
                                     value.status == "good") &&
@@ -1644,10 +1642,9 @@ const styles = StyleSheet.create({
   appBackupButton: {
     flexDirection: "row",
     backgroundColor: Colors.deepBlue,
-    justifyContent: "space-evenly",
     alignItems: "center",
     borderRadius: 8,
-    width: wp("31%"),
+    width: wp("35%"),
     height: wp("11%"),
   },
   resetImage: {

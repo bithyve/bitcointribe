@@ -118,7 +118,7 @@ function SecurityQuestion(props) {
                       ? Colors.red
                       : Colors.borderColor,
                 }}
-                placeholder={'Enter Answer'}
+                placeholder={'Enter answer'}
                 placeholderTextColor={Colors.borderColor}
                 value={answer}
                 textContentType="none"

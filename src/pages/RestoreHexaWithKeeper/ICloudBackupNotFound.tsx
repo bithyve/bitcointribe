@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Image, Text, StyleSheet, ImageBackground } from 'react-native';
+import { View, Image, Text, StyleSheet, ImageBackground, Platform } from 'react-native';
 import Colors from '../../common/Colors';
 import Fonts from '../../common/Fonts';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -10,21 +10,26 @@ import {
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function ICloudBackupNotFound(props) {
+  let name;
+  if (Platform.OS == "ios") name = "iCloud";
+  else name = "GDrive";
+  const [backupName, setBackupName] = useState(name)
+  
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerTitleText}>
-            iCloud backup not found
+        { backupName + " backup not found"}
         </Text>
         <Text style={styles.headerInfoText}>
-            Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod
+        We did not find a Recovery Key on iCloud. Click on Continue to recover your wallet using other Recovery Keys.
         </Text>
       </View>
-      <View style={styles.successModalAmountView}>
+      {/* <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.
         </Text>
-      </View>
+      </View> */}
       <View style={styles.bottomButtonsView}>
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressProceed()}
