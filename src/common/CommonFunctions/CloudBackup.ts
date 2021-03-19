@@ -11,7 +11,7 @@ export default class CloudBackup {
   public isNotReading = true;
   public googlePermissionCall = false;
   public googleCloudLoginCallback;
-
+  
   constructor(stateVars?: {
     dataObject?: any;
     callBack?: any;
@@ -39,8 +39,9 @@ export default class CloudBackup {
       console.log("userResponse",userResponse);
       return userResponse;
     } catch (err) {
-      throw new Error( err )
       console.log(err);
+      throw new Error( err )
+     
     }
   };
 
@@ -55,7 +56,7 @@ export default class CloudBackup {
           else this.recoveryCallback(null);
         });
       } else {
-        console.log('isNotReading', this.isNotReading);
+        console.log('isNotReading CheckCloudDataBackup', this.isNotReading);
         let checkDataIsBackedup = true;
         this.GoogleDriveLogin({ checkDataIsBackedup });
       }
@@ -66,11 +67,13 @@ export default class CloudBackup {
 
   public CloudDataBackup = (data, callback, share?) => {
     //console.log('share inside cloud', share);
-    console.log('CheckCloudDataBackup STARTED');
+    
     try{
     this.dataObject = data;
     this.callBack = callback;
     this.share = share ? share : {};
+    
+    console.log('CloudDataBackup STARTED');
     if (Platform.OS == 'ios') {
       iCloud.downloadBackup().then((backedJson) => {
         // console.log('BackedUp JSON: DONE', backedJson);
@@ -86,7 +89,7 @@ export default class CloudBackup {
         }
       });
     } else {
-      console.log('isNotReading', this.isNotReading);
+      console.log('isNotReading CloudDataBackup', this.isNotReading);
       this.GoogleDriveLogin({ share: this.share });
     }
   } catch(error){
@@ -107,11 +110,12 @@ export default class CloudBackup {
     GoogleDrive.setup()
       .then(() => {
         GoogleDrive.login(async (err, data) => {
+          console.log("googlePermissionCall######### GoogleDriveLogin",googlePermissionCall);
           if (!googlePermissionCall)
           this.handleLogin({ err, data, checkDataIsBackedup, share });
           else{
             const result = err || data;
-            console.log('GOOGLE ReSULT', data);
+            console.log('GOOGLE ReSULT GoogleDriveLogin', data);
             console.log('Error', err);
             if (result.eventName == 'onLogin') {
               this.googleCloudLoginCallback('success');
@@ -139,10 +143,10 @@ export default class CloudBackup {
       let { err, data, checkDataIsBackedup, share } = params;
       const result = err || data;
       console.log('handleLogin err', err);
-      console.log('GOOGLE ReSULT', data);
+      console.log('GOOGLE ReSULT handleLogin', data);
       if (result.eventName == 'onLogin') {
         this.checkFileIsAvailable({
-          checkDataIsBackedup: params.checkDataIsBackedup,
+          checkDataIsBackedup: checkDataIsBackedup,
           share,
         });
       }
@@ -174,6 +178,7 @@ export default class CloudBackup {
           // console.log('err, data', data, err);
           const result = err || data;
           console.log('checkFileIsAvailable', result);
+          if(!result) return;
           if (!checkDataIsBackedup) {
             if (result && result.eventName == 'listEmpty') {
               console.log('createFile');
@@ -183,9 +188,9 @@ export default class CloudBackup {
               throw new Error( result.eventName );
             } else if(result.eventName === 'UseUserRecoverableAuthIOException')
             {
+              console.log('UseUserRecoverableAuthIOException Failure');
               this.checkFileIsAvailable({ share: this.share });
-            // console.log('UseUserRecoverableAuthIOException Failure');
-            } else {
+             } else {
               console.log(
                 'readFile isNotReading checkFileIsAvailable if',
                 this.isNotReading,
@@ -236,7 +241,7 @@ export default class CloudBackup {
         };
 
           GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
-            console.log('DATA', data, err);
+           // console.log('DATA', data, err);
             const result = err || data;
             if (result && result.eventName == 'successFullyUpload') {
               this.callBack(share);
@@ -244,8 +249,6 @@ export default class CloudBackup {
               this.checkFileIsAvailable({ share: this.share });
             } 
           });
-          // uploadFile(JSON.stringify(content))
-      
       }
     } catch (error) {
       throw new Error( error )
@@ -256,9 +259,7 @@ export default class CloudBackup {
     let { metaData, share } = params;
     try {
       GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) => {
-        console.log('DATA updateFile', data);
-        console.log('ERROR updateFile', err);
-        const result = err || data;
+       const result = err || data;
         if (result.eventName == 'successFullyUpdate') {
           this.callBack(share);
         }
@@ -282,8 +283,6 @@ export default class CloudBackup {
       if (this.isNotReading) {
         this.isNotReading = false;
         GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) => {
-          console.log('isNotReading readFile data1', data1);
-          console.log('isNotReading readFile err', err);
           const result1 = err || data1.data;
           if (checkDataIsBackedup) {
             this.recoveryCallback(result1);
@@ -341,15 +340,14 @@ export default class CloudBackup {
           newArray[index].keeperData = this.dataObject.keeperData;
           newArray[index].dateTime = moment(new Date());
         }
-        console.log('ARR', newArray);
+        //console.log('ARR', newArray);
       }
       if (Platform.OS == 'ios') {
         iCloud.startBackup(JSON.stringify(newArray));
         this.callBack(share);
         // console.log('Platform.OS share', share)
       } else {
-        console.log("GOOGLEDATA", googleData);
-        const metaData = {
+       const metaData = {
           name: googleData.name,
           mimeType: googleData.mimeType,
           data: JSON.stringify(newArray),
