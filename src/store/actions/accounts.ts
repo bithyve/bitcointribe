@@ -326,7 +326,7 @@ export const addNewAccountShell = (
   }
 }
 
-export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, changeContact?: boolean, paymentDetails?: {amount: string, address: string}}
+export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, paymentDetails?: {amount: string, address: string}}
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,
@@ -668,7 +668,7 @@ export const clearReceiveAddress = ( ) => {
   }
 }
 
-export const getSMAndReSetTFAOrGenerateSXpriv = (qrdata, QRModalHeader, serviceType) => {
+export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, serviceType ) => {
   return {
     type: CREATE_SM_N_RESETTFA_OR_XPRIV,
     payload: {

@@ -68,8 +68,12 @@ import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import QRModal from '../Accounts/QRModal'
 import { StackActions } from 'react-navigation'
-import ApproveSetup from './ApproveSetup';
+import ApproveSetup from './ApproveSetup'
 import S3Service from '../../bitcoin/services/sss/S3Service'
+import AccountShell from '../../common/data/models/AccountShell'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -132,19 +136,17 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
   )
-  const regularAccount: RegularAccount = useSelector(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-  const testAccount: TestAccount = useSelector(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service,
-  )
   const trustedContactsInfo = useSelector(
     ( state ) => state.trustedContacts.trustedContactsInfo,
   )
+  const accountShells: AccountShell[] = useSelector(
+    ( state ) => state.accounts.accountShells,
+  )
+
   const [ isOTPType, setIsOTPType ] = useState( false )
   const [ trustedLink, setTrustedLink ] = useState( '' )
-  const [ trustedQR, setTrustedQR ] = useState( '' );
-  const [QrBottomSheet] = useState(React.createRef());
+  const [ trustedQR, setTrustedQR ] = useState( '' )
+  const [ QrBottomSheet ] = useState( React.createRef() )
   const [ trustedContactHistory, setTrustedContactHistory ] = useState( [
     {
       id: 1,
@@ -357,7 +359,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ updateHistory ] )
 
   const onOTPShare = useCallback(
-    async ( index ) => {
+    async ( ) => {
       saveInTransitHistory()
       setIsReshare( true )
     },
@@ -370,7 +372,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         renderTimer={renderTimer}
         onPressOk={( index ) => {
           setRenderTimer( false )
-          onOTPShare( index )
+          onOTPShare( )
           setOTP( '' )
           props.navigation.goBack()
         }}
@@ -757,146 +759,85 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
 
   const createGuardian = useCallback( async () => {
-    try {
-      if ( !Object.keys( chosenContact ).length ) return
+    if ( !Object.keys( chosenContact ).length ) return
 
-      const walletID = await AsyncStorage.getItem( 'walletID' )
-      const FCM = fcmTokenValue
-      //await AsyncStorage.getItem('fcmToken');
-      console.log( {
-        walletID, FCM
-      } )
+    const contactName = `${chosenContact.firstName} ${
+      chosenContact.lastName ? chosenContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
 
-      const contactName = `${chosenContact.firstName} ${
-        chosenContact.lastName ? chosenContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
-
-      let info = ''
-      if ( chosenContact.phoneNumbers && chosenContact.phoneNumbers.length ) {
-        const phoneNumber = chosenContact.phoneNumbers[ 0 ].number
-        let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-        number = number.slice( number.length - 10 ) // last 10 digits only
-        info = number
-      } else if ( chosenContact.emails && chosenContact.emails.length ) {
-        info = chosenContact.emails[ 0 ].email
-      }
-
-      const contactInfo = {
-        contactName,
-        info: info.trim(),
-      }
-
-      let accountNumber = regularAccount.hdWallet.trustedContactToDA[ contactName ]
-      if ( !accountNumber ) {
-        // initialize a trusted derivative account against the following account
-        const res = regularAccount.setupDerivativeAccount(
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        )
-        if ( res.status !== 200 ) {
-          console.log( 'Err occurred while generating derivative account' )
-        } else {
-          // refresh the account number
-          accountNumber = regularAccount.hdWallet.trustedContactToDA[ contactName ]
-        }
-      }
-
-      const trustedReceivingAddress = ( regularAccount.hdWallet.derivativeAccounts[
-        TRUSTED_CONTACTS
-      ][ accountNumber ] as TrustedContactDerivativeAccountElements )
-        .receivingAddress
-
-      const data: EphemeralDataElements = {
-        walletID,
-        FCM,
-        trustedAddress: trustedReceivingAddress,
-        trustedTestAddress: testAccount.hdWallet.receivingAddress,
-      }
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-      const hasTrustedChannel =
-        trustedContact && trustedContact.symmetricKey ? true : false
-      const obj = {
-        shareId: selectedShareId,
-        name: chosenContact.name,
-        uuid: chosenContact.id,
-        publicKey: '',
-        ephemeralAddress: '',
-        type: 'contact',
-        data: {
-          ...chosenContact, index
-        }
-      }
-      dispatch( updatedKeeperInfo( obj ) )
-      if ( changeContact || isChange ) {
-        setTrustedLink( '' )
-        setTrustedQR( '' )
-        // remove the previous TC
-
-        let previousGuardianName
-        if ( trustedContactsInfo ) {
-          const previousGuardian = trustedContactsInfo[ index ]
-          if ( previousGuardian ) {
-            previousGuardianName = `${previousGuardian.firstName} ${
-              previousGuardian.lastName ? previousGuardian.lastName : ''
-            }`
-              .toLowerCase()
-              .trim()
-          } else {
-            console.log( 'Previous guardian details missing' )
-          }
-        }
-
-        dispatch(
-          uploadEncMShareKeeper(
-            index,
-            selectedShareId,
-            contactInfo,
-            data,
-            changeContact || isChange,
-            previousGuardianName,
-          ),
-        )
-        updateTrustedContactsInfo( chosenContact )
-        onOTPShare( index ) // enables reshare
-        setChangeContact( false )
-      } else if (
-        !SHARES_TRANSFER_DETAILS[ index ] ||
-        Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
-          config.TC_REQUEST_EXPIRY
-      ) {
-        console.log( '!SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[ index ] )
-        setTrustedLink( '' )
-        setTrustedQR( '' )
-        dispatch(
-          uploadEncMShareKeeper( index, selectedShareId, contactInfo, data ),
-        )
-        updateTrustedContactsInfo( chosenContact )
-        onOTPShare( index ) // enables reshare
-      } else if (
-        trustedContact &&
-        !trustedContact.symmetricKey &&
-        trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-          config.TC_REQUEST_EXPIRY &&
-        !hasTrustedChannel
-      ) {
-        console.log( 'SHARES_TRANSFER_DETAILS[index]', SHARES_TRANSFER_DETAILS[ index ] )
-        setTrustedLink( '' )
-        setTrustedQR( '' )
-        dispatch(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
-      }
-    } catch ( error ) {
-      console.log( 'error', error )
+    let info = ''
+    if ( chosenContact.phoneNumbers && chosenContact.phoneNumbers.length ) {
+      const phoneNumber = chosenContact.phoneNumbers[ 0 ].number
+      let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+      number = number.slice( number.length - 10 ) // last 10 digits only
+      info = number
+    } else if ( chosenContact.emails && chosenContact.emails.length ) {
+      info = chosenContact.emails[ 0 ].email
     }
+
+    const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
+      Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
+      config.TC_REQUEST_EXPIRY
+
+    dispatch( updatedKeeperInfo( {
+      shareId: selectedShareId,
+      name: chosenContact.name,
+      uuid: chosenContact.id,
+      publicKey: '',
+      ephemeralAddress: '',
+      type: 'contact',
+      data: {
+        ...chosenContact, index
+      }
+    } ) )
+
+    // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
+    if ( changeContact || shareExpired || isChange ) {
+      setTrustedLink( '' )
+      setTrustedQR( '' )
+      updateTrustedContactsInfo( chosenContact )
+      onOTPShare( ) // enables reshare
+      setChangeContact( false )
+    } else {
+      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+      trustedContact.ephemeralChannel.initiatedAt &&
+      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+      config.TC_REQUEST_EXPIRY? true: false
+      if( !hasTrustedChannel &&
+        isEphemeralChannelExpired ){
+        setTrustedLink( '' )
+        setTrustedQR( '' )
+      }
+    }
+
+    const contactInfo = {
+      contactName,
+      info: info? info.trim(): info,
+      isGuardian: true,
+      shareIndex: index,
+      shareId: selectedShareId,
+      changeContact: changeContact || isChange,
+    }
+
+    let parentShell: AccountShell
+    accountShells.forEach( ( shell: AccountShell ) => {
+      if( !shell.primarySubAccount.instanceNumber ){
+        if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+      }
+    } )
+    const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+      accountShellID: parentShell.id,
+      isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+    } )
+
+    dispatch(
+      addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
+    )
+
   }, [ SHARES_TRANSFER_DETAILS[ index ], chosenContact, changeContact ] )
 
   useEffect( () => {
@@ -1034,8 +975,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
             }
             else {
               ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-              const popAction = StackActions.pop({ n: isChange ? 2 : 1 });
-              props.navigation.dispatch(popAction);
+              const popAction = StackActions.pop( {
+                n: isChange ? 2 : 1
+              } )
+              props.navigation.dispatch( popAction )
               // props.navigation.replace( 'ManageBackupNewBHR' )
             }
           }}
@@ -1068,149 +1011,153 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, trustedQR ] )
 
-  const onPressChangeKeeperType = (type, name) => {
-    let levelhealth: LevelHealthInterface[] = [];
-    if (levelHealth[1] && levelHealth[1].levelInfo.findIndex((v) => v.updatedAt > 0) > -1)
-      levelhealth = [levelHealth[1]];
-    if (levelHealth[2] && levelHealth[2].levelInfo.findIndex((v) => v.updatedAt > 0) > -1)
-      levelhealth = [levelHealth[1], levelHealth[2]];
-    if (currentLevel == 3 && levelHealth[2])
-      levelhealth = [levelHealth[2]];
-    let changeIndex = 1;
-    let contactCount = 0;
-    let deviceCount = 0;
-    for (let i = 0; i < levelhealth.length; i++) {
-      const element = levelhealth[i];
-      for (let j = 2; j < element.levelInfo.length; j++) {
-        const element2 = element.levelInfo[j];
+  const onPressChangeKeeperType = ( type, name ) => {
+    let levelhealth: LevelHealthInterface[] = []
+    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
+      levelhealth = [ levelHealth[ 1 ] ]
+    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
+      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
+    if ( currentLevel == 3 && levelHealth[ 2 ] )
+      levelhealth = [ levelHealth[ 2 ] ]
+    let changeIndex = 1
+    let contactCount = 0
+    let deviceCount = 0
+    for ( let i = 0; i < levelhealth.length; i++ ) {
+      const element = levelhealth[ i ]
+      for ( let j = 2; j < element.levelInfo.length; j++ ) {
+        const element2 = element.levelInfo[ j ]
         if (
-          element2.shareType == "contact" &&
+          element2.shareType == 'contact' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[i] &&
-          selectedKeeper.shareType == "contact"
+          levelhealth[ i ] &&
+          selectedKeeper.shareType == 'contact'
         ) {
-          contactCount++;
+          contactCount++
         }
         if (
-          element2.shareType == "device" &&
+          element2.shareType == 'device' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[i] &&
-          selectedKeeper.shareType == "device"
+          levelhealth[ i ] &&
+          selectedKeeper.shareType == 'device'
         ) {
-          deviceCount++;
+          deviceCount++
         }
-        let kpInfoContactIndex = keeperInfo.findIndex((value) => value.shareId == element2.shareId && value.type == "contact");
-        if (type == 'contact' && element2.shareType == "contact" && contactCount < 2) {
-          if (kpInfoContactIndex > -1 && keeperInfo[kpInfoContactIndex].data.index == 1) {
-            changeIndex = 2;
-          } else changeIndex = 1;
+        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
+        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
+          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
+            changeIndex = 2
+          } else changeIndex = 1
         }
-        if(type == 'device'){
-          if (element2.shareType == "device" && deviceCount == 1) {
-            changeIndex = 3;
-          } else if(element2.shareType == "device" && deviceCount == 2){
-            changeIndex = 4;
+        if( type == 'device' ){
+          if ( element2.shareType == 'device' && deviceCount == 1 ) {
+            changeIndex = 3
+          } else if( element2.shareType == 'device' && deviceCount == 2 ){
+            changeIndex = 4
           }
         }
       }
     }
-    if (type == "contact") {
-      (ChangeBottomSheet as any).current.snapTo(1);
+    if ( type == 'contact' ) {
+      ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
-    if (type == "device") {
-      props.navigation.navigate("KeeperDeviceHistory", {
+    if ( type == 'device' ) {
+      props.navigation.navigate( 'KeeperDeviceHistory', {
         ...props.navigation.state.params,
         selectedTitle: name,
         isChangeKeeperType: true,
-      });
+      } )
     }
-    if (type == "pdf") {
-      props.navigation.navigate("PersonalCopyHistoryNewBHR", {
+    if ( type == 'pdf' ) {
+      props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
         ...props.navigation.state.params,
         selectedTitle: name,
         isChangeKeeperType: true,
-      });
+      } )
     }
-  };
+  }
 
-  const sendApprovalRequestToPK = (type) => {
-    setQrBottomSheetsFlag(true);
-    (QrBottomSheet as any).current.snapTo(1);
-    (keeperTypeBottomSheet as any).current.snapTo(0);
-  };
+  const sendApprovalRequestToPK = ( type ) => {
+    setQrBottomSheetsFlag( true );
+    ( QrBottomSheet as any ).current.snapTo( 1 );
+    ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+  }
 
   const renderQrContent = () => {
     return (
       <QRModal
         isFromKeeperDeviceHistory={true}
-        QRModalHeader={"QR scanner ddfds"}
-        title={"Note"}
+        QRModalHeader={'QR scanner ddfds'}
+        title={'Note'}
         infoText={
-          "Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod"
+          'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
-        onQrScan={async(qrScannedData) => {
+        onQrScan={async( qrScannedData ) => {
           try {
-            if (qrScannedData) {
-              let qrData = JSON.parse(qrScannedData);
-              console.log('qrData', qrData);
-              const res = await S3Service.downloadSMShare(qrData.publicKey);
-              console.log("Keeper Shares", res);
-              if (res.status === 200) {
-                console.log("SHARES DOWNLOAD", res.data);
-                dispatch(secondaryShareDownloaded(res.data.metaShare));
-                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
-                (QrBottomSheet as any).current.snapTo(0);
+            if ( qrScannedData ) {
+              const qrData = JSON.parse( qrScannedData )
+              console.log( 'qrData', qrData )
+              const res = await S3Service.downloadSMShare( qrData.publicKey )
+              console.log( 'Keeper Shares', res )
+              if ( res.status === 200 ) {
+                console.log( 'SHARES DOWNLOAD', res.data )
+                dispatch( secondaryShareDownloaded( res.data.metaShare ) );
+                ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
+                ( QrBottomSheet as any ).current.snapTo( 0 )
               }
             }
-          } catch (err) {
-            console.log({ err });
+          } catch ( err ) {
+            console.log( {
+              err
+            } )
           }
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet as any).current.snapTo(0);
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onBackPress={() => {
-          setQrBottomSheetsFlag(false);
-          if (QrBottomSheet) (QrBottomSheet as any).current.snapTo(0);
+          setQrBottomSheetsFlag( false )
+          if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          console.log('JHGUYFGYUBJ')
-          let qrScannedData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
+          console.log( 'JHGUYFGYUBJ' )
+          const qrScannedData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
-            if (qrScannedData) {
-              let qrData = JSON.parse(qrScannedData);
-              console.log('qrData', qrData);
-              const res = await S3Service.downloadSMShare(qrData.publicKey);
-              console.log("Keeper Shares", res);
-              if (res.status === 200) {
-                console.log("SHARES DOWNLOAD", res.data);
-                dispatch(secondaryShareDownloaded(res.data.metaShare));
-                (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(1);
-                (QrBottomSheet as any).current.snapTo(0);
+            if ( qrScannedData ) {
+              const qrData = JSON.parse( qrScannedData )
+              console.log( 'qrData', qrData )
+              const res = await S3Service.downloadSMShare( qrData.publicKey )
+              console.log( 'Keeper Shares', res )
+              if ( res.status === 200 ) {
+                console.log( 'SHARES DOWNLOAD', res.data )
+                dispatch( secondaryShareDownloaded( res.data.metaShare ) );
+                ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
+                ( QrBottomSheet as any ).current.snapTo( 0 )
               }
             }
-          } catch (err) {
-            console.log({ err });
+          } catch ( err ) {
+            console.log( {
+              err
+            } )
           }
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet as any).current.snapTo(0);
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
+    )
   }
 
   const renderQrHeader = () => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          setQrBottomSheetsFlag(false);
-          (QrBottomSheet as any).current.snapTo(0);
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
+    )
   }
 
   return (
@@ -1415,8 +1362,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
           <ApproveSetup
             isContinueDisabled={false}
             onPressContinue={() => {
-              onPressChangeKeeperType(selectedKeeperType, selectedKeeperName);
-              (ApprovePrimaryKeeperBottomSheet as any).current.snapTo(0);
+              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
+              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
             }}
           />
         )}
