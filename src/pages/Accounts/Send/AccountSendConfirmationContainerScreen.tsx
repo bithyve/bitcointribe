@@ -24,6 +24,8 @@ import { clearTransfer, refreshAccountShell } from '../../../store/actions/accou
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 
 export type NavigationParams = {
 };
@@ -49,6 +51,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
   const sendingState = useSendingState()
+  const formattedUnitText = useFormattedUnitText( {
+    bitcoinUnit: BitcoinUnit.SATS,
+  } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -59,7 +64,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
+    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
   const showSendSuccessBottomSheet = useCallback( () => {
