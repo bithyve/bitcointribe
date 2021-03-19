@@ -6,6 +6,7 @@ import { take, fork } from 'redux-saga/effects'
 import { AsyncStorage, Alert } from 'react-native'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import KeeperService from '../../bitcoin/services/KeeperService';
+import { MetaShare } from '../../bitcoin/utilities/Interface'
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -231,7 +232,7 @@ export const requestTimedout = () => {
 export const serviceGeneratorForNewBHR = async (
   securityAns: string,
   mnemonic?: string,
-  metaShares?: any,
+  metaShares?: MetaShare[],
   decryptedCloudDataJson? : any,
 ): Promise<{
   regularAcc: RegularAccount;
@@ -262,7 +263,7 @@ export const serviceGeneratorForNewBHR = async (
   const s3Service = new S3Service(primaryMnemonic);
   console.log('s3Service serviceGenerator2',s3Service);
 
-  if (metaShares) {
+  if (metaShares && metaShares.length) {
     res = s3Service.restoreMetaSharesKeeper(metaShares);
     if (res.status !== 200) throw new Error('Share restoration failed');
   }
@@ -289,17 +290,16 @@ export const serviceGeneratorForNewBHR = async (
 
   let secondaryXpub = '';
   let bhXpub = '';
-  if (metaShares) {
-    if(decryptedCloudDataJson && decryptedCloudDataJson.walletImage.SERVICES.SECURE_ACCOUNT)
+  if(decryptedCloudDataJson && decryptedCloudDataJson.walletImage.SERVICES.SECURE_ACCOUNT)
     {
       let secureAccountData = JSON.parse(decryptedCloudDataJson.walletImage.SERVICES.SECURE_ACCOUNT);
       secondaryXpub = secureAccountData.secureHDWallet.xpubs.secondary;
       bhXpub = secureAccountData.secureHDWallet.xpubs.bh;
     }
-  }
 
   // Secure account setup
   const secureAcc = new SecureAccount(primaryMnemonic);
+  console.log("metaShares",metaShares, typeof metaShares);
   if (!metaShares) {
     console.log('New setup: secure account');
     res = await secureAcc.setupSecureAccount(); // executed once (during initial wallet creation)

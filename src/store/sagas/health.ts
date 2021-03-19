@@ -592,37 +592,22 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     WALLET_SETUP,
     DECENTRALIZED_BACKUP,
     ASYNC_DATA,
-  } = payload.icloudData.walletImage
-
+  } = payload.icloudData.walletImage;
+  let restorationShares: MetaShare[] = [];
+  let mnemonics = JSON.parse(SERVICES.S3_SERVICE).levelhealth.mnemonic; 
+  console.log("mnemonics",mnemonics);
   try {
-    if (ASYNC_DATA) {
-      for (const key of Object.keys(ASYNC_DATA)) {
-        console.log("restoring to async: ", key);
-        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+    const { s3Service, } = yield call(
+      serviceGeneratorForNewBHR,
+      WALLET_SETUP.security.answer,
+      mnemonics,
+      restorationShares,
+      payload.icloudData
+    )
+    console.log( 's3Service', s3Service )
+    
+    yield put( fetchWalletImage( s3Service ) )
 
-        if (key === "TrustedContactsInfo" && ASYNC_DATA[key]) {
-          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
-          yield put(updateTrustedContactsInfoLocally(trustedContactsInfo));
-        }
-      }
-    }
-
-    const payload = {
-      SERVICES, DECENTRALIZED_BACKUP
-    }
-    //console.log("payload afshjkfhdfjhf", payload);
-    // update hashes
-    const hashesWI = {
-    }
-    Object.keys( payload ).forEach( ( key ) => {
-      hashesWI[ key ] = hash( payload[ key ] )
-    } )
-    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
-    yield call( insertDBWorker, {
-      payload
-    } )
-    yield delay( 2000 )
-    const s3Service = JSON.parse( SERVICES.S3_SERVICE )
     yield call(
       AsyncStorage.setItem,
       'walletID',
@@ -1335,6 +1320,7 @@ export const updateWalletImageHealthWatcher = createWatcher(
 )
 
 function* fetchWalletImageWorker( { payload } ) {
+  try {
   const s3Service: S3Service = payload.s3Service
 
   const res = yield call( s3Service.fetchWalletImageKeeper )
@@ -1443,6 +1429,9 @@ function* fetchWalletImageWorker( { payload } ) {
     console.log( 'Failed to fetch Wallet Image' )
   }
   yield put( walletImageChecked( true ) )
+} catch (error) {
+    console.log("ERROR",error);
+}
 }
 
 export const fetchWalletImageHealthWatcher = createWatcher(
