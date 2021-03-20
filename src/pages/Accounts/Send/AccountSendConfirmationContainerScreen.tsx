@@ -26,6 +26,7 @@ import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccount
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export type NavigationParams = {
 };
@@ -181,20 +182,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   return (
     <ScrollView style={styles.rootContainer}>
-
-      <View style={styles.headerSection}>
-        <SelectedRecipientsCarousel
-          recipients={selectedRecipients}
-          subAccountKind={sourcePrimarySubAccount.kind}
-        />
-      </View>
-
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginBottom: 24,
+        marginBottom: heightPercentageToDP( '1%' ),
+        marginTop: heightPercentageToDP( '2%' )
       }}>
         <Text style={{
           marginRight: RFValue( 4 )
@@ -211,7 +205,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           {sourceAccountHeadlineText}
         </Text>
       </View>
-
+      <View style={styles.headerSection}>
+        <SelectedRecipientsCarousel
+          recipients={selectedRecipients}
+          subAccountKind={sourcePrimarySubAccount.kind}
+        />
+      </View>
       <SendConfirmationCurrentTotalHeader />
 
       <TransactionPriorityMenu
@@ -254,7 +253,7 @@ const styles = StyleSheet.create( {
   },
 
   headerSection: {
-    paddingVertical: 24,
+    paddingVertical: heightPercentageToDP( '1%' ),
   },
 
   footerSection: {

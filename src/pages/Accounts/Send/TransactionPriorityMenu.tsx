@@ -136,7 +136,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
               <View style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                paddingVertical: 14,
+                paddingVertical: heightPercentageToDP( '2%' ),
                 flex: 1,
               }}>
                 <RadioButton
@@ -237,7 +237,7 @@ const styles = StyleSheet.create( {
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
     marginTop: heightPercentageToDP( '2%' ),
-    paddingBottom: heightPercentageToDP( '1.5%' ),
+    paddingBottom: heightPercentageToDP( '2%' ),
   },
   priorityTableContainer: {
     flex: 1,
