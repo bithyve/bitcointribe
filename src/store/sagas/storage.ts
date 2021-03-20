@@ -69,7 +69,7 @@ export const fetchDBWatcher = createWatcher(fetchDBWorker, FETCH_FROM_DB);
 
 export function* insertDBWorker({ payload }) {
   console.log("*********************************************");
-  console.log("insertDBWorker payload", payload);
+  // console.log("insertDBWorker payload", payload);
   console.log("*********************************************");
   try {
     const storage = yield select((state) => state.storage);

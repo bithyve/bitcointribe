@@ -60,9 +60,9 @@ export default function RestoreFromICloud(props) {
           </View>
         </View>
       </AppBottomSheetTouchableWrapper>
-      <View style={styles.successModalAmountView}>
+      {props.info ? <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>{props.info}</Text>
-      </View>
+      </View> : null}
       <View style={styles.bottomButtonsView}>
         <AppBottomSheetTouchableWrapper
           disabled={props.isLoading ? props.isLoading : false}
