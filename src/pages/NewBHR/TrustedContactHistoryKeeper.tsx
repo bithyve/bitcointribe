@@ -704,7 +704,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     async ( contact ) => {
       const tcInfo = trustedContactsInfo
 
-      if ( tcInfo ) {
+      if ( tcInfo.length ) {
         if ( tcInfo[ index ] ) {
           let found = false
           for ( let i = 3; i < tcInfo.length; i++ ) {

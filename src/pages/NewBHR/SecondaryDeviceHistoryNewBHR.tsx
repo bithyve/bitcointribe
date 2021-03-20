@@ -229,7 +229,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     async ( contact ) => {
       const tcInfo = trustedContactsInfo
 
-      if ( tcInfo ) {
+      if ( tcInfo.length ) {
         tcInfo[ 0 ] = contact
       } else {
         tcInfo[ 0 ] = contact
