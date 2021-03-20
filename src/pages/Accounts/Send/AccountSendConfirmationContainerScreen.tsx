@@ -97,7 +97,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '52%' ],
+        dismissOnOverlayPress: false,
+        dismissOnScrollDown: false,
+        snapPoints: [ '52%', '52%' ],
       },
     )
   },
