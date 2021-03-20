@@ -5,7 +5,6 @@ import Fonts from '../../common/Fonts'
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import { RFValue } from 'react-native-responsive-fontsize'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import useTotalSpendingAmount from '../../utils/hooks/sending-utils/UseTotalSpendingAmount'
 
@@ -19,7 +18,6 @@ const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {}: Props ) => {
   const formattedAmountText = useFormattedAmountText( totalAmount )
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
-    currencyKind: CurrencyKind.BITCOIN
   } )
 
   return (

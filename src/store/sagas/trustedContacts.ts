@@ -39,7 +39,7 @@ import {
   downloadMShare as downloadMShareSSS,
   uploadEncMShare
 } from '../actions/sss'
-import { downloadMShare as downloadMShareHealth } from '../actions/health'
+import { downloadMShare as downloadMShareHealth, uploadEncMShareKeeper } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
@@ -142,7 +142,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
 
   if( contactInfo.isGuardian ){
     // Trusted Contact: Guardian
-    const { changeContact, shareIndex } = contactInfo
+    const { changeContact, shareIndex, shareId, legacy } = contactInfo
     const { SHARES_TRANSFER_DETAILS } = yield select(
       ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
     )
@@ -166,14 +166,24 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
 
       // upload share for the new contact(guardian)
-      yield put(
-        uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
-      )
+      if( legacy )
+        yield put(
+          uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
+        )
+      else
+        yield put(
+          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
+        )
     } else if( shareExpired ) {
       // share expired, re-upload (creates ephermeal channel as well)
-      yield put(
-        uploadEncMShare( shareIndex, contactInfo, data ),
-      )
+      if( legacy )
+        yield put(
+          uploadEncMShare( shareIndex, contactInfo, data ),
+        )
+      else
+        yield put(
+          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
+        )
     } else {
       // re-initiating expired Ephemeral Channel
       const hasTrustedChannel = trustedContact.symmetricKey ? true : false
@@ -532,7 +542,7 @@ function* updateEphemeralChannelWorker( { payload } ) {
     ( state ) => state.accounts[ TEST_ACCOUNT ].service,
   )
 
-  const { contactInfo, data, fetch, isFromKeeper } = payload;
+  const { contactInfo, data, fetch, isFromKeeper } = payload
 
   let generatedKey = false
   if (
@@ -724,10 +734,18 @@ function* updateEphemeralChannelWorker( { payload } ) {
     if ( data && data.shareTransferDetails ) {
       const { otp, encryptedKey } = data.shareTransferDetails
       // yield delay(1000); // introducing delay in order to evade database insertion collision
-      if(isFromKeeper){
-        yield call(downloadMetaShareWorkerKeeper, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+      if( isFromKeeper ){
+        yield call( downloadMetaShareWorkerKeeper, {
+          payload: {
+            encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : ''
+          }
+        } )
       } else {
-        yield call(downloadMetaShareWorker, { payload: { encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : '' } });
+        yield call( downloadMetaShareWorker, {
+          payload: {
+            encryptedKey, otp, walletID: data.walletID, walletName: contactInfo.walletName ? contactInfo.walletName : ''
+          }
+        } )
       }
       Toast( 'You have been successfully added as a Keeper' )
       yield put( trustedContactApproved( contactInfo.contactName, true ) )

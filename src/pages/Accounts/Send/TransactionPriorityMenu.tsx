@@ -64,7 +64,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
         isCancel={true}
         onPressOk={( amount, customEstimatedBlock ) => {
           Keyboard.dismiss()
-          handleCustomFee( amount, customEstimatedBlock )
+          dismissBottomSheet()
           handleCustomFee( amount, customEstimatedBlock )
         }}
         onPressCancel={() => {
