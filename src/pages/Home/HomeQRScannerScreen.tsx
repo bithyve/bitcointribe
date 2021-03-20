@@ -41,13 +41,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const accountsState = useSelector( ( state ) => state.accounts, )
 
   function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
-    console.log( 'X^X^X' )
     dispatch( clearTransfer( REGULAR_ACCOUNT ) )
     const network = Bitcoin.networkType( dataString )
     if ( network ) {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( dataString )
       console.log( {
@@ -86,7 +84,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   function onSend( address: string, amount: Satoshis ) {
     const recipient = makeAddressRecipientDescription( {
-      address,
+      address
     } )
 
     dispatch( clearTransfer( REGULAR_ACCOUNT ) )
@@ -97,7 +95,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     dispatch( recipientSelectedForAmountSetting( recipient ) )
     dispatch( amountForRecipientUpdated( {
       recipient,
-      amount
+      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
     } ) )
 
     navigation.dispatch(
