@@ -48,20 +48,13 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( dataString )
-      console.log( {
-        type
-      }, ScannedAddressKind.ADDRESS, ScannedAddressKind.PAYMENT_URI )
       if ( type===ScannedAddressKind.ADDRESS ) {
         onSend( dataString, 0 )
       } else if( type===ScannedAddressKind.PAYMENT_URI )  {
-        console.log( 'paymentURI ', dataString )
         const res = service.decodePaymentURI( dataString )
         const address = res.address
         const options = res.options
         let donationId = null
-        console.log( {
-          address, options
-        } )
         // checking for donationId to send note
         if ( options && options.message ) {
           const rawMessage = options.message
