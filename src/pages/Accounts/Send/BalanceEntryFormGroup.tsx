@@ -47,8 +47,8 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const dispatch = useDispatch()
 
   const [ isSendingMax, setIsSendingMax ] = useState( false )
-  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( '' )
-  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( '' )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String( currentRecipient.amount ? currentRecipient.amount : 0 ) )
+  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ) )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( currentSatsAmountTextValue )

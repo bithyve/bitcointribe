@@ -78,8 +78,8 @@ export default function SendConfirmationContent( props ) {
           alignItems: 'center',
           marginBottom:
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? wp( '5%' )
-              : wp( '15%' ),
+              ? wp( '2%' )
+              : wp( '2%' ),
         }}
       >
         <AppBottomSheetTouchableWrapper

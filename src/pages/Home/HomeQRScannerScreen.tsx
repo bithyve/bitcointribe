@@ -20,6 +20,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
+import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -45,13 +46,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     if ( network ) {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( dataString )
-
-      if ( type=='address' ) {
+      if ( type===ScannedAddressKind.ADDRESS ) {
         onSend( dataString, 0 )
-      } else if( type=='paymentURI' )  {
+      } else if( type===ScannedAddressKind.PAYMENT_URI )  {
         const res = service.decodePaymentURI( dataString )
         const address = res.address
         const options = res.options
@@ -78,7 +77,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   function onSend( address: string, amount: Satoshis ) {
     const recipient = makeAddressRecipientDescription( {
-      address,
+      address
     } )
 
     dispatch( clearTransfer( REGULAR_ACCOUNT ) )
@@ -89,7 +88,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     dispatch( recipientSelectedForAmountSetting( recipient ) )
     dispatch( amountForRecipientUpdated( {
       recipient,
-      amount
+      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
     } ) )
 
     navigation.dispatch(
