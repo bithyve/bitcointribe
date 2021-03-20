@@ -19,7 +19,7 @@ import Toast from '../../../components/Toast'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
-import { addRecipientForSending, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
+import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting } from '../../../store/actions/sending'
 import AccountSendScreen from './AccountSendScreen'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
@@ -27,6 +27,7 @@ import useSendableAccountShells from '../../../utils/hooks/state-selectors/sendi
 import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import idx from 'idx'
+import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 
 export type Props = {
   navigation: any;
@@ -74,6 +75,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   function handlePaymentURIEntry( uri: string ) {
     let address: string
     let donationID: string | null = null
+    let amount: number | null = 0
 
     try {
       const decodingResult = walletService.decodePaymentURI( uri )
@@ -85,6 +87,10 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       if ( options?.message ) {
         const rawMessage = options.message
         donationID = rawMessage.split( ':' ).pop().trim()
+        amount = options.amount
+      }
+      if ( options?.amount ) {
+        amount = options.amount
       }
     } catch ( err ) {
       Alert.alert( 'Unable to decode payment URI' )
@@ -95,6 +101,16 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       address,
       donationID,
     } )
+
+    if ( isRecipientSelectedForSending( newRecipient ) == false ) {
+      handleRecipientSelection( newRecipient )
+    }
+    dispatch( addRecipientForSending( newRecipient ) )
+    dispatch( recipientSelectedForAmountSetting( newRecipient ) )
+    dispatch( amountForRecipientUpdated( {
+      recipient: newRecipient,
+      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
+    } ) )
 
     handleRecipientSelection( newRecipient )
   }
@@ -113,7 +129,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   function handleQRScan( { data: barcodeDataString }: BarCodeReadEvent ) {
     const { type: scannedAddressKind }: { type: ScannedAddressKind } = walletService.addressDiff( barcodeDataString.trim() )
-
     switch ( scannedAddressKind ) {
         case ScannedAddressKind.ADDRESS:
           const recipientAddress = barcodeDataString
