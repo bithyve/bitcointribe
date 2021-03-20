@@ -20,6 +20,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
+import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -40,6 +41,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const accountsState = useSelector( ( state ) => state.accounts, )
 
   function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
+    console.log( 'X^X^X' )
     dispatch( clearTransfer( REGULAR_ACCOUNT ) )
     const network = Bitcoin.networkType( dataString )
     if ( network ) {
@@ -48,14 +50,20 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( dataString )
-
-      if ( type=='address' ) {
+      console.log( {
+        type
+      }, ScannedAddressKind.ADDRESS, ScannedAddressKind.PAYMENT_URI )
+      if ( type===ScannedAddressKind.ADDRESS ) {
         onSend( dataString, 0 )
-      } else if( type=='paymentURI' )  {
+      } else if( type===ScannedAddressKind.PAYMENT_URI )  {
+        console.log( 'paymentURI ', dataString )
         const res = service.decodePaymentURI( dataString )
         const address = res.address
         const options = res.options
         let donationId = null
+        console.log( {
+          address, options
+        } )
         // checking for donationId to send note
         if ( options && options.message ) {
           const rawMessage = options.message
