@@ -19,6 +19,7 @@ let bitcoinAxios = axios.create( {
 } )
 export default class Bitcoin {
   public static networkType = ( scannedStr: string ) => {
+    scannedStr = scannedStr.replace( 'BITCOIN', 'bitcoin' )
     let address = scannedStr
     if ( scannedStr.slice( 0, 8 ) === 'bitcoin:' ) {
       address = bip21.decode( scannedStr ).address
@@ -538,9 +539,9 @@ export default class Bitcoin {
   public addressDiff = (
     scannedStr: string,
   ): { type: ScannedAddressKind | null } => {
+    scannedStr = scannedStr.replace( 'BITCOIN', 'bitcoin' )
     if ( this.isPaymentURI( scannedStr ) ) {
       const { address } = this.decodePaymentURI( scannedStr )
-
       if ( this.isValidAddress( address ) ) {
         return {
           type: ScannedAddressKind.PAYMENT_URI
@@ -663,7 +664,7 @@ export default class Bitcoin {
       message?: string;
     };
   } => {
-    return bip21.decode( paymentURI.toLowerCase() )
+    return bip21.decode( paymentURI )
   };
 
   public categorizeTx = (

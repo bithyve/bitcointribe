@@ -5,9 +5,9 @@ import Fonts from '../../common/Fonts'
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import { RFValue } from 'react-native-responsive-fontsize'
-import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import useTotalSpendingAmount from '../../utils/hooks/sending-utils/UseTotalSpendingAmount'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export type Props = {
 };
@@ -19,7 +19,6 @@ const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {}: Props ) => {
   const formattedAmountText = useFormattedAmountText( totalAmount )
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
-    currencyKind: CurrencyKind.BITCOIN
   } )
 
   return (
@@ -48,7 +47,7 @@ const SendConfirmationCurrentTotalHeader: React.FC<Props> = ( {}: Props ) => {
 const styles = StyleSheet.create( {
   rootContainer: {
     paddingHorizontal: 24,
-    paddingVertical: 36,
+    paddingVertical: heightPercentageToDP( '2.5%' ),
   },
 
   headingText: {

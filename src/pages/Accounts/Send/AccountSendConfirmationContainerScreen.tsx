@@ -24,6 +24,9 @@ import { clearTransfer, refreshAccountShell } from '../../../store/actions/accou
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useAccountSendST2CompletionEffect from '../../../utils/sending/UseAccountSendST2CompletionEffect'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
+import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import { heightPercentageToDP } from 'react-native-responsive-screen'
 
 export type NavigationParams = {
 };
@@ -49,6 +52,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
   const sendingState = useSendingState()
+  const formattedUnitText = useFormattedUnitText( {
+    bitcoinUnit: BitcoinUnit.SATS,
+  } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -59,7 +65,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
+    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
   const showSendSuccessBottomSheet = useCallback( () => {
@@ -92,7 +98,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       />,
       {
         ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '52%' ],
+        dismissOnOverlayPress: false,
+        dismissOnScrollDown: false,
+        snapPoints: [ '52%', '52%' ],
       },
     )
   },
@@ -174,20 +182,13 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   return (
     <ScrollView style={styles.rootContainer}>
-
-      <View style={styles.headerSection}>
-        <SelectedRecipientsCarousel
-          recipients={selectedRecipients}
-          subAccountKind={sourcePrimarySubAccount.kind}
-        />
-      </View>
-
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 24,
-        marginBottom: 24,
+        marginBottom: heightPercentageToDP( '1%' ),
+        marginTop: heightPercentageToDP( '2%' )
       }}>
         <Text style={{
           marginRight: RFValue( 4 )
@@ -204,7 +205,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
           {sourceAccountHeadlineText}
         </Text>
       </View>
-
+      <View style={styles.headerSection}>
+        <SelectedRecipientsCarousel
+          recipients={selectedRecipients}
+          subAccountKind={sourcePrimarySubAccount.kind}
+        />
+      </View>
       <SendConfirmationCurrentTotalHeader />
 
       <TransactionPriorityMenu
@@ -247,7 +253,7 @@ const styles = StyleSheet.create( {
   },
 
   headerSection: {
-    paddingVertical: 24,
+    paddingVertical: heightPercentageToDP( '1%' ),
   },
 
   footerSection: {
