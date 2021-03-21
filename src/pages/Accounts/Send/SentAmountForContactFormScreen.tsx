@@ -31,6 +31,7 @@ import { resetStackToAccountDetails } from '../../../navigation/actions/Navigati
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import idx from 'idx'
 
 export type NavigationParams = {
 };
@@ -56,7 +57,8 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const spendableBalance = useSpendableBalanceForAccountShell( sourceAccountShell )
-  const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentRecipient.amount ? currentRecipient.amount : 0 )
+  const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
+  const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const [ noteText, setNoteText ] = useState( '' )
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
