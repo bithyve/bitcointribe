@@ -230,15 +230,18 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
       <View style={styles.footerSection}>
         <TouchableOpacity
+          disabled={!selectedAmount}
           onPress={handleConfirmationButtonPress}
-          style={ButtonStyles.primaryActionButton}
+          style={{
+            ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
+          }}
         >
           <Text style={ButtonStyles.actionButtonText}>Confirm & Proceed</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleAddRecipientButtonPress}
-          disabled={!!sendingState.sendMaxFee}
+          disabled={!!sendingState.sendMaxFee || !selectedAmount }
           style={{
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
@@ -247,7 +250,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         >
           <Text style={{
             ...ButtonStyles.actionButtonText,
-            color: sendingState.sendMaxFee? Colors.lightBlue: Colors.blue,
+            color: sendingState.sendMaxFee || !selectedAmount ? Colors.lightBlue: Colors.blue,
           }}>
               Add Recipient
           </Text>
