@@ -14,7 +14,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, resetSendStage1, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -153,6 +153,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   }
 
   function handleBackButtonPress() {
+    dispatch( resetSendStage1() )
     navigation.goBack()
   }
 

@@ -13,6 +13,7 @@ export const AMOUNT_FOR_RECIPIENT_UPDATED = 'AMOUNT_FOR_RECIPIENT_UPDATED'
 export const SET_BALANCE_FOR_SENDING_RECIPIENT = 'SET_BALANCE_FOR_SENDING_RECIPIENT'
 export const EXECUTE_SEND_STAGE1 = 'EXECUTE_SEND_STAGE1'
 export const SEND_STAGE1_EXECUTED = 'SEND_STAGE1_EXECUTED'
+export const RESET_SEND_STAGE1 = 'RESET_SEND_STAGE1'
 export const FEE_INTEL_MISSING = 'FEE_INTEL_MISSING'
 export const EXECUTE_SEND_STAGE2 = 'EXECUTE_SEND_STAGE2'
 export const SEND_STAGE2_EXECUTED = 'SEND_STAGE2_EXECUTED'
@@ -151,6 +152,16 @@ export const sendStage1Executed = (
   return {
     type: SEND_STAGE1_EXECUTED,
     payload,
+  }
+}
+
+export interface ResetSendStage1Action extends Action {
+  type: typeof RESET_SEND_STAGE1;
+}
+
+export const resetSendStage1 = (): ResetSendStage1Action => {
+  return {
+    type: RESET_SEND_STAGE1,
   }
 }
 
