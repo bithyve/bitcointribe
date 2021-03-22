@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
@@ -27,6 +27,8 @@ import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSen
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
+import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 
 export type NavigationParams = {
 };
@@ -157,6 +159,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     navigation.goBack()
   }
 
+  useEffect( ()=>{
+    navigation.setParams( {
+      handleBackButtonPress: handleBackButtonPress,
+    } )
+  }, [] )
+
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
@@ -264,5 +272,16 @@ const styles = StyleSheet.create( {
   },
 
 } )
+
+
+AccountSendConfirmationContainerScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
+  return {
+    ...defaultStackScreenNavigationOptions,
+
+    headerLeft: () => {
+      return <SmallNavHeaderBackButton onPress={navigation.getParam( 'handleBackButtonPress' )} />
+    },
+  }
+}
 
 export default AccountSendConfirmationContainerScreen

@@ -1,4 +1,4 @@
-import { call, fork, put, select, spawn } from 'redux-saga/effects'
+import { call, delay, put, select, spawn } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
   switchLoader,
@@ -85,8 +85,6 @@ import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-
-const delay = time => new Promise( resolve => setTimeout( resolve, time ) )
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -775,12 +773,14 @@ export const refreshAccountShellWatcher = createWatcher(
 )
 
 function* autoSyncShellsWorker( { payload } ) {
-  yield call( clearAccountSyncCache )
+  yield spawn( clearAccountSyncCache )
   const shells = yield select(
     ( state ) => state.accounts.accountShells
   )
+
   for ( const shell of shells ) {
     if ( shell.syncStatus === SyncStatus.PENDING ) {
+      yield delay( 3000 )
       yield spawn( refreshAccountShellWorker,
         {
           payload: {
