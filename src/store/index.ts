@@ -67,7 +67,8 @@ import {
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
   fetchReceiveAddressWatcher,
-  validateTwoFAWatcher
+  validateTwoFAWatcher,
+  createSmNResetTFAOrXPrivWatcher
 } from './sagas/accounts'
 
 import {
@@ -227,6 +228,7 @@ const rootSaga = function* () {
     getAllAccountsDataWatcher,
     fetchReceiveAddressWatcher,
     validateTwoFAWatcher,
+    createSmNResetTFAOrXPrivWatcher,
 
     // sss watchers
     initHCWatcher,

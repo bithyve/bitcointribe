@@ -535,7 +535,7 @@ export const feeAndExchangeRatesWatcher = createWatcher(
 )
 
 function* resetTwoFAWorker( { payload } ) {
-  const service = yield select(
+  const service: SecureAccount = yield select(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
@@ -1327,16 +1327,17 @@ export const fetchReceiveAddressWatcher = createWatcher(
 
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrData: string, QRModalHeader: string, serviceType: string } } ) {
   try {
-    const { qrData, QRModalHeader, serviceType } = payload
+    let { qrData, QRModalHeader, serviceType } = payload
+    console.log('payload', payload);
+    // qrData = '{"requester":"Shivani","publicKey":"M80Nz8hMm6lrce7SADVwapF8","uploadedAt":1616149096398,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
     const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select( ( state ) => state.storage.database )
     const s3Service = yield select( ( state ) => state.health.service )
     let secondaryMnemonic
     const sharesArray = [ DECENTRALIZED_BACKUP.PK_SHARE ]
     const qrDataObj = JSON.parse( qrData )
-    if( qrDataObj.type == 'pdf' ) {
+    if( qrDataObj.type && qrDataObj.type == 'pdf' ) {
       const walletId = s3Service.levelhealth.walletId
       const key = LevelHealth.getDerivedKey( walletId )
-      qrData
       const data = yield LevelHealth.decryptWithAnswer( qrDataObj.encryptedData, WALLET_SETUP.security.answer )
       const data1 = JSON.parse( data.decryptedString )
       const res = yield call( S3Service.downloadSMPDFShare, data1.messageId, key )
@@ -1351,8 +1352,9 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrData: stri
         sharesArray.push( res.data.metaShare )
       }
     }
+    console.log('sharesArray', sharesArray)
     if( sharesArray.length>1 ){
-      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray )
+      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, WALLET_SETUP.security.answer )
     }
     console.log( 'secondaryMnemonic', secondaryMnemonic )
     if ( QRModalHeader === 'Reset 2FA' ) {

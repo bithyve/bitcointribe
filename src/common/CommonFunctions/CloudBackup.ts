@@ -263,6 +263,9 @@ export default class CloudBackup {
         if (result.eventName == 'successFullyUpdate') {
           this.callBack(share);
         }
+        else if(result.eventName == 'failure'){
+          throw new Error( result.eventName )
+        }
         console.log('GoogleDrive.updateFile', result);
       });
     } catch (error) {

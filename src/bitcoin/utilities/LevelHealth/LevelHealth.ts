@@ -1775,8 +1775,16 @@ export default class LevelHealth {
     return { metaShares: this.metaSharesKeeper };
   };
 
-  public static getSecondaryMnemonics = (secretsArray) => {
-    const recoveredMnemonicHex = secrets.combine(secretsArray);
+  public static getSecondaryMnemonics = (secretsArray: MetaShare[], answer: string) => {
+    let decryptedShareArr = [];
+    for (let i = 0; i < secretsArray.length; i++) {
+      const element = secretsArray[i];
+      decryptedShareArr.push(element.encryptedSecret);
+    }
+    let { decryptedSecrets } = LevelHealth.decryptSecrets(decryptedShareArr, answer)
+    const recoveredMnemonicHex = secrets.combine(decryptedSecrets);
+    console.log('recoveredMnemonicHex', recoveredMnemonicHex);
+    console.log('LevelHealth.hexToString(recoveredMnemonicHex)', LevelHealth.hexToString(recoveredMnemonicHex))
     return { mnemonic: LevelHealth.hexToString(recoveredMnemonicHex) };
   }
 
