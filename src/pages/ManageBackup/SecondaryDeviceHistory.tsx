@@ -222,6 +222,7 @@ const SecondaryDeviceHistory = ( props ) => {
         isGuardian: true,
         shareIndex: 0,
         changeContact: changeKeeper,
+        legacy: true, // legacy mode(uploadEncMShare)
       }
 
       let parentShell: AccountShell

@@ -29,6 +29,9 @@ import SendConfirmationContent from '../SendConfirmationContent'
 import { clearTransfer } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
+import idx from 'idx'
 
 export type NavigationParams = {
 };
@@ -54,10 +57,13 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const spendableBalance = useSpendableBalanceForAccountShell( sourceAccountShell )
-  const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( null )
+  const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
+  const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const [ noteText, setNoteText ] = useState( '' )
   const sendingState = useSendingState()
-
+  const formattedUnitText = useFormattedUnitText( {
+    bitcoinUnit: BitcoinUnit.SATS,
+  } )
   const availableBalance = useMemo( () => {
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
@@ -67,8 +73,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const sourceAccountHeadlineText = useMemo( () => {
     const title = sourcePrimarySubAccount.customDisplayName || sourcePrimarySubAccount.defaultTitle
 
-    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} sats)`
+    return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
+
 
   const orderedRecipients = useMemo( () => {
     return Array.from( selectedRecipients || [] ).reverse()
@@ -225,15 +232,18 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
       <View style={styles.footerSection}>
         <TouchableOpacity
+          disabled={!selectedAmount}
           onPress={handleConfirmationButtonPress}
-          style={ButtonStyles.primaryActionButton}
+          style={{
+            ...ButtonStyles.primaryActionButton, opacity: !selectedAmount ? 0.5: 1
+          }}
         >
           <Text style={ButtonStyles.actionButtonText}>Confirm & Proceed</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={handleAddRecipientButtonPress}
-          disabled={!!sendingState.sendMaxFee}
+          disabled={!!sendingState.sendMaxFee || !selectedAmount }
           style={{
             ...ButtonStyles.primaryActionButton,
             marginRight: 8,
@@ -242,7 +252,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         >
           <Text style={{
             ...ButtonStyles.actionButtonText,
-            color: sendingState.sendMaxFee? Colors.lightBlue: Colors.blue,
+            color: sendingState.sendMaxFee || !selectedAmount ? Colors.lightBlue: Colors.blue,
           }}>
               Add Recipient
           </Text>

@@ -22,6 +22,7 @@ import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSen
 import useTotalSpendingAmount from '../../../utils/hooks/sending-utils/UseTotalSpendingAmount'
 import { clearSendMaxFee } from '../../../store/actions/sending'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
+import idx from 'idx'
 
 export type Props = {
   currentRecipient: RecipientDescribing,
@@ -47,8 +48,9 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   const dispatch = useDispatch()
 
   const [ isSendingMax, setIsSendingMax ] = useState( false )
-  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( '' )
-  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( '' )
+  const currentAmount = idx( currentRecipient, ( _ ) => _.amount )
+  const [ currentSatsAmountTextValue, setCurrentSatsAmountTextValue ] = useState( String(  currentAmount ? currentAmount : 0 ) )
+  const [ currentFiatAmountTextValue, setCurrentFiatAmountTextValue ] = useState( String( convertSatsToFiat( Number( currentSatsAmountTextValue ) ) ) )
 
   const currentSatsAmountFormValue = useMemo( () => {
     return Number( currentSatsAmountTextValue )
