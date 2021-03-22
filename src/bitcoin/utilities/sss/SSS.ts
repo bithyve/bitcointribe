@@ -985,6 +985,8 @@ export default class SSS {
       bhXpub: string;
     },
     tag: string,
+    questionId: string,
+    question? : string,
     version?: string,
   ): {
     metaShares: MetaShare[];
@@ -1021,6 +1023,8 @@ export default class SSS {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId,
+            question
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         }
@@ -1036,6 +1040,8 @@ export default class SSS {
             tag,
             timestamp,
             reshareVersion: 0,
+            questionId,
+            question
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         }
@@ -1048,7 +1054,7 @@ export default class SSS {
       this.metaShares = []
       throw new Error('Something went wrong while generating metaShares')
     }
-
+console.log('SSS this.metaShares',this.metaShares)
     return {
       metaShares: this.metaShares 
     }

@@ -17,6 +17,9 @@ import {
   DerivativeAccountElements,
   InputUTXOs,
   AverageTxFees,
+  TransactionPrerequisiteElements,
+  WyreDerivativeAccountElements,
+  RampDerivativeAccountElements,
 } from '../Interface'
 import Bitcoin from './Bitcoin'
 import {
@@ -27,23 +30,23 @@ import {
   SECURE_ACCOUNT,
   WYRE,
   RAMP
-} from '../../../common/constants/serviceTypes'
+} from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
 const {  HEXA_ID } = config
 
 
 export default class SecureHDWallet extends Bitcoin {
-  public twoFASetup: {
+  public twoFASetup?: {
     qrData: string;
     secret: string;
   };
-  public secondaryMnemonic: string;
-  public secondaryXpriv: string;
+  public secondaryMnemonic?: string;
+  public secondaryXpriv?: string;
   public xpubs: {
-    primary: string;
-    secondary: string;
-    bh: string;
+    primary?: string;
+    secondary?: string;
+    bh?: string;
   };
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
@@ -111,7 +114,7 @@ export default class SecureHDWallet extends Bitcoin {
     stateVars?: {
       accountName: string;
       accountDescription: string;
-      secondaryMnemonic: string;
+      secondaryMnemonic?: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -142,7 +145,7 @@ export default class SecureHDWallet extends Bitcoin {
       }>;
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
       txIdMap: {[txid: string]: string[]};
-      twoFASetup: {
+      twoFASetup?: {
         qrData: string;
         secret: string;
       };
@@ -262,7 +265,9 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public getInitialReceivingAddress = (): string => {
-    if ( this.xpubs ) return this.createSecureMultiSig( 0 ).address
+    if ( this.xpubs ) {
+      return this.createSecureMultiSig( 0 ).address
+    }
   };
 
   public getReceivingAddress = (
@@ -357,8 +362,11 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public getAccountId = (): string => {
-    const xpub = this.xpubs.secondary
-    return crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
+    console.log( 'this.xpubs', this.xpubs )
+    if( this.xpubs && this.xpubs.secondary ){
+      const xpub = this.xpubs.secondary
+      return crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
+    }
   };
 
   public decryptSecondaryXpub = ( encryptedSecXpub: string ) => {
@@ -583,6 +591,7 @@ export default class SecureHDWallet extends Bitcoin {
         lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
         accountType: 'Savings Account',
+        accountName: this.accountName,
       }
     }
     const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
@@ -891,6 +900,15 @@ export default class SecureHDWallet extends Bitcoin {
         internalAddresses
       }
 
+      let accountName: string = accountType
+      switch ( accountType ) {
+          case SUB_PRIMARY_ACCOUNT:
+          case WYRE:
+          case RAMP:
+            accountName = ( this.derivativeAccounts[ accountType ][ accountNumber ] as SubPrimaryDerivativeAccountElements | WyreDerivativeAccountElements | RampDerivativeAccountElements ).accountName
+            break
+      }
+
       accounts[ xpubId ] = {
         externalAddressSet,
         internalAddressSet,
@@ -908,6 +926,7 @@ export default class SecureHDWallet extends Bitcoin {
         accountType: accountType === FAST_BITCOINS ? FAST_BITCOINS : accountType,
         contactName: null,
         primaryAccType: accountType === SUB_PRIMARY_ACCOUNT ? 'Savings Account' : null,
+        accountName
       }
     }
 
@@ -1150,7 +1169,7 @@ export default class SecureHDWallet extends Bitcoin {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ): {
     accountId: string;
     accountNumber: number;
@@ -1170,8 +1189,8 @@ export default class SecureHDWallet extends Bitcoin {
             .derivativeAccounts[ accountType ][ accountNumber ]
           const updatedDervInstance = {
             ...derivativeInstance,
-            accountName: accountDetails.accountName,
-            accountDescription: accountDetails.accountDescription,
+            accountName: accountDetails? accountDetails.accountName: null,
+            accountDescription:accountDetails? accountDetails.accountDescription: null,
           }
           this.derivativeAccounts[ accountType ][
             accountNumber
@@ -1306,7 +1325,11 @@ export default class SecureHDWallet extends Bitcoin {
           donee,
           subject,
           description,
-          xpubs: [ xpub, this.xpubs.secondary, this.xpubs.bh ],
+          xpubs: [
+            xpub,
+            this.xpubs.secondary ? this.xpubs.secondary : '',
+            this.xpubs.bh ? this.xpubs.bh : '',
+          ],
           xpubId,
           configuration,
         },
@@ -1328,6 +1351,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  // TODO: This method Will modify
   public setupSecureAccount = async (): Promise<{
     setupData: {
       qrData: string;
@@ -1338,6 +1362,7 @@ export default class SecureHDWallet extends Bitcoin {
     // invoked once per wallet (during initial setup)
     let res: AxiosResponse
     this.secondaryMnemonic = bip39.generateMnemonic( 256 )
+    console.log( 'initSetupWorker setupSecureAccount secondaryMnemonic', this.secondaryMnemonic )
     const { secondaryID } = this.getSecondaryID( this.secondaryMnemonic )
     try {
       res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
@@ -1349,7 +1374,9 @@ export default class SecureHDWallet extends Bitcoin {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
     }
-    // console.log({ res });
+    console.log( {
+      res
+    } )
     const { setupSuccessful, setupData } = res.data
     if ( !setupSuccessful ) {
       throw new Error( 'Secure account setup failed' )
@@ -1842,7 +1869,7 @@ export default class SecureHDWallet extends Bitcoin {
     }[],
     customTxFeePerByte: number,
     derivativeAccountDetails?: { type: string; number: number },
-  ) => {
+  ): TransactionPrerequisiteElements => {
     let inputUTXOs
     if ( derivativeAccountDetails ) {
       const derivativeUtxos = this.derivativeAccounts[
@@ -1873,10 +1900,6 @@ export default class SecureHDWallet extends Bitcoin {
     }
     // console.log({ inputUTXOs });
 
-    let confirmedBalance = 0
-    inputUTXOs.forEach( ( confirmedUtxo ) => {
-      confirmedBalance += confirmedUtxo.value
-    } )
     const { inputs, outputs, fee } = coinselect(
       inputUTXOs,
       outputUTXOs,
@@ -1884,10 +1907,10 @@ export default class SecureHDWallet extends Bitcoin {
     )
 
     if ( !inputs ) return {
-      fee, balance: confirmedBalance
+      fee,
     }
     return {
-      inputs, outputs, fee, balance: confirmedBalance
+      inputs, outputs, fee,
     }
   };
 
@@ -2034,7 +2057,7 @@ export default class SecureHDWallet extends Bitcoin {
   public createHDTransaction = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<{
@@ -2221,6 +2244,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
   };
 
+  // TODO mofify for secondary mnemonics
   public prepareSecureAccount = (
     bhXpub: string,
     secondaryXpub?: string,
@@ -2496,6 +2520,8 @@ export default class SecureHDWallet extends Bitcoin {
     address: string;
   } => {
     let childPrimaryPub
+    let childRecoveryPub
+    let childBHPub
     if ( !derivativeXpub )
       childPrimaryPub = this.getPub(
         this.derivePrimaryChildXKey( this.xpubs.primary, childIndex, internal ),
@@ -2504,30 +2530,39 @@ export default class SecureHDWallet extends Bitcoin {
       childPrimaryPub = this.getPub(
         this.deriveDerivativeChildXKey( derivativeXpub, childIndex, internal ),
       )
+    if( this.xpubs.secondary && this.xpubs.bh ){
+      childRecoveryPub = this.getPub(
+        this.deriveChildXKey( this.xpubs.secondary, childIndex ),
+      )
+      childBHPub = this.getPub(
+        this.deriveChildXKey( this.xpubs.bh, childIndex ),
+      )
 
-    const childRecoveryPub = this.getPub(
-      this.deriveChildXKey( this.xpubs.secondary, childIndex ),
-    )
-    const childBHPub = this.getPub(
-      this.deriveChildXKey( this.xpubs.bh, childIndex ),
-    )
 
-    // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
-    // for generating ga_recovery based recoverable multiSigs
-    const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ]
-    // console.log({ pubs });
-    const multiSig = this.generateMultiSig( 2, pubs )
+      // public keys should be aligned in the following way: [bhPub, primaryPub, recoveryPub]
+      // for generating ga_recovery based recoverable multiSigs
+      const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ]
+      // // console.log({ pubs });
+      const multiSig = this.generateMultiSig( 2, pubs )
 
-    const construct = {
-      scripts: {
-        redeem: multiSig.p2sh.redeem.output.toString( 'hex' ),
-        witness: multiSig.p2wsh.redeem.output.toString( 'hex' ),
-      },
-      address: multiSig.address,
+      const construct = {
+        scripts: {
+          redeem: multiSig.p2sh.redeem.output.toString( 'hex' ),
+          witness: multiSig.p2wsh.redeem.output.toString( 'hex' ),
+        },
+        address: multiSig.address,
+      }
+
+      return construct
     }
-
-    return construct
-  };
+    return {
+      scripts: {
+        redeem: '',
+        witness: '',
+      },
+      address: ''
+    }
+  }
 
   private generateKey = ( psuedoKey: string ): string => {
     const hashRounds = 5048
@@ -2589,4 +2624,110 @@ export default class SecureHDWallet extends Bitcoin {
       return xpub
     }
   };
+
+  public getSecureXpubs = (): {
+    primary: string;
+    secondary: string;
+    bh: string;
+  } => {
+    return {
+      primary: this.xpubs && this.xpubs.primary ? this.xpubs.primary : '',
+      secondary: this.xpubs && this.xpubs.secondary ? this.xpubs.secondary : '',
+      bh: this.xpubs && this.xpubs.bh ? this.xpubs.bh : '',
+    }
+  };
+
+  public getSecureXpubs2 = (): {
+    primary: string;
+  } => {
+    console.log( 'this.xpubs', this.xpubs )
+    return {
+      primary: this.xpubs.primary,
+    }
+  };
+
+  public setSecureXpubs = (
+    secondary: string,
+    bh: string,
+  ): {
+    primary?: string;
+    secondary?: string;
+    bh?: string;
+  } => {
+    this.xpubs = {
+      ...this.xpubs,
+      secondary: secondary,
+      bh,
+    }
+
+    this.receivingAddress = this.createSecureMultiSig(
+      this.nextFreeAddressIndex,
+    ).address
+    return this.xpubs
+  };
+
+  public setupSecureAccount2 = async () => {
+    // invoked once per wallet (during initial setup)
+    let res: AxiosResponse
+    // this.secondaryMnemonic = bip39.generateMnemonic(256);
+    // const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
+    // try {
+    //   res = await SIGNING_AXIOS.post('setupSecureAccount', {
+    //     HEXA_ID,
+    //     walletID: this.walletID,
+    //     secondaryID,
+    //   });
+    // } catch (err) {
+    //   if (err.response) throw new Error(err.response.data.err);
+    //   if (err.code) throw new Error(err.code);
+    // }
+    // console.log({ res });
+    // const { setupSuccessful, setupData } = res.data;
+    const { prepared } = this.prepareSecureAccount2()
+  };
+
+  public prepareSecureAccount2 = (): { prepared: boolean } => {
+    try {
+      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`
+      const primaryXpub = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        primaryPath,
+      )
+      this.primaryXpriv = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        primaryPath,
+        true,
+      )
+
+      // if (!secondaryXpub) {
+      //   if (!this.secondaryMnemonic)
+      //     throw new Error(
+      //       'SecondaryXpub required; secondary mnemonic missing ',
+      //     );
+      //   const path = this.derivePath(bhXpub);
+      //   secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
+      // }
+
+      this.xpubs = {
+        ...this.xpubs, primary: primaryXpub
+      }
+      console.log( 'this.xpubs prepareSecureAccount2', this.xpubs )
+      return {
+        prepared: true,
+      }
+    } catch ( err ) {
+      console.log( 'prepareSecureAccount2 err', err )
+      return {
+        prepared: false,
+      }
+    }
+  };
+
+  public deleteSecondaryMnemonics = () => {
+    this.secondaryMnemonic = ''
+  };
+
+  // public getSecondaryMnemonic = () => {
+  //   return this.secondaryMnemonic;
+  // };
 }

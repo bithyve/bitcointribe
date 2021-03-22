@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGenerator } from '../utils/utilities'
+import { createWatcher, serviceGenerator2, serviceGenerator, serviceGeneratorForNewBHR } from '../utils/utilities'
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -17,6 +17,7 @@ import {
   CHANGE_AUTH_CRED,
   credsChanged,
   pinChangedFailed,
+  setIsNewHealthSystemSet,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
@@ -27,35 +28,43 @@ import config from '../../bitcoin/HexaConfig'
 function* initSetupWorker( { payload } ) {
   yield put( switchSetupLoader( 'initializing' ) )
 
-  const { walletName, security } = payload
-  const {
-    regularAcc,
-    testAcc,
-    secureAcc,
-    s3Service,
-    trustedContacts,
-  } = yield call( serviceGenerator, security.answer )
-
+  const { walletName, security } = payload;
+  let accountData = {
+    regularAcc: {},
+    testAcc: {},
+    secureAcc: {},
+    s3Service: {},
+    trustedContacts: {},
+    keepersInfo: {}
+  }
+  // let isNewSetup = false;
+  // if(isNewSetup){
+  //   yield put(setIsNewHealthSystemSet(true))
+  //   accountData = yield call( serviceGenerator2, security.answer )
+  // }else{
+  //   yield put(setIsNewHealthSystemSet(false))
+  //   accountData = yield call( serviceGenerator, security.answer )
+  // }
+  yield put(setIsNewHealthSystemSet(true))
+  accountData = yield call( serviceGeneratorForNewBHR, security.answer )
   const initialDatabase: Database = {
     WALLET_SETUP: {
       walletName, security 
     },
     DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {
-      },
-      SHARES_TRANSFER_DETAILS: {
-      },
-      UNDER_CUSTODY: {
-      },
-      DYNAMIC_NONPMDD: {
-      },
+      RECOVERY_SHARES: {},
+      SHARES_TRANSFER_DETAILS: {},
+      UNDER_CUSTODY: {},
+      DYNAMIC_NONPMDD: {},
+      // PK_SHARE: {}
     },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      REGULAR_ACCOUNT: JSON.stringify( accountData.regularAcc ),
+      TEST_ACCOUNT: JSON.stringify( accountData.testAcc ),
+      SECURE_ACCOUNT: JSON.stringify( accountData.secureAcc ),
+      S3_SERVICE: JSON.stringify( accountData.s3Service ),
+      TRUSTED_CONTACTS: JSON.stringify( accountData.trustedContacts ),
+      KEEPERS_INFO: JSON.stringify( accountData.keepersInfo ),
     },
     VERSION: DeviceInfo.getVersion(),
   }

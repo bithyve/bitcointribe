@@ -1,8 +1,7 @@
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { SERVICES_ENRICHED } from '../actions/storage'
-import { TRUSTED_CONTACTS } from '../../common/constants/serviceTypes'
+import { TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import {
-  TRUSTED_CONTACT_INITIALIZED,
   TRUSTED_CONTACT_APPROVED,
   EPHEMERAL_CHANNEL_FETCHED,
   EPHEMERAL_CHANNEL_UPDATED,
@@ -12,48 +11,76 @@ import {
   CLEAR_PAYMENT_DETAILS,
   SWITCH_TC_LOADING,
   APPROVE_TRUSTED_CONTACT,
-  CLEAR_TRUSTED_CONTACTS_CACHE
+  CLEAR_TRUSTED_CONTACTS_CACHE,
+  UPDATE_ADDRESS_BOOK_LOCALLY,
+  UPDATE_TRUSTED_CONTACTS_INFO,
 } from '../actions/trustedContacts'
 import {
-  EphemeralData,
+  ContactElements,
+  Contacts,
   EphemeralDataElements,
 } from '../../bitcoin/utilities/Interface'
-import {
-  UPDATE_ADDRESS_BOOK_LOCALLY,
-  UPDATE_TRUSTED_CONTACT_INFO,
-} from '../constants'
-import { chain } from 'icepick'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import RecipientKind from '../../common/data/enums/RecipientKind'
+import { ImageSourcePropType } from 'react-native'
 
-const initialState: {
+
+// TODO: Fill this out and eventually move it to a more sensible place.
+type TrustedContactInfo = {
+  id: string;
+  firstName: string;
+  lastName: string | null | undefined;
+  imageAvailable: boolean;
+  image?: ImageSourcePropType;
+} & Record<string, unknown>;
+
+
+export type AddressBook = {
+  myKeepers: ContactRecipientDescribing[];
+  contactsKeptByUser: ContactRecipientDescribing[];
+  otherTrustedContacts: ContactRecipientDescribing[];
+  trustedContacts: ContactRecipientDescribing[];
+};
+
+
+export type TrustedContactsState = {
   service: TrustedContactsService;
-  serviceEnriched: Boolean;
-  initializedTrustedContacts: { [contactName: string]: { publicKey: string } }; //contact name to pubkey mapping
+
   approvedTrustedContacts: {
     [contactName: string]: {
-      approved: Boolean;
+      approved: boolean;
     };
   };
+
   ephemeralChannel: {
-    [contactName: string]: { updated: Boolean; data?: EphemeralDataElements };
+    [contactName: string]: { updated: boolean; data?: EphemeralDataElements };
   };
-  trustedChannel: { [contactName: string]: { updated: Boolean; data?: any } };
+
+  trustedChannel: { [contactName: string]: { updated: boolean; data?: unknown } };
+
   paymentDetails: {
     address?: string;
     paymentURI?: string;
   };
+
   loading: {
-    updateEphemeralChannel: Boolean;
-    updateTrustedChannel: Boolean;
-    trustedChannelsSetupSync: Boolean;
-    approvingTrustedContact: Boolean;
-    walletCheckIn: Boolean;
+    updateEphemeralChannel: boolean;
+    updateTrustedChannel: boolean;
+    trustedChannelsSetupSync: boolean;
+    approvingTrustedContact: boolean;
+    walletCheckIn: boolean;
   };
-  addressBook: any;
-  trustedContactsInfo: any;
-} = {
+
+  addressBook: AddressBook;
+  trustedContactsInfo: TrustedContactInfo[];
+
+  trustedContactRecipients: ContactRecipientDescribing[];
+};
+
+
+const initialState: TrustedContactsState = {
   service: null,
-  serviceEnriched: false,
-  initializedTrustedContacts: null,
   approvedTrustedContacts: null,
   ephemeralChannel: null,
   trustedChannel: null,
@@ -66,10 +93,12 @@ const initialState: {
     walletCheckIn: false,
   },
   addressBook: null,
-  trustedContactsInfo: null,
+  trustedContactsInfo: [],
+  trustedContactRecipients: [],
 }
 
-export default ( state = initialState, action ) => {
+
+export default ( state: TrustedContactsState = initialState, action ): TrustedContactsState => {
   switch ( action.type ) {
       case CLEAR_TRUSTED_CONTACTS_CACHE:
         return {
@@ -83,18 +112,10 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           service: action.payload.services[ TRUSTED_CONTACTS ],
-          serviceEnriched: true,
-        }
-
-      case TRUSTED_CONTACT_INITIALIZED:
-        return {
-          ...state,
-          initializedTrustedContacts: {
-            ...state.initializedTrustedContacts,
-            [ action.payload.contactName ]: {
-              publicKey: action.payload.publicKey
-            },
-          },
+          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
+            trustedContactsInfo: state.trustedContactsInfo,
+            backendTrustedContactsData: action.payload.services[ TRUSTED_CONTACTS ].tc.trustedContacts,
+          } ),
         }
 
       case APPROVE_TRUSTED_CONTACT:
@@ -191,13 +212,115 @@ export default ( state = initialState, action ) => {
         }
 
       case UPDATE_ADDRESS_BOOK_LOCALLY:
-        return chain( state ).setIn( [ 'addressBook' ], action.payload ).value()
+        return {
+          ...state,
+          addressBook: action.payload,
+        }
 
-      case UPDATE_TRUSTED_CONTACT_INFO:
-        return chain( state )
-          .setIn( [ 'trustedContactsInfo' ], action.payload.trustedContactInfo )
-          .value()
+      case UPDATE_TRUSTED_CONTACTS_INFO:
+        return {
+          ...state,
+          trustedContactsInfo: action.payload.trustedContactsInfo,
+          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
+            trustedContactsInfo: action.payload.trustedContactsInfo,
+            backendTrustedContactsData: state.service.tc.trustedContacts,
+          } ),
+        }
   }
 
   return state
+}
+
+
+function reduceTCInfoIntoRecipientDescriptions( {
+  trustedContactsInfo,
+  backendTrustedContactsData,
+}: {
+  trustedContactsInfo: TrustedContactInfo[];
+  backendTrustedContactsData: Contacts;
+} ): ContactRecipientDescribing[] {
+  return trustedContactsInfo.reduce( (
+    accumulatedRecipients: ContactRecipientDescribing[],
+    currentTCInfoObject: TrustedContactInfo | null,
+    currentIndex: number,
+  ): ContactRecipientDescribing[] => {
+    if ( !currentTCInfoObject ) { return accumulatedRecipients }
+
+    // TODO: This is probably not a reliable/safe way to determine whether or not
+    // someone is a guardian.
+    const isGuardian = currentIndex < 3 ? true : false
+
+    const contactName = `${currentTCInfoObject.firstName} ${
+      currentTCInfoObject.lastName ? currentTCInfoObject.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
+
+    const backendTCInfo: ContactElements = backendTrustedContactsData[ contactName ]
+
+    const isWard: boolean = backendTCInfo && backendTCInfo.isWard || false
+    const hasTrustedAddress = Boolean( backendTCInfo && backendTCInfo.trustedAddress ) || Boolean( backendTCInfo && backendTCInfo.trustedTestAddress )
+    const walletName: string | null = backendTCInfo && backendTCInfo.contactsWalletName || null
+    const lastSeenActive: number | null = backendTCInfo && backendTCInfo.lastSeen || null
+    const initiatedAt: number | null = backendTCInfo && backendTCInfo?.ephemeralChannel?.initiatedAt || null
+    const hasTrustedChannelWithUser = Boolean( backendTCInfo && backendTCInfo.symmetricKey )
+
+
+    let trustKind: ContactTrustKind
+
+    // TODO: Figure out the meaning of these properties and whether or not this is
+    // actually the correct logic.
+    if ( isWard ) {
+      trustKind = ContactTrustKind.KEEPER_OF_USER
+    } else if ( isGuardian ) {
+      trustKind = ContactTrustKind.USER_IS_KEEPING
+    } else {
+      trustKind = ContactTrustKind.OTHER
+    }
+
+
+    let displayedName = `${currentTCInfoObject.firstName} ${currentTCInfoObject.lastName || ''}`
+      || walletName
+
+    // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
+    if ( displayedName &&
+      [
+        'f&f request',
+        'f&f request awaiting',
+        'f & f request',
+        'f & f request awaiting',
+      ].some( ( placeholder ) => displayedName.includes( placeholder ) )
+    ) {
+      displayedName = walletName
+    }
+
+
+    let recipientKind = RecipientKind.CONTACT
+
+    // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
+    if ( !displayedName ) {
+      recipientKind = RecipientKind.ADDRESS
+      displayedName = `${currentTCInfoObject.id || '@'}`
+    }
+
+    const avatarImageSource = currentTCInfoObject.imageAvailable ? currentTCInfoObject.image : null
+
+    const contactRecipient: ContactRecipientDescribing = {
+      id: currentTCInfoObject.id,
+      kind: recipientKind,
+      trustKind,
+      displayedName,
+      walletName,
+      avatarImageSource,
+      initiatedAt,
+      lastSeenActive,
+      hasTrustedAddress,
+      hasTrustedChannelWithUser,
+    }
+
+    return [
+      ...accumulatedRecipients,
+      contactRecipient,
+    ]
+  }, [] )
 }

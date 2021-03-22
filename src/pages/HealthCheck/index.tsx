@@ -18,7 +18,7 @@ import { widthPercentageToDP } from 'react-native-responsive-screen';
 import { RFValue } from 'react-native-responsive-fontsize';
 import KnowMoreButton from '../../components/KnowMoreButton';
 import { useDispatch, useSelector } from 'react-redux';
-import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
+import { initHealthCheck } from '../../store/actions/sss';
 import S3Service from '../../bitcoin/services/sss/S3Service';
 import HomePageShield from '../../components/HomePageShield';
 
@@ -169,6 +169,7 @@ export default function HealthCheck(props) {
       setPageData(updatedPageData);
     }
   }, [overallHealth]);
+
 
   return (
     <View style={{ flex: 1 }}>

@@ -1,4 +1,5 @@
-import { Platform, NativeModules, Alert } from 'react-native'
+import { Platform, NativeModules, Alert } from 'react-native';
+import { getFormattedString } from '../../common/CommonFunctions';
 
 const chunkArray = ( arr: any, n: any ) => {
   const chunkLength = Math.max( arr.length / n, 1 )
@@ -11,32 +12,20 @@ const chunkArray = ( arr: any, n: any ) => {
 }
 
 
-const getFormattedString = ( qrString: string ) => {
-  qrString = qrString.split( '"' ).join( 'Dquote' )
-  qrString = qrString.split( ':' ).join( 'Qutation' )
-  qrString = qrString.split( '{' ).join( 'Lbrace' )
-  qrString = qrString.split( '}' ).join( 'Rbrace' )
-  qrString = qrString.split( '/' ).join( 'Slash' )
-  qrString = qrString.split( ',' ).join( 'Comma' )
-  qrString = qrString.split( '\'' ).join( 'Squote' )
-  qrString = qrString.split( ' ' ).join( 'Space' )
-  return qrString
-}
-
-export default async ( pdfData, fileName, title, password ) => {
-  const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData
-  const qrcode: string[] = []
-  const qrCodeString: string[][] = []
-  qrData.forEach( ( qrString ) => {
-    qrcode.push( getFormattedString( qrString ) )
-    qrCodeString.push( qrString )
-  } )
-  const pdfDatas = {
+export default async (pdfData, fileName, title, password) => {
+  const { qrData, secondaryMnemonic, secondaryXpub, bhXpub } = pdfData;
+  const qrcode: string[] = [];
+  const qrCodeString: string[][] = [];
+  qrData.forEach((qrString) => {
+    qrcode.push(getFormattedString(qrString));
+    qrCodeString.push(qrString);
+  });
+  let pdfDatas = {
     title,
     fileName,
-    password,
     qrcode,
     qrCodeString,
+    password,
     secondaryXpub,
     secondaryMnemonic,
     bhXpub,

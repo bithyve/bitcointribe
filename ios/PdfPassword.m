@@ -26,9 +26,9 @@ RCT_EXPORT_METHOD(createPdf:(NSString *)pdfData
   PdfGenerate *pdf= [[PdfGenerate alloc]init];
   pdf.title = [json objectForKey:@"title"];
   pdf.pdfPath =[json objectForKey:@"fileName"];
-  pdf.password =[json objectForKey:@"password"];
   pdf.qrcode = [json objectForKey:@"qrcode"];
   pdf.qrCodeString =[json objectForKey:@"qrCodeString"];
+  pdf.password =[json objectForKey:@"password"];
   pdf.secondaryXpub = [json objectForKey:@"secondaryXpub"];
   pdf.twoFAQR = [json objectForKey:@"twoFAQR"];
   pdf.twoFASecret = [json objectForKey:@"twoFASecret"];
@@ -40,6 +40,23 @@ RCT_EXPORT_METHOD(createPdf:(NSString *)pdfData
   //return pdfPath;
 }
 
+RCT_EXPORT_METHOD(createPdfKeeper:(NSString *)pdfData
+                  get:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  NSLog(pdfData);
+  NSData *objectData = [pdfData dataUsingEncoding:NSUTF8StringEncoding];
+  NSDictionary *json = [NSJSONSerialization JSONObjectWithData:objectData options:0 error:nil];
+  PdfGenerate *pdf= [[PdfGenerate alloc]init];
+  pdf.title = [json objectForKey:@"title"];
+  pdf.pdfPath =[json objectForKey:@"fileName"];
+  pdf.qrcode = [json objectForKey:@"qrcode"];
+  pdf.qrCodeString =[json objectForKey:@"qrCodeString"];
+  NSString *pdfPath =  [pdf generatePdfKeeper];
+  NSLog(pdfPath);
+  resolve(pdfPath);
+  //return pdfPath;
+}
 
 
   

@@ -1,7 +1,11 @@
-import NavStyles from '../../common/Styles/NavStyles';
-import { NavigationScreenConfig } from 'react-navigation';
-import { NavigationStackOptions } from 'react-navigation-stack';
-import { Platform } from 'react-native';
+import NavStyles from '../../common/Styles/NavStyles'
+import { NavigationScreenConfig } from 'react-navigation'
+import { NavigationStackOptions } from 'react-navigation-stack'
+import { Platform } from 'react-native'
+
+
+export type NavigationOptions = NavigationScreenConfig<NavigationStackOptions, any>;
+
 
 const defaultStackScreenNavigationOptions: NavigationScreenConfig<NavigationStackOptions, any> = {
   headerTitleStyle: NavStyles.modalHeaderTitleText,
@@ -17,7 +21,7 @@ const defaultStackScreenNavigationOptions: NavigationScreenConfig<NavigationStac
   headerRightContainerStyle: {
     paddingRight: 16,
   },
-};
+}
 
 
-export default defaultStackScreenNavigationOptions;
+export default defaultStackScreenNavigationOptions

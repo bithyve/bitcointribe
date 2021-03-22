@@ -17,49 +17,14 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { ScrollView } from 'react-native-gesture-handler'
 import RecipientComponent from './RecipientComponent'
 import DeviceInfo from 'react-native-device-info'
-import { RecipientDescribing, makeSubAccountRecipientDescription, makeContactRecipientDescription } from '../../common/data/models/interfaces/RecipientDescribing'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP } from '../../common/constants/serviceTypes'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 export default function SendConfirmationContent( props ) {
-  const [ SelectedContactId, setSelectedContactId ] = useState( 0 )
-
-  const renderContacts = ( item: unknown ) => {
-    const selectedContactData = {
-      ...item.selectedContact,
-      amount: item.selectedContact.bitcoinAmount || item.bitcoinAmount, // https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605722649345500?thread_ts=1605718686.340700&cid=CEBLWDEKH
-    }
-
-    // TODO: This should already be computed
-    // ahead of time in the data passed to this screen.
-    let recipient: RecipientDescribing
-
-    // 🔑 This seems to be the way the backend is defining the "account kind".
-    // This should be refactored to leverage the new accounts structure
-    // in https://github.com/bithyve/hexa/tree/feature/account-management
-    const accountKind = {
-      'Checking Account': REGULAR_ACCOUNT,
-      'Savings Account': SECURE_ACCOUNT,
-      'Test Account': TEST_ACCOUNT,
-      'Donation Account': DONATION_ACCOUNT,
-      'Wyre': WYRE,
-      'Ramp': RAMP
-    }[ selectedContactData.account_name || 'Checking Account' ]
-
-    // 🔑 This seems to be the way the backend is distinguishing between
-    // accounts and contacts.
-    if ( selectedContactData.account_name != null ) {
-      recipient = makeSubAccountRecipientDescription(
-        selectedContactData,
-        accountKind,
-      )
-    } else {
-      recipient = makeContactRecipientDescription( selectedContactData )
-    }
-
+  const renderRecipientItem = ( recipient: RecipientDescribing ) => {
     return (
       <RecipientComponent
         recipient={recipient}
-        selectedContactId={String( SelectedContactId )}
+        selectedContactId={'0'}
         accountKind={props.accountKind}
       />
     )
@@ -67,7 +32,7 @@ export default function SendConfirmationContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white 
+      height: '100%', backgroundColor: Colors.white
     }}>
       <View
         style={{
@@ -78,16 +43,16 @@ export default function SendConfirmationContent( props ) {
       >
         <Text style={styles.modalTitleText}>{props.title}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1%' ) 
+          ...styles.modalInfoText, marginTop: wp( '1%' )
         }}>
           {props.info}
         </Text>
       </View>
 
       <ScrollView style={{
-        marginTop: hp( '1.5%' ), marginBottom: hp( '2%' ) 
+        marginTop: hp( '1.5%' ), marginBottom: hp( '2%' )
       }}>
-        {props.userInfo.map( ( item ) => renderContacts( item ) )}
+        {props.recipients.map( ( item ) => renderRecipientItem( item ) )}
       </ScrollView>
 
       {props.infoText && (
@@ -100,7 +65,7 @@ export default function SendConfirmationContent( props ) {
           }}
         >
           <Text style={{
-            ...styles.modalInfoText 
+            ...styles.modalInfoText
           }}>
             {props.infoText ? props.infoText : ''}
           </Text>
@@ -113,18 +78,18 @@ export default function SendConfirmationContent( props ) {
           alignItems: 'center',
           marginBottom:
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? wp( '5%' )
-              : wp( '15%' ),
+              ? wp( '2%' )
+              : wp( '2%' ),
         }}
       >
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
           style={{
-            ...styles.successModalButtonView 
+            ...styles.successModalButtonView
           }}
         >
           <Text style={styles.proceedButtonText}
-          onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
+            onPress={() => props.onPressOk()}>{props.okButtonText}</Text>
         </AppBottomSheetTouchableWrapper>
         {props.isCancel && (
           <AppBottomSheetTouchableWrapper
@@ -137,7 +102,7 @@ export default function SendConfirmationContent( props ) {
             }}
           >
             <Text style={{
-              ...styles.proceedButtonText, color: Colors.blue 
+              ...styles.proceedButtonText, color: Colors.blue
             }}>
               {props.cancelButtonText}
             </Text>
@@ -233,7 +198,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
@@ -274,7 +239,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   contactNameText: {

@@ -18,7 +18,7 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -263,7 +263,7 @@ const updatePrimarySubAccounts = (
           break
 
         case SubAccountKind.SERVICE:
-          switch( ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ){
+          switch ( ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
               case ServiceAccountKind.WYRE:
                 const { sourceKind, instanceNumber } = shell.primarySubAccount
                 let derivativeAccounts
@@ -277,7 +277,7 @@ const updatePrimarySubAccounts = (
                       break
                 }
                 const wyreAccounts: WyreDerivativeAccount =
-                derivativeAccounts[ DerivativeAccountTypes.WYRE ]
+              derivativeAccounts[ DerivativeAccountTypes.WYRE ]
                 const wyreInstance: WyreDerivativeAccountElements = wyreAccounts[ instanceNumber ]
 
                 if ( wyreInstance && wyreInstance.balances ) {
@@ -410,6 +410,7 @@ const updateSecondarySubAccounts = (
                     accountShellID: shell.id,
                     balances: dervBalances,
                     transactions: dervTransactions,
+                    isTFAEnabled: shell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
                   } )
                   break
 
@@ -419,7 +420,7 @@ const updateSecondarySubAccounts = (
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
-                    isTFAEnabled: shell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+                    isTFAEnabled: shell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT ? true : false,
                     balances: dervBalances,
                     transactions: dervTransactions,
                   } )

@@ -15,13 +15,15 @@ export interface OutputUTXOs {
   address: string;
 }
 
+export interface TransactionPrerequisiteElements {
+  inputs?: InputUTXOs[];
+  outputs?: OutputUTXOs[];
+  fee?: number;
+  estimatedBlocks?: number;
+}
+
 export interface TransactionPrerequisite {
-  [txnPriority: string]: {
-    inputs?: InputUTXOs[];
-    outputs: OutputUTXOs[];
-    fee: number;
-    estimatedBlocks: number;
-  };
+  [txnPriority: string]: TransactionPrerequisiteElements
 }
 
 export interface TransactionDetails {
@@ -58,6 +60,11 @@ export interface TransactionDetails {
    * Account(primary-sub) to which the transaction belongs
    */
   primaryAccType?: string;
+
+   /**
+   * Name of the account(custom) to which the transaction belongs
+   */
+  accountName?: string;
 
   /**
    * Name of the contact in case of an inbound transaction from trusted-contact
@@ -110,9 +117,12 @@ export interface MetaShare {
     tag: string;
     timestamp: string;
     reshareVersion: number;
+    questionId: string;
+    question?: string;
     guardian?: string;
+    encryptedKeeperInfo?: string;
   };
-  encryptedStaticNonPMDD: string;
+  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {
@@ -137,7 +147,7 @@ export interface BuddyStaticNonPMDD {
 export interface ShareUploadables {
   encryptedMetaShare: string;
   messageId: string;
-  encryptedDynamicNonPMDD: EncDynamicNonPMDD;
+  encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
 }
 
 export interface DerivativeAccountElements {
@@ -295,6 +305,13 @@ export interface DerivativeAccounts {
 
 export enum notificationType {
   contact = 'contact',
+  approveKeeper = 'approveKeeper',
+  uploadSecondaryShare = 'uploadSecondaryShare',
+  reShare = 'reShare',
+  reShareResponse = 'reShareResponse',
+  smUploadedForPK = 'smUploadedForPK',
+  newFCM = 'newFCM',
+  newKeeperInfo = 'newKeeperInfo',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -337,6 +354,7 @@ export interface EphemeralDataElements {
   };
   trustedAddress?: string;
   trustedTestAddress?: string;
+  restoreOf?: string;
 }
 
 export interface EphemeralData {
@@ -372,6 +390,19 @@ export interface TrustedDataElements {
   removeGuardian?: boolean;
   remove?: boolean;
   version?: string;
+  isPrimary?: boolean;
+  featuresList?: any;
+  xPub?: any;
+  securityQuestion?: any;
+  metaShare? : MetaShare;
+  pdfShare? : MetaShare;
+  secondaryMnemonics?: string;
+  twoFASetup?: {
+      qrData: string;
+      secret: string;
+  };
+  secondaryShare?: MetaShare[];
+  keeperInfo?: string;
 }
 export interface TrustedData {
   publicKey: string;
@@ -387,33 +418,34 @@ export interface EncryptedTrustedData {
   dataHash?: string; // hash of the encrypted TrustedData (TrustedData's encDataHash = dataHash)
 }
 
-export interface Contacts {
-  [contactName: string]: {
-    privateKey: string;
-    publicKey: string;
-    encKey: string;
-    otp?: string;
-    symmetricKey?: string;
-    secondaryKey?: string;
-    contactsPubKey?: string;
-    contactsWalletName?: string;
-    isWard?: boolean;
-    isGuardian?: boolean;
-    walletID?: string;
-    FCMs?: string[];
-    ephemeralChannel?: {
-      address: string;
-      initiatedAt?: number;
-      data?: EphemeralDataElements[];
-    };
-    trustedChannel?: {
-      address: string;
-      data?: TrustedData[];
-    };
-    lastSeen?: number;
-    trustedAddress?: string;
-    trustedTestAddress?: string;
+export interface ContactElements {
+  privateKey: string;
+  publicKey: string;
+  encKey: string;
+  otp?: string;
+  symmetricKey?: string;
+  secondaryKey?: string;
+  contactsPubKey?: string;
+  contactsWalletName?: string;
+  isWard?: boolean;
+  isGuardian?: boolean;
+  walletID?: string;
+  FCMs?: string[];
+  ephemeralChannel?: {
+    address: string;
+    initiatedAt?: number;
+    data?: EphemeralDataElements[];
   };
+  trustedChannel?: {
+    address: string;
+    data?: TrustedData[];
+  };
+  lastSeen?: number;
+  trustedAddress?: string;
+  trustedTestAddress?: string;
+}
+export interface Contacts {
+  [contactName: string]: ContactElements
 }
 
 export interface WalletImage {
@@ -434,6 +466,74 @@ export interface EncryptedImage {
   ASYNC_DATA?: string;
   STATE_DATA?: string;
 }
+
+export interface Keepers {
+  [shareId: string]: {
+    shareType?: string;
+    privateKey?: string;
+    publicKey?: string;
+    shareTransferDetails?: {
+      otp?: string;
+      encryptedKey?: string;
+    };
+    symmetricKey?: string;
+    secondaryKey?: string;
+    keeperPubKey?: string;
+    walletName?: string;
+    walletID?: string;
+    FCMs?: string[];
+    ephemeralChannel?: {
+      address: string;
+      initiatedAt?: number;
+      data?: EphemeralDataElements[];
+    };
+    trustedChannel?: {
+      address: string;
+      data?: TrustedData[];
+    };
+    keeperUUID?: string;
+    keeperFeatureList?: any[],
+    isPrimary?: Boolean
+  }
+}
+
+// TRUSTED Keeper
+export interface EphemeralDataElementsForKeeper {
+  publicKey?: string;
+  walletID?: string;
+  hexaID?: string;
+  FCM?: string;
+  DHInfo?: {
+    publicKey: string;
+    address?: string;
+  };
+  shareTransferDetails?: {
+    otp: string;
+    encryptedKey: string;
+  };
+  xPub? : any;
+  securityQuestion?: any;
+  featuresList?: any;
+  isPrimary?: boolean;
+}
+
+export interface EphemeralDataForKeeper {
+  publicKey: string;
+  data: EphemeralDataElementsForKeeper;
+}
+
+export interface LevelHealthInterface {
+  levelInfo: LevelInfo[];
+}
+
+export interface LevelInfo {
+  shareType: string;
+  updatedAt: number;
+  status: string;
+  shareId: string;
+  reshareVersion?: number;
+  name?: string;
+}
 //VersionHistory
 export interface VersionHistory {
   id: string;
@@ -444,6 +544,10 @@ export interface VersionHistory {
   date: Date;
 }
 
+export enum ScannedAddressKind {
+  ADDRESS = 'address',
+  PAYMENT_URI = 'paymentURI',
+}
 
 export interface AverageTxFees {
   [priority: string]: {

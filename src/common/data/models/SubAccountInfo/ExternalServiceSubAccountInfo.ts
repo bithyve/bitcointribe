@@ -17,8 +17,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
   defaultDescription?: string;
   serviceAccountKind: ServiceAccountKind;
 };
-export default class ExternalServiceSubAccountInfo
-implements ExternalServiceSubAccountDescribing {
+export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
   id: string;
   accountShellID: string | null;
   instanceNumber: number;
@@ -74,4 +73,5 @@ implements ExternalServiceSubAccountDescribing {
     this.transactions = transactions
     this.utxoCompatibilityGroup = utxoCompatibilityGroup
   }
+  avatarImageSource: ImageSourcePropType;
 }

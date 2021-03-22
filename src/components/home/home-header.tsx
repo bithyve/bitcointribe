@@ -188,7 +188,7 @@ const HomeHeader = ( {
           </View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate( 'ManageBackup' )
+              navigation.navigate('ManageBackup');
             }}
             style={styles.headerButton}
           >

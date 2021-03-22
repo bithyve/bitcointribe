@@ -42,7 +42,7 @@ import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import { SECURE_ACCOUNT } from '../../common/constants/serviceTypes'
+import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -156,10 +156,11 @@ const PersonalCopyHistory = ( props ) => {
       const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
       if ( blockPCShare ) {
         setBlockReshare( blockPCShare )
-      } else if ( !secureAccount.secureHDWallet.secondaryMnemonic ) {
-        AsyncStorage.setItem( 'blockPCShare', 'true' )
-        setBlockReshare( blockPCShare )
       }
+      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
+      //   AsyncStorage.setItem('blockPCShare', 'true');
+      //   setBlockReshare(blockPCShare);
+      // }
     } )()
   }, [] )
 
@@ -500,7 +501,7 @@ const PersonalCopyHistory = ( props ) => {
             const index = selectedPersonalCopy.type === 'copy1' ? 3 : 4
             dispatch( checkPDFHealth( qrData, index ) )
           } else if ( QRModalHeader === 'Reshare Personal Copy' ) {
-            let restored = false
+            const restored = false
             try {
               qrData = JSON.parse( qrData )
               if ( qrData.type && qrData.type === 'encryptedExitKey' ) {
@@ -508,9 +509,9 @@ const PersonalCopyHistory = ( props ) => {
                   qrData.encryptedExitKey,
                 )
                 if ( res.status === 200 ) {
-                  restored = secureAccount.restoreSecondaryMnemonic(
-                    res.data.decryptedStaticNonPMDD.secondaryMnemonic,
-                  ).restored
+                  // restored = secureAccount.restoreSecondaryMnemonic(
+                  //   res.data.decryptedStaticNonPMDD.secondaryMnemonic,
+                  // ).restored;
                 } else {
                   Alert.alert(
                     'Reshare failed',
@@ -518,12 +519,16 @@ const PersonalCopyHistory = ( props ) => {
                   )
                 }
               } else {
-                restored = secureAccount.restoreSecondaryMnemonic( qrData )
-                  .restored
+                // restored = secureAccount.restoreSecondaryMnemonic(qrData)
+                //   .restored;
               }
             } catch ( err ) {
-              restored = secureAccount.restoreSecondaryMnemonic( qrData )
-                .restored
+              // if secondary mnemonic parsing fails
+              console.log( {
+                err
+              } )
+              // restored = secureAccount.restoreSecondaryMnemonic(qrData)
+              //   .restored;
             }
 
             if ( restored ) {

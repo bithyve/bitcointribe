@@ -1,27 +1,26 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image, Alert } from 'react-native'
+import { View, Text, StyleSheet, Image } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 import ListStyles from '../../common/Styles/ListStyles'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import RecipientAddressTextInputSection from '../../components/send/RecipientAddressTextInputSection'
-import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/serviceTypes'
-import AccountShell from '../../common/data/models/AccountShell'
+import { REGULAR_ACCOUNT, TEST_ACCOUNT } from '../../common/constants/wallet-service-types'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { useDispatch, useSelector } from 'react-redux'
-import { addTransferDetails, clearTransfer } from '../../store/actions/accounts'
+import { clearTransfer } from '../../store/actions/accounts'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import { Button } from 'react-native-elements'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { ScrollView } from 'react-native-gesture-handler'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
-// TODO: The patterns here are meant to be the starting point for the way other
-// other screens that render QRCode scanners should lay out their components and
-// handle actions from the scanning.
+import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
+import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
+import { Satoshis } from '../../common/data/enums/UnitAliases'
+import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -39,9 +38,6 @@ const HeaderSection: React.FC = () => {
 
 const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
-  const accountShells: AccountShell[] = useSelector(
-    ( state ) => state.accounts.accountShells,
-  )
   const accountsState = useSelector( ( state ) => state.accounts, )
 
   function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
@@ -50,13 +46,11 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     if ( network ) {
       const serviceType =
         network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( dataString )
-
-      if ( type=='address' ) {
-        onSend( dataString, null, null )
-      } else if( type=='paymentURI' )  {
+      if ( type===ScannedAddressKind.ADDRESS ) {
+        onSend( dataString, 0 )
+      } else if( type===ScannedAddressKind.PAYMENT_URI )  {
         const res = service.decodePaymentURI( dataString )
         const address = res.address
         const options = res.options
@@ -67,11 +61,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           donationId = rawMessage.split( ':' ).pop().trim()
         }
 
-        const bitcoinAmount= options.amount
-          ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-          : ''
-
-        onSend( address, bitcoinAmount, donationId )
+        onSend( address, options.amount )
       }
       return
     }
@@ -85,37 +75,25 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     navigation.goBack( null )
   }
 
-  function onSend( address, bitcoinAmount, donationId ) {
-    const item = {
-      id: address,
-    }
-    dispatch( clearTransfer( REGULAR_ACCOUNT ) )
-
-    dispatch( addTransferDetails( REGULAR_ACCOUNT, {
-      selectedContact: item,
-    } ) )
-
-    let defaultAccountShell: AccountShell
-    accountShells.forEach( ( shell: AccountShell ) => {
-      if (
-        shell.primarySubAccount.kind === SubAccountKind.REGULAR_ACCOUNT &&
-        !shell.primarySubAccount.instanceNumber
-      )
-        defaultAccountShell = shell
+  function onSend( address: string, amount: Satoshis ) {
+    const recipient = makeAddressRecipientDescription( {
+      address
     } )
+
+    dispatch( clearTransfer( REGULAR_ACCOUNT ) )
+    dispatch( sourceAccountSelectedForSending(
+      accountsState.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
+    ) )
+    dispatch( addRecipientForSending( recipient ) )
+    dispatch( recipientSelectedForAmountSetting( recipient ) )
+    dispatch( amountForRecipientUpdated( {
+      recipient,
+      amount: amount < 1 ? amount * SATOSHIS_IN_BTC : amount
+    } ) )
 
     navigation.dispatch(
       resetStackToSend( {
-        accountShellID: defaultAccountShell.id,
-        selectedContact: item,
-        serviceType: REGULAR_ACCOUNT,
-        isFromAddressBook: true,
-        ...bitcoinAmount && {
-          bitcoinAmount
-        },
-        ...donationId && {
-          donationId
-        }
+        selectedRecipientID: recipient.id,
       } )
     )
   }
@@ -143,10 +121,10 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
             containerStyle={{
               margin: 0, padding: 0
             }}
-            placeholder="Enter Address Manually"
-            accountKind={REGULAR_ACCOUNT}
-            onAddressSubmitted={( address ) => {
-              onSend( address, null, null )
+            placeholder="Enter address manually"
+            sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
+            onAddressEntered={( address ) => {
+              onSend( address, 0 )
             }}
           />
         </View>
@@ -212,12 +190,6 @@ const styles = StyleSheet.create( {
     marginLeft: 'auto',
     padding: heightPercentageToDP( 1.5 ),
   },
-  // scannerContainer: {
-  //   alignSelf: 'center',
-  //   marginBottom: 16,
-  //   width: widthPercentageToDP(90),
-  //   height: widthPercentageToDP(90),
-  // },
 } )
 
 export default HomeQRScannerScreen

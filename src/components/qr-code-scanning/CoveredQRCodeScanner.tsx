@@ -1,44 +1,27 @@
 import React, { useState, useRef } from 'react'
-import { View, StyleSheet, TouchableOpacity, ImageBackground, ImageSourcePropType } from 'react-native'
+import { View, StyleSheet, ImageBackground, ImageSourcePropType } from 'react-native'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RNCamera } from 'react-native-camera'
+import { RNCamera, BarCodeReadEvent } from 'react-native-camera'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 
 export type Props = {
   containerStyle?: Record<string, unknown>;
   coverImageSource?: ImageSourcePropType;
-  onCodeScanned: ( scanEvent ) => void;
+  onCodeScanned: ( event: BarCodeReadEvent ) => void;
 };
 
 // TODO: Make the styling here a bit more readable 🙂.
 const CameraFrameIndicators: React.FC = () => {
   return (
     <>
-      <View
-        style={{
-          flexDirection: 'row', paddingTop: 12, paddingRight: 12, paddingLeft: 12, width: '100%'
-        }}
-      >
-        <View style={{
-          borderLeftWidth: 1, borderTopColor: 'white', borderLeftColor: 'white', height: heightPercentageToDP( '5%' ), width: heightPercentageToDP( '5%' ), borderTopWidth: 1
-        }} />
-
-        <View style={{
-          borderTopWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderTopColor: 'white', height: heightPercentageToDP( '5%' ), width: heightPercentageToDP( '5%' ), marginLeft: 'auto'
-        }} />
+      <View style={styles.view1}>
+        <View style={styles.view2} />
+        <View style={styles.view3} />
       </View>
 
-      <View style={{
-        marginTop: 'auto', flexDirection: 'row', paddingBottom: 12, paddingRight: 12, paddingLeft: 12, width: '100%',
-      }}>
-
-        <View style={{
-          borderLeftWidth: 1, borderBottomColor: 'white', borderLeftColor: 'white', height: heightPercentageToDP( '5%' ), width: heightPercentageToDP( '5%' ), borderBottomWidth: 1
-        }} />
-
-        <View style={{
-          borderBottomWidth: 1, borderRightWidth: 1, borderRightColor: 'white', borderBottomColor: 'white', height: heightPercentageToDP( '5%' ), width: heightPercentageToDP( '5%' ), marginLeft: 'auto'
-        }} />
+      <View style={styles.view4}>
+        <View style={styles.view5} />
+        <View style={styles.view6} />
       </View>
     </>
   )
@@ -47,14 +30,21 @@ const CameraFrameIndicators: React.FC = () => {
 const CoveredQRCodeScanner: React.FC<Props> = ( {
   containerStyle = {
   },
-  coverImageSource = require( '../../assets/images/icons/iPhone-QR.jpg' ),
+  coverImageSource = require( '../../assets/images/icons/iPhone-QR.png' ),
   onCodeScanned,
 }: Props ) => {
   const [ isCameraOpen, setIsCameraOpen ] = useState( false )
 
   const CameraCover: React.FC = () => {
     return (
-      <AppBottomSheetTouchableWrapper onPress={() => setIsCameraOpen( true )} >
+      <AppBottomSheetTouchableWrapper onPress={() => {
+        setIsCameraOpen(true)
+        // let data ={
+        //   key: "a9a1a6b7f20c58a55f83c949",
+        //   name: 'primaryk'
+        // }
+        // onCodeScanned(data)
+        }} >
         <ImageBackground
           source={coverImageSource}
           style={{
@@ -81,8 +71,8 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
           style={{
             flex: 1,
           }}
-          onBarCodeRead={( data ) => {
-            onCodeScanned( data )
+          onBarCodeRead={( event: BarCodeReadEvent ) => {
+            onCodeScanned( event )
             setIsCameraOpen( false )
           }}
           captureAudio={false}
@@ -108,6 +98,53 @@ const styles = StyleSheet.create( {
     width: widthPercentageToDP( 90 ),
     height: widthPercentageToDP( 90 ),
   },
-} )
+  view1:{ flexDirection: 'row', 
+  paddingTop: 12, 
+  paddingRight: 12, 
+  paddingLeft: 12, 
+  width: '100%' 
+},
+  view2: { 
+    borderLeftWidth: 1, 
+    borderTopColor: 'white', 
+    borderLeftColor: 'white', 
+    height: heightPercentageToDP('5%'), 
+    width: heightPercentageToDP('5%'), 
+    borderTopWidth: 1 
+  },
+  view3:{ borderTopWidth: 1, 
+    borderRightWidth: 1, 
+    borderRightColor: 'white', 
+    borderTopColor: 'white', 
+    height: heightPercentageToDP('5%'), 
+    width: heightPercentageToDP('5%'), 
+    marginLeft: 'auto' 
+  },
+  view4: { 
+    marginTop: 'auto', 
+  flexDirection: 'row', 
+  paddingBottom: 12, 
+  paddingRight: 12, 
+  paddingLeft: 12, 
+  width: '100%', 
+},
+view5: { 
+  borderLeftWidth: 1,
+  borderBottomWidth: 1, 
+  borderBottomColor: 'white', 
+  borderLeftColor: 'white', 
+  height: heightPercentageToDP('5%'), 
+  width: heightPercentageToDP('5%'), 
+},
+view6: { 
+  borderBottomWidth: 1, 
+  borderRightWidth: 1, 
+  borderRightColor: 'white', 
+  borderBottomColor: 'white', 
+  height: heightPercentageToDP('5%'), 
+  width: heightPercentageToDP('5%'), 
+  marginLeft: 'auto',
+}
+});
 
 export default CoveredQRCodeScanner
