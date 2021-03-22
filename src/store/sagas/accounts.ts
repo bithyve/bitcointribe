@@ -6,13 +6,11 @@ import {
   ACCUMULATIVE_BAL_AND_TX,
   testcoinsReceived,
   accountsSynched,
-  settedDonationAccount,
   FETCH_BALANCE_TX,
   GENERATE_SECONDARY_XPRIV,
   RESET_TWO_FA,
   twoFAResetted,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
-  REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
@@ -615,7 +613,6 @@ function* setupDonationAccountWorker( { payload } ) {
     // console.log( { res } )
     const { setupSuccessful, accountId, accountNumber } = res.data
     if ( !setupSuccessful ) {
-      yield put( settedDonationAccount( serviceType, false ) )
       throw new Error( 'Donation account setup failed' )
     }
 
@@ -629,7 +626,7 @@ function* setupDonationAccountWorker( { payload } ) {
         SERVICES: updatedSERVICES
       }
     } )
-    yield put( settedDonationAccount( serviceType, true ) )
+
     return {
       accountId, accountNumber
     }

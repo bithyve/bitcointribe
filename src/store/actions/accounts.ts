@@ -543,14 +543,6 @@ export const twoFAResetted = ( resetted ) => {
   }
 }
 
-export const settedDonationAccount = ( serviceType, successful ) => {
-  return {
-    type: SETTED_DONATION_ACC, payload: {
-      serviceType, successful
-    }
-  }
-}
-
 export const newAccountShellAddFailed = ( {
   accountShell,
   error,

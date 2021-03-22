@@ -6,8 +6,6 @@ import {
   SECONDARY_XPRIV_GENERATED,
   TWO_FA_RESETTED,
   AVERAGE_TX_FEE,
-  SETTED_DONATION_ACC,
-  SETUP_DONATION_ACCOUNT,
   ADD_NEW_ACCOUNT_SHELL,
   NEW_ACCOUNT_SHELL_ADDED,
   NEW_ACCOUNT_ADD_FAILED,
@@ -52,12 +50,6 @@ import SyncStatus from '../../common/data/enums/SyncStatus'
 
 export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
-  receivingAddress: string;
-  balances: {
-    balance: number;
-    unconfirmedBalance: number;
-  };
-  transactions: any;
   loading: {
     receivingAddress: boolean;
     balances: boolean;
@@ -67,22 +59,11 @@ export type AccountVars = {
     transfer: boolean;
     testcoins: boolean;
   };
-  donationAccount: {
-    settedup: boolean;
-    loading: boolean;
-  };
 }
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: AccountVars  = {
   service: null,
-  receivingAddress: '',
-  balances: {
-    balance: 0,
-    unconfirmedBalance: 0,
-  },
-  transactions: {
-  },
   loading: {
     receivingAddress: false,
     balances: false,
@@ -92,28 +73,22 @@ const ACCOUNT_VARS: AccountVars  = {
     transfer: false,
     testcoins: false,
   },
-  donationAccount: {
-    settedup: false,
-    loading: false,
-  },
 }
 
 export type AccountsState = {
   servicesEnriched: boolean;
   accountsSynched: boolean;
-
-  // TODO: Consider separating this into another reducer -- I'm not
-  // sure it's really a concern of the "Accounts state".
-  exchangeRates?: any;
-
   accountShells: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
   // up account data from `activeAccounts` using a UUID.
-  REGULAR_ACCOUNT: any;
-  TEST_ACCOUNT: any;
-  SECURE_ACCOUNT: any;
+  REGULAR_ACCOUNT: AccountVars;
+  TEST_ACCOUNT: AccountVars;
+  SECURE_ACCOUNT: AccountVars;
 
+  // TODO: Consider separating this into another reducer -- I'm not
+  // sure it's really a concern of the "Accounts state".
+  exchangeRates?: any;
   averageTxFees: any;
 
   // TODO: How does this differ from ANY added account?
@@ -291,31 +266,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
           averageTxFees: action.payload.averageTxFees,
-        }
-
-      case SETUP_DONATION_ACCOUNT:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            donationAccount: {
-              settedup: false,
-              loading: true,
-            },
-          },
-        }
-
-      case SETTED_DONATION_ACC:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            donationAccount: {
-              ...state[ accountType ].donationAccount,
-              settedup: action.payload.successful,
-              loading: false,
-            },
-          },
         }
 
       case ADD_NEW_ACCOUNT_SHELL:
