@@ -1218,6 +1218,7 @@ class ManageBackupNewBHR extends Component<
                                         : Colors.white,
                                     fontSize: RFValue(11),
                                     marginLeft: wp("3%"),
+                                    marginRight: wp("1%"),
                                   } }
                                   numberOfLines={1}
                                 >
@@ -1299,6 +1300,7 @@ class ManageBackupNewBHR extends Component<
                                         ? Colors.textColorGrey
                                         : Colors.white,
                                         marginLeft: wp("3%"),
+                                        marginRight: wp("1%"),
                                   }}
                                   numberOfLines={1}
                                 >
