@@ -41,6 +41,7 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
+//import { setCloudData } from '../store/actions/cloud'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -85,8 +86,7 @@ export default function NewWalletQuestion( props ) {
   const accounts = useSelector( ( state ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
   const s3service = useSelector( ( state ) => state.health.service );
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth );
-
+  
   
   useEffect( () => {
     ( async () => {
@@ -135,23 +135,23 @@ export default function NewWalletQuestion( props ) {
       // balances.testBalance &&
       // transactions.length > 0
     ) {
-      ( loaderBottomSheet as any ).current.snapTo( 0 )
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
       dispatch( walletCheckIn() ) // fetches exchange rates
-      props.navigation.navigate( 'HomeNav' )
+      dispatch(initializeHealthSetup());
     }
   }, [ isInitialized ] )
 
   useEffect( () => {
     if(s3service){
     const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( healthCheckInitializedKeeper === false) {
-      dispatch(initializeHealthSetup());
+    if ( healthCheckInitializedKeeper === true) {
+      ( loaderBottomSheet as any ).current.snapTo( 0 )
+     // dispatch(setCloudData());
+      props.navigation.navigate( 'HomeNav' );
     }
   }
   }, [ s3service ] );
 
-  
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
 
