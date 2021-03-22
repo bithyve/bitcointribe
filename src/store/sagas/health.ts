@@ -133,6 +133,7 @@ import { personalNodeConfigurationSet } from "../actions/nodeSettings";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 import Toast from "../../components/Toast";
 import { restoredVersionHistory } from "../actions/versionHistory";
+import { getVersions } from '../../common/utilities';
 
 function* initHealthWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -629,7 +630,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     yield put( walletRecoveryFailed( true ) )
     // Alert.alert('Wallet recovery failed!', err.message);
   }
-  yield put( walletImageChecked( true ) )
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
 }
 
@@ -1172,44 +1172,52 @@ export const cloudMetaShareHealthWatcher = createWatcher(
 function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
+  const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+
   const versionHistory = yield select(
     ( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
   )
+  const restoreVersions = yield select(
+    ( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) )
+
+  const versions = getVersions( versionHistory, restoreVersions )
 
   const STATE_DATA = {
   }
+
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if( activePersonalNode )
+  if ( trustedContactsInfo && trustedContactsInfo.length )
+    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+
+  if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
-  if ( versionHistory && versionHistory.length )
-    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+  if ( versions && versions.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versions )
+
   return STATE_DATA
 }
 
 const asyncDataToBackup = async () => {
   const [
-    [ , TrustedContactsInfo ],
     [ , personalCopyDetails ],
     [ , FBTCAccount ],
     [ , PersonalNode ]
   ] = await AsyncStorage.multiGet( [
-    'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
     'PersonalNode'
   ] )
   const ASYNC_DATA = {
   }
-  if ( TrustedContactsInfo )
-    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+
   if ( personalCopyDetails )
     ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
   if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
-  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
+  if ( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
 
   return ASYNC_DATA
 }

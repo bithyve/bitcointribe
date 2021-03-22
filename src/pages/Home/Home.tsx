@@ -64,9 +64,6 @@ import {
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
-  isEmpty,
-  buildVersionExists,
-  CloudData,
   getKeeperInfoFromShareId,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'

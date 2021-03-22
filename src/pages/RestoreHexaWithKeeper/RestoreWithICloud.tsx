@@ -171,13 +171,13 @@ class RestoreWithICloud extends Component<
       checkMSharesHealth,
       walletRecoveryFailed,
     } = this.props;
-    if (SERVICES && prevProps.walletImageChecked != walletImageChecked) {
+    if (SERVICES && prevProps.walletImageChecked !== walletImageChecked) {
       await AsyncStorage.setItem("walletExists", "true");
       await AsyncStorage.setItem("walletRecovered", "true");
       checkMSharesHealth();
       if (this.refs.loaderBottomSheet as any)
         (this.refs.loaderBottomSheet as any).snapTo(0);
-      this.props.navigation.navigate("Home");
+      this.props.navigation.navigate( 'HomeNav' )
     }
 
     if (

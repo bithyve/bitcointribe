@@ -85,36 +85,36 @@ export const generateRandomString = (length: number): string => {
 
 const asyncDataToBackup = async () => {
   const [
-    [ , TrustedContactsInfo ],
     [ , personalCopyDetails ],
     [ , FBTCAccount ],
     [ , PersonalNode ]
   ] = await AsyncStorage.multiGet( [
-    'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
     'PersonalNode'
   ] )
   const ASYNC_DATA = {
   }
-  if ( TrustedContactsInfo )
-    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+
   if ( personalCopyDetails )
     ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
   if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
-  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
+  if ( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
 
   return ASYNC_DATA
 }
 
-function* stateDataToBackup(accountShells, activePersonalNode, versionHistory) {
+function* stateDataToBackup(accountShells, activePersonalNode, versionHistory, trustedContactsInfo) {
   // state data to backup
   const STATE_DATA = {
   }
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if( activePersonalNode )
+  if ( trustedContactsInfo && trustedContactsInfo.length )
+    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+
+  if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
   if ( versionHistory && versionHistory.length )
@@ -122,7 +122,7 @@ function* stateDataToBackup(accountShells, activePersonalNode, versionHistory) {
 
   return STATE_DATA
 }
-export const CloudData = async (database, accountShells, activePersonalNode,versionHistory) => {
+export const CloudData = async (database, accountShells, activePersonalNode, versionHistory, trustedContactsInfo) => {
   let encryptedCloudDataJson;
     let walletImage = {
       SERVICES: {},
@@ -141,7 +141,7 @@ export const CloudData = async (database, accountShells, activePersonalNode,vers
       if (database.WALLET_SETUP)
         walletImage.WALLET_SETUP = database.WALLET_SETUP;
       walletImage.ASYNC_DATA = await asyncDataToBackup();
-      walletImage.STATE_DATA = stateDataToBackup(accountShells, activePersonalNode, versionHistory);
+      walletImage.STATE_DATA = stateDataToBackup(accountShells, activePersonalNode, versionHistory, trustedContactsInfo);
       let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
       CloudDataJson = {
         walletImage,
