@@ -1,6 +1,4 @@
 import { Action } from 'redux'
-import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -461,7 +459,6 @@ export const accountShellOrderedToFront = (
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
-export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING'
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED'
 export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED'
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
@@ -492,14 +489,6 @@ export const transactionsFetched = ( serviceType, transactions ) => {
   return {
     type: TRANSACTIONS_FETCHED, payload: {
       serviceType, transactions
-    }
-  }
-}
-
-export const switchLoader = ( serviceType, beingLoaded ) => {
-  return {
-    type: ACCOUNTS_LOADING, payload: {
-      serviceType, beingLoaded
     }
   }
 }

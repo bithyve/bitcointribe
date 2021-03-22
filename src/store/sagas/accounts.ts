@@ -1,7 +1,6 @@
 import { call, delay, put, select, spawn } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
-  switchLoader,
   GET_TESTCOINS,
   ACCUMULATIVE_BAL_AND_TX,
   testcoinsReceived,
@@ -98,8 +97,8 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
   // delta txs(hard refresh)
   const txsFound: TransactionDescribing[] = []
 
-  if ( payload.options.loader )
-    yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+  // if ( payload.options.loader )
+  //   yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   const service = payload.options.service
     ? payload.options.service
     : yield select( ( state ) => state.accounts[ payload.serviceType ].service )
@@ -185,7 +184,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
 
   if ( payload.options.loader ) {
     // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
-    yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+    // yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   }
 
   return txsFound
@@ -200,7 +199,7 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   let { serviceType, accountNumber, accountType, hardRefresh, blindRefresh } = payload
   const dervTxsFound: TransactionDescribing[] = []
 
-  yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
+  // yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
 
   if ( !accountNumber ) accountNumber = 1
@@ -242,9 +241,9 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
         SERVICES: updatedSERVICES
       }
     } )
-    yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
+    // yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   } else if ( res.status !== 200 ) {
-    yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
+    // yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
 
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     throw new Error( 'Failed to fetch balance/transactions from the indexer' )
@@ -322,7 +321,7 @@ function* syncDerivativeAccountsWorker( { payload }: { payload: { serviceTypes: 
 }
 
 function* syncViaXpubAgentWorker( { payload } ) {
-  yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+  // yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
 
   const { serviceType, derivativeAccountType, accountNumber } = payload
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
@@ -371,7 +370,7 @@ function* syncViaXpubAgentWorker( { payload } ) {
     console.log( 'Failed to sync derivative account' )
   }
 
-  yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+  // yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
 }
 
 export const syncViaXpubAgentWatcher = createWatcher(
@@ -414,8 +413,6 @@ export const generateSecondaryXprivWatcher = createWatcher(
 
 
 function* testcoinsWorker( { payload } ) {
-  yield put( switchLoader( payload.serviceType, 'testcoins' ) )
-
   const service = yield select(
     ( state ) => state.accounts[ payload.serviceType ].service
   )
@@ -440,7 +437,6 @@ function* testcoinsWorker( { payload } ) {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     throw new Error( 'Failed to get testcoins' )
   }
-  yield put( switchLoader( payload.serviceType, 'testcoins' ) )
 }
 
 export const testcoinsWatcher = createWatcher( testcoinsWorker, GET_TESTCOINS )

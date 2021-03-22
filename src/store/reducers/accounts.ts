@@ -1,5 +1,4 @@
 import {
-  ACCOUNTS_LOADING,
   TESTCOINS_RECEIVED,
   ACCOUNTS_SYNCHED,
   EXCHANGE_RATE_CALCULATED,
@@ -50,29 +49,11 @@ import SyncStatus from '../../common/data/enums/SyncStatus'
 
 export type AccountVars = {
   service: RegularAccount | TestAccount | SecureAccount;
-  loading: {
-    receivingAddress: boolean;
-    balances: boolean;
-    transactions: boolean;
-    balanceTx: boolean;
-    derivativeBalanceTx: boolean;
-    transfer: boolean;
-    testcoins: boolean;
-  };
 }
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
 const ACCOUNT_VARS: AccountVars  = {
   service: null,
-  loading: {
-    receivingAddress: false,
-    balances: false,
-    transactions: false,
-    balanceTx: false,
-    derivativeBalanceTx: false,
-    transfer: false,
-    testcoins: false,
-  },
 }
 
 export type AccountsState = {
@@ -202,21 +183,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             },
             servicesEnriched: true,
             accountShells: updateAccountShells( services, state.accountShells ),
-          }
-
-      case ACCOUNTS_LOADING:
-        if ( state[ accountType ] )
-          return {
-            ...state,
-            [ accountType ]: {
-              ...state[ accountType ],
-              loading: {
-                ...state[ accountType ].loading,
-                [ action.payload.beingLoaded ]: !state[ accountType ].loading[
-                  action.payload.beingLoaded
-                ],
-              },
-            },
           }
 
       case ACCOUNTS_SYNCHED:
