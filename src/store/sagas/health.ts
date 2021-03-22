@@ -1433,10 +1433,15 @@ function* fetchWalletImageWorker( { payload } ) {
       hashesWI[ key ] = hash( walletImage[ key ] )
     } )
     yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
-  } else {
+    yield put( walletImageChecked( true ) )
+  }else {
+    console.log( {
+      err: res.err
+    } )
+    yield put( walletImageChecked( false ) )
+    yield put( ErrorReceiving( true ) )
     console.log( 'Failed to fetch Wallet Image' )
   }
-  yield put( walletImageChecked( true ) )
 } catch (error) {
     console.log("ERROR",error);
 }

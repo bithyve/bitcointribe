@@ -115,6 +115,7 @@ interface RestoreWithICloudPropsTypes {
   walletRecoveryFailed: boolean;
   requestShare: any;
   downloadMetaShare: Boolean;
+  errorReceiving: Boolean;
 }
 
 class RestoreWithICloud extends Component<
@@ -191,6 +192,12 @@ class RestoreWithICloud extends Component<
     }
 
     if (prevProps.walletRecoveryFailed !== walletRecoveryFailed) {
+      if (this.refs.loaderBottomSheet as any)
+        (this.refs.loaderBottomSheet as any).snapTo(0);
+    }
+
+    if(prevProps.errorReceiving !== this.props.errorReceiving && this.props.errorReceiving === true){
+      this.setState({showLoader: false});
       if (this.refs.loaderBottomSheet as any)
         (this.refs.loaderBottomSheet as any).snapTo(0);
     }
@@ -1199,6 +1206,8 @@ const mapStateToProps = (state) => {
     walletRecoveryFailed: idx(state, (_) => _.health.walletRecoveryFailed),
     DECENTRALIZED_BACKUP:
       idx(state, (_) => _.storage.database.DECENTRALIZED_BACKUP) || {},
+    errorReceiving:
+      idx(state, (_) => _.health.errorReceiving) || {},
     downloadMetaShare: idx(state, (_) => _.health.loading.downloadMetaShare),
   };
 };
