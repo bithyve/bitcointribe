@@ -22,7 +22,8 @@ function* cloudWorker( { payload } ) {
       const accountShells = yield select( ( state ) => state.accounts.accountShells )
       const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
       const versionHistory = yield select( ( state ) => state.versionHistory.versions )
-      
+      const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
+
       let encryptedCloudDataJson
       const shares =
             share &&
@@ -33,7 +34,8 @@ function* cloudWorker( { payload } ) {
         database,
         accountShells,
         activePersonalNode,
-        versionHistory
+        versionHistory,
+        trustedContactsInfo
       )
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
 

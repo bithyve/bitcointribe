@@ -133,6 +133,7 @@ import { personalNodeConfigurationSet } from "../actions/nodeSettings";
 import TestAccount from "../../bitcoin/services/accounts/TestAccount";
 import Toast from "../../components/Toast";
 import { restoredVersionHistory } from "../actions/versionHistory";
+import { getVersions } from '../../common/utilities';
 
 function* initHealthWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -592,37 +593,22 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     WALLET_SETUP,
     DECENTRALIZED_BACKUP,
     ASYNC_DATA,
-  } = payload.icloudData.walletImage
-
+  } = payload.icloudData.walletImage;
+  let restorationShares: MetaShare[] = [];
+  let mnemonics = JSON.parse(SERVICES.S3_SERVICE).levelhealth.mnemonic; 
+  console.log("mnemonics",mnemonics);
   try {
-    if (ASYNC_DATA) {
-      for (const key of Object.keys(ASYNC_DATA)) {
-        console.log("restoring to async: ", key);
-        yield call(AsyncStorage.setItem, key, ASYNC_DATA[key]);
+    const { s3Service, } = yield call(
+      serviceGeneratorForNewBHR,
+      WALLET_SETUP.security.answer,
+      mnemonics,
+      restorationShares,
+      payload.icloudData
+    )
+    console.log( 's3Service', s3Service )
+    
+    yield put( fetchWalletImage( s3Service ) )
 
-        if (key === "TrustedContactsInfo" && ASYNC_DATA[key]) {
-          const trustedContactsInfo = JSON.parse(ASYNC_DATA[key]);
-          yield put(updateTrustedContactsInfoLocally(trustedContactsInfo));
-        }
-      }
-    }
-
-    const payload = {
-      SERVICES, DECENTRALIZED_BACKUP
-    }
-    //console.log("payload afshjkfhdfjhf", payload);
-    // update hashes
-    const hashesWI = {
-    }
-    Object.keys( payload ).forEach( ( key ) => {
-      hashesWI[ key ] = hash( payload[ key ] )
-    } )
-    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
-    yield call( insertDBWorker, {
-      payload
-    } )
-    yield delay( 2000 )
-    const s3Service = JSON.parse( SERVICES.S3_SERVICE )
     yield call(
       AsyncStorage.setItem,
       'walletID',
@@ -644,7 +630,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
     yield put( walletRecoveryFailed( true ) )
     // Alert.alert('Wallet recovery failed!', err.message);
   }
-  yield put( walletImageChecked( true ) )
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
 }
 
@@ -1187,44 +1172,52 @@ export const cloudMetaShareHealthWatcher = createWatcher(
 function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
+  const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
+
   const versionHistory = yield select(
     ( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
   )
+  const restoreVersions = yield select(
+    ( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) ) )
+
+  const versions = getVersions( versionHistory, restoreVersions )
 
   const STATE_DATA = {
   }
+
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if( activePersonalNode )
+  if ( trustedContactsInfo && trustedContactsInfo.length )
+    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+
+  if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
 
-  if ( versionHistory && versionHistory.length )
-    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+  if ( versions && versions.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versions )
+
   return STATE_DATA
 }
 
 const asyncDataToBackup = async () => {
   const [
-    [ , TrustedContactsInfo ],
     [ , personalCopyDetails ],
     [ , FBTCAccount ],
     [ , PersonalNode ]
   ] = await AsyncStorage.multiGet( [
-    'TrustedContactsInfo',
     'personalCopyDetails',
     'FBTCAccount',
     'PersonalNode'
   ] )
   const ASYNC_DATA = {
   }
-  if ( TrustedContactsInfo )
-    ASYNC_DATA[ 'TrustedContactsInfo' ] = TrustedContactsInfo
+
   if ( personalCopyDetails )
     ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
   if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
-  if( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
+  if ( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
 
   return ASYNC_DATA
 }
@@ -1335,6 +1328,7 @@ export const updateWalletImageHealthWatcher = createWatcher(
 )
 
 function* fetchWalletImageWorker( { payload } ) {
+  try {
   const s3Service: S3Service = payload.s3Service
 
   const res = yield call( s3Service.fetchWalletImageKeeper )
@@ -1443,6 +1437,9 @@ function* fetchWalletImageWorker( { payload } ) {
     console.log( 'Failed to fetch Wallet Image' )
   }
   yield put( walletImageChecked( true ) )
+} catch (error) {
+    console.log("ERROR",error);
+}
 }
 
 export const fetchWalletImageHealthWatcher = createWatcher(
