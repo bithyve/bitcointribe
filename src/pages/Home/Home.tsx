@@ -64,9 +64,6 @@ import {
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
-  isEmpty,
-  buildVersionExists,
-  CloudData,
   getKeeperInfoFromShareId,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -866,7 +863,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     )
     console.log( 's3Service', s3Service )
     const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( !healthCheckInitializedKeeper ) {
+    if ( healthCheckInitializedKeeper === false) {
       initializeHealthSetup()
     }
 

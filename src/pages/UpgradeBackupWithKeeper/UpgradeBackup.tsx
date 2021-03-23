@@ -278,7 +278,7 @@ class UpgradeBackup extends Component<
   cloudBackup = () => {
     const { s3Service, initializeHealthSetup } = this.props
     const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( !healthCheckInitializedKeeper ) {
+    if ( healthCheckInitializedKeeper === false) {
       initializeHealthSetup()
     }
   };

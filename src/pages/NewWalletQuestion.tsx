@@ -145,7 +145,7 @@ export default function NewWalletQuestion( props ) {
   useEffect( () => {
     if(s3service){
     const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( !healthCheckInitializedKeeper ) {
+    if ( healthCheckInitializedKeeper === false) {
       dispatch(initializeHealthSetup());
     }
   }

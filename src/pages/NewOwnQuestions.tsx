@@ -176,7 +176,7 @@ export default function NewOwnQuestions( props ) {
 
   useEffect( () => {
     const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( !healthCheckInitializedKeeper ) {
+    if ( healthCheckInitializedKeeper === false) {
       dispatch(initializeHealthSetup());
     }
   }, [ s3service ] );
