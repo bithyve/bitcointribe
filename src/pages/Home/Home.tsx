@@ -198,6 +198,8 @@ interface HomePropsTypes {
   exchangeRates?: any[];
 
   accountsState: AccountsState;
+  cloudPermissionGranted: any;
+
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
 
@@ -983,7 +985,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = ( prevProps ) => {
-    if ( this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
+    if ( this.props.cloudPermissionGranted && this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
       this.props.setCloudData( this.setCloudBackupStatusCallBack )
     }
 
@@ -2524,6 +2526,7 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications,
     accountsState: state.accounts,
+    cloudPermissionGranted: state.health.cloudPermissionGranted,
     currentWyreSubAccount: state.accounts.currentWyreSubAccount,
     currentRampSubAccount: state.accounts.currentRampSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
