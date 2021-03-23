@@ -40,6 +40,7 @@ import {
 
 import {
   initSetupWatcher,
+  initDBHydrationWatcher,
   initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
@@ -200,6 +201,7 @@ const rootSaga = function* () {
 
     // wallet setup watcher
     initSetupWatcher,
+    initDBHydrationWatcher,
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,

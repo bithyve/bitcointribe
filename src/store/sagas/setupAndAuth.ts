@@ -6,6 +6,7 @@ import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 import {
   INIT_SETUP,
+  INITIAL_DB_HYDRATION,
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
@@ -18,6 +19,7 @@ import {
   credsChanged,
   pinChangedFailed,
   setIsNewHealthSystemSet,
+  databaseInitialised,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
@@ -25,64 +27,43 @@ import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 // import { timer } from '../../utils'
 
-function* initSetupWorker( { payload } ) {
-  yield put( switchSetupLoader( 'initializing' ) )
-
-  const { walletName, security } = payload;
-  let accountData = {
-    regularAcc: {},
-    testAcc: {},
-    secureAcc: {},
-    s3Service: {},
-    trustedContacts: {},
-    keepersInfo: {}
-  }
-  // let isNewSetup = false;
-  // if(isNewSetup){
-  //   yield put(setIsNewHealthSystemSet(true))
-  //   accountData = yield call( serviceGenerator2, security.answer )
-  // }else{
-  //   yield put(setIsNewHealthSystemSet(false))
-  //   accountData = yield call( serviceGenerator, security.answer )
-  // }
-  yield put(setIsNewHealthSystemSet(true))
-  accountData = yield call( serviceGeneratorForNewBHR, security.answer )
+function* initDBHydrationWorker() {
+  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
   const initialDatabase: Database = {
-    WALLET_SETUP: {
-      walletName, security 
-    },
     DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {},
-      SHARES_TRANSFER_DETAILS: {},
-      UNDER_CUSTODY: {},
-      DYNAMIC_NONPMDD: {},
-      // PK_SHARE: {}
+      RECOVERY_SHARES: {
+      },
+      SHARES_TRANSFER_DETAILS: {
+      },
+      UNDER_CUSTODY: {
+      },
+      DYNAMIC_NONPMDD: {
+      },
     },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( accountData.regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( accountData.testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( accountData.secureAcc ),
-      S3_SERVICE: JSON.stringify( accountData.s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( accountData.trustedContacts ),
-      KEEPERS_INFO: JSON.stringify( accountData.keepersInfo ),
+      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
+      TEST_ACCOUNT: JSON.stringify( testAcc ),
+      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
+      S3_SERVICE: JSON.stringify( s3Service ),
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      KEEPERS_INFO: JSON.stringify( keepersInfo ),
     },
     VERSION: DeviceInfo.getVersion(),
   }
   yield call( insertDBWorker, {
-    payload: initialDatabase 
+    payload: initialDatabase
   } )
-  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-  yield put( setupInitialized() )
+  yield put( databaseInitialised() )
 }
 
-export const initSetupWatcher = createWatcher( initSetupWorker, INIT_SETUP )
+export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIAL_DB_HYDRATION )
 
 function* initRecoveryWorker( { payload } ) {
   const { walletName, security } = payload
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
-      walletName, security 
+      walletName, security
     },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {
@@ -98,7 +79,7 @@ function* initRecoveryWorker( { payload } ) {
   }
 
   yield call( insertDBWorker, {
-    payload: initialDatabase 
+    payload: initialDatabase
   } )
   // yield call(AsyncStorage.setItem, "walletExists", "true");
   // yield put(setupInitialized());
@@ -146,7 +127,7 @@ function* credentialsAuthWorker( { payload } ) {
     key = yield call( Cipher.decrypt, encryptedKey, hash )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
@@ -164,7 +145,7 @@ function* credentialsAuthWorker( { payload } ) {
     // initialize configuration file
     const { activePersonalNode } = yield select( state => state.nodeSettings )
     if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
-    
+
     // TODO -- this need to be done on
     yield put( fetchFromDB() )
   }
@@ -199,7 +180,7 @@ function* changeAuthCredWorker( { payload } ) {
     yield put( credsChanged( 'changed' ) )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     yield put( pinChangedFailed( true ) )
     // Alert.alert('Pin change failed!', err.message);

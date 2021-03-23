@@ -2,11 +2,12 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const INIT_SETUP = 'INIT_SETUP'
+export const INITIAL_DB_HYDRATION = 'INITIAL_DB_HYDRATION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
-export const IS_NEW_HEALTH_SYSTEM = 'IS_NEW_HEALTH_SYSTEM';
+export const IS_NEW_HEALTH_SYSTEM = 'IS_NEW_HEALTH_SYSTEM'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 
@@ -33,6 +34,12 @@ export const initializeSetup = ( walletName, security ) => {
     type: INIT_SETUP, payload: {
       walletName, security
     }
+  }
+}
+
+export const initialDBHydration = ( ) => {
+  return {
+    type: INITIAL_DB_HYDRATION
   }
 }
 
@@ -71,6 +78,7 @@ export const switchCredsChanged = () => {
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
 export const SETUP_INITIALIZED = 'SETUP_INITIALIZED'
+export const DATABASE_INITIALIZED = 'DATABASE_INITIALIZED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
 export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED'
@@ -92,6 +100,12 @@ export const credsAuthenticated = isAuthenticated => {
 export const setupInitialized = () => {
   return {
     type: SETUP_INITIALIZED
+  }
+}
+
+export const databaseInitialised = () => {
+  return {
+    type: DATABASE_INITIALIZED
   }
 }
 
