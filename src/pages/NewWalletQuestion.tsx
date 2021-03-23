@@ -41,7 +41,7 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
-//import { setCloudData } from '../store/actions/cloud'
+import { setCloudData } from '../store/actions/cloud'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -85,9 +85,9 @@ export default function NewWalletQuestion( props ) {
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
-  const s3service = useSelector( ( state ) => state.health.service );
-  
-  
+  const s3service = useSelector( ( state ) => state.health.service )
+
+
   useEffect( () => {
     ( async () => {
       if ( testAccService ) {
@@ -137,20 +137,20 @@ export default function NewWalletQuestion( props ) {
     ) {
       // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
       dispatch( walletCheckIn() ) // fetches exchange rates
-      dispatch(initializeHealthSetup());
+      dispatch( initializeHealthSetup() )
     }
   }, [ isInitialized ] )
 
   useEffect( () => {
-    if(s3service){
-    const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( healthCheckInitializedKeeper === true) {
-      ( loaderBottomSheet as any ).current.snapTo( 0 )
-     // dispatch(setCloudData());
-      props.navigation.navigate( 'HomeNav' );
+    if( s3service ){
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
+      if ( healthCheckInitializedKeeper === true ) {
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        // dispatch( setCloudData() )
+        props.navigation.navigate( 'HomeNav' )
+      }
     }
-  }
-  }, [ s3service ] );
+  }, [ s3service ] )
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )

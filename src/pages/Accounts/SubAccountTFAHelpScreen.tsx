@@ -66,6 +66,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
 
     if ( resettedTwoFA ) {
       const twoFASetupDetails = idx( accountsState, ( _ )=> _[ sourceAccountShell.primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      console.log( 'twoFASetupDetails', twoFASetupDetails )
       navigation.navigate( 'TwoFASetup', {
         twoFASetup: twoFASetupDetails,
         onPressBack: () => {
@@ -112,11 +113,12 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     setTimeout( () => {
       setQrBottomSheetsFlag( false )
     }, 2 )
-    if(qrData.includes("{")) {
-      console.log('qrData in IF', qrData);
-      dispatch(getSMAndReSetTFAOrGenerateSXpriv(qrData, QRModalHeader, SECURE_ACCOUNT))
+    console.log( 'qrData', typeof qrData )
+    if( qrData.includes( '{' ) ) {
+      console.log( 'qrData in IF', qrData )
+      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, QRModalHeader, SECURE_ACCOUNT ) )
     } else {
-      console.log('qrData in ELSE', qrData);
+      console.log( 'qrData in ELSE', qrData )
       if ( QRModalHeader === 'Reset 2FA' ) {
         dispatch( resetTwoFA( qrData ) )
       } else if ( QRModalHeader === 'Sweep Funds' ) {
@@ -146,8 +148,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          let qrData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
-          if (qrData) {
+          const qrData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          if ( qrData ) {
             if ( QRModalHeader == 'Sweep Funds' ) {
               ( QrBottomSheet as any ).current.snapTo( 0 )
             }

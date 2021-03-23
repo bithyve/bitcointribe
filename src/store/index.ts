@@ -174,6 +174,7 @@ import {
   updateKeeperInfoToTrustedChannelWatcher,
   updateKeeperInfoToUnderCustodyWatcher,
   autoShareLevel2KeepersWatcher,
+  downloadSmShareForApprovalWatcher
 } from './sagas/health'
 
 import {
@@ -316,6 +317,7 @@ const rootSaga = function* () {
     updateKeeperInfoToTrustedChannelWatcher,
     updateKeeperInfoToUnderCustodyWatcher,
     autoShareLevel2KeepersWatcher,
+    downloadSmShareForApprovalWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,

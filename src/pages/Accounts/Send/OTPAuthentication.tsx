@@ -397,7 +397,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
             >
               {( !isConfirmDisabled && sendingState.sendST3.inProgress ) ||
               ( isConfirmDisabled && sendingState.sendST3.inProgress ) ? (
-                  <ActivityIndicator size="small" />
+                  <ActivityIndicator color={Colors.white} size="small" />
                 ) : (
                   <Text style={styles.confirmButtonText}>Confirm</Text>
                 )}

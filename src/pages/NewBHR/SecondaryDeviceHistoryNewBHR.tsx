@@ -11,7 +11,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { ErrorSending } from '../../store/actions/health'
+import { downloadSmShareForApproval, ErrorSending } from '../../store/actions/health'
 import { updatedKeeperInfo, updateMSharesHealth, secondaryShareDownloaded } from '../../store/actions/health'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -71,7 +71,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
 
-  const [ index, setIndex ] = useState( props.navigation.state.params.index )
+  const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -146,53 +146,31 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
 
-  const [ selectedTime, setSelectedTime ] = useState(
-    props.navigation.getParam( 'selectedTime' ),
-  )
+  const [ selectedTime, setSelectedTime ] = useState( props.navigation.getParam( 'selectedTime' ) )
   const [ selectedStatus, setSelectedStatus ] = useState(
     props.navigation.getParam( 'selectedStatus' ),
   )
   const [ selectedTitle, setSelectedTitle ] = useState(
     props.navigation.getParam( 'selectedTitle' ),
   )
-  const [ selectedLevelId, setSelectedLevelId ] = useState(
-    props.navigation.state.params.selectedLevelId,
-  )
-  const [ selectedKeeper, setSelectedKeeper ] = useState(
-    props.navigation.state.params.selectedKeeper,
-  )
-  console.log( 'props.navigation.getParam(\'selectedTime\'', props.navigation.state.params.selectedKeeper )
-  console.log( 'RESHARE', props.navigation.state.params.selectedKeeper.updatedAt == 0
-    ? false
-    : true )
+  const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState( props.navigation.state.params.selectedKeeper.updatedAt == 0
     ? false
     : true )
   const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
-  const [ isChange, setIsChange ] = useState( false )
+  const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
+    ? props.navigation.state.params.isChangeKeeperType
+    : false )
+  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
+  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+
   useEffect( () => {
-    setSelectedLevelId( props.navigation.state.params.selectedLevelId )
-    setSelectedKeeper( props.navigation.state.params.selectedKeeper )
-    setIsReshare(
-      props.navigation.state.params.selectedKeeper.updatedAt == 0
-        ? false
-        : true
-    )
-    setIndex( props.navigation.state.params.index )
-    setSelectedTime( props.navigation.state.params.selectedTime )
-    setSelectedStatus( props.navigation.state.params.selectedStatus )
-    setSelectedTitle( props.navigation.state.params.selectedTitle )
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
-    setIsChange(
-      props.navigation.state.params.isChangeKeeperType
-        ? props.navigation.state.params.isChangeKeeperType
-        : false
-    )
   }, [
     props.navigation.state.params.selectedLevelId,
     props.navigation.state.params.selectedKeeper,
-    props.navigation.state.params.selectedStatus,
   ] )
   const [ secondaryDeviceBottomSheet ] = useState(
     React.createRef(),
@@ -236,6 +214,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
         tcInfo[ 2 ] = undefined
       }
+      console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
 
       const contactName = contact.firstName + ' ' + contact.lastName
@@ -250,6 +229,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           status: 'notAccessible',
         },
       ]
+      console.log( 'shareArray', shareArray )
       dispatch( updateMSharesHealth( shareArray ) )
     },
     [ trustedContactsInfo ],
@@ -434,6 +414,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       />
     )
   }, [] )
+
   const renderSecondaryDeviceMessageContents = useCallback( () => {
     return (
       <ErrorModalContents
@@ -670,7 +651,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     dispatch( ErrorSending( null ) )
   }
 
-  const sendApprovalRequestToPK = ( type ) => {
+  const sendApprovalRequestToPK = ( ) => {
     setQrBottomSheetsFlag( true );
     ( QrBottomSheet as any ).current.snapTo( 1 );
     ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
@@ -680,7 +661,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     return (
       <QRModal
         isFromKeeperDeviceHistory={true}
-        QRModalHeader={'QR scanner ddfds'}
+        QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
           'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
@@ -688,26 +669,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          try {
-            if ( qrScannedData ) {
-              const qrData = JSON.parse( qrScannedData )
-              console.log( 'qrData', qrData )
-              const res = await S3Service.downloadSMShare( qrData.publicKey )
-              console.log( 'Keeper Shares', res )
-              if ( res.status === 200 ) {
-                console.log( 'SHARES DOWNLOAD', res.data )
-                dispatch( secondaryShareDownloaded( res.data.metaShare ) );
-                ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-                ( QrBottomSheet as any ).current.snapTo( 0 )
-              }
-            }
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          dispatch( downloadSmShareForApproval( qrScannedData ) )
+          setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
@@ -717,24 +680,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
           try {
             if ( qrScannedData ) {
-              const qrData = JSON.parse( qrScannedData )
-              console.log( 'qrData', qrData )
-              const res = await S3Service.downloadSMShare( qrData.publicKey )
-              console.log( 'Keeper Shares', res )
-              if ( res.status === 200 ) {
-                console.log( 'SHARES DOWNLOAD', res.data )
-                dispatch( secondaryShareDownloaded( res.data.metaShare ) );
-                ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-                ( QrBottomSheet as any ).current.snapTo( 0 )
-              }
+              dispatch( downloadSmShareForApproval( qrScannedData ) )
+              setQrBottomSheetsFlag( false )
             }
           } catch ( err ) {
             console.log( {
               err
             } )
           }
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
       />
     )
@@ -799,8 +752,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
     }
+    console.log( 'changeIndex', changeIndex )
     if ( type == 'contact' ) {
-      props.navigation.navigate( 'TrustedContactHistoryKeeper', {
+      props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
         selectedTitle: name,
         index: changeIndex,
@@ -818,6 +772,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       } )
     }
   }
+
+  useEffect( ()=>{
+    if( secondaryShareDownloadedStatus && !downloadSmShare ){
+      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
+      ( QrBottomSheet as any ).current.snapTo( 0 )
+    }
+  }, [ secondaryShareDownloadedStatus, downloadSmShare ] )
 
   return (
     <View style={{
@@ -959,7 +920,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             onPressSetup={async ( type, name ) => {
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )
-              sendApprovalRequestToPK( type )
+              sendApprovalRequestToPK( )
             }}
             onPressBack={() =>
               ( keeperTypeBottomSheet as any ).current.snapTo( 0 )

@@ -54,6 +54,7 @@ const initialState: {
     pdfShare: Boolean;
     pdfDataConfirm: Boolean;
     uploadRequestedShare: Boolean;
+    downloadSmShare: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -128,6 +129,7 @@ const initialState: {
     pdfShare: false,
     pdfDataConfirm: false,
     uploadRequestedShare: false,
+    downloadSmShare: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,

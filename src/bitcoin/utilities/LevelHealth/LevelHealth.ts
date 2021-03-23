@@ -1,8 +1,8 @@
-import { AxiosResponse } from 'axios';
-import * as bip39 from 'bip39';
-import crypto from 'crypto';
-import secrets from 'secrets.js-grempe';
-import config from '../../HexaConfig';
+import { AxiosResponse } from 'axios'
+import * as bip39 from 'bip39'
+import crypto from 'crypto'
+import secrets from 'secrets.js-grempe'
+import config from '../../HexaConfig'
 import {
   BuddyStaticNonPMDD,
   EncDynamicNonPMDD,
@@ -10,12 +10,12 @@ import {
   SocialStaticNonPMDD,
   EncryptedImage,
   WalletImage,
-} from '../Interface';
+} from '../Interface'
 
-import { BH_AXIOS } from '../../../services/api';
-import { generateRandomString } from '../../../common/CommonFunctions';
-import moment from 'moment';
-const { HEXA_ID } = config;
+import { BH_AXIOS } from '../../../services/api'
+import { generateRandomString } from '../../../common/CommonFunctions'
+import moment from 'moment'
+const { HEXA_ID } = config
 export default class LevelHealth {
   public static cipherSpec: {
     algorithm: string;
@@ -30,23 +30,25 @@ export default class LevelHealth {
   ): {
     mnemonic: string;
   } => {
-    let levelThreshold = level == 2 ? LevelHealth.thresholdLevel1 : level == 3 ? LevelHealth.thresholdLevel2 : LevelHealth.threshold; 
-    if (decryptedSecrets.length >= levelThreshold) {
-      const secretsArray = [];
-      for (const secret of decryptedSecrets) {
-        if (LevelHealth.validShare(secret)) {
-          secretsArray.push(secret.slice(0, secret.length - 8));
+    const levelThreshold = level == 2 ? LevelHealth.thresholdLevel1 : level == 3 ? LevelHealth.thresholdLevel2 : LevelHealth.threshold
+    if ( decryptedSecrets.length >= levelThreshold ) {
+      const secretsArray = []
+      for ( const secret of decryptedSecrets ) {
+        if ( LevelHealth.validShare( secret ) ) {
+          secretsArray.push( secret.slice( 0, secret.length - 8 ) )
         } else {
-          throw new Error(`Invalid checksum, share: ${secret} is corrupt`);
+          throw new Error( `Invalid checksum, share: ${secret} is corrupt` )
         }
       }
 
-      const recoveredMnemonicHex = secrets.combine(secretsArray);
-      return { mnemonic: LevelHealth.hexToString(recoveredMnemonicHex) };
+      const recoveredMnemonicHex = secrets.combine( secretsArray )
+      return {
+        mnemonic: LevelHealth.hexToString( recoveredMnemonicHex )
+      }
     } else {
       throw new Error(
         `supplied number of shares are less than the threshold (${levelThreshold})`,
-      );
+      )
     }
   };
 
@@ -56,20 +58,22 @@ export default class LevelHealth {
   ): {
     decryptedSecrets: string[];
   } => {
-    const key = LevelHealth.getDerivedKey(answer);
+    const key = LevelHealth.getDerivedKey( answer )
 
-    const decryptedSecrets: string[] = [];
-    for (const secret of secretsArray) {
+    const decryptedSecrets: string[] = []
+    for ( const secret of secretsArray ) {
       const decipher = crypto.createDecipheriv(
         LevelHealth.cipherSpec.algorithm,
         key,
         LevelHealth.cipherSpec.iv,
-      );
-      let decrypted = decipher.update(secret, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      decryptedSecrets.push(decrypted);
+      )
+      let decrypted = decipher.update( secret, 'hex', 'utf8' )
+      decrypted += decipher.final( 'utf8' )
+      decryptedSecrets.push( decrypted )
     }
-    return { decryptedSecrets };
+    return {
+      decryptedSecrets
+    }
   };
 
   public static downloadShare = async (
@@ -87,29 +91,31 @@ export default class LevelHealth {
         encryptedDynamicNonPMDD?: undefined;
       }
   > => {
-    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if (otp) {
-      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if ( otp ) {
+      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
     }
     const messageId: string = LevelHealth.getMessageId(
       key,
       config.MSG_ID_LENGTH,
-    );
-    let res: AxiosResponse;
+    )
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadShare', {
+      res = await BH_AXIOS.post( 'downloadShare', {
         HEXA_ID,
         messageId,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { share, encryptedDynamicNonPMDD } = res.data;
-    const metaShare = LevelHealth.decryptMetaShare(share, key)
-      .decryptedMetaShare;
-    return { metaShare, encryptedDynamicNonPMDD, messageId };
+    const { share, encryptedDynamicNonPMDD } = res.data
+    const metaShare = LevelHealth.decryptMetaShare( share, key )
+      .decryptedMetaShare
+    return {
+      metaShare, encryptedDynamicNonPMDD, messageId
+    }
   };
 
   public static downloadPdfShare = async (
@@ -127,22 +133,24 @@ export default class LevelHealth {
         encryptedDynamicNonPMDD?: undefined;
       }
   > => {
-    
-    let res: AxiosResponse;
+
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadPDFShare', {
+      res = await BH_AXIOS.post( 'downloadPDFShare', {
         HEXA_ID,
         messageId,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { share, encryptedDynamicNonPMDD } = res.data;
-    const metaShare = LevelHealth.decryptMetaShare(share, key)
-      .decryptedMetaShare;
-    return { metaShare, encryptedDynamicNonPMDD, messageId };
+    const { share, encryptedDynamicNonPMDD } = res.data
+    const metaShare = LevelHealth.decryptMetaShare( share, key )
+      .decryptedMetaShare
+    return {
+      metaShare, encryptedDynamicNonPMDD, messageId
+    }
   };
 
   public static downloadSMShare = async (
@@ -160,29 +168,31 @@ export default class LevelHealth {
         messageId: string;
       }
   > => {
-    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if (otp) {
-      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if ( otp ) {
+      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
     }
     const messageId: string = LevelHealth.getMessageId(
       key,
       config.MSG_ID_LENGTH,
-    );
-    let res: AxiosResponse;
+    )
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadSecondaryShare', {
+      res = await BH_AXIOS.post( 'downloadSecondaryShare', {
         HEXA_ID,
         messageId,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { share } = res.data;
-    const metaShare = LevelHealth.decryptMetaShare(share, key)
-      .decryptedMetaShare;
-    return { status: 200, metaShare, messageId };
+    const { share } = res.data
+    const metaShare = LevelHealth.decryptMetaShare( share, key )
+      .decryptedMetaShare
+    return {
+      status: 200, metaShare, messageId
+    }
   };
 
   public static downloadDynamicNonPMDD = async (
@@ -190,24 +200,24 @@ export default class LevelHealth {
   ): Promise<{
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadDynamicNonPMDD', {
+      res = await BH_AXIOS.post( 'downloadDynamicNonPMDD', {
         HEXA_ID,
         walletID,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { encryptedDynamicNonPMDD } = res.data;
-    if (encryptedDynamicNonPMDD) {
+    const { encryptedDynamicNonPMDD } = res.data
+    if ( encryptedDynamicNonPMDD ) {
       return {
         encryptedDynamicNonPMDD,
-      };
+      }
     } else {
-      throw new Error('Unable to download EncDynamicNonPMDD');
+      throw new Error( 'Unable to download EncDynamicNonPMDD' )
     }
   };
 
@@ -216,26 +226,26 @@ export default class LevelHealth {
     existingShares: MetaShare[],
     walletId?: string,
   ): boolean => {
-    if (walletId && decryptedMetaShare.meta.walletId === walletId) {
-      throw new Error("You're not allowed to be your own contact");
+    if ( walletId && decryptedMetaShare.meta.walletId === walletId ) {
+      throw new Error( 'You\'re not allowed to be your own contact' )
     }
 
-    if (existingShares.length) {
-      for (const share of existingShares) {
-        if (share.meta.walletId === decryptedMetaShare.meta.walletId) {
+    if ( existingShares.length ) {
+      for ( const share of existingShares ) {
+        if ( share.meta.walletId === decryptedMetaShare.meta.walletId ) {
           if (
-            parseFloat(share.meta.version) >=
-            parseFloat(decryptedMetaShare.meta.version)
+            parseFloat( share.meta.version ) >=
+            parseFloat( decryptedMetaShare.meta.version )
           ) {
             throw new Error(
               'You cannot store lower share version of the same share',
-            );
+            )
           }
         }
       }
     }
 
-    return true;
+    return true
   };
 
   public static affirmDecryption = async (
@@ -243,51 +253,55 @@ export default class LevelHealth {
   ): Promise<{
     deleted: boolean;
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
 
     try {
-      res = await BH_AXIOS.post('affirmDecryption', {
+      res = await BH_AXIOS.post( 'affirmDecryption', {
         HEXA_ID,
         messageId,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    return { deleted: res.data.deleted };
+    return {
+      deleted: res.data.deleted
+    }
   };
 
   public static encryptMetaShare = (
     metaShare: MetaShare,
     key?: string,
   ): { encryptedMetaShare: string; key: string; messageId: string } => {
-    if (!key) {
-      key = LevelHealth.generateKey(LevelHealth.cipherSpec.keyLength);
+    if ( !key ) {
+      key = LevelHealth.generateKey( LevelHealth.cipherSpec.keyLength )
     }
     const messageId: string = LevelHealth.getMessageId(
       key,
       config.MSG_ID_LENGTH,
-    );
+    )
     const cipher = crypto.createCipheriv(
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
-    let encrypted = cipher.update(JSON.stringify(metaShare), 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const encryptedMetaShare = encrypted;
+    )
+    let encrypted = cipher.update( JSON.stringify( metaShare ), 'utf8', 'hex' )
+    encrypted += cipher.final( 'hex' )
+    const encryptedMetaShare = encrypted
     return {
       encryptedMetaShare,
       key,
       messageId,
-    };
+    }
   };
 
   public static generateRequestCreds = () => {
-    const key = LevelHealth.generateKey(LevelHealth.cipherSpec.keyLength);
+    const key = LevelHealth.generateKey( LevelHealth.cipherSpec.keyLength )
     // const { otp, otpEncryptedData } = LevelHealth.encryptViaOTP(key);
-    return { key };
+    return {
+      key
+    }
   };
 
   public static uploadRequestedShare = async (
@@ -296,33 +310,35 @@ export default class LevelHealth {
     metaShare?: MetaShare,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<{ success: boolean }> => {
-    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if (otp) {
-      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if ( otp ) {
+      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
     }
     const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
       key,
-    );
+    )
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('uploadShare', {
+      res = await BH_AXIOS.post( 'uploadShare', {
         HEXA_ID,
         share: encryptedMetaShare,
         messageId,
         encryptedDynamicNonPMDD,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { success } = res.data;
-    if (!success) {
-      throw new Error('Unable to upload share');
+    const { success } = res.data
+    if ( !success ) {
+      throw new Error( 'Unable to upload share' )
     }
-    return { success };
+    return {
+      success
+    }
   };
 
   public static uploadNewShare = async (
@@ -331,33 +347,35 @@ export default class LevelHealth {
     metaShare?: MetaShare,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<{ success: boolean }> => {
-    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if (otp) {
-      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if ( otp ) {
+      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
     }
     const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
       key,
-    );
+    )
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('uploadShare2', {
+      res = await BH_AXIOS.post( 'uploadShare2', {
         HEXA_ID,
         share: encryptedMetaShare,
         messageId,
         encryptedDynamicNonPMDD,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { success } = res.data;
-    if (!success) {
-      throw new Error('Unable to upload share');
+    const { success } = res.data
+    if ( !success ) {
+      throw new Error( 'Unable to upload share' )
     }
-    return { success };
+    return {
+      success
+    }
   };
 
   public static downloadAndValidateShare = async (
@@ -373,14 +391,16 @@ export default class LevelHealth {
       metaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    } = await LevelHealth.downloadShare(encryptedKey, otp);
+    } = await LevelHealth.downloadShare( encryptedKey, otp )
 
-    if (LevelHealth.validateStorage(metaShare, existingShares, walletId)) {
+    if ( LevelHealth.validateStorage( metaShare, existingShares, walletId ) ) {
       // const { deleted } = await LevelHealth.affirmDecryption(messageId);
       // if (!deleted) {
       //   console.log('Unable to remove the share from the server');
       // }
-      return { metaShare, encryptedDynamicNonPMDD };
+      return {
+        metaShare, encryptedDynamicNonPMDD
+      }
     }
   };
 
@@ -390,7 +410,7 @@ export default class LevelHealth {
   ): {
     decryptedData: any;
   } => {
-    const key = LevelHealth.getDerivedKey(otp);
+    const key = LevelHealth.getDerivedKey( otp )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
@@ -400,17 +420,19 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
+    )
 
     try {
-      let decrypted = decipher.update(otpEncryptedData, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      const decryptedData = JSON.parse(decrypted);
-      return { decryptedData };
-    } catch (err) {
+      let decrypted = decipher.update( otpEncryptedData, 'hex', 'utf8' )
+      decrypted += decipher.final( 'utf8' )
+      const decryptedData = JSON.parse( decrypted )
+      return {
+        decryptedData
+      }
+    } catch ( err ) {
       throw new Error(
         'An error occurred while decrypting the data: Invalid OTP/Tampered data',
-      );
+      )
     }
   };
 
@@ -429,50 +451,54 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
+    )
 
     try {
-      let decrypted = decipher.update(encryptedMetaShare, 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      const decryptedMetaShare: MetaShare = JSON.parse(decrypted);
-      const { shareId, encryptedSecret } = decryptedMetaShare;
+      let decrypted = decipher.update( encryptedMetaShare, 'hex', 'utf8' )
+      decrypted += decipher.final( 'utf8' )
+      const decryptedMetaShare: MetaShare = JSON.parse( decrypted )
+      const { shareId, encryptedSecret } = decryptedMetaShare
       const generatedShareId = crypto
-        .createHash('sha256')
-        .update(JSON.stringify(encryptedSecret))
-        .digest('hex');
+        .createHash( 'sha256' )
+        .update( JSON.stringify( encryptedSecret ) )
+        .digest( 'hex' )
 
       if (
         shareId !== generatedShareId &&
         decryptedMetaShare.meta.validator !== 'HEXA'
       ) {
-        throw new Error();
+        throw new Error()
       }
 
-      return { decryptedMetaShare };
-    } catch (err) {
+      return {
+        decryptedMetaShare
+      }
+    } catch ( err ) {
       throw new Error(
         'An error occurred while decrypting the share: Invalid Key/Tampered Share',
-      );
+      )
     }
   };
 
-  public static getMessageId = (key: string, length: number): string => {
-    const messageId = crypto.createHash('sha256').update(key).digest('hex');
-    return messageId.slice(0, length);
+  public static getMessageId = ( key: string, length: number ): string => {
+    const messageId = crypto.createHash( 'sha256' ).update( key ).digest( 'hex' )
+    return messageId.slice( 0, length )
   };
 
   public static recoverMetaShareFromQR = (
     qrData: string[],
   ): { metaShare: MetaShare } => {
-    qrData.sort();
-    let recoveredQRData: string;
-    recoveredQRData = '';
-    for (let itr = 0; itr < config.SSS_METASHARE_SPLITS; itr++) {
-      const res = qrData[itr].slice(3);
-      recoveredQRData = recoveredQRData + res;
+    qrData.sort()
+    let recoveredQRData: string
+    recoveredQRData = ''
+    for ( let itr = 0; itr < config.SSS_METASHARE_SPLITS; itr++ ) {
+      const res = qrData[ itr ].slice( 3 )
+      recoveredQRData = recoveredQRData + res
     }
-    const metaShare = JSON.parse(recoveredQRData);
-    return { metaShare };
+    const metaShare = JSON.parse( recoveredQRData )
+    return {
+      metaShare
+    }
   };
 
   public static updateHealthKeeper = async (
@@ -510,27 +536,27 @@ export default class LevelHealth {
       walletId: string;
     }>
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('updateSharesHealth2', {
+      res = await BH_AXIOS.post( 'updateSharesHealth2', {
         HEXA_ID,
         toUpdate: shares,
-      });
-      console.log('updateSharesHealth2 res', res)
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+      console.log( 'updateSharesHealth2 res', res )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
-    return res.data;
+    return res.data
   };
 
-  public static getShareId = (encryptedSecret: string): string =>
+  public static getShareId = ( encryptedSecret: string ): string =>
     crypto
-      .createHash('sha256')
-      .update(JSON.stringify(encryptedSecret))
-      .digest('hex');
+      .createHash( 'sha256' )
+      .update( JSON.stringify( encryptedSecret ) )
+      .digest( 'hex' );
 
-  public static strechKey = (password: string): string => {
+  public static strechKey = ( password: string ): string => {
     return crypto
       .pbkdf2Sync(
         password,
@@ -539,18 +565,18 @@ export default class LevelHealth {
         LevelHealth.cipherSpec.keyLength / 2,
         'sha256',
       )
-      .toString('hex');
+      .toString( 'hex' )
   };
 
-  public static generateKey = (length: number): string => {
-    let result = '';
+  public static generateKey = ( length: number ): string => {
+    let result = ''
     const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    const charactersLength = characters.length;
-    for (let itr = 0; itr < length; itr++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    const charactersLength = characters.length
+    for ( let itr = 0; itr < length; itr++ ) {
+      result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
     }
-    return result;
+    return result
   };
 
   public static encryptViaOTP = (
@@ -560,9 +586,9 @@ export default class LevelHealth {
     otp: string;
   } => {
     const otp: string = LevelHealth.generateOTP(
-      parseInt(config.SSS_OTP_LENGTH, 10),
-    );
-    const key = LevelHealth.getDerivedKey(otp);
+      parseInt( config.SSS_OTP_LENGTH, 10 ),
+    )
+    const key = LevelHealth.getDerivedKey( otp )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   this.cipherSpec.salt,
@@ -573,64 +599,64 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
-    let encrypted = cipher.update(JSON.stringify(data), 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    const encryptedData = encrypted;
+    )
+    let encrypted = cipher.update( JSON.stringify( data ), 'utf8', 'hex' )
+    encrypted += cipher.final( 'hex' )
+    const encryptedData = encrypted
     return {
       otpEncryptedData: encryptedData,
       otp,
-    };
+    }
   };
 
-  public static generateOTP = (otpLength: number): string =>
-    LevelHealth.generateRandomString(otpLength);
+  public static generateOTP = ( otpLength: number ): string =>
+    LevelHealth.generateRandomString( otpLength );
 
-  public static generateRandomString = (length: number): string => {
-    let randomString: string = '';
-    const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    for (let itr = 0; itr < length; itr++) {
+  public static generateRandomString = ( length: number ): string => {
+    let randomString = ''
+    const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    for ( let itr = 0; itr < length; itr++ ) {
       randomString += possibleChars.charAt(
-        Math.floor(Math.random() * possibleChars.length),
-      );
+        Math.floor( Math.random() * possibleChars.length ),
+      )
     }
-    return randomString;
+    return randomString
   };
   private static threshold: number = config.SSS_THRESHOLD;
   private static thresholdLevel1: number = config.SSS_LEVEL1_THRESHOLD;
   private static thresholdLevel2: number = config.SSS_LEVEL2_THRESHOLD;
 
-  private static hexToString = (hex: string): string => secrets.hex2str(hex);
+  private static hexToString = ( hex: string ): string => secrets.hex2str( hex );
 
-  public static getDerivedKey = (psuedoKey: string): string => {
-    const hashRounds = 1048;
-    let key = psuedoKey;
-    for (let itr = 0; itr < hashRounds; itr++) {
-      const hash = crypto.createHash('sha512');
-      key = hash.update(key).digest('hex');
+  public static getDerivedKey = ( psuedoKey: string ): string => {
+    const hashRounds = 1048
+    let key = psuedoKey
+    for ( let itr = 0; itr < hashRounds; itr++ ) {
+      const hash = crypto.createHash( 'sha512' )
+      key = hash.update( key ).digest( 'hex' )
     }
-    return key.slice(key.length - LevelHealth.cipherSpec.keyLength);
+    return key.slice( key.length - LevelHealth.cipherSpec.keyLength )
   };
 
-  private static validShare = (checksumedShare: string): boolean => {
-    const extractedChecksum = checksumedShare.slice(checksumedShare.length - 8);
-    const recoveredShare = checksumedShare.slice(0, checksumedShare.length - 8);
-    const calculatedChecksum = LevelHealth.calculateChecksum(recoveredShare);
-    if (calculatedChecksum !== extractedChecksum) {
-      return false;
+  private static validShare = ( checksumedShare: string ): boolean => {
+    const extractedChecksum = checksumedShare.slice( checksumedShare.length - 8 )
+    const recoveredShare = checksumedShare.slice( 0, checksumedShare.length - 8 )
+    const calculatedChecksum = LevelHealth.calculateChecksum( recoveredShare )
+    if ( calculatedChecksum !== extractedChecksum ) {
+      return false
     }
-    return true;
+    return true
   };
 
-  private static calculateChecksum = (share: string): string => {
-    let temp = share;
-    for (let itr = 0; itr < config.CHECKSUM_ITR; itr++) {
-      const hash = crypto.createHash('sha512');
-      hash.update(temp);
-      temp = hash.digest('hex');
+  private static calculateChecksum = ( share: string ): string => {
+    let temp = share
+    for ( let itr = 0; itr < config.CHECKSUM_ITR; itr++ ) {
+      const hash = crypto.createHash( 'sha512' )
+      hash.update( temp )
+      temp = hash.digest( 'hex' )
     }
 
-    return temp.slice(0, 8);
+    return temp.slice( 0, 8 )
   };
 
   public walletId: string;
@@ -658,50 +684,54 @@ export default class LevelHealth {
       SMMetaSharesKeeper: MetaShare[];
     },
   ) {
-    if (bip39.validateMnemonic(mnemonic)) {
-      this.mnemonic = mnemonic;
+    if ( bip39.validateMnemonic( mnemonic ) ) {
+      this.mnemonic = mnemonic
     } else {
-      throw new Error('Invalid Mnemonic');
+      throw new Error( 'Invalid Mnemonic' )
     }
     this.walletId = stateVars
       ? stateVars.walletId
       : crypto
-          .createHash('sha256')
-          .update(bip39.mnemonicToSeedSync(this.mnemonic))
-          .digest('hex');
-    this.encryptedSecretsKeeper = stateVars ? stateVars.encryptedSecretsKeeper : [];
-    this.shareIDsKeeper = stateVars ? stateVars.shareIDsKeeper : [];
-    this.metaSharesKeeper = stateVars ? stateVars.metaSharesKeeper : [];
+        .createHash( 'sha256' )
+        .update( bip39.mnemonicToSeedSync( this.mnemonic ) )
+        .digest( 'hex' )
+    this.encryptedSecretsKeeper = stateVars ? stateVars.encryptedSecretsKeeper : []
+    this.shareIDsKeeper = stateVars ? stateVars.shareIDsKeeper : []
+    this.metaSharesKeeper = stateVars ? stateVars.metaSharesKeeper : []
     this.healthCheckInitializedKeeper = stateVars
       ? stateVars.healthCheckInitializedKeeper
-      : false;
-    this.healthCheckStatusKeeper = stateVars ? stateVars.healthCheckStatusKeeper : {};
-    this.pdfHealthKeeper = stateVars ? stateVars.pdfHealthKeeper : {};
-    this.encryptedSMSecretsKeeper = stateVars ? stateVars.encryptedSMSecretsKeeper : [];
-    this.SMMetaSharesKeeper = stateVars ? stateVars.SMMetaSharesKeeper : [];
+      : false
+    this.healthCheckStatusKeeper = stateVars ? stateVars.healthCheckStatusKeeper : {
+    }
+    this.pdfHealthKeeper = stateVars ? stateVars.pdfHealthKeeper : {
+    }
+    this.encryptedSMSecretsKeeper = stateVars ? stateVars.encryptedSMSecretsKeeper : []
+    this.SMMetaSharesKeeper = stateVars ? stateVars.SMMetaSharesKeeper : []
   }
 
-  public stringToHex = (str: string): string => secrets.str2hex(str);
+  public stringToHex = ( str: string ): string => secrets.str2hex( str );
 
   public generateMessageID = (): string =>
-    LevelHealth.generateRandomString(config.MSG_ID_LENGTH);
+    LevelHealth.generateRandomString( config.MSG_ID_LENGTH );
 
   public generateLevel1Shares = (): {
     shares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     const shares = secrets.share(
-      this.stringToHex(this.mnemonic),
+      this.stringToHex( this.mnemonic ),
       config.SSS_LEVEL1_TOTAL,
       config.SSS_LEVEL1_THRESHOLD,
-    );
+    )
 
-    for (let itr = 0; itr < shares.length; itr++) {
-      const checksum = LevelHealth.calculateChecksum(shares[itr]);
-      shares[itr] = shares[itr] + checksum;
+    for ( let itr = 0; itr < shares.length; itr++ ) {
+      const checksum = LevelHealth.calculateChecksum( shares[ itr ] )
+      shares[ itr ] = shares[ itr ] + checksum
     }
 
-    return { shares };
+    return {
+      shares
+    }
   };
 
   public generateLevel2Shares = (): {
@@ -709,17 +739,19 @@ export default class LevelHealth {
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     const shares = secrets.share(
-      this.stringToHex(this.mnemonic),
+      this.stringToHex( this.mnemonic ),
       config.SSS_LEVEL2_TOTAL,
       config.SSS_LEVEL2_THRESHOLD,
-    );
+    )
 
-    for (let itr = 0; itr < shares.length; itr++) {
-      const checksum = LevelHealth.calculateChecksum(shares[itr]);
-      shares[itr] = shares[itr] + checksum;
+    for ( let itr = 0; itr < shares.length; itr++ ) {
+      const checksum = LevelHealth.calculateChecksum( shares[ itr ] )
+      shares[ itr ] = shares[ itr ] + checksum
     }
 
-    return { shares };
+    return {
+      shares
+    }
   };
 
   public prepareShareUploadablesKeeper = (
@@ -733,49 +765,49 @@ export default class LevelHealth {
     messageId: string;
     encryptedDynamicNonPMDD: EncDynamicNonPMDD;
   } => {
-    if (!this.metaSharesKeeper.length) {
-      throw new Error('Generate MetaShares prior uploading');
+    if ( !this.metaSharesKeeper.length ) {
+      throw new Error( 'Generate MetaShares prior uploading' )
     }
-    console.log("prepareShareUploadablesKeeper this.metaSharesKeeper", this.metaSharesKeeper);
+    console.log( 'prepareShareUploadablesKeeper this.metaSharesKeeper', this.metaSharesKeeper )
 
     // let res: AxiosResponse;
     this.metaSharesKeeper[
       shareIndex
-    ].meta.guardian = contactName.toLowerCase().trim();
-    const metaShare: MetaShare = this.metaSharesKeeper[shareIndex];
+    ].meta.guardian = contactName.toLowerCase().trim()
+    const metaShare: MetaShare = this.metaSharesKeeper[ shareIndex ]
     const { encryptedMetaShare, key, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
-    );
+    )
 
-    let encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-    if (dynamicNonPMDD) {
+    let encryptedDynamicNonPMDD: EncDynamicNonPMDD
+    if ( dynamicNonPMDD ) {
       encryptedDynamicNonPMDD = {
-        encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+        encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD( dynamicNonPMDD )
           .encryptedDynamicNonPMDD,
         updatedAt: Date.now(),
-      };
+      }
     }
 
-    const { otp, otpEncryptedData } = LevelHealth.encryptViaOTP(key);
+    const { otp, otpEncryptedData } = LevelHealth.encryptViaOTP( key )
     return {
       otp,
       encryptedKey: otpEncryptedData,
       encryptedMetaShare,
       messageId,
       encryptedDynamicNonPMDD,
-    };
+    }
   };
 
   public initializeHealthKeeper = async (): Promise<{
     success: boolean;
     levelInfo: any[];
   }> => {
-    if (this.healthCheckInitializedKeeper)
-      throw new Error('Health Check is already initialized.');
+    if ( this.healthCheckInitializedKeeper )
+      throw new Error( 'Health Check is already initialized.' )
 
-    let randomIdForSecurityQ = generateRandomString(8);
-    let randomIdForCloud = generateRandomString(8);
-    let levelInfo = [
+    const randomIdForSecurityQ = generateRandomString( 8 )
+    const randomIdForCloud = generateRandomString( 8 )
+    const levelInfo = [
       {
         shareType: 'cloud',
         updatedAt: 0,
@@ -785,31 +817,31 @@ export default class LevelHealth {
       },
       {
         shareType: 'securityQuestion',
-        updatedAt: moment(new Date()).valueOf(),
+        updatedAt: moment( new Date() ).valueOf(),
         status: 'accessible',
         shareId: randomIdForSecurityQ,
         reshareVersion: 0,
       },
-    ];
+    ]
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('sharesHealthCheckInit2', {
+      res = await BH_AXIOS.post( 'sharesHealthCheckInit2', {
         HEXA_ID,
         walletID: this.walletId,
         levelInfo,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
-    if (res.data.initSuccessful) {
-      this.healthCheckInitializedKeeper = true;
+    if ( res.data.initSuccessful ) {
+      this.healthCheckInitializedKeeper = true
     }
     return {
       success: res.data.initSuccessful,
       levelInfo: levelInfo,
-    };
+    }
   };
 
   public checkHealth = async (): Promise<{
@@ -817,157 +849,161 @@ export default class LevelHealth {
       [index: number]: { shareId: string; updatedAt: number; guardian: string };
     };
   }> => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
 
-    if (!this.metaSharesKeeper.length)
-      throw new Error('Can not initialize health check; missing MetaShares');
+    if ( !this.metaSharesKeeper.length )
+      throw new Error( 'Can not initialize health check; missing MetaShares' )
 
-    const metaShares = this.metaSharesKeeper.slice(0, 3);
+    const metaShares = this.metaSharesKeeper.slice( 0, 3 )
     try {
-      res = await BH_AXIOS.post('checkSharesHealth2', {
+      res = await BH_AXIOS.post( 'checkSharesHealth2', {
         HEXA_ID,
         walletID: this.walletId,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     const updates: Array<{ shareId: string; updatedAt: number }> =
-      res.data.lastUpdateds;
+      res.data.lastUpdateds
 
-    const shareGuardianMapping = {};
-    for (const { shareId, updatedAt } of updates) {
-      for (let index = 0; index < metaShares.length; index++) {
-        if (metaShares[index] && metaShares[index].shareId === shareId) {
-          this.healthCheckStatusKeeper[index] = { shareId, updatedAt };
-          shareGuardianMapping[index] = {
+    const shareGuardianMapping = {
+    }
+    for ( const { shareId, updatedAt } of updates ) {
+      for ( let index = 0; index < metaShares.length; index++ ) {
+        if ( metaShares[ index ] && metaShares[ index ].shareId === shareId ) {
+          this.healthCheckStatusKeeper[ index ] = {
+            shareId, updatedAt
+          }
+          shareGuardianMapping[ index ] = {
             shareId,
             updatedAt,
-            guardian: metaShares[index].meta.guardian,
-          };
+            guardian: metaShares[ index ].meta.guardian,
+          }
         }
       }
     }
 
     return {
       shareGuardianMapping,
-    };
+    }
   };
 
   public checkHealthKeeper = async (): Promise<{
     data: {};
   }> => {
-    let response = {};
-    let res: AxiosResponse;
+    let response = {
+    }
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('checkSharesHealth2', {
+      res = await BH_AXIOS.post( 'checkSharesHealth2', {
         HEXA_ID,
         walletID: this.walletId,
-      });
-      response = res;
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
-      response = err;
+      } )
+      response = res
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+      response = err
     }
-    if(res.data){
+    if( res.data ){
       return {
         data: res.data
-      };
+      }
     }
     else return {
       data: response
-    };
-    
+    }
+
   };
 
-  public updateHealthLevel2 = async (SecurityQuestionHealth, _level): Promise<{
+  public updateHealthLevel2 = async ( SecurityQuestionHealth, _level ): Promise<{
     success: boolean;
     message: string;
   }> => {
-    let levelInfo = [];
-    if (this.metaSharesKeeper.length) {
-      levelInfo[0] = {
+    const levelInfo = []
+    if ( this.metaSharesKeeper.length ) {
+      levelInfo[ 0 ] = {
         shareType: 'cloud',
         updatedAt: 0,
         status: 'notAccessible',
-        shareId: this.metaSharesKeeper[0].shareId,
+        shareId: this.metaSharesKeeper[ 0 ].shareId,
         reshareVersion: 0,
-      };
-      levelInfo[1] = SecurityQuestionHealth;
-      for (let i = 1; i < this.metaSharesKeeper.length; i++) {
-        const element = this.metaSharesKeeper[i];
-        let shareType = '';
-        if (i == 0) shareType = 'cloud';
-        if (i == 1) shareType = 'primaryKeeper';
-        let obj = {
+      }
+      levelInfo[ 1 ] = SecurityQuestionHealth
+      for ( let i = 1; i < this.metaSharesKeeper.length; i++ ) {
+        const element = this.metaSharesKeeper[ i ]
+        let shareType = ''
+        if ( i == 0 ) shareType = 'cloud'
+        if ( i == 1 ) shareType = 'primaryKeeper'
+        const obj = {
           shareType: shareType,
           updatedAt: 0,
           status: 'notAccessible',
           shareId: element.shareId,
           reshareVersion: 0,
-        };
-        levelInfo.push(obj);
+        }
+        levelInfo.push( obj )
       }
-      let res: AxiosResponse;
+      let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post('updateHealthLevel2', {
+        res = await BH_AXIOS.post( 'updateHealthLevel2', {
           HEXA_ID,
           walletID: this.walletId,
           level: _level,
           levelInfo,
-        });
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
       return {
         success: res.data.updateSuccessful,
         message: '',
-      };
+      }
     }
     return {
       success: false,
       message: 'Something went wrong!',
-    };
+    }
   };
 
-  public generateStaticNonPMDD = (secureAccAssets: {
+  public generateStaticNonPMDD = ( secureAccAssets: {
     secondaryMnemonic: string;
     twoFASecret: string;
     secondaryXpub: string;
     bhXpub: string;
-  }) => {
+  } ) => {
     const {
       secondaryMnemonic,
       twoFASecret,
       secondaryXpub,
       bhXpub,
-    } = secureAccAssets;
+    } = secureAccAssets
 
-    const shareIDs = this.shareIDsKeeper;
+    const shareIDs = this.shareIDsKeeper
 
     const socialStaticNonPMDD: SocialStaticNonPMDD = {
       secondaryXpub,
       bhXpub,
       shareIDs,
-    };
+    }
     const buddyStaticNonPMDD: BuddyStaticNonPMDD = {
       secondaryMnemonic,
       twoFASecret,
       secondaryXpub,
       bhXpub,
       shareIDs,
-    };
+    }
 
     return {
       encryptedSocialStaticNonPMDD: this.encryptStaticNonPMDD(
         socialStaticNonPMDD,
       ).encryptedStaticNonPMDD,
-      encryptedBuddyStaticNonPMDD: this.encryptStaticNonPMDD(buddyStaticNonPMDD)
+      encryptedBuddyStaticNonPMDD: this.encryptStaticNonPMDD( buddyStaticNonPMDD )
         .encryptedStaticNonPMDD,
-    };
+    }
   };
 
   public encryptStaticNonPMDD = (
@@ -976,8 +1012,8 @@ export default class LevelHealth {
     encryptedStaticNonPMDD: string;
   } => {
     const key = LevelHealth.getDerivedKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
+      bip39.mnemonicToSeedSync( this.mnemonic ).toString( 'hex' ),
+    )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   LevelHealth.cipherSpec.salt,
@@ -987,11 +1023,13 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
+    )
 
-    let encrypted = cipher.update(JSON.stringify(staticNonPMDD), 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return { encryptedStaticNonPMDD: encrypted };
+    let encrypted = cipher.update( JSON.stringify( staticNonPMDD ), 'utf8', 'hex' )
+    encrypted += cipher.final( 'hex' )
+    return {
+      encryptedStaticNonPMDD: encrypted
+    }
   };
 
   public decryptStaticNonPMDD = (
@@ -1000,8 +1038,8 @@ export default class LevelHealth {
     decryptedStaticNonPMDD;
   } => {
     const key = LevelHealth.getDerivedKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
+      bip39.mnemonicToSeedSync( this.mnemonic ).toString( 'hex' ),
+    )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   LevelHealth.cipherSpec.salt,
@@ -1012,20 +1050,22 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
-    let decrypted = decipher.update(encryptStaticNonPMDD, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
+    )
+    let decrypted = decipher.update( encryptStaticNonPMDD, 'hex', 'utf8' )
+    decrypted += decipher.final( 'utf8' )
 
-    const decryptedStaticNonPMDD = JSON.parse(decrypted);
-    return { decryptedStaticNonPMDD };
+    const decryptedStaticNonPMDD = JSON.parse( decrypted )
+    return {
+      decryptedStaticNonPMDD
+    }
   };
 
   public encryptDynamicNonPMDD = (
     dynamicNonPMDD: MetaShare[],
   ): { encryptedDynamicNonPMDD: string } => {
     const key = LevelHealth.getDerivedKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
+      bip39.mnemonicToSeedSync( this.mnemonic ).toString( 'hex' ),
+    )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   LevelHealth.cipherSpec.salt,
@@ -1036,15 +1076,17 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
+    )
     let encrypted = cipher.update(
-      JSON.stringify(dynamicNonPMDD),
+      JSON.stringify( dynamicNonPMDD ),
       'utf8',
       'hex',
-    );
-    encrypted += cipher.final('hex');
+    )
+    encrypted += cipher.final( 'hex' )
 
-    return { encryptedDynamicNonPMDD: encrypted };
+    return {
+      encryptedDynamicNonPMDD: encrypted
+    }
   };
 
   public decryptDynamicNonPMDD = (
@@ -1053,8 +1095,8 @@ export default class LevelHealth {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
     const key = LevelHealth.getDerivedKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
+      bip39.mnemonicToSeedSync( this.mnemonic ).toString( 'hex' ),
+    )
     // const key = crypto.scryptSync(
     //   intermediateKey,
     //   LevelHealth.cipherSpec.salt,
@@ -1065,16 +1107,18 @@ export default class LevelHealth {
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
+    )
     let decrypted = decipher.update(
       encryptedDynamicNonPMDD.encryptedDynamicNonPMDD,
       'hex',
       'utf8',
-    );
-    decrypted += decipher.final('utf8');
+    )
+    decrypted += decipher.final( 'utf8' )
 
-    const decryptedDynamicNonPMDD = JSON.parse(decrypted);
-    return { decryptedDynamicNonPMDD };
+    const decryptedDynamicNonPMDD = JSON.parse( decrypted )
+    return {
+      decryptedDynamicNonPMDD
+    }
   };
 
   public restoreDynamicNonPMDD = (
@@ -1082,22 +1126,24 @@ export default class LevelHealth {
   ): {
     decryptedDynamicNonPMDD: MetaShare[];
   } => {
-    if (dynamicNonPMDDs.length === 0) {
-      throw new Error('No dynamicNonPMDDs supplied');
+    if ( dynamicNonPMDDs.length === 0 ) {
+      throw new Error( 'No dynamicNonPMDDs supplied' )
     }
 
     const latestDNP = dynamicNonPMDDs
-      .sort((dnp1, dnp2) => {
+      .sort( ( dnp1, dnp2 ) => {
         return dnp1.updatedAt > dnp2.updatedAt
           ? 1
           : dnp2.updatedAt > dnp1.updatedAt
-          ? -1
-          : 0;
-      })
-      .pop();
+            ? -1
+            : 0
+      } )
+      .pop()
 
-    const { decryptedDynamicNonPMDD } = this.decryptDynamicNonPMDD(latestDNP);
-    return { decryptedDynamicNonPMDD };
+    const { decryptedDynamicNonPMDD } = this.decryptDynamicNonPMDD( latestDNP )
+    return {
+      decryptedDynamicNonPMDD
+    }
   };
 
   public updateDynamicNonPMDD = async (
@@ -1107,29 +1153,29 @@ export default class LevelHealth {
   }> => {
     const encryptedDynamicNonPMDD: EncDynamicNonPMDD = {
       updatedAt: Date.now(),
-      encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD(dynamicNonPMDD)
+      encryptedDynamicNonPMDD: this.encryptDynamicNonPMDD( dynamicNonPMDD )
         .encryptedDynamicNonPMDD,
-    };
+    }
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('updateDynamicNonPMDD', {
+      res = await BH_AXIOS.post( 'updateDynamicNonPMDD', {
         HEXA_ID,
         walletID: this.walletId,
         encryptedDynamicNonPMDD,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
-    const { updated } = res.data;
-    if (updated) {
+    const { updated } = res.data
+    if ( updated ) {
       return {
         updated,
-      };
+      }
     } else {
-      throw new Error('Unable to update the NonPMDD');
+      throw new Error( 'Unable to update the NonPMDD' )
     }
   };
 
@@ -1146,30 +1192,30 @@ export default class LevelHealth {
   ): {
     metaShares: MetaShare[];
   } => {
-    if (!this.encryptedSecretsKeeper.length) {
-      throw new Error('Can not create MetaShares; missing encryptedSecrets');
+    if ( !this.encryptedSecretsKeeper.length ) {
+      throw new Error( 'Can not create MetaShares; missing encryptedSecrets' )
     }
 
     const {
       encryptedSocialStaticNonPMDD,
       encryptedBuddyStaticNonPMDD,
-    } = this.generateStaticNonPMDD(secureAssets);
+    } = this.generateStaticNonPMDD( secureAssets )
 
-    const timestamp = new Date().toLocaleString(undefined, {
+    const timestamp = new Date().toLocaleString( undefined, {
       day: 'numeric',
       month: 'numeric',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    } )
 
-    let index = 0;
-    let metaShare: MetaShare;
-    for (const encryptedSecret of this.encryptedSecretsKeeper) {
-      if (index === 0) {
+    let index = 0
+    let metaShare: MetaShare
+    for ( const encryptedSecret of this.encryptedSecretsKeeper ) {
+      if ( index === 0 ) {
         metaShare = {
           encryptedSecret,
-          shareId: LevelHealth.getShareId(encryptedSecret),
+          shareId: LevelHealth.getShareId( encryptedSecret ),
           meta: {
             version: version ? version : '0',
             validator: 'HEXA',
@@ -1181,11 +1227,11 @@ export default class LevelHealth {
             questionId
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
-        };
+        }
       } else {
         metaShare = {
           encryptedSecret,
-          shareId: LevelHealth.getShareId(encryptedSecret),
+          shareId: LevelHealth.getShareId( encryptedSecret ),
           meta: {
             version: version ? version : '0',
             validator: 'HEXA',
@@ -1197,18 +1243,20 @@ export default class LevelHealth {
             questionId
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
-        };
+        }
       }
 
-      this.metaSharesKeeper.push(metaShare);
-      index++;
+      this.metaSharesKeeper.push( metaShare )
+      index++
     }
-    if (this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL) {
-      this.metaSharesKeeper = [];
-      throw new Error('Something went wrong while generating metaShares');
+    if ( this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL ) {
+      this.metaSharesKeeper = []
+      throw new Error( 'Something went wrong while generating metaShares' )
     }
 
-    return { metaShares: this.metaSharesKeeper };
+    return {
+      metaShares: this.metaSharesKeeper
+    }
   };
 
   public createMetaSharesKeeper = (
@@ -1226,31 +1274,31 @@ export default class LevelHealth {
   ): {
     metaShares: MetaShare[];
   } => {
-    if (!this.encryptedSecretsKeeper.length) {
-      throw new Error('Can not create MetaShares; missing encryptedSecrets');
+    if ( !this.encryptedSecretsKeeper.length ) {
+      throw new Error( 'Can not create MetaShares; missing encryptedSecrets' )
     }
 
     const {
       encryptedSocialStaticNonPMDD,
       encryptedBuddyStaticNonPMDD,
-    } = this.generateStaticNonPMDD(secureAssets);
+    } = this.generateStaticNonPMDD( secureAssets )
 
-    const timestamp = new Date().toLocaleString(undefined, {
+    const timestamp = new Date().toLocaleString( undefined, {
       day: 'numeric',
       month: 'numeric',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    } )
 
-    let index = 0;
-    let metaShareArray = [];
-    let metaShare: MetaShare;
-    for (const encryptedSecret of this.encryptedSecretsKeeper) {
-      if (index === 1) {
+    let index = 0
+    const metaShareArray = []
+    let metaShare: MetaShare
+    for ( const encryptedSecret of this.encryptedSecretsKeeper ) {
+      if ( index === 1 ) {
         metaShare = {
           encryptedSecret,
-          shareId: LevelHealth.getShareId(encryptedSecret),
+          shareId: LevelHealth.getShareId( encryptedSecret ),
           meta: {
             version: version ? version : '0',
             validator: 'HEXA',
@@ -1263,11 +1311,11 @@ export default class LevelHealth {
             question
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
-        };
+        }
       } else {
         metaShare = {
           encryptedSecret,
-          shareId: LevelHealth.getShareId(encryptedSecret),
+          shareId: LevelHealth.getShareId( encryptedSecret ),
           meta: {
             version: version ? version : '0',
             validator: 'HEXA',
@@ -1280,31 +1328,35 @@ export default class LevelHealth {
             question
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
-        };
+        }
       }
-      metaShareArray.push(metaShare);
-      index++;
+      metaShareArray.push( metaShare )
+      index++
     }
-    this.metaSharesKeeper = metaShareArray;
-    
-     if (level == 2 && this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL) {
-      this.metaSharesKeeper = [];
-      throw new Error('Something went wrong while generating metaShares');
+    this.metaSharesKeeper = metaShareArray
+
+    if ( level == 2 && this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL ) {
+      this.metaSharesKeeper = []
+      throw new Error( 'Something went wrong while generating metaShares' )
     }
 
-    if (level == 3 && this.metaSharesKeeper.length !== config.SSS_LEVEL2_TOTAL) {
-      this.metaSharesKeeper = [];
-      throw new Error('Something went wrong while generating metaShares');
+    if ( level == 3 && this.metaSharesKeeper.length !== config.SSS_LEVEL2_TOTAL ) {
+      this.metaSharesKeeper = []
+      throw new Error( 'Something went wrong while generating metaShares' )
     }
 
-    return { metaShares: this.metaSharesKeeper };
+    return {
+      metaShares: this.metaSharesKeeper
+    }
   };
 
-  public reshareMetaShareKeeper = (index: number) => {
-    this.metaSharesKeeper[index].meta.reshareVersion =
-    this.metaSharesKeeper[index].meta.reshareVersion + 1;
-    console.log({ resharing: this.metaSharesKeeper[index] });
-    return this.metaSharesKeeper[index];
+  public reshareMetaShareKeeper = ( index: number ) => {
+    this.metaSharesKeeper[ index ].meta.reshareVersion =
+    this.metaSharesKeeper[ index ].meta.reshareVersion + 1
+    console.log( {
+      resharing: this.metaSharesKeeper[ index ]
+    } )
+    return this.metaSharesKeeper[ index ]
   };
 
   public restoreMetaSharesKeeper = (
@@ -1312,16 +1364,16 @@ export default class LevelHealth {
   ): {
     restored: boolean;
   } => {
-    if (!Object.keys(metaShares).length) {
-      throw new Error('Restoration requires metaShares');
+    if ( !Object.keys( metaShares ).length ) {
+      throw new Error( 'Restoration requires metaShares' )
     }
 
-    this.metaSharesKeeper = metaShares;
+    this.metaSharesKeeper = metaShares
 
     // restoring other assets
 
     // restoring healthCheckInit variable
-    this.healthCheckInitializedKeeper = true;
+    this.healthCheckInitializedKeeper = true
 
     // enriching pdf health variable if restoration is done via Personal Copy
     // if (this.metaSharesKeeper[3]) {
@@ -1332,52 +1384,56 @@ export default class LevelHealth {
     // }
 
     // replenishing shareIDs from any of the available shares
-    for (const share of metaShares) {
-      if (share) {
+    for ( const share of metaShares ) {
+      if ( share ) {
         const { decryptedStaticNonPMDD } = this.decryptStaticNonPMDD(
           share.encryptedStaticNonPMDD,
-        );
-        const { shareIDs } = decryptedStaticNonPMDD;
-        this.shareIDsKeeper = shareIDs;
-        break;
+        )
+        const { shareIDs } = decryptedStaticNonPMDD
+        this.shareIDsKeeper = shareIDs
+        break
       }
     }
 
-    return { restored: true };
+    return {
+      restored: true
+    }
   };
 
-  public createQR = (index: number): { qrData: string[] } => {
-    const splits: number = config.SSS_METASHARE_SPLITS;
-    const metaString = JSON.stringify(this.metaSharesKeeper[index]);
-    const slice = Math.trunc(metaString.length / splits);
-    const qrData: string[] = [];
+  public createQR = ( index: number ): { qrData: string[] } => {
+    const splits: number = config.SSS_METASHARE_SPLITS
+    const metaString = JSON.stringify( this.metaSharesKeeper[ index ] )
+    const slice = Math.trunc( metaString.length / splits )
+    const qrData: string[] = []
 
-    let start = 0;
-    let end = slice;
-    for (let itr = 0; itr < splits; itr++) {
-      if (itr !== splits - 1) {
-        qrData[itr] = metaString.slice(start, end);
+    let start = 0
+    let end = slice
+    for ( let itr = 0; itr < splits; itr++ ) {
+      if ( itr !== splits - 1 ) {
+        qrData[ itr ] = metaString.slice( start, end )
       } else {
-        qrData[itr] = metaString.slice(start);
+        qrData[ itr ] = metaString.slice( start )
       }
-      start = end;
-      end = end + slice;
-      if (index === 3) {
-        qrData[itr] = 'e0' + (itr + 1) + qrData[itr];
-      } else if (index === 4) {
-        qrData[itr] = 'c0' + (itr + 1) + qrData[itr];
+      start = end
+      end = end + slice
+      if ( index === 3 ) {
+        qrData[ itr ] = 'e0' + ( itr + 1 ) + qrData[ itr ]
+      } else if ( index === 4 ) {
+        qrData[ itr ] = 'c0' + ( itr + 1 ) + qrData[ itr ]
       }
-      if (itr === 0) {
+      if ( itr === 0 ) {
         this.pdfHealthKeeper = {
           ...this.pdfHealthKeeper,
-          [index]: {
-            shareId: this.metaSharesKeeper[index].shareId,
-            qrData: qrData[itr],
+          [ index ]: {
+            shareId: this.metaSharesKeeper[ index ].shareId,
+            qrData: qrData[ itr ],
           },
-        };
+        }
       }
     }
-    return { qrData };
+    return {
+      qrData
+    }
   };
 
   public encryptSecrets = (
@@ -1387,29 +1443,31 @@ export default class LevelHealth {
   ): {
     encryptedSecrets: string[];
   } => {
-    const key = LevelHealth.getDerivedKey(answer);
-    const shareIDs = [];
-    const encryptedSecretsTmp = [];
-    for (const secret of secretsToEncrypt) {
+    const key = LevelHealth.getDerivedKey( answer )
+    const shareIDs = []
+    const encryptedSecretsTmp = []
+    for ( const secret of secretsToEncrypt ) {
       const cipher = crypto.createCipheriv(
         LevelHealth.cipherSpec.algorithm,
         key,
         LevelHealth.cipherSpec.iv,
-      );
-      let encrypted = cipher.update(secret, 'utf8', 'hex');
-      encrypted += cipher.final('hex');
-      encryptedSecretsTmp.push(encrypted);
-      shareIDs.push(LevelHealth.getShareId(encrypted));
+      )
+      let encrypted = cipher.update( secret, 'utf8', 'hex' )
+      encrypted += cipher.final( 'hex' )
+      encryptedSecretsTmp.push( encrypted )
+      shareIDs.push( LevelHealth.getShareId( encrypted ) )
     }
-    if(isSmShares){
-      this.encryptedSMSecretsKeeper = encryptedSecretsTmp;
-      console.log('this.encryptedSMSecretsKeeper', this.encryptedSMSecretsKeeper)
+    if( isSmShares ){
+      this.encryptedSMSecretsKeeper = encryptedSecretsTmp
+      console.log( 'this.encryptedSMSecretsKeeper', this.encryptedSMSecretsKeeper )
     }else{
-      this.encryptedSecretsKeeper = encryptedSecretsTmp;
-      this.shareIDsKeeper = shareIDs; // preserving just the online(relay-transmitted) shareIDs
+      this.encryptedSecretsKeeper = encryptedSecretsTmp
+      this.shareIDsKeeper = shareIDs // preserving just the online(relay-transmitted) shareIDs
     }
-    
-    return { encryptedSecrets: encryptedSecretsTmp };
+
+    return {
+      encryptedSecrets: encryptedSecretsTmp
+    }
   };
 
   public encryptWI = (
@@ -1417,28 +1475,31 @@ export default class LevelHealth {
   ): { encryptedImage: EncryptedImage } => {
     // encrypts Wallet Image
     const encKey = LevelHealth.getDerivedKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
+      bip39.mnemonicToSeedSync( this.mnemonic ).toString( 'hex' ),
+    )
 
-    const encryptedImage = {};
-    for (const key of Object.keys(walletImage)) {
+    const encryptedImage = {
+    }
+    for ( const key of Object.keys( walletImage ) ) {
       const cipher = crypto.createCipheriv(
         LevelHealth.cipherSpec.algorithm,
         encKey,
         LevelHealth.cipherSpec.iv,
-      ); // needs to be re-created per decryption
+      ) // needs to be re-created per decryption
 
       let encrypted = cipher.update(
-        JSON.stringify(walletImage[key]),
+        JSON.stringify( walletImage[ key ] ),
         'utf8',
         'hex',
-      );
-      encrypted += cipher.final('hex');
+      )
+      encrypted += cipher.final( 'hex' )
 
-      encryptedImage[key] = encrypted;
+      encryptedImage[ key ] = encrypted
     }
 
-    return { encryptedImage };
+    return {
+      encryptedImage
+    }
   };
 
   public decryptWI = (
@@ -1447,23 +1508,26 @@ export default class LevelHealth {
     walletImage: WalletImage;
   } => {
     const decKey = LevelHealth.getDerivedKey(
-      bip39.mnemonicToSeedSync(this.mnemonic).toString('hex'),
-    );
+      bip39.mnemonicToSeedSync( this.mnemonic ).toString( 'hex' ),
+    )
 
-    const walletImage = {};
-    for (const key of Object.keys(encryptedImage)) {
+    const walletImage = {
+    }
+    for ( const key of Object.keys( encryptedImage ) ) {
       const decipher = crypto.createDecipheriv(
         LevelHealth.cipherSpec.algorithm,
         decKey,
         LevelHealth.cipherSpec.iv,
-      ); // needs to be re-created per decryption
+      ) // needs to be re-created per decryption
 
-      let decrypted = decipher.update(encryptedImage[key], 'hex', 'utf8');
-      decrypted += decipher.final('utf8');
-      walletImage[key] = JSON.parse(decrypted);
+      let decrypted = decipher.update( encryptedImage[ key ], 'hex', 'utf8' )
+      decrypted += decipher.final( 'utf8' )
+      walletImage[ key ] = JSON.parse( decrypted )
     }
 
-    return { walletImage };
+    return {
+      walletImage
+    }
   };
 
   public updateWalletImage = async (
@@ -1472,25 +1536,27 @@ export default class LevelHealth {
     updated: boolean;
   }> => {
     try {
-      let res: AxiosResponse;
+      let res: AxiosResponse
       try {
-        const { encryptedImage } = this.encryptWI(walletImage);
+        const { encryptedImage } = this.encryptWI( walletImage )
 
-        res = await BH_AXIOS.post('updateWalletImage', {
+        res = await BH_AXIOS.post( 'updateWalletImage', {
           HEXA_ID,
           walletID: this.walletId,
           encryptedImage,
-        });
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
-      const { updated } = res.data;
-      if (!updated) throw new Error();
+      const { updated } = res.data
+      if ( !updated ) throw new Error()
 
-      return { updated };
-    } catch (err) {
-      throw new Error('Failed to update Wallet Image');
+      return {
+        updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to update Wallet Image' )
     }
   };
 
@@ -1498,43 +1564,49 @@ export default class LevelHealth {
     walletImage: WalletImage;
   }> => {
     try {
-      let res: AxiosResponse;
+      let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post('fetchWalletImage', {
+        res = await BH_AXIOS.post( 'fetchWalletImage', {
           HEXA_ID,
           walletID: this.walletId,
-        });
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
-      const { encryptedImage } = res.data;
-      if (!encryptedImage) throw new Error();
+      const { encryptedImage } = res.data
+      if ( !encryptedImage ) throw new Error()
 
-      const { walletImage } = this.decryptWI(encryptedImage);
-      console.log({ walletImage });
-      return { walletImage };
-    } catch (err) {
-      throw new Error('Failed to fetch Wallet Image');
+      const { walletImage } = this.decryptWI( encryptedImage )
+      console.log( {
+        walletImage
+      } )
+      return {
+        walletImage
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch Wallet Image' )
     }
   };
 
   public updateGuardianInMetaShare = async (
     shareId: string,
-     name: string,
+    name: string,
   ) : Promise<{
    data: MetaShare[];
   }> => {
-    for (let i = 0; i < this.metaSharesKeeper.length; i++) {
-      const element = this.metaSharesKeeper[i];
-      console.log('updateGuardianInMetaShare Guardian name', name)
-      if(element.shareId == shareId){
-        console.log('updateGuardianInMetaShare element.shareId inside if', shareId);
-        this.metaSharesKeeper[i].meta.guardian = name.toLowerCase().trim();
+    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
+      const element = this.metaSharesKeeper[ i ]
+      console.log( 'updateGuardianInMetaShare Guardian name', name )
+      if( element.shareId == shareId ){
+        console.log( 'updateGuardianInMetaShare element.shareId inside if', shareId )
+        this.metaSharesKeeper[ i ].meta.guardian = name.toLowerCase().trim()
       }
     }
-    console.log('updateGuardianInMetaShare outside for', this.metaSharesKeeper);
-    return {data: this.metaSharesKeeper};
+    console.log( 'updateGuardianInMetaShare outside for', this.metaSharesKeeper )
+    return {
+      data: this.metaSharesKeeper
+    }
   }
 
   public static encryptWithAnswer = (
@@ -1543,15 +1615,17 @@ export default class LevelHealth {
   ): {
     encryptedString: string;
   } => {
-    const key = LevelHealth.getDerivedKey(answer);
+    const key = LevelHealth.getDerivedKey( answer )
     const cipher = crypto.createCipheriv(
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
-    let encrypted = cipher.update(secretsToEncrypt, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    return { encryptedString: encrypted };
+    )
+    let encrypted = cipher.update( secretsToEncrypt, 'utf8', 'hex' )
+    encrypted += cipher.final( 'hex' )
+    return {
+      encryptedString: encrypted
+    }
   };
 
   public static decryptWithAnswer = (
@@ -1560,58 +1634,60 @@ export default class LevelHealth {
   ): {
     decryptedString: string;
   } => {
-    const key = LevelHealth.getDerivedKey(answer);
-    const decryptedSecrets: string[] = [];
+    const key = LevelHealth.getDerivedKey( answer )
+    const decryptedSecrets: string[] = []
     const decipher = crypto.createDecipheriv(
       LevelHealth.cipherSpec.algorithm,
       key,
       LevelHealth.cipherSpec.iv,
-    );
-    let decrypted = decipher.update(secretsToDecrypt, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    
-    return { decryptedString: decrypted };
+    )
+    let decrypted = decipher.update( secretsToDecrypt, 'hex', 'utf8' )
+    decrypted += decipher.final( 'utf8' )
+
+    return {
+      decryptedString: decrypted
+    }
   };
 
   public static uploadPDFPrimaryShare = async (
     share: string,
     messageId?: string,
   ): Promise<{success : Boolean}> => {
-    console.log('uploadPDFPrimaryShare messageId', messageId)
-    let res: AxiosResponse;
+    console.log( 'uploadPDFPrimaryShare messageId', messageId )
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('uploadPDFShare', {
+      res = await BH_AXIOS.post( 'uploadPDFShare', {
         HEXA_ID,
         share,
         messageId
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
-    console.log('uploadPDFPrimaryShare res', res)
-    return res.data;
+    console.log( 'uploadPDFPrimaryShare res', res )
+    return res.data
   };
 
    public static uploadPDFSecondaryShare = async (
-    share: string,
-    messageId?: string,
-  ): Promise<{success : Boolean}> => {
-    console.log('uploadPDFSecondaryShare messageId', messageId)
-    let res: AxiosResponse;
-    try {
-      res = await BH_AXIOS.post('uploadPDFSecondaryShare', {
-        HEXA_ID,
-        share,
-        messageId
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
-    }
-    console.log('uploadPDFSecondaryShare res', res)
-    return res.data;
-  };
+     share: string,
+     messageId?: string,
+   ): Promise<{success : Boolean}> => {
+     console.log( 'uploadPDFSecondaryShare messageId', messageId )
+     let res: AxiosResponse
+     try {
+       res = await BH_AXIOS.post( 'uploadPDFSecondaryShare', {
+         HEXA_ID,
+         share,
+         messageId
+       } )
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+     }
+     console.log( 'uploadPDFSecondaryShare res', res )
+     return res.data
+   };
 
   public static removeUnwantedUnderCustody = async (
     metaShares: MetaShare[],
@@ -1625,8 +1701,8 @@ export default class LevelHealth {
       err?: string;
     }>;
   }> => {
-    if (metaShares.length === 0) {
-      throw new Error('No metaShare supplied')
+    if ( metaShares.length === 0 ) {
+      throw new Error( 'No metaShare supplied' )
     }
 
     const toUpdate: Array<{
@@ -1634,47 +1710,49 @@ export default class LevelHealth {
       shareId: string;
       reshareVersion: number;
     }> = []
-    for (const metaShare of metaShares) {
-      toUpdate.push({
+    for ( const metaShare of metaShares ) {
+      toUpdate.push( {
         walletId: metaShare.meta.walletId,
         shareId: metaShare.shareId,
         reshareVersion: metaShare.meta.reshareVersion,
-      })
+      } )
     }
 
     let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('removeUnwantedUnderCustody', {
+      res = await BH_AXIOS.post( 'removeUnwantedUnderCustody', {
         HEXA_ID,
         toUpdate,
-      })
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err)
-      if (err.code) throw new Error(err.code)
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
 
     const { updationInfo } = res.data
     return {
-      updationInfo 
+      updationInfo
     }
   };
 
-  public generateSMShares = (secondaryMnemonics: string): {
+  public generateSMShares = ( secondaryMnemonics: string ): {
     shares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     const shares = secrets.share(
-      this.stringToHex(secondaryMnemonics),
+      this.stringToHex( secondaryMnemonics ),
       config.SSS_LEVEL1_TOTAL,
       config.SSS_LEVEL1_THRESHOLD,
-    );
+    )
 
-    for (let itr = 0; itr < shares.length; itr++) {
-      const checksum = LevelHealth.calculateChecksum(shares[itr]);
-      shares[itr] = shares[itr] + checksum;
+    for ( let itr = 0; itr < shares.length; itr++ ) {
+      const checksum = LevelHealth.calculateChecksum( shares[ itr ] )
+      shares[ itr ] = shares[ itr ] + checksum
     }
 
-    return { shares };
+    return {
+      shares
+    }
   };
   public createSMMetaSharesKeeper = (
     secondaryMnemonic: string,
@@ -1685,44 +1763,46 @@ export default class LevelHealth {
   ): {
     metaShares: MetaShare[];
   } => {
-    if (!this.encryptedSMSecretsKeeper.length) {
-      console.log('Can not create MetaShares; missing encryptedSecrets')
-      throw new Error('Can not create MetaShares; missing encryptedSecrets');
+    if ( !this.encryptedSMSecretsKeeper.length ) {
+      console.log( 'Can not create MetaShares; missing encryptedSecrets' )
+      throw new Error( 'Can not create MetaShares; missing encryptedSecrets' )
     }
 
-    const timestamp = new Date().toLocaleString(undefined, {
+    const timestamp = new Date().toLocaleString( undefined, {
       day: 'numeric',
       month: 'numeric',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-    });
+    } )
 
-    let index = 0;
-    let metaShareArray = [];
-    let metaShare: MetaShare;
-    for (const encryptedSecret of this.encryptedSMSecretsKeeper) {
-        metaShare = {
-          encryptedSecret,
-          shareId: LevelHealth.getShareId(encryptedSecret),
-          meta: {
-            version: version ? version : '0',
-            validator: 'HEXA',
-            index,
-            walletId: this.walletId,
-            tag,
-            timestamp,
-            reshareVersion: 0,
-            questionId,
-            question
-          },
-        };
-      metaShareArray.push(metaShare);
-      index++;
+    let index = 0
+    const metaShareArray = []
+    let metaShare: MetaShare
+    for ( const encryptedSecret of this.encryptedSMSecretsKeeper ) {
+      metaShare = {
+        encryptedSecret,
+        shareId: LevelHealth.getShareId( encryptedSecret ),
+        meta: {
+          version: version ? version : '0',
+          validator: 'HEXA',
+          index,
+          walletId: this.walletId,
+          tag,
+          timestamp,
+          reshareVersion: 0,
+          questionId,
+          question
+        },
+      }
+      metaShareArray.push( metaShare )
+      index++
     }
-    this.SMMetaSharesKeeper = metaShareArray;
-    console.log('this.SMMetaSharesKeeper', this.SMMetaSharesKeeper)
-    return { metaShares: this.SMMetaSharesKeeper };
+    this.SMMetaSharesKeeper = metaShareArray
+    console.log( 'this.SMMetaSharesKeeper', this.SMMetaSharesKeeper )
+    return {
+      metaShares: this.SMMetaSharesKeeper
+    }
   };
 
   public static uploadRequestedSMShare = async (
@@ -1731,64 +1811,76 @@ export default class LevelHealth {
     otp?: string,
     encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
   ): Promise<{ success: boolean }> => {
-    let key = encryptedKey; // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if (otp) {
-      key = LevelHealth.decryptViaOTP(encryptedKey, otp).decryptedData;
+    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
+    if ( otp ) {
+      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
     }
     const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
       metaShare,
       key,
-    );
+    )
 
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('uploadSecondaryShare', {
+      res = await BH_AXIOS.post( 'uploadSecondaryShare', {
         HEXA_ID,
         share: encryptedMetaShare,
         messageId,
         encryptedDynamicNonPMDD,
-      });
+      } )
 
-      const { success } = res.data;
-      if (!success) {
-        return { success: false };
+      const { success } = res.data
+      if ( !success ) {
+        return {
+          success: false
+        }
       }
-      return { success };
-    } catch (err) {
-      return { success: false };
+      return {
+        success
+      }
+    } catch ( err ) {
+      return {
+        success: false
+      }
     }
   };
 
   public deleteSmSharesAndSM = async (): Promise<{ success: boolean }> => {
-    this.SMMetaSharesKeeper = [];
-    this.encryptedSMSecretsKeeper = [];
-    return { success: true };
+    this.SMMetaSharesKeeper = []
+    this.encryptedSMSecretsKeeper = []
+    return {
+      success: true
+    }
   };
 
-  public updateKeeperInfoToMetaShare = (keeperInfo: any, answer: string): { metaShares: MetaShare[] } => {
-    let {encryptedString} = LevelHealth.encryptWithAnswer(JSON.stringify(keeperInfo), answer);
-    console.log("ENCRYPTED KEEPERINFO", encryptedString);
-    for (let i = 0; i < this.metaSharesKeeper.length; i++) {
-      this.metaSharesKeeper[i].meta.encryptedKeeperInfo = encryptedString;
+  public updateKeeperInfoToMetaShare = ( keeperInfo: any, answer: string ): { metaShares: MetaShare[] } => {
+    const { encryptedString } = LevelHealth.encryptWithAnswer( JSON.stringify( keeperInfo ), answer )
+    console.log( 'ENCRYPTED KEEPERINFO', encryptedString )
+    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
+      this.metaSharesKeeper[ i ].meta.encryptedKeeperInfo = encryptedString
     }
-    console.log('updateKeeperInfoToMetaShare this.metaSharesKeeper', this.metaSharesKeeper);
-    return { metaShares: this.metaSharesKeeper };
+    console.log( 'updateKeeperInfoToMetaShare this.metaSharesKeeper', this.metaSharesKeeper )
+    return {
+      metaShares: this.metaSharesKeeper
+    }
   };
 
-  public static getSecondaryMnemonics = (secretsArray: MetaShare[], answer: string) => {
-    let decryptedShareArr = [];
-    for (let i = 0; i < secretsArray.length; i++) {
-      const element = secretsArray[i];
-      decryptedShareArr.push(element.encryptedSecret);
+  public static getSecondaryMnemonics = ( secretsArray: MetaShare[], answer: string ) => {
+    const decryptedShareArr = []
+    for ( let i = 0; i < secretsArray.length; i++ ) {
+      const element = secretsArray[ i ]
+      decryptedShareArr.push( element.encryptedSecret )
     }
-    let { decryptedSecrets } = LevelHealth.decryptSecrets(decryptedShareArr, answer)
-    const recoveredMnemonicHex = secrets.combine(decryptedSecrets);
-    console.log('recoveredMnemonicHex', recoveredMnemonicHex);
-    console.log('LevelHealth.hexToString(recoveredMnemonicHex)', LevelHealth.hexToString(recoveredMnemonicHex))
-    return { mnemonic: LevelHealth.hexToString(recoveredMnemonicHex) };
+    const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
+    const recoveredMnemonicHex = secrets.combine( decryptedSecrets )
+    console.log( 'recoveredMnemonicHex', recoveredMnemonicHex )
+    console.log( 'LevelHealth.hexToString(recoveredMnemonicHex)', LevelHealth.hexToString( recoveredMnemonicHex ) )
+    return {
+      mnemonic: LevelHealth.hexToString( recoveredMnemonicHex )
+    }
   }
 
-  public static downloadSMPDFShare = async (messageId: string, key: string): Promise<
+  public static downloadSMPDFShare = async ( messageId: string, key: string ): Promise<
     | {
         status: number;
         metaShare: MetaShare;
@@ -1798,20 +1890,22 @@ export default class LevelHealth {
         metaShare: MetaShare;
       }
   > => {
-    let res: AxiosResponse;
+    let res: AxiosResponse
     try {
-      res = await BH_AXIOS.post('downloadPDFSecondaryShare', {
+      res = await BH_AXIOS.post( 'downloadPDFSecondaryShare', {
         HEXA_ID,
         messageId,
-      });
-    } catch (err) {
-      if (err.response) throw new Error(err.response.data.err);
-      if (err.code) throw new Error(err.code);
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
     }
-    console.log('downloadSMPDFShare res', res);
-    let { decryptedMetaShare } = LevelHealth.decryptMetaShare(res.data.share,key);
+    console.log( 'downloadSMPDFShare res', res )
+    const { decryptedMetaShare } = LevelHealth.decryptMetaShare( res.data.share, key )
 
-    const { share } = res.data;
-    return { status: 200, metaShare: decryptedMetaShare };
+    const { share } = res.data
+    return {
+      status: 200, metaShare: decryptedMetaShare
+    }
   };
 }

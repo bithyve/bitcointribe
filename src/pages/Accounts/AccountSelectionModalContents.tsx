@@ -123,7 +123,7 @@ export default function AccountSelectionModalContents( props ) {
           style={styles.successModalButtonView}
         >
           {props.loading && props.loading == true ? (
-            <ActivityIndicator size="small" />
+            <ActivityIndicator color={Colors.white} size="small" />
           ) : (
             <Text style={styles.proceedButtonText}>Confirm</Text>
           )}

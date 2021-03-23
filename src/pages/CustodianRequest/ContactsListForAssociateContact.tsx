@@ -194,7 +194,7 @@ const ContactsListForAssociateContact = ( props ) => {
             }}
           >
             {approvingTrustedContact ? (
-              <ActivityIndicator size={'small'} />
+              <ActivityIndicator color={Colors.white} size={'small'} />
             ) : (
               <Text
                 style={{
