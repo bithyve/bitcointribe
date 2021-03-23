@@ -716,9 +716,6 @@ export const downloadSmShareForApproval = ( qrData ) =>{
 }
 
 export const updateCloudPermission = ( cloudPermissionGranted ) => {
-  console.log( {
-    cloudPermissionGranted
-  } )
   return {
     type: UPDATE_CLOUD_PERMISSION, payload: {
       cloudPermissionGranted

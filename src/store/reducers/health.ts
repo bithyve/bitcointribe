@@ -402,7 +402,6 @@ export default ( state = initialState, action ) => {
           uploadSMSuccessfully: action.payload.isUploaded,
         }
       case UPDATE_CLOUD_PERMISSION:
-        console.log( 'UPDATE_CLOUD_PERMISSION', action.payload )
         return {
           ...state,
           cloudPermissionGranted: action.payload.cloudPermissionGranted
