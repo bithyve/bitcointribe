@@ -1,12 +1,11 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGenerator2, serviceGenerator, serviceGeneratorForNewBHR } from '../utils/utilities'
+import { createWatcher } from '../utils/utilities'
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 import {
   SETUP_WALLET_DETAILS,
-  INITIALIZE_DB_HYDRATION,
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
@@ -19,44 +18,12 @@ import {
   credsChanged,
   pinChangedFailed,
   setIsNewHealthSystemSet,
-  databaseHydrated,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 // import { timer } from '../../utils'
-
-function* initDBHydrationWorker() {
-  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const initialDatabase: Database = {
-    DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {
-      },
-      SHARES_TRANSFER_DETAILS: {
-      },
-      UNDER_CUSTODY: {
-      },
-      DYNAMIC_NONPMDD: {
-      },
-    },
-    SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-      KEEPERS_INFO: JSON.stringify( keepersInfo ),
-    },
-    VERSION: DeviceInfo.getVersion(),
-  }
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
-  yield put( databaseHydrated() )
-}
-
-export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )
 
 function* setupWalletDetailsWorker( { payload } ) {
   const { walletName, security } = payload

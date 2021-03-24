@@ -6,12 +6,18 @@ export const FETCH_FROM_DB = 'FETCH_FROM_DB'
 export const INSERT_INTO_DB = 'INSERT_INTO_DB'
 export const KEY_FETCHED = 'KEY_FETCHED'
 export const ENRICH_SERVICES = 'ENRICH_SERVICES'
-
+export const INITIALIZE_DB_HYDRATION = 'INITIALIZE_DB_HYDRATION'
 
 
 export const initializeDB = () => {
   return {
     type: INIT_DB
+  }
+}
+
+export const initializeDBHydration = ( ) => {
+  return {
+    type: INITIALIZE_DB_HYDRATION
   }
 }
 
@@ -43,6 +49,7 @@ export const enrichServices = ( database ) => {
 
 // types and action creators (saga): dispatched by saga workers
 export const DB_INITIALIZED = 'DB_INITIALIZED'
+export const DATABASE_HYDRATED = 'DATABASE_HYDRATED'
 export const DB_FETCHED = 'DB_FETCHED'
 export const DB_INSERTED = 'DB_INSERTED'
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED'
@@ -52,6 +59,12 @@ export const dbInitialized = ( initialized ) => {
     type: DB_INITIALIZED, payload: {
       initialized
     }
+  }
+}
+
+export const databaseHydrated = () => {
+  return {
+    type: DATABASE_HYDRATED
   }
 }
 
