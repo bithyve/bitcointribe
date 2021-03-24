@@ -1,5 +1,5 @@
-import { call, delay, put, select } from "redux-saga/effects";
-import { createWatcher } from "../utils/utilities";
+import { call, delay, put, select } from 'redux-saga/effects'
+import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import {
   INIT_DB,
   dbInitialized,
@@ -9,128 +9,158 @@ import {
   dbInserted,
   ENRICH_SERVICES,
   servicesEnriched,
-} from "../actions/storage";
-import dataManager from "../../storage/database-manager";
-import RegularAccount from "../../bitcoin/services/accounts/RegularAccount";
-import TestAccount from "../../bitcoin/services/accounts/TestAccount";
-import SecureAccount from "../../bitcoin/services/accounts/SecureAccount";
-import S3Service from "../../bitcoin/services/sss/S3Service";
-import TrustedContactsService from "../../bitcoin/services/TrustedContactsService";
-import { AsyncStorage } from "react-native";
-import DeviceInfo from "react-native-device-info";
-import semver from "semver";
-import { updateWalletImage } from "../actions/sss";
-import { walletCheckIn } from "../actions/trustedContacts";
-import KeeperService from "../../bitcoin/services/KeeperService";
-import { updateWalletImageHealth } from "../actions/health";
-import config from "../../bitcoin/HexaConfig";
+} from '../actions/storage'
+import dataManager from '../../storage/database-manager'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { AsyncStorage } from 'react-native'
+import DeviceInfo from 'react-native-device-info'
+import semver from 'semver'
+import { walletCheckIn } from '../actions/trustedContacts'
+import KeeperService from '../../bitcoin/services/KeeperService'
+import { updateWalletImageHealth } from '../actions/health'
+import config from '../../bitcoin/HexaConfig'
+import { databaseHydrated, INITIALIZE_DB_HYDRATION } from '../actions/storage'
+import { Database } from '../../common/interfaces/Interfaces'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
   try {
-    yield call(dataManager.initialize);
-    yield put(dbInitialized(true));
-  } catch (err) {
-    console.log(err);
-    yield put(dbInitialized(false));
+    yield call( dataManager.initialize )
+    yield put( dbInitialized( true ) )
+  } catch ( err ) {
+    console.log( err )
+    yield put( dbInitialized( false ) )
   }
 }
 
-export const initDBWatcher = createWatcher(initDBWorker, INIT_DB);
+export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
+
+function* initDBHydrationWorker() {
+  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  const initialDatabase: Database = {
+    DECENTRALIZED_BACKUP: {
+      RECOVERY_SHARES: {
+      },
+      SHARES_TRANSFER_DETAILS: {
+      },
+      UNDER_CUSTODY: {
+      },
+      DYNAMIC_NONPMDD: {
+      },
+    },
+    SERVICES: {
+      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
+      TEST_ACCOUNT: JSON.stringify( testAcc ),
+      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
+      S3_SERVICE: JSON.stringify( s3Service ),
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      KEEPERS_INFO: JSON.stringify( keepersInfo ),
+    },
+    VERSION: DeviceInfo.getVersion(),
+  }
+  yield call( insertDBWorker, {
+    payload: initialDatabase
+  } )
+  yield put( databaseHydrated() )
+}
+
+export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )
+
 
 function* fetchDBWorker() {
   try {
     // let t = timer('fetchDBWorker')
-    const key = yield select((state) => state.storage.key);
-    const database = yield call(dataManager.fetch, key);
-    if (key && database) {
-      yield call(servicesEnricherWorker, {
+    const key = yield select( ( state ) => state.storage.key )
+    const database = yield call( dataManager.fetch, key )
+    if ( key && database ) {
+      yield call( servicesEnricherWorker, {
         payload: {
           database,
         },
-      });
-      yield put(dbFetched(database));
+      } )
+      yield put( dbFetched( database ) )
 
-      if (yield call(AsyncStorage.getItem, "walletExists")) {
+      if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
-        yield put(walletCheckIn());
-        yield put(updateWalletImageHealth());
+        yield put( walletCheckIn() )
+        yield put( updateWalletImageHealth() )
         //yield put( updateWalletImage() )
       }
     } else {
       // DB would be absent during wallet setup
     }
-  } catch (err) {
-    console.log(err);
+  } catch ( err ) {
+    console.log( err )
   }
 }
 
-export const fetchDBWatcher = createWatcher(fetchDBWorker, FETCH_FROM_DB);
+export const fetchDBWatcher = createWatcher( fetchDBWorker, FETCH_FROM_DB )
 
-export function* insertDBWorker({ payload }) {
-  console.log("*********************************************");
-  // console.log("insertDBWorker payload", payload);
-  console.log("*********************************************");
+export function* insertDBWorker( { payload } ) {
   try {
-    const storage = yield select((state) => state.storage);
-    const { database, insertedIntoDB, key } = storage;
-    if (!key) {
+    const storage = yield select( ( state ) => state.storage )
+    const { database, insertedIntoDB, key } = storage
+    if ( !key ) {
       // dispatch failure
-      console.log("Key missing");
-      return;
+      console.log( 'Key missing' )
+      return
     }
 
     const updatedDB = {
       ...database,
       ...payload,
-    };
+    }
 
     const inserted = yield call(
       dataManager.insert,
       updatedDB,
       key,
       insertedIntoDB
-    );
-    if (!inserted) {
+    )
+    if ( !inserted ) {
       // dispatch failure
-      console.log("Failed to insert into DB");
-      return;
+      console.log( 'Failed to insert into DB' )
+      return
     }
-    yield put(dbInserted(payload));
+    yield put( dbInserted( payload ) )
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
-    yield call(servicesEnricherWorker, {
+    yield call( servicesEnricherWorker, {
       payload: {
         database: updatedDB,
       },
-    });
-  } catch (err) {
-    console.log(err);
+    } )
+  } catch ( err ) {
+    console.log( err )
   }
 }
-export const insertDBWatcher = createWatcher(insertDBWorker, INSERT_INTO_DB);
+export const insertDBWatcher = createWatcher( insertDBWorker, INSERT_INTO_DB )
 
-function* servicesEnricherWorker({ payload }) {
+function* servicesEnricherWorker( { payload } ) {
   try {
     const database = payload.database
       ? payload.database
-      : yield select((state) => state.storage.database);
-    if (!database) {
-      throw new Error("Database missing; services encrichment failed");
+      : yield select( ( state ) => state.storage.database )
+    if ( !database ) {
+      throw new Error( 'Database missing; services encrichment failed' )
     }
 
-    let dbVersion = database.VERSION;
-    let appVersion = DeviceInfo.getVersion();
-    if (appVersion === "0.7") {
-      appVersion = "0.7.0";
+    let dbVersion = database.VERSION
+    let appVersion = DeviceInfo.getVersion()
+    if ( appVersion === '0.7' ) {
+      appVersion = '0.7.0'
     }
-    if (appVersion === "0.8") {
-      appVersion = "0.8.0";
+    if ( appVersion === '0.8' ) {
+      appVersion = '0.8.0'
     }
-    if (appVersion === "0.9") {
-      appVersion = "0.9.0";
+    if ( appVersion === '0.9' ) {
+      appVersion = '0.9.0'
     }
-    let services;
-    let migrated = false;
+    let services
+    let migrated = false
     const {
       REGULAR_ACCOUNT,
       TEST_ACCOUNT,
@@ -138,122 +168,122 @@ function* servicesEnricherWorker({ payload }) {
       S3_SERVICE,
       TRUSTED_CONTACTS,
       KEEPERS_INFO,
-    } = database.SERVICES;
+    } = database.SERVICES
 
-    if (!database.VERSION) {
-      dbVersion = "0.7.0";
-    } else if (database.VERSION === "0.8") {
-      dbVersion = "0.8.0";
-    } else if (database.VERSION === "0.9") {
-      dbVersion = "0.9.0";
-    } else if (database.VERSION === "1.0") {
-      dbVersion = "1.0.0";
+    if ( !database.VERSION ) {
+      dbVersion = '0.7.0'
+    } else if ( database.VERSION === '0.8' ) {
+      dbVersion = '0.8.0'
+    } else if ( database.VERSION === '0.9' ) {
+      dbVersion = '0.9.0'
+    } else if ( database.VERSION === '1.0' ) {
+      dbVersion = '1.0.0'
     }
-    if (semver.gt(appVersion, dbVersion)) {
-      if (dbVersion === "0.7.0" && semver.gte(appVersion, "0.9.0")) {
+    if ( semver.gt( appVersion, dbVersion ) ) {
+      if ( dbVersion === '0.7.0' && semver.gte( appVersion, '0.9.0' ) ) {
         // version 0.7.0 support
-        console.log("Migration running for 0.7.0");
+        console.log( 'Migration running for 0.7.0' )
         services = {
-          REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-          TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-          SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-          S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+          REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+          TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+          SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+          S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
           TRUSTED_CONTACTS: new TrustedContactsService(),
           KEEPERS_INFO: new KeeperService(),
-        };
+        }
         // hydrating new/missing async storage variables
         yield call(
           AsyncStorage.setItem,
-          "walletID",
+          'walletID',
           services.S3_SERVICE.sss.walletId
-        );
+        )
 
-        migrated = true;
+        migrated = true
       } else {
         // default enrichment (when database versions are different but migration is not available)
         services = {
-          REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-          TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-          SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-          S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+          REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+          TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+          SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+          S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
           TRUSTED_CONTACTS: TRUSTED_CONTACTS
-            ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+            ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
             : new TrustedContactsService(),
           KEEPERS_INFO: KEEPERS_INFO
-            ? KeeperService.fromJSON(KEEPERS_INFO)
+            ? KeeperService.fromJSON( KEEPERS_INFO )
             : new KeeperService(),
-        };
+        }
       }
 
-      if (semver.eq(appVersion, "1.1.0")) {
+      if ( semver.eq( appVersion, '1.1.0' ) ) {
         // version 1.0 and lower support
 
         // re-derive primary extended keys (standardization)
-        const secureAccount: SecureAccount = services.SECURE_ACCOUNT;
-        if (secureAccount.secureHDWallet.rederivePrimaryXKeys()) {
-          console.log("Standardized Primary XKeys for secure a/c");
-          services.SECURE_ACCOUNT = secureAccount;
-          migrated = true;
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT
+        if ( secureAccount.secureHDWallet.rederivePrimaryXKeys() ) {
+          console.log( 'Standardized Primary XKeys for secure a/c' )
+          services.SECURE_ACCOUNT = secureAccount
+          migrated = true
         }
       }
 
-      if (semver.lt(dbVersion, "1.4.5")) {
+      if ( semver.lt( dbVersion, '1.4.5' ) ) {
         // update sub-account instances count
-        const regularAccount: RegularAccount = services.REGULAR_ACCOUNT;
-        const secureAccount: SecureAccount = services.SECURE_ACCOUNT;
+        const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT
 
-        for (const accountType of Object.keys(config.DERIVATIVE_ACC)) {
-          let instanceCount = 5;
-          if (accountType == "TRUSTED_CONTACTS") {
-            instanceCount = 20;
+        for ( const accountType of Object.keys( config.DERIVATIVE_ACC ) ) {
+          let instanceCount = 5
+          if ( accountType == 'TRUSTED_CONTACTS' ) {
+            instanceCount = 20
           }
           regularAccount.hdWallet.derivativeAccounts[
             accountType
-          ].instance.max = instanceCount;
+          ].instance.max = instanceCount
           secureAccount.secureHDWallet.derivativeAccounts[
             accountType
-          ].instance.max = instanceCount;
+          ].instance.max = instanceCount
         }
 
-        console.log("Updated sub-account instances count");
-        services.REGULAR_ACCOUNT = regularAccount;
-        services.SECURE_ACCOUNT = secureAccount;
-        migrated = true;
+        console.log( 'Updated sub-account instances count' )
+        services.REGULAR_ACCOUNT = regularAccount
+        services.SECURE_ACCOUNT = secureAccount
+        migrated = true
       }
     } else {
       services = {
-        REGULAR_ACCOUNT: RegularAccount.fromJSON(REGULAR_ACCOUNT),
-        TEST_ACCOUNT: TestAccount.fromJSON(TEST_ACCOUNT),
-        SECURE_ACCOUNT: SecureAccount.fromJSON(SECURE_ACCOUNT),
-        S3_SERVICE: S3Service.fromJSON(S3_SERVICE),
+        REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
+        TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
+        SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
+        S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
         TRUSTED_CONTACTS: TRUSTED_CONTACTS
-          ? TrustedContactsService.fromJSON(TRUSTED_CONTACTS)
+          ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
           : new TrustedContactsService(),
         KEEPERS_INFO: KEEPERS_INFO
-          ? KeeperService.fromJSON(KEEPERS_INFO)
+          ? KeeperService.fromJSON( KEEPERS_INFO )
           : new KeeperService(),
-      };
+      }
     }
-    yield put(servicesEnriched(services));
-    if (migrated) {
-      database.VERSION = DeviceInfo.getVersion();
+    yield put( servicesEnriched( services ) )
+    if ( migrated ) {
+      database.VERSION = DeviceInfo.getVersion()
       database.SERVICES = {
-        REGULAR_ACCOUNT: JSON.stringify(services.REGULAR_ACCOUNT),
-        TEST_ACCOUNT: JSON.stringify(services.TEST_ACCOUNT),
-        SECURE_ACCOUNT: JSON.stringify(services.SECURE_ACCOUNT),
-        S3_SERVICE: JSON.stringify(services.S3_SERVICE),
-        TRUSTED_CONTACTS: JSON.stringify(services.TRUSTED_CONTACTS),
-      };
-      yield call(insertDBWorker, {
+        REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
+        TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
+        SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
+        S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
+        TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+      }
+      yield call( insertDBWorker, {
         payload: database,
-      });
+      } )
     }
-  } catch (err) {
-    console.log(err);
+  } catch ( err ) {
+    console.log( err )
   }
 }
 
 export const servicesEnricherWatcher = createWatcher(
   servicesEnricherWorker,
   ENRICH_SERVICES
-);
+)

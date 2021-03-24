@@ -4,6 +4,7 @@ import {
   DB_FETCHED,
   DB_INSERTED,
   KEY_FETCHED,
+  DATABASE_HYDRATED,
 } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 
@@ -14,16 +15,18 @@ const initialState: {
   database: Database;
   dbFetched: Boolean;
   databaseSSS: {};
+  databaseHydrated: Boolean;
 } = {
   databaseInitialized: false,
   insertedIntoDB: false,
   key: '',
   database: {
-    WALLET_SETUP: null, DECENTRALIZED_BACKUP: null 
+    WALLET_SETUP: null, DECENTRALIZED_BACKUP: null
   },
   dbFetched: false,
   databaseSSS: {
   },
+  databaseHydrated: false
 }
 
 export default ( state = initialState, action ) => {
@@ -45,9 +48,14 @@ export default ( state = initialState, action ) => {
           ...action.payload.updatedEntity,
         } ).setIn( [ 'insertedIntoDB' ], true ).value()
 
+
+      case DATABASE_HYDRATED:
+        return chain( state )
+          .setIn( [ 'databaseHydrated' ], true )
+          .value()
+
       case KEY_FETCHED:
         return chain( state ).setIn( [ 'key' ], action.payload.key ).value()
-
 
   }
   return state

@@ -362,7 +362,6 @@ export default class SecureHDWallet extends Bitcoin {
   };
 
   public getAccountId = (): string => {
-    console.log( 'this.xpubs', this.xpubs )
     if( this.xpubs && this.xpubs.secondary ){
       const xpub = this.xpubs.secondary
       return crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
@@ -1362,7 +1361,6 @@ export default class SecureHDWallet extends Bitcoin {
     // invoked once per wallet (during initial setup)
     let res: AxiosResponse
     this.secondaryMnemonic = bip39.generateMnemonic( 256 )
-    console.log( 'initSetupWorker setupSecureAccount secondaryMnemonic', this.secondaryMnemonic )
     const { secondaryID } = this.getSecondaryID( this.secondaryMnemonic )
     try {
       res = await SIGNING_AXIOS.post( 'setupSecureAccount', {

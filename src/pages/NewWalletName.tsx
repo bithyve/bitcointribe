@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import {
   StyleSheet,
   View,
@@ -25,17 +26,27 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
 import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
+import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import { initializeDBHydration } from '../store/actions/storage'
 
 export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
+  const isDBHydrated = useInitialDBHydrationState()
+  const dispatch = useDispatch()
+  useEffect( ()=>{
+    if( !isDBHydrated ){
+      dispatch( initializeDBHydration() )
+    }
+  }, [] )
+
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -55,7 +66,7 @@ export default function NewWalletName( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
@@ -90,12 +101,12 @@ export default function NewWalletName( props ) {
               autoCorrect={false}
               autoCompleteType="off"
             />
-            <View style={{ 
-              marginLeft: 20, 
+            <View style={{
+              marginLeft: 20,
             }}>
-              <Text style={{ 
+              <Text style={{
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey, 
+                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
               }}>
                   No numbers or special characters allowed</Text>
             </View>
@@ -109,7 +120,7 @@ export default function NewWalletName( props ) {
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
                   shadowOffset: {
-                    width: 15, height: 15 
+                    width: 15, height: 15
                   },
                 }}
               >
@@ -133,7 +144,7 @@ export default function NewWalletName( props ) {
 
           {walletName.trim() == '' ? (
             <View style={{
-              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0 
+              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
             }}>
               <BottomInfoBox
                 title={'We do not store this'}
@@ -192,7 +203,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
