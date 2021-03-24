@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  InteractionManager,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -39,9 +40,12 @@ export default function NewWalletName( props ) {
   const dispatch = useDispatch()
   const isDBHydrated = useInitialDBHydrationState()
   useEffect( ()=>{
-    if( !isDBHydrated ){
-      dispatch( initializeDBHydration() )
-    }
+    InteractionManager.runAfterInteractions( () => {
+      if( !isDBHydrated ){
+        dispatch( initializeDBHydration() )
+      }
+    } )
+
   }, [] )
 
   return (

@@ -41,7 +41,7 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
-import { setCloudData } from '../store/actions/cloud'
+import { googleDriveLogin, setCloudData } from '../store/actions/cloud'
 import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 
 // only admit lowercase letters and digits
@@ -51,7 +51,7 @@ function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function NewWalletQuestion( props ) {
+export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
   const [ message, setMessage ] = useState( 'Creating your wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
@@ -81,13 +81,18 @@ export default function NewWalletQuestion( props ) {
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
+  const { isInitialized } = useSelector( ( state: { setupAndAuth: any } ) => state.setupAndAuth )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
-  const accounts = useSelector( ( state ) => state.accounts )
+  const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
   const s3service = useSelector( ( state ) => state.health.service )
   const isDBHydrated = useInitialDBHydrationState()
+  const [ loginSuccess, setLoginSuccess ] = useState( '' )
+  const isGoogleLoginSuccess = useSelector( ( state ) => state.cloud.isGoogleLoginSuccess )
+  const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
+  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
 
   useEffect( () => {
     if ( isDBHydrated ){
@@ -132,22 +137,49 @@ export default function NewWalletQuestion( props ) {
     if (
       walletDetailsSetted
     ) {
-      ( loaderBottomSheet as any ).current.snapTo( 0 )
       dispatch( walletCheckIn() )
-      dispatch( initializeHealthSetup() )
     }
   }, [ walletDetailsSetted ] )
 
+
   useEffect( () => {
-    if( s3service ){
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      if ( healthCheckInitializedKeeper === true ) {
-        ( loaderBottomSheet as any ).current.snapTo( 0 )
-        //dispatch( setCloudData() )
-        props.navigation.navigate( 'HomeNav' )
-      }
+    if( backupStatus === null ) return
+    if( backupStatus || backupStatus === false ){
+      navigateToHome()
     }
-  }, [ s3service ] )
+  }, [ backupStatus ] )
+
+  const navigateToHome = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 0 )
+    props.navigation.navigate( 'HomeNav', {
+      walletName,
+    } )
+  }
+
+  const checkCloudLogin = () =>{
+    const { healthCheckInitializedKeeper } = s3service.levelhealth
+    if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
+      dispatch( setCloudData() )
+      showLoader()
+    } else{
+      showLoader()
+      navigateToHome()
+
+    }
+  }
+
+  const showLoader = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 1 )
+    seLoaderMessages()
+    setTimeout( () => {
+      setElevation( 0 )
+    }, 0.2 )
+    setTimeout( () => {
+      setIsLoaderStart( true )
+      setIsEditable( false )
+      setIsDisabled( true )
+    }, 2 )
+  }
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -184,33 +216,13 @@ export default function NewWalletQuestion( props ) {
     }
   }, [ confirmAnswer ] )
 
-  const googleCloudLoginCallback = () => {
-    ( loaderBottomSheet as any ).current.snapTo( 1 )
-    seLoaderMessages()
-    setTimeout( () => {
-      setElevation( 0 )
-    }, 0.2 )
-    setTimeout( () => {
-      setIsLoaderStart( true )
-      setIsEditable( false )
-      setIsDisabled( true )
-    }, 2 )
-  }
+
 
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={() => {
-          if ( Platform.OS === 'android' ) {
-            const cloudObject = new CloudBackup( {
-              googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback,
-            } )
-            cloudObject.GoogleDriveLogin( {
-              googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback
-            } )
-          } else {
-            googleCloudLoginCallback()
-          }
+        onPress={async () => {
+          checkCloudLogin()
         }}
         style={{
           ...styles.buttonView, elevation: Elevation
@@ -358,7 +370,8 @@ export default function NewWalletQuestion( props ) {
                       height: hp( '40%' )
                     }}
                   >
-                    {dropdownBoxList.map( ( value, index ) => (
+                    {dropdownBoxList.map( ( value: React.SetStateAction<{ id: string; question: string }>, index: number ) => (
+                      // eslint-disable-next-line react/jsx-key
                       <TouchableOpacity
                         onPress={() => {
                           setTimeout( () => {

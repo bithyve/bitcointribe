@@ -9,7 +9,7 @@ import {
   RECEIVE_HELPER_DONE,
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
-  UPDATE_APPLICATION_STATUS, 
+  UPDATE_APPLICATION_STATUS,
   UPDATE_LAST_SEEN,
   CLOUD_BACKUP_DATA_STATUS,
   CARD_DATA,
@@ -43,7 +43,7 @@ const initialState = ip.freeze( {
   cloudBackupStatus: false,
   cardData: null,
   isBackupProcessing: false
-})
+} )
 
 export default ( state = initialState, { type, payload } ) => {
   switch ( type ) {
@@ -122,27 +122,30 @@ export default ( state = initialState, { type, payload } ) => {
         }
 
       case UPDATE_LAST_SEEN:
-        return Object.assign({}, state, { lastSeen: new Date() })
+        return Object.assign( {
+        }, state, {
+          lastSeen: new Date()
+        } )
 
       case CLOUD_BACKUP_DATA_STATUS:
         return {
           ...state,
           cloudBackupStatus: payload.status,
-        };
-      
+        }
+
       case CARD_DATA:
         return {
           ...state,
           cardData: payload.cardData,
-        };
+        }
 
       case IS_BACKUP_PROCESSING:
         return {
           ...state,
           isBackupProcessing: payload.status,
-        };
+        }
 
       default:
-        return state;
+        return state
   }
 }

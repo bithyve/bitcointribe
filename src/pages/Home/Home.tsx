@@ -984,10 +984,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  componentDidUpdate = ( prevProps ) => {
-    if ( this.props.cloudPermissionGranted && this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
-      this.props.setCloudData( this.setCloudBackupStatusCallBack )
-    }
+  componentDidUpdate = ( prevProps, prevState ) => {
+    // if ( this.props.cloudPermissionGranted && this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
+    //   this.props.setCloudData()
+    // }
 
     if (
       prevProps.notificationList !== this.props.notificationList ||

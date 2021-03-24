@@ -1,33 +1,23 @@
 package io.hexawallet.hexa;
 
-import android.content.Context;
 import android.net.Uri;
-import android.os.Environment;
-
-import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.Callback;
-import com.facebook.react.bridge.ReactMethod; 
+import com.facebook.react.bridge.ReactMethod;
 
 
 import android.app.Activity;
 import android.content.Intent;
-import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.util.Log;
-import android.util.Pair;
 
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.facebook.react.bridge.WritableNativeArray;
-import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -35,21 +25,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.drive.Drive;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.services.drive.DriveScopes;
-import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static io.hexawallet.hexa.DriveServiceHelper.getGoogleDriveService;
@@ -62,11 +47,11 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     private DriveServiceHelper mDriveServiceHelper;
     private static final String TAG = "GoogleDrive";
     private GoogleApiClient googleApiClient;
-    private Callback tokenCallback;
-    private Callback uploadFileCallback;
-    private Callback listOfFilesAvailable;
-    private Callback updateFileCallback;
-    private Callback readFileCallback;
+    private Promise tokenPromise;
+    private Promise uploadFilePromise;
+    private Promise listOfFilesAvailable;
+    private Promise updateFilePromise;
+    private Promise readFilePromise;
     private final String LOGIN = "onLogin";
     private final String VALIDATE = "onValidate";
     private final String LOGOUT = "onLogout";
@@ -79,7 +64,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
     private final String SUCCESSFULLY_UPLOAD = "successFullyUpload";
     private final String ON_FAILURE = "failure";
     private String ifExistFileMetaData = null;
-    private String currentCallBack = null;
+    private String currentPromise = null;
 
     public GoogleDrive(ReactApplicationContext reactContext) {
         super(reactContext); // required by React Native
@@ -124,8 +109,8 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void login(final Callback callback) {
-        tokenCallback = callback;
+    public void login(final Promise promise) {
+        tokenPromise = promise;
         if (googleApiClient == null) {
             onError(-1, "googleApiClient is null");
             return;
@@ -198,25 +183,16 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         onLogin(map);
     }
 
-//    @ReactMethod
-//    public void searchFile(String metaData, Callback callBack) {
-//        uploadFileCallback = callBack;
-//        if (mDriveServiceHelper == null) {
-//            return;
-//        }
-//    }
-
     private void onError(int code, String error) {
         WritableMap map = Arguments.createMap();
         map.putString(EVENT_KEY, ERROR);
         map.putString("error", error);
-        map.putString(ERROR_KEY, error);
-        tokenCallback.invoke(map, null);
+        tokenPromise.resolve(map);
     }
 
     private void onLogin(WritableMap map) {
         map.putString(EVENT_KEY, LOGIN);
-        tokenCallback.invoke(null, map);
+        tokenPromise.resolve(map);
     }
 
     private class ActivityEventListener extends BaseActivityEventListener {
@@ -233,14 +209,14 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
             case REQUEST_AUTHORIZATION:
            // Log.d(TAG, "ifExistFileMetaData : " + ifExistFileMetaData);
             //   Log.d(TAG, "listOfFilesAvailable " + listOfFilesAvailable);
-               if(currentCallBack.equals("listOfFilesAvailable")) {
+               if(currentPromise.equals("listOfFilesAvailable")) {
                    WritableMap map = Arguments.createMap();
                    map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
-                   listOfFilesAvailable.invoke(null, map);
-               } else if(currentCallBack.equals("uploadFileCallback")) {
+                   listOfFilesAvailable.resolve(map);
+               } else if(currentPromise.equals("uploadFilePromise")) {
                    WritableMap map = Arguments.createMap();
                    map.putString(EVENT_KEY, "UseUserRecoverableAuthIOException");
-                   uploadFileCallback.invoke(null, map);
+                   uploadFilePromise.resolve( map);
                }
            break;
         }
@@ -250,9 +226,9 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
-    public void uploadFile(String metaData, Callback callBack) {
-        uploadFileCallback = callBack;
-        currentCallBack = "uploadFileCallback";
+    public void uploadFile(String metaData, Promise promise) {
+        uploadFilePromise = promise;
+        currentPromise = "uploadFilePromise";
         Log.d(TAG, "mDriveServiceHelper " + mDriveServiceHelper);
         if (mDriveServiceHelper == null) {
             return;
@@ -266,7 +242,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                             Log.d(TAG, "onSuccess GoogleDriveFileHolder: " + googleDriveFileHolder);
                             WritableMap map = Arguments.createMap();
                             map.putString(EVENT_KEY, SUCCESSFULLY_UPLOAD);
-                            uploadFileCallback.invoke(map, null);
+                            uploadFilePromise.resolve(map);
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {
@@ -280,7 +256,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                             } else {
                                 WritableMap map = Arguments.createMap();
                                 map.putString(EVENT_KEY, ON_FAILURE);
-                                uploadFileCallback.invoke(null, map);
+                                uploadFilePromise.resolve(map);
                             }
 
 
@@ -290,16 +266,16 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
         catch (Exception e) {
             WritableMap map = Arguments.createMap();
             map.putString(EVENT_KEY, ON_FAILURE);
-            uploadFileCallback.invoke(null, map);
-            Log.d(TAG, " uploadFileCallback Exception: " + e.getMessage());
+            uploadFilePromise.resolve(map);
+            Log.d(TAG, " uploadFilePromise Exception: " + e.getMessage());
         }
 
     }
 
     @ReactMethod
-    public  List<GoogleDriveFileHolder>  checkIfFileExist(String metaData, Callback callBack) {
-        listOfFilesAvailable = callBack;
-        currentCallBack = "listOfFilesAvailable";
+    public  List<GoogleDriveFileHolder>  checkIfFileExist(String metaData, Promise promise) {
+        listOfFilesAvailable = promise;
+        currentPromise = "listOfFilesAvailable";
 
         ifExistFileMetaData = metaData;
         if (mDriveServiceHelper == null) {
@@ -331,7 +307,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                                     map.putDouble("size", googleDriveFileHolders.get(i).getSize());
                                 }
                             }
-                            listOfFilesAvailable.invoke(map, null);
+                            listOfFilesAvailable.resolve(map);
                         }
                         })
                     .addOnFailureListener(new OnFailureListener() {
@@ -344,7 +320,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                             }   else{
                                 WritableMap map = Arguments.createMap();
                                 map.putString(EVENT_KEY, ON_FAILURE);
-                                listOfFilesAvailable.invoke(null, map);
+                                listOfFilesAvailable.resolve(map);
                             }
                         }
                     });
@@ -354,14 +330,14 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
             Log.d(TAG, " checkIfFileExist Exception: " + e.getMessage());
             WritableMap map = Arguments.createMap();
                             map.putString(EVENT_KEY, ON_FAILURE);
-                            listOfFilesAvailable.invoke(map, null);
+                            listOfFilesAvailable.resolve(map);
         }
         return googleDriveFileHolders;
     }
 
     @ReactMethod
-    public void updateFile(String metaData, Callback callBack) {
-        updateFileCallback = callBack;
+    public void updateFile(String metaData, Promise promise) {
+        updateFilePromise = promise;
         if (mDriveServiceHelper == null) {
             return;
         }
@@ -373,7 +349,7 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         Log.d(TAG, "onSuccess updateFile: ");
                         WritableMap map = Arguments.createMap();
                         map.putString(EVENT_KEY, SUCCESSFULLY_UPDATE);
-                        updateFileCallback.invoke(map, null);
+                        updateFilePromise.resolve(map);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -382,20 +358,20 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                         Log.d(TAG, "onFailure updateFile: " + e.getMessage());
                         WritableMap map = Arguments.createMap();
                         map.putString(EVENT_KEY, ON_FAILURE);
-                        updateFileCallback.invoke(null, map);
+                        updateFilePromise.resolve(map);
                     }
                 });
         } catch (Exception e) {
             WritableMap map = Arguments.createMap();
             map.putString(EVENT_KEY, ON_FAILURE);
-            updateFileCallback.invoke(null, map);
-            Log.d(TAG, " updateFileCallback Exception: " + e.getMessage());
+            updateFilePromise.resolve(map);
+            Log.d(TAG, " updateFilePromise Exception: " + e.getMessage());
         }
     }
 
     @ReactMethod
-    public void readFile(String metaData, Callback callBack) {
-        readFileCallback = callBack;
+    public void readFile(String metaData, Promise promise) {
+        readFilePromise = promise;
         if (mDriveServiceHelper == null) {
             return;
         }
@@ -406,23 +382,23 @@ public class GoogleDrive extends ReactContextBaseJavaModule {
                 .addOnSuccessListener(new OnSuccessListener<String>() {
                     @Override
                     public void onSuccess(String data) {
-                        Log.d(TAG, "onSuccess readFileCallback: "+ data);
+                        Log.d(TAG, "onSuccess readFilePromise: "+ data);
                         WritableMap map = Arguments.createMap();
                         map.putString("data", data);
-                        readFileCallback.invoke(map, null);
+                        readFilePromise.resolve(map);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure readFileCallback: " + e.getMessage());
-                        readFileCallback.invoke(null, e.getMessage());
+                        Log.d(TAG, "onFailure readFilePromise: " + e.getMessage());
+                        readFilePromise.resolve(e.getMessage());
                     }
                 });
         } catch (Exception e) {
             WritableMap map = Arguments.createMap();
             map.putString(EVENT_KEY, ON_FAILURE);
-            readFileCallback.invoke(map, null);
+            readFilePromise.resolve(map);
             Log.d(TAG, " readFile Exception: " + e.getMessage());
         }
     }

@@ -40,6 +40,7 @@ import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
 import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import { setCloudData } from '../store/actions/cloud'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -77,14 +78,19 @@ export default function NewOwnQuestions( props ) {
   const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
   const s3service = useSelector( ( state ) => state.health.service )
   const isDBHydrated = useInitialDBHydrationState()
-
+  const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
   )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
-
+  const testAccService = accounts[ TEST_ACCOUNT ].service
+  const [ loginSuccess, setLoginSuccess ] = useState( '' )
+  const isGoogleLoginSuccess = useSelector( ( state ) => state.cloud.isGoogleLoginSuccess )
+  const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
+  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
 
   useEffect( () => {
     if ( isDBHydrated ){
@@ -125,16 +131,6 @@ export default function NewOwnQuestions( props ) {
     }
   }, [ isLoaderStart, isDBHydrated ] )
 
-  useEffect( () => {
-    if (
-      walletDetailsSetted
-    ) {
-      ( loaderBottomSheet as any ).current.snapTo( 0 )
-      dispatch( walletCheckIn() )
-      props.navigation.navigate( 'HomeNav' )
-    }
-  }, [ walletDetailsSetted ] )
-
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -170,7 +166,41 @@ export default function NewOwnQuestions( props ) {
     }
   }, [ confirmAnswer ] )
 
-  const googleCloudLoginCallback = () => {
+  useEffect( () => {
+    if (
+      walletDetailsSetted
+    ) {
+      dispatch( walletCheckIn() )
+    }
+  }, [ walletDetailsSetted ] )
+
+  useEffect( () => {
+    if( backupStatus === null ) return
+    if( backupStatus || backupStatus === false ){
+      navigateToHome()
+    }
+  }, [ backupStatus ] )
+
+  const navigateToHome = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 0 )
+    props.navigation.navigate( 'HomeNav', {
+      walletName,
+    } )
+  }
+
+  const checkCloudLogin = () =>{
+    const { healthCheckInitializedKeeper } = s3service.levelhealth
+    if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
+      dispatch( setCloudData() )
+      showLoader()
+    } else{
+      showLoader()
+      navigateToHome()
+
+    }
+  }
+
+  const showLoader = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )
     seLoaderMessages()
     setTimeout( () => {
@@ -183,24 +213,11 @@ export default function NewOwnQuestions( props ) {
     }, 2 )
   }
 
-  const onPressConfirm = () => {
-    if ( Platform.OS === 'android' ) {
-      const cloudObject = new CloudBackup( {
-        googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback,
-      } )
-      cloudObject.GoogleDriveLogin( {
-        googlePermissionCall: true, googleCloudLoginCallback: googleCloudLoginCallback
-      } )
-    }
-    else {
-      googleCloudLoginCallback()
-    }
-  }
 
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={() => walletName ? onPressConfirm() : null}
+        onPress={() => walletName ? checkCloudLogin() : null}
         style={{
           ...styles.buttonView, elevation: Elevation
         }}

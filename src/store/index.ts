@@ -186,7 +186,15 @@ import {
 import {
   cloudWatcher,
   updateHealthForCloudStatusWatcher,
-  updateHealthForCloudWatcher
+  updateHealthForCloudWatcher,
+  getCloudBackupRecoveryWatcher,
+  checkCloudBackupWatcher,
+  GoogleDriveLoginWatcher,
+  updateDataWatcher,
+  createFileWatcher,
+  checkFileIsAvailableWatcher,
+  readFileWatcher,
+  uplaodFileWatcher,
 } from './sagas/cloud'
 
 import { fromPrivateKey } from 'bip32'
@@ -342,7 +350,14 @@ const rootSaga = function* () {
     cloudWatcher,
     updateHealthForCloudStatusWatcher,
     updateHealthForCloudWatcher,
-
+    getCloudBackupRecoveryWatcher,
+    checkCloudBackupWatcher,
+    GoogleDriveLoginWatcher,
+    updateDataWatcher,
+    createFileWatcher,
+    checkFileIsAvailableWatcher,
+    readFileWatcher,
+    uplaodFileWatcher,
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,

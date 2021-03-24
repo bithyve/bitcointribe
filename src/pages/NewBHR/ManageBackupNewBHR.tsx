@@ -151,6 +151,7 @@ interface ManageBackupNewBHRPropsTypes {
   downloadSmShareForApproval: any;
   downloadSmShare: boolean;
   secondaryShareDownloadedStatus: any;
+  cloudPermissionGranted: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -310,16 +311,13 @@ class ManageBackupNewBHR extends Component<
       : timeFormatter( moment( new Date() ), item )
   };
 
-  setCloudBackupStatusCallBack = ( share ) => {
-    this.props.updateHealthForCloud( share )
-  };
-
-  componentDidUpdate = ( prevProps ) => {
+  componentDidUpdate = ( prevProps, prevState ) => {
     const {
       healthLoading,
       cloudBackupStatus,
       keeperInfo,
       currentLevel,
+      levelHealth
     } = this.props
     if (
       prevProps.healthLoading !== this.props.healthLoading ||
@@ -355,11 +353,12 @@ class ManageBackupNewBHR extends Component<
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === false
+        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === false && this.props.cloudPermissionGranted === true
       ) {
-        this.props.setCloudData( this.setCloudBackupStatusCallBack )
+        this.props.setCloudData()
       } else {
-        this.updateCloudData()
+        if( this.props.cloudPermissionGranted === true )
+          this.updateCloudData()
       }
     }
 
@@ -439,7 +438,7 @@ class ManageBackupNewBHR extends Component<
 
   updateCloudData = () => {
     console.log( 'updateCloudData', this.props.cloudBackupStatus )
-    if( this.props.cloudBackupStatus === true ) return
+    if( this.props.cloudBackupStatus === true && this.props.cloudPermissionGranted === false ) return
     const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
     let secretShare = {
     }
@@ -469,7 +468,6 @@ class ManageBackupNewBHR extends Component<
       }
     }
     this.props.setCloudData(
-      this.setCloudBackupStatusCallBack,
       keeperInfo,
       currentLevel,
       secretShare
@@ -1566,6 +1564,8 @@ const mapStateToProps = ( state ) => {
     isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.health.isSmMetaSharesCreatedFlag ),
     downloadSmShare: idx( state, ( _ ) => _.health.loading.downloadSmShare ),
     secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
+    cloudPermissionGranted: state.health.cloudPermissionGranted,
+
   }
 }
 
