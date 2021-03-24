@@ -30,6 +30,7 @@ export const IS_LEVEL2_INITIALIZED = 'IS_LEVEL2_INITIALIZED'
 export const IS_LEVEL3_INITIALIZED = 'IS_LEVEL3_INITIALIZED'
 export const KEEPER_INFO = 'KEEPER_INFO'
 export const PUT_KEEPER_INFO = 'PUT_KEEPER_INFO'
+export const UPDATE_CLOUD_PERMISSION = 'UPDATE_CLOUD_PERMISSION'
 export const RECOVER_WALLET_USING_ICLOUD = 'RECOVER_WALLET_USING_ICLOUD'
 export const WALLET_RECOVERY_FAILED_HEALTH = 'WALLET_RECOVERY_FAILED_HEALTH'
 export const WALLET_IMAGE_HEALTH_CHECKED = 'WALLET_IMAGE_HEALTH_CHECKED'
@@ -710,6 +711,14 @@ export const downloadSmShareForApproval = ( qrData ) =>{
   return {
     type: DOWNLOAD_SMSHARE_FOR_APPROVAL, payload: {
       qrData
+    }
+  }
+}
+
+export const updateCloudPermission = ( cloudPermissionGranted ) => {
+  return {
+    type: UPDATE_CLOUD_PERMISSION, payload: {
+      cloudPermissionGranted
     }
   }
 }

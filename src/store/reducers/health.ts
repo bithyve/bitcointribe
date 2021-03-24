@@ -32,7 +32,9 @@ import {
   DOWNLOADED_PDFSHARE_HEALTH,
   PUT_KEEPER_INFO,
   SM_META_SHARE_GENERATE,
-  UPLOAD_SUCCESSFULLY_SM
+  UPLOAD_SUCCESSFULLY_SM,
+  UPDATE_CLOUD_PERMISSION
+
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
 
@@ -111,6 +113,7 @@ const initialState: {
   },
   isSmMetaSharesCreatedFlag: boolean;
   uploadSMSuccessfully: Boolean;
+  cloudPermissionGranted: Boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -162,7 +165,8 @@ const initialState: {
     privateKey: ''
   },
   isSmMetaSharesCreatedFlag: false,
-  uploadSMSuccessfully: false
+  uploadSMSuccessfully: false,
+  cloudPermissionGranted: null
 }
 
 export default ( state = initialState, action ) => {
@@ -396,6 +400,11 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           uploadSMSuccessfully: action.payload.isUploaded,
+        }
+      case UPDATE_CLOUD_PERMISSION:
+        return {
+          ...state,
+          cloudPermissionGranted: action.payload.cloudPermissionGranted
         }
   }
   return state
