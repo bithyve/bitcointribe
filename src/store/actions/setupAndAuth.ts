@@ -1,7 +1,7 @@
 // types and action creators: dispatched by components and sagas
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
-export const INIT_SETUP = 'INIT_SETUP'
+export const SETUP_WALLET_DETAILS = 'SETUP_WALLET_DETAILS'
 export const INITIALIZE_DB_HYDRATION = 'INITIALIZE_DB_HYDRATION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
@@ -29,9 +29,9 @@ export const credsAuth = ( passcode, reLogin? ) => {
   }
 }
 
-export const initializeSetup = ( walletName, security ) => {
+export const setupWalletDetails = ( walletName, security ) => {
   return {
-    type: INIT_SETUP, payload: {
+    type: SETUP_WALLET_DETAILS, payload: {
       walletName, security
     }
   }
@@ -77,7 +77,7 @@ export const switchCredsChanged = () => {
 
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
-export const SETUP_INITIALIZED = 'SETUP_INITIALIZED'
+export const SETTED_WALLET_DETAILS = 'SETTED_WALLET_DETAILS'
 export const DATABASE_HYDRATED = 'DATABASE_HYDRATED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
@@ -97,9 +97,9 @@ export const credsAuthenticated = isAuthenticated => {
   }
 }
 
-export const setupInitialized = () => {
+export const settedWalletDetails = () => {
   return {
-    type: SETUP_INITIALIZED
+    type: SETTED_WALLET_DETAILS
   }
 }
 

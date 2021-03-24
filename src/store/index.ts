@@ -39,8 +39,8 @@ import {
 } from './sagas/storage'
 
 import {
-  initSetupWatcher,
   initDBHydrationWatcher,
+  setupWalletDetailsWatcher,
   initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
@@ -200,8 +200,8 @@ const rootSaga = function* () {
     servicesEnricherWatcher,
 
     // wallet setup watcher
-    initSetupWatcher,
     initDBHydrationWatcher,
+    setupWalletDetailsWatcher,
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,

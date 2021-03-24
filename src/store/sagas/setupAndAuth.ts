@@ -5,13 +5,13 @@ import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 import {
-  INIT_SETUP,
+  SETUP_WALLET_DETAILS,
   INITIALIZE_DB_HYDRATION,
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
   credsAuthenticated,
-  setupInitialized,
+  settedWalletDetails,
   switchSetupLoader,
   switchReLogin,
   INIT_RECOVERY,
@@ -57,6 +57,23 @@ function* initDBHydrationWorker() {
 }
 
 export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )
+
+function* setupWalletDetailsWorker( { payload } ) {
+  const { walletName, security } = payload
+  yield put( setIsNewHealthSystemSet( true ) )
+
+  yield call( insertDBWorker, {
+    payload: {
+      WALLET_SETUP: {
+        walletName, security
+      }
+    }
+  } )
+  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+  yield put( settedWalletDetails() )
+}
+
+export const setupWalletDetailsWatcher = createWatcher( setupWalletDetailsWorker, SETUP_WALLET_DETAILS )
 
 function* initRecoveryWorker( { payload } ) {
   const { walletName, security } = payload

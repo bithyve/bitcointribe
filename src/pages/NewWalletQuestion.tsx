@@ -84,10 +84,10 @@ export default function NewWalletQuestion( props ) {
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
-  const s3service = useSelector( ( state ) => state.health.service );
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth );
+  const s3service = useSelector( ( state ) => state.health.service )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
 
-  
+
   useEffect( () => {
     ( async () => {
       if ( testAccService ) {
@@ -143,15 +143,15 @@ export default function NewWalletQuestion( props ) {
   }, [ isInitialized ] )
 
   useEffect( () => {
-    if(s3service){
-    const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( healthCheckInitializedKeeper === false) {
-      dispatch(initializeHealthSetup());
+    if( s3service ){
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
+      if ( healthCheckInitializedKeeper === false ) {
+        dispatch( initializeHealthSetup() )
+      }
     }
-  }
-  }, [ s3service ] );
+  }, [ s3service ] )
 
-  
+
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
 

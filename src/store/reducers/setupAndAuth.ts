@@ -2,7 +2,7 @@ import { chain } from 'icepick'
 import {
   CREDS_STORED,
   CREDS_AUTHENTICATED,
-  SETUP_INITIALIZED,
+  SETTED_WALLET_DETAILS,
   SETUP_LOADING,
   RE_LOGIN,
   AUTH_CRED_CHANGED,
@@ -13,12 +13,11 @@ import {
 } from '../actions/setupAndAuth'
 
 const initialState: {
-  isInitialized: Boolean;
   hasCreds: Boolean;
   isAuthenticated: Boolean;
   authenticationFailed: Boolean;
   databaseHydrated: Boolean;
-  walletExists: Boolean;
+  walletDetailsSetted: Boolean;
   reLogin: Boolean;
   loading: {
     initializing: Boolean;
@@ -29,12 +28,11 @@ const initialState: {
   pinChangedFailed: Boolean;
   isNewHealthSystemSet: Boolean;
 } = {
-  isInitialized: false,
   hasCreds: false,
   isAuthenticated: false,
   authenticationFailed: false,
   databaseHydrated: false,
-  walletExists: false,
+  walletDetailsSetted: false,
   reLogin: false,
   loading: {
     initializing: false,
@@ -48,13 +46,6 @@ const initialState: {
 
 export default ( state = initialState, action ) => {
   switch ( action.type ) {
-      case SETUP_INITIALIZED:
-        return chain( state )
-          .setIn( [ 'isInitialized' ], true )
-          .setIn( [ 'loading', 'initializing' ], false )
-          .value()
-
-
       case CREDS_STORED:
         return chain( state )
           .setIn( [ 'hasCreds' ], true )
@@ -71,6 +62,11 @@ export default ( state = initialState, action ) => {
       case DATABASE_HYDRATED:
         return chain( state )
           .setIn( [ 'databaseHydrated' ], true )
+          .value()
+
+      case SETTED_WALLET_DETAILS:
+        return chain( state )
+          .setIn( [ 'walletDetailsSetted' ], true )
           .value()
 
       case SETUP_LOADING:
