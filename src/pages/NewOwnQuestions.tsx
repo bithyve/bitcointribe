@@ -84,21 +84,22 @@ export default function NewOwnQuestions( props ) {
   )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
-  const testAccService = accounts[ TEST_ACCOUNT ].service
+
 
   useEffect( () => {
-    ( async () => {
-      if ( testAccService ) {
-        const { balances } = testAccService.hdWallet
-        const netBalance = testAccService
-          ? balances.balance + balances.unconfirmedBalance
-          : 0
-        if ( !netBalance ) {
-          dispatch( getTestcoins( TEST_ACCOUNT ) )
+    if ( isDBHydrated ){
+      // get test-sats(10K)
+      dispatch( getTestcoins( TEST_ACCOUNT ) )
+
+      // initialize health-check schema on relay
+      if( s3service ){
+        const { healthCheckInitializedKeeper } = s3service.levelhealth
+        if ( healthCheckInitializedKeeper === false ) {
+          dispatch( initializeHealthSetup() )
         }
       }
-    } )()
-  }, [ testAccService ] )
+    }
+  }, [ isDBHydrated ] )
 
   useEffect( () => {
     if ( isLoaderStart  && isDBHydrated ) {
@@ -168,13 +169,6 @@ export default function NewOwnQuestions( props ) {
       }
     }
   }, [ confirmAnswer ] )
-
-  useEffect( () => {
-    const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( healthCheckInitializedKeeper === false ) {
-      dispatch( initializeHealthSetup() )
-    }
-  }, [ s3service ] )
 
   const googleCloudLoginCallback = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )
