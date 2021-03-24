@@ -9,7 +9,7 @@ import {
   SWITCH_CREDS_CHANGED,
   PIN_CHANGED_FAILED,
   IS_NEW_HEALTH_SYSTEM,
-  DATABASE_INITIALIZED
+  DATABASE_HYDRATED
 } from '../actions/setupAndAuth'
 
 const initialState: {
@@ -17,7 +17,7 @@ const initialState: {
   hasCreds: Boolean;
   isAuthenticated: Boolean;
   authenticationFailed: Boolean;
-  databaseInitialised: Boolean;
+  databaseHydrated: Boolean;
   walletExists: Boolean;
   reLogin: Boolean;
   loading: {
@@ -33,7 +33,7 @@ const initialState: {
   hasCreds: false,
   isAuthenticated: false,
   authenticationFailed: false,
-  databaseInitialised: false,
+  databaseHydrated: false,
   walletExists: false,
   reLogin: false,
   loading: {
@@ -68,9 +68,9 @@ export default ( state = initialState, action ) => {
           .setIn( [ 'loading', 'authenticating' ], false )
           .value()
 
-      case DATABASE_INITIALIZED:
+      case DATABASE_HYDRATED:
         return chain( state )
-          .setIn( [ 'databaseInitialised' ], true )
+          .setIn( [ 'databaseHydrated' ], true )
           .value()
 
       case SETUP_LOADING:

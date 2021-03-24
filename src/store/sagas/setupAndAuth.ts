@@ -6,7 +6,7 @@ import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 import {
   INIT_SETUP,
-  INITIAL_DB_HYDRATION,
+  INITIALIZE_DB_HYDRATION,
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
@@ -19,7 +19,7 @@ import {
   credsChanged,
   pinChangedFailed,
   setIsNewHealthSystemSet,
-  databaseInitialised,
+  databaseHydrated,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
@@ -53,10 +53,10 @@ function* initDBHydrationWorker() {
   yield call( insertDBWorker, {
     payload: initialDatabase
   } )
-  yield put( databaseInitialised() )
+  yield put( databaseHydrated() )
 }
 
-export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIAL_DB_HYDRATION )
+export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )
 
 function* initRecoveryWorker( { payload } ) {
   const { walletName, security } = payload

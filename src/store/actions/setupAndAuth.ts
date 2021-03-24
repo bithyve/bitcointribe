@@ -2,7 +2,7 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const INIT_SETUP = 'INIT_SETUP'
-export const INITIAL_DB_HYDRATION = 'INITIAL_DB_HYDRATION'
+export const INITIALIZE_DB_HYDRATION = 'INITIALIZE_DB_HYDRATION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
@@ -37,9 +37,9 @@ export const initializeSetup = ( walletName, security ) => {
   }
 }
 
-export const initialDBHydration = ( ) => {
+export const initializeDBHydration = ( ) => {
   return {
-    type: INITIAL_DB_HYDRATION
+    type: INITIALIZE_DB_HYDRATION
   }
 }
 
@@ -78,7 +78,7 @@ export const switchCredsChanged = () => {
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
 export const SETUP_INITIALIZED = 'SETUP_INITIALIZED'
-export const DATABASE_INITIALIZED = 'DATABASE_INITIALIZED'
+export const DATABASE_HYDRATED = 'DATABASE_HYDRATED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
 export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED'
@@ -103,9 +103,9 @@ export const setupInitialized = () => {
   }
 }
 
-export const databaseInitialised = () => {
+export const databaseHydrated = () => {
   return {
-    type: DATABASE_INITIALIZED
+    type: DATABASE_HYDRATED
   }
 }
 
