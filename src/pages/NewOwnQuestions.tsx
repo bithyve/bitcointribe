@@ -28,7 +28,7 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { initializeSetup } from '../store/actions/setupAndAuth'
+import { setupWalletDetails } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
 import { getTestcoins, accountsSynched } from '../store/actions/accounts'
@@ -39,6 +39,7 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
+import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -73,9 +74,10 @@ export default function NewOwnQuestions( props ) {
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
-  const s3service = useSelector( ( state ) => state.health.service );
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth );
+  const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
+  const s3service = useSelector( ( state ) => state.health.service )
+  const isDBHydrated = useInitialDBHydrationState()
+
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
@@ -99,45 +101,38 @@ export default function NewOwnQuestions( props ) {
   }, [ testAccService ] )
 
   useEffect( () => {
-    ( async () => {
-      if ( isLoaderStart ) {
-        const security = {
-          questionId: '0',
-          question: question,
-          answer,
-        }
-        dispatch( initializeSetup( walletName, security ) )
-        dispatch( setVersion( 'Current' ) )
-        const current = Date.now()
-        await AsyncStorage.setItem(
-          'SecurityAnsTimestamp',
-          JSON.stringify( current ),
-        )
-        const securityQuestionHistory = {
-          created: current,
-        }
-        await AsyncStorage.setItem(
-          'securityQuestionHistory',
-          JSON.stringify( securityQuestionHistory ),
-        )
+    if ( isLoaderStart  && isDBHydrated ) {
+      const security = {
+        questionId: '0',
+        question: question,
+        answer,
       }
-    } )()
-  }, [ isLoaderStart ] )
+      dispatch( setupWalletDetails( walletName, security ) )
+      dispatch( setVersion( 'Current' ) )
+      const current = Date.now()
+      AsyncStorage.setItem(
+        'SecurityAnsTimestamp',
+        JSON.stringify( current ),
+      )
+      const securityQuestionHistory = {
+        created: current,
+      }
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify( securityQuestionHistory ),
+      )
+    }
+  }, [ isLoaderStart, isDBHydrated ] )
 
   useEffect( () => {
     if (
-      isInitialized
-      // exchangeRates &&
-      // balances.testBalance &&
-      // transactions.length > 0
+      walletDetailsSetted
     ) {
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-      // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
-      dispatch( walletCheckIn() ) // fetches exchange rates
-
+      dispatch( walletCheckIn() )
       props.navigation.navigate( 'HomeNav' )
     }
-  }, [ isInitialized ] )
+  }, [ walletDetailsSetted ] )
 
 
   const handleSubmit = () => {
@@ -176,10 +171,10 @@ export default function NewOwnQuestions( props ) {
 
   useEffect( () => {
     const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if ( healthCheckInitializedKeeper === false) {
-      dispatch(initializeHealthSetup());
+    if ( healthCheckInitializedKeeper === false ) {
+      dispatch( initializeHealthSetup() )
     }
-  }, [ s3service ] );
+  }, [ s3service ] )
 
   const googleCloudLoginCallback = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )

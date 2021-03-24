@@ -262,7 +262,6 @@ export const serviceGeneratorForNewBHR = async (
 
   // Share generation/restoration
   const s3Service = new S3Service( primaryMnemonic )
-  console.log( 's3Service serviceGenerator2', s3Service )
 
   if ( metaShares && metaShares.length ) {
     res = s3Service.restoreMetaSharesKeeper( metaShares )
@@ -287,7 +286,8 @@ export const serviceGeneratorForNewBHR = async (
       createdAt,
     },
   ]
-  await AsyncStorage.setItem( 'shareHistory', JSON.stringify( shareHistory ) )
+
+  AsyncStorage.setItem( 'shareHistory', JSON.stringify( shareHistory ) )
 
   let secondaryXpub = ''
   let bhXpub = ''

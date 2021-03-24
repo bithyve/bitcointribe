@@ -26,8 +26,8 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
 import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
-import useInitialDBHydrationState from '../utils/hooks/state-selectors/setupAndAuth/useInitialDBHydrationState'
-import { initialDBHydration } from '../store/actions/setupAndAuth'
+import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import { initializeDBHydration } from '../store/actions/storage'
 
 export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
@@ -36,7 +36,7 @@ export default function NewWalletName( props ) {
   const dispatch = useDispatch()
   useEffect( ()=>{
     if( !isDBHydrated ){
-      dispatch( initialDBHydration() )
+      dispatch( initializeDBHydration() )
     }
   }, [] )
 
