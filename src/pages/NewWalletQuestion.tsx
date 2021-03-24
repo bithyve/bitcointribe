@@ -30,7 +30,7 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { initializeSetup } from '../store/actions/setupAndAuth'
+import { setupWalletDetails } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
 import { getTestcoins } from '../store/actions/accounts'
@@ -42,6 +42,7 @@ import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
 import { setCloudData } from '../store/actions/cloud'
+import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -79,74 +80,70 @@ export default function NewWalletQuestion( props ) {
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
+  const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
   const s3service = useSelector( ( state ) => state.health.service )
-
-
-  useEffect( () => {
-    ( async () => {
-      if ( testAccService ) {
-        const { balances } = testAccService.hdWallet
-        const netBalance = testAccService
-          ? balances.balance + balances.unconfirmedBalance
-          : 0
-        if ( !netBalance ) {
-          dispatch( getTestcoins( TEST_ACCOUNT ) )
-        }
-      }
-    } )()
-  }, [ testAccService ] )
+  const isDBHydrated = useInitialDBHydrationState()
 
   useEffect( () => {
-    ( async () => {
-      if ( isLoaderStart ) {
-        const security = {
-          questionId: dropdownBoxValue.id,
-          question: dropdownBoxValue.question,
-          answer,
+    if ( isDBHydrated ){
+      // get test-sats(10K)
+      dispatch( getTestcoins( TEST_ACCOUNT ) )
+
+      // initialize health-check schema on relay
+      if( s3service ){
+        const { healthCheckInitializedKeeper } = s3service.levelhealth
+        if ( healthCheckInitializedKeeper === false ) {
+          dispatch( initializeHealthSetup() )
         }
-        dispatch( initializeSetup( walletName, security ) )
-        dispatch( setVersion( 'Current' ) )
-        const current = Date.now()
-        await AsyncStorage.setItem(
-          'SecurityAnsTimestamp',
-          JSON.stringify( current ),
-        )
-        const securityQuestionHistory = {
-          created: current,
-        }
-        await AsyncStorage.setItem(
-          'securityQuestionHistory',
-          JSON.stringify( securityQuestionHistory ),
-        )
       }
-    } )()
-  }, [ isLoaderStart ] )
+    }
+  }, [ isDBHydrated ] )
+
+  useEffect( () => {
+    if ( isLoaderStart && isDBHydrated ) {
+      const security = {
+        questionId: dropdownBoxValue.id,
+        question: dropdownBoxValue.question,
+        answer,
+      }
+      dispatch( setupWalletDetails( walletName, security ) )
+      dispatch( setVersion( 'Current' ) )
+      const current = Date.now()
+      AsyncStorage.setItem(
+        'SecurityAnsTimestamp',
+        JSON.stringify( current ),
+      )
+      const securityQuestionHistory = {
+        created: current,
+      }
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify( securityQuestionHistory ),
+      )
+    }
+  }, [ isLoaderStart, isDBHydrated ] )
 
   useEffect( () => {
     if (
-      isInitialized
-      // exchangeRates &&
-      // balances.testBalance &&
-      // transactions.length > 0
+      walletDetailsSetted
     ) {
-      // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
-      dispatch( walletCheckIn() ) // fetches exchange rates
+      ( loaderBottomSheet as any ).current.snapTo( 0 )
+      dispatch( walletCheckIn() )
       dispatch( initializeHealthSetup() )
     }
-  }, [ isInitialized ] )
+  }, [ walletDetailsSetted ] )
 
   useEffect( () => {
     if( s3service ){
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       if ( healthCheckInitializedKeeper === true ) {
         ( loaderBottomSheet as any ).current.snapTo( 0 )
-        // dispatch( setCloudData() )
+        //dispatch( setCloudData() )
         props.navigation.navigate( 'HomeNav' )
       }
     }
