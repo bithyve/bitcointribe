@@ -643,7 +643,7 @@ class RestoreWithICloud extends Component<
             <TouchableOpacity
               onPress={() => {
                 this.props.clearCloudCache()
-                navigation.goBack()
+                navigation.navigate( 'WalletInitialization' )
               }}
               style={styles.headerBackArrowView}
             >
