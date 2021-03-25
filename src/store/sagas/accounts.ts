@@ -417,23 +417,10 @@ function* testcoinsWorker( { payload } ) {
     ( state ) => state.accounts[ payload.serviceType ].service
   )
   const res = yield call( service.getTestcoins )
-  // console.log( { res } )
-  if ( res.status === 200 ) {
-    yield put( testcoinsReceived( payload.serviceType, service ) )
 
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ payload.serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-
-    yield put( accountsSynched( true ) ) // initial sync: test-acc only (turns the amount text to black)
-  } else {
+  if ( res.status === 200 )
+    yield put( testcoinsReceived( ) )
+  else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     throw new Error( 'Failed to get testcoins' )
   }

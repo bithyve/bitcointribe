@@ -42,6 +42,7 @@ import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
 import { initializeHealthSetup } from '../store/actions/health'
 import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import useAccountsState from '../utils/hooks/state-selectors/accounts/UseAccountsState'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -83,14 +84,15 @@ export default function NewWalletQuestion( props ) {
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
-  const accounts = useSelector( ( state ) => state.accounts )
+  const accounts = useAccountsState()
   const s3service = useSelector( ( state ) => state.health.service )
   const isDBHydrated = useInitialDBHydrationState()
 
   useEffect( () => {
     if ( isDBHydrated ){
       // get test-sats(10K)
-      dispatch( getTestcoins( TEST_ACCOUNT ) )
+      if( !accounts.testCoinsReceived )
+        dispatch( getTestcoins( TEST_ACCOUNT ) )
 
       // initialize health-check schema on relay
       if( s3service ){

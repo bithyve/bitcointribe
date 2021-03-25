@@ -477,11 +477,9 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 
-export const testcoinsReceived = ( serviceType, service ) => {
+export const testcoinsReceived = ( ) => {
   return {
-    type: TESTCOINS_RECEIVED, payload: {
-      serviceType, service
-    }
+    type: TESTCOINS_RECEIVED
   }
 }
 

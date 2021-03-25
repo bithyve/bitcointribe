@@ -59,6 +59,7 @@ const ACCOUNT_VARS: AccountVars  = {
 export type AccountsState = {
   servicesEnriched: boolean;
   accountsSynched: boolean;
+  testCoinsReceived: boolean,
   accountShells: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
@@ -115,6 +116,7 @@ const initialState: AccountsState = {
   servicesEnriched: false,
   accountsSynched: false,
   exchangeRates: null,
+  testCoinsReceived: false,
 
   REGULAR_ACCOUNT: ACCOUNT_VARS,
   TEST_ACCOUNT: ACCOUNT_VARS,
@@ -152,16 +154,12 @@ const initialState: AccountsState = {
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
-  const accountType = action.payload ? action.payload.serviceType : null
 
   switch ( action.type ) {
       case TESTCOINS_RECEIVED:
         return {
           ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            service: action.payload.service,
-          },
+          testCoinsReceived: true
         }
 
       case SERVICES_ENRICHED:
