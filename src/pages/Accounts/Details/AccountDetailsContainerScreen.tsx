@@ -254,7 +254,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     if ( primarySubAccount.isTFAEnabled ) {
       const twoFASetupDetails = idx( accountsState, ( _ )=> _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      const twoFAValid = idx( accountsState, ( _ )=> _.additional.secure.twoFAValid )
+      const twoFAValid = idx( accountsState, ( _ )=> _.twoFAHelpFlags.twoFAValid )
 
       if( twoFASetupDetails && !twoFAValid )
         navigation.navigate( 'TwoFASetup', {

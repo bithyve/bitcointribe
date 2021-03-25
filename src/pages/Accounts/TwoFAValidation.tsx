@@ -35,18 +35,18 @@ export default function TwoFAValidation( props ) {
   )
   const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( true )
 
-  const additional = useSelector( ( state ) => state.accounts.additional )
+  const twoFAHelpFlags = useSelector( ( state ) => state.accounts.twoFAHelpFlags )
 
   useEffect( ()=>{
-    if ( token && additional && additional.secure ) {
-      const validationSucccessful = additional.secure.twoFAValid
+    if ( token && twoFAHelpFlags ) {
+      const validationSucccessful = twoFAHelpFlags.twoFAValid
       if( validationSucccessful ){
         props.navigation.navigate( 'AccountDetails' )
       } else {
         SendUnSuccessBottomSheet.current.snapTo( 1 )
       }
     }
-  }, [ additional ] )
+  }, [ twoFAHelpFlags ] )
 
 
   function onPressNumber( text ) {
