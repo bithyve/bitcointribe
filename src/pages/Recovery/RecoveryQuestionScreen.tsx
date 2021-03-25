@@ -36,17 +36,17 @@ export default function RecoveryQuestionScreen( props ) {
   } )
   const [ answer, setAnswer ] = useState( '' )
   const [ dropdownBoxList ] = useState( QuestionList )
-
+  const { initializeRecoveryCompleted } = useSelector( state => state.setupAndAuth )
   const { insertedIntoDB } = useSelector( state => state.storage )
   useEffect( () => {
     ( async () => {
-      if ( insertedIntoDB ) {
+      if ( initializeRecoveryCompleted ) {
         await AsyncStorage.setItem( 'recoveryExists', 'true' )
         props.navigation.navigate( 'RestoreWithICloud' )
         //props.navigation.navigate('RestoreSelectedContactsList');
       }
     } )()
-  }, [ insertedIntoDB ] )
+  }, [ initializeRecoveryCompleted ] )
 
   return (
     <SafeAreaView style={{

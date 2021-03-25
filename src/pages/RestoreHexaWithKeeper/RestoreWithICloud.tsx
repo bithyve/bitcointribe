@@ -72,7 +72,7 @@ import ContactListForRestore from './ContactListForRestore'
 import SendViaLink from '../../components/SendViaLink'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
-import { getCloudDataRecovery, } from '../../store/actions/cloud'
+import { getCloudDataRecovery, clearCloudCache } from '../../store/actions/cloud'
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -120,6 +120,7 @@ interface RestoreWithICloudPropsTypes {
   errorReceiving: Boolean;
   getCloudDataRecovery: any;
   cloudData: any;
+  clearCloudCache: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -641,6 +642,7 @@ class RestoreWithICloud extends Component<
           }}>
             <TouchableOpacity
               onPress={() => {
+                this.props.clearCloudCache()
                 navigation.goBack()
               }}
               style={styles.headerBackArrowView}
@@ -1298,7 +1300,8 @@ export default withNavigationFocus(
     downloadPdfShare,
     updateCloudMShare,
     requestShare,
-    getCloudDataRecovery
+    getCloudDataRecovery,
+    clearCloudCache
   } )( RestoreWithICloud )
 )
 

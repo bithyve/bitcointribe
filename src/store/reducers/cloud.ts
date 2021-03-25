@@ -1,5 +1,5 @@
 import ip, { chain } from 'icepick'
-import { DATA_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
+import { CLEAR_CLOUD_CACHE, DATA_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
 
 const initialState = ip.freeze( {
 
@@ -55,6 +55,10 @@ export default ( state = initialState, { type, payload } ) => {
           backupStatus: payload.backupStatus,
         }
 
+      case CLEAR_CLOUD_CACHE:
+        return {
+          ...initialState,
+        }
 
       default:
         return state
