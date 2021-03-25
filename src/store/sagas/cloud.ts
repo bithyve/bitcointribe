@@ -8,14 +8,21 @@ import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLO
 import { updateMSharesHealth } from '../actions/health'
 import { setCloudBackupStatus } from '../actions/preferences'
 import { createWatcher } from '../utils/utilities'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
+
 
 function* cloudWorker( { payload } ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.preferences.cloudBackupStatus )
-    if ( cloudBackupStatus === false ) {
-      yield put( setCloudBackupStatus( true ) )
+    if ( cloudBackupStatus !== CloudBackupStatus.COMPLETED ) {
+
+      // If this is to indicate that cloud backup has started then we should use:
+      yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
+      // yield put( setCloudBackupStatus( true ) )
+
       const { kpInfo, level, share } = payload
       const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
       const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
@@ -75,15 +82,19 @@ function* cloudWorker( { payload } ) {
           }
         } )
       } else{
+        // If this is for cloud backup failed then we should update with CloudBackupStatus.FAILED
+        // If this is to indicate cloud backup has not started then we should update with CloudBackupStatus.PENDING
+        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        // yield put( setCloudBackupStatus( false ) )
         yield put( DataBackupStatus( false ) )
-        yield put( setCloudBackupStatus( false ) )
       }
 
     }
   }
   catch ( error ) {
     yield put( DataBackupStatus( false ) )
-    yield put( setCloudBackupStatus( false ) )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    // yield put( setCloudBackupStatus( false ) )
     console.log( 'ERROR cloudWorker', error )
   }
 }

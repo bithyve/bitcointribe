@@ -73,6 +73,7 @@ import SendViaLink from '../../components/SendViaLink'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { getCloudDataRecovery, clearCloudCache } from '../../store/actions/cloud'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -1285,7 +1286,7 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.sss.service ),
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     security: idx( state, ( _ ) => _.storage.database.WALLET_SETUP.security ),

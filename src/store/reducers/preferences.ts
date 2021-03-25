@@ -19,6 +19,7 @@ import {
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import ip, { chain } from 'icepick'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import * as RNLocalize from 'react-native-localize'
 
 const initialState = ip.freeze( {
@@ -40,7 +41,7 @@ const initialState = ip.freeze( {
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
-  cloudBackupStatus: false,
+  cloudBackupStatus: CloudBackupStatus.PENDING,
   cardData: null,
   isBackupProcessing: false
 } )

@@ -76,6 +76,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setCloudData, updateHealthForCloud } from '../../store/actions/cloud'
 import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
@@ -108,7 +109,7 @@ interface ManageBackupNewBHRPropsTypes {
   navigation: any;
   updateHealthForCloud: any;
   setIsBackupProcessing: any;
-  cloudBackupStatus: any;
+  cloudBackupStatus: CloudBackupStatus;
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
@@ -330,11 +331,11 @@ class ManageBackupNewBHR extends Component<
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      if ( healthLoading || cloudBackupStatus ) {
+      if ( healthLoading || cloudBackupStatus===CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true
         } )
-      } else if ( !healthLoading && !cloudBackupStatus ) {
+      } else if ( !healthLoading && cloudBackupStatus===CloudBackupStatus.COMPLETED ) {
         this.setState( {
           refreshControlLoader: false
         } )
@@ -350,7 +351,7 @@ class ManageBackupNewBHR extends Component<
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === false && this.props.cloudPermissionGranted === true
+        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === CloudBackupStatus.FAILED && this.props.cloudPermissionGranted === true
       ) {
         this.props.setCloudData( )
       } else if(
@@ -448,7 +449,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateCloudData = () => {
-    if( this.props.cloudBackupStatus === true ) return
+    if( this.props.cloudBackupStatus === CloudBackupStatus.COMPLETED ) return
     if( this.props.cloudPermissionGranted === false ) return
     const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
     let secretShare = {
@@ -1114,13 +1115,13 @@ class ManageBackupNewBHR extends Component<
                                   paddingRight: wp( '3%' ),
                                   overflow:'hidden'
                                 }}
-                                disabled={this.props.cloudBackupStatus}
+                                disabled={this.props.cloudBackupStatus===CloudBackupStatus.COMPLETED}
                                 onPress={() => {
                                   console.log(
                                     'this.props.cloudBackupStatus',
                                     this.props.cloudBackupStatus, typeof this.props.cloudBackupStatus
                                   )
-                                  if ( this.props.cloudBackupStatus === false ) {
+                                  if ( this.props.cloudBackupStatus === CloudBackupStatus.FAILED ) {
                                     this.updateCloudData()
                                   }
                                 }}
@@ -1534,7 +1535,7 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.health.service ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },

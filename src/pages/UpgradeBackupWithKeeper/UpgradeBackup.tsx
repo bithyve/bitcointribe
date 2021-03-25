@@ -54,7 +54,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth'
 import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
-
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
   listData: {
@@ -675,7 +675,7 @@ const mapStateToProps = ( state ) => {
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
