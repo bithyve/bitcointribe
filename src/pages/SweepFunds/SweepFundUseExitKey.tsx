@@ -23,7 +23,6 @@ import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
-  clearPaymentDetails,
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -33,10 +32,7 @@ import ConfirmSweepFunds from './ConfirmSweepFunds'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import CoveredQRCodeScanner from '../../components/qr-code-scanning/CoveredQRCodeScanner'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import moment from 'moment'
 import { downloadSMShard, recoverMmnemonic, removeSecondaryMnemonic } from '../../store/actions/health'
-import { combine } from 'secrets.js-grempe'
 import { generateSecondaryXpriv, clearTransfer, secondaryXprivGenerated } from '../../store/actions/accounts'
 import ResetTwoFASuccess from '../Accounts/ResetTwoFASuccess'
 import LoaderModal from '../../components/LoaderModal'
@@ -61,7 +57,7 @@ interface SweepFundUseExitKeyPropsTypes {
   security:any;
   mnemonic: any;
   generateSecondaryXpriv:any;
-  additional: any;
+  twoFAHelpFlags: any;
   clearTransfer: any;
   service: any;
   secondaryXprivGenerated: any;
@@ -196,8 +192,8 @@ SweepFundUseExitKeyPropsTypes,
       if( this.props.mnemonic ) this.props.generateSecondaryXpriv( SECURE_ACCOUNT, this.props.mnemonic.split( '_' )[ 0 ] )
     }
 
-    if( this.props.additional && this.props.additional.secure && prevProps.additional.secure.xprivGenerated != this.props.additional.secure.xprivGenerated ){
-      if ( this.props.additional.secure.xprivGenerated ) {
+    if( this.props.twoFAHelpFlags && prevProps.twoFAHelpFlags.xprivGenerated != this.props.twoFAHelpFlags.xprivGenerated ){
+      if ( this.props.twoFAHelpFlags.xprivGenerated ) {
         this.props.removeSecondaryMnemonic()
         this.props.clearTransfer( SECURE_ACCOUNT );
         ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
@@ -209,7 +205,7 @@ SweepFundUseExitKeyPropsTypes,
                 this.props.service.secureHDWallet.balances.unconfirmedBalance,
         } )
         this.props.secondaryXprivGenerated( null )
-      } else if ( this.props.additional.secure.xprivGenerated === false ) {
+      } else if ( this.props.twoFAHelpFlags.xprivGenerated === false ) {
         ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
         this.setState( {
           SuccessMessage: 'Invalid Exit Key, please try again',
@@ -491,7 +487,7 @@ const mapStateToProps = ( state ) => {
     secondaryShareDownloaded: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
     security: idx( state, ( _ ) => _.storage.database.WALLET_SETUP.security ) || '',
     mnemonic: idx( state, ( _ ) => _.health.mnemonic ),
-    additional: idx( state, ( _ ) => _.accounts.additional ),
+    twoFAHelpFlags: idx( state, ( _ ) => _.accounts.twoFAHelpFlags ),
     service: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),

@@ -64,7 +64,6 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
         isCancel={true}
         onPressOk={( amount, customEstimatedBlock ) => {
           Keyboard.dismiss()
-          dismissBottomSheet()
           handleCustomFee( amount, customEstimatedBlock )
         }}
         onPressCancel={() => {
@@ -99,6 +98,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
       setTransactionPriorities( [ ...txPriorites, TransactionPriority.CUSTOM ] )
       setTransactionPriority( TransactionPriority.CUSTOM )
       onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+      dismissBottomSheet()
     }
   }
 

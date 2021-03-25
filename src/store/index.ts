@@ -16,7 +16,6 @@ import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
 import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
-import loaders from './reducers/loaders'
 import keeper from './reducers/keeper'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
@@ -397,7 +396,6 @@ const rootReducer = combineReducers( {
   sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
-  loaders,
   keeper,
   swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,

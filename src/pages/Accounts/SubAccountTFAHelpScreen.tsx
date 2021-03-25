@@ -62,7 +62,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const twoFASetupDetails = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.twoFASetup )
   useEffect( () => {
-    const resettedTwoFA = idx( accountsState.additional, ( _ ) => _.secure.twoFAResetted )
+    const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
 
     if ( resettedTwoFA ) {
       navigation.navigate( 'TwoFASetup', {
@@ -86,10 +86,10 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
       dispatch( twoFAResetted( null ) )
     }
-  }, [ accountsState.additional ] )
+  }, [ accountsState.twoFAHelpFlags ] )
 
   useEffect( () => {
-    const generatedSecureXPriv = idx( accountsState.additional, ( _ ) => _.secure.xprivGenerated )
+    const generatedSecureXPriv = idx( accountsState.twoFAHelpFlags, ( _ ) => _.xprivGenerated )
     if ( generatedSecureXPriv ) {
       dispatch( resetSendState() )
       navigation.navigate( 'Send', {
@@ -105,7 +105,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
       dispatch( secondaryXprivGenerated( null ) )
     }
-  }, [ accountsState.additional ] )
+  }, [ accountsState.twoFAHelpFlags ] )
 
   const getQrCodeData = ( qrData ) => {
     setTimeout( () => {
