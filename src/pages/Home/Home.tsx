@@ -863,7 +863,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     )
     console.log( 's3Service', s3Service )
     const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( healthCheckInitializedKeeper === false) {
+    if ( healthCheckInitializedKeeper === false ) {
       initializeHealthSetup()
     }
 
@@ -981,7 +981,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = ( prevProps, prevState ) => {
-    if (this.props.levelHealth.length == 1 && this.props.currentLevel == 0) {
+    if ( this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
       this.props.setCloudData( this.setCloudBackupStatusCallBack )
     }
 
@@ -2089,12 +2089,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
-            ? [ 0, '32%' ]
-            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+            ? [ 0, '67%' ]
+            : Platform.OS == 'ios' ? [ 0, '67%' ] : [ 0, '65%' ]
         case BottomSheetKind.RAMP_STATUS_INFO:
           return ( this.state.rampFromDeepLink )
-            ? [ 0, '32%' ]
-            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+            ? [ 0, '67%' ]
+            : Platform.OS == 'ios' ? [ 0, '67%' ] : [ 0, '65%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return Platform.OS == 'ios' ? [ 0, '65%' ] : [ 0, '70%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
