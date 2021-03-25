@@ -68,7 +68,8 @@ import {
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
   fetchReceiveAddressWatcher,
-  validateTwoFAWatcher
+  validateTwoFAWatcher,
+  createSmNResetTFAOrXPrivWatcher
 } from './sagas/accounts'
 
 import {
@@ -174,6 +175,7 @@ import {
   updateKeeperInfoToTrustedChannelWatcher,
   updateKeeperInfoToUnderCustodyWatcher,
   autoShareLevel2KeepersWatcher,
+  downloadSmShareForApprovalWatcher
 } from './sagas/health'
 
 import {
@@ -184,7 +186,15 @@ import {
 import {
   cloudWatcher,
   updateHealthForCloudStatusWatcher,
-  updateHealthForCloudWatcher
+  updateHealthForCloudWatcher,
+  getCloudBackupRecoveryWatcher,
+  checkCloudBackupWatcher,
+  GoogleDriveLoginWatcher,
+  updateDataWatcher,
+  createFileWatcher,
+  checkFileIsAvailableWatcher,
+  readFileWatcher,
+  uplaodFileWatcher,
 } from './sagas/cloud'
 
 import { fromPrivateKey } from 'bip32'
@@ -229,6 +239,7 @@ const rootSaga = function* () {
     getAllAccountsDataWatcher,
     fetchReceiveAddressWatcher,
     validateTwoFAWatcher,
+    createSmNResetTFAOrXPrivWatcher,
 
     // sss watchers
     initHCWatcher,
@@ -316,6 +327,7 @@ const rootSaga = function* () {
     updateKeeperInfoToTrustedChannelWatcher,
     updateKeeperInfoToUnderCustodyWatcher,
     autoShareLevel2KeepersWatcher,
+    downloadSmShareForApprovalWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,
@@ -338,7 +350,14 @@ const rootSaga = function* () {
     cloudWatcher,
     updateHealthForCloudStatusWatcher,
     updateHealthForCloudWatcher,
-
+    getCloudBackupRecoveryWatcher,
+    checkCloudBackupWatcher,
+    GoogleDriveLoginWatcher,
+    updateDataWatcher,
+    createFileWatcher,
+    checkFileIsAvailableWatcher,
+    readFileWatcher,
+    uplaodFileWatcher,
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,

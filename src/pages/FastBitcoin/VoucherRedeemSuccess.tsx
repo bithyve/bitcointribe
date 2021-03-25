@@ -18,7 +18,7 @@ export default function VoucherRedeemSuccess( props ) {
             Voucher redeemed successfully
           </Text>
           <Text style={{
-            ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
+            ...styles.modalInfoText, marginTop: wp( '1.5%' )
           }}>
             Congratulations, the voucher has been redeemed successfully but bitcoin will be delivered and they should receive an email when that happens
           </Text>
@@ -45,7 +45,7 @@ export default function VoucherRedeemSuccess( props ) {
               source={require( '../../assets/images/icons/icon_bitcoin_gray.png' )}
             />
             <Text style={{
-              ...styles.cardAmountText 
+              ...styles.cardAmountText
             }}>
               {props.redeemAmount}
             </Text>
@@ -72,11 +72,11 @@ export default function VoucherRedeemSuccess( props ) {
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressRedeem()}
             style={{
-              ...styles.successModalButtonView 
+              ...styles.successModalButtonView
             }}
           >
             {props.loading && props.loading == true ? (
-              <ActivityIndicator size="small" />
+              <ActivityIndicator color={Colors.white} size="small" />
             ) : (
               <Text style={styles.proceedButtonText}>View Account</Text>
             )}
@@ -135,7 +135,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',

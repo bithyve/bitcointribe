@@ -254,7 +254,7 @@ class UpgradeBackup extends Component<
         this.props.s3Service.levelhealth.healthCheckInitializedKeeper &&
       this.props.s3Service.levelhealth.healthCheckInitializedKeeper
     ) {
-      this.props.setCloudData( this.setCloudBackupStatusCallBack )
+      this.props.setCloudData(  )
     }
     if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) ){
       if( this.props.levelHealth[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
@@ -271,14 +271,14 @@ class UpgradeBackup extends Component<
 
   };
 
-  setCloudBackupStatusCallBack = ( share ) =>{
-    this.props.updateHealthForCloud( share )
-  }
+  // setCloudBackupStatusCallBack = ( share ) =>{
+  //   this.props.updateHealthForCloud( share )
+  // }
 
   cloudBackup = () => {
     const { s3Service, initializeHealthSetup } = this.props
     const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( healthCheckInitializedKeeper === false) {
+    if ( healthCheckInitializedKeeper === false ) {
       initializeHealthSetup()
     }
   };

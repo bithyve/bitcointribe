@@ -1,222 +1,237 @@
-import { NativeModules, PermissionsAndroid, Platform } from 'react-native';
-import moment from 'moment';
+import { NativeModules, PermissionsAndroid, Platform } from 'react-native'
+import moment from 'moment'
 
-const GoogleDrive = NativeModules.GoogleDrive;
-const iCloud = NativeModules.iCloud;
+const GoogleDrive = NativeModules.GoogleDrive
+const iCloud = NativeModules.iCloud
 export default class CloudBackup {
+
   public dataObject;
   public callBack;
   public share;
   public recoveryCallback;
   public isNotReading = true;
   public googlePermissionCall = false;
-  public googleCloudLoginCallback;
-  
-  constructor(stateVars?: {
+
+  constructor( stateVars?: {
     dataObject?: any;
-    callBack?: any;
     share?: any;
     recoveryCallback?: any;
     googlePermissionCall?: any;
-    googleCloudLoginCallback?: any;
-  }) {
-    let { recoveryCallback, share, callBack, dataObject, googlePermissionCall, googleCloudLoginCallback } = stateVars;
-    if (dataObject) this.dataObject = dataObject;
-    if (callBack) this.callBack = callBack;
-    if (share) this.share = share;
-    if (recoveryCallback) this.recoveryCallback = recoveryCallback;
-    if (googlePermissionCall) this.googlePermissionCall = googlePermissionCall;
-    if (googleCloudLoginCallback) this.googleCloudLoginCallback = googleCloudLoginCallback;
+  } ) {
+    const { recoveryCallback, share, dataObject, googlePermissionCall } = stateVars
+    if ( dataObject ) this.dataObject = dataObject
+    if ( share ) this.share = share
+    if ( recoveryCallback ) this.recoveryCallback = recoveryCallback
+    if ( googlePermissionCall ) this.googlePermissionCall = googlePermissionCall
   }
 
-  // check storage permission
-  public checkPermission = async () => {
-    try {
-      const userResponse = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-      ]);
-      console.log("userResponse",userResponse);
-      return userResponse;
-    } catch (err) {
-      console.log(err);
-      throw new Error( err )
-     
-    }
-  };
 
-  public CheckCloudDataBackup = (recoveryCallback1) => {
+  public CheckCloudDataBackup = ( recoveryCallback1 ) => {
     try {
-      this.recoveryCallback = recoveryCallback1;
-      if (Platform.OS == 'ios') {
+      this.recoveryCallback = recoveryCallback1
+      if ( Platform.OS == 'ios' ) {
         // console.log(iCloud.startBackup("sfsfsdfsdfsf"));
-        iCloud.downloadBackup().then((backedJson) => {
+        iCloud.downloadBackup().then( ( backedJson ) => {
           //console.log('BackedUp JSON: DONE', backedJson);
-          if (backedJson) this.recoveryCallback(backedJson);
-          else this.recoveryCallback(null);
-        });
+          if ( backedJson ) this.recoveryCallback( backedJson )
+          else this.recoveryCallback( null )
+        } )
       } else {
-        console.log('isNotReading CheckCloudDataBackup', this.isNotReading);
-        let checkDataIsBackedup = true;
-        this.GoogleDriveLogin({ checkDataIsBackedup });
+        console.log( 'isNotReading CheckCloudDataBackup', this.isNotReading )
+        const checkDataIsBackedup = true
+        return this.GoogleDriveLogin( {
+          checkDataIsBackedup
+        } )
       }
-    } catch (error) {
+    } catch ( error ) {
       throw new Error( error )
     }
   };
 
-  public CloudDataBackup = (data, callback, share?) => {
+  public CloudDataBackup = async( data, share? ) : Promise<any> => {
     //console.log('share inside cloud', share);
-    
     try{
-    this.dataObject = data;
-    this.callBack = callback;
-    this.share = share ? share : {};
-    
-    console.log('CloudDataBackup STARTED');
-    if (Platform.OS == 'ios') {
-      iCloud.downloadBackup().then((backedJson) => {
+      this.dataObject = data
+      this.share = share ? share : {
+      }
+
+      console.log( 'CloudDataBackup STARTED' )
+      if ( Platform.OS == 'ios' ) {
+        return iCloud.downloadBackup().then( async ( backedJson ) => {
         // console.log('BackedUp JSON: DONE', backedJson);
-        if (backedJson) {
-          this.updateData({
-            result1: backedJson,
-            googleData: '',
-            share: this.share,
-          });
-        } else {
-          console.log('createFile');
-          this.createFile({});
-        }
-      });
-    } else {
-      console.log('isNotReading CloudDataBackup', this.isNotReading);
-      this.GoogleDriveLogin({ share: this.share });
+          if ( backedJson ) {
+            return await this.updateData( {
+              result1: backedJson,
+              googleData: '',
+              share: this.share,
+            } )
+          } else {
+            console.log( 'createFile' )
+            return await this.createFile( {
+            } )
+          }
+        } )
+      } else {
+        console.log( 'isNotReading CloudDataBackup', this.isNotReading )
+        return await this.GoogleDriveLogin( {
+          share: this.share
+        } )
+      }
+    } catch( error ){
+      console.log( 'CloudDataBackup error', error )
+      throw new Error( error )
     }
-  } catch(error){
-    console.log("CloudDataBackup error", error);
-    throw new Error( error )
-  }
   };
 
-  public GoogleDriveLogin = (params: {
+  public GoogleDriveLogin = async ( params: {
     checkDataIsBackedup?: boolean;
     share?: any;
     googlePermissionCall? : any,
-    googleCloudLoginCallback? : any,
-  }) => {
+  } ) : Promise<any> => {
     try {
-    let { checkDataIsBackedup, share, googlePermissionCall, googleCloudLoginCallback } = params;
-    this.googleCloudLoginCallback = googleCloudLoginCallback;
-    GoogleDrive.setup()
-      .then(() => {
-        GoogleDrive.login(async (err, data) => {
-          console.log("googlePermissionCall######### GoogleDriveLogin",googlePermissionCall);
-          if (!googlePermissionCall)
-          this.handleLogin({ err, data, checkDataIsBackedup, share });
-          else{
-            const result = err || data;
-            console.log('GOOGLE ReSULT GoogleDriveLogin', data);
-            console.log('Error', err);
-            if (result.eventName == 'onLogin') {
-              this.googleCloudLoginCallback('success');
-          }
-          }
-        });
-      })
-      .catch((err) => {
-        console.log('GOOGLE SetupFail', err);
-        throw new Error( err )
-      });
-    } catch (error) {
+      const { checkDataIsBackedup, share, googlePermissionCall } = params
+      const result = await this.GoogleLogin( params )
+      console.log( 'RESULT', result )
+      // await GoogleDrive.login( async ( err, data ) => {
+      //   const result = err || data
+      //   console.log( 'googlePermissionCall######### GoogleDriveLogin', googlePermissionCall )
+      //   if ( !googlePermissionCall ){
+      //     if ( result.eventName == 'onLogin' ) {
+      //       return await this.checkFileIsAvailable( {
+      //         checkDataIsBackedup: checkDataIsBackedup,
+      //         share,
+      //       } )
+      //     } else{
+      //       console.log( 'GOOGLE SetupFail else', result )
+      //       throw new Error( 'Google LoginFail' )
+      //     }
+      //   }
+      //   else{
+      //     console.log( 'GOOGLE ReSULT GoogleDriveLogin', result )
+      //     if ( result.eventName === 'onLogin' ) {
+      //       return 'LoginSuccess'
+      //     } else{
+      //       console.log( 'GOOGLE SetupFail else', result )
+      //       throw new Error( 'Google LoginFail' )
+      //     }
+      //   }
+      // } )
+
+
+    } catch ( error ) {
       throw new Error( error )
     }
   };
 
-  public handleLogin = async (params: {
-    err: any;
-    data: any;
+  public GoogleLogin = async ( params: {
     checkDataIsBackedup?: boolean;
     share?: any;
-  }) => {
+    googlePermissionCall? : any,
+  } ) : Promise<any> => {
     try {
-      console.log('isNotReading handleLogin', this.isNotReading);
-      let { err, data, checkDataIsBackedup, share } = params;
-      const result = err || data;
-      console.log('handleLogin err', err);
-      console.log('GOOGLE ReSULT handleLogin', data);
-      if (result.eventName == 'onLogin') {
-        this.checkFileIsAvailable({
-          checkDataIsBackedup: checkDataIsBackedup,
-          share,
-        });
-      }
-    } catch (error) {
+      const { checkDataIsBackedup, share, googlePermissionCall } = params
+      GoogleDrive.setup()
+        .then( async() => {
+          await GoogleDrive.login( async ( err, data ) => {
+            const result = err || data
+            console.log( 'googlePermissionCall######### GoogleDriveLogin', googlePermissionCall )
+            if ( !googlePermissionCall ){
+              if ( result.eventName == 'onLogin' ) {
+                return await this.checkFileIsAvailable( {
+                  checkDataIsBackedup: checkDataIsBackedup,
+                  share,
+                } )
+              } else{
+                console.log( 'GOOGLE SetupFail else', result )
+                throw new Error( 'Google LoginFail' )
+              }
+            }
+            else{
+              console.log( 'GOOGLE ReSULT GoogleDriveLogin', result )
+              if ( result.eventName === 'onLogin' ) {
+                return 'LoginSuccess'
+              } else{
+                console.log( 'GOOGLE SetupFail else', result )
+                throw new Error( 'Google LoginFail' )
+              }
+            }
+          } )
+
+        } )
+
+        .catch( ( err ) => {
+          console.log( 'GOOGLE SetupFail', err )
+          throw new Error( err )
+        } )
+    } catch ( error ) {
       throw new Error( error )
     }
   };
 
-  public checkFileIsAvailable = async (params: {
+  public checkFileIsAvailable = async ( params: {
     checkDataIsBackedup?: boolean;
     share?: any;
-  }) => {
+  } ) : Promise<any> => {
     /**
      * TODO: Check if file exist if not then create new file having name HexaWalletBackup.json
      * If file exist then call
      */
     try {
-      console.log('isNotReading checkFileIsAvailable', this.isNotReading);
-      let { checkDataIsBackedup, share } = params;
+      const { checkDataIsBackedup, share } = params
       const metaData = {
         name: 'HexaWalletBackup.json',
         description: 'Backup data for my app',
         mimeType: 'application/json',
-      };
-      console.log('checkFileIsAvailable err', share);
-      await GoogleDrive.checkIfFileExist(
-        JSON.stringify(metaData),
-        (err, data) => {
+      }
+      GoogleDrive.checkIfFileExist(
+        JSON.stringify( metaData ),
+        async ( err, data ) => {
           // console.log('err, data', data, err);
-          const result = err || data;
-          console.log('checkFileIsAvailable', result);
-          if(!result) return;
-          if (!checkDataIsBackedup) {
-            if (result && result.eventName == 'listEmpty') {
-              console.log('createFile');
-              this.createFile({ share });
-            } else if (result.eventName == 'failure') {
-              console.log('FAILURE');
-              throw new Error( result.eventName );
-            } else if(result.eventName === 'UseUserRecoverableAuthIOException')
+          const result = err || data
+          if( !result ) return null
+          if ( !checkDataIsBackedup ) {
+            if ( result && result.eventName == 'listEmpty' ) {
+              console.log( 'createFile' )
+              return await this.createFile( {
+                share
+              } )
+            } else if ( result.eventName == 'failure' ) {
+              console.log( 'FAILURE' )
+              throw new Error( result.eventName )
+            } else if( result.eventName === 'UseUserRecoverableAuthIOException' )
             {
-              console.log('UseUserRecoverableAuthIOException Failure');
-              this.checkFileIsAvailable({ share: this.share });
-             } else {
+              console.log( 'UseUserRecoverableAuthIOException Failure' )
+              return await this.checkFileIsAvailable( {
+                share: share
+              } )
+            } else {
               console.log(
-                'readFile isNotReading checkFileIsAvailable if',
-                this.isNotReading,
-              );
-              this.readFile({ result, share });
+                'readFile isNotReading checkFileIsAvailable if' )
+              return await this.readFile( {
+                result, share
+              } )
             }
           } else {
             console.log(
-              'isNotReading checkFileIsAvailable else',
-              this.isNotReading,
-            );
-            this.readFile({ result, checkDataIsBackedup, share });
+              'isNotReading checkFileIsAvailable else' )
+            return await this.readFile( {
+              result, checkDataIsBackedup, share
+            } )
           }
         },
-      );
-    } catch (error) {
+      )
+    } catch ( error ) {
       throw new Error( error )
     }
+    return null
   };
 
-  public createFile = (params: { share?: any }) => {
+  public createFile = async( params: { share?: any } ) : Promise<any> => {
     try {
-      let { share } = params;
-      let WalletData = [];
-      const { data } = this.dataObject.regularAccount.getWalletId();
-      let tempData = {
+      const { share } = params
+      const WalletData = []
+      const { data } = this.dataObject.regularAccount.getWalletId()
+      const tempData = {
         levelStatus: this.dataObject.levelStatus,
         walletName: this.dataObject.walletName,
         questionId: this.dataObject.questionId,
@@ -225,101 +240,100 @@ export default class CloudBackup {
         data: this.dataObject.encryptedCloudDataJson,
         shares: this.dataObject.shares,
         keeperData: this.dataObject.keeperData,
-        dateTime: moment(new Date()),
-      };
-      WalletData.push(tempData);
+        dateTime: moment( new Date() ),
+      }
+      WalletData.push( tempData )
 
-      if (Platform.OS === 'ios') {
-        iCloud.startBackup(JSON.stringify(WalletData));
-        this.callBack(share);
+      if ( Platform.OS === 'ios' ) {
+        return iCloud.startBackup( JSON.stringify( WalletData ) ).then( ( result ) => {
+          console.log( 'iCloudStatus', result )
+          if( result ) return 'iCloudSuccess'
+          else throw new Error( 'iCLoud failure' )
+        } ).catch( ( err ) => {
+          console.log( 'iCloudStatus err', err )
+          throw new Error( err )
+        } )
+        // this.callBack( share )
       } else {
         const metaData = {
           name: 'HexaWalletBackup.json',
           description: 'Backup data for my app',
           mimeType: 'application/json',
-          data: JSON.stringify(WalletData),
-        };
-
-          GoogleDrive.uploadFile(JSON.stringify(metaData), (data, err) => {
-           // console.log('DATA', data, err);
-            const result = err || data;
-            if (result && result.eventName == 'successFullyUpload') {
-              this.callBack(share);
-            } else if (result && result.eventName === 'UseUserRecoverableAuthIOException') {
-              this.checkFileIsAvailable({ share: this.share });
-            } 
-          });
-      }
-    } catch (error) {
-      throw new Error( error )
-    }
-  };
-
-  public UpdateFile = (params: { metaData: any; share?: any }) => {
-    let { metaData, share } = params;
-    try {
-      GoogleDrive.updateFile(JSON.stringify(metaData), (data, err) => {
-       const result = err || data;
-        if (result.eventName == 'successFullyUpdate') {
-          this.callBack(share);
+          data: JSON.stringify( WalletData ),
         }
-        console.log('GoogleDrive.updateFile', result);
-      });
-    } catch (error) {
-      console.log('error', error);
+
+        GoogleDrive.uploadFile( JSON.stringify( metaData ), async ( data, err ) => {
+          // console.log('DATA', data, err);
+          const result = err || data
+          if ( result && result.eventName == 'successFullyUpload' ) {
+            return result.eventName
+            // this.callBack( share )
+          } else if ( result && result.eventName === 'UseUserRecoverableAuthIOException' ) {
+            return await this.checkFileIsAvailable( {
+              share: this.share
+            } )
+          }
+        } )
+      }
+    } catch ( error ) {
       throw new Error( error )
     }
+    return null
   };
 
-  public readFile = (params: {
+  public readFile = async ( params: {
     result: any;
     checkDataIsBackedup?: any;
     share?: any;
-  }) => {
-    let { result, checkDataIsBackedup, share } = params;
-    const metaData = { id: result.id };
-    console.log('isNotReading readFile', this.isNotReading);
+  } ) : Promise<any>  => {
+    const { result, checkDataIsBackedup, share } = params
+    const metaData = {
+      id: result.id
+    }
+    console.log( 'isNotReading readFile', this.isNotReading )
     try {
-      if (this.isNotReading) {
-        this.isNotReading = false;
-        GoogleDrive.readFile(JSON.stringify(metaData), (data1, err) => {
-          const result1 = err || data1.data;
-          if (checkDataIsBackedup) {
-            this.recoveryCallback(result1);
+      if ( this.isNotReading ) {
+        this.isNotReading = false
+        GoogleDrive.readFile( JSON.stringify( metaData ), async( data1, err ) => {
+          const result1 = err || data1.data
+          if ( checkDataIsBackedup ) {
+            this.recoveryCallback( result1 )
           } else {
-            this.updateData({ result1, googleData: result, share });
+            return await this.updateData( {
+              result1, googleData: result, share
+            } )
           }
-          if (result1) this.isNotReading = true;
-        });
+          if ( result1 ) this.isNotReading = true
+        } )
       }
-    } catch (error) {
-      console.log('error', error);
+    } catch ( error ) {
+      console.log( 'error', error )
       throw new Error( error )
     }
   };
 
-  public updateData = (params: {
+  public updateData = async ( params: {
     result1: any;
     googleData: any;
     share?: any;
-  }) => {
+  } ) : Promise<any> => {
     try {
-      let { result1, googleData, share } = params;
-      console.log('updateData share', share);
-      const { data } = this.dataObject.regularAccount.getWalletId();
-      var arr = [];
-      var newArray = [];
-      if (result1) {
-        arr = JSON.parse(result1);
-        if (arr && arr.length) {
-          for (var i = 0; i < arr.length; i++) {
-            newArray.push(arr[i]);
+      const { result1, googleData, share } = params
+      console.log( 'updateData share', share )
+      const { data } = this.dataObject.regularAccount.getWalletId()
+      let arr = []
+      const newArray = []
+      if ( result1 ) {
+        arr = JSON.parse( result1 )
+        if ( arr && arr.length ) {
+          for ( let i = 0; i < arr.length; i++ ) {
+            newArray.push( arr[ i ] )
           }
         }
-        var index = newArray.findIndex((x) => x.walletId == data.walletId);
-        //console.log('sdgsdg', index);
-        if (index === -1) {
-          let tempData = {
+        const index = newArray.findIndex( ( x ) => x.walletId == data.walletId )
+        console.log( 'sdgsdg', index )
+        if ( index === -1 ) {
+          const tempData = {
             levelStatus: this.dataObject.levelStatus,
             walletName: this.dataObject.walletName,
             questionId: this.dataObject.questionId,
@@ -328,35 +342,81 @@ export default class CloudBackup {
             data: this.dataObject.encryptedCloudDataJson,
             shares: this.dataObject.shares,
             keeperData: this.dataObject.keeperData,
-            dateTime: moment(new Date()),
-          };
-          newArray.push(tempData);
+            dateTime: moment( new Date() ),
+          }
+          newArray.push( tempData )
         } else {
-          newArray[index].questionId = this.dataObject.questionId,
-          newArray[index].question = this.dataObject.question,
-          newArray[index].levelStatus = this.dataObject.levelStatus;
-          newArray[index].data = this.dataObject.encryptedCloudDataJson;
-          newArray[index].shares = this.dataObject.shares ? this.dataObject.shares : newArray[index].shares;
-          newArray[index].keeperData = this.dataObject.keeperData;
-          newArray[index].dateTime = moment(new Date());
+          newArray[ index ].questionId = this.dataObject.questionId,
+          newArray[ index ].question = this.dataObject.question,
+          newArray[ index ].levelStatus = this.dataObject.levelStatus
+          newArray[ index ].data = this.dataObject.encryptedCloudDataJson
+          newArray[ index ].shares = this.dataObject.shares ? this.dataObject.shares : newArray[ index ].shares
+          newArray[ index ].keeperData = this.dataObject.keeperData
+          newArray[ index ].dateTime = moment( new Date() )
         }
-        //console.log('ARR', newArray);
+        console.log( 'ARR', newArray )
+        if ( Platform.OS == 'ios' ) {
+          if( newArray.length ) {
+            return iCloud.startBackup( JSON.stringify( newArray ) ).then( ( result ) => {
+              if( result ) return 'iCloudSuccess'
+              else throw new Error( 'iCLoud failure' )
+            } ).catch( ( err ) => {
+              throw new Error( err )
+            } )
+
+          }
+          // console.log('Platform.OS share', share)
+        } else {
+          const metaData = {
+            name: googleData.name,
+            mimeType: googleData.mimeType,
+            data: JSON.stringify( newArray ),
+            id: googleData.id,
+          }
+          return await this.UpdateFile( {
+            metaData, share
+          } )
+        }
       }
-      if (Platform.OS == 'ios') {
-        iCloud.startBackup(JSON.stringify(newArray));
-        this.callBack(share);
-        // console.log('Platform.OS share', share)
-      } else {
-       const metaData = {
-          name: googleData.name,
-          mimeType: googleData.mimeType,
-          data: JSON.stringify(newArray),
-          id: googleData.id,
-        };
-        this.UpdateFile({ metaData, share });
-      }
-    } catch (error) {
+
+    } catch ( error ) {
       throw new Error( error )
     }
   };
+
+
+  public UpdateFile = ( params: { metaData: any; share?: any } ) : Promise<any> => {
+    const { metaData, share } = params
+    try {
+      GoogleDrive.updateFile( JSON.stringify( metaData ), ( data, err ) => {
+        const result = err || data
+        if ( result.eventName == 'successFullyUpdate' ) {
+          return 'successFullyUpdate'
+          //this.callBack( share )
+        }
+        else if( result.eventName == 'failure' ){
+          throw new Error( result.eventName )
+        }
+        console.log( 'GoogleDrive.updateFile', result )
+      } )
+    } catch ( error ) {
+      console.log( 'error', error )
+      throw new Error( error )
+    }
+    return null
+  };
+
+
+  //   public static returnPromise = ( promise ) : Promise<any> => {
+
+//     promise.then( ( result ) => {
+//       console.log( 'return promise success', result )
+//       return result
+//     } ).catch( ( err ) => {
+//       console.log( 'return promise error', err )
+//       throw new Error( err )
+//     } )
+//     return null
+//   }
 }
+

@@ -547,7 +547,7 @@ function* updateEphemeralChannelWorker( { payload } ) {
   let generatedKey = false
   if (
     !contactInfo.info &&
-    contactInfo.contactName == 'Secondary Device'.toLowerCase()
+   ( contactInfo.contactName == 'Secondary Device'.toLowerCase() || contactInfo.contactName == 'Secondary Device1'.toLowerCase() ||  contactInfo.contactName == 'Secondary Device2'.toLowerCase() ||  contactInfo.contactName == 'Secondary Device3'.toLowerCase() )
   ) {
     // contact info = null, for secondary device (initially)
     contactInfo.info = SSS.generateKey( SSS.cipherSpec.keyLength )

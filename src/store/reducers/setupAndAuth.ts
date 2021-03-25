@@ -9,6 +9,8 @@ import {
   SWITCH_CREDS_CHANGED,
   PIN_CHANGED_FAILED,
   IS_NEW_HEALTH_SYSTEM,
+  INIT_RECOVERY_COMPLETED,
+
 } from '../actions/setupAndAuth'
 
 const initialState: {
@@ -25,6 +27,7 @@ const initialState: {
   credsChanged: string;
   pinChangedFailed: Boolean;
   isNewHealthSystemSet: Boolean;
+  initializeRecoveryCompleted: boolean;
 } = {
   hasCreds: false,
   isAuthenticated: false,
@@ -39,6 +42,7 @@ const initialState: {
   credsChanged: '',
   pinChangedFailed: false,
   isNewHealthSystemSet: false,
+  initializeRecoveryCompleted: false
 }
 
 export default ( state = initialState, action ) => {
@@ -100,6 +104,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           isNewHealthSystemSet: action.payload.isNewHealthSystemSet,
+        }
+
+      case INIT_RECOVERY_COMPLETED:
+        return {
+          ...state,
+          initializeRecoveryCompleted: action.payload.initializeRecoveryCompleted,
         }
   }
 

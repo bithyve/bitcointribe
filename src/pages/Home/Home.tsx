@@ -43,6 +43,7 @@ import {
   uploadSecondaryShareForPK,
   downloadSMShard,
   updateKeeperInfoToUnderCustody,
+  generateMetaShare
 } from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
@@ -197,6 +198,8 @@ interface HomePropsTypes {
   exchangeRates?: any[];
 
   accountsState: AccountsState;
+  cloudPermissionGranted: any;
+
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
 
@@ -262,6 +265,7 @@ interface HomePropsTypes {
   updateNewFcm: any;
   setCloudData: any;
   updateKeeperInfoToUnderCustody: any;
+  generateMetaShare: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -981,9 +985,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = ( prevProps, prevState ) => {
-    if ( this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
-      this.props.setCloudData( this.setCloudBackupStatusCallBack )
-    }
+    // if ( this.props.cloudPermissionGranted && this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
+    //   this.props.setCloudData()
+    // }
 
     if (
       prevProps.notificationList !== this.props.notificationList ||
@@ -1009,6 +1013,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.secondaryDeviceAddressValue
     ) {
       this.setSecondaryDeviceAddresses()
+    }
+
+    if( prevProps.currentLevel == 0 && prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 1 ) {
+      // this.props.generateMetaShare( 2 )
     }
 
     if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
@@ -2255,7 +2263,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               userName={custodyRequest.requester}
               onPressAcceptSecret={() => {
                 this.closeBottomSheet()
-
                 if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
                   Alert.alert(
                     'Request expired!',
@@ -2519,6 +2526,7 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications,
     accountsState: state.accounts,
+    cloudPermissionGranted: state.health.cloudPermissionGranted,
     currentWyreSubAccount: state.accounts.currentWyreSubAccount,
     currentRampSubAccount: state.accounts.currentRampSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
@@ -2592,7 +2600,8 @@ export default withNavigationFocus(
     downloadSMShard,
     updateNewFcm,
     setCloudData,
-    updateKeeperInfoToUnderCustody
+    updateKeeperInfoToUnderCustody,
+    generateMetaShare,
   } )( Home )
 )
 

@@ -37,6 +37,7 @@ import {
   onApprovalStatusChange,
   uploadSMShareKeeper,
   secondaryShareDownloaded,
+  downloadSmShareForApproval,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
 import SendShareModal from './SendShareModal'
@@ -183,17 +184,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedTitle, setSelectedTitle ] = useState(
     props.navigation.getParam( 'selectedTitle' ),
   )
-  const [ index, setIndex ] = useState( props.navigation.state.params.index )
+  const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
   const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
-  const [ selectedLevelId, setSelectedLevelId ] = useState(
-    props.navigation.state.params.selectedLevelId,
-  )
-  const [ selectedKeeper, setSelectedKeeper ] = useState(
-    props.navigation.state.params.selectedKeeper,
-  )
+  const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
+  const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.state.params.selectedTitle == 'Friends and Family'
+    props.navigation.getParam( 'selectedTitle' ) == 'Friends and Family'
       ? false
       : true,
   )
@@ -205,35 +202,18 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const keeperApproveStatus = useSelector(
     ( state ) => state.health.keeperApproveStatus
   )
-  const [ isChange, setIsChange ] = useState( false )
-  const [
-    ApprovePrimaryKeeperBottomSheet,
-    setApprovePrimaryKeeperBottomSheet,
-  ] = useState( React.createRef() )
+  const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
+    ? props.navigation.getParam( 'isChangeKeeperType' )
+    : false )
+  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
+  const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
+  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
+  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
   useEffect( () => {
-    setSelectedLevelId( props.navigation.state.params.selectedLevelId )
-    setSelectedKeeper( props.navigation.state.params.selectedKeeper )
-    setIsReshare(
-      props.navigation.state.params.selectedTitle == 'Friends and Family'
-        ? false
-        : true,
-    )
-    setSelectedTime( props.navigation.state.params.selectedTime )
-    setSelectedStatus( props.navigation.state.params.selectedStatus )
-    setSelectedTitle( props.navigation.state.params.selectedTitle )
-    setIndex( props.navigation.state.params.index )
-    setChosenContact( props.navigation.state.params.selectedContact )
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
-    setIsChange(
-      props.navigation.state.params.isChangeKeeperType
-        ? props.navigation.state.params.isChangeKeeperType
-        : false
-    )
   }, [
-    props.navigation.state.params.selectedLevelId,
-    props.navigation.state.params.selectedKeeper,
-    props.navigation.state.params.selectedStatus,
+    props.navigation.getParam( 'selectedKeeper' ),
   ] )
 
   useEffect( () => {
@@ -1028,8 +1008,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           element2.shareType == 'contact' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ] &&
-          selectedKeeper.shareType == 'contact'
+          levelhealth[ i ]
         ) {
           contactCount++
         }
@@ -1037,8 +1016,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           element2.shareType == 'device' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ] &&
-          selectedKeeper.shareType == 'device'
+          levelhealth[ i ]
         ) {
           deviceCount++
         }
@@ -1057,14 +1035,17 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
     }
+    console.log( 'changeIndex', changeIndex, type )
     if ( type == 'contact' ) {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
     if ( type == 'device' ) {
-      props.navigation.navigate( 'KeeperDeviceHistory', {
+      console.log( 'changeIndex', changeIndex )
+      props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...props.navigation.state.params,
         selectedTitle: name,
         isChangeKeeperType: true,
+        index: changeIndex
       } )
     }
     if ( type == 'pdf' ) {
@@ -1076,7 +1057,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }
 
-  const sendApprovalRequestToPK = ( type ) => {
+  const sendApprovalRequestToPK = ( ) => {
     setQrBottomSheetsFlag( true );
     ( QrBottomSheet as any ).current.snapTo( 1 );
     ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
@@ -1086,7 +1067,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     return (
       <QRModal
         isFromKeeperDeviceHistory={true}
-        QRModalHeader={'QR scanner ddfds'}
+        QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
           'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
@@ -1094,54 +1075,25 @@ const TrustedContactHistoryKeeper = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          try {
-            if ( qrScannedData ) {
-              const qrData = JSON.parse( qrScannedData )
-              console.log( 'qrData', qrData )
-              const res = await S3Service.downloadSMShare( qrData.publicKey )
-              console.log( 'Keeper Shares', res )
-              if ( res.status === 200 ) {
-                console.log( 'SHARES DOWNLOAD', res.data )
-                dispatch( secondaryShareDownloaded( res.data.metaShare ) );
-                ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-                ( QrBottomSheet as any ).current.snapTo( 0 )
-              }
-            }
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          setIsApprovalStarted( true )
+          dispatch( downloadSmShareForApproval( qrScannedData ) )
+          setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          console.log( 'JHGUYFGYUBJ' )
-          const qrScannedData = '{"requester":"ShivaniQ","publicKey":"c64DyxhpJXyup8Y6lXmRE1S2","uploadedAt":1615905819048,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          setIsApprovalStarted( true )
+          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
-            if ( qrScannedData ) {
-              const qrData = JSON.parse( qrScannedData )
-              console.log( 'qrData', qrData )
-              const res = await S3Service.downloadSMShare( qrData.publicKey )
-              console.log( 'Keeper Shares', res )
-              if ( res.status === 200 ) {
-                console.log( 'SHARES DOWNLOAD', res.data )
-                dispatch( secondaryShareDownloaded( res.data.metaShare ) );
-                ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-                ( QrBottomSheet as any ).current.snapTo( 0 )
-              }
-            }
+            dispatch( downloadSmShareForApproval( qrScannedData ) )
+            setQrBottomSheetsFlag( false )
           } catch ( err ) {
             console.log( {
               err
             } )
           }
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
       />
     )
@@ -1157,6 +1109,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
       />
     )
   }
+
+  useEffect( ()=>{
+    if( !downloadSmShare ) setIsApprovalStarted( false )
+    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
+      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
+      ( QrBottomSheet as any ).current.snapTo( 0 )
+    }
+  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
 
   return (
     <View style={{
@@ -1334,7 +1294,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             onPressSetup={async ( type, name ) =>{
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )
-              sendApprovalRequestToPK( type )
+              sendApprovalRequestToPK( )
               // onPressChangeKeeperType(type, name);
               // (keeperTypeBottomSheet as any).current.snapTo(0);
             }}

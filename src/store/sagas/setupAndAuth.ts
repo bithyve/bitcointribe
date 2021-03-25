@@ -18,6 +18,7 @@ import {
   credsChanged,
   pinChangedFailed,
   setIsNewHealthSystemSet,
+  initializeRecoveryCompleted,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
@@ -65,6 +66,7 @@ function* initRecoveryWorker( { payload } ) {
   yield call( insertDBWorker, {
     payload: initialDatabase
   } )
+  yield put( initializeRecoveryCompleted( true ) )
   // yield call(AsyncStorage.setItem, "walletExists", "true");
   // yield put(setupInitialized());
 }
