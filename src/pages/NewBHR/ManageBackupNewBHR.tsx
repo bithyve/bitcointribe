@@ -197,30 +197,36 @@ class ManageBackupNewBHR extends Component<
       isError: false,
       levelData: [
         {
+          levelName: 'Automated Cloud Backup',
           status: 'notSetup',
-          infoGray: 'Improve security by adding Keepers',
-          infoRed: 'Keepers need your attention',
-          infoGreen: 'All Keepers are accessible',
+          keeper1ButtonText: 'Add Backup',
+          keeper2ButtonText: 'Security Question',
           keeper1: obj,
           keeper2: obj,
+          note:'',
+          info:'',
           id: 1,
         },
         {
+          levelName: 'Double Backup',
           status: 'notSetup',
-          infoGray: 'Improve security by adding Keepers',
-          infoRed: 'Keepers need your attention',
-          infoGreen: 'All Keepers are accessible',
+          keeper1ButtonText: 'Share Recovery Key (1)',
+          keeper2ButtonText: 'Share Recovery Key (2)',
           keeper1: obj,
           keeper2: obj,
+          note:'',
+          info:'',
           id: 2,
         },
         {
+          levelName: 'Multi Key Backup',
           status: 'notSetup',
-          infoGray: 'Improve security by adding Keepers',
-          infoRed: 'Keepers need your attention',
-          infoGreen: 'All Keepers are accessible',
+          keeper1ButtonText: 'Share Recovery Key (1)',
+          keeper2ButtonText: 'Share Recovery Key (2)',
           keeper1: obj,
           keeper2: obj,
+          note:'',
+          info:'',
           id: 3,
         },
       ],
@@ -335,8 +341,8 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    console.log( 'currentLevel', currentLevel )
-    console.log( 'this.props.cloudBackupStatus', this.props.cloudBackupStatus )
+    // console.log( 'currentLevel', currentLevel )
+    // console.log( 'this.props.cloudBackupStatus', this.props.cloudBackupStatus )
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
       console.log( 'second condition' )
@@ -780,7 +786,7 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          const qrScannedData = '{"requester":"Erf","publicKey":"0nhtodKPJRk4wRayEenxWuwq","uploadedAt":1616687078230,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
             if ( qrScannedData ) {
               this.props.downloadSmShareForApproval( qrScannedData )
@@ -866,7 +872,7 @@ class ManageBackupNewBHR extends Component<
             flex: 1
           }}
         >
-          <View style={styles.topHealthView}>
+          <View style={ styles.topHealthView }>
             <ImageBackground
               source={require( '../../assets/images/icons/keeper_sheild.png' )}
               style={{
@@ -891,12 +897,11 @@ class ManageBackupNewBHR extends Component<
               )}
             </ImageBackground>
             <View style={styles.headerSeparator} />
-            <View>
+            <View style={{
+              width: wp( '30%' )
+            }}>
               <Text style={styles.backupText}>Backup</Text>
-              <Text style={styles.backupInfoText}>Security is</Text>
-              <Text style={styles.backupInfoText}>
-                at level {currentLevel ? currentLevel : ''}
-              </Text>
+              <Text style={styles.backupInfoText}>{currentLevel == 1 ? 'Cloud Backup Complete' : currentLevel == 2 ? 'Double Backup Complete' : currentLevel == 3 ? 'Multi Key Backup Complete' : ''}</Text>
             </View>
           </View>
           <View
@@ -1014,7 +1019,7 @@ class ManageBackupNewBHR extends Component<
                                   : Colors.white,
                             }}
                           >
-                            Level {value.id}
+                            {value.levelName}
                           </Text>
                           <Text
                             style={{
@@ -1023,20 +1028,10 @@ class ManageBackupNewBHR extends Component<
                                 value.status == 'notSetup'
                                   ? Colors.textColorGrey
                                   : Colors.white,
+                              width: wp( '55%' )
                             }}
                           >
-                            {value.keeper1.status == 'notAccessible' &&
-                            value.keeper2.status == 'notAccessible' &&
-                            value.keeper1.updatedAt == 0 &&
-                            value.keeper2.updatedAt == 0
-                              ? value.infoGray
-                              : value.keeper1.status == 'accessible' &&
-                                value.keeper2.status == 'accessible'
-                                ? value.infoGreen
-                                : value.keeper1.status == 'accessible' ||
-                                value.keeper2.status == 'accessible'
-                                  ? value.infoRed
-                                  : value.infoRed}
+                            {value.info}
                           </Text>
                         </View>
                         <TouchableOpacity
@@ -1081,7 +1076,7 @@ class ManageBackupNewBHR extends Component<
                         />
                         <View style={styles.cardView}>
                           <View style={{
-                            width: wp( '40%' )
+                            width: wp( '55%' )
                           }}>
                             <Text
                               numberOfLines={2}
@@ -1094,7 +1089,7 @@ class ManageBackupNewBHR extends Component<
                                 fontSize: RFValue( 10 ),
                               }}
                             >
-                              Lorem ipsum dolor sit amet, consetetur
+                              {value.note}
                             </Text>
                           </View>
                           {value.id == 1 ? (
@@ -1289,12 +1284,7 @@ class ManageBackupNewBHR extends Component<
                                   } }
                                   numberOfLines={1}
                                 >
-                                  {value.status == 'good' ||
-                                  ( value.status == 'bad' && value.keeper1.name )
-                                    ? value.keeper1.name
-                                    : value.id == 2
-                                      ? 'Add Device Keeper'
-                                      : 'Add Keeper'}
+                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share Recovery Key (1)'}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
@@ -1372,11 +1362,7 @@ class ManageBackupNewBHR extends Component<
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {( value.status == 'bad' ||
-                                    value.status == 'good' ) &&
-                                  value.keeper2.name
-                                    ? value.keeper2.name
-                                    : 'Add Keeper'}
+                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share Recovery Key (2)'}
                                 </Text>
                               </TouchableOpacity>
                             </View>
@@ -1669,7 +1655,7 @@ const styles = StyleSheet.create( {
   cardView: {
     height: wp( '35%' ),
     width: wp( '85%' ),
-    padding: 20,
+    padding: 15,
   },
   cardHealthImageView: {
     backgroundColor: Colors.red,
@@ -1702,7 +1688,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
-    width: wp( '20%' ),
+    width: wp( '22%' ),
   },
   levelText: {
     fontSize: RFValue( 18 ),
@@ -1731,7 +1717,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.deepBlue,
     alignItems: 'center',
     borderRadius: 8,
-    width: wp( '35%' ),
+    width: wp( '37%' ),
     height: wp( '11%' ),
   },
   resetImage: {
