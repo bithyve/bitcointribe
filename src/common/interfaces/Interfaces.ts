@@ -51,7 +51,7 @@ export interface ServicesJSON {
 }
 
 export interface Database {
-  WALLET_SETUP: {
+  WALLET_SETUP?: {
     walletName: string;
     security: { question: string; answer: string };
   };
