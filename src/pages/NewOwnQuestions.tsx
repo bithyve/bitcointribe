@@ -107,31 +107,6 @@ export default function NewOwnQuestions( props ) {
     }
   }, [ isDBHydrated ] )
 
-  useEffect( () => {
-    if ( isLoaderStart  && isDBHydrated ) {
-      const security = {
-        questionId: '0',
-        question: question,
-        answer,
-      }
-      dispatch( setupWalletDetails( walletName, security ) )
-      dispatch( setVersion( 'Current' ) )
-      const current = Date.now()
-      AsyncStorage.setItem(
-        'SecurityAnsTimestamp',
-        JSON.stringify( current ),
-      )
-      const securityQuestionHistory = {
-        created: current,
-      }
-      AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify( securityQuestionHistory ),
-      )
-    }
-  }, [ isLoaderStart, isDBHydrated ] )
-
-
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
 
@@ -170,7 +145,13 @@ export default function NewOwnQuestions( props ) {
     if (
       walletDetailsSetted
     ) {
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
+      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        navigateToHome()
+      }
     }
   }, [ walletDetailsSetted ] )
 
@@ -188,15 +169,29 @@ export default function NewOwnQuestions( props ) {
     } )
   }
 
-  const checkCloudLogin = () =>{
-    const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-      dispatch( setCloudData() )
-      showLoader()
-    } else{
-      showLoader()
-      navigateToHome()
 
+  const checkCloudLogin = () =>{
+    if( isDBHydrated ){
+      showLoader()
+      const security = {
+        questionId: '0',
+        question: question,
+        answer,
+      }
+      dispatch( setupWalletDetails( walletName, security ) )
+      dispatch( setVersion( 'Current' ) )
+      const current = Date.now()
+      AsyncStorage.setItem(
+        'SecurityAnsTimestamp',
+        JSON.stringify( current ),
+      )
+      const securityQuestionHistory = {
+        created: current,
+      }
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify( securityQuestionHistory ),
+      )
     }
   }
 

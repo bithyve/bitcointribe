@@ -110,7 +110,35 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ isDBHydrated ] )
 
   useEffect( () => {
-    if ( isLoaderStart && isDBHydrated ) {
+    if( backupStatus === null ) return
+    if( backupStatus || backupStatus === false ){
+      navigateToHome()
+    }
+  }, [ backupStatus ] )
+
+  const navigateToHome = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 0 )
+    props.navigation.navigate( 'HomeNav', {
+      walletName,
+    } )
+  }
+
+  useEffect( () => {
+    if( walletDetailsSetted ){
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
+      dispatch( walletCheckIn() )
+      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        navigateToHome()
+      }
+    }
+  }, [ walletDetailsSetted ] )
+
+  const checkCloudLogin = () =>{
+
+    if( isDBHydrated ){
+      showLoader()
       const security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
@@ -131,41 +159,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         JSON.stringify( securityQuestionHistory ),
       )
     }
-  }, [ isLoaderStart, isDBHydrated ] )
 
-  useEffect( () => {
-    if (
-      walletDetailsSetted
-    ) {
-      dispatch( walletCheckIn() )
-    }
-  }, [ walletDetailsSetted ] )
-
-
-  useEffect( () => {
-    if( backupStatus === null ) return
-    if( backupStatus || backupStatus === false ){
-      navigateToHome()
-    }
-  }, [ backupStatus ] )
-
-  const navigateToHome = () => {
-    ( loaderBottomSheet as any ).current.snapTo( 0 )
-    props.navigation.navigate( 'HomeNav', {
-      walletName,
-    } )
-  }
-
-  const checkCloudLogin = () =>{
-    const { healthCheckInitializedKeeper } = s3service.levelhealth
-    if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-      dispatch( setCloudData() )
-      showLoader()
-    } else{
-      showLoader()
-      navigateToHome()
-
-    }
   }
 
   const showLoader = () => {

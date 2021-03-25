@@ -437,8 +437,8 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateCloudData = () => {
-    console.log( 'updateCloudData', this.props.cloudBackupStatus )
-    if( this.props.cloudBackupStatus === true && this.props.cloudPermissionGranted === false ) return
+    if( this.props.cloudBackupStatus === true ) return
+    if( this.props.cloudPermissionGranted === false ) return
     const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
     let secretShare = {
     }
