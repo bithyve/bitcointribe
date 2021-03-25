@@ -26,14 +26,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 export default function WalletNameRecovery( props ) {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ walletName, setWalletName ] = useState( '' )
-  
+
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={commonStyle.headerContainer}>
           <TouchableOpacity
@@ -41,8 +41,8 @@ export default function WalletNameRecovery( props ) {
             onPress={() => {
               props.navigation.goBack()
             }}
-            hitSlop={{ 
-              top: 20, left: 20, bottom: 20, right: 20 
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
             }}
           >
             <View style={commonStyle.headerLeftIconInnerContainer}>
@@ -52,13 +52,13 @@ export default function WalletNameRecovery( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <View style={{ 
-            flex:1 
+          <View style={{
+            flex:1
           }}>
             <Text
               style={{
@@ -71,7 +71,7 @@ export default function WalletNameRecovery( props ) {
               Type in the name of your wallet
             </Text>
             <Text style={{
-              ...styles.modalInfoText, marginTop: 7, marginLeft: 20,  
+              ...styles.modalInfoText, marginTop: 7, marginLeft: 20,
             }}>
                Your contacts will see this to{' '}
               <Text
@@ -121,7 +121,7 @@ export default function WalletNameRecovery( props ) {
                   //     this.handleScannedData(scannedData),
                   // })
                   props.navigation.navigate( 'RecoveryQuestion', {
-                    walletName 
+                    walletName
                   } )
                 }
                 style={styles.buttonView}
@@ -170,7 +170,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   buttonView: {
@@ -210,7 +210,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular
@@ -225,7 +225,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     marginRight: 20,

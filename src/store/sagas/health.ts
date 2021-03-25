@@ -602,7 +602,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
   try {
     const { s3Service, } = yield call(
       serviceGeneratorForNewBHR,
-      WALLET_SETUP.security.answer,
       mnemonics,
       restorationShares,
       payload.icloudData
@@ -1033,7 +1032,6 @@ function* recoverWalletWorker( { payload } ) {
       // );
       const { s3Service, } = yield call(
         serviceGeneratorForNewBHR,
-        security.answer,
         mnemonic,
         restorationShares,
         decryptedCloudDataJson
