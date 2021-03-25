@@ -60,13 +60,11 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const accountsState: AccountsState = useAccountsState()
   const sourceAccountShell = useSourceAccountShellForSending()
   const dispatch = useDispatch()
-
+  const twoFASetupDetails = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.twoFASetup )
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.additional, ( _ ) => _.secure.twoFAResetted )
 
     if ( resettedTwoFA ) {
-      const twoFASetupDetails = idx( accountsState, ( _ )=> _[ sourceAccountShell.primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      console.log( 'twoFASetupDetails', twoFASetupDetails )
       navigation.navigate( 'TwoFASetup', {
         twoFASetup: twoFASetupDetails,
         onPressBack: () => {
