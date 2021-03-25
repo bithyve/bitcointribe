@@ -30,7 +30,10 @@ import {
   TWO_FA_VALID,
   SET_ALL_ACCOUNTS_DATA,
   FETCH_RECEIVE_ADDRESS_SUCCEEDED,
-  CLEAR_RECEIVE_ADDRESS
+  CLEAR_RECEIVE_ADDRESS,
+  GENERATE_SECONDARY_XPRIV,
+  RESET_TWO_FA,
+  VALIDATE_TWO_FA
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -72,9 +75,9 @@ export type AccountsState = {
   averageTxFees: any;
 
   twoFAHelpFlags: {
-      xprivGenerated: boolean;
-      twoFAValid: boolean;
-      twoFAResetted: boolean;
+      xprivGenerated: boolean | null;
+      twoFAValid: boolean | null;
+      twoFAResetted: boolean | null;
   };
 
   isGeneratingNewAccountShell: boolean;
@@ -118,9 +121,9 @@ const initialState: AccountsState = {
   accountShells: [],
 
   twoFAHelpFlags: {
-    xprivGenerated: false,
-    twoFAValid: false,
-    twoFAResetted: false,
+    xprivGenerated: null,
+    twoFAValid: null,
+    twoFAResetted: null,
   },
 
   isGeneratingNewAccountShell: false,
@@ -192,6 +195,15 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           exchangeRates: action.payload.exchangeRates,
         }
 
+      case GENERATE_SECONDARY_XPRIV:
+        return {
+          ...state,
+          twoFAHelpFlags: {
+            ...state.twoFAHelpFlags,
+            xprivGenerated: null,
+          },
+        }
+
       case SECONDARY_XPRIV_GENERATED:
         return {
           ...state,
@@ -201,12 +213,31 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           },
         }
 
+
+      case VALIDATE_TWO_FA:
+        return {
+          ...state,
+          twoFAHelpFlags: {
+            ...state.twoFAHelpFlags,
+            twoFAValid: null,
+          },
+        }
+
       case TWO_FA_VALID:
         return {
           ...state,
           twoFAHelpFlags: {
             ...state.twoFAHelpFlags,
             twoFAValid: action.payload.isValid,
+          },
+        }
+
+      case RESET_TWO_FA:
+        return {
+          ...state,
+          twoFAHelpFlags: {
+            ...state.twoFAHelpFlags,
+            twoFAResetted: null,
           },
         }
 

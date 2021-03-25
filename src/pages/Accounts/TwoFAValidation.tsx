@@ -42,7 +42,7 @@ export default function TwoFAValidation( props ) {
       const validationSucccessful = twoFAHelpFlags.twoFAValid
       if( validationSucccessful ){
         props.navigation.navigate( 'AccountDetails' )
-      } else {
+      } else if( validationSucccessful === false ) {
         SendUnSuccessBottomSheet.current.snapTo( 1 )
       }
     }
