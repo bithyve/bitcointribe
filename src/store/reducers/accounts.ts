@@ -68,21 +68,13 @@ export type AccountsState = {
   TEST_ACCOUNT: AccountVars;
   SECURE_ACCOUNT: AccountVars;
 
-  // TODO: Consider separating this into another reducer -- I'm not
-  // sure it's really a concern of the "Accounts state".
   exchangeRates?: any;
   averageTxFees: any;
 
-  // TODO: How does this differ from ANY added account?
-  // Perhaps we should consolidate the items here into that array?
-  additional?: {
-    regular?: any;
-    test?: any;
-    secure?: {
-      xprivGenerated?: boolean;
-      twoFAValid?: boolean;
-      twoFAResetted?: boolean;
-    };
+  twoFAHelpFlags: {
+      xprivGenerated: boolean;
+      twoFAValid: boolean;
+      twoFAResetted: boolean;
   };
 
   isGeneratingNewAccountShell: boolean;
@@ -123,8 +115,13 @@ const initialState: AccountsState = {
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
   averageTxFees: null,
-
   accountShells: [],
+
+  twoFAHelpFlags: {
+    xprivGenerated: false,
+    twoFAValid: false,
+    twoFAResetted: false,
+  },
 
   isGeneratingNewAccountShell: false,
   hasNewAccountShellGenerationSucceeded: false,
@@ -198,30 +195,27 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case SECONDARY_XPRIV_GENERATED:
         return {
           ...state,
-          additional: {
-            secure: {
-              xprivGenerated: action.payload.generated,
-            },
+          twoFAHelpFlags: {
+            ...state.twoFAHelpFlags,
+            xprivGenerated: action.payload.generated,
           },
         }
 
       case TWO_FA_VALID:
         return {
           ...state,
-          additional: {
-            secure: {
-              twoFAValid: action.payload.isValid,
-            },
+          twoFAHelpFlags: {
+            ...state.twoFAHelpFlags,
+            twoFAValid: action.payload.isValid,
           },
         }
 
       case TWO_FA_RESETTED:
         return {
           ...state,
-          additional: {
-            secure: {
-              twoFAResetted: action.payload.resetted,
-            },
+          twoFAHelpFlags: {
+            ...state.twoFAHelpFlags,
+            twoFAResetted: action.payload.resetted,
           },
         }
 
