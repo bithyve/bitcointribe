@@ -1401,6 +1401,8 @@ class ManageBackupNewBHR extends Component<
           ]}
           renderContent={() => (
             <KeeperTypeModalContents
+              headerText={'Backup Recovery Key'}
+              subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
               onPressSetup={async ( type, name ) => {
                 this.setState( {
                   selectedKeeperType: type,

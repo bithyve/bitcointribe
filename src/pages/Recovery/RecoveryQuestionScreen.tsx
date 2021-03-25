@@ -74,10 +74,10 @@ export default function RecoveryQuestionScreen( props ) {
             flexDirection: 'row', padding: wp( '7%' )
           }}>
             <View style={{
-              flex: 3, justifyContent: 'center'
+              justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Enter Security Question{'\n'}and Answer
+                Enter Security Question and Answer
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
@@ -86,7 +86,7 @@ export default function RecoveryQuestionScreen( props ) {
                 and enter its answer
               </Text>
             </View>
-            <View style={{
+            {/* <View style={{
               flex: 1
             }}>
               <KnowMoreButton
@@ -97,10 +97,10 @@ export default function RecoveryQuestionScreen( props ) {
                 textStyle={{
                 }}
               />
-            </View>
+            </View>*/}
           </View>
           <View style={{
-            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
+            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' ),
           }}>
             <TouchableOpacity
               activeOpacity={10}
@@ -231,7 +231,7 @@ export default function RecoveryQuestionScreen( props ) {
               </TouchableOpacity>
 
               <Text style={styles.modalInfoText}>
-                The Security Answer is case sensitive, make sure you{'\n'}enter
+                The Security answer is case sensitive, make sure you enter
                 the case, numeric or symbolic values correctly
               </Text>
             </View>

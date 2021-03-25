@@ -929,6 +929,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         ]}
         renderContent={() => (
           <KeeperTypeModalContents
+            headerText={'Change backup method'}
+            subHeader={'Share your Recovery Key with a new contact or a different device'}
             onPressSetup={async ( type, name ) => {
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )

@@ -127,13 +127,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     if( walletDetailsSetted ){
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
-      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        navigateToHome()
-      }
+      if( healthCheckInitializedKeeper === true ){
+        if( cloudPermissionGranted ){
+          dispatch( setCloudData() )
+        } else{
+          navigateToHome()
+        }}
     }
-  }, [ walletDetailsSetted ] )
+  }, [ walletDetailsSetted, s3service ] )
 
   const checkCloudLogin = () =>{
 
@@ -364,8 +365,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       height: hp( '40%' )
                     }}
                   >
-                    {dropdownBoxList.map( ( value: React.SetStateAction<{ id: string; question: string }>, index: number ) => (
-                      // eslint-disable-next-line react/jsx-key
+                    {dropdownBoxList.map( ( value, index ) => (
                       <TouchableOpacity
                         onPress={() => {
                           setTimeout( () => {
@@ -622,9 +622,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         ...styles.bottomButtonView,
       }}>
         {(
-          answer.trim() == confirmAnswer.trim() &&
+          answer.trim() === confirmAnswer.trim() &&
             confirmAnswer.trim() &&
-            answer.trim() && answerError.length == 0
+            answer.trim() && answerError.length === 0
         ) && (
           setButtonVisible()
         ) || null}

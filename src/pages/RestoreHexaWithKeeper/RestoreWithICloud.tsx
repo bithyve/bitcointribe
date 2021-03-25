@@ -660,7 +660,7 @@ class RestoreWithICloud extends Component<
                 {'Recover using keys'}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              The status of your Recovery Key request is visible below.
+              The status of your Recovery Key request is visible below
               </Text>
             </View>
           </View>
@@ -673,7 +673,8 @@ class RestoreWithICloud extends Component<
             />
           }
           style={{
-            flex: 1
+            flex: 1,
+            marginBottom: hp( '2%' ),
           }}
         >
           {cloudBackup &&
@@ -791,6 +792,20 @@ class RestoreWithICloud extends Component<
               )
             } )}
         </ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginLeft: 25,
+            marginRight: 25,
+            marginTop: 'auto',
+            marginBottom: hp( '1%' ),
+            alignItems: 'center',
+          }}
+        >
+          <Text style={styles.modalHeaderInfoText}>
+        Use Send Request to share a link with a contact. If the person you wish to backup your Recovery Key with, is with you in person, use Scan Key. Or they could also send you a screenshot of the QR for you to scan
+          </Text>
+        </View>
         <View
           style={{
             flexDirection: 'row',
