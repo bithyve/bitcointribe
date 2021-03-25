@@ -40,7 +40,7 @@ import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
-import { initializeHealthSetup } from '../store/actions/health'
+import { initializeHealthSetup, initNewBHRFlow } from '../store/actions/health'
 import { googleDriveLogin, setCloudData } from '../store/actions/cloud'
 import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 
@@ -127,6 +127,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     if( walletDetailsSetted ){
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
+      dispatch( initNewBHRFlow( true ) )
       if( healthCheckInitializedKeeper === true ){
         if( cloudPermissionGranted ){
           dispatch( setCloudData() )

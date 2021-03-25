@@ -60,7 +60,7 @@ import {
   downloadPdfShare,
 } from '../../store/actions/health'
 import axios from 'axios'
-import { initializeHealthSetup } from '../../store/actions/health'
+import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/health'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
@@ -121,6 +121,7 @@ interface RestoreWithICloudPropsTypes {
   getCloudDataRecovery: any;
   cloudData: any;
   clearCloudCache: any;
+  initNewBHRFlow: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -189,6 +190,7 @@ class RestoreWithICloud extends Component<
       await AsyncStorage.setItem( 'walletExists', 'true' )
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
       checkMSharesHealth()
+      initNewBHRFlow( true )
       if ( this.refs.loaderBottomSheet as any )
         ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'HomeNav' )
@@ -1316,7 +1318,8 @@ export default withNavigationFocus(
     updateCloudMShare,
     requestShare,
     getCloudDataRecovery,
-    clearCloudCache
+    clearCloudCache,
+    initNewBHRFlow
   } )( RestoreWithICloud )
 )
 

@@ -38,7 +38,7 @@ import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import CloudBackup from '../common/CommonFunctions/CloudBackup'
-import { initializeHealthSetup } from '../store/actions/health'
+import { initializeHealthSetup, initNewBHRFlow } from '../store/actions/health'
 import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 import { setCloudData } from '../store/actions/cloud'
 
@@ -147,11 +147,13 @@ export default function NewOwnQuestions( props ) {
     ) {
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
-      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        navigateToHome()
-      }
+      dispatch( initNewBHRFlow( true ) )
+      if( healthCheckInitializedKeeper === true ){
+        if( cloudPermissionGranted ){
+          dispatch( setCloudData() )
+        } else{
+          navigateToHome()
+        }}
     }
   }, [ walletDetailsSetted ] )
 

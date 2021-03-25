@@ -79,6 +79,15 @@ export const UPDATE_KEEPERINFO_TO_TC = 'UPDATE_KEEPERINFO_TO_TC'
 export const UPDATE_KEEPERINFO_UNDER_CUSTODY = 'UPDATE_KEEPERINFO_UNDER_CUSTODY'
 export const AUTO_SHARE_LEVEL2_KEEPER = 'AUTO_SHARE_LEVEL2_KEEPER'
 export const DOWNLOAD_SMSHARE_FOR_APPROVAL = 'DOWNLOAD_SMSHARE_FOR_APPROVAL'
+export const INIT_NEW_BHR = 'INIT_NEW_BHR'
+
+export const initNewBHRFlow = ( newBHRFlowStarted ) => {
+  return {
+    type: INIT_NEW_BHR, payload: {
+      newBHRFlowStarted
+    }
+  }
+}
 
 export const initHealthCheck = () => {
   return {
