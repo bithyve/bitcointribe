@@ -70,7 +70,9 @@ function* cloudWorker( { payload } ) {
       if( isCloudBackupCompleted ) {
         yield put( DataBackupStatus( true ) )
         yield call( updateHealthForCloudStatusWorker, {
-          payload : share
+          payload : {
+            share
+          }
         } )
       } else{
         yield put( DataBackupStatus( false ) )
