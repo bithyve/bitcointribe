@@ -1740,7 +1740,7 @@ export default class LevelHealth {
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     const shares = secrets.share(
-      this.stringToHex( secondaryMnemonics ),
+      this.stringToHex( secondaryMnemonics.trim() ),
       config.SSS_LEVEL1_TOTAL,
       config.SSS_LEVEL1_THRESHOLD,
     )

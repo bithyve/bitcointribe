@@ -543,6 +543,17 @@ function* resetTwoFAWorker( { payload } ) {
 
   if ( res.status == 200 ) {
     yield put( twoFAResetted( true ) )
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      [ SECURE_ACCOUNT ]: JSON.stringify( service ),
+    }
+    console.log( 'updatedSERVICES', updatedSERVICES )
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     console.log( 'Failed to reset twoFA', res.err )
