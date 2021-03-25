@@ -71,7 +71,7 @@
     "crypto-js": "^3.1.9-1",
     "dns.js": "^1.0.1",
     "domain-browser": "^1.2.0",
-    "elliptic": "^6.5.2",
+    "elliptic": "^6.5.4",
     "events": "^1.1.1",
     "expo-contacts": "^8.6.0",
     "expo-secure-store": "^9.2.0",
