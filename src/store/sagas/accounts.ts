@@ -515,7 +515,7 @@ export const feeAndExchangeRatesWatcher = createWatcher(
 )
 
 function* resetTwoFAWorker( { payload } ) {
-  const service = yield select(
+  const service: SecureAccount = yield select(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
@@ -523,6 +523,17 @@ function* resetTwoFAWorker( { payload } ) {
 
   if ( res.status == 200 ) {
     yield put( twoFAResetted( true ) )
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      [ SECURE_ACCOUNT ]: JSON.stringify( service ),
+    }
+    console.log( 'updatedSERVICES', updatedSERVICES )
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     console.log( 'Failed to reset twoFA', res.err )
@@ -1280,20 +1291,27 @@ export const fetchReceiveAddressWatcher = createWatcher(
   FETCH_RECEIVE_ADDRESS
 )
 
-function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrData: string, QRModalHeader: string, serviceType: string } } ) {
+function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, serviceType: string } } ) {
   try {
-    const { qrData, QRModalHeader, serviceType } = payload
+    const { qrdata, QRModalHeader, serviceType } = payload
+    console.log( 'payload', payload )
+    // qrData = '{"requester":"Shivani","publicKey":"M80Nz8hMm6lrce7SADVwapF8","uploadedAt":1616149096398,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
     const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select( ( state ) => state.storage.database )
     const s3Service = yield select( ( state ) => state.health.service )
     let secondaryMnemonic
     const sharesArray = [ DECENTRALIZED_BACKUP.PK_SHARE ]
-    const qrDataObj = JSON.parse( qrData )
-    if( qrDataObj.type == 'pdf' ) {
+    console.log( 'qrData', qrdata )
+    const qrDataObj = JSON.parse( qrdata )
+    console.log( 'qrDataObj', qrDataObj )
+    if( qrDataObj.type && qrDataObj.type == 'pdf' ) {
+
       const walletId = s3Service.levelhealth.walletId
       const key = LevelHealth.getDerivedKey( walletId )
-      qrData
+      console.log( 'key', key )
       const data = yield LevelHealth.decryptWithAnswer( qrDataObj.encryptedData, WALLET_SETUP.security.answer )
+      console.log( 'data', data )
       const data1 = JSON.parse( data.decryptedString )
+      console.log( 'data1', data1 )
       const res = yield call( S3Service.downloadSMPDFShare, data1.messageId, key )
       if ( res.status === 200 ) {
         console.log( 'SHARES DOWNLOAD pdf', res.data )
@@ -1306,14 +1324,15 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrData: stri
         sharesArray.push( res.data.metaShare )
       }
     }
+    console.log( 'sharesArray', sharesArray )
     if( sharesArray.length>1 ){
-      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray )
+      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, WALLET_SETUP.security.answer )
     }
-    console.log( 'secondaryMnemonic', secondaryMnemonic )
+    console.log( 'secondaryMnemonic', secondaryMnemonic.mnemonic )
     if ( QRModalHeader === 'Reset 2FA' ) {
-      yield put( resetTwoFA( secondaryMnemonic ) )
+      yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
     } else if ( QRModalHeader === 'Sweep Funds' ) {
-      yield put( generateSecondaryXpriv( SECURE_ACCOUNT, secondaryMnemonic ) )
+      yield put( generateSecondaryXpriv( SECURE_ACCOUNT, secondaryMnemonic.mnemonic ) )
     }
   } catch ( error ) {
     console.log( 'error', error )

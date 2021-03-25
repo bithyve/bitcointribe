@@ -3,6 +3,8 @@ import { View, StyleSheet, Text, Image } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
+import ListStyles from '../../../common/Styles/ListStyles'
+import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
@@ -10,6 +12,7 @@ import useWyreIntegrationState from '../../../utils/hooks/state-selectors/accoun
 import { fetchWyreReceiveAddress, fetchWyreReservation } from '../../../store/actions/WyreIntegration'
 import useWyreReservationFetchEffect from '../../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
 import openLink from '../../../utils/OpenLink'
+import { ListItem } from 'react-native-elements'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -40,28 +43,90 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       setHasButtonBeenPressed( true )
     }
   } )
+
   // eslint-disable-next-line quotes
-  let wyreMessage = `Wyre enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Wyre Account\n- ${wyreReceiveAddress}`
-  let wyreTitle = 'Buy with Wyre'
+  let wyreMessage = `Wyre enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin.`
+
+  let wyreTitle = 'Buy Bitcoins with Wyre'
+
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'fail' )>=0 ) {
     wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
     wyreTitle = 'Wyre order failed'
   }
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'success' )>=0 ) {
     wyreMessage = 'Your order is successful, the purchased bitcoin will be transferred to your Wyre account shortly'
-    wyreTitle = 'Order successfull'
+    wyreTitle = 'Order successful'
   }
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
     <View style={{
-      height: '90%'
+      height: '92%'
     }}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.modalTitleText}>{wyreTitle}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText,
+          marginTop: wp( 1.5 ),
+          marginBottom: wp( 5 ),
         }}>{wyreMessage}</Text>
+
+        <View style={{
+          flexDirection: 'row',
+          marginBottom: wp( 5 ),
+        }}>
+          <Image
+            source={require( '../../../assets/images/icons/wyre_notext_small.png' )}
+            style={styles.avatarImage}
+            resizeMode="contain"
+          />
+
+          <ListItem.Content style={{
+            flex: 1,
+          }}>
+            <ListItem.Subtitle
+              style={ListStyles.infoHeaderSubtitleText}
+              numberOfLines={1}
+            >
+            Bitcoins will be transferred to
+            </ListItem.Subtitle>
+
+            <ListItem.Title
+              style={styles.destinationTitleText}
+              numberOfLines={1}
+            >
+            Wyre Account
+            </ListItem.Title>
+          </ListItem.Content>
+        </View>
+
+        <View style={{
+          flexDirection: 'row',
+        }}>
+          <Image
+            source={require( '../../../assets/images/icons/icon_address_type.png' )}
+            style={styles.avatarImage}
+            resizeMode="contain"
+          />
+
+          <ListItem.Content style={{
+            flex: 1
+          }}>
+            <ListItem.Subtitle
+              style={ListStyles.infoHeaderSubtitleText}
+              numberOfLines={1}
+            >
+            Bitcoins will be transferred to
+            </ListItem.Subtitle>
+
+            <ListItem.Title
+              style={styles.destinationTitleText}
+              numberOfLines={1}
+            >
+              {wyreReceiveAddress}
+            </ListItem.Title>
+          </ListItem.Content>
+        </View>
       </View>
 
       <View style={{
@@ -74,7 +139,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Proceed to Wyre' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
 
         </AppBottomSheetTouchableWrapper>
         {wyreFromBuyMenu
@@ -99,11 +164,9 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           </View>
           : null
         }
-        {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
       </View>
 
     </View>
-
   </View>
   )
 }
@@ -112,16 +175,25 @@ const styles = StyleSheet.create( {
   modalContentContainer: {
     backgroundColor: Colors.white,
   },
+  avatarImage: {
+    ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageLarge,
+    marginRight: 14,
+  },
+  destinationTitleText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 20 ),
+    color: Colors.black,
+  },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
-    marginTop: wp( '5%' ),
-    flex: 1.7
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
+    width: wp( 30 )
   },
   modalInfoText: {
     color: Colors.textColorGrey,

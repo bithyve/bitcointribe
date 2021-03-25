@@ -1,17 +1,17 @@
-import React from "react";
-import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import React from 'react'
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
-import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
-import Ionicons from "react-native-vector-icons/Ionicons";
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
-export default function RestoreFromICloud(props) {
+export default function RestoreFromICloud( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
@@ -20,23 +20,28 @@ export default function RestoreFromICloud(props) {
       </View>
       <AppBottomSheetTouchableWrapper
         activeOpacity={10}
-        onPress={() => props.onPressCard ? props.onPressCard() : {}}
-        style={{ justifyContent: "center", alignItems: "center" }}
+        onPress={() => props.onPressCard ? props.onPressCard() : {
+        }}
+        style={{
+          justifyContent: 'center', alignItems: 'center'
+        }}
       >
         <View style={styles.greyBox}>
           <View style={styles.greyBoxImage}>
             <MaterialCommunityIcons
-              name={"restore"}
-              size={RFValue(25)}
+              name={'restore'}
+              size={RFValue( 25 )}
               color={Colors.blue}
             />
           </View>
-          <View style={{ marginLeft: 10 }}>
+          <View style={{
+            marginLeft: 10
+          }}>
             <Text style={styles.greyBoxText}>{props.cardInfo}</Text>
             <Text
               style={{
                 ...styles.greyBoxText,
-                fontSize: RFValue(20),
+                fontSize: RFValue( 20 ),
               }}
             >
               {props.cardTitle}
@@ -44,10 +49,10 @@ export default function RestoreFromICloud(props) {
             <Text
               style={{
                 ...styles.greyBoxText,
-                fontSize: RFValue(10),
+                fontSize: RFValue( 10 ),
               }}
             >
-              {props.levelStatus ? props.levelStatus : ""}
+              {props.levelStatus ? props.levelStatus : ''}
             </Text>
           </View>
           <View style={styles.arrowIconView}>
@@ -55,7 +60,9 @@ export default function RestoreFromICloud(props) {
               name="ios-arrow-down"
               color={Colors.textColorGrey}
               size={15}
-              style={{ alignSelf: "center" }}
+              style={{
+                alignSelf: 'center'
+              }}
             />
           </View>
         </View>
@@ -72,14 +79,14 @@ export default function RestoreFromICloud(props) {
           {/* {props.isLoading ? (
             <ActivityIndicator size={"small"} color={Colors.white} />
           ) : ( */}
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: Colors.white,
-              }}
-            >
-              {props.proceedButtonText}
-            </Text>
+          <Text
+            style={{
+              ...styles.proceedButtonText,
+              color: Colors.white,
+            }}
+          >
+            {props.proceedButtonText}
+          </Text>
           {/* )} */}
         </AppBottomSheetTouchableWrapper>
         <AppBottomSheetTouchableWrapper
@@ -98,88 +105,90 @@ export default function RestoreFromICloud(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: "100%",
+    height: '100%',
     backgroundColor: Colors.white,
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: wp("1.5%"),
+    marginTop: wp( '1.5%' ),
   },
   bottomInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: hp("1%"),
-    marginTop: "auto",
+    marginBottom: hp( '1%' ),
+    marginTop: 'auto',
   },
   bottomButtonsView: {
-    height: hp("15%"),
-    flexDirection: "row",
-    alignItems: "center",
+    height: hp( '15%' ),
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   transparentButtonView: {
-    height: wp("13%"),
-    width: wp("35%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp( '13%' ),
+    width: wp( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   successModalHeaderView: {
-    marginRight: wp("8%"),
-    marginLeft: wp("8%"),
-    marginTop: wp("4%"),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '4%' ),
   },
   successModalAmountView: {
-    justifyContent: "center",
-    marginRight: wp("8%"),
-    marginLeft: wp("8%"),
-    marginTop: "auto",
+    justifyContent: 'center',
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: 'auto',
   },
   successModalButtonView: {
-    height: wp("13%"),
-    width: wp("35%"),
-    justifyContent: "center",
-    alignItems: "center",
+    height: wp( '13%' ),
+    width: wp( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     backgroundColor: Colors.blue,
-    alignSelf: "center",
-    marginLeft: wp("8%"),
+    alignSelf: 'center',
+    marginLeft: wp( '8%' ),
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   greyBox: {
-    width: wp("90%"),
+    width: wp( '90%' ),
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor1,
     padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   greyBoxImage: {
-    width: wp("15%"),
-    height: wp("15%"),
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: wp("15%") / 2,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp( '15%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 1,
     shadowOffset: {
@@ -194,12 +203,12 @@ const styles = StyleSheet.create({
   greyBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
   arrowIconView: {
-    marginLeft: "auto",
+    marginLeft: 'auto',
     marginRight: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-});
+} )

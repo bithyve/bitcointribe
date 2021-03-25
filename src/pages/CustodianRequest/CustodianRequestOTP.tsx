@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import {
   View,
   Image,
@@ -12,84 +12,84 @@ import {
   StatusBar,
   Keyboard,
   Platform,
-} from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { downloadMShare, ErrorReceiving } from '../../store/actions/sss';
-import { useDispatch, useSelector } from 'react-redux';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import CommonStyle from '../../common/Styles/Styles';
-import BottomSheet from 'reanimated-bottom-sheet';
-import DeviceInfo from 'react-native-device-info';
-import ErrorModalContents from '../../components/ErrorModalContents';
-import ModalHeader from '../../components/ModalHeader';
+} from 'react-native-responsive-screen'
+import { downloadMShare, ErrorReceiving } from '../../store/actions/sss'
+import { useDispatch, useSelector } from 'react-redux'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import CommonStyle from '../../common/Styles/Styles'
+import BottomSheet from 'reanimated-bottom-sheet'
+import DeviceInfo from 'react-native-device-info'
+import ErrorModalContents from '../../components/ErrorModalContents'
+import ModalHeader from '../../components/ModalHeader'
 
-export default function CustodianRequestOTP(props) {
-  const [ErrorBottomSheet, setErrorBottomSheet] = useState(React.createRef());
-  const [errorMessage, setErrorMessage] = useState('');
-  const [buttonText, setButtonText] = useState('Try again');
-  const [errorMessageHeader, setErrorMessageHeader] = useState('');
+export default function CustodianRequestOTP( props ) {
+  const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
+  const [ errorMessage, setErrorMessage ] = useState( '' )
+  const [ buttonText, setButtonText ] = useState( 'Try again' )
+  const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const isErrorReceivingFailed = useSelector(
-    (state) => state.sss.errorReceiving,
-  );
-  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
-  const custodyRequest = props.navigation.getParam('custodyRequest');
-  const { requester, ek, otp } = custodyRequest;
-  const [passcode, setPasscode] = useState([]);
-  const [demo, setDemo] = useState(false);
-  const inputRef = useRef(null);
+    ( state ) => state.sss.errorReceiving,
+  )
+  const [ isConfirmDisabled, setIsConfirmDisabled ] = useState( false )
+  const custodyRequest = props.navigation.getParam( 'custodyRequest' )
+  const { requester, ek, otp } = custodyRequest
+  const [ passcode, setPasscode ] = useState( [] )
+  const [ demo, setDemo ] = useState( false )
+  const inputRef = useRef( null )
   const [
     CustodianRequestRejectedBottomSheet,
     setCustodianRequestRejectedBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState( React.createRef() )
   const [
     CustodianRequestAcceptBottomSheet,
     setCustodianRequestAcceptBottomSheet,
-  ] = useState(React.createRef());
+  ] = useState( React.createRef() )
 
-  function onPressNumber(text, i) {
-    if (text.length == 6) {
-      setTimeout(() => {
-        setPasscode(Array.from(text));
-      }, 5);
-      setDemo(!demo);
-      if (passcode.join('').length == 6) {
-        Keyboard.dismiss();
+  function onPressNumber( text, i ) {
+    if ( text.length == 6 ) {
+      setTimeout( () => {
+        setPasscode( Array.from( text ) )
+      }, 5 )
+      setDemo( !demo )
+      if ( passcode.join( '' ).length == 6 ) {
+        Keyboard.dismiss()
       }
     } else {
-      let tempPasscode = passcode;
-      tempPasscode[i] = Array.from(text)[0];
-      setTimeout(() => {
-        setPasscode(tempPasscode);
-      }, 5);
-      setDemo(!demo);
-      if (passcode.join('').length == 6) {
-        Keyboard.dismiss();
+      const tempPasscode = passcode
+      tempPasscode[ i ] = Array.from( text )[ 0 ]
+      setTimeout( () => {
+        setPasscode( tempPasscode )
+      }, 5 )
+      setDemo( !demo )
+      if ( passcode.join( '' ).length == 6 ) {
+        Keyboard.dismiss()
       }
     }
   }
 
-  const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.sss);
+  const dispatch = useDispatch()
+  const { loading } = useSelector( ( state ) => state.sss )
 
-  useEffect(() => {
-    if (otp) dispatch(downloadMShare(ek, otp)); // secondary device auto download
-  }, []);
+  useEffect( () => {
+    if ( otp ) dispatch( downloadMShare( ek, otp ) ) // secondary device auto download
+  }, [] )
 
   const onOTPSubmit = () => {
-    if (passcode.join('').length !== 6 || !ek) return;
-    setIsConfirmDisabled(true);
-    dispatch(downloadMShare(ek, passcode.join('')));
-  };
+    if ( passcode.join( '' ).length !== 6 || !ek ) return
+    setIsConfirmDisabled( true )
+    dispatch( downloadMShare( ek, passcode.join( '' ) ) )
+  }
 
   const { UNDER_CUSTODY } = useSelector(
-    (state) => state.storage.database.DECENTRALIZED_BACKUP,
-  );
+    ( state ) => state.storage.database.DECENTRALIZED_BACKUP,
+  )
 
   // useEffect(() => {
   //   if (UNDER_CUSTODY[requester]) {
@@ -107,18 +107,20 @@ export default function CustodianRequestOTP(props) {
   //   }
   // }, [UNDER_CUSTODY]);
 
-  useEffect(() => {
+  useEffect( () => {
     // check for whether the share from the same wallet is under custody is done prior to landing on this page
-    if (UNDER_CUSTODY[requester]) {
-      if (passcode.join('').length === 6 || otp)
-        setTimeout(() => {
-          setIsConfirmDisabled(false);
-        }, 10);
-      props.navigation.navigate('CustodianRequestAccepted', { requester });
+    if ( UNDER_CUSTODY[ requester ] ) {
+      if ( passcode.join( '' ).length === 6 || otp )
+        setTimeout( () => {
+          setIsConfirmDisabled( false )
+        }, 10 )
+      props.navigation.navigate( 'CustodianRequestAccepted', {
+        requester
+      } )
     }
-  }, [UNDER_CUSTODY]);
+  }, [ UNDER_CUSTODY ] )
 
-  const renderErrorModalContent = useCallback(() => {
+  const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={ErrorBottomSheet}
@@ -126,53 +128,57 @@ export default function CustodianRequestOTP(props) {
         info={errorMessage}
         proceedButtonText={buttonText}
         onPressProceed={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          ( ErrorBottomSheet as any ).current.snapTo( 0 )
         }}
         isBottomImage={true}
-        bottomImage={require('../../assets/images/icons/errorImage.png')}
+        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
       />
-    );
-  }, [errorMessage, errorMessageHeader, buttonText]);
+    )
+  }, [ errorMessage, errorMessageHeader, buttonText ] )
 
-  const renderErrorModalHeader = useCallback(() => {
+  const renderErrorModalHeader = useCallback( () => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          (ErrorBottomSheet as any).current.snapTo(0);
+          ( ErrorBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
-  }, []);
+    )
+  }, [] )
 
-  if (isErrorReceivingFailed) {
-    setTimeout(() => {
-      setIsConfirmDisabled(false);
-      setErrorMessageHeader('Error receiving Recovery Key');
+  if ( isErrorReceivingFailed ) {
+    setTimeout( () => {
+      setIsConfirmDisabled( false )
+      setErrorMessageHeader( 'Error receiving Recovery Key' )
       setErrorMessage(
         'There was an error while receiving your Recovery Key, please try again',
-      );
-      setButtonText('Try again');
-    }, 2);
-    (ErrorBottomSheet as any).current.snapTo(1);
-    dispatch(ErrorReceiving(null));
+      )
+      setButtonText( 'Try again' )
+    }, 2 );
+    ( ErrorBottomSheet as any ).current.snapTo( 1 )
+    dispatch( ErrorReceiving( null ) )
   }
 
-  useEffect(() => {
-    if (!loading.downloadMetaShare) {
-      setIsConfirmDisabled(false);
+  useEffect( () => {
+    if ( !loading.downloadMetaShare ) {
+      setIsConfirmDisabled( false )
     }
-  }, [loading]);
+  }, [ loading ] )
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{
+      flex: 1
+    }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyle.headerContainer}>
         <TouchableOpacity
           style={CommonStyle.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack();
+            props.navigation.goBack()
           }}
-          hitSlop={{top: 20, left: 20, bottom: 20, right: 20}}
+          hitSlop={{
+            top: 20, left: 20, bottom: 20, right: 20
+          }}
         >
           <View style={CommonStyle.headerLeftIconInnerContainer}>
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -182,181 +188,187 @@ export default function CustodianRequestOTP(props) {
       <View style={styles.modalContentContainer}>
         <View
           style={{
-            marginRight: wp('8%'),
-            marginLeft: wp('8%'),
+            marginRight: wp( '8%' ),
+            marginLeft: wp( '8%' ),
           }}
         >
-          <View style={{ ...styles.otpRequestHeaderView }}>
+          <View style={{
+            ...styles.otpRequestHeaderView
+          }}>
             <Text style={styles.modalTitleText}>
               Enter OTP to accept request
             </Text>
-            <Text style={{ ...styles.modalInfoText, marginTop: hp('1.5%') }}>
+            <Text style={{
+              ...styles.modalInfoText, marginTop: hp( '1.5%' )
+            }}>
               Please enter the 6 digit OTP the owner of the Recovery Key shared with you
             </Text>
           </View>
-          <View style={{ marginBottom: hp('2%') }}>
+          <View style={{
+            marginBottom: hp( '2%' )
+          }}>
             <View style={styles.passcodeTextInputView}>
               <TextInput
-                value={passcode ? passcode[0] : ''}
+                value={passcode ? passcode[ 0 ] : ''}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 selectTextOnFocus={true}
                 autoFocus={true}
                 autoCorrect={false}
-                ref={(input) => {
-                  this.textInput = input;
+                ref={( input ) => {
+                  this.textInput = input
                 }}
                 style={[
                   this.textInput && this.textInput.isFocused()
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={(value) => {
-                  console.log('VALUE', value);
-                  onPressNumber(value, 0);
-                  if (value.length >= 1) {
-                    this.textInput2.focus();
+                onChangeText={( value ) => {
+                  console.log( 'VALUE', value )
+                  onPressNumber( value, 0 )
+                  if ( value.length >= 1 ) {
+                    this.textInput2.focus()
                   }
                 }}
-                onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput.focus();
-                    onPressNumber('', 0);
+                onKeyPress={( e ) => {
+                  if ( e.nativeEvent.key === 'Backspace' ) {
+                    this.textInput.focus()
+                    onPressNumber( '', 0 )
                   }
                 }}
               />
 
               <TextInput
-                value={passcode ? passcode[1] : ''}
+                value={passcode ? passcode[ 1 ] : ''}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 selectTextOnFocus={true}
                 autoCorrect={false}
-                ref={(input) => {
-                  this.textInput2 = input;
+                ref={( input ) => {
+                  this.textInput2 = input
                 }}
                 style={[
                   this.textInput2 && this.textInput2.isFocused()
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={(value) => {
-                  onPressNumber(value, 1);
-                  if (value.length >= 1) this.textInput3.focus();
+                onChangeText={( value ) => {
+                  onPressNumber( value, 1 )
+                  if ( value.length >= 1 ) this.textInput3.focus()
                 }}
-                onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput.focus();
-                    onPressNumber('', 1);
+                onKeyPress={( e ) => {
+                  if ( e.nativeEvent.key === 'Backspace' ) {
+                    this.textInput.focus()
+                    onPressNumber( '', 1 )
                   }
                 }}
               />
 
               <TextInput
-                value={passcode ? passcode[2] : ''}
+                value={passcode ? passcode[ 2 ] : ''}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 selectTextOnFocus={true}
                 autoCorrect={false}
-                ref={(input) => {
-                  this.textInput3 = input;
+                ref={( input ) => {
+                  this.textInput3 = input
                 }}
                 style={[
                   this.textInput3 && this.textInput3.isFocused()
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={(value) => {
-                  onPressNumber(value, 2);
-                  if (value.length >= 1) this.textInput4.focus();
+                onChangeText={( value ) => {
+                  onPressNumber( value, 2 )
+                  if ( value.length >= 1 ) this.textInput4.focus()
                 }}
-                onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput2.focus();
-                    onPressNumber('', 2);
+                onKeyPress={( e ) => {
+                  if ( e.nativeEvent.key === 'Backspace' ) {
+                    this.textInput2.focus()
+                    onPressNumber( '', 2 )
                   }
                 }}
               />
 
               <TextInput
-                value={passcode ? passcode[3] : ''}
+                value={passcode ? passcode[ 3 ] : ''}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 selectTextOnFocus={true}
                 autoCorrect={false}
-                ref={(input) => {
-                  this.textInput4 = input;
+                ref={( input ) => {
+                  this.textInput4 = input
                 }}
                 style={[
                   this.textInput4 && this.textInput4.isFocused()
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={(value) => {
-                  onPressNumber(value, 3);
-                  if (value.length >= 1) this.textInput5.focus();
+                onChangeText={( value ) => {
+                  onPressNumber( value, 3 )
+                  if ( value.length >= 1 ) this.textInput5.focus()
                 }}
-                onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput3.focus();
-                    onPressNumber('', 3);
+                onKeyPress={( e ) => {
+                  if ( e.nativeEvent.key === 'Backspace' ) {
+                    this.textInput3.focus()
+                    onPressNumber( '', 3 )
                   }
                 }}
               />
 
               <TextInput
-                value={passcode ? passcode[4] : ''}
+                value={passcode ? passcode[ 4 ] : ''}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 selectTextOnFocus={true}
                 autoCorrect={false}
-                ref={(input) => {
-                  this.textInput5 = input;
+                ref={( input ) => {
+                  this.textInput5 = input
                 }}
                 style={[
                   this.textInput5 && this.textInput5.isFocused()
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={(value) => {
-                  onPressNumber(value, 4);
-                  if (value.length >= 1) this.textInput6.focus();
+                onChangeText={( value ) => {
+                  onPressNumber( value, 4 )
+                  if ( value.length >= 1 ) this.textInput6.focus()
                 }}
-                onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput4.focus();
-                    onPressNumber('', 4);
+                onKeyPress={( e ) => {
+                  if ( e.nativeEvent.key === 'Backspace' ) {
+                    this.textInput4.focus()
+                    onPressNumber( '', 4 )
                   }
                 }}
               />
               <TextInput
-                value={passcode ? passcode[5] : ''}
+                value={passcode ? passcode[ 5 ] : ''}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 selectTextOnFocus={true}
                 autoCorrect={false}
-                ref={(input) => {
-                  this.textInput6 = input;
+                ref={( input ) => {
+                  this.textInput6 = input
                 }}
                 style={[
                   this.textInput6 && this.textInput6.isFocused()
                     ? styles.textBoxActive
                     : styles.textBoxStyles,
                 ]}
-                onChangeText={(value) => {
-                  onPressNumber(value, 5);
-                  if (value.length >= 1) this.textInput6.focus();
+                onChangeText={( value ) => {
+                  onPressNumber( value, 5 )
+                  if ( value.length >= 1 ) this.textInput6.focus()
                 }}
-                onKeyPress={(e) => {
-                  if (e.nativeEvent.key === 'Backspace') {
-                    this.textInput5.focus();
-                    onPressNumber('', 5);
+                onKeyPress={( e ) => {
+                  if ( e.nativeEvent.key === 'Backspace' ) {
+                    this.textInput5.focus()
+                    onPressNumber( '', 5 )
                   }
                 }}
               />
@@ -364,21 +376,27 @@ export default function CustodianRequestOTP(props) {
           </View>
           <View
             style={{
-              marginBottom: hp('8%'),
-              marginLeft: wp('2%'),
-              marginRight: wp('2%'),
+              marginBottom: hp( '8%' ),
+              marginLeft: wp( '2%' ),
+              marginRight: wp( '2%' ),
             }}
           >
-            <Text style={{ ...styles.modalInfoText }}>
+            <Text style={{
+              ...styles.modalInfoText
+            }}>
               The OTP is time sensitive, please be sure to enter the OTP shared
               within 10 minutes
             </Text>
           </View>
-          <View style={{ flexDirection: 'row', marginTop: 'auto' }}>
+          <View style={{
+            flexDirection: 'row', marginTop: 'auto'
+          }}>
             <TouchableOpacity
               disabled={isConfirmDisabled}
               onPress={onOTPSubmit}
-              style={{ ...styles.confirmModalButtonView }}
+              style={{
+                ...styles.confirmModalButtonView
+              }}
             >
               {isConfirmDisabled ? (
                 <ActivityIndicator size="small" color={Colors.white} />
@@ -394,16 +412,16 @@ export default function CustodianRequestOTP(props) {
         ref={ErrorBottomSheet}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp('35%') : hp('40%'),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
       />
     </SafeAreaView>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -411,12 +429,12 @@ const styles = StyleSheet.create({
   passcodeTextInputText: {
     color: Colors.blue,
     fontWeight: 'bold',
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
   },
   textBoxStyles: {
     borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
+    height: wp( '12%' ),
+    width: wp( '12%' ),
     borderRadius: 7,
     borderColor: Colors.borderColor,
     alignItems: 'center',
@@ -424,77 +442,81 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     marginLeft: 8,
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     textAlign: 'center',
     lineHeight: 18,
   },
   textBoxActive: {
     borderWidth: 0.5,
-    height: wp('12%'),
-    width: wp('12%'),
+    height: wp( '12%' ),
+    width: wp( '12%' ),
     borderRadius: 7,
     elevation: 10,
     shadowColor: Colors.borderColor,
     shadowOpacity: 0.35,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: {
+      width: 0, height: 3
+    },
     borderColor: Colors.borderColor,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: Colors.white,
     marginLeft: 8,
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     textAlign: 'center',
     lineHeight: 18,
   },
   textStyles: {
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     textAlign: 'center',
     lineHeight: 18,
   },
   textFocused: {
     color: Colors.black,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     textAlign: 'center',
     lineHeight: 18,
   },
   otpRequestHeaderView: {
-    marginTop: hp('2%'),
-    marginBottom: hp('2%'),
+    marginTop: hp( '2%' ),
+    marginBottom: hp( '2%' ),
   },
   modalTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   confirmModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
   },
   confirmButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   passcodeTextInputView: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    marginTop: hp('2.5%'),
-    marginBottom: hp('2.5%'),
+    marginTop: hp( '2.5%' ),
+    marginBottom: hp( '2.5%' ),
   },
-});
+} )

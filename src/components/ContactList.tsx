@@ -553,7 +553,7 @@ export default function ContactList( props ) {
             }}
           >
             {approvingTrustedContact ? (
-              <ActivityIndicator size={'small'} />
+              <ActivityIndicator color={Colors.white} size={'small'} />
             ) : (
               <Text style={styles.buttonText}>Confirm & Proceed</Text>
             )}

@@ -110,7 +110,7 @@ export default function RemoveSelectedRecipient( props ) {
           }}
         >
           {props.loading && props.loading == true ? (
-            <ActivityIndicator size="small" />
+            <ActivityIndicator color={Colors.white} size="small" />
           ) : (
             <Text style={styles.proceedButtonText}>Remove</Text>
           )}

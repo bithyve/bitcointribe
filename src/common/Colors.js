@@ -17,7 +17,7 @@ const Colors = {
   yellow: '#F7C910',
   shadowYellow: '#fff2cc',
   lightRed:'#FF78614D',
-  backgroundColor1: '#FCFCFC',
+  backgroundColor1: '#FAFAFA', //'#FCFCFC',
   buttonText:'#626262',
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
@@ -40,8 +40,8 @@ const Colors = {
   primaryText: '#010101',
   secondaryText: '#8B8B8B',
 
-  primaryAccent: "#006CB4",
-  primaryAccentLighter1: "#61ACE1",
-  primaryAccentLighter2: "#77B9EB",
-};
-export default Colors;
+  primaryAccent: '#006CB4',
+  primaryAccentLighter1: '#61ACE1',
+  primaryAccentLighter2: '#77B9EB',
+}
+export default Colors

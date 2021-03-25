@@ -84,7 +84,7 @@ export default class SecureAccount {
       feeRates: any;
     } = secureHDWallet
 
-    return new SecureAccount(primaryMnemonic, {
+    return new SecureAccount( primaryMnemonic, {
       secondaryMnemonic,
       accountName,
       accountDescription,
@@ -224,9 +224,11 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.setupSecureAccount2(),
-      };
-    } catch (err) {
-      return { status: 301, err: err.message, message: ErrMap[301] };
+      }
+    } catch ( err ) {
+      return {
+        status: 301, err: err.message, message: ErrMap[ 301 ]
+      }
     }
   };
 
@@ -388,10 +390,12 @@ export default class SecureAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.resetTwoFA(secondaryMnemonic),
-      };
-    } catch (err) {
-      return { status: 306, err: err.message, message: ErrMap[306] };
+        data: await this.secureHDWallet.resetTwoFA( secondaryMnemonic ),
+      }
+    } catch ( err ) {
+      return {
+        status: 306, err: err.message, message: ErrMap[ 306 ]
+      }
     }
   };
 
@@ -401,14 +405,14 @@ export default class SecureAccount {
   public removeTwoFADetails = (): { removed: Boolean } =>
     this.secureHDWallet.removeTwoFADetails();
 
-  public isSecondaryMnemonic = (secondaryMnemonic: string) =>
-    this.secureHDWallet.isSecondaryMnemonic(secondaryMnemonic);
+  public isSecondaryMnemonic = ( secondaryMnemonic: string ) =>
+    this.secureHDWallet.isSecondaryMnemonic( secondaryMnemonic );
 
   public restoreSecondaryMnemonic = (
     secondaryMnemonic: string,
   ): {
     restored: boolean;
-  } => this.secureHDWallet.restoreSecondaryMnemonic(secondaryMnemonic);
+  } => this.secureHDWallet.restoreSecondaryMnemonic( secondaryMnemonic );
 
   public getSecondaryXpub = ():
     | {
@@ -1073,7 +1077,7 @@ export default class SecureAccount {
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
-      this.secureHDWallet.removeSecondaryXpriv();
+      this.secureHDWallet.removeSecondaryXpriv()
 
       return {
         status: config.STATUS.SUCCESS, data: {
@@ -1172,11 +1176,11 @@ export default class SecureAccount {
   };
 
   public getXpubsForAccount = () => {
-    return this.secureHDWallet.getSecureXpubs();
+    return this.secureHDWallet.getSecureXpubs()
   };
 
   public getXpubsForAccount2 = () => {
-    return this.secureHDWallet.getSecureXpubs2();
+    return this.secureHDWallet.getSecureXpubs2()
   };
 
   public setSecureXpubsAccount = (
@@ -1187,11 +1191,11 @@ export default class SecureAccount {
     secondary?: string;
     bh?: string;
   } => {
-    return this.secureHDWallet.setSecureXpubs(secondary, bh);
+    return this.secureHDWallet.setSecureXpubs( secondary, bh )
   };
 
   public deleteSecondaryMnemonics = () => {
-    return this.secureHDWallet.deleteSecondaryMnemonics();
+    return this.secureHDWallet.deleteSecondaryMnemonics()
   };
 
   // public getSecondaryMnemonics = () => {

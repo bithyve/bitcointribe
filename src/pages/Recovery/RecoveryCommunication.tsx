@@ -67,7 +67,7 @@ export default function RecoveryCommunication( props ) {
     // contactInfo[index].isSelected would become true during the next render cycle (batched state updates)
     if ( !contactInfo[ index ].isSelected ) {
       setSelectedContactMode( {
-        ...contactInfo[ index ], isSelected: true 
+        ...contactInfo[ index ], isSelected: true
       } )
     } else {
       setSelectedContactMode( null )
@@ -82,7 +82,7 @@ export default function RecoveryCommunication( props ) {
   const { REQUEST_DETAILS } = RECOVERY_SHARES[ index ]
     ? RECOVERY_SHARES[ index ]
     : {
-      REQUEST_DETAILS: null 
+      REQUEST_DETAILS: null
     }
 
   const dispatch = useDispatch()
@@ -260,7 +260,7 @@ export default function RecoveryCommunication( props ) {
   const downloadSecret = useCallback(
     ( shareIndex?, key? ) => {
       console.log( {
-        shareIndex, key 
+        shareIndex, key
       } )
       if ( shareIndex && key ) {
         dispatch( downloadMShare( key, null, 'recovery', shareIndex ) )
@@ -270,7 +270,7 @@ export default function RecoveryCommunication( props ) {
         if ( !META_SHARE ) {
           const { KEY } = REQUEST_DETAILS
           console.log( {
-            KEY 
+            KEY
           } )
           dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
@@ -311,116 +311,116 @@ export default function RecoveryCommunication( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
-      <View style={commonStyle.headerContainer}>
-        <TouchableOpacity
-          style={commonStyle.headerLeftIconContainer}
-          onPress={() => {
-            props.navigation.goBack()
-          }}
-          hitSlop={{ 
-            top: 20, left: 20, bottom: 20, right: 20 
-          }}
-        >
-          <View style={commonStyle.headerLeftIconInnerContainer}>
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </View>
-        </TouchableOpacity>
-      </View>
-      <View style={{
-            marginTop: hp( '2%' ), marginBottom: hp( '2%' ) 
-          }}>
-            <Text style={styles.commModeModalHeaderText}>
+        <View style={commonStyle.headerContainer}>
+          <TouchableOpacity
+            style={commonStyle.headerLeftIconContainer}
+            onPress={() => {
+              props.navigation.goBack()
+            }}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
+            }}
+          >
+            <View style={commonStyle.headerLeftIconInnerContainer}>
+              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            </View>
+          </TouchableOpacity>
+        </View>
+        <View style={{
+          marginTop: hp( '2%' ), marginBottom: hp( '2%' )
+        }}>
+          <Text style={styles.commModeModalHeaderText}>
               Select Mode of Communication{'\n'}for Contact
-            </Text>
-            <Text style={styles.commModeModalInfoText}>
+          </Text>
+          <Text style={styles.commModeModalInfoText}>
               You can choose a primary number or email
-            </Text>
-          </View>
-          <View style={styles.contactProfileView}>
-            <View style={{
-              flexDirection: 'row', alignItems: 'center' 
-            }}>
-              <View
-                style={{
-                  backgroundColor: Colors.backgroundColor,
-                  flex: 1,
-                  height: 80,
-                  justifyContent: 'center',
-                  marginLeft: 60,
-                  overflow: 'hidden',
-                  position: 'relative',
-                  borderRadius: 10,
-                }}
-              >
-                <Text style={styles.contactNameText}>
-                  {contact.firstName && contact.lastName
-                    ? contact.firstName + ' ' + contact.lastName
-                    : contact.firstName && !contact.lastName
-                      ? contact.firstName
-                      : !contact.firstName && contact.lastName
-                        ? contact.lastName
-                        : ''}
-                </Text>
-              </View>
-              <View
-                style={{
-                  backgroundColor: Colors.white,
-                  width: 80,
-                  height: 80,
-                  borderRadius: 80 / 2,
-                  position: 'absolute',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}
-              >
-                {contact.imageAvailable ? (
-                  <Image
-                    source={contact.image}
+          </Text>
+        </View>
+        <View style={styles.contactProfileView}>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center'
+          }}>
+            <View
+              style={{
+                backgroundColor: Colors.backgroundColor,
+                flex: 1,
+                height: 80,
+                justifyContent: 'center',
+                marginLeft: 60,
+                overflow: 'hidden',
+                position: 'relative',
+                borderRadius: 10,
+              }}
+            >
+              <Text style={styles.contactNameText}>
+                {contact.firstName && contact.lastName
+                  ? contact.firstName + ' ' + contact.lastName
+                  : contact.firstName && !contact.lastName
+                    ? contact.firstName
+                    : !contact.firstName && contact.lastName
+                      ? contact.lastName
+                      : ''}
+              </Text>
+            </View>
+            <View
+              style={{
+                backgroundColor: Colors.white,
+                width: 80,
+                height: 80,
+                borderRadius: 80 / 2,
+                position: 'absolute',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              {contact.imageAvailable ? (
+                <Image
+                  source={contact.image}
+                  style={{
+                    ...styles.contactProfileImage
+                  }}
+                />
+              ) : (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: Colors.shadowBlue,
+                    width: 70,
+                    height: 70,
+                    borderRadius: 70 / 2,
+                  }}
+                >
+                  <Text
                     style={{
-                      ...styles.contactProfileImage 
-                    }}
-                  />
-                ) : (
-                  <View
-                    style={{
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      backgroundColor: Colors.shadowBlue,
-                      width: 70,
-                      height: 70,
-                      borderRadius: 70 / 2,
+                      textAlign: 'center',
+                      fontSize: 13,
+                      lineHeight: 13, //... One for top and one for bottom alignment
                     }}
                   >
-                    <Text
-                      style={{
-                        textAlign: 'center',
-                        fontSize: 13,
-                        lineHeight: 13, //... One for top and one for bottom alignment
-                      }}
-                    >
-                      {nameToInitials(
-                        contact.firstName && contact.lastName
-                          ? contact.firstName + ' ' + contact.lastName
-                          : contact.firstName && !contact.lastName
-                            ? contact.firstName
-                            : !contact.firstName && contact.lastName
-                              ? contact.lastName
-                              : '',
-                      )}
-                    </Text>
-                  </View>
-                )}
-              </View>
+                    {nameToInitials(
+                      contact.firstName && contact.lastName
+                        ? contact.firstName + ' ' + contact.lastName
+                        : contact.firstName && !contact.lastName
+                          ? contact.firstName
+                          : !contact.firstName && contact.lastName
+                            ? contact.lastName
+                            : '',
+                    )}
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
-          <ScrollView >
-              {contactInfo &&
+        </View>
+        <ScrollView >
+          {contactInfo &&
                 contactInfo.map( ( item, index ) => {
                   return (
                     <TouchableOpacity
@@ -440,8 +440,10 @@ export default function RecoveryCommunication( props ) {
                     </TouchableOpacity>
                   )
                 } )}
-            </ScrollView>
-          <View style={{height: wp( '15%' ),}}>
+        </ScrollView>
+        <View style={{
+          height: wp( '15%' ),
+        }}>
           {selectedContactMode ? (
             <TouchableOpacity
               onPress={() => {
@@ -454,21 +456,21 @@ export default function RecoveryCommunication( props ) {
               }}
             >
               {!REQUEST_DETAILS ? (
-                <ActivityIndicator size="small" />
+                <ActivityIndicator color={Colors.white} size="small" />
               ) : (
                 <Text style={styles.proceedButtonText}>Proceed</Text>
               )}
             </TouchableOpacity>
           ) : null}
-      </View>
-      <BottomSheet
-        onCloseStart={() => {}}
-        enabledInnerScrolling={true}
-        ref={trustedContactQrBottomSheet as any}
-        snapPoints={[ -30, hp( '85%' ) ]}
-        renderContent={renderTrustedContactQrContents}
-        renderHeader={renderTrustedContactQrHeader}
-      />
+        </View>
+        <BottomSheet
+          onCloseStart={() => {}}
+          enabledInnerScrolling={true}
+          ref={trustedContactQrBottomSheet as any}
+          snapPoints={[ -30, hp( '85%' ) ]}
+          renderContent={renderTrustedContactQrContents}
+          renderHeader={renderTrustedContactQrHeader}
+        />
       </View>
     </SafeAreaView>
   )
@@ -542,7 +544,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   proceedButtonText: {
