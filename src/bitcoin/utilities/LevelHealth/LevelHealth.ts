@@ -1872,7 +1872,13 @@ export default class LevelHealth {
       decryptedShareArr.push( element.encryptedSecret )
     }
     const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
-    const recoveredMnemonicHex = secrets.combine( decryptedSecrets )
+
+    const secretsArr = [] // secrets w/o checksum
+    for ( const secret of decryptedSecrets ) {
+      secretsArr.push( secret.slice( 0, secret.length - 8 ) )
+    }
+
+    const recoveredMnemonicHex = secrets.combine( secretsArr )
     console.log( 'recoveredMnemonicHex', recoveredMnemonicHex )
     console.log( 'LevelHealth.hexToString(recoveredMnemonicHex)', LevelHealth.hexToString( recoveredMnemonicHex ) )
     return {
