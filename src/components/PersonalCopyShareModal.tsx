@@ -24,6 +24,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { sharePersonalCopy } from '../store/actions/sss';
 import BottomSheet from 'reanimated-bottom-sheet';
 import ModalHeader from './ModalHeader';
+import { sharePDF } from '../store/actions/health';
 
 export default function PersonalCopyShareModal(props) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
@@ -60,32 +61,13 @@ export default function PersonalCopyShareModal(props) {
   const dispatch = useDispatch();
 
   const onShare = async (shareOption, isEmailOtherOptions) => {
-    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions));
+    dispatch(sharePDF(shareOption.type, isEmailOtherOptions));
     props.onPressShare();
   };
 
   const onConfirm = async () => {
     props.onPressConfirm();
   };
-
-  const disableSharingOption = useCallback(
-    (shareOption) => {
-      if (!props.personalCopyDetails) return false;
-
-      const alternateCopy =
-        props.personalCopyDetails[
-          props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
-        ];
-      if (alternateCopy && alternateCopy.sharingDetails) {
-        return alternateCopy.sharingDetails.shareVia == shareOption.type
-          ? true
-          : false;
-      } else {
-        return false;
-      }
-    },
-    [props.personalCopyDetails, props.selectedPersonalCopy],
-  );
 
   const renderMailOptionsHeader = () => {
     return(
@@ -159,15 +141,11 @@ export default function PersonalCopyShareModal(props) {
                   }
                   else {
                     onShare(item, false);
-                    setIsShared(true)
+                    setIsShared(true);
                   }
                 }}
-                disabled={disableSharingOption(item)}
                 style={[
                   styles.listElements,
-                  disableSharingOption(item)
-                    ? { backgroundColor: Colors.borderColor }
-                    : null,
                 ]}
               >
                 <Image

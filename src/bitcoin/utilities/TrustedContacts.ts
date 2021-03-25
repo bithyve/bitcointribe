@@ -685,6 +685,12 @@ export default class TrustedContacts {
           encryptedDynamicNonPMDD: shareUploadables.encryptedDynamicNonPMDD,
         } )
       } else {
+        // console.log('form data updateTrustedChannel', JSON.stringify({
+        //   HEXA_ID,
+        //   address: trustedChannel.address,
+        //   data: encryptedDataPacket,
+        //   fetch,
+        // }))
         res = await BH_AXIOS.post( 'updateTrustedChannel', {
           HEXA_ID,
           address: trustedChannel.address,
@@ -692,6 +698,7 @@ export default class TrustedContacts {
           fetch,
         } )
       }
+      console.log('updateTrustedChannel res Call', res)
 
       let { updated, data } = res.data
       if ( !updated ) throw new Error( 'Failed to update ephemeral space' )

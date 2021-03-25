@@ -11,7 +11,7 @@ import Entypo from 'react-native-vector-icons/Entypo';
 import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes';
+} from '../../common/constants/wallet-service-types';
 import config from '../../bitcoin/HexaConfig';
 import LabeledBalanceDisplay from '../../components/LabeledBalanceDisplay';
 

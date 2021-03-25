@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import {
   StyleSheet,
   View,
@@ -11,6 +12,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  InteractionManager,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -25,17 +27,34 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
 import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
+import Entypo from 'react-native-vector-icons/Entypo'
+import { updateCloudPermission } from '../store/actions/health'
+import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import { initializeDBHydration } from '../store/actions/storage'
 
 export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
+  const [ doCloudBackup, setDoCloudBackup ] = useState( true )
+  const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
+  const dispatch = useDispatch()
+  const isDBHydrated = useInitialDBHydrationState()
+  useEffect( ()=>{
+    InteractionManager.runAfterInteractions( () => {
+      if( !isDBHydrated ){
+        dispatch( initializeDBHydration() )
+      }
+    } )
+
+  }, [] )
+
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -55,7 +74,7 @@ export default function NewWalletName( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
@@ -90,15 +109,37 @@ export default function NewWalletName( props ) {
               autoCorrect={false}
               autoCompleteType="off"
             />
-            <View style={{ 
-              marginLeft: 20, 
+            <View style={{
+              marginLeft: 20,
             }}>
-              <Text style={{ 
+              <Text style={{
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey, 
+                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
               }}>
                   No numbers or special characters allowed</Text>
             </View>
+            <TouchableOpacity
+              style={styles.doCloudBackupField}
+              onPress={() => setDoCloudBackup( !doCloudBackup )}
+              activeOpacity={1}
+            >
+              <View style={styles.doCloudBackupFieldContentContainer}>
+                <Text style={{
+                  ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                }}>
+              Secure my backup on my {cloud}
+                </Text>
+                <View style={styles.checkbox}>
+                  {doCloudBackup && (
+                    <Entypo
+                      name="check"
+                      size={RFValue( 20 )}
+                      color={Colors.green}
+                    />
+                  )}
+                </View>
+              </View>
+            </TouchableOpacity>
           </ScrollView>
 
           <View style={styles.bottomButtonView}>
@@ -109,12 +150,13 @@ export default function NewWalletName( props ) {
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
                   shadowOffset: {
-                    width: 15, height: 15 
+                    width: 15, height: 15
                   },
                 }}
               >
                 <TouchableOpacity
                   onPress={() => {
+                    dispatch( updateCloudPermission( doCloudBackup ) )
                     props.navigation.navigate( 'NewWalletQuestion', {
                       walletName,
                     } )
@@ -133,7 +175,7 @@ export default function NewWalletName( props ) {
 
           {walletName.trim() == '' ? (
             <View style={{
-              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0 
+              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
             }}>
               <BottomInfoBox
                 title={'We do not store this'}
@@ -192,7 +234,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
@@ -245,5 +287,37 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
     marginLeft: 5,
+  },
+  checkbox: {
+    width: wp( '7%' ),
+    height: wp( '7%' ),
+    borderRadius: 7,
+    backgroundColor: Colors.white,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    marginLeft: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  doCloudBackupField: {
+    borderRadius: 10,
+    backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
+    marginBottom: 36,
+    marginHorizontal: 14,
+    paddingHorizontal: 10,
+    padding:10,
+    marginTop: hp( '5%' ),
+  },
+  doCloudBackupFieldContentContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  smallInfoLabelText: {
+    backgroundColor: Colors.backgroundColor,
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
   },
 } )

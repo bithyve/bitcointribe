@@ -23,7 +23,7 @@ import {
   SECURE_ACCOUNT,
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -50,25 +50,25 @@ const NewWalletGenerationOTP = props => {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalHeaderTitleView}>
         <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center' 
+          flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
           <TouchableOpacity
             onPress={() => {
               props.navigation.goBack()
             }}
-            hitSlop={{ 
-              top: 20, left: 20, bottom: 20, right: 20 
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
             }}
             style={{
-              height: 30, width: 30, justifyContent: 'center' 
+              height: 30, width: 30, justifyContent: 'center'
             }}
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -78,22 +78,22 @@ const NewWalletGenerationOTP = props => {
       </View>
       <KeyboardAvoidingView
         style={{
-          flex: 1 
+          flex: 1
         }}
         behavior={Platform.OS == 'ios' ? 'padding' : ''}
         enabled
       >
         <ScrollView style={{
-          flex: 1 
+          flex: 1
         }}>
           <View style={{
-            ...styles.modalContentContainer, height: '100%' 
+            ...styles.modalContentContainer, height: '100%'
           }}>
             <View style={{
-              height: '100%' 
+              height: '100%'
             }}>
               <View style={{
-                marginTop: hp( '3.5%' ), marginBottom: hp( '2%' ) 
+                marginTop: hp( '3.5%' ), marginBottom: hp( '2%' )
               }}>
                 <Text style={styles.commModeModalHeaderText}>
                   {'Enter OTP for the\nexisting secure account'}
@@ -426,7 +426,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 0.35,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     borderColor: Colors.borderColor,
     alignItems: 'center',

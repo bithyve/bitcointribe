@@ -28,16 +28,19 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { initializeSetup } from '../store/actions/setupAndAuth'
+import { setupWalletDetails } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
-import { getTestcoins } from '../store/actions/accounts'
-import { TEST_ACCOUNT } from '../common/constants/serviceTypes'
+import { getTestcoins, accountsSynched } from '../store/actions/accounts'
+import { TEST_ACCOUNT } from '../common/constants/wallet-service-types'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-
+import CloudBackup from '../common/CommonFunctions/CloudBackup'
+import { initializeHealthSetup } from '../store/actions/health'
+import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import { setCloudData } from '../store/actions/cloud'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -72,7 +75,11 @@ export default function NewOwnQuestions( props ) {
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
+  const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
+  const s3service = useSelector( ( state ) => state.health.service )
+  const isDBHydrated = useInitialDBHydrationState()
   const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
@@ -80,61 +87,25 @@ export default function NewOwnQuestions( props ) {
   const [ visibleButton, setVisibleButton ] = useState( false )
   const accounts = useSelector( ( state ) => state.accounts )
   const testAccService = accounts[ TEST_ACCOUNT ].service
+  const [ loginSuccess, setLoginSuccess ] = useState( '' )
+  const isGoogleLoginSuccess = useSelector( ( state ) => state.cloud.isGoogleLoginSuccess )
+  const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
+  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
 
   useEffect( () => {
-    ( async () => {
-      if ( testAccService ) {
-        const { balances } = testAccService.hdWallet
-        const netBalance = testAccService
-          ? balances.balance + balances.unconfirmedBalance
-          : 0
-        if ( !netBalance ) {
-          dispatch( getTestcoins( TEST_ACCOUNT ) )
+    if ( isDBHydrated ){
+      // get test-sats(10K)
+      dispatch( getTestcoins( TEST_ACCOUNT ) )
+
+      // initialize health-check schema on relay
+      if( s3service ){
+        const { healthCheckInitializedKeeper } = s3service.levelhealth
+        if ( healthCheckInitializedKeeper === false ) {
+          dispatch( initializeHealthSetup() )
         }
       }
-    } )()
-  }, [ testAccService ] )
-
-  useEffect( () => {
-    ( async () => {
-      if ( isLoaderStart ) {
-        const security = {
-          question: question,
-          answer,
-        }
-        dispatch( initializeSetup( walletName, security ) );
-        dispatch(setVersion('Current'));
-        const current = Date.now()
-        await AsyncStorage.setItem(
-          'SecurityAnsTimestamp',
-          JSON.stringify( current ),
-        )
-        const securityQuestionHistory = {
-          created: current,
-        }
-        await AsyncStorage.setItem(
-          'securityQuestionHistory',
-          JSON.stringify( securityQuestionHistory ),
-        )
-      }
-    } )()
-  }, [ isLoaderStart ] )
-
-  useEffect( () => {
-    if (
-      isInitialized
-      // exchangeRates &&
-      // balances.testBalance &&
-      // transactions.length > 0
-    ) {
-      ( loaderBottomSheet as any ).current.snapTo( 0 )
-      // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
-      dispatch( walletCheckIn() ) // fetches exchange rates
-
-      props.navigation.navigate( 'HomeNav' )
     }
-  }, [ isInitialized ] )
-
+  }, [ isDBHydrated ] )
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -170,21 +141,78 @@ export default function NewOwnQuestions( props ) {
     }
   }, [ confirmAnswer ] )
 
+  useEffect( () => {
+    if (
+      walletDetailsSetted
+    ) {
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
+      dispatch( walletCheckIn() )
+      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        navigateToHome()
+      }
+    }
+  }, [ walletDetailsSetted ] )
+
+  useEffect( () => {
+    if( backupStatus === null ) return
+    if( backupStatus || backupStatus === false ){
+      navigateToHome()
+    }
+  }, [ backupStatus ] )
+
+  const navigateToHome = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 0 )
+    props.navigation.navigate( 'HomeNav', {
+      walletName,
+    } )
+  }
+
+
+  const checkCloudLogin = () =>{
+    if( isDBHydrated ){
+      showLoader()
+      const security = {
+        questionId: '0',
+        question: question,
+        answer,
+      }
+      dispatch( setupWalletDetails( walletName, security ) )
+      dispatch( setVersion( 'Current' ) )
+      const current = Date.now()
+      AsyncStorage.setItem(
+        'SecurityAnsTimestamp',
+        JSON.stringify( current ),
+      )
+      const securityQuestionHistory = {
+        created: current,
+      }
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify( securityQuestionHistory ),
+      )
+    }
+  }
+
+  const showLoader = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 1 )
+    seLoaderMessages()
+    setTimeout( () => {
+      setElevation( 0 )
+    }, 0.2 )
+    setTimeout( () => {
+      setIsLoaderStart( true )
+      setIsEditable( false )
+      setIsDisabled( true )
+    }, 2 )
+  }
+
+
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={() => {
-          ( loaderBottomSheet as any ).current.snapTo( 1 )
-          seLoaderMessages()
-          setTimeout( () => {
-            setElevation( 0 )
-          }, 0.2 )
-          setTimeout( () => {
-            setIsLoaderStart( true )
-            setIsEditable( false )
-            setIsDisabled( true )
-          }, 2 )
-        }}
+        onPress={() => walletName ? checkCloudLogin() : null}
         style={{
           ...styles.buttonView, elevation: Elevation
         }}
@@ -329,8 +357,8 @@ export default function NewOwnQuestions( props ) {
                   }}
                 />
               </View>
-              {question ? (
-                <View style={{
+              {question ?
+                ( <View style={{
                   marginTop: 15
                 }}>
                   <View
@@ -362,6 +390,7 @@ export default function NewOwnQuestions( props ) {
                           : 'visible-password'
                       }
                       onChangeText={( text ) => {
+
                         setAnswer( text )
                         setAnswerMasked( text )
                       }}
@@ -477,7 +506,7 @@ export default function NewOwnQuestions( props ) {
                     </Text>
                   )}
                 </View>
-              ) : null}
+                ) : null}
               <View
                 style={{
                   marginLeft: 20,
@@ -499,46 +528,46 @@ export default function NewOwnQuestions( props ) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        </KeyboardAvoidingView>
-        <View style={{
-          ...styles.bottomButtonView
-        }}>
-          {(
-            answer.trim() == confirmAnswer.trim() &&
+      </KeyboardAvoidingView>
+      <View style={{
+        ...styles.bottomButtonView
+      }}>
+        {(
+          answer.trim() == confirmAnswer.trim() &&
             confirmAnswer.trim() &&
             answer.trim() && answerError.length == 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View>
+        ) && (
+          setButtonVisible()
+        ) || null}
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
-        {!visibleButton ? (
-          <View
-            style={{
-              marginBottom:
+      </View>
+      {!visibleButton ? (
+        <View
+          style={{
+            marginBottom:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-            }}
-          >
-            <BottomInfoBox
-              title={'This answer is used to encrypt your wallet'}
-              infoText={'It is extremely important that only you'}
-              italicText={' know and remember the answer'}
-            />
-          </View>
-        ) : null}
-        <BottomSheet
-          onCloseEnd={() => {}}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
-      
+          }}
+        >
+          <BottomInfoBox
+            title={'This answer is used to encrypt your wallet'}
+            infoText={'It is extremely important that only you'}
+            italicText={' know and remember the answer'}
+          />
+        </View>
+      ) : null}
+      <BottomSheet
+        onCloseEnd={() => { }}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[ -50, hp( '100%' ) ]}
+        renderContent={renderLoaderModalContent}
+        renderHeader={renderLoaderModalHeader}
+      />
+
     </View>
   )
 }

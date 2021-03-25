@@ -32,7 +32,7 @@
 //     amount: 3081,
 //     message: 'Buy Coffee',
 //     xPubAccountID: 'R-1',
-//     xPubAccountKind: SubAccountKind.REGULAR,
+//     xPubAccountKind: SubAccountKind.REGULAR_ACCOUNT,
 //     destinationAddress: 'bc1q3phfpmz02fa8ajhpt58xmvkdyaz3evxlxr7v64',
 //   }),
 //   new InboundTransactionInfo({
@@ -43,7 +43,7 @@
 //     amount: 218383,
 //     message: 'Payment for Logo Design',
 //     xPubAccountID: 'R-1',
-//     xPubAccountKind: SubAccountKind.REGULAR,
+//     xPubAccountKind: SubAccountKind.REGULAR_ACCOUNT,
 //     sourceAddress: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
 //     sourceXPubAccountID: 'R-1',
 //   }),
@@ -55,7 +55,7 @@
 //     amount: 937710,
 //     message: 'Buy Pizza',
 //     xPubAccountID: 'R-1',
-//     xPubAccountKind: SubAccountKind.REGULAR,
+//     xPubAccountKind: SubAccountKind.REGULAR_ACCOUNT,
 //     destinationAddress: 'bc1q3phfpmz02fa8ajhpt58xmvkdyaz3evxlxr7v64',
 //   }),
 
@@ -69,7 +69,7 @@
 //     amount: 960000000,
 //     message: 'Buy Lambo',
 //     xPubAccountID: 'C-1',
-//     xPubAccountKind: SubAccountKind.SECURE,
+//     xPubAccountKind: SubAccountKind.SECURE_ACCOUNT,
 //     destinationAddress: 'bc1q3phfpmz02fa8ajhpt58xmvkdyaz3evxlxr7v64',
 //   }),
 // ];

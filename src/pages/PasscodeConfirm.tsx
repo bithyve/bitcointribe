@@ -5,11 +5,12 @@ import {
   View,
   SafeAreaView,
   TouchableOpacity,
-  StatusBar
-} from 'react-native'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
+  StatusBar,
+  // NativeModules
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import Colors from "../common/Colors";
+import Fonts from "../common/Fonts";
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp
@@ -20,10 +21,11 @@ import { useDispatch, useSelector } from 'react-redux'
 import { storeCreds } from '../store/actions/setupAndAuth'
 
 export default function PasscodeConfirm( props ) {
-  const [ passcode, setPasscode ] = useState( '' )
-  const [ confirmPasscode, setConfirmPasscode ] = useState( '' )
-  const [ passcodeFlag, setPasscodeFlag ] = useState( true )
-  const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 )
+  const [ passcode, setPasscode ] = useState( "" );
+  const [ confirmPasscode, setConfirmPasscode ] = useState( "" );
+  const [ passcodeFlag, setPasscodeFlag ] = useState( true );
+  const [ confirmPasscodeFlag, setConfirmPasscodeFlag ] = useState( 0 );
+  // const iCloud = NativeModules.iCloud;
 
   function onPressNumber( text ) {
     let tmpPasscode = passcode
@@ -79,7 +81,8 @@ export default function PasscodeConfirm( props ) {
       setPasscodeFlag( true )
       setConfirmPasscodeFlag( 0 )
     }
-  }, [ passcode, confirmPasscode ] )
+    // iCloud.startBackup("");
+  }, [ passcode, confirmPasscode ] );
 
   const dispatch = useDispatch()
   const { hasCreds } = useSelector( state => state.setupAndAuth )

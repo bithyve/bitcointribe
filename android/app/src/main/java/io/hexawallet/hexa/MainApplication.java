@@ -3,6 +3,7 @@ package io.hexawallet.hexa;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.rnfs.RNFSPackage;
 import com.rpt.reactnativecheckpackageinstallation.CheckPackageInstallationPackage;
@@ -53,6 +54,7 @@ import org.unimodules.core.interfaces.SingletonModule;
 import java.util.List;
 
 import io.hexawallet.hexa.PdfPasswordPackage;
+import io.hexawallet.hexa.GoogleDrivePackage; 
 
 import android.content.Context;
 import com.facebook.react.PackageList;
@@ -87,6 +89,7 @@ public class MainApplication extends Application implements ShareApplication, Re
             // packages.add(new MyReactNativePackage());
 
             packages.add(new PdfPasswordPackage());
+            packages.add(new GoogleDrivePackage());
             // Add unimodules
             List<ReactPackage> unimodules = Arrays.<ReactPackage>asList(
                     new ModuleRegistryAdapter(mModuleRegistryProvider)

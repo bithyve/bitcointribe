@@ -36,20 +36,21 @@ export default function RecoveryQuestionScreen( props ) {
   } )
   const [ answer, setAnswer ] = useState( '' )
   const [ dropdownBoxList ] = useState( QuestionList )
-
+  const { initializeRecoveryCompleted } = useSelector( state => state.setupAndAuth )
   const { insertedIntoDB } = useSelector( state => state.storage )
   useEffect( () => {
     ( async () => {
-      if ( insertedIntoDB ) {
+      if ( initializeRecoveryCompleted ) {
         await AsyncStorage.setItem( 'recoveryExists', 'true' )
-        props.navigation.navigate( 'RestoreSelectedContactsList' )
+        props.navigation.navigate( 'RestoreWithICloud' )
+        //props.navigation.navigate('RestoreSelectedContactsList');
       }
     } )()
-  }, [ insertedIntoDB ] )
+  }, [ initializeRecoveryCompleted ] )
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={commonStyle.headerContainer}>
@@ -58,8 +59,8 @@ export default function RecoveryQuestionScreen( props ) {
           onPress={() => {
             props.navigation.goBack()
           }}
-          hitSlop={{ 
-            top: 20, left: 20, bottom: 20, right: 20 
+          hitSlop={{
+            top: 20, left: 20, bottom: 20, right: 20
           }}
         >
           <View style={commonStyle.headerLeftIconInnerContainer}>
@@ -70,28 +71,28 @@ export default function RecoveryQuestionScreen( props ) {
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{
-            flexDirection: 'row', padding: wp( '7%' ) 
+            flexDirection: 'row', padding: wp( '7%' )
           }}>
             <View style={{
-              flex: 3, justifyContent: 'center' 
+              flex: 3, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
                 Enter Security Question{'\n'}and Answer
               </Text>
               <Text style={{
-                ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
+                ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
                 To recover your wallet you have to select the security question
                 and enter its answer
               </Text>
             </View>
             <View style={{
-              flex: 1 
+              flex: 1
             }}>
               <KnowMoreButton
                 onpress={() => {}}
                 containerStyle={{
-                  marginLeft: 'auto', marginTop: 10 
+                  marginLeft: 'auto', marginTop: 10
                 }}
                 textStyle={{
                 }}
@@ -99,7 +100,7 @@ export default function RecoveryQuestionScreen( props ) {
             </View>
           </View>
           <View style={{
-            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' ) 
+            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
           }}>
             <TouchableOpacity
               activeOpacity={10}
@@ -126,7 +127,7 @@ export default function RecoveryQuestionScreen( props ) {
               </Text>
               <Ionicons
                 style={{
-                  marginLeft: 'auto' 
+                  marginLeft: 'auto'
                 }}
                 name={dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'}
                 size={15}
@@ -134,7 +135,7 @@ export default function RecoveryQuestionScreen( props ) {
               />
             </TouchableOpacity>
             <View style={{
-              position: 'relative' 
+              position: 'relative'
             }}>
               {dropdownBoxOpenClose && (
                 <View style={styles.dropdownBoxModal}>
@@ -286,7 +287,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 0, height: 10 
+      width: 0, height: 10
     },
     backgroundColor: Colors.white,
     position: 'absolute',
@@ -325,7 +326,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     alignItems: 'center',
@@ -340,7 +341,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     marginTop: hp( '6%' ),
@@ -369,7 +370,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,

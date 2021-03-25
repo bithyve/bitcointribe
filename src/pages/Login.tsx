@@ -32,7 +32,7 @@ import { clearAccountSyncCache } from '../store/actions/accounts'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
 
-const LOADER_MESSAGE_TIME = 2500
+const LOADER_MESSAGE_TIME = 2
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',

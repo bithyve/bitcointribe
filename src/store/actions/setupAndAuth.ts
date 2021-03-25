@@ -1,12 +1,13 @@
 // types and action creators: dispatched by components and sagas
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
-export const INIT_SETUP = 'INIT_SETUP'
+export const SETUP_WALLET_DETAILS = 'SETUP_WALLET_DETAILS'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
-
+export const IS_NEW_HEALTH_SYSTEM = 'IS_NEW_HEALTH_SYSTEM'
+export const INIT_RECOVERY_COMPLETED = 'INIT_RECOVERY_COMPLETED'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 
@@ -28,9 +29,9 @@ export const credsAuth = ( passcode, reLogin? ) => {
   }
 }
 
-export const initializeSetup = ( walletName, security ) => {
+export const setupWalletDetails = ( walletName, security ) => {
   return {
-    type: INIT_SETUP, payload: {
+    type: SETUP_WALLET_DETAILS, payload: {
       walletName, security
     }
   }
@@ -40,6 +41,14 @@ export const initializeRecovery = ( walletName, security ) => {
   return {
     type: INIT_RECOVERY, payload: {
       walletName, security
+    }
+  }
+}
+
+export const initializeRecoveryCompleted = ( initializeRecoveryCompleted ) => {
+  return {
+    type: INIT_RECOVERY_COMPLETED, payload: {
+      initializeRecoveryCompleted
     }
   }
 }
@@ -70,7 +79,7 @@ export const switchCredsChanged = () => {
 
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
-export const SETUP_INITIALIZED = 'SETUP_INITIALIZED'
+export const SETTED_WALLET_DETAILS = 'SETTED_WALLET_DETAILS'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
 export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED'
@@ -89,11 +98,13 @@ export const credsAuthenticated = isAuthenticated => {
   }
 }
 
-export const setupInitialized = () => {
+export const settedWalletDetails = () => {
   return {
-    type: SETUP_INITIALIZED
+    type: SETTED_WALLET_DETAILS
   }
 }
+
+
 
 export const switchSetupLoader = beingLoaded => {
   return {
@@ -119,6 +130,13 @@ export const pinChangedFailed = isFailed => {
   }
 }
 
+export const setIsNewHealthSystemSet = isNewHealthSystemSet => {
+  return {
+    type: IS_NEW_HEALTH_SYSTEM, payload: {
+      isNewHealthSystemSet
+    }
+  }
+}
 
 // handle thunk way
 export const validatePin = ( passcode ) => {

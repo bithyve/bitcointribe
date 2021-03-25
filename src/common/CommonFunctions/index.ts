@@ -1,3 +1,8 @@
+import { AsyncStorage } from "react-native";
+import { LevelHealthInterface, LevelInfo } from "../../bitcoin/utilities/Interface";
+import SSS from "../../bitcoin/utilities/sss/SSS";
+import AccountShell from "../data/models/AccountShell";
+import { encrypt } from "../encryption";
 import DeviceInfo from 'react-native-device-info'
 
 export const nameToInitials = fullName => {
@@ -54,6 +59,99 @@ export const APP_LIST = {
   'Messenger': {
     pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}'
   }, // fa: facebook
+}
+export const getFormattedString = (qrString: string) => {
+  qrString = qrString.split('"').join('Dquote');
+  qrString = qrString.split(':').join('Qutation');
+  qrString = qrString.split('{').join('Lbrace');
+  qrString = qrString.split('}').join('Rbrace');
+  qrString = qrString.split('/').join('Slash');
+  qrString = qrString.split(',').join('Comma');
+  qrString = qrString.split("'").join('Squote');
+  qrString = qrString.split(' ').join('Space');
+  return qrString;
+};
+
+export const generateRandomString = (length: number): string => {
+  let randomString: string = '';
+  const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  for (let itr = 0; itr < length; itr++) {
+    randomString += possibleChars.charAt(
+      Math.floor(Math.random() * possibleChars.length),
+    );
+  }
+  return randomString;
+};
+
+const asyncDataToBackup = async () => {
+  const [
+    [ , personalCopyDetails ],
+    [ , FBTCAccount ],
+    [ , PersonalNode ]
+  ] = await AsyncStorage.multiGet( [
+    'personalCopyDetails',
+    'FBTCAccount',
+    'PersonalNode'
+  ] )
+  const ASYNC_DATA = {
+  }
+
+  if ( personalCopyDetails )
+    ASYNC_DATA[ 'personalCopyDetails' ] = personalCopyDetails
+  if ( FBTCAccount ) ASYNC_DATA[ 'FBTCAccount' ] = FBTCAccount
+  if ( PersonalNode ) ASYNC_DATA[ 'PersonalNode' ] = PersonalNode
+
+  return ASYNC_DATA
+}
+
+function* stateDataToBackup(accountShells, activePersonalNode, versionHistory, trustedContactsInfo) {
+  // state data to backup
+  const STATE_DATA = {
+  }
+  if ( accountShells && accountShells.length )
+    STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
+
+  if ( trustedContactsInfo && trustedContactsInfo.length )
+    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+
+  if ( activePersonalNode )
+    STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
+
+  if ( versionHistory && versionHistory.length )
+    STATE_DATA[ 'versionHistory' ] = JSON.stringify( versionHistory )
+
+  return STATE_DATA
+}
+export const CloudData = async (database, accountShells, activePersonalNode, versionHistory, trustedContactsInfo) => {
+  let encryptedCloudDataJson;
+    let walletImage = {
+      SERVICES: {},
+      DECENTRALIZED_BACKUP: {},
+      ASYNC_DATA: {},
+      WALLET_SETUP: {},
+      STATE_DATA: {},
+    };
+   // console.log("DATABASE", database);
+    let CloudDataJson = {};
+    if (!isEmpty(database)) {
+      if (database.SERVICES)
+        walletImage.SERVICES = database.SERVICES;
+      if (database.DECENTRALIZED_BACKUP)
+        walletImage.DECENTRALIZED_BACKUP = database.DECENTRALIZED_BACKUP;
+      if (database.WALLET_SETUP)
+        walletImage.WALLET_SETUP = database.WALLET_SETUP;
+      walletImage.ASYNC_DATA = await asyncDataToBackup();
+      walletImage.STATE_DATA = stateDataToBackup(accountShells, activePersonalNode, versionHistory, trustedContactsInfo);
+      let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
+      CloudDataJson = {
+        walletImage,
+        keeperInfo: [],
+      };
+      // console.log("walletImage", walletImage);
+      encryptedCloudDataJson = await encrypt(CloudDataJson, key);
+      // console.log('encryptedDatabase', encryptedCloudDataJson);
+      return encryptedCloudDataJson;
+}
 }
 
 export const getCurrencyImageByRegion = (
@@ -142,16 +240,36 @@ export const getCurrencyImageByRegion = (
     }
     return require( '../../assets/images/currencySymbols/icon_chf_gray.png' )
   }
+};
 
-  // Using the below as the default fall back in case some corrency is missed in the list
-  if ( type == 'light' ) {
-    return require( '../../assets/images/currencySymbols/icon_dollar_white.png' )
-  } else if ( type == 'dark' ) {
-    return require( '../../assets/images/currencySymbols/icon_dollar_dark.png' )
-  } else if ( type == 'gray' ) {
-    return require( '../../assets/images/currencySymbols/dollar_grey.png' )
-  } else if ( type == 'light_blue' ) {
-    return require( '../../assets/images/currencySymbols/icon_dollar_lightblue.png' )
+export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealthInterface[], shareId: string) : {
+  shareType: string;
+  updatedAt: number;
+  status: string;
+  shareId: string;
+  reshareVersion?: number;
+  name?: string;
+} =>{
+  let index;
+  for (let i = 0; i < levelHealthVar.length; i++) {
+    const element = levelHealthVar[i];
+    index = element.levelInfo.findIndex(value=>value.shareId == shareId);
+    if(index>-1){
+      return element.levelInfo[index];
+    }
   }
-  return require( '../../assets/images/currencySymbols/icon_dollar_light.png' )
+}
+
+export const getLevelInfo = (levelHealthVar: LevelHealthInterface[], currentLevel: number) : LevelInfo[] =>{
+  if (levelHealthVar[currentLevel]) {
+    if(levelHealthVar[1]){
+      for (let i = 0; i < levelHealthVar[currentLevel].levelInfo.length; i++) {
+        if (levelHealthVar[currentLevel].levelInfo[i].updatedAt !== 0 && levelHealthVar[currentLevel].levelInfo[i].shareType !== "securityQuestion") {
+          return levelHealthVar[currentLevel].levelInfo;
+        }
+      }
+    }
+    else return levelHealthVar[0].levelInfo;
+  }
+  return levelHealthVar[currentLevel - 1].levelInfo;
 }

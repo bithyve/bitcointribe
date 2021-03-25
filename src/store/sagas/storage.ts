@@ -1,5 +1,5 @@
 import { call, delay, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
+import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import {
   INIT_DB,
   dbInitialized,
@@ -19,9 +19,12 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { updateWalletImage } from '../actions/sss'
 import { walletCheckIn } from '../actions/trustedContacts'
+import KeeperService from '../../bitcoin/services/KeeperService'
+import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
+import { databaseHydrated, INITIALIZE_DB_HYDRATION } from '../actions/storage'
+import { Database } from '../../common/interfaces/Interfaces'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -36,6 +39,38 @@ function* initDBWorker() {
 
 export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
 
+function* initDBHydrationWorker() {
+  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  const initialDatabase: Database = {
+    DECENTRALIZED_BACKUP: {
+      RECOVERY_SHARES: {
+      },
+      SHARES_TRANSFER_DETAILS: {
+      },
+      UNDER_CUSTODY: {
+      },
+      DYNAMIC_NONPMDD: {
+      },
+    },
+    SERVICES: {
+      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
+      TEST_ACCOUNT: JSON.stringify( testAcc ),
+      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
+      S3_SERVICE: JSON.stringify( s3Service ),
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      KEEPERS_INFO: JSON.stringify( keepersInfo ),
+    },
+    VERSION: DeviceInfo.getVersion(),
+  }
+  yield call( insertDBWorker, {
+    payload: initialDatabase
+  } )
+  yield put( databaseHydrated() )
+}
+
+export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )
+
+
 function* fetchDBWorker() {
   try {
     // let t = timer('fetchDBWorker')
@@ -44,15 +79,16 @@ function* fetchDBWorker() {
     if ( key && database ) {
       yield call( servicesEnricherWorker, {
         payload: {
-          database
-        }
+          database,
+        },
       } )
       yield put( dbFetched( database ) )
 
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
         yield put( walletCheckIn() )
-        yield put( updateWalletImage() )
+        yield put( updateWalletImageHealth() )
+        //yield put( updateWalletImage() )
       }
     } else {
       // DB would be absent during wallet setup
@@ -83,7 +119,7 @@ export function* insertDBWorker( { payload } ) {
       dataManager.insert,
       updatedDB,
       key,
-      insertedIntoDB,
+      insertedIntoDB
     )
     if ( !inserted ) {
       // dispatch failure
@@ -94,8 +130,8 @@ export function* insertDBWorker( { payload } ) {
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
     yield call( servicesEnricherWorker, {
       payload: {
-        database: updatedDB
-      }
+        database: updatedDB,
+      },
     } )
   } catch ( err ) {
     console.log( err )
@@ -123,16 +159,17 @@ function* servicesEnricherWorker( { payload } ) {
     if ( appVersion === '0.9' ) {
       appVersion = '0.9.0'
     }
+    let services
+    let migrated = false
     const {
       REGULAR_ACCOUNT,
       TEST_ACCOUNT,
       SECURE_ACCOUNT,
       S3_SERVICE,
       TRUSTED_CONTACTS,
+      KEEPERS_INFO,
     } = database.SERVICES
 
-    let services
-    let migrated = false
     if ( !database.VERSION ) {
       dbVersion = '0.7.0'
     } else if ( database.VERSION === '0.8' ) {
@@ -152,12 +189,13 @@ function* servicesEnricherWorker( { payload } ) {
           SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
           S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
           TRUSTED_CONTACTS: new TrustedContactsService(),
+          KEEPERS_INFO: new KeeperService(),
         }
         // hydrating new/missing async storage variables
         yield call(
           AsyncStorage.setItem,
           'walletID',
-          services.S3_SERVICE.sss.walletId,
+          services.S3_SERVICE.sss.walletId
         )
 
         migrated = true
@@ -171,6 +209,9 @@ function* servicesEnricherWorker( { payload } ) {
           TRUSTED_CONTACTS: TRUSTED_CONTACTS
             ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
             : new TrustedContactsService(),
+          KEEPERS_INFO: KEEPERS_INFO
+            ? KeeperService.fromJSON( KEEPERS_INFO )
+            : new KeeperService(),
         }
       }
 
@@ -186,18 +227,22 @@ function* servicesEnricherWorker( { payload } ) {
         }
       }
 
-      if( semver.lt( dbVersion, '1.4.5' ) ){
+      if ( semver.lt( dbVersion, '1.4.5' ) ) {
         // update sub-account instances count
         const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
 
-        for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+        for ( const accountType of Object.keys( config.DERIVATIVE_ACC ) ) {
           let instanceCount = 5
-          if( accountType == 'TRUSTED_CONTACTS' ){
+          if ( accountType == 'TRUSTED_CONTACTS' ) {
             instanceCount = 20
           }
-          regularAccount.hdWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
-          secureAccount.secureHDWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
+          regularAccount.hdWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
+          secureAccount.secureHDWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
         }
 
         console.log( 'Updated sub-account instances count' )
@@ -214,6 +259,9 @@ function* servicesEnricherWorker( { payload } ) {
         TRUSTED_CONTACTS: TRUSTED_CONTACTS
           ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
           : new TrustedContactsService(),
+        KEEPERS_INFO: KEEPERS_INFO
+          ? KeeperService.fromJSON( KEEPERS_INFO )
+          : new KeeperService(),
       }
     }
     yield put( servicesEnriched( services ) )
@@ -227,7 +275,7 @@ function* servicesEnricherWorker( { payload } ) {
         TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
       }
       yield call( insertDBWorker, {
-        payload: database
+        payload: database,
       } )
     }
   } catch ( err ) {
@@ -237,5 +285,5 @@ function* servicesEnricherWorker( { payload } ) {
 
 export const servicesEnricherWatcher = createWatcher(
   servicesEnricherWorker,
-  ENRICH_SERVICES,
+  ENRICH_SERVICES
 )

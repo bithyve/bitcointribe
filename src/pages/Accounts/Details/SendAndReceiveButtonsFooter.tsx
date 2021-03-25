@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import {
   View,
   Text,
@@ -10,8 +10,11 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import Colors from '../../../common/Colors'
+import CurrencyKind from '../../../common/data/enums/CurrencyKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import Fonts from '../../../common/Fonts'
+import useCurrencyCode from '../../../utils/hooks/state-selectors/UseCurrencyCode'
+import useCurrencyKind from '../../../utils/hooks/state-selectors/UseCurrencyKind'
 
 type FooterButtonProps = {
   style?: Record<string, unknown>;
@@ -62,6 +65,27 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
   averageTxFees,
   network,
 } ) => {
+  const currencyKind = useCurrencyKind()
+  const currencyCode = useCurrencyCode()
+
+  const transactionFeeUnitPrefix = useMemo( () => {
+    if ( currencyKind == CurrencyKind.FIAT ) {
+      return currencyCode.toLowerCase()
+    } else {
+      return network == NetworkKind.MAINNET ? 'sat' : 't-sat'
+    }
+  }, [ network, currencyKind ] )
+
+  const transactionFeeUnitText = useMemo( () => {
+    if ( currencyKind == CurrencyKind.FIAT ) {
+      return transactionFeeUnitPrefix
+    }
+
+    const suffix = averageTxFees[ network ].low.averageTxFee == 1 ? '' : 's'
+
+    return `${transactionFeeUnitPrefix}${suffix}`
+  }, [ transactionFeeUnitPrefix, averageTxFees ] )
+
   return (
     <View style={{
       flexDirection: 'row',
@@ -76,7 +100,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
         title="Send"
         subtitle={`Tran Fee: ~${
           averageTxFees ? averageTxFees[ network ].low.averageTxFee : 0
-        } (${network === NetworkKind.TESTNET ? 't-sats' : 'sats'})`}
+        } (${transactionFeeUnitText})`}
         imageSource={require( '../../../assets/images/icons/icon_send.png' )}
       />
       <FooterButton

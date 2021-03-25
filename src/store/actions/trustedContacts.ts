@@ -7,10 +7,8 @@ import {
 } from '../../bitcoin/utilities/Interface'
 
 import { createAction } from 'redux-actions'
-import { UPDATE_ADDRESS_BOOK_LOCALLY } from '../constants'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
-export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
@@ -18,7 +16,8 @@ export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
-export const UPDATE_TRUSTED_CONTACT_INFO = 'UPDATE_TRUSTED_CONTACT_INFO'
+export const UPDATE_TRUSTED_CONTACTS_INFO = 'UPDATE_TRUSTED_CONTACTS_INFO'
+export const UPDATE_ADDRESS_BOOK_LOCALLY = 'UPDATE_ADDRESS_BOOK_LOCALLY'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
@@ -30,24 +29,13 @@ export const clearTrustedContactsCache = () => {
   }
 }
 
-export const initializeTrustedContact = ( contactInfo: {
-  contactName: string;
-  info: string;
-} ) => {
-  return {
-    type: INITIALIZE_TRUSTED_CONTACT,
-    payload: {
-      contactInfo
-    },
-  }
-}
-
 export const approveTrustedContact = (
   contactInfo: { contactName: string; info: string },
   contactsPublicKey: string,
   updateEphemeralChannel?: Boolean,
   contactsWalletName?: string,
   isGuardian?: boolean,
+  isFromKeeper?: boolean,
 ) => {
   return {
     type: APPROVE_TRUSTED_CONTACT,
@@ -57,6 +45,7 @@ export const approveTrustedContact = (
       updateEphemeralChannel,
       contactsWalletName,
       isGuardian,
+      isFromKeeper,
     },
   }
 }
@@ -72,13 +61,14 @@ export const removeTrustedContact = ( contactName, shareIndex? ) => {
 }
 
 export const updateEphemeralChannel = (
-  contactInfo: { contactName: string; info: string },
+  contactInfo: { contactName: string; info: string, walletName?: string; },
   data: EphemeralDataElements,
   fetch?: Boolean,
   trustedContacts?: TrustedContactsService,
   uploadXpub?: Boolean,
   shareUploadables?: ShareUploadables,
   updatedDB?: any,
+  isFromKeeper?: boolean
 ) => {
   return {
     type: UPDATE_EPHEMERAL_CHANNEL,
@@ -90,6 +80,7 @@ export const updateEphemeralChannel = (
       uploadXpub,
       shareUploadables,
       updatedDB,
+      isFromKeeper,
     },
   }
 }
@@ -168,17 +159,16 @@ export const postRecoveryChannelSync = () => {
   }
 }
 
-export const updateTrustedContactInfoLocally = ( trustedContactInfo ) => {
+export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
   return {
-    type: UPDATE_TRUSTED_CONTACT_INFO,
+    type: UPDATE_TRUSTED_CONTACTS_INFO,
     payload: {
-      trustedContactInfo
+      trustedContactsInfo
     },
   }
 }
 
 // types and action creators: dispatched by sagas
-export const TRUSTED_CONTACT_INITIALIZED = 'TRUSTED_CONTACT_INITIALIZED'
 export const TRUSTED_CONTACT_APPROVED = 'TRUSTED_CONTACT_APPROVED'
 export const EPHEMERAL_CHANNEL_UPDATED = 'EPHEMERAL_CHANNEL_UPDATED'
 export const EPHEMERAL_CHANNEL_FETCHED = 'EPHEMERAL_CHANNEL_FETCHED'
@@ -187,18 +177,6 @@ export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED'
 export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED'
 export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS'
 export const SWITCH_TC_LOADING = 'SWITCH_TC_LOADING'
-
-export const trustedContactInitialized = (
-  contactName: string,
-  publicKey: string,
-) => {
-  return {
-    type: TRUSTED_CONTACT_INITIALIZED,
-    payload: {
-      contactName, publicKey
-    },
-  }
-}
 
 export const trustedContactApproved = (
   contactName: string,
@@ -283,5 +261,6 @@ export const switchTCLoading = ( beingLoaded ) => {
 const updateAddressBookLocallyRequest = createAction(
   UPDATE_ADDRESS_BOOK_LOCALLY,
 )
+
 export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
   dispatch( updateAddressBookLocallyRequest( payload ) )

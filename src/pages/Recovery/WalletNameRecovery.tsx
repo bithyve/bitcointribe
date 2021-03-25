@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   View,
   TouchableOpacity,
@@ -8,7 +8,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  Alert
 } from 'react-native'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -28,11 +29,11 @@ export default function WalletNameRecovery( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={commonStyle.headerContainer}>
           <TouchableOpacity
@@ -40,8 +41,8 @@ export default function WalletNameRecovery( props ) {
             onPress={() => {
               props.navigation.goBack()
             }}
-            hitSlop={{ 
-              top: 20, left: 20, bottom: 20, right: 20 
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
             }}
           >
             <View style={commonStyle.headerLeftIconInnerContainer}>
@@ -51,13 +52,13 @@ export default function WalletNameRecovery( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
         >
-          <View style={{ 
-            flex:1 
+          <View style={{
+            flex:1
           }}>
             <Text
               style={{
@@ -67,10 +68,10 @@ export default function WalletNameRecovery( props ) {
                 marginLeft: 20,
               }}
             >
-              Type in the name{'\n'}of your wallet
+              Type in the name of your wallet
             </Text>
             <Text style={{
-              ...styles.modalInfoText, marginTop: 7, marginLeft: 20,  
+              ...styles.modalInfoText, marginTop: 7, marginLeft: 20,
             }}>
                Your contacts will see this to{' '}
               <Text
@@ -114,8 +115,13 @@ export default function WalletNameRecovery( props ) {
             <View style={styles.bottomButtonView}>
               <TouchableOpacity
                 onPress={() =>
+                  // props.navigation.navigate("ScanRecoveryKey", {
+                  //   walletName: walletName,
+                  //   scannedData: (scannedData) =>
+                  //     this.handleScannedData(scannedData),
+                  // })
                   props.navigation.navigate( 'RecoveryQuestion', {
-                    walletName 
+                    walletName
                   } )
                 }
                 style={styles.buttonView}
@@ -164,7 +170,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
   },
   buttonView: {
@@ -204,7 +210,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular
@@ -219,7 +225,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     marginRight: 20,
@@ -232,3 +238,5 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   }
 } )
+
+

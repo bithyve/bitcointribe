@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import useAccountsState from "../state-selectors/accounts/UseAccountsState";
-import { TEST_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TRUSTED_CONTACTS } from "../../../common/constants/serviceTypes";
+import { TEST_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TRUSTED_CONTACTS } from "../../../common/constants/wallet-service-types";
 import moment from "moment";
 import btcConfig from '../../../bitcoin/HexaConfig';
 

@@ -1,5 +1,4 @@
 import {
-  TRANSACTIONS_FETCHED,
   TRANSFER_ST1_EXECUTED,
   TRANSFER_ST2_EXECUTED,
   CLEAR_TRANSFER,
@@ -55,7 +54,7 @@ import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
 import { updateAccountShells } from '../utils/accountShellMapping'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
@@ -147,7 +146,7 @@ export type AccountsState = {
 
   averageTxFees: any;
 
-  // TODO: How does this differ from ANY added account? (See `activeAccounts`)
+  // TODO: How does this differ from ANY added account?
   // Perhaps we should consolidate the items here into that array?
   additional?: {
     regular?: any;
@@ -236,19 +235,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           [ accountType ]: {
             ...state[ accountType ],
             service: action.payload.service,
-          },
-        }
-
-      case TRANSACTIONS_FETCHED:
-        return {
-          ...state,
-          [ accountType ]: {
-            ...state[ accountType ],
-            transactions: action.payload.transactions,
-            loading: {
-              ...state[ accountType ].loading,
-              transactions: false,
-            },
           },
         }
 

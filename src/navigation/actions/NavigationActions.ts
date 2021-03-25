@@ -1,50 +1,58 @@
-import { NavigationActions, StackActions } from "react-navigation";
+import { NavigationActions, StackActions } from 'react-navigation'
 
 
-export const goHomeAction = NavigationActions.navigate({
+export const goHomeAction = NavigationActions.navigate( {
   routeName: 'Home',
-});
+} )
 
 
-export const resetToHomeAction = (params = {}) => {
-  return StackActions.reset({
+export const resetToHomeAction = ( params = {
+} ) => {
+  return StackActions.reset( {
     key: null,
     index: 0,
     actions: [
-      NavigationActions.navigate({
+      NavigationActions.navigate( {
         routeName: 'Home',
         params,
-      }),
+      } ),
     ],
-  });
-};
+  } )
+}
 
 
-export const resetStackToAccountDetails = (params) => {
-  return StackActions.reset({
+export const resetStackToAccountDetails = ( params ) => {
+  return StackActions.reset( {
     index: 1,
     actions: [
-      NavigationActions.navigate({ routeName: 'Home' }),
-      NavigationActions.navigate({
+      NavigationActions.navigate( {
+        routeName: 'Home'
+      } ),
+      NavigationActions.navigate( {
         routeName: 'AccountDetails',
         params,
-      }),
+      } ),
     ],
-  });
-};
+  } )
+}
 
-export const resetStackToSend = (params) => {
-  return StackActions.reset({
+export const resetStackToSend = ( params ) => {
+  return StackActions.reset( {
     index: 1,
     actions: [
-      NavigationActions.navigate({ routeName: "Home" }),
-      NavigationActions.navigate({
-        routeName: "Send",
-        action: NavigationActions.navigate({
-          routeName: "SendToContact",
-          params,
-        }),
-      }),
-    ],
-  });
-};
+      NavigationActions.navigate( {
+        routeName: 'Home'
+      } ),
+      NavigationActions.navigate( {
+        routeName: 'AccountDetails',
+        action: NavigationActions.navigate( {
+          routeName: 'Send',
+          action: NavigationActions.navigate( {
+            routeName: 'SentAmountForContactForm',
+            params,
+          } ),
+        } ),
+      } ),
+    ]
+  } )
+}
