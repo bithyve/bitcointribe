@@ -162,6 +162,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
     : false )
+  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
 
@@ -238,7 +239,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const createGuardian = useCallback(
     async ( changeKeeper?: boolean ) => {
       const firstName = 'Secondary'
-      const lastName = 'Device'
+      let lastName = 'Device'
+      if( index === 0 ) lastName = 'Device1'
+      else if( index === 3 ) lastName = 'Device2'
+      else lastName = 'Device3'
+
       const contactName = `${firstName} ${lastName ? lastName : ''}`
         .toLowerCase()
         .trim()
@@ -316,7 +321,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
 
     const firstName = 'Secondary'
-    const lastName = 'Device'
+    let lastName = 'Device'
+    if( index === 0 ) lastName = 'Device1'
+    else if( index === 3 ) lastName = 'Device2'
+    else lastName = 'Device3'
     const contactName = `${firstName} ${lastName ? lastName : ''}`
       .toLowerCase()
       .trim()
@@ -353,7 +361,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     const firstName = 'Secondary'
-    const lastName = 'Device'
+    let lastName = 'Device'
+    if( index === 0 ) lastName = 'Device1'
+    else if( index === 3 ) lastName = 'Device2'
+    else lastName = 'Device3'
     const contactName = `${firstName} ${lastName ? lastName : ''}`
       .toLowerCase()
       .trim()
@@ -669,6 +680,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
+          setIsApprovalStarted( true )
           dispatch( downloadSmShareForApproval( qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
@@ -677,7 +689,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
+          setIsApprovalStarted( true )
+          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
             if ( qrScannedData ) {
               dispatch( downloadSmShareForApproval( qrScannedData ) )
@@ -723,8 +736,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           element2.shareType == 'contact' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ] &&
-          selectedKeeper.shareType == 'contact'
+          levelhealth[ i ]
         ) {
           contactCount++
         }
@@ -732,8 +744,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           element2.shareType == 'device' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ] &&
-          selectedKeeper.shareType == 'device'
+          levelhealth[ i ]
         ) {
           deviceCount++
         }
@@ -774,11 +785,12 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( secondaryShareDownloadedStatus && !downloadSmShare ){
+    if( !downloadSmShare ) setIsApprovalStarted( false )
+    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare ] )
+  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
 
   return (
     <View style={{

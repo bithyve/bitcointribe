@@ -1080,9 +1080,7 @@ class ContactDetails extends PureComponent<
                   this.Contact.contactsWalletName !== undefined &&
                   this.Contact.contactsWalletName !== ''
                     ? `${this.Contact.contactsWalletName}'s Wallet`
-                    : this.Contact.contactName == 'Secondary Device'
-                      ? 'Keeper Device'
-                      : contact.contactName}
+                    : contact.contactName}
                 </Text>
                 {contact.connectedVia ? (
                   <Text style={styles.phoneText}>
@@ -1097,7 +1095,7 @@ class ContactDetails extends PureComponent<
               {this.Contact.hasTrustedChannel &&
               !(
                 this.Contact.hasXpub || this.Contact.hasTrustedAddress
-              ) ? null : this.Contact.contactName === 'Secondary Device' &&
+              ) ? null : ( this.Contact.contactName === 'Secondary Device' || this.Contact.contactName === 'Secondary Device1' || this.Contact.contactName === 'Secondary Device2' || this.Contact.contactName === 'Secondary Device3' ) &&
                 !(
                   this.Contact.hasXpub || this.Contact.hasTrustedAddress
                 ) ? null : (
@@ -1110,7 +1108,7 @@ class ContactDetails extends PureComponent<
 
                         this.Contact.hasXpub || this.Contact.hasTrustedAddress
                           ? this.onPressSend()
-                          : this.Contact.contactName != 'Secondary Device'
+                          : ( this.Contact.contactName != 'Secondary Device' || this.Contact.contactName != 'Secondary Device1' || this.Contact.contactName != 'Secondary Device2' || this.Contact.contactName != 'Secondary Device3' )
                             ? this.onPressResendRequest()
                             : null
                       }}

@@ -340,30 +340,35 @@ class ManageBackupNewBHR extends Component<
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
       console.log( 'second condition' )
-      if (
-        this.props.levelHealth.findIndex(
-          ( value ) =>
-            value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' ) >
-            -1
-        ) > -1
-      ) {
-        this.props.trustedChannelsSetupSync()
-      }
       this.modifyLevelData()
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
         prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === false && this.props.cloudPermissionGranted === true
       ) {
-        this.props.setCloudData()
-      } else {
-        if( this.props.cloudPermissionGranted === true )
-          this.updateCloudData()
+        this.props.setCloudData( )
+      } else if(
+        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' ) ||
+      ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
+      levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
+      levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
+      ) {
+        this.updateCloudData()
       }
     }
 
+
     if( prevProps.levelHealth != this.props.levelHealth ){
       this.autoUploadShare()
+      if (
+        this.props.levelHealth.findIndex(
+          ( value ) =>
+            value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
+            -1
+        ) > -1
+      ) {
+        this.props.trustedChannelsSetupSync()
+      }
     }
 
     if( prevProps.currentLevel == 0 && prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 1 ) {
@@ -383,7 +388,7 @@ class ManageBackupNewBHR extends Component<
           id: 2,
           selectedKeeper: {
             shareType: 'device',
-            name: 'Secondary Device',
+            name: 'Secondary Device1',
             reshareVersion: 0,
             status: 'notAccessible',
             updatedAt: 0,
@@ -469,7 +474,7 @@ class ManageBackupNewBHR extends Component<
     }
     this.props.setCloudData(
       keeperInfo,
-      currentLevel,
+      currentLevel == 3 ? 3 : currentLevel + 1,
       secretShare
     )
   };
@@ -577,6 +582,9 @@ class ManageBackupNewBHR extends Component<
         navigationParams
       )
     }
+    ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+    ( this.QrBottomSheet as any ).snapTo( 0 );
+    ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
   };
 
   onPressKeeper = ( value, number ) => {
@@ -644,7 +652,7 @@ class ManageBackupNewBHR extends Component<
       id: value.id,
       selectedKeeper: {
         ...keeper,
-        name: value.id === 2 && number == 1 ? 'Secondary Device' : keeper.name,
+        name: value.id === 2 && number == 1 ? 'Secondary Device1' : keeper.name,
         shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
       },
       isSetup: keeper.updatedAt ? false : true,
@@ -772,7 +780,7 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"Sdfsdf","publicKey":"6E6KImumgSQoh7GjpJqQe0EM","uploadedAt":1615816353302,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
             if ( qrScannedData ) {
               this.props.downloadSmShareForApproval( qrScannedData )
@@ -983,6 +991,7 @@ class ManageBackupNewBHR extends Component<
                                 value.status == 'notSetup'
                                   ? Colors.textColorGrey
                                   : Colors.white,
+                              width:'auto'
                             }}
                           >
                             Know More
@@ -1108,6 +1117,7 @@ class ManageBackupNewBHR extends Component<
                                       : 1,
                                   paddingLeft: wp( '3%' ),
                                   paddingRight: wp( '3%' ),
+                                  overflow:'hidden'
                                 }}
                                 disabled={this.props.cloudBackupStatus}
                                 onPress={() => {
@@ -1130,6 +1140,7 @@ class ManageBackupNewBHR extends Component<
                                     fontSize: RFValue( 11 ),
                                     marginLeft: wp( '2%' ),
                                   }}
+                                  numberOfLines={1}
                                 >
                                   {value.keeper1.status == 'accessible'
                                     ? 'Data Backed-Up'
@@ -1152,6 +1163,7 @@ class ManageBackupNewBHR extends Component<
                                   marginLeft: 'auto',
                                   paddingLeft: wp( '3%' ),
                                   paddingRight: wp( '3%' ),
+                                  overflow: 'hidden'
                                 }}
                                 onPress={() =>
                                   navigation.navigate(
@@ -1190,6 +1202,7 @@ class ManageBackupNewBHR extends Component<
                                     fontSize: RFValue( 11 ),
                                     marginLeft: wp( '2%' ),
                                   }}
+                                  numberOfLines={1}
                                 >
                                   Security Question
                                 </Text>
@@ -1200,6 +1213,7 @@ class ManageBackupNewBHR extends Component<
                               style={{
                                 flexDirection: 'row',
                                 marginTop: 'auto',
+                                justifyContent: 'space-between'
                               }}
                             >
                               <TouchableOpacity
@@ -1221,6 +1235,7 @@ class ManageBackupNewBHR extends Component<
                                     value.keeper1.status == 'accessible'
                                       ? 0
                                       : 1,
+                                  overflow:'hidden'
                                 }}
                                 onPress={() => this.onPressKeeper( value, 1 )}
                               >
@@ -1271,7 +1286,6 @@ class ManageBackupNewBHR extends Component<
                                         : Colors.white,
                                     fontSize: RFValue( 11 ),
                                     marginLeft: wp( '3%' ),
-                                    marginRight: wp( '1%' ),
                                   } }
                                   numberOfLines={1}
                                 >
@@ -1303,6 +1317,7 @@ class ManageBackupNewBHR extends Component<
                                       ? 0
                                       : 0.5,
                                   marginLeft: wp( '4%' ),
+                                  overflow:'hidden'
                                 }}
                                 onPress={() => this.onPressKeeper( value, 2 )}
                               >
@@ -1685,6 +1700,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
+    width: wp( '20%' ),
   },
   levelText: {
     fontSize: RFValue( 18 ),

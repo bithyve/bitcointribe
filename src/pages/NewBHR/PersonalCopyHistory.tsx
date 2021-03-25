@@ -106,7 +106,7 @@ const PersonalCopyHistory = ( props ) => {
     props.navigation.state.params.selectedKeeper
   )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.state.params.selectedTitle == 'Pdf Keeper' ? false : true
+    props.navigation.getParam( 'selectedTitle' ) == 'Pdf Keeper' ? false : true
   )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
@@ -115,27 +115,12 @@ const PersonalCopyHistory = ( props ) => {
   const keeperApproveStatus = useSelector(
     ( state ) => state.health.keeperApproveStatus
   )
-  const [ isChange, setIsChange ] = useState( false )
+  const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
+    ? props.navigation.getParam( 'isChangeKeeperType' )
+    : false )
+  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
-  useEffect( () => {
-    setIsPrimaryKeeper( props.navigation.state.params.isPrimaryKeeper )
-    setSelectedLevelId( props.navigation.state.params.selectedLevelId )
-    setSelectedKeeper( props.navigation.state.params.selectedKeeper )
-    setIsReshare(
-      props.navigation.state.params.selectedTitle == 'Pdf Keeper' ? false : true
-    )
-    setIsChange(
-      props.navigation.state.params.isChangeKeeperType
-        ? props.navigation.state.params.isChangeKeeperType
-        : false
-    )
-  }, [
-    props.navigation.state.params.selectedLevelId,
-    props.navigation.state.params.isPrimaryKeeper,
-    props.navigation.state.params.selectedKeeper,
-    props.navigation.state.params.selectedStatus,
-  ] )
 
   // const saveInTransitHistory = async () => {
   //   try{
@@ -319,8 +304,7 @@ const PersonalCopyHistory = ( props ) => {
           element2.shareType == 'contact' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ] &&
-          selectedKeeper.shareType == 'contact'
+          levelhealth[ i ]
         ) {
           contactCount++
         }
@@ -328,21 +312,22 @@ const PersonalCopyHistory = ( props ) => {
           element2.shareType == 'device' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ] &&
-          selectedKeeper.shareType == 'device'
+          levelhealth[ i ]
         ) {
           deviceCount++
         }
         const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-        if ( element2.shareType == 'contact' && contactCount < 2 ) {
+        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
           if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
             changeIndex = 2
           } else changeIndex = 1
         }
-        if ( element2.shareType == 'device' && deviceCount == 1 ) {
-          changeIndex = 3
-        } else if( element2.shareType == 'device' && deviceCount == 2 ){
-          changeIndex = 4
+        if( type == 'device' ){
+          if ( element2.shareType == 'device' && deviceCount == 1 ) {
+            changeIndex = 3
+          } else if( element2.shareType == 'device' && deviceCount == 2 ){
+            changeIndex = 4
+          }
         }
       }
     }
@@ -366,7 +351,7 @@ const PersonalCopyHistory = ( props ) => {
       ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
     }
   }
-  const sendApprovalRequestToPK = ( type ) => {
+  const sendApprovalRequestToPK = ( ) => {
     setQrBottomSheetsFlag( true );
     ( QrBottomSheet as any ).current.snapTo( 1 );
     ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
@@ -384,6 +369,7 @@ const PersonalCopyHistory = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
+          setIsApprovalStarted( true )
           dispatch( downloadSmShareForApproval( qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
@@ -392,6 +378,7 @@ const PersonalCopyHistory = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
+          setIsApprovalStarted( true )
           const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
           try {
             dispatch( downloadSmShareForApproval( qrScannedData ) )
@@ -420,11 +407,12 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( secondaryShareDownloadedStatus && !downloadSmShare ){
+    if( !downloadSmShare ) setIsApprovalStarted( false )
+    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare ] )
+  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
 
   return (
     <View style={{
@@ -510,7 +498,7 @@ const PersonalCopyHistory = ( props ) => {
             onPressSetup={async ( type, name ) => {
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )
-              sendApprovalRequestToPK( type )
+              sendApprovalRequestToPK( )
             }}
             onPressBack={() => ( keeperTypeBottomSheet as any ).current.snapTo( 0 )}
             selectedLevelId={selectedLevelId}

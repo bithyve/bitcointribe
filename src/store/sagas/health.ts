@@ -3419,10 +3419,18 @@ function* updateKeeperInfoToTrustedChannelWorker() {
           privateKey: string;
         } = yield select( ( state ) => state.health.pdfInfo )
 
-      const publicKey = pdfInfo.publicKey
       const privateKey = pdfInfo.privateKey
-
-      const primaryShare = s3Service.levelhealth.metaSharesKeeper[ pdfKeeperElement.shareId ]
+      let shareIndex = 3
+      if ( pdfKeeperElement.shareId && s3Service.levelhealth.metaSharesKeeper.length ) {
+        if (
+          s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == pdfKeeperElement.shareId ) > -1
+        ) {
+          shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex(
+            ( value ) => value.shareId == pdfKeeperElement.shareId
+          )
+        }
+      }
+      const primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
       const primaryShareKey = Keeper.getDerivedKey( privateKey )
 
       const primaryData = LevelHealth.encryptMetaShare(
@@ -3532,8 +3540,9 @@ function* autoShareLevel2KeepersWorker( { payload } ) {
     const keeperInfo: any[] = yield select(
       ( state ) => state.health.keeperInfo
     )
-    for ( let i = 0; i < contactLevelInfo.length; i++ ) {
-      const element = contactLevelInfo[ i ]
+    const ArrForKeeperInfoUpdate = [ ...contactLevelInfo, ...pdfLevelInfo ]
+    for ( let i = 0; i < ArrForKeeperInfoUpdate.length; i++ ) {
+      const element = ArrForKeeperInfoUpdate[ i ]
       if ( levelHealth[ 2 ].levelInfo[ element.index ].status != 'accessible' ) {
         const oldShareId = element.shareId
         const selectedShareId = element.newShareId
