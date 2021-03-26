@@ -1,3 +1,9 @@
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import KeeperService from '../../bitcoin/services/KeeperService'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import dataManager from '../../storage/database-manager'
 
 // types and action creators: dispatched by components and sagas
@@ -5,8 +11,8 @@ export const INIT_DB = 'INIT_DB'
 export const FETCH_FROM_DB = 'FETCH_FROM_DB'
 export const INSERT_INTO_DB = 'INSERT_INTO_DB'
 export const KEY_FETCHED = 'KEY_FETCHED'
+export const INITIALIZE_SERVICES = 'INITIALIZE_SERVICES'
 export const ENRICH_SERVICES = 'ENRICH_SERVICES'
-export const INITIALIZE_DB_HYDRATION = 'INITIALIZE_DB_HYDRATION'
 
 
 export const initializeDB = () => {
@@ -15,9 +21,9 @@ export const initializeDB = () => {
   }
 }
 
-export const initializeDBHydration = ( ) => {
+export const initializeServices= ( ) => {
   return {
-    type: INITIALIZE_DB_HYDRATION
+    type: INITIALIZE_SERVICES
   }
 }
 
@@ -49,7 +55,7 @@ export const enrichServices = ( database ) => {
 
 // types and action creators (saga): dispatched by saga workers
 export const DB_INITIALIZED = 'DB_INITIALIZED'
-export const DATABASE_HYDRATED = 'DATABASE_HYDRATED'
+export const SERVICES_INITIALIZED = 'SERVICES_INITIALIZED'
 export const DB_FETCHED = 'DB_FETCHED'
 export const DB_INSERTED = 'DB_INSERTED'
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED'
@@ -62,9 +68,19 @@ export const dbInitialized = ( initialized ) => {
   }
 }
 
-export const databaseHydrated = () => {
+export const servicesInitialized = ( services: {
+  regularAcc: RegularAccount;
+  testAcc: TestAccount;
+  secureAcc: SecureAccount;
+  s3Service: S3Service;
+  trustedContacts: TrustedContactsService;
+  keepersInfo: KeeperService;
+} ) => {
   return {
-    type: DATABASE_HYDRATED
+    type: SERVICES_INITIALIZED,
+    payload:{
+      services
+    }
   }
 }
 

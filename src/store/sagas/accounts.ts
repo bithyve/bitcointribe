@@ -412,9 +412,9 @@ export const generateSecondaryXprivWatcher = createWatcher(
 )
 
 
-function* testcoinsWorker( { payload } ) {
+function* testcoinsWorker() {
   const service = yield select(
-    ( state ) => state.accounts[ payload.serviceType ].service
+    ( state ) => state.accounts[ TEST_ACCOUNT ].service
   )
   const res = yield call( service.getTestcoins )
 
