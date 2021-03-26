@@ -28,14 +28,13 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWalletDetails } from '../store/actions/setupAndAuth'
+import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 import { setCloudData } from '../store/actions/cloud'
 
 // only admit lowercase letters and digits
@@ -71,9 +70,8 @@ export default function NewOwnQuestions( props ) {
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
+  const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   const s3service = useSelector( ( state ) => state.health.service )
-  const isDBHydrated = useInitialDBHydrationState()
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState(
     React.createRef(),
@@ -118,7 +116,7 @@ export default function NewOwnQuestions( props ) {
 
   useEffect( () => {
     if (
-      walletDetailsSetted
+      walletSetupCompleted
     ) {
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
@@ -128,7 +126,7 @@ export default function NewOwnQuestions( props ) {
         navigateToHome()
       }
     }
-  }, [ walletDetailsSetted ] )
+  }, [ walletSetupCompleted ] )
 
   useEffect( () => {
     if( backupStatus === null ) return
@@ -146,28 +144,26 @@ export default function NewOwnQuestions( props ) {
 
 
   const checkCloudLogin = () =>{
-    if( isDBHydrated ){
-      showLoader()
-      const security = {
-        questionId: '0',
-        question: question,
-        answer,
-      }
-      dispatch( setupWalletDetails( walletName, security ) )
-      dispatch( setVersion( 'Current' ) )
-      const current = Date.now()
-      AsyncStorage.setItem(
-        'SecurityAnsTimestamp',
-        JSON.stringify( current ),
-      )
-      const securityQuestionHistory = {
-        created: current,
-      }
-      AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify( securityQuestionHistory ),
-      )
+    showLoader()
+    const security = {
+      questionId: '0',
+      question: question,
+      answer,
     }
+    dispatch( setupWallet( walletName, security ) )
+    dispatch( setVersion( 'Current' ) )
+    const current = Date.now()
+    AsyncStorage.setItem(
+      'SecurityAnsTimestamp',
+      JSON.stringify( current ),
+    )
+    const securityQuestionHistory = {
+      created: current,
+    }
+    AsyncStorage.setItem(
+      'securityQuestionHistory',
+      JSON.stringify( securityQuestionHistory ),
+    )
   }
 
   const showLoader = () => {

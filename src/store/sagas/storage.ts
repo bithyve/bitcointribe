@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import {
   INIT_DB,
@@ -21,11 +21,9 @@ import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
 import { walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
-import { initializeHealthSetup, updateWalletImageHealth } from '../actions/health'
+import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
-import { Database } from '../../common/interfaces/Interfaces'
-import { getTestcoins } from '../actions/accounts'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -42,40 +40,9 @@ export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
 
 function* initServicesWorker() {
   const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  // const initialDatabase: Database = {
-  //   DECENTRALIZED_BACKUP: {
-  //     RECOVERY_SHARES: {
-  //     },
-  //     SHARES_TRANSFER_DETAILS: {
-  //     },
-  //     UNDER_CUSTODY: {
-  //     },
-  //     DYNAMIC_NONPMDD: {
-  //     },
-  //   },
-  //   SERVICES: {
-  //     REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-  //     TEST_ACCOUNT: JSON.stringify( testAcc ),
-  //     SECURE_ACCOUNT: JSON.stringify( secureAcc ),
-  //     S3_SERVICE: JSON.stringify( s3Service ),
-  //     TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-  //     KEEPERS_INFO: JSON.stringify( keepersInfo ),
-  //   },
-  //   VERSION: DeviceInfo.getVersion(),
-  // }
-  // yield call( insertDBWorker, {
-  //   payload: initialDatabase
-  // } )
   yield put( servicesInitialized( {
     regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo
   } ) )
-
-  // Post Hydration activities
-  // saturate the test account w/ 10K sats
-  yield put( getTestcoins() )
-
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
 }
 
 export const initServicesWatcher = createWatcher( initServicesWorker, INITIALIZE_SERVICES )

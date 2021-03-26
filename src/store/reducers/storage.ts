@@ -13,6 +13,7 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import KeeperService from '../../bitcoin/services/KeeperService'
+import { COMPLETED_WALLET_SETUP } from '../actions/setupAndAuth'
 
 const initialState: {
   databaseInitialized: Boolean;
@@ -64,7 +65,12 @@ export default ( state = initialState, action ) => {
 
       case SERVICES_INITIALIZED:
         return chain( state )
-          .setIn( [ 'initialServiceInstances' ],  ...action.payload.services )
+          .setIn( [ 'initialServiceInstances' ],  action.payload.services )
+          .value()
+
+      case COMPLETED_WALLET_SETUP:
+        return chain( state )
+          .setIn( [ 'initialServiceInstances' ],  null )
           .value()
 
       case KEY_FETCHED:

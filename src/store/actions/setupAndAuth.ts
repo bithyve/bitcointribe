@@ -1,7 +1,7 @@
 // types and action creators: dispatched by components and sagas
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
-export const SETUP_WALLET_DETAILS = 'SETUP_WALLET_DETAILS'
+export const SETUP_WALLET = 'SETUP_WALLET'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
@@ -29,9 +29,9 @@ export const credsAuth = ( passcode, reLogin? ) => {
   }
 }
 
-export const setupWalletDetails = ( walletName, security ) => {
+export const setupWallet = ( walletName, security ) => {
   return {
-    type: SETUP_WALLET_DETAILS, payload: {
+    type: SETUP_WALLET, payload: {
       walletName, security
     }
   }
@@ -79,7 +79,8 @@ export const switchCredsChanged = () => {
 
 export const CREDS_STORED = 'CREDS_STORED'
 export const CREDS_AUTHENTICATED = 'CREDS_AUTHENTICATED'
-export const SETTED_WALLET_DETAILS = 'SETTED_WALLET_DETAILS'
+export const COMPLETED_WALLET_SETUP = 'COMPLETED_WALLET_SETUP'
+export const WALLET_SETUP_FAILED = 'WALLET_SETUP_FAILED'
 export const SETUP_LOADING = 'SETUP_LOADING'
 export const AUTH_CRED_CHANGED = 'AUTH_CRED_CHANGED'
 export const PIN_CHANGED_FAILED = 'PIN_CHANGED_FAILED'
@@ -98,13 +99,17 @@ export const credsAuthenticated = isAuthenticated => {
   }
 }
 
-export const settedWalletDetails = () => {
+export const completedWalletSetup = ( ) => {
   return {
-    type: SETTED_WALLET_DETAILS
+    type: COMPLETED_WALLET_SETUP,
   }
 }
 
-
+export const walletSetupFailed = ( ) => {
+  return {
+    type: WALLET_SETUP_FAILED,
+  }
+}
 
 export const switchSetupLoader = beingLoaded => {
   return {
