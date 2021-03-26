@@ -263,6 +263,7 @@ interface HomePropsTypes {
   setCloudData: any;
   updateKeeperInfoToUnderCustody: any;
   generateMetaShare: any;
+  newBHRFlowStarted: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -854,6 +855,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation,
       s3Service,
       initializeHealthSetup,
+      newBHRFlowStarted
     } = this.props
     const versionData = []
     this.closeBottomSheet()
@@ -862,10 +864,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       'change',
       this.onAppStateChange
     )
-    console.log( 's3Service', s3Service )
-    const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( healthCheckInitializedKeeper === false ) {
-      initializeHealthSetup()
+    if( newBHRFlowStarted === true )
+    {
+      const { healthCheckInitializedKeeper } = s3Service.levelhealth
+      if ( healthCheckInitializedKeeper === false ) {
+        initializeHealthSetup()
+      }
     }
 
     //const { healthCheckInitialized } = s3Service.sss;
@@ -1762,12 +1766,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     console.log( 'notification passed ', value )
 
     const { notificationData } = this.state
-    const {
-      navigation,
-      s3Service,
-      fetchKeeperTrustedChannel,
-      levelHealth,
-    } = this.props
+    const { navigation, } = this.props
     const tempNotificationData = notificationData
     for ( let i = 0; i < tempNotificationData.length; i++ ) {
       const element = tempNotificationData[ i ]
@@ -2555,6 +2554,7 @@ const mapStateToProps = ( state ) => {
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
+    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
   }
 }
 

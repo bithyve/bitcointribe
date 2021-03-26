@@ -143,7 +143,7 @@ const HomeHeader = ( {
   const getMessageToShow = () => {
     let name = ''
     let message = ''
-    if ( levelHealth.length ) {
+    if ( levelHealth && levelHealth.length && newBHRFlowStarted === true ) {
       for ( let i = 0; i < levelHealth.length; i++ ) {
         const element = levelHealth[ i ].levelInfo
         let j = 0

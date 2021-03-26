@@ -1228,14 +1228,19 @@ export const trustedChannelsSetupSyncWatcher = createWatcher(
 
 function* walletCheckInWorker( { payload } ) {
   // syncs last seen, health & exchange rates
-
+  const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
+  let s3Service: S3Service
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
   const walletCheckInLoading: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.loading.walletCheckIn,
   )
-  const s3Service: S3Service = yield select( ( state ) => state.health.service )
+  if( newBHRFlowStarted === true ){
+    s3Service = yield select( ( state ) => state.health.service )
+  } else {
+    s3Service = yield select( ( state ) => state.sss.service )
+  }
 
   const storedExchangeRates = yield select(
     ( state ) => state.accounts.exchangeRates,
