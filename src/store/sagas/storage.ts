@@ -21,10 +21,11 @@ import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
 import { walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
-import { updateWalletImageHealth } from '../actions/health'
+import { initializeHealthSetup, updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { databaseHydrated, INITIALIZE_DB_HYDRATION } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
+import { getTestcoins } from '../actions/accounts'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -66,6 +67,13 @@ function* initDBHydrationWorker() {
     payload: initialDatabase
   } )
   yield put( databaseHydrated() )
+
+  // Post Hydration activities
+  // saturate the test account w/ 10K sats
+  yield put( getTestcoins() )
+
+  // initialize health-check schema on relay
+  yield put( initializeHealthSetup() )
 }
 
 export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )

@@ -33,13 +33,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setupWalletDetails } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
-import { getTestcoins } from '../store/actions/accounts'
-import { TEST_ACCOUNT } from '../common/constants/wallet-service-types'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import { initializeHealthSetup } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
 import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
 import useAccountsState from '../utils/hooks/state-selectors/accounts/UseAccountsState'
@@ -91,21 +88,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
 
-  useEffect( () => {
-    if ( isDBHydrated ){
-      // get test-sats(10K)
-      if( !accounts.testCoinsReceived )
-        dispatch( getTestcoins( TEST_ACCOUNT ) )
-
-      // initialize health-check schema on relay
-      if( s3service ){
-        const { healthCheckInitializedKeeper } = s3service.levelhealth
-        if ( healthCheckInitializedKeeper === false ) {
-          dispatch( initializeHealthSetup() )
-        }
-      }
-    }
-  }, [ isDBHydrated ] )
 
   useEffect( () => {
     if( backupStatus === null ) return

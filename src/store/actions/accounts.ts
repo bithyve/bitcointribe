@@ -87,13 +87,9 @@ export const fetchBalanceTx = (
   }
 }
 
-export const getTestcoins = ( serviceType ) => {
-  // Test account specific
-  // console.log("Called getTestcoins", new Date())
+export const getTestcoins = ( ) => {
   return {
-    type: GET_TESTCOINS, payload: {
-      serviceType
-    }
+    type: GET_TESTCOINS,
   }
 }
 
