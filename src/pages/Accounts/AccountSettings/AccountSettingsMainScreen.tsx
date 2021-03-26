@@ -64,7 +64,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           screenName: 'SubAccountTFAHelp',
           imageSource: require( '../../../assets/images/icons/icon_merge_blue.png' ),
         }
-      ] : [] )
+      ] : [] ),
 
       // 📝 These items are being commented out until their functionality is fully implemented.
       // See: https://github.com/bithyve/hexa/issues/2243
@@ -75,12 +75,15 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       //   screenName: 'ReassignTransactionsMainOptions',
       //   imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
       // },
-      // {
-      //   title: 'Account Visibility',
-      //   subtitle: `Configure for different privacy-sensitive contexts`,
-      //   screenName: 'EditVisibility',
-      //   imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
-      // },
+      {
+        title: 'Account Visibility',
+        subtitle: 'Configure for different privacy-sensitive contexts',
+        screenName: 'EditVisibility',
+        screenParams: {
+          accountShellID: accountShell.id,
+        },
+        imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
+      },
       // {
       //   title: 'Merge Account',
       //   subtitle: `Move all transactions to another Hexa account`,
