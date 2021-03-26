@@ -28,7 +28,6 @@ const initialState: {
   };
   credsChanged: string;
   pinChangedFailed: Boolean;
-  isNewHealthSystemSet: Boolean;
   initializeRecoveryCompleted: boolean;
 } = {
   hasCreds: false,
@@ -44,7 +43,6 @@ const initialState: {
   },
   credsChanged: '',
   pinChangedFailed: false,
-  isNewHealthSystemSet: false,
   initializeRecoveryCompleted: false
 }
 
@@ -105,12 +103,6 @@ export default ( state = initialState, action ) => {
 
       case PIN_CHANGED_FAILED:
         return chain( state ).setIn( [ 'pinChangedFailed' ], action.payload.isFailed ).value()
-
-      case IS_NEW_HEALTH_SYSTEM:
-        return {
-          ...state,
-          isNewHealthSystemSet: action.payload.isNewHealthSystemSet,
-        }
 
       case INIT_RECOVERY_COMPLETED:
         return {

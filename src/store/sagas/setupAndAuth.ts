@@ -16,7 +16,6 @@ import {
   CHANGE_AUTH_CRED,
   credsChanged,
   pinChangedFailed,
-  setIsNewHealthSystemSet,
   initializeRecoveryCompleted,
   completedWalletSetup,
   walletSetupFailed,
@@ -37,7 +36,6 @@ import { initializeHealthSetup } from '../actions/health'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
-  yield put( setIsNewHealthSystemSet( true ) )
 
   const services: {
     regularAcc: RegularAccount;

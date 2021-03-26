@@ -35,7 +35,9 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
+import { initNewBHRFlow } from '../store/actions/health'
 import { setCloudData } from '../store/actions/cloud'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -77,7 +79,7 @@ export default function NewOwnQuestions( props ) {
     React.createRef(),
   )
   const [ visibleButton, setVisibleButton ] = useState( false )
-  const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
 
   const handleSubmit = () => {
@@ -120,20 +122,21 @@ export default function NewOwnQuestions( props ) {
     ) {
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
-      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        navigateToHome()
-      }
+      dispatch( initNewBHRFlow( true ) )
+      if( healthCheckInitializedKeeper === true ){
+        if( cloudPermissionGranted ){
+          dispatch( setCloudData() )
+        } else{
+          navigateToHome()
+        }}
     }
   }, [ walletSetupCompleted ] )
 
   useEffect( () => {
-    if( backupStatus === null ) return
-    if( backupStatus || backupStatus === false ){
+    if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       navigateToHome()
     }
-  }, [ backupStatus ] )
+  }, [ cloudBackupStatus ] )
 
   const navigateToHome = () => {
     ( loaderBottomSheet as any ).current.snapTo( 0 )

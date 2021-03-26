@@ -1,5 +1,6 @@
 import ip, { chain } from 'icepick'
-import { CLEAR_CLOUD_CACHE, DATA_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { CLEAR_CLOUD_CACHE, CLOUD_BACKUP_STATUS, DATA_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
 
 const initialState = ip.freeze( {
 
@@ -8,7 +9,8 @@ const initialState = ip.freeze( {
   cloudData: null,
   isCloudBackupUpdated: false,
   isCloudBackupSuccess: false,
-  backupStatus: null
+  cloudBackupStatus: CloudBackupStatus.PENDING,
+
 } )
 
 export default ( state = initialState, { type, payload } ) => {
@@ -49,15 +51,15 @@ export default ( state = initialState, { type, payload } ) => {
           isCloudBackupSuccess: payload.isCloudBackupSuccess,
         }
 
-      case DATA_BACKUP_STATUS:
-        return {
-          ...state,
-          backupStatus: payload.backupStatus,
-        }
-
       case CLEAR_CLOUD_CACHE:
         return {
           ...initialState,
+        }
+
+      case CLOUD_BACKUP_STATUS:
+        return {
+          ...state,
+          cloudBackupStatus: payload.cloudBackupStatus,
         }
 
       default:

@@ -1,15 +1,15 @@
-import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React from 'react'
+import { View, Image, Text, StyleSheet } from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
-export default function RestoreWallet(props) {
+export default function RestoreWallet( props ) {
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
@@ -17,29 +17,35 @@ export default function RestoreWallet(props) {
             Restore Hexa Wallet
         </Text>
         <Text style={styles.headerInfoText}>
-            Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod
+        You have enough Recovery Keys to restore your wallet. Click Restore and you're all done
         </Text>
       </View>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{
+        flex: 1, justifyContent: 'center', alignItems: 'center'
+      }}>
         <View style={styles.greyBox}>
-          <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{
+            justifyContent: 'center', alignItems: 'center'
+          }}>
             <Image
-              source={require('../../assets/images/icons/icon_wallet.png')}
+              source={require( '../../assets/images/icons/icon_wallet.png' )}
               style={styles.greyBoxImage}
             />
           </View>
-          <View style={{ marginLeft: 10 }}>
+          <View style={{
+            marginLeft: 10
+          }}>
             <Text style={styles.greyBoxText}>Pam’s Wallet</Text>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'flex-end',
-                marginTop: hp('1%'),
+                marginTop: hp( '1%' ),
               }}
             >
               <Image
                 style={styles.cardBitCoinImage}
-                source={require('../../assets/images/icons/icon_bitcoin_dark_grey.png')}
+                source={require( '../../assets/images/icons/icon_bitcoin_dark_grey.png' )}
               />
               <Text style={styles.cardAmountTextGrey}>{'2,065,000'}</Text>
               <Text style={styles.cardAmountUnitText}>{'sats'}</Text>
@@ -49,7 +55,7 @@ export default function RestoreWallet(props) {
       </View>
       <View style={styles.successModalAmountView}>
         <Text style={styles.bottomInfoText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.
+        Make sure to backup your wallet first thing once the wallet is restored
         </Text>
       </View>
       <View style={styles.bottomButtonsView}>
@@ -74,75 +80,77 @@ export default function RestoreWallet(props) {
         </AppBottomSheetTouchableWrapper>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: wp('1.5%'),
+    marginTop: wp( '1.5%' ),
   },
   bottomInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: hp('1%'),
+    marginBottom: hp( '1%' ),
     marginTop: 'auto',
   },
   bottomButtonsView: {
-    height: hp('15%'),
+    height: hp( '15%' ),
     flexDirection: 'row',
     alignItems: 'center',
   },
   transparentButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
   successModalHeaderView: {
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: wp('4%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '4%' ),
   },
   successModalAmountView: {
     justifyContent: 'center',
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
     marginTop: 'auto',
   },
   successModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp('8%'),
+    marginLeft: wp( '8%' ),
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   greyBox: {
-    width: wp('90%'),
+    width: wp( '90%' ),
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor1,
     padding: 15,
@@ -152,34 +160,34 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   greyBoxImage: {
-    width: wp('13%'),
-    height: wp('13%'),
+    width: wp( '13%' ),
+    height: wp( '13%' ),
   },
   greyBoxText: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
   },
   cardAmountUnitText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     marginTop: 'auto',
-    lineHeight: RFValue(17),
+    lineHeight: RFValue( 17 ),
   },
   cardAmountTextGrey: {
     color: Colors.black,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     marginRight: 5,
     marginTop: 'auto',
-    lineHeight: RFValue(18),
+    lineHeight: RFValue( 18 ),
   },
   cardBitCoinImage: {
-    width: wp('3%'),
-    height: wp('3%'),
+    width: wp( '3%' ),
+    height: wp( '3%' ),
     marginRight: 5,
     resizeMode: 'contain',
-    marginBottom: wp('0.7%'),
+    marginBottom: wp( '0.7%' ),
   },
-});
+} )
