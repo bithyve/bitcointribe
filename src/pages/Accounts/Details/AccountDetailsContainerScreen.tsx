@@ -66,8 +66,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const accountTransactions = AccountShell.getAllTransactions( accountShell )
-  const spendableBalance = useSpendableBalanceForAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
   let derivativeAccountKind: any = primarySubAccount.kind
 
@@ -256,7 +254,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     if ( primarySubAccount.isTFAEnabled ) {
       const twoFASetupDetails = idx( accountsState, ( _ )=> _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      const twoFAValid = idx( accountsState, ( _ )=> _.additional.secure.twoFAValid )
+      const twoFAValid = idx( accountsState, ( _ )=> _.twoFAHelpFlags.twoFAValid )
 
       if( twoFASetupDetails && !twoFAValid )
         navigation.navigate( 'TwoFASetup', {
@@ -313,7 +311,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           return (
             <View style={styles.viewSectionContainer}>
               <TransactionsPreviewSection
-                transactions={accountTransactions.slice( 0, 3 )}
+                transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
                 availableBalance={AccountShell.getSpendableBalance( accountShell )}
                 bitcoinUnit={accountShell.unit}
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
@@ -374,7 +372,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         },
       },
     ]
-  }, [ accountTransactions, accountShell ] )
+  }, [ accountShell ] )
 
   return (
     <View style={styles.rootContainer}>

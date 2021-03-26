@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import {
   INIT_DB,
@@ -23,8 +23,7 @@ import { walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
 import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
-import { databaseHydrated, INITIALIZE_DB_HYDRATION } from '../actions/storage'
-import { Database } from '../../common/interfaces/Interfaces'
+import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -39,36 +38,14 @@ function* initDBWorker() {
 
 export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
 
-function* initDBHydrationWorker() {
+function* initServicesWorker() {
   const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const initialDatabase: Database = {
-    DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {
-      },
-      SHARES_TRANSFER_DETAILS: {
-      },
-      UNDER_CUSTODY: {
-      },
-      DYNAMIC_NONPMDD: {
-      },
-    },
-    SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-      KEEPERS_INFO: JSON.stringify( keepersInfo ),
-    },
-    VERSION: DeviceInfo.getVersion(),
-  }
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
-  yield put( databaseHydrated() )
+  yield put( servicesInitialized( {
+    regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo
+  } ) )
 }
 
-export const initDBHydrationWatcher = createWatcher( initDBHydrationWorker, INITIALIZE_DB_HYDRATION )
+export const initServicesWatcher = createWatcher( initServicesWorker, INITIALIZE_SERVICES )
 
 
 function* fetchDBWorker() {

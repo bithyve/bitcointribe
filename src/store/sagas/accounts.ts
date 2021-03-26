@@ -1,18 +1,15 @@
 import { call, delay, put, select, spawn } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
-  switchLoader,
   GET_TESTCOINS,
   ACCUMULATIVE_BAL_AND_TX,
   testcoinsReceived,
   accountsSynched,
-  settedDonationAccount,
   FETCH_BALANCE_TX,
   GENERATE_SECONDARY_XPRIV,
   RESET_TWO_FA,
   twoFAResetted,
   FETCH_DERIVATIVE_ACC_BALANCE_TX,
-  REMOVE_TWO_FA,
   SETUP_DONATION_ACCOUNT,
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
@@ -62,7 +59,6 @@ import {
 import {
   DerivativeAccountTypes,
 } from '../../bitcoin/utilities/Interface'
-import { setAutoAccountSync } from '../actions/loaders'
 import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
@@ -101,8 +97,8 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
   // delta txs(hard refresh)
   const txsFound: TransactionDescribing[] = []
 
-  if ( payload.options.loader )
-    yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+  // if ( payload.options.loader )
+  //   yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   const service = payload.options.service
     ? payload.options.service
     : yield select( ( state ) => state.accounts[ payload.serviceType ].service )
@@ -188,7 +184,7 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
 
   if ( payload.options.loader ) {
     // yield delay(1000); // introducing delay for a sec to let the fetchTx/insertIntoDB finish
-    yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+    // yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
   }
 
   return txsFound
@@ -203,7 +199,7 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
   let { serviceType, accountNumber, accountType, hardRefresh, blindRefresh } = payload
   const dervTxsFound: TransactionDescribing[] = []
 
-  yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
+  // yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
 
   if ( !accountNumber ) accountNumber = 1
@@ -245,9 +241,9 @@ function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
         SERVICES: updatedSERVICES
       }
     } )
-    yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
+    // yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
   } else if ( res.status !== 200 ) {
-    yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
+    // yield put( switchLoader( serviceType, 'derivativeBalanceTx' ) )
 
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     throw new Error( 'Failed to fetch balance/transactions from the indexer' )
@@ -325,7 +321,7 @@ function* syncDerivativeAccountsWorker( { payload }: { payload: { serviceTypes: 
 }
 
 function* syncViaXpubAgentWorker( { payload } ) {
-  yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+  // yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
 
   const { serviceType, derivativeAccountType, accountNumber } = payload
   const service = yield select( ( state ) => state.accounts[ serviceType ].service )
@@ -374,7 +370,7 @@ function* syncViaXpubAgentWorker( { payload } ) {
     console.log( 'Failed to sync derivative account' )
   }
 
-  yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
+  // yield put( switchLoader( payload.serviceType, 'balanceTx' ) )
 }
 
 export const syncViaXpubAgentWatcher = createWatcher(
@@ -416,34 +412,18 @@ export const generateSecondaryXprivWatcher = createWatcher(
 )
 
 
-function* testcoinsWorker( { payload } ) {
-  yield put( switchLoader( payload.serviceType, 'testcoins' ) )
-
+function* testcoinsWorker() {
   const service = yield select(
-    ( state ) => state.accounts[ payload.serviceType ].service
+    ( state ) => state.accounts[ TEST_ACCOUNT ].service
   )
   const res = yield call( service.getTestcoins )
-  // console.log( { res } )
-  if ( res.status === 200 ) {
-    yield put( testcoinsReceived( payload.serviceType, service ) )
 
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ payload.serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-
-    yield put( accountsSynched( true ) ) // initial sync: test-acc only (turns the amount text to black)
-  } else {
+  if ( res.status === 200 )
+    yield put( testcoinsReceived( ) )
+  else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     throw new Error( 'Failed to get testcoins' )
   }
-  yield put( switchLoader( payload.serviceType, 'testcoins' ) )
 }
 
 export const testcoinsWatcher = createWatcher( testcoinsWorker, GET_TESTCOINS )
@@ -627,7 +607,6 @@ function* setupDonationAccountWorker( { payload } ) {
     // console.log( { res } )
     const { setupSuccessful, accountId, accountNumber } = res.data
     if ( !setupSuccessful ) {
-      yield put( settedDonationAccount( serviceType, false ) )
       throw new Error( 'Donation account setup failed' )
     }
 
@@ -641,7 +620,7 @@ function* setupDonationAccountWorker( { payload } ) {
         SERVICES: updatedSERVICES
       }
     } )
-    yield put( settedDonationAccount( serviceType, true ) )
+
     return {
       accountId, accountNumber
     }
@@ -715,22 +694,6 @@ function* refreshAccountShellWorker( { payload } ) {
         accountKind = primarySubAccount.kind
   }
 
-  if ( options && options.autoSync ) {
-    // auto-refresh the account-shell once per-session
-    const autoAccountSync = yield select(
-      ( state ) => state.loaders.autoAccountSync
-    )
-
-    if (
-      autoAccountSync &&
-      autoAccountSync[ `${accountKind + primarySubAccount.instanceNumber}` ]
-    ) {
-      // account-shell already synched
-      yield put( accountShellRefreshCompleted( shell ) )
-      return
-    }
-  }
-
   const nonDerivativeAccounts = [
     SubAccountKind.TEST_ACCOUNT,
     SubAccountKind.REGULAR_ACCOUNT,
@@ -767,10 +730,6 @@ function* refreshAccountShellWorker( { payload } ) {
       } )
       yield put( rescanSucceeded( rescanTxs ) )
     }
-
-    yield put(
-      setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
-    )
   } else {
     const payload = {
       serviceType: accountKind,
@@ -794,10 +753,6 @@ function* refreshAccountShellWorker( { payload } ) {
       } )
     } )
     yield put( rescanSucceeded( rescanTxs ) )
-
-    yield put(
-      setAutoAccountSync( `${accountKind + primarySubAccount.instanceNumber}` )
-    )
   }
 
   yield put( accountShellRefreshCompleted( shell ) )

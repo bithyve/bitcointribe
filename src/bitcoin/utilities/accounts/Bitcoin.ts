@@ -197,6 +197,8 @@ export default class Bitcoin {
           )
         }
       } catch( err ){
+        if( config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN === config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN ) throw new Error( err.message ) // not using own-node
+
         if( !config.USE_ESPLORA_FALLBACK ){
           Toast( 'We could not connect to your node.\nTry connecting to the BitHyve node- Go to settings ....' )
           throw new Error( err.message )
@@ -594,6 +596,8 @@ export default class Bitcoin {
       console.log(
         `An error occurred while broadcasting via current node. ${err}`,
       )
+
+      if( config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX === config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX ) throw new Error( err.message ) // not using own-node
 
       if ( config.USE_ESPLORA_FALLBACK ) {
         console.log( 'using Hexa node as fallback(tx-broadcast)' )

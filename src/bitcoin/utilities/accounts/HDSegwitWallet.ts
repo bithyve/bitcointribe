@@ -1201,8 +1201,6 @@ export default class HDSegwitWallet extends Bitcoin {
   public testnetFaucet = async (): Promise<{
     txid: any;
     funded: any;
-    balances: any;
-    transactions: any;
   }> => {
     if ( !this.isTest ) {
       throw new Error( 'Can only fund test account' )
@@ -1224,73 +1222,9 @@ export default class HDSegwitWallet extends Bitcoin {
 
     const { txid, funded } = res.data
 
-    if ( txid ) {
-      const externalAddresses = {
-        [ recipientAddress ]: 0
-      }
-      const internalAddresses = {
-      }
-      const ownedAddresses = [ recipientAddress ]
-
-      const externalAddressSet = externalAddresses
-      const internalAddressSet = internalAddresses
-
-      const xpubId = crypto.createHash( 'sha256' ).update( this.getXpub() ).digest( 'hex' )
-      const accounts = {
-        [ xpubId ]: {
-          externalAddressSet,
-          internalAddressSet,
-          externalAddresses,
-          internalAddresses,
-          ownedAddresses,
-          cachedUTXOs: this.confirmedUTXOs,
-          cachedTxs: this.transactions,
-          cachedTxIdMap: this.txIdMap,
-          cachedAQL: this.addressQueryList,
-          lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
-          lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
-          accountType: 'Test Account',
-          accountName: this.accountName,
-        }
-      }
-      const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
-
-      const  {
-        UTXOs,
-        balances,
-        transactions,
-        nextFreeAddressIndex,
-        nextFreeChangeAddressIndex,
-      } = synchedAccounts[ xpubId ]
-
-      const confirmedUTXOs = []
-      for ( const utxo of UTXOs ) {
-        if ( utxo.status ) {
-          if ( this.isTest && utxo.address === this.getAddress( false, 0 ) ) {
-            confirmedUTXOs.push( utxo ) // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
-            continue
-          }
-
-          if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
-        } else {
-          // utxo's from fallback won't contain status var (defaulting them as confirmed)
-          confirmedUTXOs.push( utxo )
-        }
-      }
-
-      this.confirmedUTXOs = confirmedUTXOs
-      this.nextFreeAddressIndex = nextFreeAddressIndex
-      this.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
-      this.receivingAddress = this.getAddress( false, this.nextFreeAddressIndex )
-
-      this.balances = balances
-      this.transactions = transactions
-    }
     return {
       txid,
       funded,
-      balances: this.balances,
-      transactions: this.transactions,
     }
   };
 
