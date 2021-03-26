@@ -11,7 +11,6 @@ import {
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS,
   UPDATE_LAST_SEEN,
-  CLOUD_BACKUP_DATA_STATUS,
   CARD_DATA,
   IS_BACKUP_PROCESSING,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
@@ -40,7 +39,6 @@ const initialState = ip.freeze( {
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
-  cloudBackupStatus: false,
   cardData: null,
   isBackupProcessing: false
 } )
@@ -127,22 +125,10 @@ export default ( state = initialState, { type, payload } ) => {
           lastSeen: new Date()
         } )
 
-      case CLOUD_BACKUP_DATA_STATUS:
-        return {
-          ...state,
-          cloudBackupStatus: payload.status,
-        }
-
       case CARD_DATA:
         return {
           ...state,
           cardData: payload.cardData,
-        }
-
-      case IS_BACKUP_PROCESSING:
-        return {
-          ...state,
-          isBackupProcessing: payload.status,
         }
 
       default:

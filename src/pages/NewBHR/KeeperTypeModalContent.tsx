@@ -287,7 +287,7 @@ const styles = StyleSheet.create( {
   },
   successModalButtonView: {
     height: wp( '13%' ),
-    width: wp( '35%' ),
+    width: wp( '40%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,

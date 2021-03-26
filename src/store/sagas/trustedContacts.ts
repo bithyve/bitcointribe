@@ -768,7 +768,7 @@ function* fetchEphemeralChannelWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
-  const isNewHealthSystemSet = yield select( ( state ) => state.setupAndAuth.isNewHealthSystemSet )
+  const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
 
   const { contactInfo, approveTC, publicKey } = payload // if publicKey: fetching just the payment details
   const encKey = SSS.strechKey( contactInfo.info )
@@ -795,7 +795,7 @@ function* fetchEphemeralChannelWorker( { payload } ) {
 
     if ( data && data.shareTransferDetails ) {
       const { otp, encryptedKey } = data.shareTransferDetails
-      if( isNewHealthSystemSet ) downloadMShareHealth( {
+      if( newBHRFlowStarted ) downloadMShareHealth( {
         encryptedKey, otp
       } )
       else downloadMShareSSS( {
@@ -896,7 +896,7 @@ function* fetchTrustedChannelWorker( { payload } ) {
     const data: TrustedDataElements = res.data.data
     yield put( trustedChannelFetched( contactInfo.contactName, data ) )
     const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const isNewHealthSystemSet = yield select( ( state ) => state.setupAndAuth.isNewHealthSystemSet )
+    const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
     const updatedSERVICES = {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
@@ -912,7 +912,7 @@ function* fetchTrustedChannelWorker( { payload } ) {
         Toast( 'You have been successfully added as a Keeper' )
         const { otp, encryptedKey } = data.shareTransferDetails
         // yield delay(1000); // introducing delay in order to evade database insertion collision
-        if( isNewHealthSystemSet ) yield put( downloadMShareHealth( {
+        if( newBHRFlowStarted ) yield put( downloadMShareHealth( {
           encryptedKey, otp, walletName: contactsWalletName
         } ) )
         else yield put( downloadMShareSSS( {

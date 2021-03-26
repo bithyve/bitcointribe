@@ -102,7 +102,6 @@ import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
-  setIsBackupProcessing,
 } from '../../store/actions/preferences'
 
 import CloudBackup from '../../common/CommonFunctions/CloudBackup'
@@ -253,8 +252,6 @@ interface HomePropsTypes {
   autoDownloadShareContact: any;
   accountShells: AccountShell[];
   setVersion: any;
-  isNewHealthSystemSet: Boolean;
-  setIsBackupProcessing: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
   downloadSMShard: any;
@@ -2558,10 +2555,6 @@ const mapStateToProps = ( state ) => {
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
-    isNewHealthSystemSet: idx(
-      state,
-      ( _ ) => _.setupAndAuth.isNewHealthSystemSet
-    ),
   }
 }
 
@@ -2596,7 +2589,6 @@ export default withNavigationFocus(
     onApprovalStatusChange,
     autoDownloadShareContact,
     setVersion,
-    setIsBackupProcessing,
     downloadSMShard,
     updateNewFcm,
     setCloudData,

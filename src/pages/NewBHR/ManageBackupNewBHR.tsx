@@ -28,7 +28,6 @@ import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import { fetchEphemeralChannel } from '../../store/actions/trustedContacts'
-import { setIsBackupProcessing } from '../../store/actions/preferences'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -79,6 +78,7 @@ import PersonalNode from '../../common/data/models/PersonalNode'
 import { setCloudData, updateHealthForCloud } from '../../store/actions/cloud'
 import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -107,8 +107,7 @@ interface ManageBackupNewBHRStateTypes {
 interface ManageBackupNewBHRPropsTypes {
   navigation: any;
   updateHealthForCloud: any;
-  setIsBackupProcessing: any;
-  cloudBackupStatus: any;
+  cloudBackupStatus: CloudBackupStatus;
   walletName: string;
   regularAccount: RegularAccount;
   database: any;
@@ -330,11 +329,14 @@ class ManageBackupNewBHR extends Component<
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      if ( healthLoading || cloudBackupStatus ) {
+      console.log( 'healthLoading', healthLoading )
+      console.log( 'cloudBackupStatus', cloudBackupStatus )
+
+      if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true
         } )
-      } else if ( !healthLoading && !cloudBackupStatus ) {
+      } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING ) ) {
         this.setState( {
           refreshControlLoader: false
         } )
@@ -350,7 +352,7 @@ class ManageBackupNewBHR extends Component<
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0 && this.props.cloudBackupStatus === false && this.props.cloudPermissionGranted === true
+        prevProps.levelHealth.length == 0 && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true
       ) {
         this.props.setCloudData( )
       } else if(
@@ -448,7 +450,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateCloudData = () => {
-    if( this.props.cloudBackupStatus === true ) return
+    if( this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
     if( this.props.cloudPermissionGranted === false ) return
     const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
     let secretShare = {
@@ -1114,13 +1116,9 @@ class ManageBackupNewBHR extends Component<
                                   paddingRight: wp( '3%' ),
                                   overflow:'hidden'
                                 }}
-                                disabled={this.props.cloudBackupStatus}
+                                disabled={this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS}
                                 onPress={() => {
-                                  console.log(
-                                    'this.props.cloudBackupStatus',
-                                    this.props.cloudBackupStatus, typeof this.props.cloudBackupStatus
-                                  )
-                                  if ( this.props.cloudBackupStatus === false ) {
+                                  if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
                                     this.updateCloudData()
                                   }
                                 }}
@@ -1534,7 +1532,7 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.health.service ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+      idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
@@ -1580,7 +1578,6 @@ export default withNavigationFocus(
     checkMSharesHealth,
     initLevelTwo,
     updateMSharesHealth,
-    setIsBackupProcessing,
     sendApprovalRequest,
     onApprovalStatusChange,
     fetchKeeperTrustedChannel,

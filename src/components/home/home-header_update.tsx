@@ -327,6 +327,7 @@ const HomeHeader = ( {
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
+            console.log( 'newBHRFlowStarted', newBHRFlowStarted )
             if ( newBHRFlowStarted === true ) {
               navigation.navigate( 'ManageBackupNewBHR' )
             } else {
