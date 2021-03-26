@@ -4,9 +4,15 @@ import {
   DB_FETCHED,
   DB_INSERTED,
   KEY_FETCHED,
-  DATABASE_HYDRATED,
+  SERVICES_INITIALIZED,
 } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import KeeperService from '../../bitcoin/services/KeeperService'
 
 const initialState: {
   databaseInitialized: Boolean;
@@ -15,7 +21,14 @@ const initialState: {
   database: Database;
   dbFetched: Boolean;
   databaseSSS: {};
-  databaseHydrated: Boolean;
+  initialServiceInstances: {
+    regularAcc: RegularAccount;
+    testAcc: TestAccount;
+    secureAcc: SecureAccount;
+    s3Service: S3Service;
+    trustedContacts: TrustedContactsService;
+    keepersInfo: KeeperService;
+  };
 } = {
   databaseInitialized: false,
   insertedIntoDB: false,
@@ -26,7 +39,7 @@ const initialState: {
   dbFetched: false,
   databaseSSS: {
   },
-  databaseHydrated: false
+  initialServiceInstances: null
 }
 
 export default ( state = initialState, action ) => {
@@ -49,9 +62,9 @@ export default ( state = initialState, action ) => {
         } ).setIn( [ 'insertedIntoDB' ], true ).value()
 
 
-      case DATABASE_HYDRATED:
+      case SERVICES_INITIALIZED:
         return chain( state )
-          .setIn( [ 'databaseHydrated' ], true )
+          .setIn( [ 'initialServiceInstances' ],  ...action.payload.services )
           .value()
 
       case KEY_FETCHED:
