@@ -90,28 +90,28 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
-      navigateToHome()
+      ( loaderBottomSheet as any ).current.snapTo( 0 )
+      props.navigation.navigate( 'HomeNav', {
+        walletName,
+      } )
     }
   }, [ cloudBackupStatus ] )
-
-  const navigateToHome = () => {
-    ( loaderBottomSheet as any ).current.snapTo( 0 )
-    props.navigation.navigate( 'HomeNav', {
-      walletName,
-    } )
-  }
 
   useEffect( () => {
     if( walletSetupCompleted ){
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
       dispatch( initNewBHRFlow( true ) )
+
       if( healthCheckInitializedKeeper === true ){
         if( cloudPermissionGranted ){
           dispatch( setCloudData() )
         } else{
-          navigateToHome()
-        }}
+          ( loaderBottomSheet as any ).current.snapTo( 0 )
+          props.navigation.navigate( 'HomeNav', {
+            walletName,
+          } ) }
+      }
     }
   }, [ walletSetupCompleted, s3service ] )
 
