@@ -45,9 +45,9 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   } )
 
   // eslint-disable-next-line quotes
-  let rampMessage = 'Ramp enables purchases of bitcoin using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'
+  let rampMessage = 'Ramp enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'
 
-  let rampTitle = 'Buy Bitcoins with Ramp'
+  let rampTitle = 'Buy bitcoin with Ramp'
 
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
@@ -88,7 +88,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
               style={ListStyles.infoHeaderSubtitleText}
               numberOfLines={1}
             >
-              Bitcoins will be transferred to
+              bitcoin will be transferred to
             </ListItem.Subtitle>
 
             <ListItem.Title
@@ -116,7 +116,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
               style={ListStyles.infoHeaderSubtitleText}
               numberOfLines={1}
             >
-              Bitcoins will be transferred to
+              bitcoin will be transferred to
             </ListItem.Subtitle>
 
             <ListItem.Title
@@ -139,7 +139,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
 
         </AppBottomSheetTouchableWrapper>
         {rampFromBuyMenu
