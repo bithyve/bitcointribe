@@ -73,8 +73,8 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const showReceiveAmountBottomSheet = useCallback( () => {
     presentBottomSheet(
       <ReceiveAmountContent
-        title={'Receive'}
-        message={'Enter amount in sats'}
+        title={'Receive sats'}
+        message={'Receive sats into the selected account'}
         onPressConfirm={( amount ) => {
           setAmount( amount )
           dismissBottomSheet()
@@ -112,7 +112,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.text}
           >
-            <Text style={styles.titleText}>{'Enter Amount to Receive'}</Text>
+            <Text style={styles.titleText}>{'Enter amount to receive'}</Text>
           </View>
 
           <View style={{
@@ -215,6 +215,10 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           </AppBottomSheetTouchableWrapper>
 
         </View>}
+        <BottomInfoBox
+          title="Note"
+          infoText="It would take some time for the sats to reflect in your account based on the network condition"
+        />
       </ScrollView>
     </View>
   )

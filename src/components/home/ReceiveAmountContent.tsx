@@ -67,10 +67,6 @@ const ReceiveAmountContent = ( {
           <View style={{
             marginTop: 'auto',
           }}>
-            <BottomInfoBox
-              title="Note"
-              infoText="Enter an amount in sats and click the Receive button"
-            />
             <View
               style={{
                 flexDirection: 'row',
