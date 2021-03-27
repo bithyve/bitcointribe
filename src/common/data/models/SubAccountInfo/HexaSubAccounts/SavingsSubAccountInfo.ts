@@ -27,7 +27,8 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   isTFAEnabled = true;
 
   defaultTitle: string;
-  defaultDescription = 'Multi-factor security';
+  defaultSubTitle: string;
+  defaultDescription = 'User Savings Account';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -35,23 +36,25 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.MULTI_SIG_PUBLIC;
 
-  constructor({
+  constructor( {
     id = uuid(),
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Savings Account',
+    defaultSubTitle= 'Multi-factor security',
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     transactions = [],
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = id
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle
+    this.defaultSubTitle = defaultSubTitle
     this.balances = balances
     this.customDisplayName = customDisplayName
     this.customDescription = customDescription
