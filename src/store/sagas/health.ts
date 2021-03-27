@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { call, delay, fork, put, select } from 'redux-saga/effects'
 import {
   createWatcher,
   requestTimedout,
@@ -279,7 +279,7 @@ export const checkSharesHealthWatcher = createWatcher(
 function* updateSharesHealthWorker( { payload } ) {
   // // set a timelapse for auto update and enable instantaneous manual update
   try {
-    console.log( 'modifyLevelStatus payload.shares', payload.shares )
+    console.log( 'modifyLevelStatus payload.shares', payload )
     yield put( updateMSharesLoader( true ) )
     const res = yield call( S3Service.updateHealthKeeper, payload.shares )
     if ( res.status === 200 ) {
@@ -3379,7 +3379,7 @@ function* updateKeeperInfoToTrustedChannelWorker() {
         const data: TrustedDataElements = {
           keeperInfo: encryptedString
         }
-        const res = yield call(
+        const res = yield fork(
           trustedContacts.updateTrustedChannel,
           name,
           data,
@@ -3397,7 +3397,7 @@ function* updateKeeperInfoToTrustedChannelWorker() {
             tag: notificationTag.IMP,
             date: new Date(),
           }
-          const ress = yield call(
+          const ress = yield fork(
             RelayServices.sendNotifications,
             [ {
               walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
@@ -3437,7 +3437,7 @@ function* updateKeeperInfoToTrustedChannelWorker() {
       )
 
       // TODO upload Data
-      const res1 = yield call(
+      const res1 = yield fork(
         LevelHealth.uploadPDFPrimaryShare,
         primaryData.encryptedMetaShare,
         primaryData.messageId

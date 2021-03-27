@@ -106,9 +106,9 @@ export default function KeeperTypeModalContents( props ) {
         }
       }
     }
-    console.log( 'contactCount', contactCount )
-    console.log( 'pdfCount', pdfCount )
-    console.log( 'deviceCount', deviceCount )
+    // console.log("contactCount", contactCount);
+    // console.log("pdfCount", pdfCount);
+    // console.log("deviceCount", deviceCount);
     if ( contactCount >= 2 ) completedKeeperType.push( 'contact' )
     if ( pdfCount >= 1 ) completedKeeperType.push( 'pdf' )
     if ( deviceCount >= 2 ) completedKeeperType.push( 'device' )
