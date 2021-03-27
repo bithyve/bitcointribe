@@ -35,6 +35,11 @@ interface SubAccountDescribing {
   defaultTitle: string;
 
   /**
+   * Default displayable sub title.
+   */
+   defaultSubTitle: string;
+
+  /**
    * A display name set by the user
    */
   customDisplayName: string | null;
@@ -80,6 +85,7 @@ export type SubAccountDescribingConstructorProps = {
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;
+  defaultSubTitle?: string;
   defaultDescription?: string;
   customDisplayName?: string | null;
   customDescription?: string | null;

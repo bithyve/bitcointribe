@@ -75,7 +75,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationContent
         title={'Sent Successfully'}
         info={'Transaction(s) successfully submitted'}
-        infoText={'Bitcoins successfully sent from your account'}
+        infoText={'bitcoin successfully sent from your account'}
         recipients={sendingState.selectedRecipients}
         isFromContact={false}
         okButtonText={'View Account'}
