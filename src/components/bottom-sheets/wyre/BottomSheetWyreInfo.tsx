@@ -47,7 +47,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   // eslint-disable-next-line quotes
   let wyreMessage = `Wyre enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin.`
 
-  let wyreTitle = 'Buy Bitcoins with Wyre'
+  let wyreTitle = 'Buy bitcoin with Wyre'
 
   if( wyreDeepLinkContent && wyreDeepLinkContent.search( 'fail' )>=0 ) {
     wyreMessage = 'Wyre was not able to process your payment. Please try after sometime or use a different payment method'
@@ -88,7 +88,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
               style={ListStyles.infoHeaderSubtitleText}
               numberOfLines={1}
             >
-            Bitcoins will be transferred to
+            bitcoin will be transferred to
             </ListItem.Subtitle>
 
             <ListItem.Title
@@ -116,7 +116,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
               style={ListStyles.infoHeaderSubtitleText}
               numberOfLines={1}
             >
-            Bitcoins will be transferred to
+            bitcoin will be transferred to
             </ListItem.Subtitle>
 
             <ListItem.Title

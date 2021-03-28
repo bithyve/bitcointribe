@@ -2,7 +2,7 @@ import { chain } from 'icepick'
 import {
   CREDS_STORED,
   CREDS_AUTHENTICATED,
-  SETTED_WALLET_DETAILS,
+  COMPLETED_WALLET_SETUP,
   SETUP_LOADING,
   RE_LOGIN,
   AUTH_CRED_CHANGED,
@@ -10,6 +10,7 @@ import {
   PIN_CHANGED_FAILED,
   IS_NEW_HEALTH_SYSTEM,
   INIT_RECOVERY_COMPLETED,
+  WALLET_SETUP_FAILED,
 
 } from '../actions/setupAndAuth'
 
@@ -17,7 +18,8 @@ const initialState: {
   hasCreds: Boolean;
   isAuthenticated: Boolean;
   authenticationFailed: Boolean;
-  walletDetailsSetted: Boolean;
+  walletSetupCompleted: Boolean;
+  walletSetupFailed: Boolean;
   reLogin: Boolean;
   loading: {
     initializing: Boolean;
@@ -26,13 +28,13 @@ const initialState: {
   };
   credsChanged: string;
   pinChangedFailed: Boolean;
-  isNewHealthSystemSet: Boolean;
   initializeRecoveryCompleted: boolean;
 } = {
   hasCreds: false,
   isAuthenticated: false,
   authenticationFailed: false,
-  walletDetailsSetted: false,
+  walletSetupCompleted: false,
+  walletSetupFailed: false,
   reLogin: false,
   loading: {
     initializing: false,
@@ -41,7 +43,6 @@ const initialState: {
   },
   credsChanged: '',
   pinChangedFailed: false,
-  isNewHealthSystemSet: false,
   initializeRecoveryCompleted: false
 }
 
@@ -60,9 +61,14 @@ export default ( state = initialState, action ) => {
           .setIn( [ 'loading', 'authenticating' ], false )
           .value()
 
-      case SETTED_WALLET_DETAILS:
+      case COMPLETED_WALLET_SETUP:
         return chain( state )
-          .setIn( [ 'walletDetailsSetted' ], true )
+          .setIn( [ 'walletSetupCompleted' ], true )
+          .value()
+
+      case WALLET_SETUP_FAILED:
+        return chain( state )
+          .setIn( [ 'walletSetupFailed' ], true )
           .value()
 
       case SETUP_LOADING:
@@ -88,8 +94,6 @@ export default ( state = initialState, action ) => {
           .setIn( [ 'loading', 'authenticating' ], false )
           .value()
 
-
-
       case AUTH_CRED_CHANGED:
         return chain( state )
           .setIn( [ 'credsChanged' ], action.payload.changed ).value()
@@ -99,12 +103,6 @@ export default ( state = initialState, action ) => {
 
       case PIN_CHANGED_FAILED:
         return chain( state ).setIn( [ 'pinChangedFailed' ], action.payload.isFailed ).value()
-
-      case IS_NEW_HEALTH_SYSTEM:
-        return {
-          ...state,
-          isNewHealthSystemSet: action.payload.isNewHealthSystemSet,
-        }
 
       case INIT_RECOVERY_COMPLETED:
         return {

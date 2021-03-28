@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Image,
@@ -8,155 +8,156 @@ import {
   Clipboard,
   NativeModules,
   Platform
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import BottomInfoBox from './BottomInfoBox';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import { APP_LIST, nameToInitials } from '../common/CommonFunctions';
-import { ScrollView } from 'react-native-gesture-handler';
-import Toast from '../components/Toast';
+} from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import BottomInfoBox from './BottomInfoBox'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import { APP_LIST, nameToInitials } from '../common/CommonFunctions'
+import { ScrollView } from 'react-native-gesture-handler'
+import Toast from '../components/Toast'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../common/constants/wallet-service-types';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+} from '../common/constants/wallet-service-types'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 //var isPackageInstalled = require('NativeModules').CheckPackageInstallation.isPackageInstalled;
 
-export default function SendViaLink(props) {
-  const [contactName, setContactName] = useState('');
+export default function SendViaLink( props ) {
+  const [ contactName, setContactName ] = useState( '' )
 
-  const [shareLink, setShareLink] = useState('');
-  const [infoText, setInfoText] = useState('');
-  const [stateUpdate, setStateUpdate] = useState(false);
+  const [ shareLink, setShareLink ] = useState( '' )
+  const [ infoText, setInfoText ] = useState( '' )
+  const [ stateUpdate, setStateUpdate ] = useState( false )
 
-  const [serviceType, setServiceType] = useState(
+  const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
-  );
-  const [shareApps, setShareApps] = useState([
+  )
+  const [ shareApps, setShareApps ] = useState( [
     {
-      title: `WhatsApp`,
-      image: require('../assets/images/icons/whatsapp.png'),
+      title: 'WhatsApp',
+      image: require( '../assets/images/icons/whatsapp.png' ),
       url: 'whatsapp://send?',
       isAvailable: false,
     },
     {
-      title: `Telegram`,
-      image: require('../assets/images/icons/telegram.png'),
+      title: 'Telegram',
+      image: require( '../assets/images/icons/telegram.png' ),
       url: 'https://t.me/share/url?url=',
       isAvailable: false,
     },
     {
-      title: `Messenger`,
-      image: require('../assets/images/icons/messenger.png'),
+      title: 'Messenger',
+      image: require( '../assets/images/icons/messenger.png' ),
       url: 'http://m.me/',
       isAvailable: false,
     },
     {
-      title: `Copy Link`,
-      image: require('../assets/images/icons/copylink_share.png'),
+      title: 'Copy Link',
+      image: require( '../assets/images/icons/copylink_share.png' ),
       url: '',
       isAvailable: true,
     },
-  ]);
-  const contact = props.contact;
+  ] )
+  const contact = props.contact
   // console.log("Contact SEND VIA LINK", contact);
-  const [Contact, setContact] = useState(props.contact ? props.contact : {});
+  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
+  } )
 
-  useEffect(() => {
-    let contactName =
+  useEffect( () => {
+    const contactName =
       Contact && Contact.firstName && Contact.lastName
         ? Contact.firstName + ' ' + Contact.lastName
         : Contact && Contact.firstName && !Contact.lastName
-        ? Contact.firstName
-        : Contact && !Contact.firstName && Contact.lastName
-        ? Contact.lastName
-        : '';
-    setContactName(contactName);
-  }, [Contact]);
+          ? Contact.firstName
+          : Contact && !Contact.firstName && Contact.lastName
+            ? Contact.lastName
+            : ''
+    setContactName( contactName )
+  }, [ Contact ] )
 
-  useEffect(() => {
-    if (props.serviceType) {
-      setServiceType(props.serviceType);
+  useEffect( () => {
+    if ( props.serviceType ) {
+      setServiceType( props.serviceType )
     }
-  }, [props.serviceType]);
+  }, [ props.serviceType ] )
 
-  useEffect(() => {
-    setContact(props.contact);
-    (async () => {
-      for (let i = 0; i < shareApps.length; i++) {
-        if (shareApps[i].url) {
-      isAppInstalled(shareApps[i].title)
-    .then((isInstalled) => {
-      // console.log("isInstalled", isInstalled);
-      shareApps[i].isAvailable = Boolean(isInstalled);
-        // isInstalled is true if the app is installed or false if not
-    });
+  useEffect( () => {
+    setContact( props.contact );
+    ( async () => {
+      for ( let i = 0; i < shareApps.length; i++ ) {
+        if ( shareApps[ i ].url ) {
+          isAppInstalled( shareApps[ i ].title )
+            .then( ( isInstalled ) => {
+              // console.log("isInstalled", isInstalled);
+              shareApps[ i ].isAvailable = Boolean( isInstalled )
+              // isInstalled is true if the app is installed or false if not
+            } )
           //let supported = await Linking.canOpenURL(shareApps[i].url);
         }
       }
-      setTimeout(() => {
-        setShareApps(shareApps);
-      }, 2);
-      setStateUpdate(!stateUpdate);
-    })();
-  }, [contact]);
+      setTimeout( () => {
+        setShareApps( shareApps )
+      }, 2 )
+      setStateUpdate( !stateUpdate )
+    } )()
+  }, [ contact ] )
 
   function writeToClipboard() {
-    if (infoText) {
-      Clipboard.setString(infoText + '\n' + shareLink);
+    if ( infoText ) {
+      Clipboard.setString( infoText + '\n' + shareLink )
     } else {
-      Clipboard.setString(shareLink);
+      Clipboard.setString( shareLink )
     }
-    Toast('Copied Successfully');
+    Toast( 'Copied Successfully' )
   }
 
-  const checkPackageName = (packagename) => {
-    return new Promise(async (resolve, reject) => {
+  const checkPackageName = ( packagename ) => {
+    return new Promise( async ( resolve, reject ) => {
 
-      NativeModules.CheckPackageInstallation.isPackageInstalled(packagename, (isInstalled) => {
+      NativeModules.CheckPackageInstallation.isPackageInstalled( packagename, ( isInstalled ) => {
         // console.log("RESOLVE", packagename, resolve);
-            resolve(isInstalled);
-        });
-    });
-}
+        resolve( isInstalled )
+      } )
+    } )
+  }
 
-function checkURLScheme(proto, query) {
-  return new Promise((resolve, reject) => {
+  function checkURLScheme( proto, query ) {
+    return new Promise( ( resolve, reject ) => {
       Linking
-          .canOpenURL(proto + '://' + query || '')
-          .then((isInstalled) => {
-              resolve(isInstalled);
-          })
-          .catch((err) => {
-              reject(err);
-          });
-  });
-}
+        .canOpenURL( proto + '://' + query || '' )
+        .then( ( isInstalled ) => {
+          resolve( isInstalled )
+        } )
+        .catch( ( err ) => {
+          reject( err )
+        } )
+    } )
+  }
 
-const isAppInstalled = (key) => {
-  let isAppInstalled = Platform.select({
-    ios: () => { return isAppInstalledIOS(key); },
-    android: () => { return isAppInstalledAndroid(key); }
-})();
-// console.log("isAppInstalled", isAppInstalled)
-  return isAppInstalled;
-}
+  const isAppInstalled = ( key ) => {
+    const isAppInstalled = Platform.select( {
+      ios: () => { return isAppInstalledIOS( key ) },
+      android: () => { return isAppInstalledAndroid( key ) }
+    } )()
+    // console.log("isAppInstalled", isAppInstalled)
+    return isAppInstalled
+  }
 
-function isAppInstalledAndroid(key) {
-  return checkPackageName(APP_LIST[key].pkgName);
-}
+  function isAppInstalledAndroid( key ) {
+    return checkPackageName( APP_LIST[ key ].pkgName )
+  }
 
-function isAppInstalledIOS(key) {
+  function isAppInstalledIOS( key ) {
   //console.log("isAppInstalledIOS", checkURLScheme(APP_LIST[key].urlScheme, APP_LIST[key].urlParams))
-  return checkURLScheme(APP_LIST[key].urlScheme, APP_LIST[key].urlParams);
-}
+    return checkURLScheme( APP_LIST[ key ].urlScheme, APP_LIST[ key ].urlParams )
+  }
 
   const renderVerticalDivider = () => {
     return (
@@ -170,58 +171,58 @@ function isAppInstalledIOS(key) {
           alignSelf: 'center',
         }}
       />
-    );
-  };
+    )
+  }
 
-  useEffect(() => {
-    setShareLink(props.link);
-    if (props.infoText) setInfoText(props.infoText);
-  }, [props.link]);
+  useEffect( () => {
+    setShareLink( props.link )
+    if ( props.infoText ) setInfoText( props.infoText )
+  }, [ props.link ] )
 
-  const openWhatsApp = (appUrl) => {
-    if (shareLink) {
-      let url = appUrl + 'text=' + infoText + '\n' + shareLink; //+ '&phone=' + mobile;
-      Linking.openURL(url)
-        .then((data) => {
+  const openWhatsApp = ( appUrl ) => {
+    if ( shareLink ) {
+      const url = appUrl + 'text=' + infoText + '\n' + shareLink //+ '&phone=' + mobile;
+      Linking.openURL( url )
+        .then( ( data ) => {
           // console.log('WhatsApp Opened');
-        })
-        .catch(() => {
-          alert('Make sure WhatsApp installed on your device');
-        });
+        } )
+        .catch( () => {
+          alert( 'Make sure WhatsApp installed on your device' )
+        } )
     }
-  };
+  }
 
-  const openTelegram = (appUrl) => {
-    if (shareLink) {
-      let url = appUrl + infoText + '\n' + shareLink;
-      Linking.openURL(url)
-        .then((data) => {
+  const openTelegram = ( appUrl ) => {
+    if ( shareLink ) {
+      const url = appUrl + infoText + '\n' + shareLink
+      Linking.openURL( url )
+        .then( ( data ) => {
           // console.log('Telegram Opened');
-        })
-        .catch(() => {
-          alert('Make sure Telegram installed on your device');
-        });
+        } )
+        .catch( () => {
+          alert( 'Make sure Telegram installed on your device' )
+        } )
     }
-  };
+  }
 
-  const openMessenger = (appUrl) => {
-    if (shareLink) {
-      let url = appUrl;
-          Linking.openURL(url)
-          .then((data) => {
-            // console.log('Messenger Opened');
-          })
-          .catch(() => {
-            alert('Make sure Facebook Messenger installed on your device');
-          });
-      }
+  const openMessenger = ( appUrl ) => {
+    if ( shareLink ) {
+      const url = appUrl
+      Linking.openURL( url )
+        .then( ( data ) => {
+          // console.log('Messenger Opened');
+        } )
+        .catch( () => {
+          alert( 'Make sure Facebook Messenger installed on your device' )
+        } )
+    }
   }
 
   const setPhoneNumber = () =>{
-    let phoneNumber = Contact.phoneNumbers[0].number;
-    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-    number = number.slice(number.length - 10); // last 10 digits only
-    return number;
+    const phoneNumber = Contact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    return number
   }
 
   return (
@@ -231,14 +232,16 @@ function isAppInstalledIOS(key) {
           alignItems: 'center',
           flexDirection: 'row',
           paddingRight: 10,
-          paddingBottom: hp('1.5%'),
-          paddingTop: hp('1%'),
+          paddingBottom: hp( '1.5%' ),
+          paddingTop: hp( '1%' ),
           marginLeft: 10,
           marginRight: 10,
-          marginBottom: hp('1.5%'),
+          marginBottom: hp( '1.5%' ),
         }}
       >
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flexDirection: 'row', alignItems: 'center'
+        }}>
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressBack();
@@ -247,14 +250,16 @@ function isAppInstalledIOS(key) {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper> */}
-          <View style={{ flex: 1, marginLeft: 5 }}>
+          <View style={{
+            flex: 1, marginLeft: 5
+          }}>
             <Text style={styles.modalHeaderTitleText}>
               {props.headerText ? props.headerText : 'Send Request via Link'}
             </Text>
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontSize: RFValue(12),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular,
                 paddingTop: 5,
               }}
@@ -268,8 +273,8 @@ function isAppInstalledIOS(key) {
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressDone()}
               style={{
-                height: wp('8%'),
-                width: wp('18%'),
+                height: wp( '8%' ),
+                width: wp( '18%' ),
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: Colors.blue,
@@ -281,7 +286,7 @@ function isAppInstalledIOS(key) {
               <Text
                 style={{
                   color: Colors.white,
-                  fontSize: RFValue(12),
+                  fontSize: RFValue( 12 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
@@ -292,16 +297,22 @@ function isAppInstalledIOS(key) {
         </View>
       </View>
       <ScrollView
-        style={{ marginTop: props.isFromReceive ? hp('0.1%') : hp('1.7%') }}
+        style={{
+          marginTop: props.isFromReceive ? hp( '0.1%' ) : hp( '1.7%' )
+        }}
       >
         <View
-          style={{ marginLeft: 20, marginRight: 20, marginBottom: hp('1.7%') }}
+          style={{
+            marginLeft: 20, marginRight: 20, marginBottom: hp( '1.7%' )
+          }}
         >
           {!props.isFromReceive ? (
             <View>
               {contact && (
                 <View style={styles.contactProfileView}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center'
+                  }}>
                     <View
                       style={{
                         flexDirection: 'row',
@@ -313,13 +324,15 @@ function isAppInstalledIOS(key) {
                         borderRadius: 10,
                       }}
                     >
-                      <View style={{ marginLeft: 70 }}>
+                      <View style={{
+                        marginLeft: 70
+                      }}>
                         {props.contactText ? (
                           <Text
                             style={{
                               color: Colors.textColorGrey,
                               fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(11),
+                              fontSize: RFValue( 11 ),
                               marginLeft: 25,
                               paddingTop: 5,
                               paddingBottom: 3,
@@ -336,34 +349,34 @@ function isAppInstalledIOS(key) {
                         {Contact &&
                         Contact.phoneNumbers &&
                         Contact.phoneNumbers.length ? (
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
-                              marginLeft: 25,
-                              paddingTop: 3,
-                            }}
-                          >
-                            {setPhoneNumber()}
-                            {/* {Contact.phoneNumbers[0].digits} */}
-                          </Text>
-                        ) : Contact &&
+                            <Text
+                              style={{
+                                color: Colors.textColorGrey,
+                                fontFamily: Fonts.FiraSansRegular,
+                                fontSize: RFValue( 10 ),
+                                marginLeft: 25,
+                                paddingTop: 3,
+                              }}
+                            >
+                              {setPhoneNumber()}
+                              {/* {Contact.phoneNumbers[0].digits} */}
+                            </Text>
+                          ) : Contact &&
                           Contact.emails &&
                           Contact.emails.length ? (
-                          <Text
-                            style={{
-                              color: Colors.textColorGrey,
-                              fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(10),
-                              marginLeft: 25,
-                              paddingTop: 3,
-                              paddingBottom: 5,
-                            }}
-                          >
-                            {Contact.emails[0].email}
-                          </Text>
-                        ) : null}
+                              <Text
+                                style={{
+                                  color: Colors.textColorGrey,
+                                  fontFamily: Fonts.FiraSansRegular,
+                                  fontSize: RFValue( 10 ),
+                                  marginLeft: 25,
+                                  paddingTop: 3,
+                                  paddingBottom: 5,
+                                }}
+                              >
+                                {Contact.emails[ 0 ].email}
+                              </Text>
+                            ) : null}
                       </View>
                     </View>
                     {Contact && Contact.imageAvailable ? (
@@ -375,12 +388,16 @@ function isAppInstalledIOS(key) {
                           alignItems: 'center',
                           justifyContent: 'center',
                           shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
+                          shadowOffset: {
+                            width: 2, height: 2
+                          },
                         }}
                       >
                         <Image
                           source={Contact.image}
-                          style={{ ...styles.contactProfileImage }}
+                          style={{
+                            ...styles.contactProfileImage
+                          }}
                         />
                       </View>
                     ) : (
@@ -397,17 +414,19 @@ function isAppInstalledIOS(key) {
                           borderRadius: 70 / 2,
                           shadowColor: Colors.shadowBlue,
                           shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
+                          shadowOffset: {
+                            width: 2, height: 2
+                          },
                         }}
                       >
                         <Text
                           style={{
                             textAlign: 'center',
-                            fontSize: RFValue(20),
-                            lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                            fontSize: RFValue( 20 ),
+                            lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
                           }}
                         >
-                          {nameToInitials(contactName)}
+                          {nameToInitials( contactName )}
                         </Text>
                       </View>
                     )}
@@ -432,7 +451,7 @@ function isAppInstalledIOS(key) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
+                      fontSize: RFValue( 12 ),
                       fontFamily: Fonts.FiraSansRegular,
                       textAlign: 'center',
                     }}
@@ -442,10 +461,10 @@ function isAppInstalledIOS(key) {
                       {serviceType && serviceType == TEST_ACCOUNT
                         ? '  Test Account'
                         : serviceType && serviceType == REGULAR_ACCOUNT
-                        ? '  Checking Account'
-                        : serviceType && serviceType == SECURE_ACCOUNT
-                        ? '  Saving Account'
-                        : ''}
+                          ? '  Checking Account'
+                          : serviceType && serviceType == SECURE_ACCOUNT
+                            ? '  Saving Account'
+                            : ''}
                     </Text>
                   </Text>
                   {/* <Ionicons
@@ -461,7 +480,7 @@ function isAppInstalledIOS(key) {
                   <Text
                     style={{
                       color: Colors.blue,
-                      fontSize: RFValue(13),
+                      fontSize: RFValue( 13 ),
                       fontFamily: Fonts.FiraSansRegular,
                       marginLeft: 5,
                     }}
@@ -485,14 +504,14 @@ function isAppInstalledIOS(key) {
                       <View style={styles.amountInputImage}>
                         <Image
                           style={styles.textBoxImage}
-                          source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                          source={require( '../assets/images/icons/icon_bitcoin_gray.png' )}
                         />
                       </View>
                       {renderVerticalDivider()}
                       <Text
                         style={{
                           color: Colors.black,
-                          fontSize: RFValue(20),
+                          fontSize: RFValue( 20 ),
                           fontFamily: Fonts.FiraSansRegular,
                           marginLeft: 10,
                         }}
@@ -502,7 +521,7 @@ function isAppInstalledIOS(key) {
                       <Text
                         style={{
                           color: Colors.textColorGrey,
-                          fontSize: RFValue(13),
+                          fontSize: RFValue( 13 ),
                           fontFamily: Fonts.FiraSansRegular,
                           marginRight: 5,
                         }}
@@ -549,7 +568,7 @@ function isAppInstalledIOS(key) {
             <Text
               style={{
                 color: Colors.lightBlue,
-                fontSize: RFValue(13),
+                fontSize: RFValue( 13 ),
                 fontFamily: Fonts.FiraSansRegular,
                 paddingTop: 5,
               }}
@@ -564,12 +583,12 @@ function isAppInstalledIOS(key) {
               marginLeft: 20,
               marginRight: 20,
               marginTop: props.isFromReceive ? 15 : 40,
-              marginBottom: props.isFromReceive ? hp('2%') : hp('4%'),
+              marginBottom: props.isFromReceive ? hp( '2%' ) : hp( '4%' ),
             }}
           >
             <ScrollView horizontal={true}>
-              {shareApps.map((item) => {
-                if (item.isAvailable) {
+              {shareApps.map( ( item ) => {
+                if ( item.isAvailable ) {
                   return (
                     <AppBottomSheetTouchableWrapper
                       onPress={() => {
@@ -577,11 +596,11 @@ function isAppInstalledIOS(key) {
                           item.title == 'Copy Link' ||
                           item.title == 'Copy address'
                         )
-                          writeToClipboard();
+                          writeToClipboard()
 
-                        if (item.title == 'WhatsApp') openWhatsApp(item.url);
-                        if (item.title == 'Telegram') openTelegram(item.url);
-                        if (item.title == 'Messenger') openMessenger(item.url);
+                        if ( item.title == 'WhatsApp' ) openWhatsApp( item.url )
+                        if ( item.title == 'Telegram' ) openTelegram( item.url )
+                        if ( item.title == 'Messenger' ) openMessenger( item.url )
                       }}
                       style={{
                         ...styles.addModalView,
@@ -606,33 +625,39 @@ function isAppInstalledIOS(key) {
                               width: 15,
                               height: 15,
                               shadowOpacity: 1,
-                              shadowOffset: { width: 5, height: 5 },
+                              shadowOffset: {
+                                width: 5, height: 5
+                              },
                             }}
                           >
                             <Image
                               source={item.image}
-                              style={{ width: 50, height: 50 }}
+                              style={{
+                                width: 50, height: 50
+                              }}
                             />
                           </View>
                           <Text style={styles.addModalInfoText}>
-                            {item.title == `Copy Link`
+                            {item.title == 'Copy Link'
                               ? !props.contact && props.isFromReceive
-                                ? `Copy address`
-                                : `Copy Link`
+                                ? 'Copy address'
+                                : 'Copy Link'
                               : item.title}
                           </Text>
                         </View>
                       </View>
                     </AppBottomSheetTouchableWrapper>
-                  );
+                  )
                 }
-              })}
+              } )}
             </ScrollView>
           </View>
         </View>
       </ScrollView>
       {!props.isFromReceive ? (
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{
+          marginTop: 'auto'
+        }}>
           <BottomInfoBox
             title={'Sharing options'}
             infoText={
@@ -642,9 +667,9 @@ function isAppInstalledIOS(key) {
         </View>
       ) : null}
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   addModalView: {
     padding: 7,
     flexDirection: 'row',
@@ -659,13 +684,13 @@ const styles = StyleSheet.create({
   },
   addModalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 35,
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
@@ -695,11 +720,13 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
   },
   contactNameText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
@@ -713,7 +740,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
@@ -723,7 +750,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
@@ -736,8 +763,8 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   textBoxImage: {
-    width: wp('6%'),
-    height: wp('6%'),
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     resizeMode: 'contain',
   },
   boldItalicText: {
@@ -748,23 +775,25 @@ const styles = StyleSheet.create({
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp('1%'),
+    marginTop: hp( '1%' ),
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1.5%'),
+    paddingBottom: hp( '1.5%' ),
+    paddingTop: hp( '1.5%' ),
   },
   dropdownBoxModal: {
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-    marginTop: hp('1%'),
-    width: wp('90%'),
-    height: hp('18%'),
+    marginTop: hp( '1%' ),
+    width: wp( '90%' ),
+    height: hp( '18%' ),
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0, height: 10
+    },
     backgroundColor: Colors.white,
     position: 'absolute',
     zIndex: 9999,
@@ -776,4 +805,4 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingLeft: 15,
   },
-});
+} )

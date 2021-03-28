@@ -52,8 +52,9 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
-import { setIsNewHealthSystemSet } from '../../store/actions/setupAndAuth'
+import { initNewBHRFlow } from '../../store/actions/health'
 import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -90,7 +91,7 @@ interface UpgradeBackupPropsTypes {
   accountShells: AccountShell[];
   activePersonalNode: PersonalNode;
   isBackupProcessing: any;
-  setIsNewHealthSystemSet: any;
+  initNewBHRFlow: any;
   versionHistory: any;
   setCloudData: any;
 }
@@ -233,7 +234,7 @@ class UpgradeBackup extends Component<
     const { listData } = this.state
     if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
       listData[ 0 ].status = 'accessible'
-      this.props.setIsNewHealthSystemSet( true )
+      this.props.initNewBHRFlow( true )
       this.props.navigation.replace( 'ManageBackupNewBHR' )
     }
     else{
@@ -675,7 +676,7 @@ const mapStateToProps = ( state ) => {
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+      idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
@@ -695,7 +696,7 @@ export default withNavigationFocus(
     initializeHealthSetup,
     updateHealthForCloud,
     updateMSharesHealth,
-    setIsNewHealthSystemSet,
+    initNewBHRFlow,
     setCloudData
   } )( UpgradeBackup )
 )

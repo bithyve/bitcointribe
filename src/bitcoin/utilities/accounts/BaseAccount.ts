@@ -558,8 +558,6 @@ export default class BaseAccount {
         data: {
           txid: any;
           funded: any;
-          balances: any;
-          transactions: any;
         };
         err?: undefined;
         message?: undefined;

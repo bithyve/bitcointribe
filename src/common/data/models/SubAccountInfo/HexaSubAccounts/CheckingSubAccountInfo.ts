@@ -27,7 +27,8 @@ implements HexaSubAccountDescribing {
   isTFAEnabled = false;
 
   defaultTitle: string;
-  defaultDescription = 'Fast and easy';
+  defaultSubTitle: string;
+  defaultDescription = 'User Checking Account';
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -35,23 +36,25 @@ implements HexaSubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
-  constructor({
+  constructor( {
     id = uuid(),
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Checking Account',
+    defaultSubTitle= 'Fast and easy',
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     transactions = [],
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = id
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle
+    this.defaultSubTitle = defaultSubTitle
     this.balances = balances
     this.customDisplayName = customDisplayName
     this.customDescription = customDescription

@@ -1,6 +1,4 @@
 import { Action } from 'redux'
-import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -89,13 +87,9 @@ export const fetchBalanceTx = (
   }
 }
 
-export const getTestcoins = ( serviceType ) => {
-  // Test account specific
-  // console.log("Called getTestcoins", new Date())
+export const getTestcoins = ( ) => {
   return {
-    type: GET_TESTCOINS, payload: {
-      serviceType
-    }
+    type: GET_TESTCOINS,
   }
 }
 
@@ -461,7 +455,6 @@ export const accountShellOrderedToFront = (
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
-export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING'
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED'
 export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED'
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
@@ -480,11 +473,9 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
 
-export const testcoinsReceived = ( serviceType, service ) => {
+export const testcoinsReceived = ( ) => {
   return {
-    type: TESTCOINS_RECEIVED, payload: {
-      serviceType, service
-    }
+    type: TESTCOINS_RECEIVED
   }
 }
 
@@ -492,14 +483,6 @@ export const transactionsFetched = ( serviceType, transactions ) => {
   return {
     type: TRANSACTIONS_FETCHED, payload: {
       serviceType, transactions
-    }
-  }
-}
-
-export const switchLoader = ( serviceType, beingLoaded ) => {
-  return {
-    type: ACCOUNTS_LOADING, payload: {
-      serviceType, beingLoaded
     }
   }
 }
@@ -539,14 +522,6 @@ export const twoFAResetted = ( resetted ) => {
   return {
     type: TWO_FA_RESETTED, payload: {
       resetted
-    }
-  }
-}
-
-export const settedDonationAccount = ( serviceType, successful ) => {
-  return {
-    type: SETTED_DONATION_ACC, payload: {
-      serviceType, successful
     }
   }
 }

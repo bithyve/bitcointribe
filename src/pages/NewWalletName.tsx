@@ -29,8 +29,6 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { updateCloudPermission } from '../store/actions/health'
-import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
-import { initializeDBHydration } from '../store/actions/storage'
 
 export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
@@ -38,15 +36,6 @@ export default function NewWalletName( props ) {
   const [ doCloudBackup, setDoCloudBackup ] = useState( true )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const dispatch = useDispatch()
-  const isDBHydrated = useInitialDBHydrationState()
-  useEffect( ()=>{
-    InteractionManager.runAfterInteractions( () => {
-      if( !isDBHydrated ){
-        dispatch( initializeDBHydration() )
-      }
-    } )
-
-  }, [] )
 
   return (
     <SafeAreaView style={{

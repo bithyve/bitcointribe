@@ -28,6 +28,7 @@ import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
   clearPaymentDetails,
+  walletCheckIn,
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -60,7 +61,7 @@ import {
   downloadPdfShare,
 } from '../../store/actions/health'
 import axios from 'axios'
-import { initializeHealthSetup } from '../../store/actions/health'
+import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/health'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import { MetaShare } from '../../bitcoin/utilities/Interface'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
@@ -73,6 +74,7 @@ import SendViaLink from '../../components/SendViaLink'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { getCloudDataRecovery, clearCloudCache } from '../../store/actions/cloud'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -121,6 +123,8 @@ interface RestoreWithICloudPropsTypes {
   getCloudDataRecovery: any;
   cloudData: any;
   clearCloudCache: any;
+  initNewBHRFlow: any;
+  walletCheckIn: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -180,7 +184,9 @@ class RestoreWithICloud extends Component<
       SERVICES,
       checkMSharesHealth,
       walletRecoveryFailed,
-      cloudData
+      cloudData,
+      walletCheckIn,
+      initNewBHRFlow
     } = this.props
     if( prevProps.cloudData !== cloudData ){
       this.getData( cloudData )
@@ -188,7 +194,9 @@ class RestoreWithICloud extends Component<
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
       await AsyncStorage.setItem( 'walletExists', 'true' )
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
+      initNewBHRFlow( true )
       checkMSharesHealth()
+      walletCheckIn()
       if ( this.refs.loaderBottomSheet as any )
         ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'HomeNav' )
@@ -643,7 +651,7 @@ class RestoreWithICloud extends Component<
             <TouchableOpacity
               onPress={() => {
                 this.props.clearCloudCache()
-                navigation.goBack()
+                navigation.navigate( 'WalletInitialization' )
               }}
               style={styles.headerBackArrowView}
             >
@@ -660,7 +668,7 @@ class RestoreWithICloud extends Component<
                 {'Recover using keys'}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-              The status of your Recovery Key request is visible below.
+              The status of your Recovery Key request is visible below
               </Text>
             </View>
           </View>
@@ -673,7 +681,8 @@ class RestoreWithICloud extends Component<
             />
           }
           style={{
-            flex: 1
+            flex: 1,
+            marginBottom: hp( '2%' ),
           }}
         >
           {cloudBackup &&
@@ -791,6 +800,20 @@ class RestoreWithICloud extends Component<
               )
             } )}
         </ScrollView>
+        <View
+          style={{
+            flexDirection: 'row',
+            marginLeft: 25,
+            marginRight: 25,
+            marginTop: 'auto',
+            marginBottom: hp( '1%' ),
+            alignItems: 'center',
+          }}
+        >
+          <Text style={styles.modalHeaderInfoText}>
+        Use Send Request to share a link with a contact. If the person you wish to backup your Recovery Key with, is with you in person, use Scan Key. Or they could also send you a screenshot of the QR for you to scan
+          </Text>
+        </View>
         <View
           style={{
             flexDirection: 'row',
@@ -1268,7 +1291,7 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.sss.service ),
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     cloudBackupStatus:
-      idx( state, ( _ ) => _.preferences.cloudBackupStatus ) || false,
+      idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     security: idx( state, ( _ ) => _.storage.database.WALLET_SETUP.security ),
@@ -1301,7 +1324,9 @@ export default withNavigationFocus(
     updateCloudMShare,
     requestShare,
     getCloudDataRecovery,
-    clearCloudCache
+    clearCloudCache,
+    initNewBHRFlow,
+    walletCheckIn
   } )( RestoreWithICloud )
 )
 

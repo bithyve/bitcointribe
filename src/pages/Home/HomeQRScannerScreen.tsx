@@ -134,7 +134,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         >
           <Button
             raised
-            title="Receive Bitcoins"
+            title="Receive bitcoin"
             icon={
               <Image
                 source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}

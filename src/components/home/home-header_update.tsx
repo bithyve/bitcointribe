@@ -72,9 +72,13 @@ const HomeHeader = ( {
   )
   const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
-  
+
   const s3Service: S3Service = useSelector(
     ( state ) => state.health.service
+  )
+
+  const newBHRFlowStarted = useSelector(
+    ( state ) => state.health.newBHRFlowStarted
   )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
@@ -139,7 +143,7 @@ const HomeHeader = ( {
   const getMessageToShow = () => {
     let name = ''
     let message = ''
-    if ( levelHealth.length ) {
+    if ( levelHealth && levelHealth.length && newBHRFlowStarted === true ) {
       for ( let i = 0; i < levelHealth.length; i++ ) {
         const element = levelHealth[ i ].levelInfo
         let j = 0
@@ -323,10 +327,11 @@ const HomeHeader = ( {
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            if (s3Service.levelhealth.healthCheckInitializedKeeper === true) {
-            navigation.navigate( 'ManageBackupNewBHR' )
+            console.log( 'newBHRFlowStarted', newBHRFlowStarted )
+            if ( newBHRFlowStarted === true ) {
+              navigation.navigate( 'ManageBackupNewBHR' )
             } else {
-              navigation.navigate("ManageBackup");
+              navigation.navigate( 'ManageBackup' )
             }
           }}
           style={styles.manageBackupMessageView}

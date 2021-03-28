@@ -77,7 +77,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     if ( showsBalance ) {
       return `${subAccountInfo.balances.confirmed} ${unitText}`
     } else {
-      return subAccountInfo.customDescription ? subAccountInfo.customDescription : subAccountInfo.defaultDescription
+      return subAccountInfo.defaultSubTitle ? subAccountInfo.defaultSubTitle : subAccountInfo.defaultDescription
     }
   }, [ showsBalance, subAccountInfo ] )
 

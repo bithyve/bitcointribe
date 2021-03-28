@@ -75,7 +75,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
         <Input
           inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
           inputStyle={FormStyles.inputText}
-          placeholder={'Enter An Account Name'}
+          placeholder={'Enter an account name'}
           placeholderTextColor={FormStyles.placeholderText.color}
           underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountName}

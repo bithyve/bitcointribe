@@ -33,7 +33,8 @@ import {
   PUT_KEEPER_INFO,
   SM_META_SHARE_GENERATE,
   UPLOAD_SUCCESSFULLY_SM,
-  UPDATE_CLOUD_PERMISSION
+  UPDATE_CLOUD_PERMISSION,
+  INIT_NEW_BHR
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
@@ -114,6 +115,7 @@ const initialState: {
   isSmMetaSharesCreatedFlag: boolean;
   uploadSMSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
+  newBHRFlowStarted: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -166,7 +168,8 @@ const initialState: {
   },
   isSmMetaSharesCreatedFlag: false,
   uploadSMSuccessfully: false,
-  cloudPermissionGranted: null
+  cloudPermissionGranted: null,
+  newBHRFlowStarted: false
 }
 
 export default ( state = initialState, action ) => {
@@ -405,6 +408,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           cloudPermissionGranted: action.payload.cloudPermissionGranted
+        }
+
+      case INIT_NEW_BHR:
+        return {
+          ...state,
+          newBHRFlowStarted: action.payload.newBHRFlowStarted
         }
   }
   return state

@@ -30,19 +30,16 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWalletDetails } from '../store/actions/setupAndAuth'
+import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
-import { getTestcoins } from '../store/actions/accounts'
-import { TEST_ACCOUNT } from '../common/constants/wallet-service-types'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import CloudBackup from '../common/CommonFunctions/CloudBackup'
-import { initializeHealthSetup } from '../store/actions/health'
-import { googleDriveLogin, setCloudData } from '../store/actions/cloud'
-import useInitialDBHydrationState from '../utils/hooks/state-selectors/storage/useInitialDBHydrationState'
+import { initializeHealthSetup, initNewBHRFlow } from '../store/actions/health'
+import {  setCloudData } from '../store/actions/cloud'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -80,91 +77,70 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { walletDetailsSetted } = useSelector( ( state ) => state.setupAndAuth )
-  const { isInitialized } = useSelector( ( state: { setupAndAuth: any } ) => state.setupAndAuth )
+  const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
-  const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
-  const testAccService = accounts[ TEST_ACCOUNT ].service
+
   const s3service = useSelector( ( state ) => state.health.service )
-  const isDBHydrated = useInitialDBHydrationState()
-  const [ loginSuccess, setLoginSuccess ] = useState( '' )
-  const isGoogleLoginSuccess = useSelector( ( state ) => state.cloud.isGoogleLoginSuccess )
-  const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
+  const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
 
-  useEffect( () => {
-    if ( isDBHydrated ){
-      // get test-sats(10K)
-      dispatch( getTestcoins( TEST_ACCOUNT ) )
 
-      // initialize health-check schema on relay
-      if( s3service ){
-        const { healthCheckInitializedKeeper } = s3service.levelhealth
-        if ( healthCheckInitializedKeeper === false ) {
-          dispatch( initializeHealthSetup() )
-        }
-      }
+  useEffect( () => {
+    if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
+      ( loaderBottomSheet as any ).current.snapTo( 0 )
+      props.navigation.navigate( 'HomeNav', {
+        walletName,
+      } )
     }
-  }, [ isDBHydrated ] )
+  }, [ cloudBackupStatus ] )
 
   useEffect( () => {
-    if( backupStatus === null ) return
-    if( backupStatus || backupStatus === false ){
-      navigateToHome()
-    }
-  }, [ backupStatus ] )
-
-  const navigateToHome = () => {
-    ( loaderBottomSheet as any ).current.snapTo( 0 )
-    props.navigation.navigate( 'HomeNav', {
-      walletName,
-    } )
-  }
-
-  useEffect( () => {
-    if( walletDetailsSetted ){
+    if( walletSetupCompleted ){
       const { healthCheckInitializedKeeper } = s3service.levelhealth
       dispatch( walletCheckIn() )
-      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        navigateToHome()
+      dispatch( initNewBHRFlow( true ) )
+
+      if( healthCheckInitializedKeeper === true ){
+        if( cloudPermissionGranted ){
+          dispatch( setCloudData() )
+        } else{
+          ( loaderBottomSheet as any ).current.snapTo( 0 )
+          props.navigation.navigate( 'HomeNav', {
+            walletName,
+          } ) }
       }
     }
-  }, [ walletDetailsSetted ] )
+  }, [ walletSetupCompleted, s3service ] )
 
   const checkCloudLogin = () =>{
-
-    if( isDBHydrated ){
-      showLoader()
-      const security = {
-        questionId: dropdownBoxValue.id,
-        question: dropdownBoxValue.question,
-        answer,
-      }
-      dispatch( setupWalletDetails( walletName, security ) )
-      dispatch( setVersion( 'Current' ) )
-      const current = Date.now()
-      AsyncStorage.setItem(
-        'SecurityAnsTimestamp',
-        JSON.stringify( current ),
-      )
-      const securityQuestionHistory = {
-        created: current,
-      }
-      AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify( securityQuestionHistory ),
-      )
+    showLoader()
+    const security = {
+      questionId: dropdownBoxValue.id,
+      question: dropdownBoxValue.question,
+      answer,
     }
-
+    dispatch( setupWallet( walletName, security ) )
+    dispatch( setVersion( 'Current' ) )
+    const current = Date.now()
+    AsyncStorage.setItem(
+      'SecurityAnsTimestamp',
+      JSON.stringify( current ),
+    )
+    const securityQuestionHistory = {
+      created: current,
+    }
+    AsyncStorage.setItem(
+      'securityQuestionHistory',
+      JSON.stringify( securityQuestionHistory ),
+    )
   }
 
   const showLoader = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )
-    seLoaderMessages()
+    setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -231,7 +207,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     )
   }
 
-  const seLoaderMessages = () => {
+  const setLoaderMessages = () => {
     setTimeout( () => {
       setMessage( 'Bootstrapping Accounts' )
       setSubTextMessage(
@@ -364,8 +340,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       height: hp( '40%' )
                     }}
                   >
-                    {dropdownBoxList.map( ( value: React.SetStateAction<{ id: string; question: string }>, index: number ) => (
-                      // eslint-disable-next-line react/jsx-key
+                    {dropdownBoxList.map( ( value, index ) => (
                       <TouchableOpacity
                         onPress={() => {
                           setTimeout( () => {
@@ -622,9 +597,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         ...styles.bottomButtonView,
       }}>
         {(
-          answer.trim() == confirmAnswer.trim() &&
+          answer.trim() === confirmAnswer.trim() &&
             confirmAnswer.trim() &&
-            answer.trim() && answerError.length == 0
+            answer.trim() && answerError.length === 0
         ) && (
           setButtonVisible()
         ) || null}

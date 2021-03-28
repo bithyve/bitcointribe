@@ -7,7 +7,7 @@ export const modifyLevelStatus = (
   let isError = false
   const abc = JSON.stringify( levelHealth )
   const levelHealthVar = [ ...getModifiedData( keeperInfo, JSON.parse( abc ) ) ]
-  console.log( 'modifyLevelStatus levelHealthVar', levelHealthVar )
+  // console.log( 'modifyLevelStatus levelHealthVar', levelHealthVar )
   if ( levelHealthVar && levelHealthVar.length > 0 ) {
     // Executes when level 1 setup or complete and level 2 not initialized
     if (
@@ -43,8 +43,9 @@ export const modifyLevelStatus = (
   if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
     isError = true
   }
+
   return {
-    levelData, isError
+    levelData: getLevelInfoStatus( levelData ), isError
   }
 }
 
@@ -56,22 +57,20 @@ const checkLevelHealth = (
   currentLevel: number
 ) => {
   try {
-
-
-    console.log( 'modifyLevelStatus index index2', index, index2 )
+    // console.log( 'modifyLevelStatus index index2', index, index2 )
     if (
       levelHealthVar[ index ].levelInfo[ index2 ].updatedAt === 0 &&
     levelHealthVar[ index ].levelInfo[ index2 + 1 ].updatedAt === 0
     ) {
       levelData[ index ].status = 'notSetup'
       if( index == 2 && currentLevel > 0 && levelHealthVar[ index ] ){
-        console.log( 'modifyLevelStatus index == 2 && currentLevel > 0 && levelHealthVar[ index ]' )
+        // console.log( 'modifyLevelStatus index == 2 && currentLevel > 0 && levelHealthVar[ index ]' )
         levelData[ index ].keeper1 = levelHealthVar[ index ] && levelHealthVar[ index ].levelInfo ? levelHealthVar[ index ].levelInfo[ index2 ] : levelData[ index2 ].keeper1
         levelData[ index ].keeper2 = levelHealthVar[ index ] && levelHealthVar[ index ].levelInfo[ index2 ] ? levelHealthVar[ index ].levelInfo[ index2 ] : levelData[ index2 ].keeper2
         levelData[ index ].status = checkStatus( levelHealthVar, index, index2 )
       }
       else if( index != 0 && currentLevel > 0 ){
-        console.log( 'modifyLevelStatus index != 0 && currentLevel > 0' )
+        // console.log( 'modifyLevelStatus index != 0 && currentLevel > 0' )
         levelData[ index-1 ].keeper1 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
         levelData[ index-1 ].keeper1.name = index == 0 ? 'Cloud' : levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ].name
         levelData[ index-1 ].keeper2 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
@@ -79,7 +78,7 @@ const checkLevelHealth = (
         levelData[ index-1 ].status = checkStatus( levelHealthVar, currentLevel - 1, 0 )
       }
       else if( index == 0 && currentLevel == 0 ){
-        console.log( 'modifyLevelStatus index == 0 && currentLevel == 0' )
+        // console.log( 'modifyLevelStatus index == 0 && currentLevel == 0' )
         levelData[ index ].keeper1 = levelHealthVar[ 0 ] && levelHealthVar[ 0 ].levelInfo ? levelHealthVar[ 0 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
         levelData[ index ].keeper1.name = 'Cloud'
         levelData[ index ].keeper2 = levelHealthVar[ 0 ] && levelHealthVar[ 0 ].levelInfo[ 1 ] ? levelHealthVar[ 0 ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
@@ -89,7 +88,7 @@ const checkLevelHealth = (
       levelData[ index ].status = 'notSetup'
       return levelData
     } else {
-      console.log( 'modifyLevelStatus ELSE' )
+      // console.log( 'modifyLevelStatus ELSE' )
       const status = checkStatus( levelHealthVar, index, index2 )
       if( levelHealthVar[ 0 ] && currentLevel > 0 ){
         levelData[ 0 ].keeper1 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
@@ -123,7 +122,7 @@ const checkLevelHealth = (
         levelData[ 2 ].status = checkStatus( levelHealthVar, 2, 4 )
       }
     }
-    console.log( 'modifyLevelStatus levelData', levelData )
+    // console.log( 'modifyLevelStatus levelData', levelData )
     return levelData
   } catch ( error ) {
     console.log( 'error', error )
@@ -141,9 +140,9 @@ const checkStatus = ( levelHealthVar: any[], index: number, index2: number ) => 
     }
     if( goodCount == levelHealthVar[ index ].levelInfo.length ) status = 'good'
     else if( goodCount < levelHealthVar[ index ].levelInfo.length ) status = 'bad'
-    console.log( 'modifyLevelStatus badCount', badCount )
-    console.log( 'modifyLevelStatus goodCount', goodCount )
-    console.log( 'modifyLevelStatus status', status )
+    // console.log( 'modifyLevelStatus badCount', badCount )
+    // console.log( 'modifyLevelStatus goodCount', goodCount )
+    // console.log( 'modifyLevelStatus status', status )
     return status
   }
   return status
@@ -219,4 +218,56 @@ const getModifiedData = ( keeperInfo, levelHealthVar ) => {
     }
   }
   return levelHealthVar
+}
+
+const getLevelInfoStatus = ( levelData ) => {
+  const levelHealthUpdated = levelData
+  for ( let i = 0; i < levelData.length; i++ ) {
+    const element = levelData[ i ]
+    if( i == 0 ){
+      // Not SETUP
+      if( levelData[ i ].status == 'notSetup' ) {
+        levelData[ i ].info = 'Improve security by reinforcing backup'
+      }
+      levelData[ i ].note = 'Backup your wallet on your cloud service'
+      if( ( element.keeper1.status == 'notAccessible' || element.keeper2.status == 'notAccessible' ) ) {
+        levelData[ i ].info = 'Start securing your bitcoin'
+      }
+      if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
+        levelData[ i ].info = 'Automated cloud backup is accessible'
+        levelData[ i ].note= 'All Recovery Keys are accessible'
+      }
+    }
+    if( i == 1 || i == 2 ) {
+      // NOT SETUP
+      if( levelData[ i ].status == 'notSetup' && i == 1 || i == 2 ) {
+        levelData[ i ].info = i == 1 ? 'Improve security by reinforcing backup' : 'Maximize security with enhanced backup'
+        levelData[ i ].note = 'Share your Recovery Keys with personal devices, contacts or as a PDF'
+      }
+      // BOTH ACCESSIBLE
+      if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
+        levelData[ i ].info = i == 1 ? 'Double Backup is accessible' : 'Multi Key Backup is accessible'
+        levelData[ i ].note= 'All Recovery Keys are accessible'
+      }
+      // ONLY ONE ACCESSIBLE
+      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
+        let name = ''
+        levelData[ i ].info = 'You have successfully secured a Recovery Key'
+        if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
+        if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
+        if( ( element.keeper1.updatedAt > 0 && element.keeper2.updatedAt == 0 )|| ( element.keeper2.updatedAt > 0 && element.keeper1.updatedAt == 0 ) ) levelData[ i ].note = 'Your '+name+' is set up. Please backup the other Recovery Key.'
+        else levelData[ i ].note = name+' needs your attention.'
+      }
+      // BOTH NOT ACCESSIBLE
+      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
+        let name = ''
+        if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
+        if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
+        levelData[ i ].info =  name+' needs your attention.'
+        levelData[ i ].note ='Recovery Keys not secure. Your wallet is vulnerable.'
+      }
+    }
+    console.log( 'element', element )
+  }
+  return levelHealthUpdated
 }
