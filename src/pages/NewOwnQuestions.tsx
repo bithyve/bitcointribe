@@ -170,7 +170,7 @@ export default function NewOwnQuestions( props ) {
 
   const showLoader = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )
-    seLoaderMessages()
+    setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -199,7 +199,7 @@ export default function NewOwnQuestions( props ) {
     )
   }
 
-  const seLoaderMessages = () => {
+  const setLoaderMessages = () => {
     setTimeout( () => {
       setMessage( 'Bootstrapping Accounts' )
       setSubTextMessage(
