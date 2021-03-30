@@ -1171,7 +1171,7 @@ class ManageBackupNewBHR extends Component<
                                 }}
                               >
                                 <Image
-                                  source={require( '../../assets/images/icons/reset.png' )}
+                                  source={require( '../../assets/images/icons/ico_cloud_backup.png' )}
                                   style={styles.resetImage}
                                 />
                                 <Text
