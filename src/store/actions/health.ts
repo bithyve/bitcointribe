@@ -80,6 +80,7 @@ export const UPDATE_KEEPERINFO_UNDER_CUSTODY = 'UPDATE_KEEPERINFO_UNDER_CUSTODY'
 export const AUTO_SHARE_LEVEL2_KEEPER = 'AUTO_SHARE_LEVEL2_KEEPER'
 export const DOWNLOAD_SMSHARE_FOR_APPROVAL = 'DOWNLOAD_SMSHARE_FOR_APPROVAL'
 export const INIT_NEW_BHR = 'INIT_NEW_BHR'
+export const UPDATE_LEVEL_DATA = 'UPDATE_LEVEL_DATA'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -728,6 +729,14 @@ export const updateCloudPermission = ( cloudPermissionGranted ) => {
   return {
     type: UPDATE_CLOUD_PERMISSION, payload: {
       cloudPermissionGranted
+    }
+  }
+}
+
+export const updateLevelData = ( levelData ) =>{
+  return {
+    type: UPDATE_LEVEL_DATA, payload: {
+      levelData
     }
   }
 }

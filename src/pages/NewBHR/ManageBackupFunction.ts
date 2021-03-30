@@ -3,6 +3,7 @@ export const modifyLevelStatus = (
   levelHealth: any[],
   currentLevel: number,
   keeperInfo: any[],
+  callBack: any
 ): { levelData: any[]; isError: boolean } => {
   let isError = false
   const abc = JSON.stringify( levelHealth )
@@ -44,8 +45,10 @@ export const modifyLevelStatus = (
     isError = true
   }
 
+  const levelDataUpdated = getLevelInfoStatus( levelData )
+  callBack( levelDataUpdated )
   return {
-    levelData: getLevelInfoStatus( levelData ), isError
+    levelData: levelDataUpdated, isError
   }
 }
 
@@ -221,7 +224,6 @@ const getModifiedData = ( keeperInfo, levelHealthVar ) => {
 }
 
 const getLevelInfoStatus = ( levelData ) => {
-  const levelHealthUpdated = levelData
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
     if( i == 0 ){
@@ -269,5 +271,5 @@ const getLevelInfoStatus = ( levelData ) => {
     }
     console.log( 'element', element )
   }
-  return levelHealthUpdated
+  return levelData
 }

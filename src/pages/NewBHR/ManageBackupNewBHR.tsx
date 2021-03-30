@@ -55,7 +55,8 @@ import {
   updateKeeperInfoToTrustedChannel,
   secondaryShareDownloaded,
   autoShareToLevel2Keepers,
-  downloadSmShareForApproval
+  downloadSmShareForApproval,
+  updateLevelData
 } from '../../store/actions/health'
 import { modifyLevelStatus } from './ManageBackupFunction'
 import {
@@ -79,6 +80,7 @@ import { setCloudData, updateHealthForCloud } from '../../store/actions/cloud'
 import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import LoaderModal from '../../components/LoaderModal'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -151,6 +153,7 @@ interface ManageBackupNewBHRPropsTypes {
   downloadSmShare: boolean;
   secondaryShareDownloadedStatus: any;
   cloudPermissionGranted: boolean;
+  updateLevelData: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -167,6 +170,7 @@ class ManageBackupNewBHR extends Component<
   keeperTypeBottomSheet: any;
   QrBottomSheet: any;
   ApprovePrimaryKeeperBottomSheet: any
+  loaderBottomSheet: any
 
   constructor( props ) {
     super( props )
@@ -178,6 +182,7 @@ class ManageBackupNewBHR extends Component<
     this.keeperTypeBottomSheet
     this.QrBottomSheet
     this.ApprovePrimaryKeeperBottomSheet
+    this.loaderBottomSheet
 
     const obj = {
       shareType: '',
@@ -209,8 +214,8 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Double Backup',
           status: 'notSetup',
-          keeper1ButtonText: 'Share Recovery Key (1)',
-          keeper2ButtonText: 'Share Recovery Key (2)',
+          keeper1ButtonText: 'Share RK 1',
+          keeper2ButtonText: 'Share RK 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
@@ -220,8 +225,8 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Multi Key Backup',
           status: 'notSetup',
-          keeper1ButtonText: 'Share Recovery Key (1)',
-          keeper2ButtonText: 'Share Recovery Key (2)',
+          keeper1ButtonText: 'Share RK 1',
+          keeper2ButtonText: 'Share RK 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
@@ -260,7 +265,8 @@ class ManageBackupNewBHR extends Component<
       this.state.levelData,
       levelHealthObject,
       currentLevel,
-      keeperInfo
+      keeperInfo,
+      this.updateLevelDataToReducer
     )
     console.log( 'LEVELDATA', levelData )
     this.setState( {
@@ -316,6 +322,10 @@ class ManageBackupNewBHR extends Component<
       : timeFormatter( moment( new Date() ), item )
   };
 
+  updateLevelDataToReducer = ( levelData ) =>{
+    this.props.updateLevelData( levelData )
+  }
+
   componentDidUpdate = ( prevProps, prevState ) => {
     const {
       healthLoading,
@@ -348,7 +358,7 @@ class ManageBackupNewBHR extends Component<
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
       console.log( 'second condition' )
-      this.modifyLevelData()
+      this.modifyLevelData( )
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
@@ -380,7 +390,7 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.currentLevel == 0 && prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 1 ) {
-      this.props.generateMetaShare( 2 )
+      // this.props.generateMetaShare( 2 )
     }
 
     if( prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 2 ) {
@@ -410,7 +420,7 @@ class ManageBackupNewBHR extends Component<
         this.setState( {
           selectedKeeper: obj.selectedKeeper,
         } )
-        this.goToHistory( obj )
+        // this.goToHistory( obj )
       }
       if ( this.props.metaSharesKeeper.length == 5 ) {
         const obj = {
@@ -433,6 +443,15 @@ class ManageBackupNewBHR extends Component<
         } )
         this.sendApprovalRequestToPK( )
       }
+    }
+
+    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
+      this.goToHistory( {
+        id: 2,
+        selectedKeeper: this.state.selectedKeeper,
+        isSetup: true
+      } )
+      this.loaderBottomSheet.snapTo( 0 )
     }
 
     if( JSON.stringify( prevProps.keeperInfo ) != JSON.stringify( keeperInfo ) ){
@@ -676,6 +695,7 @@ class ManageBackupNewBHR extends Component<
             !this.props.isLevelTwoMetaShareCreated &&
             value.id == 2
           ) {
+            this.loaderBottomSheet.snapTo( 1 )
             this.props.generateMetaShare( value.id )
           } else {
             this.goToHistory( obj )
@@ -788,7 +808,7 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"Erf","publicKey":"0nhtodKPJRk4wRayEenxWuwq","uploadedAt":1616687078230,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          const qrScannedData = '{"requester":"F","publicKey":"0ZAQZ73wKVPJY3AvXXZVReT0","uploadedAt":1616858612794,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
             if ( qrScannedData ) {
               this.props.downloadSmShareForApproval( qrScannedData )
@@ -814,6 +834,33 @@ class ManageBackupNewBHR extends Component<
             QrBottomSheetsFlag: false
           } );
           ( this.QrBottomSheet as any ).snapTo( 0 )
+        }}
+      />
+    )
+  }
+
+  renderLoaderModalContent = () => {
+    return (
+      <LoaderModal
+        headerText={'Wait while process is done'}
+        messageText={'Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet'}
+        messageText2={'Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet'}
+        showGif={false}
+      />
+    )
+  }
+
+  renderLoaderModalHeader = () => {
+    return (
+      <View
+        style={{
+          marginTop: 'auto',
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          height: hp( '75%' ),
+          zIndex: 9999,
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       />
     )
@@ -853,7 +900,7 @@ class ManageBackupNewBHR extends Component<
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => navigation.replace( 'Home' )}
             style={styles.headerSettingImageView}
           >
@@ -861,7 +908,7 @@ class ManageBackupNewBHR extends Component<
               source={require( '../../assets/images/icons/setting.png' )}
               style={styles.headerSettingImage}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <ScrollView
           refreshControl={
@@ -1282,7 +1329,7 @@ class ManageBackupNewBHR extends Component<
                                   } }
                                   numberOfLines={1}
                                 >
-                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share Recovery Key (1)'}
+                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share RK 1'}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
@@ -1360,7 +1407,7 @@ class ManageBackupNewBHR extends Component<
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share Recovery Key (2)'}
+                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share RK 2'}
                                 </Text>
                               </TouchableOpacity>
                             </View>
@@ -1515,6 +1562,15 @@ class ManageBackupNewBHR extends Component<
           renderContent={this.renderQrContent}
           renderHeader={this.renderQrHeader}
         />
+        <BottomSheet
+          onCloseEnd={() => { }}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={( c )=>this.loaderBottomSheet = c}
+          snapPoints={[ -50, hp( '100%' ) ]}
+          renderContent={this.renderLoaderModalContent}
+          renderHeader={this.renderLoaderModalHeader}
+        />
       </View>
     )
   }
@@ -1591,7 +1647,8 @@ export default withNavigationFocus(
     updateKeeperInfoToTrustedChannel,
     secondaryShareDownloaded,
     autoShareToLevel2Keepers,
-    downloadSmShareForApproval
+    downloadSmShareForApproval,
+    updateLevelData
   } )( ManageBackupNewBHR )
 )
 

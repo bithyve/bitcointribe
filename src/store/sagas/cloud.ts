@@ -205,7 +205,7 @@ function* checkCloudBackupWorker ( { payload } ) {
     console.log( 'CloudDataBackup STARTED' )
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson', backedJson )
+      // console.log( 'backedJson', backedJson )
       if ( backedJson ) {
         const isCloudBackupUpdated = yield call( updateDataWorker, {
           payload: {
