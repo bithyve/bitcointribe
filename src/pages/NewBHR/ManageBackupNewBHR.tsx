@@ -900,7 +900,7 @@ class ManageBackupNewBHR extends Component<
               />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => navigation.replace( 'Home' )}
             style={styles.headerSettingImageView}
           >
@@ -908,7 +908,7 @@ class ManageBackupNewBHR extends Component<
               source={require( '../../assets/images/icons/setting.png' )}
               style={styles.headerSettingImage}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         <ScrollView
           refreshControl={
