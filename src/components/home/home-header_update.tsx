@@ -156,13 +156,18 @@ const HomeHeader = ( {
             isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
           }
         }
+        if( currentLevel == 0 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+          }
+        }
         if( currentLevel === 1 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Upgrade security to level 2', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
           }
         } else if( currentLevel === 2 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Upgrade security to level 3', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
           }
         } else if( currentLevel == 3 ){
           return {
@@ -212,15 +217,18 @@ const HomeHeader = ( {
                 messageOne: name, messageTwo: message
               }
             }
+            if( currentLevel == 0 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+              }
+            }
             if( currentLevel == 1 ){
-              if( i == 1 && levelData[ i ].status == 'notSetup' ) {
-                return {
-                  isFirstMessageBold: false, messageOne: 'Upgrade security to level 2', messageTwo: ''
-                }
+              return {
+                isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
               }
             } else if( currentLevel === 2 ){
               return {
-                isFirstMessageBold: false, messageOne: 'Upgrade security to level 3', messageTwo: ''
+                isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
               }
             } else if( currentLevel == 3 ){
               return {
