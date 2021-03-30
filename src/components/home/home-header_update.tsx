@@ -146,37 +146,32 @@ const HomeHeader = ( {
     if( levelData ){
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
-
-        if( currentLevel === 1 && levelHealth[ 1 ] == undefined ){
-          if( i == 1 && levelData[ i ].status == 'notSetup' ) {
-            return {
-              isFirstMessageBold: false, messageOne: 'Upgrade security to level 2', messageTwo: ''
-            }
-          }
-        } else if( currentLevel === 2 && levelHealth[ 2 ] == undefined ){
+        if( element.keeper1.name && element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ){
           return {
-            isFirstMessageBold: false, messageOne: 'Upgrade security to level 3', messageTwo: ''
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
+          }
+        }
+        if( element.keeper2.name && element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ){
+          return {
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
+          }
+        }
+        if( currentLevel == 0 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+          }
+        }
+        if( currentLevel === 1 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
+          }
+        } else if( currentLevel === 2 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
           }
         } else if( currentLevel == 3 ){
           return {
-            isFirstMessageBold: true, messageOne: 'Your wallet is at full security', messageTwo: ''
-          }
-        }
-        else {
-          if( element.keeper1.name && element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ){
-            return {
-              isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
-            }
-          }
-          if( element.keeper2.name && element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ){
-            return {
-              isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
-            }
-          }
-          if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
-            return {
-              isFirstMessageBold: false, messageOne: 'Backup Recovery Key to improve security', messageTwo: ''
-            }
+            isFirstMessageBold: true, messageOne: 'Multi-key backup complete', messageTwo: ''
           }
         }
       }
@@ -192,13 +187,6 @@ const HomeHeader = ( {
           else if ( currentLevel == 2 && i == 2 ) j = 4
           for ( j; j < element.length; j++ ) {
             const item = element[ j ]
-            if( currentLevel == 1 && !levelHealth[ 1 ] ){
-              if( i == 1 && levelData[ i ].status == 'notSetup' ) {
-                return {
-                  isFirstMessageBold: false, messageOne: 'Upgrade security to level 2', messageTwo: ''
-                }
-              }
-            }
             if ( j == 1 && item.status == 'notAccessible' ) name = 'Security Question'
             if ( j == 2 && item.status == 'notAccessible' ) name = 'Primary Keeper'
             if ( j == 3 && item.status == 'notAccessible' ) name = 'Second Keeper'
@@ -227,6 +215,24 @@ const HomeHeader = ( {
             ) {
               return {
                 messageOne: name, messageTwo: message
+              }
+            }
+            if( currentLevel == 0 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+              }
+            }
+            if( currentLevel == 1 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
+              }
+            } else if( currentLevel === 2 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
+              }
+            } else if( currentLevel == 3 ){
+              return {
+                isFirstMessageBold: true, messageOne: 'Your wallet is at full security', messageTwo: ''
               }
             }
           }

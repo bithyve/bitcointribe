@@ -201,36 +201,36 @@ class ManageBackupNewBHR extends Component<
       isError: false,
       levelData: [
         {
-          levelName: 'Automated Cloud Backup',
+          levelName: 'Level 1',
           status: 'notSetup',
-          keeper1ButtonText: 'Add Backup',
+          keeper1ButtonText: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
           keeper2ButtonText: 'Security Question',
           keeper1: obj,
           keeper2: obj,
           note:'',
-          info:'',
+          info:'Automated Cloud Backup',
           id: 1,
         },
         {
-          levelName: 'Double Backup',
+          levelName: 'Level 2',
           status: 'notSetup',
           keeper1ButtonText: 'Share RK 1',
           keeper2ButtonText: 'Share RK 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
-          info:'',
+          info:'Double Backup',
           id: 2,
         },
         {
-          levelName: 'Multi Key Backup',
+          levelName: 'Level 3',
           status: 'notSetup',
           keeper1ButtonText: 'Share RK 1',
           keeper2ButtonText: 'Share RK 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
-          info:'',
+          info:'Multi Key Backup',
           id: 3,
         },
       ],
@@ -808,7 +808,7 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"F","publicKey":"0ZAQZ73wKVPJY3AvXXZVReT0","uploadedAt":1616858612794,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           try {
             if ( qrScannedData ) {
               this.props.downloadSmShareForApproval( qrScannedData )
@@ -842,9 +842,9 @@ class ManageBackupNewBHR extends Component<
   renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Wait while process is done'}
-        messageText={'Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet'}
-        messageText2={'Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet'}
+        headerText={'Upgrading your backup'}
+        messageText={'It may take a little while as we upgrade/ setup your backup. Do not close the app or go back'}
+        messageText2={''}
         showGif={false}
       />
     )
@@ -946,12 +946,31 @@ class ManageBackupNewBHR extends Component<
               )}
             </ImageBackground>
             <View style={styles.headerSeparator} />
-            <View style={{
-              width: wp( '30%' )
-            }}>
-              <Text style={styles.backupText}>Backup</Text>
-              <Text style={styles.backupInfoText}>{currentLevel == 1 ? 'Cloud Backup Complete' : currentLevel == 2 ? 'Double Backup Complete' : currentLevel == 3 ? 'Multi Key Backup Complete' : ''}</Text>
-            </View>
+            {currentLevel ?
+              <View style={{
+                width: wp( '30%' )
+              }}>
+                <Text style={styles.backupText}>Wallet Security</Text>
+                <Text style={styles.backupInfoText}>Security is</Text>
+                <Text style={styles.backupInfoText}>
+                at level {currentLevel ? currentLevel : ''}
+                </Text>
+              </View>:
+              <View style={{
+                width: wp( '30%' )
+              }}>
+                <Text style={styles.backupText}>Wallet Security</Text>
+                <Text style={styles.backupInfoText}>Complete Level 1</Text>
+              </View>
+            }
+          </View>
+          <View style={{
+            justifyContent:'center',
+            alignItems:'center'
+          }}>
+            <Text style={{
+              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+            }}>{currentLevel === 1 ? 'Cloud backup complete, Upgrade security to level 2' : currentLevel === 2 ? 'Double backup complete, Upgrade security to level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete level 1' }</Text>
           </View>
           <View
             style={{
@@ -1182,9 +1201,7 @@ class ManageBackupNewBHR extends Component<
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {value.keeper1.status == 'accessible'
-                                    ? 'Data Backed-Up'
-                                    : 'Add Backup'}
+                                  {value.keeper1ButtonText}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity

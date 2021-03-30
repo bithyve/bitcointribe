@@ -75,6 +75,7 @@ import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { getCloudDataRecovery, clearCloudCache } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { setVersion } from '../../store/actions/versionHistory'
 
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
@@ -125,6 +126,7 @@ interface RestoreWithICloudPropsTypes {
   clearCloudCache: any;
   initNewBHRFlow: any;
   walletCheckIn: any;
+  setVersion: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -186,7 +188,8 @@ class RestoreWithICloud extends Component<
       walletRecoveryFailed,
       cloudData,
       walletCheckIn,
-      initNewBHRFlow
+      initNewBHRFlow,
+      setVersion
     } = this.props
     if( prevProps.cloudData !== cloudData ){
       this.getData( cloudData )
@@ -194,6 +197,7 @@ class RestoreWithICloud extends Component<
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
       await AsyncStorage.setItem( 'walletExists', 'true' )
       await AsyncStorage.setItem( 'walletRecovered', 'true' )
+      setVersion( 'Restored' )
       initNewBHRFlow( true )
       checkMSharesHealth()
       walletCheckIn()
@@ -1326,7 +1330,8 @@ export default withNavigationFocus(
     getCloudDataRecovery,
     clearCloudCache,
     initNewBHRFlow,
-    walletCheckIn
+    walletCheckIn,
+    setVersion
   } )( RestoreWithICloud )
 )
 

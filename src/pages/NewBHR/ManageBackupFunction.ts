@@ -226,50 +226,31 @@ const getModifiedData = ( keeperInfo, levelHealthVar ) => {
 const getLevelInfoStatus = ( levelData ) => {
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
-    if( i == 0 ){
-      // Not SETUP
-      if( levelData[ i ].status == 'notSetup' ) {
-        levelData[ i ].info = 'Improve security by reinforcing backup'
-      }
-      levelData[ i ].note = 'Backup your wallet on your cloud service'
-      if( ( element.keeper1.status == 'notAccessible' || element.keeper2.status == 'notAccessible' ) ) {
-        levelData[ i ].info = 'Start securing your bitcoin'
-      }
-      if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
-        levelData[ i ].info = 'Automated cloud backup is accessible'
-        levelData[ i ].note= 'All Recovery Keys are accessible'
-      }
+    if( levelData[ i ].status == 'notSetup' ) {
+      levelData[ i ].note= 'Setup/Upgrade your backup.'
     }
-    if( i == 1 || i == 2 ) {
-      // NOT SETUP
-      if( levelData[ i ].status == 'notSetup' && i == 1 || i == 2 ) {
-        levelData[ i ].info = i == 1 ? 'Improve security by reinforcing backup' : 'Maximize security with enhanced backup'
-        levelData[ i ].note = 'Share your Recovery Keys with personal devices, contacts or as a PDF'
-      }
-      // BOTH ACCESSIBLE
-      if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
-        levelData[ i ].info = i == 1 ? 'Double Backup is accessible' : 'Multi Key Backup is accessible'
-        levelData[ i ].note= 'All Recovery Keys are accessible'
-      }
-      // ONLY ONE ACCESSIBLE
-      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
-        let name = ''
-        levelData[ i ].info = 'You have successfully secured a Recovery Key'
-        if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
-        if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
-        if( ( element.keeper1.updatedAt > 0 && element.keeper2.updatedAt == 0 )|| ( element.keeper2.updatedAt > 0 && element.keeper1.updatedAt == 0 ) ) levelData[ i ].note = 'Your '+name+' is set up. Please backup the other Recovery Key.'
-        else levelData[ i ].note = name+' needs your attention.'
-      }
-      // BOTH NOT ACCESSIBLE
-      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
-        let name = ''
-        if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
-        if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
-        levelData[ i ].info =  name+' needs your attention.'
-        levelData[ i ].note ='Recovery Keys not secure. Your wallet is vulnerable.'
-      }
+    if( levelData[ i ].status == 'bad' ) {
+      levelData[ i ].note= 'Backup needs your attention.'
     }
-    console.log( 'element', element )
+    if( levelData[ i ].status == 'good' ) {
+      levelData[ i ].note= 'Backup is secure.'
+    }
+
+    // ONLY ONE ACCESSIBLE
+    if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
+      if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
+      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
+    }
+    // BOTH NOT ACCESSIBLE
+    if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
+      if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
+      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
+    }
+    // BOTH NOT ACCESSIBLE
+    if( levelData[ i ].status == 'good' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ) ){
+      levelData[ i ].keeper1ButtonText = element.keeper1.name
+      levelData[ i ].keeper2ButtonText = element.keeper2.name
+    }
   }
   return levelData
 }
