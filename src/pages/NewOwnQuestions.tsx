@@ -81,6 +81,7 @@ export default function NewOwnQuestions( props ) {
   const [ visibleButton, setVisibleButton ] = useState( false )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -125,20 +126,18 @@ export default function NewOwnQuestions( props ) {
   }, [ walletSetupCompleted ] )
 
   useEffect( () => {
-    if( walletSetupCompleted && s3service && s3service.levelhealth ){
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      console.log( 'healthCheckInitializedKeeper****', healthCheckInitializedKeeper )
-      if( healthCheckInitializedKeeper === true ){
-        if( cloudPermissionGranted ){
-          dispatch( setCloudData() )
-        } else{
-          ( loaderBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.navigate( 'HomeNav', {
-            walletName,
-          } ) }
-      }
+    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      if( cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        props.navigation.navigate( 'HomeNav', {
+          walletName,
+        } ) }
     }
-  }, [ walletSetupCompleted, s3service ] )
+  }, [ walletSetupCompleted, levelHealth ] )
+
 
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){

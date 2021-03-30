@@ -86,6 +86,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
 
 
   useEffect( () => {
@@ -106,20 +107,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ walletSetupCompleted ] )
 
   useEffect( () => {
-    if( walletSetupCompleted && s3service && s3service.levelhealth ){
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      console.log( 'healthCheckInitializedKeeper****', healthCheckInitializedKeeper )
-      if( healthCheckInitializedKeeper === true ){
-        if( cloudPermissionGranted ){
-          dispatch( setCloudData() )
-        } else{
-          ( loaderBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.navigate( 'HomeNav', {
-            walletName,
-          } ) }
-      }
+    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      if( cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        props.navigation.navigate( 'HomeNav', {
+          walletName,
+        } ) }
     }
-  }, [ walletSetupCompleted, s3service ] )
+  }, [ walletSetupCompleted, levelHealth ] )
 
   const checkCloudLogin = () =>{
     showLoader()
