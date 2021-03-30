@@ -1394,23 +1394,6 @@ class ManageBackupUpgradeSecurity extends Component<
             </View>
           </View>
           <View style={{
-            justifyContent: 'center', alignItems: 'center'
-          }}>
-            <Text style={styles.noteText}>
-              Lorem ipsum Dolor
-              <Text
-                style={{
-                  ...styles.noteText,
-                  fontFamily: Fonts.FiraSansMediumItalic,
-                  fontStyle: 'italic',
-                }}
-              >
-                {' Upgrade Security'}
-              </Text>
-            </Text>
-          </View>
-
-          <View style={{
             marginBottom: 10, marginTop: 25
           }}>
             {pageData.map( ( item, index ) => {
