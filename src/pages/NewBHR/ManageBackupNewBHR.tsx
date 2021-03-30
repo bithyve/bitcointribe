@@ -964,7 +964,14 @@ class ManageBackupNewBHR extends Component<
               </View>
             }
           </View>
-
+          <View style={{
+            justifyContent:'center',
+            alignItems:'center'
+          }}>
+            <Text style={{
+              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
+            }}>{currentLevel === 1 ? 'Cloud backup complete, Upgrade security to level 2' : currentLevel === 2 ? 'Double backup complete, Upgrade security to level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete level 1' }</Text>
+          </View>
           <View
             style={{
               flex: 1,

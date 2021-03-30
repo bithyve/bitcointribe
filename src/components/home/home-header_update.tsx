@@ -171,7 +171,7 @@ const HomeHeader = ( {
           }
         } else if( currentLevel == 3 ){
           return {
-            isFirstMessageBold: true, messageOne: 'Your wallet is at full security', messageTwo: ''
+            isFirstMessageBold: true, messageOne: 'Multi-key backup complete', messageTwo: ''
           }
         }
       }
