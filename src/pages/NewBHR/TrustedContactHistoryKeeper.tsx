@@ -29,14 +29,10 @@ import moment from 'moment'
 import _ from 'underscore'
 import { nameToInitials } from '../../common/CommonFunctions'
 import {
-  uploadEncMShareKeeper,
   ErrorSending,
   updateMSharesHealth,
   updatedKeeperInfo,
-  sendApprovalRequest,
   onApprovalStatusChange,
-  uploadSMShareKeeper,
-  secondaryShareDownloaded,
   downloadSmShareForApproval,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
@@ -45,25 +41,17 @@ import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  EphemeralDataElements,
   LevelHealthInterface,
-  notificationType,
-  TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import {
-  updateEphemeralChannel,
   updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import {
-  TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { isEmpty } from '../../common/CommonFunctions/index'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
@@ -107,13 +95,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ SendViaLinkBottomSheet, setSendViaLinkBottomSheet ] = useState(
     React.createRef(),
   )
-  const fcmTokenValue = useSelector( ( state ) => state.preferences.fcmTokenValue )
   const [ SendViaQRBottomSheet, setSendViaQRBottomSheet ] = useState(
     React.createRef(),
   )
   const keeperTypeBottomSheet = React.createRef()
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ qrScannedData, setQrScannedData ] = useState( '' )
   const [ shareBottomSheet, setshareBottomSheet ] = useState( React.createRef() )
   const [
     shareOtpWithTrustedContactBottomSheet,
@@ -190,18 +176,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedTitle' ) == 'Friends and Family'
-      ? false
-      : true,
+    props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
   )
   const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
-  const keeperApproveStatus = useSelector(
-    ( state ) => state.health.keeperApproveStatus
-  )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
@@ -209,11 +190,25 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+
   useEffect( () => {
+    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+    setIsReshare(
+      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+    )
+    setIsChange(
+      props.navigation.getParam( 'isChangeKeeperType' )
+        ? props.navigation.getParam( 'isChangeKeeperType' )
+        : false
+    )
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
+    setIndex( props.navigation.getParam( 'index' ) )
   }, [
+    props.navigation.getParam( 'selectedLevelId' ),
     props.navigation.getParam( 'selectedKeeper' ),
+    props.navigation.state.params,
   ] )
 
   useEffect( () => {
@@ -241,7 +236,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const keeperInfoIndex = keeperInfoTemp.findIndex( ( value ) => value.shareId == selectedShareId )
       if ( keeperInfoIndex > -1 && keeperInfoTemp[ keeperInfoIndex ].type == 'contact' ) {
         setSelectedContacts( [ keeperInfoTemp[ keeperInfoIndex ].data ] )
-        const selectedContacts = trustedContactsInfo.slice( 1, 3 )
         const tempContact = keeperInfoTemp[ keeperInfoIndex ].data
         const tcInstance =
           trustedContacts.tc.trustedContacts[

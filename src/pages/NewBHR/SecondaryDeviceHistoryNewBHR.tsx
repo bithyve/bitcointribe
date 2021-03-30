@@ -146,18 +146,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
 
-  const [ selectedTime, setSelectedTime ] = useState( props.navigation.getParam( 'selectedTime' ) )
-  const [ selectedStatus, setSelectedStatus ] = useState(
-    props.navigation.getParam( 'selectedStatus' ),
-  )
-  const [ selectedTitle, setSelectedTitle ] = useState(
-    props.navigation.getParam( 'selectedTitle' ),
-  )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.state.params.selectedKeeper.updatedAt == 0
-    ? false
-    : true )
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true )
   const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
@@ -167,12 +158,25 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
 
   useEffect( () => {
+    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+    setIsReshare(
+      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+    )
+    setIsChange(
+      props.navigation.getParam( 'isChangeKeeperType' )
+        ? props.navigation.getParam( 'isChangeKeeperType' )
+        : false
+    )
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
+    setIndex( props.navigation.getParam( 'index' ) )
   }, [
-    props.navigation.state.params.selectedLevelId,
-    props.navigation.state.params.selectedKeeper,
+    props.navigation.getParam( 'selectedLevelId' ),
+    props.navigation.getParam( 'selectedKeeper' ),
+    props.navigation.state.params,
   ] )
+
   const [ secondaryDeviceBottomSheet ] = useState(
     React.createRef(),
   )
