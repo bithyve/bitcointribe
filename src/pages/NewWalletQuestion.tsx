@@ -99,10 +99,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   useEffect( () => {
     if( walletSetupCompleted ){
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      dispatch( walletCheckIn() )
-      dispatch( initNewBHRFlow( true ) )
+      console.log( 'walletSetupCompleted****', walletSetupCompleted )
 
+      dispatch( walletCheckIn() )
+    }
+  }, [ walletSetupCompleted ] )
+
+  useEffect( () => {
+    if( walletSetupCompleted && s3service && s3service.levelhealth ){
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
+      console.log( 'healthCheckInitializedKeeper****', healthCheckInitializedKeeper )
       if( healthCheckInitializedKeeper === true ){
         if( cloudPermissionGranted ){
           dispatch( setCloudData() )
@@ -123,6 +129,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       answer,
     }
     dispatch( setupWallet( walletName, security ) )
+    dispatch( initNewBHRFlow( true ) )
     dispatch( setVersion( 'Current' ) )
     const current = Date.now()
     AsyncStorage.setItem(

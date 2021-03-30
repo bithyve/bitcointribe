@@ -117,13 +117,17 @@ export default function NewOwnQuestions( props ) {
   }, [ confirmAnswer ] )
 
   useEffect( () => {
-    if (
-      walletSetupCompleted
-    ) {
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      dispatch( walletCheckIn() )
-      dispatch( initNewBHRFlow( true ) )
+    if( walletSetupCompleted ){
+      console.log( 'walletSetupCompleted****', walletSetupCompleted )
 
+      dispatch( walletCheckIn() )
+    }
+  }, [ walletSetupCompleted ] )
+
+  useEffect( () => {
+    if( walletSetupCompleted && s3service && s3service.levelhealth ){
+      const { healthCheckInitializedKeeper } = s3service.levelhealth
+      console.log( 'healthCheckInitializedKeeper****', healthCheckInitializedKeeper )
       if( healthCheckInitializedKeeper === true ){
         if( cloudPermissionGranted ){
           dispatch( setCloudData() )
@@ -131,10 +135,10 @@ export default function NewOwnQuestions( props ) {
           ( loaderBottomSheet as any ).current.snapTo( 0 )
           props.navigation.navigate( 'HomeNav', {
             walletName,
-          } )
-        }}
+          } ) }
+      }
     }
-  }, [ walletSetupCompleted ] )
+  }, [ walletSetupCompleted, s3service ] )
 
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
@@ -153,6 +157,7 @@ export default function NewOwnQuestions( props ) {
       answer,
     }
     dispatch( setupWallet( walletName, security ) )
+    dispatch( initNewBHRFlow( true ) )
     dispatch( setVersion( 'Current' ) )
     const current = Date.now()
     AsyncStorage.setItem(
