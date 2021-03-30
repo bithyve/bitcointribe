@@ -29,17 +29,6 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
     return contact.displayedName.split( ' ' ).slice( 1 ).join( ' ' )
   }, [ contact ] )
 
-  const trustKindText = useMemo( () => {
-    switch ( contact.trustKind ) {
-        case ContactTrustKind.KEEPER_OF_USER:
-          return 'My Keeper'
-        case ContactTrustKind.USER_IS_KEEPING:
-          return 'Keeping Their Secret'
-        case ContactTrustKind.OTHER:
-          return 'Trusted Contact'
-    }
-  }, [ contact ] )
-
 
   const hasExpirationBadge = useMemo( () => {
     // TODO: Establish more clarity about what this logic is supposed to mean.
@@ -72,14 +61,18 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
   return (
     <>
       <ListItem.Content style={{
-        flex: 0
+        flex: 0,
       }}>
         <View style={styles.avatarContainer}>
           <RecipientAvatar recipient={contact} contentContainerStyle={styles.avatarImage} />
 
           <LastSeenActiveIndicator
             style={{
-              position: 'absolute', right: -2, top: -2
+              position: 'absolute',
+              right: -2,
+              top: -2,
+              elevation: 2,
+              zIndex: 2,
             }}
             timeSinceActive={contact.lastSeenActive}
           />
@@ -178,6 +171,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
 const styles = StyleSheet.create( {
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageLarge,
     marginRight: 16,
   },
 
