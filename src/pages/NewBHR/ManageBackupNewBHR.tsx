@@ -56,7 +56,8 @@ import {
   secondaryShareDownloaded,
   autoShareToLevel2Keepers,
   downloadSmShareForApproval,
-  updateLevelData
+  updateLevelData,
+  keeperProcessStatus
 } from '../../store/actions/health'
 import { modifyLevelStatus } from './ManageBackupFunction'
 import {
@@ -81,6 +82,7 @@ import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import LoaderModal from '../../components/LoaderModal'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -154,6 +156,8 @@ interface ManageBackupNewBHRPropsTypes {
   secondaryShareDownloadedStatus: any;
   cloudPermissionGranted: boolean;
   updateLevelData: any;
+  keeperProcessStatusFlag: string;
+  keeperProcessStatus: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -353,11 +357,14 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    // console.log( 'currentLevel', currentLevel )
-    // console.log( 'this.props.cloudBackupStatus', this.props.cloudBackupStatus )
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
-      console.log( 'second condition' )
+      if(
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
+        levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
+      ) {
+        this.loaderBottomSheet.snapTo( 1 )
+      }
       this.modifyLevelData( )
       if (
         this.props.levelHealth.length > 0 &&
@@ -389,12 +396,12 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if( prevProps.currentLevel == 0 && prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 1 ) {
-      // this.props.generateMetaShare( 2 )
-    }
-
     if( prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 2 ) {
       this.props.deleteSmSharesAndSM()
+    }
+
+    if( prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 3 ) {
+      this.loaderBottomSheet.snapTo( 0 )
     }
 
     if (
@@ -454,8 +461,9 @@ class ManageBackupNewBHR extends Component<
       this.loaderBottomSheet.snapTo( 0 )
     }
 
-    if( JSON.stringify( prevProps.keeperInfo ) != JSON.stringify( keeperInfo ) ){
+    if( prevProps.keeperProcessStatusFlag != this.props.keeperProcessStatusFlag && this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
       this.props.updateKeeperInfoToTrustedChannel()
+      this.props.keeperProcessStatus( '' )
     }
 
     if (
@@ -510,8 +518,6 @@ class ManageBackupNewBHR extends Component<
     const {
       levelHealth,
       currentLevel,
-      reShareWithSameKeeper,
-      autoShareContact,
       autoShareToLevel2Keepers
     } = this.props
     if (
@@ -520,35 +526,8 @@ class ManageBackupNewBHR extends Component<
       levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
       levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible'
     ) {
-      const contactLevelInfo = []
-      const pdfLevelInfo = []
-      for ( let i = 2; i < levelHealth[ 2 ].levelInfo.length - 2; i++ ) {
-        if (
-          levelHealth[ 2 ].levelInfo[ i ].status != 'accessible' &&
-            levelHealth[ 1 ].levelInfo[ i ].shareType == 'pdf'
-        ) {
-          const obj = {
-            ...levelHealth[ 1 ].levelInfo[ i ],
-            newShareId: levelHealth[ 2 ].levelInfo[ i ].shareId,
-            index: i,
-          }
-          pdfLevelInfo.push( obj )
-        }
-        if (
-          levelHealth[ 2 ].levelInfo[ i ].status != 'accessible' &&
-          ( levelHealth[ 1 ].levelInfo[ i ].shareType == 'contact' || levelHealth[ 1 ].levelInfo[ i ].shareType == 'device' )
-        ) {
-          const obj = {
-            ...levelHealth[ 1 ].levelInfo[ i ],
-            newShareId: levelHealth[ 2 ].levelInfo[ i ].shareId,
-            index: i,
-          }
-          contactLevelInfo.push( obj )
-        }
-      }
-      console.log( '**** contactLevelInfo', contactLevelInfo )
-      console.log( '**** pdfLevelInfo', pdfLevelInfo )
-      if ( contactLevelInfo.length || pdfLevelInfo.length ) autoShareToLevel2Keepers( contactLevelInfo, pdfLevelInfo )
+      console.log( 'autoUploadShare levelHealth', levelHealth )
+      autoShareToLevel2Keepers( [ ...levelHealth ] )
     }
   };
 
@@ -787,7 +766,7 @@ class ManageBackupNewBHR extends Component<
   renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -808,19 +787,19 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          try {
-            if ( qrScannedData ) {
-              this.props.downloadSmShareForApproval( qrScannedData )
-              this.setState( {
-                QrBottomSheetsFlag: false
-              } )
-            }
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          // try {
+          //   if ( qrScannedData ) {
+          //     this.props.downloadSmShareForApproval( qrScannedData )
+          //     this.setState( {
+          //       QrBottomSheetsFlag: false
+          //     } )
+          //   }
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )
@@ -872,11 +851,10 @@ class ManageBackupNewBHR extends Component<
       selectedId,
       isError,
       selectedLevelId,
-      selectedKeeperType,
       refreshControlLoader,
       selectedKeeper,
     } = this.state
-    const { navigation, keeperApproveStatus, currentLevel } = this.props
+    const { navigation, currentLevel } = this.props
     return (
       <View style={{
         flex: 1, backgroundColor: 'white'
@@ -1639,7 +1617,7 @@ const mapStateToProps = ( state ) => {
     downloadSmShare: idx( state, ( _ ) => _.health.loading.downloadSmShare ),
     secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
     cloudPermissionGranted: state.health.cloudPermissionGranted,
-
+    keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
   }
 }
 
@@ -1665,7 +1643,8 @@ export default withNavigationFocus(
     secondaryShareDownloaded,
     autoShareToLevel2Keepers,
     downloadSmShareForApproval,
-    updateLevelData
+    updateLevelData,
+    keeperProcessStatus
   } )( ManageBackupNewBHR )
 )
 

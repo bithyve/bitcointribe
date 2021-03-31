@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Alert } from 'react-native'
 import { useDispatch } from 'react-redux'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
@@ -28,6 +28,11 @@ import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import idx from 'idx'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
+import { NavigationScreenConfig } from 'react-navigation'
+import { NavigationStackOptions } from 'react-navigation-stack'
+import ModalHeader from '../../../components/ModalHeader'
+import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
+import Colors from '../../../common/Colors'
 
 export type Props = {
   navigation: any;
@@ -36,6 +41,7 @@ export type Props = {
 const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
+  const [ isShowingKnowMoreSheet, setIsShowingKnowMoreSheet ] = useState( false )
 
   const accountShell = useSourceAccountShellForSending()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
@@ -150,12 +156,35 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }
 
 
+  useEffect( () => {
+    navigation.setParams( {
+      toggleKnowMoreSheet: toggleKnowMoreSheet,
+    } )
+  }, [] )
+
+  const toggleKnowMoreSheet = () => {
+    const shouldShow = !isShowingKnowMoreSheet
+    setIsShowingKnowMoreSheet( shouldShow )
+    if ( shouldShow ) {
+      showKnowMoreBottomSheet()
+    }
+  }
+
+
+
+  const KnowMoreBottomSheetHandle: React.FC = () => {
+    return <BottomSheetHandle containerStyle={{
+      backgroundColor: Colors.blue,
+    }} />
+  }
+
   const showKnowMoreBottomSheet = useCallback( () => {
     presentBottomSheet(
       <SendHelpContents titleClicked={dismissBottomSheet} />,
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [ 0, '89%' ],
+        handleComponent: KnowMoreBottomSheetHandle,
         onChange: ( newIndex ) => {
           if ( newIndex < 1 ) {
             dispatch( initialKnowMoreSendSheetShown() )
@@ -200,7 +229,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 }
 
 
-AccountSendContainerScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
+AccountSendContainerScreen.navigationOptions = ( { navigation, } ) : NavigationScreenConfig<NavigationStackOptions, any> => {
   const subAccountKind = navigation.getParam( 'subAccountKind' )
 
   return {
@@ -224,7 +253,8 @@ AccountSendContainerScreen.navigationOptions = ( { navigation } ): NavigationOpt
         return null
       } else {
         return (
-          <KnowMoreButton onpress={navigation.getParam( 'toggleKnowMoreSheet' )} />
+          <KnowMoreButton onpress={() => {
+            navigation.getParam( 'toggleKnowMoreSheet' )()}} />
         )
       }
     },

@@ -90,8 +90,9 @@ export default function AddContactSendRequest( props ) {
   )
 
   const updateTrustedContactsInfo = async ( contact ) => {
+    console.log( 'trustedContactsInfo', trustedContactsInfo )
     const tcInfo = trustedContactsInfo
-    if ( tcInfo.length ) {
+    if ( tcInfo && tcInfo.length ) {
       if (
         tcInfo.findIndex( ( trustedContact ) => {
           if ( !trustedContact ) return false
@@ -265,6 +266,7 @@ export default function AddContactSendRequest( props ) {
           Alert.alert( 'Invalid Contact', 'Something went wrong.' )
           return
         }
+        console.log( 'Contact', Contact )
         updateTrustedContactsInfo( Contact ) // Contact initialized to become TC
       }
 

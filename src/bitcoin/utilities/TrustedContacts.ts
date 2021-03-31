@@ -70,7 +70,7 @@ export default class TrustedContacts {
     encryptedPub += cipher.final( 'hex' )
 
     return {
-      encryptedPub 
+      encryptedPub
     }
   };
 
@@ -96,7 +96,7 @@ export default class TrustedContacts {
     }
 
     return {
-      decryptedPub: decryptedPub.slice( 5 ) 
+      decryptedPub: decryptedPub.slice( 5 )
     }
   };
 
@@ -118,7 +118,7 @@ export default class TrustedContacts {
     let encrypted = cipher.update( JSON.stringify( dataPacket ), 'utf8', 'hex' )
     encrypted += cipher.final( 'hex' )
     return {
-      encryptedData: encrypted 
+      encryptedData: encrypted
     }
   };
 
@@ -139,7 +139,7 @@ export default class TrustedContacts {
       )
     }
     return {
-      data 
+      data
     }
   };
 
@@ -194,12 +194,12 @@ export default class TrustedContacts {
       encKey,
       otp,
       ephemeralChannel: {
-        address: ephemeralAddress 
+        address: ephemeralAddress
       },
     }
 
     return {
-      publicKey, ephemeralAddress 
+      publicKey, ephemeralAddress
     }
   };
 
@@ -309,7 +309,7 @@ export default class TrustedContacts {
 
     this.trustedContacts[ contactName ].ephemeralChannel.data = ephemeralData
     return {
-      updatedEphemeralDataElements 
+      updatedEphemeralDataElements
     }
   };
 
@@ -452,7 +452,7 @@ export default class TrustedContacts {
       }
 
       return {
-        updated, publicKey 
+        updated, publicKey
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -525,7 +525,7 @@ export default class TrustedContacts {
       }
 
       return {
-        data 
+        data
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -583,7 +583,7 @@ export default class TrustedContacts {
 
     // this.trustedContacts[contactName].trustedChannel.data = trustedData; save post updation
     return {
-      updatedTrustedData, overallTrustedData: trustedData 
+      updatedTrustedData, overallTrustedData: trustedData
     }
   };
 
@@ -698,7 +698,7 @@ export default class TrustedContacts {
           fetch,
         } )
       }
-      console.log('updateTrustedChannel res Call', res)
+      console.log( 'updateTrustedChannel res Call', res )
 
       let { updated, data } = res.data
       if ( !updated ) throw new Error( 'Failed to update ephemeral space' )
@@ -709,7 +709,7 @@ export default class TrustedContacts {
       if ( data ) {
         data = this.processTrustedChannelData( contactName, data, symmetricKey )
         const { walletName } = data.data ? data.data : {
-          walletName: null 
+          walletName: null
         }
         if ( walletName ) {
           this.trustedContacts[ contactName ] = {
@@ -718,11 +718,11 @@ export default class TrustedContacts {
           }
         }
         return {
-          updated, data 
+          updated, data
         }
       }
       return {
-        updated 
+        updated
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
@@ -801,7 +801,7 @@ export default class TrustedContacts {
       const { trustedChannel, publicKey } = contact
       if ( trustedChannel ) {
         channelsToUpdate[ trustedChannel.address ] = {
-          publicKey 
+          publicKey
         }
       }
     }
@@ -832,7 +832,7 @@ export default class TrustedContacts {
       }
 
       return {
-        updated 
+        updated
       }
     } else {
       throw new Error( 'No trusted channels to update' )
@@ -863,7 +863,7 @@ export default class TrustedContacts {
       const { trustedChannel, publicKey } = contact
       if ( trustedChannel ) {
         channelsToUpdate[ trustedChannel.address ] = {
-          publicKey 
+          publicKey
         }
       }
     }
@@ -992,7 +992,7 @@ export default class TrustedContacts {
             dataHash = subChan.encDataHash
           }
           channelsToSync[ trustedChannel.address ] = {
-            publicKey: pub, dataHash 
+            publicKey: pub, dataHash
           }
         } )
       }
@@ -1045,8 +1045,8 @@ export default class TrustedContacts {
                   } else {
                     this.trustedContacts[ contactName ].FCMs = [ decryptedData.FCM ]
                   }
-                } 
-                 
+                }
+
               }
             } )
           }
@@ -1054,7 +1054,7 @@ export default class TrustedContacts {
       }
 
       return {
-        synched, contactsToRemove, guardiansToRemove 
+        synched, contactsToRemove, guardiansToRemove
       }
     } else {
       throw new Error( 'No trusted channels to update' )

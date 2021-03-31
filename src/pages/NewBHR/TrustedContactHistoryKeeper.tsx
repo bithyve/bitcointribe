@@ -34,6 +34,7 @@ import {
   updatedKeeperInfo,
   onApprovalStatusChange,
   downloadSmShareForApproval,
+  keeperProcessStatus,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
 import SendShareModal from './SendShareModal'
@@ -63,6 +64,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -607,6 +610,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         console.log( {
           numberDL
         } )
+        updateShare()
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
         setIsOTPType( false )
         setTrustedLink( numberDL )
         setIsReshare( true )
@@ -638,6 +643,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         console.log( {
           emailDL
         } )
+        updateShare()
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
         setIsOTPType( false )
         setTrustedLink( emailDL )
         setIsReshare( true )
@@ -661,15 +668,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
           `/${otpHint}_keeper` +
           `/${uploadedAt}` +
           `/v${appVersion}`
+        updateShare()
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
         setIsOTPType( true )
         setOTP( otp )
         setTrustedLink( otpDL )
         setIsReshare( true )
       } else {
+        dispatch( keeperProcessStatus( '' ) )
         Alert.alert( 'Invalid Contact', 'Something went wrong.' )
         return
       }
     } catch ( error ) {
+      dispatch( keeperProcessStatus( '' ) )
       console.log( 'error TC', error )
     }
   }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
@@ -707,25 +718,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         tcInfo[ index ] = contact
       }
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-
-      console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
-      const shareArray = [
-        {
-          walletId: s3Service.getWalletId().data.walletId,
-          shareId: selectedShareId,
-          reshareVersion: 0,
-          updatedAt: moment( new Date() ).valueOf(),
-          name: contact.name,
-          shareType: 'contact',
-          status: 'notAccessible',
-        },
-      ]
-      dispatch( updateMSharesHealth( shareArray ) )
-      dispatch( onApprovalStatusChange( {
-        status: false,
-        initiatedAt: 0,
-        shareId: '',
-      } ) )
     },
     [ index, trustedContactsInfo ],
   )
@@ -752,6 +744,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
+    // Keeper setup started
+    dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
 
     dispatch( updatedKeeperInfo( {
       shareId: selectedShareId,
@@ -801,7 +795,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
       }
     } )
-    const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+    const newSecondarySubAccount:SubAccountDescribing = new TrustedContactsSubAccountInfo( {
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
@@ -858,7 +852,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         info = otp
       }
 
-      if ( publicKey )
+      if ( publicKey ){
+        updateShare()
         setTrustedQR(
           JSON.stringify( {
             approvedTC: symmetricKey ? true : false,
@@ -874,6 +869,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             isFromKeeper: true,
           } ),
         )
+      }
     }
   }, [
     SHARES_TRANSFER_DETAILS[ index ],
@@ -1060,7 +1056,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -1078,16 +1074,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          setIsApprovalStarted( true )
-          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          try {
-            dispatch( downloadSmShareForApproval( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          // setIsApprovalStarted( true )
+          // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          // try {
+          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //   setQrBottomSheetsFlag( false )
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )
@@ -1111,6 +1107,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
   }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+
+  const updateShare = () => {
+    const contactName = `${chosenContact.firstName} ${
+      chosenContact.lastName ? chosenContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
+    console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
+    dispatch( updateMSharesHealth( [
+      {
+        walletId: s3Service.getWalletId().data.walletId,
+        shareId: selectedShareId,
+        reshareVersion: 0,
+        updatedAt: moment( new Date() ).valueOf(),
+        name: contactName,
+        shareType: 'contact',
+        status: 'notAccessible',
+      },
+    ] ) )
+  }
 
   return (
     <View style={{

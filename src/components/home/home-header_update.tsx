@@ -142,7 +142,6 @@ const HomeHeader = ( {
   }, [] )
 
   const getMessageToShow = () => {
-    console.log( '#levelData', levelData, currentLevel, levelHealth )
     if( levelData ){
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]

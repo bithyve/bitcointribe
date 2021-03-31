@@ -19,12 +19,13 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { walletCheckIn } from '../actions/trustedContacts'
+import { upgradeReducer, walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
 import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
 import { updateWalletImage } from '../actions/sss'
+import { TrustedContactsState } from '../reducers/trustedContacts'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -212,7 +213,7 @@ function* servicesEnricherWorker( { payload } ) {
         }
       }
 
-      if ( semver.lt( dbVersion, '1.4.5' ) ) {
+      if ( semver.lt( dbVersion, '1.4.6' ) ) {
         // update sub-account instances count
         const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
@@ -233,6 +234,9 @@ function* servicesEnricherWorker( { payload } ) {
         console.log( 'Updated sub-account instances count' )
         services.REGULAR_ACCOUNT = regularAccount
         services.SECURE_ACCOUNT = secureAccount
+
+        const trustedContact = services.TRUSTED_CONTACTS
+        yield put( upgradeReducer( trustedContact ) )
         migrated = true
       }
     } else {
