@@ -60,14 +60,14 @@ function* setupWalletWorker( { payload } ) {
   } )
 
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+
+  // initialize health-check schema on relay
+  yield put( initializeHealthSetup() )
   yield put( completedWalletSetup( ) )
 
   // Post Hydration activities
   // saturate the test account w/ 10K sats
   yield put( getTestcoins() )
-
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )

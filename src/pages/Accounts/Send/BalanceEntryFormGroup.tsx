@@ -23,6 +23,7 @@ import useTotalSpendingAmount from '../../../utils/hooks/sending-utils/UseTotalS
 import { clearSendMaxFee } from '../../../store/actions/sending'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import idx from 'idx'
+import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 
 export type Props = {
   currentRecipient: RecipientDescribing,
@@ -191,7 +192,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             ( currencyKindForEntry == CurrencyKind.FIAT ) &&
             ( isSendingMax == false ) &&
             (
-              <TouchableOpacity
+              <AppBottomSheetTouchableWrapper
                 onPress={handleSendMaxPress}
               >
                 <Text
@@ -205,7 +206,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                 >
               Send Max
                 </Text>
-              </TouchableOpacity>
+              </AppBottomSheetTouchableWrapper>
 
             )}
         </TouchableOpacity>

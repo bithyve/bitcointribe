@@ -34,10 +34,22 @@ import {
   SM_META_SHARE_GENERATE,
   UPLOAD_SUCCESSFULLY_SM,
   UPDATE_CLOUD_PERMISSION,
-  INIT_NEW_BHR
+  INIT_NEW_BHR,
+  UPDATE_LEVEL_DATA,
+  KEEPER_PROCESS_STATUS
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
+interface obj {
+  shareType: string
+  updatedAt: number
+  status: string
+  shareId: string
+  reshareVersion: number
+  name: string
+  data: any;
+  uuid: string
+}
 
 const initialState: {
   mnemonic: string;
@@ -116,6 +128,18 @@ const initialState: {
   uploadSMSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
   newBHRFlowStarted: boolean;
+  levelData: {
+    levelName: string
+    status: string
+    keeper1ButtonText: string
+    keeper2ButtonText: string
+    keeper1: obj,
+    keeper2: obj,
+    note:string
+    info:string
+    id: number
+  }[];
+  keeperProcessStatus: string;
 } = {
   mnemonic: '',
   service: null,
@@ -169,7 +193,9 @@ const initialState: {
   isSmMetaSharesCreatedFlag: false,
   uploadSMSuccessfully: false,
   cloudPermissionGranted: null,
-  newBHRFlowStarted: false
+  newBHRFlowStarted: false,
+  levelData: null,
+  keeperProcessStatus: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -414,6 +440,18 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           newBHRFlowStarted: action.payload.newBHRFlowStarted
+        }
+
+      case UPDATE_LEVEL_DATA:
+        return {
+          ...state,
+          levelData: action.payload.levelData
+        }
+
+      case KEEPER_PROCESS_STATUS:
+        return {
+          ...state,
+          keeperProcessStatus: action.payload.status
         }
   }
   return state

@@ -80,6 +80,8 @@ export const UPDATE_KEEPERINFO_UNDER_CUSTODY = 'UPDATE_KEEPERINFO_UNDER_CUSTODY'
 export const AUTO_SHARE_LEVEL2_KEEPER = 'AUTO_SHARE_LEVEL2_KEEPER'
 export const DOWNLOAD_SMSHARE_FOR_APPROVAL = 'DOWNLOAD_SMSHARE_FOR_APPROVAL'
 export const INIT_NEW_BHR = 'INIT_NEW_BHR'
+export const UPDATE_LEVEL_DATA = 'UPDATE_LEVEL_DATA'
+export const KEEPER_PROCESS_STATUS = 'KEEPER_PROCESS_STATUS'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -559,12 +561,12 @@ export const autoShareContact = (
 }
 
 export const autoShareToLevel2Keepers = (
-  contactLevelInfo, pdfLevelInfo
+  levelHealth
 ) => {
   return {
     type: AUTO_SHARE_LEVEL2_KEEPER,
     payload: {
-      contactLevelInfo, pdfLevelInfo
+      levelHealth
     },
   }
 }
@@ -728,6 +730,22 @@ export const updateCloudPermission = ( cloudPermissionGranted ) => {
   return {
     type: UPDATE_CLOUD_PERMISSION, payload: {
       cloudPermissionGranted
+    }
+  }
+}
+
+export const updateLevelData = ( levelData ) =>{
+  return {
+    type: UPDATE_LEVEL_DATA, payload: {
+      levelData
+    }
+  }
+}
+
+export const keeperProcessStatus = ( status ) =>{
+  return {
+    type: KEEPER_PROCESS_STATUS, payload: {
+      status
     }
   }
 }

@@ -19,7 +19,7 @@ import HistoryPageComponent from './HistoryPageComponent'
 import PersonalCopyShareModal from '../../components/PersonalCopyShareModal'
 import moment from 'moment'
 import _ from 'underscore'
-import DeviceInfo, { getFirstInstallTime } from 'react-native-device-info'
+import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
@@ -27,21 +27,18 @@ import HistoryHeaderComponent from './HistoryHeaderComponent'
 import {
   getPDFData,
   confirmPDFShared,
-  sendApprovalRequest,
-  onApprovalStatusChange,
   emptyShareTransferDetailsForContactChange,
-  secondaryShareDownloaded,
   downloadSmShareForApproval,
+  keeperProcessStatus,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
   LevelHealthInterface,
-  notificationType,
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import ApproveSetup from './ApproveSetup'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -57,7 +54,6 @@ const PersonalCopyHistory = ( props ) => {
   const [ QrBottomSheet, setQrBottomSheet ] = useState( React.useRef() )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ blockReshare, setBlockReshare ] = useState( '' )
-  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const [ personalCopyHistory, setPersonalCopyHistory ] = useState( [
     {
@@ -90,15 +86,10 @@ const PersonalCopyHistory = ( props ) => {
     PersonalCopyShareBottomSheet,
     setPersonalCopyShareBottomSheet,
   ] = useState( React.createRef() )
-
   const selectedPersonalCopy = props.navigation.getParam(
     'selectedPersonalCopy'
   )
-
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
-  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState(
-    props.navigation.state.params.isPrimaryKeeper
-  )
   const [ selectedLevelId, setSelectedLevelId ] = useState(
     props.navigation.state.params.selectedLevelId
   )
@@ -106,21 +97,36 @@ const PersonalCopyHistory = ( props ) => {
     props.navigation.state.params.selectedKeeper
   )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedTitle' ) == 'Pdf Keeper' ? false : true
+    props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
   )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
   const pdfInfo = useSelector( ( state ) => state.health.pdfInfo )
-  const keeperApproveStatus = useSelector(
-    ( state ) => state.health.keeperApproveStatus
-  )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
   const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+  const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
+
+  useEffect( () => {
+    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+    setIsReshare(
+      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+    )
+    setIsChange(
+      props.navigation.getParam( 'isChangeKeeperType' )
+        ? props.navigation.getParam( 'isChangeKeeperType' )
+        : false
+    )
+  }, [
+    props.navigation.getParam( 'selectedLevelId' ),
+    props.navigation.getParam( 'selectedKeeper' ),
+    props.navigation.state.params
+  ] )
 
   // const saveInTransitHistory = async () => {
   //   try{
@@ -186,6 +192,12 @@ const PersonalCopyHistory = ( props ) => {
     } )()
   }, [] )
 
+  useEffect( () => {
+    if( !pdfDataConfirm ){
+      dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
+    }
+  }, [ pdfDataConfirm ] )
+
   const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
@@ -224,6 +236,7 @@ const PersonalCopyHistory = ( props ) => {
         onPressShare={() => {}}
         onPressConfirm={() => {
           try {
+            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
             dispatch( confirmPDFShared( selectedKeeper.shareId ) );
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
             if (
@@ -244,6 +257,7 @@ const PersonalCopyHistory = ( props ) => {
             } )
             props.navigation.dispatch( popAction )
           } catch ( err ) {
+            dispatch( keeperProcessStatus( '' ) )
             console.log( 'error', err )
           }
         }}
@@ -360,7 +374,7 @@ const PersonalCopyHistory = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -378,18 +392,16 @@ const PersonalCopyHistory = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          setIsApprovalStarted( true )
-          const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
-          try {
-            dispatch( downloadSmShareForApproval( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          // setIsApprovalStarted( true )
+          // const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
+          // try {
+          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //   setQrBottomSheetsFlag( false )
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )

@@ -81,6 +81,7 @@ export default function NewOwnQuestions( props ) {
   const [ visibleButton, setVisibleButton ] = useState( false )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -117,24 +118,26 @@ export default function NewOwnQuestions( props ) {
   }, [ confirmAnswer ] )
 
   useEffect( () => {
-    if (
-      walletSetupCompleted
-    ) {
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      dispatch( walletCheckIn() )
-      dispatch( initNewBHRFlow( true ) )
+    if( walletSetupCompleted ){
+      console.log( 'walletSetupCompleted****', walletSetupCompleted )
 
-      if( healthCheckInitializedKeeper === true ){
-        if( cloudPermissionGranted ){
-          dispatch( setCloudData() )
-        } else{
-          ( loaderBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.navigate( 'HomeNav', {
-            walletName,
-          } )
-        }}
+      dispatch( walletCheckIn() )
     }
   }, [ walletSetupCompleted ] )
+
+  useEffect( () => {
+    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      if( cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        props.navigation.navigate( 'HomeNav', {
+          walletName,
+        } ) }
+    }
+  }, [ walletSetupCompleted, levelHealth ] )
+
 
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
@@ -153,6 +156,7 @@ export default function NewOwnQuestions( props ) {
       answer,
     }
     dispatch( setupWallet( walletName, security ) )
+    dispatch( initNewBHRFlow( true ) )
     dispatch( setVersion( 'Current' ) )
     const current = Date.now()
     AsyncStorage.setItem(

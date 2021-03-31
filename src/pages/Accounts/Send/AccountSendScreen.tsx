@@ -43,9 +43,9 @@ function renderSectionHeader(
 ): ReactElement | null {
   switch ( sectionKind ) {
       case SectionKind.SELECT_CONTACTS:
-        return <Text style={styles.listSectionHeading}>Send To Contacts</Text>
+        return <Text style={styles.listSectionHeading}>Send to contact</Text>
       case SectionKind.SELECT_ACCOUNT_SHELLS:
-        return <Text style={styles.listSectionHeading}>Send To Accounts</Text>
+        return <Text style={styles.listSectionHeading}>Send to account</Text>
   }
 }
 
@@ -167,6 +167,9 @@ const AccountSendScreen: React.FC<Props> = ( {
           sendableContacts,
           sendableAccountShells,
         ]}
+        contentContainerStyle={{
+          paddingVertical: 16
+        }}
         showsVerticalScrollIndicator={false}
         sections={sections}
         keyExtractor={sectionListItemKeyExtractor}

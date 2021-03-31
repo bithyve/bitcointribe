@@ -113,11 +113,18 @@ export default function NewWalletName( props ) {
               activeOpacity={1}
             >
               <View style={styles.doCloudBackupFieldContentContainer}>
-                <Text style={{
-                  ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
-                }}>
-              Secure my backup on my {cloud}
-                </Text>
+                <View>
+                  <Text style={{
+                    ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                  }}>
+              Use cloud for the initial backup
+                  </Text>
+                  <Text style={{
+                    ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                  }}>
+              (you can also upgrade the wallet security later)
+                  </Text>
+                </View>
                 <View style={styles.checkbox}>
                   {doCloudBackup && (
                     <Entypo

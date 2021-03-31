@@ -86,6 +86,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
 
 
   useEffect( () => {
@@ -99,21 +100,24 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   useEffect( () => {
     if( walletSetupCompleted ){
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
-      dispatch( walletCheckIn() )
-      dispatch( initNewBHRFlow( true ) )
+      console.log( 'walletSetupCompleted****', walletSetupCompleted )
 
-      if( healthCheckInitializedKeeper === true ){
-        if( cloudPermissionGranted ){
-          dispatch( setCloudData() )
-        } else{
-          ( loaderBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.navigate( 'HomeNav', {
-            walletName,
-          } ) }
-      }
+      dispatch( walletCheckIn() )
     }
-  }, [ walletSetupCompleted, s3service ] )
+  }, [ walletSetupCompleted ] )
+
+  useEffect( () => {
+    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      if( cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        props.navigation.navigate( 'HomeNav', {
+          walletName,
+        } ) }
+    }
+  }, [ walletSetupCompleted, levelHealth ] )
 
   const checkCloudLogin = () =>{
     showLoader()
@@ -123,6 +127,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       answer,
     }
     dispatch( setupWallet( walletName, security ) )
+    dispatch( initNewBHRFlow( true ) )
     dispatch( setVersion( 'Current' ) )
     const current = Date.now()
     AsyncStorage.setItem(

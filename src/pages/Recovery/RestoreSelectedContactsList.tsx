@@ -337,7 +337,7 @@ export default function RestoreSelectedContactsList( props ) {
         if ( !META_SHARE ) {
           const { KEY } = REQUEST_DETAILS
           console.log( {
-            KEY 
+            KEY
           } )
           dispatch( downloadMShare( KEY, null, 'recovery' ) )
         } else {
@@ -415,12 +415,12 @@ export default function RestoreSelectedContactsList( props ) {
     let obj = null
     if ( shareCode == 'e0' ) {
       obj = {
-        title: 'Personal Copy 1', status: 'received' 
+        title: 'Personal Copy 1', status: 'received'
       }
       selectedDocsTemp[ 0 ] = obj
     } else if ( shareCode == 'c0' ) {
       obj = {
-        title: 'Personal Copy 2', status: 'received' 
+        title: 'Personal Copy 2', status: 'received'
       }
       selectedDocsTemp[ 1 ] = obj
     }
@@ -474,10 +474,10 @@ export default function RestoreSelectedContactsList( props ) {
 
   return (
     <View style={{
-      flex: 1 
+      flex: 1
     }}>
       <SafeAreaView style={{
-        flex: 0 
+        flex: 0
       }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyles.headerContainer}>
@@ -536,7 +536,7 @@ export default function RestoreSelectedContactsList( props ) {
               color={Colors.textColorGrey}
               size={15}
               style={{
-                alignSelf: 'center' 
+                alignSelf: 'center'
               }}
             />
           </View>
@@ -557,7 +557,7 @@ export default function RestoreSelectedContactsList( props ) {
               </View>
               {SecondaryDeviceRS ? (
                 <View style={{
-                  flexDirection: 'row', marginLeft: 'auto' 
+                  flexDirection: 'row', marginLeft: 'auto'
                 }}>
                   <View
                     style={{
@@ -574,7 +574,7 @@ export default function RestoreSelectedContactsList( props ) {
                 </View>
               ) : !SecondaryDeviceRS ? (
                 <View style={{
-                  flexDirection: 'row', marginLeft: 'auto' 
+                  flexDirection: 'row', marginLeft: 'auto'
                 }}>
                   <View
                     style={{
@@ -594,7 +594,7 @@ export default function RestoreSelectedContactsList( props ) {
                 </View>
               ) : (
                 <View style={{
-                  flexDirection: 'row', marginLeft: 'auto' 
+                  flexDirection: 'row', marginLeft: 'auto'
                 }}>
                   <Text>{SecondaryDeviceRS ? 'Received' : 'Receive'}</Text>
                   <View style={styles.dotsView} />
@@ -609,7 +609,7 @@ export default function RestoreSelectedContactsList( props ) {
         <TouchableOpacity
           onPress={() =>
             props.navigation.navigate( 'RestoreWalletByContacts', {
-              index: 1 
+              index: 1
             } )
           }
         >
@@ -636,7 +636,7 @@ export default function RestoreSelectedContactsList( props ) {
                 color={Colors.textColorGrey}
                 size={15}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               />
             </View>
@@ -655,7 +655,7 @@ export default function RestoreSelectedContactsList( props ) {
                       } )
                     }}
                     style={{
-                      ...styles.selectedContactView, marginBottom: 15 
+                      ...styles.selectedContactView, marginBottom: 15
                     }}
                   >
                     <View>
@@ -664,7 +664,7 @@ export default function RestoreSelectedContactsList( props ) {
                           ? contact.name.split( ' ' )[ 0 ]
                           : ''}{' '}
                         <Text style={{
-                          fontFamily: Fonts.FiraSansMedium 
+                          fontFamily: Fonts.FiraSansMedium
                         }}>
                           {contact.name && contact.name.split( ' ' )[ 0 ]
                             ? contact.name.split( ' ' )[ 1 ]
@@ -687,7 +687,7 @@ export default function RestoreSelectedContactsList( props ) {
                     {contact.status == 'received' ? (
                       <View
                         style={{
-                          flexDirection: 'row', marginLeft: 'auto' 
+                          flexDirection: 'row', marginLeft: 'auto'
                         }}
                       >
                         <View
@@ -721,7 +721,7 @@ export default function RestoreSelectedContactsList( props ) {
                     ) : contact.status == 'inTransit' ? (
                       <View
                         style={{
-                          flexDirection: 'row', marginLeft: 'auto' 
+                          flexDirection: 'row', marginLeft: 'auto'
                         }}
                       >
                         <View
@@ -756,7 +756,7 @@ export default function RestoreSelectedContactsList( props ) {
                     ) : contact.status == 'rejected' ? (
                       <View
                         style={{
-                          flexDirection: 'row', marginLeft: 'auto' 
+                          flexDirection: 'row', marginLeft: 'auto'
                         }}
                       >
                         <View
@@ -794,7 +794,7 @@ export default function RestoreSelectedContactsList( props ) {
                       <TouchableOpacity
                         onPress={() => {}}
                         style={{
-                          flexDirection: 'row', marginLeft: 'auto' 
+                          flexDirection: 'row', marginLeft: 'auto'
                         }}
                       >
                         <Text>{contact.status}</Text>
@@ -839,7 +839,7 @@ export default function RestoreSelectedContactsList( props ) {
                 color={Colors.textColorGrey}
                 size={15}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               />
             </View>
@@ -869,7 +869,7 @@ export default function RestoreSelectedContactsList( props ) {
                       {value.status == 'received' ? (
                         <View
                           style={{
-                            flexDirection: 'row', marginLeft: 'auto' 
+                            flexDirection: 'row', marginLeft: 'auto'
                           }}
                         >
                           <View
@@ -903,7 +903,7 @@ export default function RestoreSelectedContactsList( props ) {
                       ) : value.status == 'rejected' ? (
                         <View
                           style={{
-                            flexDirection: 'row', marginLeft: 'auto' 
+                            flexDirection: 'row', marginLeft: 'auto'
                           }}
                         >
                           <View
@@ -941,7 +941,7 @@ export default function RestoreSelectedContactsList( props ) {
                         <TouchableOpacity
                           onPress={() => handleDocuments()}
                           style={{
-                            flexDirection: 'row', marginLeft: 'auto' 
+                            flexDirection: 'row', marginLeft: 'auto'
                           }}
                         >
                           <Text>{value.status}</Text>
@@ -973,8 +973,8 @@ export default function RestoreSelectedContactsList( props ) {
                 setTimeout( () => {
                   setElevation( 0 )
                 }, 2 )
-                dispatch( recoverWallet() );
-                dispatch(setVersion('Restored'));
+                dispatch( recoverWallet() )
+                dispatch( setVersion( 'Restored' ) )
               }}
             >
               <Text style={styles.proceedButtonText}>Restore</Text>
@@ -1136,7 +1136,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     marginTop: hp( '6%' ),

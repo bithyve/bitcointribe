@@ -205,7 +205,7 @@ function* checkCloudBackupWorker ( { payload } ) {
     console.log( 'CloudDataBackup STARTED' )
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson', backedJson )
+      // console.log( 'backedJson', backedJson )
       if ( backedJson ) {
         const isCloudBackupUpdated = yield call( updateDataWorker, {
           payload: {
@@ -551,7 +551,7 @@ function* uplaodFileWorker( { payload } ) {
     const newArray = []
     if ( readResult ) {
       arr = JSON.parse( readResult )
-      console.log( 'arr', arr )
+      // console.log( 'arr', arr )
       if ( arr && arr.length ) {
         for ( let i = 0; i < arr.length; i++ ) {
           newArray.push( arr[ i ] )

@@ -177,6 +177,7 @@ export const TRUSTED_CHANNEL_FETCHED = 'TRUSTED_CHANNEL_FETCHED'
 export const PAYMENT_DETAILS_FETCHED = 'PAYMENT_DETAILS_FETCHED'
 export const CLEAR_PAYMENT_DETAILS = 'CLEAR_PAYMENT_DETAILS'
 export const SWITCH_TC_LOADING = 'SWITCH_TC_LOADING'
+export const UPGRADE_REDUCER = 'UPGRADE_REDUCER'
 
 export const trustedContactApproved = (
   contactName: string,
@@ -264,3 +265,12 @@ const updateAddressBookLocallyRequest = createAction(
 
 export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
   dispatch( updateAddressBookLocallyRequest( payload ) )
+
+export const upgradeReducer = ( legacyTrustedContactData ) => {
+  return {
+    type: UPGRADE_REDUCER,
+    payload: {
+      legacyTrustedContactData
+    },
+  }
+}
