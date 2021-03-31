@@ -1,29 +1,33 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import {
   TouchableOpacity,
   Text,
   StyleSheet
-} from 'react-native';
-import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import Colors from "../common/Colors";
-import Fonts from "../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+} from 'react-native'
+import { widthPercentageToDP as wp } from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
-export default function KnowMoreButton(props) {
+export default function KnowMoreButton( props ) {
   return (
     <TouchableOpacity
-      style={{ ...styles.knowMoreButton, ...props.containerStyle }}
+      style={{
+        ...styles.knowMoreButton, ...props.containerStyle
+      }}
       onPress={props.onpress}
     >
-      <Text style={{ ...styles.knowMoreButtonText, ...props.textStyle }}>Know more</Text>
+      <Text style={{
+        ...styles.knowMoreButtonText, ...props.textStyle
+      }}>Know more</Text>
     </TouchableOpacity>
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   knowMoreButton: {
-    height: wp('6%'),
-    width: wp('20%'),
+    height: wp( '6%' ),
+    width: wp( '20%' ),
     backgroundColor: Colors.lightBlue,
     justifyContent: 'center',
     alignItems: 'center',
@@ -32,6 +36,6 @@ const styles = StyleSheet.create({
   knowMoreButtonText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
   },
-})
+} )
