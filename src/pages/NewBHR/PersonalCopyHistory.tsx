@@ -29,6 +29,7 @@ import {
   confirmPDFShared,
   emptyShareTransferDetailsForContactChange,
   downloadSmShareForApproval,
+  keeperProcessStatus,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -37,6 +38,7 @@ import {
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
 import ApproveSetup from './ApproveSetup'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -107,6 +109,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+  const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -189,6 +192,12 @@ const PersonalCopyHistory = ( props ) => {
     } )()
   }, [] )
 
+  useEffect( () => {
+    if( !pdfDataConfirm ){
+      dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
+    }
+  }, [ pdfDataConfirm ] )
+
   const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
@@ -227,6 +236,7 @@ const PersonalCopyHistory = ( props ) => {
         onPressShare={() => {}}
         onPressConfirm={() => {
           try {
+            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
             dispatch( confirmPDFShared( selectedKeeper.shareId ) );
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
             if (
@@ -247,6 +257,7 @@ const PersonalCopyHistory = ( props ) => {
             } )
             props.navigation.dispatch( popAction )
           } catch ( err ) {
+            dispatch( keeperProcessStatus( '' ) )
             console.log( 'error', err )
           }
         }}
@@ -363,7 +374,7 @@ const PersonalCopyHistory = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -381,18 +392,16 @@ const PersonalCopyHistory = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          setIsApprovalStarted( true )
-          const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
-          try {
-            dispatch( downloadSmShareForApproval( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
+          // setIsApprovalStarted( true )
+          // const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
+          // try {
+          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //   setQrBottomSheetsFlag( false )
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )

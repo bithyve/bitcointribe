@@ -56,7 +56,8 @@ import {
   secondaryShareDownloaded,
   autoShareToLevel2Keepers,
   downloadSmShareForApproval,
-  updateLevelData
+  updateLevelData,
+  keeperProcessStatus
 } from '../../store/actions/health'
 import { modifyLevelStatus } from './ManageBackupFunction'
 import {
@@ -81,6 +82,7 @@ import ApproveSetup from './ApproveSetup'
 import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import LoaderModal from '../../components/LoaderModal'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -154,6 +156,8 @@ interface ManageBackupNewBHRPropsTypes {
   secondaryShareDownloadedStatus: any;
   cloudPermissionGranted: boolean;
   updateLevelData: any;
+  keeperProcessStatusFlag: string;
+  keeperProcessStatus: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -454,8 +458,9 @@ class ManageBackupNewBHR extends Component<
       this.loaderBottomSheet.snapTo( 0 )
     }
 
-    if( JSON.stringify( prevProps.keeperInfo ) != JSON.stringify( keeperInfo ) ){
+    if( prevProps.keeperProcessStatusFlag != this.props.keeperProcessStatusFlag && this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
       this.props.updateKeeperInfoToTrustedChannel()
+      this.props.keeperProcessStatus( '' )
     }
 
     if (
@@ -787,7 +792,7 @@ class ManageBackupNewBHR extends Component<
   renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -808,19 +813,19 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          try {
-            if ( qrScannedData ) {
-              this.props.downloadSmShareForApproval( qrScannedData )
-              this.setState( {
-                QrBottomSheetsFlag: false
-              } )
-            }
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          // try {
+          //   if ( qrScannedData ) {
+          //     this.props.downloadSmShareForApproval( qrScannedData )
+          //     this.setState( {
+          //       QrBottomSheetsFlag: false
+          //     } )
+          //   }
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )
@@ -1639,7 +1644,7 @@ const mapStateToProps = ( state ) => {
     downloadSmShare: idx( state, ( _ ) => _.health.loading.downloadSmShare ),
     secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
     cloudPermissionGranted: state.health.cloudPermissionGranted,
-
+    keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
   }
 }
 
@@ -1665,7 +1670,8 @@ export default withNavigationFocus(
     secondaryShareDownloaded,
     autoShareToLevel2Keepers,
     downloadSmShareForApproval,
-    updateLevelData
+    updateLevelData,
+    keeperProcessStatus
   } )( ManageBackupNewBHR )
 )
 

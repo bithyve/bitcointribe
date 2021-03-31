@@ -35,7 +35,8 @@ import {
   UPLOAD_SUCCESSFULLY_SM,
   UPDATE_CLOUD_PERMISSION,
   INIT_NEW_BHR,
-  UPDATE_LEVEL_DATA
+  UPDATE_LEVEL_DATA,
+  KEEPER_PROCESS_STATUS
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
@@ -138,6 +139,7 @@ const initialState: {
     info:string
     id: number
   }[];
+  keeperProcessStatus: string;
 } = {
   mnemonic: '',
   service: null,
@@ -193,6 +195,7 @@ const initialState: {
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
   levelData: null,
+  keeperProcessStatus: ''
 }
 
 export default ( state = initialState, action ) => {
@@ -443,6 +446,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           levelData: action.payload.levelData
+        }
+
+      case KEEPER_PROCESS_STATUS:
+        return {
+          ...state,
+          keeperProcessStatus: action.payload.status
         }
   }
   return state

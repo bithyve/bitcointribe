@@ -11,7 +11,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { downloadSmShareForApproval, ErrorSending } from '../../store/actions/health'
+import { downloadSmShareForApproval, ErrorSending, keeperProcessStatus } from '../../store/actions/health'
 import { updatedKeeperInfo, updateMSharesHealth, secondaryShareDownloaded } from '../../store/actions/health'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -55,6 +55,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -221,21 +223,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
       console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-
-      const contactName = contact.firstName + ' ' + contact.lastName
-      const shareArray = [
-        {
-          walletId: s3Service.getWalletId().data.walletId,
-          shareId: selectedShareId,
-          reshareVersion: 0,
-          updatedAt: moment( new Date() ).valueOf(),
-          name: contactName,
-          shareType: 'device',
-          status: 'notAccessible',
-        },
-      ]
-      console.log( 'shareArray', shareArray )
-      dispatch( updateMSharesHealth( shareArray ) )
     },
     [ trustedContactsInfo ],
   )
@@ -259,7 +246,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const shareExpired =  !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
-
+      // Keeper setup started
+      dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
       dispatch( updatedKeeperInfo( {
         shareId: selectedShareId,
         name: contactName,
@@ -306,7 +294,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
         }
       } )
-      const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+      const newSecondarySubAccount: SubAccountDescribing = new TrustedContactsSubAccountInfo( {
         accountShellID: parentShell.id,
         isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
       } )
@@ -340,7 +328,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
         contactName
       ]
-
+      if( publicKey ) {
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
+      }
+      updateShare()
       setSecondaryQR(
         JSON.stringify( {
           isGuardian: true,
@@ -675,7 +666,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -693,18 +684,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          setIsApprovalStarted( true )
-          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          try {
-            if ( qrScannedData ) {
-              dispatch( downloadSmShareForApproval( qrScannedData ) )
-              setQrBottomSheetsFlag( false )
-            }
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          // setIsApprovalStarted( true )
+          // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          // try {
+          //   if ( qrScannedData ) {
+          //     dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //     setQrBottomSheetsFlag( false )
+          //   }
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )
@@ -795,6 +786,26 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
   }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+
+  const updateShare = () =>{
+    let contactName = 'Secondary Device'
+    if( index === 0 ) contactName = 'Secondary Device1'
+    else if( index === 3 ) contactName = 'Secondary Device2'
+    else contactName = 'Secondary Device3'
+    const shareArray = [
+      {
+        walletId: s3Service.getWalletId().data.walletId,
+        shareId: selectedShareId,
+        reshareVersion: 0,
+        updatedAt: moment( new Date() ).valueOf(),
+        name: contactName,
+        shareType: 'device',
+        status: 'notAccessible',
+      },
+    ]
+    console.log( 'shareArray', shareArray )
+    dispatch( updateMSharesHealth( shareArray ) )
+  }
 
   return (
     <View style={{
