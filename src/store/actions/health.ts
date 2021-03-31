@@ -561,12 +561,12 @@ export const autoShareContact = (
 }
 
 export const autoShareToLevel2Keepers = (
-  contactLevelInfo, pdfLevelInfo
+  levelHealth
 ) => {
   return {
     type: AUTO_SHARE_LEVEL2_KEEPER,
     payload: {
-      contactLevelInfo, pdfLevelInfo
+      levelHealth
     },
   }
 }

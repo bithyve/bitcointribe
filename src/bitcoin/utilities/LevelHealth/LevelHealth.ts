@@ -1665,7 +1665,6 @@ export default class LevelHealth {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
     }
-    console.log( 'uploadPDFPrimaryShare res', res )
     return res.data
   };
 
@@ -1855,11 +1854,9 @@ export default class LevelHealth {
 
   public updateKeeperInfoToMetaShare = ( keeperInfo: any, answer: string ): { metaShares: MetaShare[] } => {
     const { encryptedString } = LevelHealth.encryptWithAnswer( JSON.stringify( keeperInfo ), answer )
-    console.log( 'ENCRYPTED KEEPERINFO', encryptedString )
     for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
       this.metaSharesKeeper[ i ].meta.encryptedKeeperInfo = encryptedString
     }
-    console.log( 'updateKeeperInfoToMetaShare this.metaSharesKeeper', this.metaSharesKeeper )
     return {
       metaShares: this.metaSharesKeeper
     }
