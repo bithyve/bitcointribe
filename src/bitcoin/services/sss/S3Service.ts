@@ -35,6 +35,7 @@ export default class S3Service {
       pdfHealth: {};
     } = sss
 
+
     const {
       encryptedSecretsKeeper,
       shareIDsKeeper,
@@ -53,7 +54,18 @@ export default class S3Service {
       pdfHealthKeeper: {};
       encryptedSMSecretsKeeper: string[];
       SMMetaSharesKeeper: MetaShare[];
-    } = levelhealth
+    } = levelhealth ? levelhealth : {
+      encryptedSecretsKeeper: [],
+      shareIDsKeeper: [],
+      metaSharesKeeper: [],
+      healthCheckInitializedKeeper: false,
+      healthCheckStatusKeeper: {
+      },
+      pdfHealthKeeper: {
+      },
+      encryptedSMSecretsKeeper: [],
+      SMMetaSharesKeeper: [],
+    }
 
     return new S3Service( mnemonic, {
       encryptedSecrets,

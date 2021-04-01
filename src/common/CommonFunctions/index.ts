@@ -1,8 +1,8 @@
-import { AsyncStorage } from "react-native";
-import { LevelHealthInterface, LevelInfo } from "../../bitcoin/utilities/Interface";
-import SSS from "../../bitcoin/utilities/sss/SSS";
-import AccountShell from "../data/models/AccountShell";
-import { encrypt } from "../encryption";
+import { AsyncStorage } from 'react-native'
+import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
+import SSS from '../../bitcoin/utilities/sss/SSS'
+import AccountShell from '../data/models/AccountShell'
+import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 
 export const nameToInitials = fullName => {
@@ -60,28 +60,28 @@ export const APP_LIST = {
     pkgName: 'com.facebook.orca', urlScheme: 'fb-messenger', urlParams: 'user-thread/{user-id}'
   }, // fa: facebook
 }
-export const getFormattedString = (qrString: string) => {
-  qrString = qrString.split('"').join('Dquote');
-  qrString = qrString.split(':').join('Qutation');
-  qrString = qrString.split('{').join('Lbrace');
-  qrString = qrString.split('}').join('Rbrace');
-  qrString = qrString.split('/').join('Slash');
-  qrString = qrString.split(',').join('Comma');
-  qrString = qrString.split("'").join('Squote');
-  qrString = qrString.split(' ').join('Space');
-  return qrString;
-};
+export const getFormattedString = ( qrString: string ) => {
+  qrString = qrString.split( '"' ).join( 'Dquote' )
+  qrString = qrString.split( ':' ).join( 'Qutation' )
+  qrString = qrString.split( '{' ).join( 'Lbrace' )
+  qrString = qrString.split( '}' ).join( 'Rbrace' )
+  qrString = qrString.split( '/' ).join( 'Slash' )
+  qrString = qrString.split( ',' ).join( 'Comma' )
+  qrString = qrString.split( '\'' ).join( 'Squote' )
+  qrString = qrString.split( ' ' ).join( 'Space' )
+  return qrString
+}
 
-export const generateRandomString = (length: number): string => {
-  let randomString: string = '';
-  const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  for (let itr = 0; itr < length; itr++) {
+export const generateRandomString = ( length: number ): string => {
+  let randomString = ''
+  const possibleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  for ( let itr = 0; itr < length; itr++ ) {
     randomString += possibleChars.charAt(
-      Math.floor(Math.random() * possibleChars.length),
-    );
+      Math.floor( Math.random() * possibleChars.length ),
+    )
   }
-  return randomString;
-};
+  return randomString
+}
 
 const asyncDataToBackup = async () => {
   const [
@@ -104,7 +104,7 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-function* stateDataToBackup(accountShells, activePersonalNode, versionHistory, trustedContactsInfo) {
+function* stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) {
   // state data to backup
   const STATE_DATA = {
   }
@@ -122,36 +122,42 @@ function* stateDataToBackup(accountShells, activePersonalNode, versionHistory, t
 
   return STATE_DATA
 }
-export const CloudData = async (database, accountShells, activePersonalNode, versionHistory, trustedContactsInfo) => {
-  let encryptedCloudDataJson;
-    let walletImage = {
-      SERVICES: {},
-      DECENTRALIZED_BACKUP: {},
-      ASYNC_DATA: {},
-      WALLET_SETUP: {},
-      STATE_DATA: {},
-    };
-   // console.log("DATABASE", database);
-    let CloudDataJson = {};
-    if (!isEmpty(database)) {
-      if (database.SERVICES)
-        walletImage.SERVICES = database.SERVICES;
-      if (database.DECENTRALIZED_BACKUP)
-        walletImage.DECENTRALIZED_BACKUP = database.DECENTRALIZED_BACKUP;
-      if (database.WALLET_SETUP)
-        walletImage.WALLET_SETUP = database.WALLET_SETUP;
-      walletImage.ASYNC_DATA = await asyncDataToBackup();
-      walletImage.STATE_DATA = stateDataToBackup(accountShells, activePersonalNode, versionHistory, trustedContactsInfo);
-      let key = SSS.strechKey(database.WALLET_SETUP.security.answer);
-      CloudDataJson = {
-        walletImage,
-        keeperInfo: [],
-      };
-      // console.log("walletImage", walletImage);
-      encryptedCloudDataJson = await encrypt(CloudDataJson, key);
-      // console.log('encryptedDatabase', encryptedCloudDataJson);
-      return encryptedCloudDataJson;
-}
+export const CloudData = async ( database, accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) => {
+  let encryptedCloudDataJson
+  const walletImage = {
+    SERVICES: {
+    },
+    DECENTRALIZED_BACKUP: {
+    },
+    ASYNC_DATA: {
+    },
+    WALLET_SETUP: {
+    },
+    STATE_DATA: {
+    },
+  }
+  // console.log("DATABASE", database);
+  let CloudDataJson = {
+  }
+  if ( !isEmpty( database ) ) {
+    if ( database.SERVICES )
+      walletImage.SERVICES = database.SERVICES
+    if ( database.DECENTRALIZED_BACKUP )
+      walletImage.DECENTRALIZED_BACKUP = database.DECENTRALIZED_BACKUP
+    if ( database.WALLET_SETUP )
+      walletImage.WALLET_SETUP = database.WALLET_SETUP
+    walletImage.ASYNC_DATA = await asyncDataToBackup()
+    walletImage.STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo )
+    const key = SSS.strechKey( database.WALLET_SETUP.security.answer )
+    CloudDataJson = {
+      walletImage,
+      keeperInfo: [],
+    }
+    // console.log("walletImage", walletImage);
+    encryptedCloudDataJson = await encrypt( CloudDataJson, key )
+    // console.log('encryptedDatabase', encryptedCloudDataJson);
+    return encryptedCloudDataJson
+  }
 }
 
 export const getCurrencyImageByRegion = (
@@ -240,9 +246,9 @@ export const getCurrencyImageByRegion = (
     }
     return require( '../../assets/images/currencySymbols/icon_chf_gray.png' )
   }
-};
+}
 
-export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealthInterface[], shareId: string) : {
+export const getKeeperInfoFromShareId = ( levelHealthVar: LevelHealthInterface[], shareId: string ) : {
   shareType: string;
   updatedAt: number;
   status: string;
@@ -250,26 +256,26 @@ export const getKeeperInfoFromShareId = (levelHealthVar: LevelHealthInterface[],
   reshareVersion?: number;
   name?: string;
 } =>{
-  let index;
-  for (let i = 0; i < levelHealthVar.length; i++) {
-    const element = levelHealthVar[i];
-    index = element.levelInfo.findIndex(value=>value.shareId == shareId);
-    if(index>-1){
-      return element.levelInfo[index];
+  let index
+  for ( let i = 0; i < levelHealthVar.length; i++ ) {
+    const element = levelHealthVar[ i ]
+    index = element.levelInfo.findIndex( value=>value.shareId == shareId )
+    if( index>-1 ){
+      return element.levelInfo[ index ]
     }
   }
 }
 
-export const getLevelInfo = (levelHealthVar: LevelHealthInterface[], currentLevel: number) : LevelInfo[] =>{
-  if (levelHealthVar[currentLevel]) {
-    if(levelHealthVar[1]){
-      for (let i = 0; i < levelHealthVar[currentLevel].levelInfo.length; i++) {
-        if (levelHealthVar[currentLevel].levelInfo[i].updatedAt !== 0 && levelHealthVar[currentLevel].levelInfo[i].shareType !== "securityQuestion") {
-          return levelHealthVar[currentLevel].levelInfo;
+export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLevel: number ) : LevelInfo[] =>{
+  if ( levelHealthVar[ currentLevel ] ) {
+    if( levelHealthVar[ 1 ] ){
+      for ( let i = 0; i < levelHealthVar[ currentLevel ].levelInfo.length; i++ ) {
+        if ( levelHealthVar[ currentLevel ].levelInfo[ i ].updatedAt !== 0 && levelHealthVar[ currentLevel ].levelInfo[ i ].shareType !== 'securityQuestion' ) {
+          return levelHealthVar[ currentLevel ].levelInfo
         }
       }
     }
-    else return levelHealthVar[0].levelInfo;
+    else return levelHealthVar[ 0 ].levelInfo
   }
-  return levelHealthVar[currentLevel - 1].levelInfo;
+  return levelHealthVar[ currentLevel - 1 ].levelInfo
 }

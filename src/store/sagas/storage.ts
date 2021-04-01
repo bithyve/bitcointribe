@@ -19,11 +19,13 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { walletCheckIn } from '../actions/trustedContacts'
+import { upgradeReducer, walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
 import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
+import { updateWalletImage } from '../actions/sss'
+import { TrustedContactsState } from '../reducers/trustedContacts'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -52,6 +54,8 @@ function* fetchDBWorker() {
   try {
     // let t = timer('fetchDBWorker')
     const key = yield select( ( state ) => state.storage.key )
+    const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
+
     const database = yield call( dataManager.fetch, key )
     if ( key && database ) {
       yield call( servicesEnricherWorker, {
@@ -64,8 +68,13 @@ function* fetchDBWorker() {
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
         yield put( walletCheckIn() )
-        yield put( updateWalletImageHealth() )
-        //yield put( updateWalletImage() )
+        if( newBHRFlowStarted === true ){
+          yield put( updateWalletImageHealth() )
+        }else{
+          yield put( updateWalletImage() )
+        }
+
+
       }
     } else {
       // DB would be absent during wallet setup
@@ -204,7 +213,7 @@ function* servicesEnricherWorker( { payload } ) {
         }
       }
 
-      if ( semver.lt( dbVersion, '1.4.5' ) ) {
+      if ( semver.lt( dbVersion, '1.4.6' ) ) {
         // update sub-account instances count
         const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
@@ -225,6 +234,9 @@ function* servicesEnricherWorker( { payload } ) {
         console.log( 'Updated sub-account instances count' )
         services.REGULAR_ACCOUNT = regularAccount
         services.SECURE_ACCOUNT = secureAccount
+
+        const trustedContact = services.TRUSTED_CONTACTS
+        yield put( upgradeReducer( trustedContact ) )
         migrated = true
       }
     } else {

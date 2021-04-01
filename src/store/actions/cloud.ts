@@ -17,8 +17,8 @@ export const IS_CLOUD_BACKUP_SUCCESS = 'IS_CLOUD_BACKUP_SUCCESS'
 export const GOOGLE_LOGIN_RESULT = 'GOOGLE_LOGIN_RESULT'
 export const GOOGLE_LOGIN = 'GOOGLE_LOGIN'
 export const GOOGLE_LOGIN_FAILURE = 'GOOGLE_LOGIN_FAILURE'
-export const DATA_BACKUP_STATUS = 'DATA_BACKUP_STATUS'
 export const CLEAR_CLOUD_CACHE = 'CLEAR_CLOUD_CACHE'
+export const CLOUD_BACKUP_STATUS = 'CLOUD_BACKUP_STATUS'
 
 export const setCloudData = ( kpInfo?, level?, share? ) => {
   return {
@@ -122,11 +122,11 @@ export const setGoogleLoginResult = ( data ) => {
   }
 }
 
-export const DataBackupStatus = ( backupStatus ) => {
+export const setCloudBackupStatus = ( cloudBackupStatus ) => {
   return {
-    type: DATA_BACKUP_STATUS,
+    type: CLOUD_BACKUP_STATUS,
     payload: {
-      backupStatus
+      cloudBackupStatus
     },
   }
 }

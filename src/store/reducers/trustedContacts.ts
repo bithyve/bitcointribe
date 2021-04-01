@@ -14,6 +14,7 @@ import {
   CLEAR_TRUSTED_CONTACTS_CACHE,
   UPDATE_ADDRESS_BOOK_LOCALLY,
   UPDATE_TRUSTED_CONTACTS_INFO,
+  UPGRADE_REDUCER,
 } from '../actions/trustedContacts'
 import {
   ContactElements,
@@ -226,6 +227,26 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
             backendTrustedContactsData: state.service.tc.trustedContacts,
           } ),
         }
+      case UPGRADE_REDUCER:
+        return {
+          ...state,
+          service: action.payload.legacyTrustedContactData.service ? action.payload.legacyTrustedContactData.service : null,
+          approvedTrustedContacts: action.payload.legacyTrustedContactData.approvedTrustedContacts ? action.payload.legacyTrustedContactData.approvedTrustedContacts : null,
+          ephemeralChannel: action.payload.legacyTrustedContactData.ephemeralChannel ? action.payload.legacyTrustedContactData.ephemeralChannel :null,
+          trustedChannel: action.payload.legacyTrustedContactData.trustedChannel ? action.payload.legacyTrustedContactData.trustedChannel : null,
+          paymentDetails: action.payload.legacyTrustedContactData.paymentDetails ? action.payload.legacyTrustedContactData.paymentDetails : null,
+          loading: {
+            updateEphemeralChannel: action.payload.legacyTrustedContactData.updateEphemeralChannel ? action.payload.legacyTrustedContactData.updateEphemeralChannel : false,
+            updateTrustedChannel: action.payload.legacyTrustedContactData.updateTrustedChannel ? action.payload.legacyTrustedContactData.updateTrustedChannel : false,
+            trustedChannelsSetupSync: action.payload.legacyTrustedContactData.trustedChannelsSetupSync ? action.payload.legacyTrustedContactData.trustedChannelsSetupSync :false,
+            approvingTrustedContact: action.payload.legacyTrustedContactData.approvingTrustedContact ? action.payload.legacyTrustedContactData.approvingTrustedContact : false,
+            walletCheckIn: action.payload.legacyTrustedContactData.walletCheckIn ? action.payload.legacyTrustedContactData.walletCheckIn : false,
+          },
+          addressBook: action.payload.legacyTrustedContactData.addressBook ? action.payload.legacyTrustedContactData.addressBook : null,
+          trustedContactsInfo: action.payload.legacyTrustedContactData.trustedContactsInfo ? action.payload.legacyTrustedContactData.trustedContactsInfo : [],
+          trustedContactRecipients: action.payload.legacyTrustedContactData.trustedContactRecipients ? action.payload.legacyTrustedContactData.trustedContactRecipients : [],
+        }
+
   }
 
   return state
@@ -239,7 +260,7 @@ function reduceTCInfoIntoRecipientDescriptions( {
   trustedContactsInfo: TrustedContactInfo[];
   backendTrustedContactsData: Contacts;
 } ): ContactRecipientDescribing[] {
-  return trustedContactsInfo.reduce( (
+  return trustedContactsInfo && trustedContactsInfo.length && trustedContactsInfo.reduce( (
     accumulatedRecipients: ContactRecipientDescribing[],
     currentTCInfoObject: TrustedContactInfo | null,
     currentIndex: number,

@@ -29,8 +29,6 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { updateCloudPermission } from '../store/actions/health'
-import useInitialServiceInstancesAvailabilityState from '../utils/hooks/state-selectors/storage/useInitialServiceInstancesAvailabilityState'
-import { initializeServices } from '../store/actions/storage'
 
 export default function NewWalletName( props ) {
   const [ walletName, setWalletName ] = useState( '' )
@@ -38,15 +36,6 @@ export default function NewWalletName( props ) {
   const [ doCloudBackup, setDoCloudBackup ] = useState( true )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const dispatch = useDispatch()
-  const servicesAvailable = useInitialServiceInstancesAvailabilityState()
-
-  useEffect( ()=>{
-    InteractionManager.runAfterInteractions( () => {
-      if( !servicesAvailable ){
-        dispatch( initializeServices() )
-      }
-    } )
-  }, [] )
 
   return (
     <SafeAreaView style={{
@@ -124,11 +113,18 @@ export default function NewWalletName( props ) {
               activeOpacity={1}
             >
               <View style={styles.doCloudBackupFieldContentContainer}>
-                <Text style={{
-                  ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
-                }}>
-              Secure my backup on my {cloud}
-                </Text>
+                <View>
+                  <Text style={{
+                    ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                  }}>
+              Use cloud for the initial backup
+                  </Text>
+                  <Text style={{
+                    ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
+                  }}>
+              (you can also upgrade the wallet security later)
+                  </Text>
+                </View>
                 <View style={styles.checkbox}>
                   {doCloudBackup && (
                     <Entypo

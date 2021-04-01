@@ -138,6 +138,7 @@ interface ContactDetailsPropTypes {
   uploadRequestedSMShare: any;
   uploadSMSuccessfullyFlag: Boolean;
   UploadSMSuccessfully: any;
+  uploadingSmShare: any;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -153,6 +154,7 @@ interface ContactDetailsStateTypes {
   key: string;
   trustedContactHistory: any;
   SMShareQR: string;
+  qrModalTitle: string;
 }
 
 class ContactDetails extends PureComponent<
@@ -225,6 +227,7 @@ class ContactDetails extends PureComponent<
           // info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
         },
       ],
+      qrModalTitle: ''
     }
 
     this.Contact = this.props.navigation.state.params.contact
@@ -527,12 +530,15 @@ class ContactDetails extends PureComponent<
           type: 'ReverseRecoveryQR',
           ver: appVersion,
         } )
-        this.setState( {
-          trustedQR: qrString
-        } )
+
         setTimeout( () => {
-          ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
-        }, 2 )
+          this.setState( {
+            trustedQR: qrString
+          } )
+        }, 2 );
+
+        ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
+
         UploadSMSuccessfully( null )
       }
     } else {
@@ -621,6 +627,9 @@ class ContactDetails extends PureComponent<
       trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
     const encryptionKey = S3Service.generateRequestCreds().key
     if( isSmKey ){
+      this.setState( {
+        qrModalTitle: 'Share Secondary Key'
+      } )
       if (
         !UNDER_CUSTODY[ requester ] ||
         !UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS
@@ -636,6 +645,9 @@ class ContactDetails extends PureComponent<
       }
     }
     else{
+      this.setState( {
+        qrModalTitle: 'Send Recovery Secret'
+      } )
       if (
         !UNDER_CUSTODY[ requester ] ||
         !UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
@@ -782,7 +794,8 @@ class ContactDetails extends PureComponent<
       return
     }
 
-    const { publicKey, otp } = trustedContacts.tc.trustedContacts[ contactName ]
+    const { publicKey, ephemeralChannel, otp } = trustedContacts.tc.trustedContacts[ contactName ]
+    const otpValue = otp ? otp : ephemeralChannel && ephemeralChannel.data[ 0 ] ? ephemeralChannel.data[ 0 ].shareTransferDetails.otp : ''
     const requester = WALLET_SETUP.walletName
     const appVersion = DeviceInfo.getVersion()
     if ( this.Contact.phoneNumbers && this.Contact.phoneNumbers.length ) {
@@ -828,10 +841,10 @@ class ContactDetails extends PureComponent<
       this.setState( {
         trustedLink: emailDL,
       } )
-    } else if ( otp ) {
+    } else if ( otpValue ) {
       const otpHintType = 'otp'
       const otpHint = 'xxx'
-      const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otp )
+      const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otpValue )
         .encryptedPub
       const otpDL =
         `https://hexawallet.io/${config.APP_STAGE}/tc` +
@@ -918,7 +931,7 @@ class ContactDetails extends PureComponent<
   renderSendViaQRContents = () => {
     return (
       <SendViaQR
-        headerText={'Send Recovery Secret'}
+        headerText={this.state.qrModalTitle}
         subHeaderText={'You should scan the QR to restore'}
         contactText={''}
         contact={this.Contact}
@@ -1031,7 +1044,7 @@ class ContactDetails extends PureComponent<
   };
 
   render() {
-    const { navigation, uploading } = this.props
+    const { navigation, uploading, uploadingSmShare } = this.props
     const {
       contact,
       Loading,
@@ -1276,9 +1289,6 @@ class ContactDetails extends PureComponent<
                   ) : (
                     <Text style={styles.buttonText}>Help Restore</Text>
                   )}
-                  {/* <Text numberOfLines={1} style={styles.buttonInfo}>
-                    Lorem ipsum dolor
-                  </Text> */}
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
@@ -1292,9 +1302,11 @@ class ContactDetails extends PureComponent<
                   style={styles.buttonImage}
                 />
                 <View>
-                  <Text style={styles.buttonText}>
-                    Help SM Key
-                  </Text>
+                  {uploadingSmShare ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Text style={styles.buttonText}>Help SM Key</Text>
+                  )}
                 </View>
               </TouchableOpacity>
               {encryptedExitKey ? (
@@ -1451,6 +1463,7 @@ class ContactDetails extends PureComponent<
 const mapStateToProps = ( state ) => {
   return {
     uploading: idx( state, ( _ ) => _.sss.loading.uploadRequestedShare ),
+    uploadingSmShare: idx( state, ( _ ) => _.health.loading.uploadRequestedShare ),
     errorSending: idx( state, ( _ ) => _.sss.errorSending ),
     uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),

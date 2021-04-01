@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
+import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -16,39 +16,20 @@ import {
   CHANGE_AUTH_CRED,
   credsChanged,
   pinChangedFailed,
-  setIsNewHealthSystemSet,
   initializeRecoveryCompleted,
   completedWalletSetup,
-  walletSetupFailed,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import { getTestcoins } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
-  yield put( setIsNewHealthSystemSet( true ) )
-
-  const services: {
-    regularAcc: RegularAccount;
-    testAcc: TestAccount;
-    secureAcc: SecureAccount;
-    s3Service: S3Service;
-    trustedContacts: TrustedContactsService;
-    keepersInfo: KeeperService;
-  } = yield select( ( state ) => state.storage.initialServiceInstances )
-
-  if( !services || !Object.keys( services ).length ) yield put( walletSetupFailed( ) )
+  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
@@ -65,12 +46,12 @@ function* setupWalletWorker( { payload } ) {
       },
     },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( services.regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( services.testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( services.secureAcc ),
-      S3_SERVICE: JSON.stringify( services.s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( services.trustedContacts ),
-      KEEPERS_INFO: JSON.stringify( services.keepersInfo ),
+      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
+      TEST_ACCOUNT: JSON.stringify( testAcc ),
+      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
+      S3_SERVICE: JSON.stringify( s3Service ),
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      KEEPERS_INFO: JSON.stringify( keepersInfo ),
     },
     VERSION: DeviceInfo.getVersion(),
   }
@@ -79,14 +60,14 @@ function* setupWalletWorker( { payload } ) {
   } )
 
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+
+  // initialize health-check schema on relay
+  yield put( initializeHealthSetup() )
   yield put( completedWalletSetup( ) )
 
   // Post Hydration activities
   // saturate the test account w/ 10K sats
   yield put( getTestcoins() )
-
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )

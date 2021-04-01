@@ -63,9 +63,9 @@ export default function OTPAuthenticationScreen( { navigation } ) {
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(
       <SendConfirmationContent
-        title={'Sent Successfully to Contact'}
+        title={'Sent Successfully'}
         info={'Transaction(s) successfully submitted'}
-        infoText={'Bitcoins successfully sent to Contact'}
+        infoText={'bitcoin successfully sent to Contact'}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
         okButtonText={'View Account'}

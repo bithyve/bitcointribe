@@ -2,20 +2,20 @@ import moment from 'moment'
 import { NativeModules, Platform } from 'react-native'
 import { call, fork, put, select, spawn } from 'redux-saga/effects'
 import { CloudData } from '../../common/CommonFunctions'
-import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, DataBackupStatus } from '../actions/cloud'
+import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus } from '../actions/cloud'
 import { updateMSharesHealth } from '../actions/health'
-import { setCloudBackupStatus } from '../actions/preferences'
 import { createWatcher } from '../utils/utilities'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
 
 function* cloudWorker( { payload } ) {
   try{
-    const cloudBackupStatus = yield select( ( state ) => state.preferences.cloudBackupStatus )
-    if ( cloudBackupStatus === false ) {
-      yield put( setCloudBackupStatus( true ) )
+    const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
+    if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+      yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share } = payload
       const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
       const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
@@ -68,22 +68,20 @@ function* cloudWorker( { payload } ) {
       } )
 
       if( isCloudBackupCompleted ) {
-        yield put( DataBackupStatus( true ) )
+        yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
         yield call( updateHealthForCloudStatusWorker, {
           payload : {
             share
           }
         } )
       } else{
-        yield put( DataBackupStatus( false ) )
-        yield put( setCloudBackupStatus( false ) )
+        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
       }
 
     }
   }
   catch ( error ) {
-    yield put( DataBackupStatus( false ) )
-    yield put( setCloudBackupStatus( false ) )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     console.log( 'ERROR cloudWorker', error )
   }
 }
@@ -96,8 +94,6 @@ export const cloudWatcher = createWatcher(
 function* updateHealthForCloudStatusWorker( { payload } ) {
   console.log( 'setCloudBackupStatusWorker', payload )
   try {
-    yield put( setCloudBackupStatus( false ) )
-
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
 
     if ( currentLevel == 0 ) {
@@ -113,10 +109,9 @@ function* updateHealthForCloudStatusWorker( { payload } ) {
         }
       } )
     }
-    yield put( setCloudBackupStatus( false ) )
   }
   catch ( error ) {
-    yield put( setCloudBackupStatus( false ) )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     console.log( 'ERRORsf', error )
   }
 }
@@ -167,7 +162,7 @@ function* updateHealthForCloudWorker( { payload } ) {
     }
   }
   catch ( error ) {
-    yield put( setCloudBackupStatus( false ) )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     console.log( 'ERRORsf', error )
     throw error
   }
@@ -194,6 +189,7 @@ function* getCloudBackupRecoveryWorker () {
       } )
     }
   } catch ( error ) {
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     throw new Error( error )
   }
 }
@@ -209,7 +205,7 @@ function* checkCloudBackupWorker ( { payload } ) {
     console.log( 'CloudDataBackup STARTED' )
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson', backedJson )
+      // console.log( 'backedJson', backedJson )
       if ( backedJson ) {
         const isCloudBackupUpdated = yield call( updateDataWorker, {
           payload: {
@@ -374,7 +370,7 @@ function* updateDataWorker( { payload } ) {
     }
   }
   catch ( error ) {
-    yield put( setCloudBackupStatus( false ) )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     console.log( 'ERRORsf', error )
     throw error
   }
@@ -432,6 +428,7 @@ function* createFileWorker( { payload } ) {
       }
     }
   } catch ( error ) {
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     throw new Error( error )
   }
 }
@@ -493,6 +490,7 @@ function* checkFileIsAvailableWorker( { payload } ) {
       return readStatus
     }
   } catch ( error ) {
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     throw new Error( error )
   }
 }
@@ -532,6 +530,7 @@ function* readFileWorker( { payload } ) {
     }
   } catch ( error ) {
     console.log( 'error', error )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     yield put( setIsFileReading( false ) )
     throw new Error( error )
   }
@@ -552,7 +551,7 @@ function* uplaodFileWorker( { payload } ) {
     const newArray = []
     if ( readResult ) {
       arr = JSON.parse( readResult )
-      console.log( 'arr', arr )
+      // console.log( 'arr', arr )
       if ( arr && arr.length ) {
         for ( let i = 0; i < arr.length; i++ ) {
           newArray.push( arr[ i ] )
@@ -608,6 +607,7 @@ function* uplaodFileWorker( { payload } ) {
     }
 
   } catch ( error ) {
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
     yield put( setIsFileReading( false ) )
     throw new Error( error )
   }

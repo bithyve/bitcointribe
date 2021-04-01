@@ -1,4 +1,4 @@
-import { call, delay, put, select } from 'redux-saga/effects'
+import { call, delay, fork, put, select } from 'redux-saga/effects'
 import {
   createWatcher,
   requestTimedout,
@@ -279,7 +279,7 @@ export const checkSharesHealthWatcher = createWatcher(
 function* updateSharesHealthWorker( { payload } ) {
   // // set a timelapse for auto update and enable instantaneous manual update
   try {
-    console.log( 'modifyLevelStatus payload.shares', payload.shares )
+    console.log( 'modifyLevelStatus payload.shares', payload )
     yield put( updateMSharesLoader( true ) )
     const res = yield call( S3Service.updateHealthKeeper, payload.shares )
     if ( res.status === 200 ) {
@@ -2510,24 +2510,36 @@ export const autoDownloadShareContactWatcher = createWatcher(
 
 function* getPDFDataWorker( { payload } ) {
   try {
-    yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
     const { shareId, isReShare } = payload
+    let shareIndex = 3
+    yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    if (
+      shareId &&
+        s3Service.levelhealth.metaSharesKeeper.length &&
+        s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == shareId ) > -1
+    ) {
+      shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == shareId )
+    }
+    const primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
+    const obj = {
+      shareId: primaryShare.shareId,
+      name: 'Keeper PDF',
+      uuid: '',
+      publicKey: '',
+      ephemeralAddress: '',
+      type: 'pdf',
+      data: {
+      }
+    }
+    yield put( updatedKeeperInfo( obj ) )
+
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeper: KeeperService = yield select( ( state ) => state.keeper.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryShareDownloaded = yield select( ( state ) => state.health.secondaryShareDownloaded )
-    let shareIndex = 3
-    if (
-      shareId &&
-        s3Service.levelhealth.metaSharesKeeper.length &&
-        metaShare.findIndex( ( value ) => value.shareId == shareId ) > -1
-    ) {
-      shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
-    }
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
     let secondaryShare
     // TODO get primaryKeeper shareID
@@ -2573,12 +2585,8 @@ function* getPDFDataWorker( { payload } ) {
         publicKey = keyPair.getPublic( 'hex' )
         privateKey = keyPair.getPrivate( 'hex' )
       }
-
-      const primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
       const primaryShareKey = Keeper.getDerivedKey( privateKey )
       const secondaryShareKey = Keeper.getDerivedKey( walletId )
-
-
       const secondaryData = LevelHealth.encryptMetaShare(
         secondaryShare,
         secondaryShareKey
@@ -2587,17 +2595,6 @@ function* getPDFDataWorker( { payload } ) {
         primaryShare,
         primaryShareKey
       )
-      const obj = {
-        shareId: primaryShare.shareId,
-        name: 'Keeper PDF',
-        uuid: '',
-        publicKey: '',
-        ephemeralAddress: '',
-        type: 'pdf',
-        data: {
-        }
-      }
-      yield put( updatedKeeperInfo( obj ) )
       const primaryShareObject = JSON.stringify( {
         key: primaryShareKey,
         messageId: primaryData.messageId,
@@ -2606,9 +2603,6 @@ function* getPDFDataWorker( { payload } ) {
         key: secondaryShareKey,
         messageId: secondaryData.messageId,
       } )
-
-      console.log( 'primaryShareObject', primaryShareObject )
-      console.log( 'secondaryShareObject', secondaryShareObject )
 
       // TODO upload Data
       const res1 = yield call(
@@ -2621,8 +2615,6 @@ function* getPDFDataWorker( { payload } ) {
         secondaryData.encryptedMetaShare,
         secondaryData.messageId
       )
-      console.log( 'res1', res1 )
-      console.log( 'res2', res2 )
       if ( res1.success && res2.success ) {
         const qrData = [
           JSON.stringify( {
@@ -3271,6 +3263,7 @@ function* uploadRequestedSMShareWorker( { payload } ) {
     } else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
     }
+    yield put( switchS3LoaderKeeper( 'uploadRequestedShare' ) )
   } catch ( error ) {
     console.log( 'RECOVERY error', error )
     yield put( switchS3LoaderKeeper( 'uploadRequestedShare' ) )
@@ -3397,7 +3390,7 @@ function* updateKeeperInfoToTrustedChannelWorker() {
             tag: notificationTag.IMP,
             date: new Date(),
           }
-          const ress = yield call(
+          const ress = yield fork(
             RelayServices.sendNotifications,
             [ {
               walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
@@ -3437,7 +3430,7 @@ function* updateKeeperInfoToTrustedChannelWorker() {
       )
 
       // TODO upload Data
-      const res1 = yield call(
+      const res1 = yield fork(
         LevelHealth.uploadPDFPrimaryShare,
         primaryData.encryptedMetaShare,
         primaryData.messageId
@@ -3531,36 +3524,47 @@ export const updateKeeperInfoToUnderCustodyWatcher = createWatcher(
 function* autoShareLevel2KeepersWorker( { payload } ) {
   try {
     yield put( switchS3LoaderKeeper( 'autoShareContact' ) )
-    const { contactLevelInfo, pdfLevelInfo } = payload
-    const levelHealth: LevelHealthInterface[] = yield select(
-      ( state ) => state.health.levelHealth
-    )
-    const keeperInfo: any[] = yield select(
-      ( state ) => state.health.keeperInfo
-    )
-    const ArrForKeeperInfoUpdate = [ ...contactLevelInfo, ...pdfLevelInfo ]
-    for ( let i = 0; i < ArrForKeeperInfoUpdate.length; i++ ) {
-      const element = ArrForKeeperInfoUpdate[ i ]
-      if ( levelHealth[ 2 ].levelInfo[ element.index ].status != 'accessible' ) {
-        const oldShareId = element.shareId
-        const selectedShareId = element.newShareId
-        if ( keeperInfo.length > 0 ) {
-          const index = keeperInfo.findIndex(
-            ( value ) => value.shareId == oldShareId
-          )
-          let object
-          if ( index > -1 ) {
-            object = {
-              ...keeperInfo[ index ]
-            }
-            object.shareId = selectedShareId
+    const { levelHealth } = payload
+    const keepersToAutoUpdate = []
+    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    if (
+      levelHealth[ 2 ] &&
+      currentLevel == 2 &&
+      levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
+      levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible'
+    ) {
+      const keeperInfo: any[] = yield select(
+        ( state ) => state.health.keeperInfo
+      )
+      for ( let i = 2; i < levelHealth[ 2 ].levelInfo.length - 2; i++ ) {
+        if (
+          levelHealth[ 2 ].levelInfo[ i ].status != 'accessible'
+        ) {
+          const obj = {
+            ...levelHealth[ 1 ].levelInfo[ i ],
+            newShareId: levelHealth[ 2 ].levelInfo[ i ].shareId,
+            index: i,
           }
-          if ( object ) {
-            yield put( updatedKeeperInfo( object ) )
+          keepersToAutoUpdate.push( obj )
+          if ( keeperInfo.length > 0 ) {
+            const index = keeperInfo.findIndex(
+              ( value ) => value.shareId == obj.shareId
+            )
+            let object
+            if ( index > -1 ) {
+              object = {
+                ...keeperInfo[ index ]
+              }
+              object.shareId = obj.newShareId
+            }
+            if ( object ) {
+              yield put( updatedKeeperInfo( object ) )
+            }
           }
         }
       }
     }
+    console.log( 'keepersToAutoUpdate', keepersToAutoUpdate )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.getWalletId().data.walletId
     const keeperInfoData = yield select(
@@ -3568,137 +3572,121 @@ function* autoShareLevel2KeepersWorker( { payload } ) {
     )
     const answer = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.answer )
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfoData, answer )
-    if( contactLevelInfo.length ) {
-      for ( let i = 0; i < contactLevelInfo.length; i++ ) {
-        const element = contactLevelInfo[ i ]
-        const type = element.shareType
-        const oldShareId = element.shareId
-        const selectedShareId = element.newShareId
-        const name: string = element.name
-        const { SERVICES } = yield select( ( state ) => state.storage.database )
-        const trustedContacts: TrustedContactsService = yield select(
-          ( state ) => state.trustedContacts.service
-        )
-        const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
-
+    if( keepersToAutoUpdate.length ) {
+      for ( let i = 0; i < keepersToAutoUpdate.length; i++ ) {
+        const element = keepersToAutoUpdate[ i ]
         let shareIndex = 3
-        if ( selectedShareId && s3Service.levelhealth.metaSharesKeeper.length ) {
+        if ( element.newShareId && s3Service.levelhealth.metaSharesKeeper.length ) {
           if (
-            s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == selectedShareId ) > -1
+            s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == element.newShareId ) > -1
           ) {
             shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex(
-              ( value ) => value.shareId == selectedShareId
+              ( value ) => value.shareId == element.newShareId
             )
           }
         }
         const share = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
-        const oldKeeperInfo = trustedContactsInfo[ name.toLowerCase() ]
-        const data: TrustedDataElements = {
-          metaShare: share
-        }
-        const res = yield call(
-          trustedContacts.updateTrustedChannel,
-          name,
-          data,
-          false
-        )
-        console.log( 'updateTrustedChannel res', res )
-        if ( res.status == 200 ) {
-          const updatedSERVICES = {
-            ...SERVICES,
-            S3_SERVICE: JSON.stringify( s3Service ),
-            TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-          }
-          yield call( insertDBWorker, {
-            payload: {
-              SERVICES: updatedSERVICES
-            },
-          } )
-
-          const shareArray = [
-            {
-              walletId: walletId,
-              shareId: selectedShareId,
-              reshareVersion: share.meta.reshareVersion,
-              updatedAt: moment( new Date() ).valueOf(),
-              shareType: type,
-              name,
-              status: 'accessible',
-            },
-          ]
-          yield put( updateMSharesHealth( shareArray ) )
-          const notification: INotification = {
-            notificationType: notificationType.reShare,
-            title: 'New share uploaded',
-            body: 'New share uploaded.',
-            data: JSON.stringify( {
-              selectedShareId, walletId: walletId
-            } ),
-            tag: notificationTag.IMP,
-            date: new Date(),
-          }
-          const ress = yield call(
-            RelayServices.sendNotifications,
-            [ {
-              walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
-            } ],
-            notification
+        // Auto share for Contact / Device type
+        if( element.shareType == 'contact' || element.shareType == 'device' ) {
+          const { SERVICES } = yield select( ( state ) => state.storage.database )
+          const trustedContacts: TrustedContactsService = yield select(
+            ( state ) => state.trustedContacts.service
           )
+          const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
+          const oldKeeperInfo = trustedContactsInfo[ element.name.toLowerCase() ]
+          const data: TrustedDataElements = {
+            metaShare: share
+          }
+          const res = yield call(
+            trustedContacts.updateTrustedChannel,
+            element.name,
+            data,
+            false
+          )
+          console.log( 'updateTrustedChannel res', res )
+          if ( res.status == 200 ) {
+            const updatedSERVICES = {
+              ...SERVICES,
+              S3_SERVICE: JSON.stringify( s3Service ),
+              TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+            }
+            yield call( insertDBWorker, {
+              payload: {
+                SERVICES: updatedSERVICES
+              },
+            } )
+            yield put( updateMSharesHealth( [
+              {
+                walletId: walletId,
+                shareId: element.newShareId,
+                reshareVersion: share.meta.reshareVersion,
+                updatedAt: moment( new Date() ).valueOf(),
+                shareType: element.shareType,
+                name: element.name,
+                status: 'accessible',
+              },
+            ] ) )
+            const notification: INotification = {
+              notificationType: notificationType.reShare,
+              title: 'New share uploaded',
+              body: 'New share uploaded.',
+              data: JSON.stringify( {
+                selectedShareId: element.newShareId, walletId: walletId
+              } ),
+              tag: notificationTag.IMP,
+              date: new Date(),
+            }
+            const ress = yield fork(
+              RelayServices.sendNotifications,
+              [ {
+                walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
+              } ],
+              notification
+            )
+          }
         }
+        // Auto share for PDF type
+        if( element.shareType == 'pdf' ){
 
+          const pdfInfo: {
+                filePath: string;
+                publicKey: string;
+                privateKey: string;
+              } = yield select( ( state ) => state.health.pdfInfo )
+          const privateKey = pdfInfo.privateKey
+          const primaryShareKey = Keeper.getDerivedKey( privateKey )
+          const primaryData = LevelHealth.encryptMetaShare(
+            share,
+            primaryShareKey
+          )
+
+          // TODO upload Data
+          const res1 = yield call(
+            LevelHealth.uploadPDFPrimaryShare,
+            primaryData.encryptedMetaShare,
+            primaryData.messageId
+          )
+          if( res1 && res1.success ){
+            yield put( updateMSharesHealth( [
+              {
+                walletId: walletId,
+                shareId: element.newShareId,
+                reshareVersion: share.meta.reshareVersion,
+                updatedAt: moment( new Date() ).valueOf(),
+                shareType: 'pdf',
+                name: element.name,
+                status: 'accessible',
+              },
+            ] ) )
+          }
+        }
       }
     }
-    console.log( 'pdfLevelInfo', pdfLevelInfo )
-    if( pdfLevelInfo.length ) {
-      const pdfKeeperElement = pdfLevelInfo[ 0 ]
-      let shareIndex = 3
-      if ( pdfKeeperElement.newShareId && s3Service.levelhealth.metaSharesKeeper.length ) {
-        if (
-          s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == pdfKeeperElement.newShareId ) > -1
-        ) {
-          shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex(
-            ( value ) => value.shareId == pdfKeeperElement.newShareId
-          )
-        }
-      }
-      const share = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
-      const pdfInfo: {
-            filePath: string;
-            publicKey: string;
-            privateKey: string;
-          } = yield select( ( state ) => state.health.pdfInfo )
-      const privateKey = pdfInfo.privateKey
-      const primaryShareKey = Keeper.getDerivedKey( privateKey )
-      const primaryData = LevelHealth.encryptMetaShare(
-        share,
-        primaryShareKey
-      )
 
-      // TODO upload Data
-      const res1 = yield call(
-        LevelHealth.uploadPDFPrimaryShare,
-        primaryData.encryptedMetaShare,
-        primaryData.messageId
-      )
-      if( res1 && res1.success ){
-        const shareArray = [
-          {
-            walletId: walletId,
-            shareId: pdfKeeperElement.newShareId,
-            reshareVersion: share.meta.reshareVersion,
-            updatedAt: moment( new Date() ).valueOf(),
-            shareType: 'pdf',
-            name,
-            status: 'accessible',
-          },
-        ]
-        yield put( updateMSharesHealth( shareArray ) )
-      }
-    }
     yield put( switchS3LoaderKeeper( 'autoShareContact' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'autoShareContact' ) )
-    console.log( 'Error EF channel', error )
+    console.log( 'Error autoShareLevel2KeepersWorker', error )
   }
 }
 

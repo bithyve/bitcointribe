@@ -88,7 +88,7 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
             <Input
               inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
               inputStyle={FormStyles.inputText}
-              placeholder={'Enter An Account Name'}
+              placeholder={'Enter an account name'}
               placeholderTextColor={FormStyles.placeholderText.color}
               underlineColorAndroid={FormStyles.placeholderText.color}
               value={accountName}

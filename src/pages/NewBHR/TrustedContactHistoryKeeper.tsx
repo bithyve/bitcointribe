@@ -29,15 +29,12 @@ import moment from 'moment'
 import _ from 'underscore'
 import { nameToInitials } from '../../common/CommonFunctions'
 import {
-  uploadEncMShareKeeper,
   ErrorSending,
   updateMSharesHealth,
   updatedKeeperInfo,
-  sendApprovalRequest,
   onApprovalStatusChange,
-  uploadSMShareKeeper,
-  secondaryShareDownloaded,
   downloadSmShareForApproval,
+  keeperProcessStatus,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
 import SendShareModal from './SendShareModal'
@@ -45,25 +42,17 @@ import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  EphemeralDataElements,
   LevelHealthInterface,
-  notificationType,
-  TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import {
-  updateEphemeralChannel,
   updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import {
-  TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { isEmpty } from '../../common/CommonFunctions/index'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
@@ -75,6 +64,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -107,13 +98,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ SendViaLinkBottomSheet, setSendViaLinkBottomSheet ] = useState(
     React.createRef(),
   )
-  const fcmTokenValue = useSelector( ( state ) => state.preferences.fcmTokenValue )
   const [ SendViaQRBottomSheet, setSendViaQRBottomSheet ] = useState(
     React.createRef(),
   )
   const keeperTypeBottomSheet = React.createRef()
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ qrScannedData, setQrScannedData ] = useState( '' )
   const [ shareBottomSheet, setshareBottomSheet ] = useState( React.createRef() )
   const [
     shareOtpWithTrustedContactBottomSheet,
@@ -190,18 +179,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedTitle' ) == 'Friends and Family'
-      ? false
-      : true,
+    props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
   )
   const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
-  const keeperApproveStatus = useSelector(
-    ( state ) => state.health.keeperApproveStatus
-  )
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
@@ -209,11 +193,25 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+
   useEffect( () => {
+    setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
+    setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
+    setIsReshare(
+      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+    )
+    setIsChange(
+      props.navigation.getParam( 'isChangeKeeperType' )
+        ? props.navigation.getParam( 'isChangeKeeperType' )
+        : false
+    )
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
+    setIndex( props.navigation.getParam( 'index' ) )
   }, [
+    props.navigation.getParam( 'selectedLevelId' ),
     props.navigation.getParam( 'selectedKeeper' ),
+    props.navigation.state.params,
   ] )
 
   useEffect( () => {
@@ -241,7 +239,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const keeperInfoIndex = keeperInfoTemp.findIndex( ( value ) => value.shareId == selectedShareId )
       if ( keeperInfoIndex > -1 && keeperInfoTemp[ keeperInfoIndex ].type == 'contact' ) {
         setSelectedContacts( [ keeperInfoTemp[ keeperInfoIndex ].data ] )
-        const selectedContacts = trustedContactsInfo.slice( 1, 3 )
         const tempContact = keeperInfoTemp[ keeperInfoIndex ].data
         const tcInstance =
           trustedContacts.tc.trustedContacts[
@@ -613,6 +610,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         console.log( {
           numberDL
         } )
+        updateShare()
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
         setIsOTPType( false )
         setTrustedLink( numberDL )
         setIsReshare( true )
@@ -644,6 +643,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         console.log( {
           emailDL
         } )
+        updateShare()
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
         setIsOTPType( false )
         setTrustedLink( emailDL )
         setIsReshare( true )
@@ -667,15 +668,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
           `/${otpHint}_keeper` +
           `/${uploadedAt}` +
           `/v${appVersion}`
+        updateShare()
+        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
         setIsOTPType( true )
         setOTP( otp )
         setTrustedLink( otpDL )
         setIsReshare( true )
       } else {
+        dispatch( keeperProcessStatus( '' ) )
         Alert.alert( 'Invalid Contact', 'Something went wrong.' )
         return
       }
     } catch ( error ) {
+      dispatch( keeperProcessStatus( '' ) )
       console.log( 'error TC', error )
     }
   }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
@@ -713,25 +718,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         tcInfo[ index ] = contact
       }
       dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-
-      console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
-      const shareArray = [
-        {
-          walletId: s3Service.getWalletId().data.walletId,
-          shareId: selectedShareId,
-          reshareVersion: 0,
-          updatedAt: moment( new Date() ).valueOf(),
-          name: contact.name,
-          shareType: 'contact',
-          status: 'notAccessible',
-        },
-      ]
-      dispatch( updateMSharesHealth( shareArray ) )
-      dispatch( onApprovalStatusChange( {
-        status: false,
-        initiatedAt: 0,
-        shareId: '',
-      } ) )
     },
     [ index, trustedContactsInfo ],
   )
@@ -758,6 +744,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
+    // Keeper setup started
+    dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
 
     dispatch( updatedKeeperInfo( {
       shareId: selectedShareId,
@@ -807,7 +795,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
       }
     } )
-    const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+    const newSecondarySubAccount:SubAccountDescribing = new TrustedContactsSubAccountInfo( {
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
@@ -864,7 +852,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         info = otp
       }
 
-      if ( publicKey )
+      if ( publicKey ){
+        updateShare()
         setTrustedQR(
           JSON.stringify( {
             approvedTC: symmetricKey ? true : false,
@@ -880,6 +869,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             isFromKeeper: true,
           } ),
         )
+      }
     }
   }, [
     SHARES_TRANSFER_DETAILS[ index ],
@@ -1066,7 +1056,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -1084,16 +1074,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          setIsApprovalStarted( true )
-          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          try {
-            dispatch( downloadSmShareForApproval( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          // setIsApprovalStarted( true )
+          // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          // try {
+          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //   setQrBottomSheetsFlag( false )
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
         }}
       />
     )
@@ -1117,6 +1107,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
   }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+
+  const updateShare = () => {
+    const contactName = `${chosenContact.firstName} ${
+      chosenContact.lastName ? chosenContact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
+    console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
+    dispatch( updateMSharesHealth( [
+      {
+        walletId: s3Service.getWalletId().data.walletId,
+        shareId: selectedShareId,
+        reshareVersion: 0,
+        updatedAt: moment( new Date() ).valueOf(),
+        name: contactName,
+        shareType: 'contact',
+        status: 'notAccessible',
+      },
+    ] ) )
+  }
 
   return (
     <View style={{
@@ -1291,6 +1301,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ]}
         renderContent={() => (
           <KeeperTypeModalContents
+            headerText={'Change backup method'}
+            subHeader={'Share your Recovery Key with a new contact or a different device'}
             onPressSetup={async ( type, name ) =>{
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )

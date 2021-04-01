@@ -70,22 +70,26 @@ const HomeHeader = ( {
   const levelHealth: LevelHealthInterface[] = useSelector(
     ( state ) => state.health.levelHealth
   )
+  const levelData = useSelector(
+    ( state ) => state.health.levelData
+  )
   const dispatch = useDispatch()
   const currencyKind: CurrencyKind = useCurrencyKind()
-  
+
   const s3Service: S3Service = useSelector(
     ( state ) => state.health.service
+  )
+
+  const newBHRFlowStarted = useSelector(
+    ( state ) => state.health.newBHRFlowStarted
   )
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
 
   const getMessage = () => {
-    const { messageOne, messageTwo } = getMessageToShow()
-    if (
-      messageTwo === ' needs your attention' ||
-      messageOne == 'Upgrade Backup'
-    ) {
+    const { messageOne, messageTwo, isFirstMessageBold } = getMessageToShow()
+    if ( isFirstMessageBold ) {
       return (
         <View
           style={{
@@ -110,21 +114,22 @@ const HomeHeader = ( {
           </Text>
         </View>
       )
+    } else {
+      return (
+        <View
+          style={{
+            flexDirection: 'row',
+            width: wp( '57%' ),
+            alignItems: 'flex-end',
+          }}
+        >
+          <Text style={styles.manageBackupMessageText}>{messageOne}</Text>
+          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
+            {messageTwo}
+          </Text>
+        </View>
+      )
     }
-    return (
-      <View
-        style={{
-          flexDirection: 'row',
-          width: wp( '57%' ),
-          alignItems: 'flex-end',
-        }}
-      >
-        <Text style={styles.manageBackupMessageText}>{messageOne}</Text>
-        <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
-          {messageTwo}
-        </Text>
-      </View>
-    )
   }
 
   useEffect( () => {
@@ -137,57 +142,108 @@ const HomeHeader = ( {
   }, [] )
 
   const getMessageToShow = () => {
-    let name = ''
-    let message = ''
-    if ( levelHealth.length ) {
-      for ( let i = 0; i < levelHealth.length; i++ ) {
-        const element = levelHealth[ i ].levelInfo
-        let j = 0
-        if ( currentLevel == 1 && i == 1 ) j = 2
-        else if ( currentLevel == 2 && i == 2 ) j = 4
-        for ( j; j < element.length; j++ ) {
-          const item = element[ j ]
-          if ( j == 0 && item.status == 'notAccessible' ) name = 'Cloud'
-          if ( j == 1 && item.status == 'notAccessible' )
-            name = 'Security Question'
-          if ( j == 2 && item.status == 'notAccessible' ) name = 'Primary Keeper'
-          if ( j == 3 && item.status == 'notAccessible' ) name = 'Second Keeper'
-          if ( j == 4 && item.status == 'notAccessible' ) name = 'Third Keeper'
-          if ( j == 5 && item.status == 'notAccessible' ) name = 'Fourth Keeper'
-          if ( item.name && item.status == 'notAccessible' ) name = item.name
-          if ( item.updatedAt == 0 && item.status == 'notAccessible' ) {
-            message = 'Add '
-          } else if ( item.updatedAt && item.status == 'notAccessible' ) {
-            message = ' needs your attention'
-          } else {
-            message = ''
+    if( levelData ){
+      for ( let i = 0; i < levelData.length; i++ ) {
+        const element = levelData[ i ]
+        if( element.keeper1.name && element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ){
+          return {
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
           }
-          if (
-            element[ j ].status == 'notAccessible' &&
-            name &&
-            message == 'Add '
-          ) {
-            return {
-              messageOne: message, messageTwo: name
-            }
-          } else if (
-            element[ j ].status == 'notAccessible' &&
-            name &&
-            message == ' needs your attention'
-          ) {
-            return {
-              messageOne: name, messageTwo: message
-            }
+        }
+        if( element.keeper2.name && element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ){
+          return {
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
+          }
+        }
+        if( currentLevel == 0 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+          }
+        }
+        if( currentLevel === 1 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
+          }
+        } else if( currentLevel === 2 ){
+          return {
+            isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
+          }
+        } else if( currentLevel == 3 ){
+          return {
+            isFirstMessageBold: true, messageOne: 'Multi-key backup complete', messageTwo: ''
           }
         }
       }
-      return {
-        messageOne: 'Your wallet is now ', messageTwo: 'secure'
+    } else
+    {
+      let name = ''
+      let message = ''
+      if ( levelHealth.length ) {
+        for ( let i = 0; i < levelHealth.length; i++ ) {
+          const element = levelHealth[ i ].levelInfo
+          let j = 0
+          if ( currentLevel == 1 && i == 1 ) j = 2
+          else if ( currentLevel == 2 && i == 2 ) j = 4
+          for ( j; j < element.length; j++ ) {
+            const item = element[ j ]
+            if ( j == 1 && item.status == 'notAccessible' ) name = 'Security Question'
+            if ( j == 2 && item.status == 'notAccessible' ) name = 'Primary Keeper'
+            if ( j == 3 && item.status == 'notAccessible' ) name = 'Second Keeper'
+            if ( j == 4 && item.status == 'notAccessible' ) name = 'Third Keeper'
+            if ( j == 5 && item.status == 'notAccessible' ) name = 'Fourth Keeper'
+            if ( item.name && item.status == 'notAccessible' ) name = item.name
+            if ( item.updatedAt == 0 && item.status == 'notAccessible' ) {
+              message = 'Add '
+            } else if ( j != 0 && item.updatedAt && item.status == 'notAccessible' ) {
+              message = ' needs your attention'
+            } else {
+              message = ''
+            }
+            if (
+              element[ j ].status == 'notAccessible' &&
+              name &&
+              message == 'Add '
+            ) {
+              return {
+                messageOne: message, messageTwo: name
+              }
+            } else if (
+              element[ j ].status == 'notAccessible' &&
+              name &&
+              message == ' needs your attention'
+            ) {
+              return {
+                messageOne: name, messageTwo: message
+              }
+            }
+            if( currentLevel == 0 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+              }
+            }
+            if( currentLevel == 1 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
+              }
+            } else if( currentLevel === 2 ){
+              return {
+                isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
+              }
+            } else if( currentLevel == 3 ){
+              return {
+                isFirstMessageBold: true, messageOne: 'Your wallet is at full security', messageTwo: ''
+              }
+            }
+          }
+        }
+      } else {
+        return {
+          isFirstMessageBold: true, messageOne: 'Upgrade Backup', messageTwo: ' to improve health'
+        }
       }
-    } else {
-      return {
-        messageOne: 'Upgrade Backup', messageTwo: ' to improve health'
-      }
+    }
+    return {
+      isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
     }
   }
 
@@ -323,10 +379,11 @@ const HomeHeader = ( {
         </ImageBackground>
         <TouchableOpacity
           onPress={() => {
-            if (s3Service.levelhealth.healthCheckInitializedKeeper === true) {
-            navigation.navigate( 'ManageBackupNewBHR' )
+            console.log( 'newBHRFlowStarted', newBHRFlowStarted )
+            if ( newBHRFlowStarted === true ) {
+              navigation.navigate( 'ManageBackupNewBHR' )
             } else {
-              navigation.navigate("ManageBackup");
+              navigation.navigate( 'ManageBackup' )
             }
           }}
           style={styles.manageBackupMessageView}

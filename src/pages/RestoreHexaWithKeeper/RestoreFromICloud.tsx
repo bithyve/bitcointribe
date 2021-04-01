@@ -135,6 +135,7 @@ const styles = StyleSheet.create( {
     height: hp( '15%' ),
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 'auto'
   },
   transparentButtonView: {
     height: wp( '13%' ),

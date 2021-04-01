@@ -35,7 +35,9 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
+import { initNewBHRFlow } from '../store/actions/health'
 import { setCloudData } from '../store/actions/cloud'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -77,8 +79,9 @@ export default function NewOwnQuestions( props ) {
     React.createRef(),
   )
   const [ visibleButton, setVisibleButton ] = useState( false )
-  const backupStatus = useSelector( ( state ) => state.cloud.backupStatus )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -115,33 +118,35 @@ export default function NewOwnQuestions( props ) {
   }, [ confirmAnswer ] )
 
   useEffect( () => {
-    if (
-      walletSetupCompleted
-    ) {
-      const { healthCheckInitializedKeeper } = s3service.levelhealth
+    if( walletSetupCompleted ){
+      console.log( 'walletSetupCompleted****', walletSetupCompleted )
+
       dispatch( walletCheckIn() )
-      if( healthCheckInitializedKeeper === true && cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        navigateToHome()
-      }
     }
   }, [ walletSetupCompleted ] )
 
   useEffect( () => {
-    if( backupStatus === null ) return
-    if( backupStatus || backupStatus === false ){
-      navigateToHome()
+    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      if( cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        props.navigation.navigate( 'HomeNav', {
+          walletName,
+        } ) }
     }
-  }, [ backupStatus ] )
+  }, [ walletSetupCompleted, levelHealth ] )
 
-  const navigateToHome = () => {
-    ( loaderBottomSheet as any ).current.snapTo( 0 )
-    props.navigation.navigate( 'HomeNav', {
-      walletName,
-    } )
-  }
 
+  useEffect( () => {
+    if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
+      ( loaderBottomSheet as any ).current.snapTo( 0 )
+      props.navigation.navigate( 'HomeNav', {
+        walletName,
+      } )
+    }
+  }, [ cloudBackupStatus ] )
 
   const checkCloudLogin = () =>{
     showLoader()
@@ -151,6 +156,7 @@ export default function NewOwnQuestions( props ) {
       answer,
     }
     dispatch( setupWallet( walletName, security ) )
+    dispatch( initNewBHRFlow( true ) )
     dispatch( setVersion( 'Current' ) )
     const current = Date.now()
     AsyncStorage.setItem(
@@ -168,7 +174,7 @@ export default function NewOwnQuestions( props ) {
 
   const showLoader = () => {
     ( loaderBottomSheet as any ).current.snapTo( 1 )
-    seLoaderMessages()
+    setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -197,7 +203,7 @@ export default function NewOwnQuestions( props ) {
     )
   }
 
-  const seLoaderMessages = () => {
+  const setLoaderMessages = () => {
     setTimeout( () => {
       setMessage( 'Bootstrapping Accounts' )
       setSubTextMessage(
