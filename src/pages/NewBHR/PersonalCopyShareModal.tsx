@@ -14,16 +14,17 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Colors from '../common/Colors'
-import Fonts from '../common/Fonts'
-import Icons from '../common/Icons'
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import Icons from '../../common/Icons'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useDispatch } from 'react-redux'
-import BottomInfoBox from './BottomInfoBox'
+import BottomInfoBox from '../../components/BottomInfoBox'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { sharePersonalCopy } from '../store/actions/sss'
+import { sharePersonalCopy } from '../../store/actions/sss'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from './ModalHeader'
+import ModalHeader from '../../components/ModalHeader'
+import { sharePDF } from '../../store/actions/health'
 
 export default function PersonalCopyShareModal( props ) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
@@ -60,32 +61,13 @@ export default function PersonalCopyShareModal( props ) {
   const dispatch = useDispatch()
 
   const onShare = async ( shareOption, isEmailOtherOptions ) => {
-    dispatch( sharePersonalCopy( shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions ) )
+    dispatch( sharePDF( shareOption.type, isEmailOtherOptions ) )
     props.onPressShare()
   }
 
   const onConfirm = async () => {
     props.onPressConfirm()
   }
-
-  const disableSharingOption = useCallback(
-    ( shareOption ) => {
-      if ( !props.personalCopyDetails ) return false
-
-      const alternateCopy =
-        props.personalCopyDetails[
-          props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
-        ]
-      if ( alternateCopy && alternateCopy.sharingDetails ) {
-        return alternateCopy.sharingDetails.shareVia == shareOption.type
-          ? true
-          : false
-      } else {
-        return false
-      }
-    },
-    [ props.personalCopyDetails, props.selectedPersonalCopy ],
-  )
 
   const renderMailOptionsHeader = () => {
     return(
@@ -111,7 +93,7 @@ export default function PersonalCopyShareModal( props ) {
         >
           <Image style={{
             height: wp( '15%' ), width: wp( '15%' )
-          }} source={require( '../assets/images/icons/ios_mail.png' )} />
+          }} source={require( '../../assets/images/icons/ios_mail.png' )} />
           <Text style={{
             color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: 5,
           }}>Mail</Text>
@@ -125,7 +107,7 @@ export default function PersonalCopyShareModal( props ) {
         >
           <Image style={{
             height: wp( '15%' ), width: wp( '15%' ), borderWidth: 1, borderColor: Colors.textColorGrey, borderRadius: 10
-          }} source={require( '../assets/images/icons/icon_more.png' )} />
+          }} source={require( '../../assets/images/icons/icon_more.png' )} />
           <Text style={{
             color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: 5,
           }}>More Options</Text>
@@ -178,14 +160,8 @@ export default function PersonalCopyShareModal( props ) {
                     setIsShared( true )
                   }
                 }}
-                disabled={disableSharingOption( item )}
                 style={[
                   styles.listElements,
-                  disableSharingOption( item )
-                    ? {
-                      backgroundColor: Colors.borderColor
-                    }
-                    : null,
                 ]}
               >
                 <Image

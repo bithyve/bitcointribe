@@ -1310,6 +1310,33 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
+        data: this.sss.createQR( index ),
+      }
+    } catch ( err ) {
+      return {
+        status: 521, err: err.message, message: ErrMap[ 521 ]
+      }
+    }
+  };
+
+  public createQRKeeper = (
+    index: number,
+  ):
+    | {
+        status: number;
+        data: { qrData: string[] };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      } => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
         data: this.levelhealth.createQR( index ),
       }
     } catch ( err ) {

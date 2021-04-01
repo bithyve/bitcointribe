@@ -266,11 +266,8 @@ const updateAddressBookLocallyRequest = createAction(
 export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
   dispatch( updateAddressBookLocallyRequest( payload ) )
 
-export const upgradeReducer = ( legacyTrustedContactData ) => {
+export const upgradeReducer = (  ) => {
   return {
     type: UPGRADE_REDUCER,
-    payload: {
-      legacyTrustedContactData
-    },
   }
 }

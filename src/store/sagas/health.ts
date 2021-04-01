@@ -1741,7 +1741,7 @@ function* generatePDFWorker( { payload } ) {
   const { selectedPersonalCopy } = payload // corresponds to metaShare index (3/4)
   //const shareIndex = selectedPersonalCopy.type === 'copy1' ? 3 : 4;
   const s3Service: S3Service = yield select( ( state ) => state.sss.service )
-  // const res = yield call(s3Service.createQR, shareIndex);
+  // const res = yield call(s3Service.createQRKeeper, shareIndex);
   // if (res.status !== 200) {
   //   console.log({ err: res.err });
   //   return;
