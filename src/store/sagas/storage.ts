@@ -212,6 +212,30 @@ function* servicesEnricherWorker( { payload } ) {
           migrated = true
         }
       }
+      if ( semver.lt( dbVersion, '1.4.5' ) ) {
+        // update sub-account instances count
+        const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT
+
+        for ( const accountType of Object.keys( config.DERIVATIVE_ACC ) ) {
+          let instanceCount = 5
+          if ( accountType == 'TRUSTED_CONTACTS' ) {
+            instanceCount = 20
+          }
+          regularAccount.hdWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
+          secureAccount.secureHDWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
+        }
+
+        console.log( 'Updated sub-account instances count' )
+        services.REGULAR_ACCOUNT = regularAccount
+        services.SECURE_ACCOUNT = secureAccount
+
+        migrated = true
+      }
 
       if ( semver.lt( dbVersion, '1.4.6' ) ) {
         // update sub-account instances count
@@ -235,8 +259,9 @@ function* servicesEnricherWorker( { payload } ) {
         services.REGULAR_ACCOUNT = regularAccount
         services.SECURE_ACCOUNT = secureAccount
 
-        const trustedContact = services.TRUSTED_CONTACTS
-        yield put( upgradeReducer( trustedContact ) )
+        console.log( 'services.TRUSTED_CONTACTS', services.TRUSTED_CONTACTS )
+        services.KEEPERS_INFO = new KeeperService()
+        //yield put( upgradeReducer( ) )
         migrated = true
       }
     } else {
@@ -262,6 +287,7 @@ function* servicesEnricherWorker( { payload } ) {
         SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
         S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
         TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+        KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
       }
       yield call( insertDBWorker, {
         payload: database,

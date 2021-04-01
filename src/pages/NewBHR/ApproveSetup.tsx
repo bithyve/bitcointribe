@@ -37,7 +37,7 @@ export default function ApproveSetup( props ) {
       }}>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.headerText}>
-          Approve Recovery Key backup request
+          Approve New Setup
           </Text>
           <Text
             numberOfLines={2}
@@ -60,14 +60,16 @@ export default function ApproveSetup( props ) {
                 style={styles.grayBoxImage}
               />
             </View>
-            <View>
+            <View style={{
+              width: wp( '63%' )
+            }}>
               <Text style={styles.modalInfoText}>
-                Waiting for approval from
+                Waiting for approval from:
               </Text>
               <Text style={{
                 ...styles.modalInfoText, fontSize: RFValue( 20 )
               }}>
-                Keeper on {Pk_name}
+                Your Previous Backup Devices
               </Text>
             </View>
           </View>
@@ -178,13 +180,14 @@ const styles = StyleSheet.create( {
     width: wp( '90%' ),
     height: wp( '25%' ),
     flexDirection: 'row',
+    overflow: 'hidden'
   },
   grayBoxImageView: {
     justifyContent: 'center',
     alignItems: 'center',
     width: wp( '15%' ),
     height: wp( '15%' ),
-    marginLeft: wp( '8%' ),
+    marginLeft: wp( '6%' ),
     marginRight: wp( '3%' ),
     borderRadius: wp( '15%' ) / 2,
     backgroundColor: Colors.white,
