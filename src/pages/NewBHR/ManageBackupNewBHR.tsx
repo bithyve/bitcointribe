@@ -660,6 +660,7 @@ class ManageBackupNewBHR extends Component<
         ...keeper,
         name: value.id === 2 && number == 1 ? 'Secondary Device1' : keeper.name,
         shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
+        shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ].shareId : this.props.metaSharesKeeper[ 4 ].shareId
       },
       isSetup: keeper.updatedAt ? false : true,
     }
@@ -1452,6 +1453,7 @@ class ManageBackupNewBHR extends Component<
                       shareType: selectedKeeper.shareType
                         ? selectedKeeper.shareType
                         : type,
+                      shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ].shareId : this.props.metaSharesKeeper[ 4 ].shareId
                     },
                     isSetup: true,
                   }
@@ -1517,7 +1519,8 @@ class ManageBackupNewBHR extends Component<
                 const obj = {
                   id: selectedLevelId,
                   selectedKeeper: {
-                    ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType
+                    ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ].shareId : this.props.metaSharesKeeper[ 4 ].shareId
                   },
                   isSetup: true,
                 }

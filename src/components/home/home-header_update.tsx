@@ -243,7 +243,7 @@ const HomeHeader = ( {
       }
     }
     return {
-      isFirstMessageBold: false, messageOne: 'Upgrade security to level 2', messageTwo: ''
+      isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
     }
   }
 

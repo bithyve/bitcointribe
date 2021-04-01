@@ -794,7 +794,8 @@ class ContactDetails extends PureComponent<
       return
     }
 
-    const { publicKey, otp } = trustedContacts.tc.trustedContacts[ contactName ]
+    const { publicKey, ephemeralChannel, otp } = trustedContacts.tc.trustedContacts[ contactName ]
+    const otpValue = otp ? otp : ephemeralChannel && ephemeralChannel.data[ 0 ] ? ephemeralChannel.data[ 0 ].shareTransferDetails.otp : ''
     const requester = WALLET_SETUP.walletName
     const appVersion = DeviceInfo.getVersion()
     if ( this.Contact.phoneNumbers && this.Contact.phoneNumbers.length ) {
@@ -840,10 +841,10 @@ class ContactDetails extends PureComponent<
       this.setState( {
         trustedLink: emailDL,
       } )
-    } else if ( otp ) {
+    } else if ( otpValue ) {
       const otpHintType = 'otp'
       const otpHint = 'xxx'
-      const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otp )
+      const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otpValue )
         .encryptedPub
       const otpDL =
         `https://hexawallet.io/${config.APP_STAGE}/tc` +
