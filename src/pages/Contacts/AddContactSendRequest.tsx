@@ -91,7 +91,7 @@ export default function AddContactSendRequest( props ) {
 
   const updateTrustedContactsInfo = async ( contact ) => {
     console.log( 'trustedContactsInfo', trustedContactsInfo )
-    const tcInfo = trustedContactsInfo
+    const tcInfo = trustedContactsInfo ? trustedContactsInfo : []
     if ( tcInfo && tcInfo.length ) {
       if (
         tcInfo.findIndex( ( trustedContact ) => {
