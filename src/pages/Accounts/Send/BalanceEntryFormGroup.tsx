@@ -194,12 +194,15 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             (
               <AppBottomSheetTouchableWrapper
                 onPress={handleSendMaxPress}
+                style={{
+                  padding: 16,
+                }}
               >
                 <Text
                   style={{
                     color: Colors.blue,
                     textAlign: 'center',
-                    paddingHorizontal: 10,
+                    // paddingHorizontal: 10,
                     fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansItalic,
                   }}
