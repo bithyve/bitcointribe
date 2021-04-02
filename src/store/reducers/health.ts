@@ -36,7 +36,8 @@ import {
   UPDATE_CLOUD_PERMISSION,
   INIT_NEW_BHR,
   UPDATE_LEVEL_DATA,
-  KEEPER_PROCESS_STATUS
+  KEEPER_PROCESS_STATUS,
+  PDF_SUCCESSFULLY_CREATED
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
@@ -140,6 +141,7 @@ const initialState: {
     id: number
   }[];
   keeperProcessStatus: string;
+  pdfCreatedSuccessfully: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -195,7 +197,8 @@ const initialState: {
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
   levelData: null,
-  keeperProcessStatus: ''
+  keeperProcessStatus: '',
+  pdfCreatedSuccessfully: false
 }
 
 export default ( state = initialState, action ) => {
@@ -452,6 +455,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           keeperProcessStatus: action.payload.status
+        }
+
+      case PDF_SUCCESSFULLY_CREATED:
+        return {
+          ...state,
+          pdfCreatedSuccessfully: action.payload.status
         }
   }
   return state
