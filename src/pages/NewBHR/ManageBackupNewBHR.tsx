@@ -558,7 +558,10 @@ class ManageBackupNewBHR extends Component<
       else {
         index = selectedKeeper.data.index
       }
-      console.log( 'device index', index )
+      console.log( 'device index', index );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      ( this.QrBottomSheet as any ).snapTo( 0 );
+      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
         index,
@@ -577,20 +580,23 @@ class ManageBackupNewBHR extends Component<
       else {
         index = selectedKeeper.data.index
       }
-      console.log( 'contact index', index )
+      console.log( 'contact index', index );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      ( this.QrBottomSheet as any ).snapTo( 0 );
+      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
+      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      ( this.QrBottomSheet as any ).snapTo( 0 );
+      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate(
         'PersonalCopyHistoryNewBHR',
         navigationParams
       )
     }
-    ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-    ( this.QrBottomSheet as any ).snapTo( 0 );
-    ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
   };
 
   onPressKeeper = ( value, number ) => {
@@ -660,7 +666,7 @@ class ManageBackupNewBHR extends Component<
         ...keeper,
         name: value.id === 2 && number == 1 ? 'Secondary Device1' : keeper.name,
         shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
-        shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ].shareId : this.props.metaSharesKeeper[ 4 ].shareId
+        shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
       },
       isSetup: keeper.updatedAt ? false : true,
     }
@@ -1187,11 +1193,11 @@ class ManageBackupNewBHR extends Component<
                                 style={{
                                   ...styles.appBackupButton,
                                   borderColor:
-                                    value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'
-                                        ? Colors.white
-                                        : Colors.deepBlue
-                                      : Colors.red,
+                                  value.keeper2.status == 'accessible'
+                                    ? value.status == 'notSetup'
+                                      ? Colors.white
+                                      : Colors.deepBlue
+                                    : Colors.red,
                                   borderWidth:
                                     value.keeper2.status == 'accessible'
                                       ? 0
@@ -1453,7 +1459,7 @@ class ManageBackupNewBHR extends Component<
                       shareType: selectedKeeper.shareType
                         ? selectedKeeper.shareType
                         : type,
-                      shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ].shareId : this.props.metaSharesKeeper[ 4 ].shareId
+                      shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
                     },
                     isSetup: true,
                   }
@@ -1520,7 +1526,7 @@ class ManageBackupNewBHR extends Component<
                   id: selectedLevelId,
                   selectedKeeper: {
                     ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ].shareId : this.props.metaSharesKeeper[ 4 ].shareId
+                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
                   },
                   isSetup: true,
                 }
