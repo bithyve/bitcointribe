@@ -45,7 +45,6 @@ import {
   generateMetaShare,
   checkMSharesHealth,
   initLevelTwo,
-  updateMSharesHealth,
   sendApprovalRequest,
   onApprovalStatusChange,
   reShareWithSameKeeper,
@@ -57,7 +56,8 @@ import {
   autoShareToLevel2Keepers,
   downloadSmShareForApproval,
   updateLevelData,
-  keeperProcessStatus
+  keeperProcessStatus,
+  setLevelToNotSetupStatus
 } from '../../store/actions/health'
 import { modifyLevelStatus } from './ManageBackupFunction'
 import {
@@ -125,7 +125,6 @@ interface ManageBackupNewBHRPropsTypes {
   isLevel3Initialized: Boolean;
   initLevelTwo: any;
   s3Service: S3Service;
-  updateMSharesHealth: any;
   keeperInfo: any[];
   sendApprovalRequest: any;
   service: any;
@@ -158,6 +157,8 @@ interface ManageBackupNewBHRPropsTypes {
   updateLevelData: any;
   keeperProcessStatusFlag: string;
   keeperProcessStatus: any;
+  setLevelToNotSetupStatus: any;
+  isLevelToNotSetupStatus: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -252,8 +253,11 @@ class ManageBackupNewBHR extends Component<
 
   componentDidMount = async () => {
     await AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
+      if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
+        this.props.setLevelToNotSetupStatus()
+      }
       // updates the new FCM token to channels post recovery
-      if ( recovered && !this.props.isNewFCMUpdated ) {
+      if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
         this.props.updateNewFcm()
       }
     } )
@@ -400,7 +404,7 @@ class ManageBackupNewBHR extends Component<
       this.props.deleteSmSharesAndSM()
     }
 
-    if( prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 3 ) {
+    if( this.props.currentLevel == 3 ) {
       this.loaderBottomSheet.snapTo( 0 )
     }
 
@@ -552,11 +556,14 @@ class ManageBackupNewBHR extends Component<
         if ( element.keeper1.shareType == 'device' ) count++
         if ( element.keeper2.shareType == 'device' ) count++
       }
-      if ( count == 0 && isSetup ) index = 0
+      if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ){
+        index = selectedKeeper.data.index
+      }
+      else if ( count == 0 && isSetup ) index = 0
       else if ( count == 1 && isSetup ) index = 3
       else if ( count == 2 && isSetup ) index = 4
       else {
-        index = selectedKeeper.data.index
+        index = 0
       }
       console.log( 'device index', index );
       ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
@@ -679,7 +686,7 @@ class ManageBackupNewBHR extends Component<
           if (
             !this.props.isLevel2Initialized &&
             !this.props.isLevelTwoMetaShareCreated &&
-            value.id == 2
+            value.id == 2 && this.props.metaSharesKeeper.length != 3
           ) {
             this.loaderBottomSheet.snapTo( 1 )
             this.props.generateMetaShare( value.id )
@@ -907,42 +914,45 @@ class ManageBackupNewBHR extends Component<
           }}
         >
           <View style={ styles.topHealthView }>
-            <ImageBackground
-              source={require( '../../assets/images/icons/keeper_sheild.png' )}
-              style={{
-                ...styles.healthShieldImage, position: 'relative'
-              }}
-              resizeMode={'contain'}
-            >
-              {isError && (
-                <View
-                  style={{
-                    backgroundColor: Colors.red,
-                    height: wp( '3%' ),
-                    width: wp( '3%' ),
-                    borderRadius: wp( '3%' ) / 2,
-                    position: 'absolute',
-                    top: wp( '5%' ),
-                    right: 0,
-                    borderWidth: 2,
-                    borderColor: Colors.white,
-                  }}
-                />
-              )}
-            </ImageBackground>
+            <View style={{
+              justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
+            }}>
+              <ImageBackground
+                source={require( '../../assets/images/icons/keeper_sheild.png' )}
+                style={{
+                  ...styles.healthShieldImage, position: 'relative',
+                }}
+                resizeMode={'contain'}
+              >
+                {isError && (
+                  <View
+                    style={{
+                      backgroundColor: Colors.red,
+                      height: wp( '3%' ),
+                      width: wp( '3%' ),
+                      borderRadius: wp( '3%' ) / 2,
+                      position: 'absolute',
+                      top: wp( '5%' ),
+                      right: 0,
+                      borderWidth: 2,
+                      borderColor: Colors.white,
+                    }}
+                  />
+                )}
+              </ImageBackground>
+            </View>
             <View style={styles.headerSeparator} />
             {currentLevel ?
               <View style={{
-                width: wp( '30%' )
+                width: wp( '35%' )
               }}>
                 <Text style={styles.backupText}>Wallet Security</Text>
-                <Text style={styles.backupInfoText}>Security is</Text>
-                <Text style={styles.backupInfoText}>
-                at level {currentLevel ? currentLevel : ''}
+                <Text style={styles.backupInfoText}>You are</Text>
+                <Text style={styles.backupInfoText}>at level {currentLevel ? currentLevel : ''}
                 </Text>
               </View>:
               <View style={{
-                width: wp( '30%' )
+                width: wp( '35%' ),
               }}>
                 <Text style={styles.backupText}>Wallet Security</Text>
                 <Text style={styles.backupInfoText}>Complete Level 1</Text>
@@ -955,7 +965,7 @@ class ManageBackupNewBHR extends Component<
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud backup complete, Upgrade security to level 2' : currentLevel === 2 ? 'Double backup complete, Upgrade security to level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete level 1' }</Text>
+            }}>{currentLevel === 1 ? 'Cloud backup complete, upgrade security to level 2' : currentLevel === 2 ? 'Double backup complete, upgrade security to level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete level 1' }</Text>
           </View>
           <View
             style={{
@@ -1445,7 +1455,8 @@ class ManageBackupNewBHR extends Component<
                   selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
-                  this.props.currentLevel == 2
+                  this.props.currentLevel == 2 &&
+                  this.props.metaSharesKeeper.length != 5
                 ) {
                   this.props.generateMetaShare( selectedLevelId )
                 } else if( selectedLevelId == 3 ) {
@@ -1627,6 +1638,7 @@ const mapStateToProps = ( state ) => {
     secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
     cloudPermissionGranted: state.health.cloudPermissionGranted,
     keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
+    isLevelToNotSetupStatus: idx( state, ( _ ) => _.health.isLevelToNotSetupStatus ),
   }
 }
 
@@ -1637,7 +1649,6 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
-    updateMSharesHealth,
     sendApprovalRequest,
     onApprovalStatusChange,
     fetchKeeperTrustedChannel,
@@ -1653,7 +1664,8 @@ export default withNavigationFocus(
     autoShareToLevel2Keepers,
     downloadSmShareForApproval,
     updateLevelData,
-    keeperProcessStatus
+    keeperProcessStatus,
+    setLevelToNotSetupStatus,
   } )( ManageBackupNewBHR )
 )
 

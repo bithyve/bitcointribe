@@ -75,9 +75,7 @@ const checkLevelHealth = (
       else if( index != 0 && currentLevel > 0 ){
         // console.log( 'modifyLevelStatus index != 0 && currentLevel > 0' )
         levelData[ index-1 ].keeper1 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
-        levelData[ index-1 ].keeper1.name = index == 0 ? 'Cloud' : levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ].name
         levelData[ index-1 ].keeper2 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
-        levelData[ index-1 ].keeper2.name = index == 0 ? 'Security Question' : levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ].name
         levelData[ index-1 ].status = checkStatus( levelHealthVar, currentLevel - 1, 0 )
       }
       else if( index == 0 && currentLevel == 0 ){

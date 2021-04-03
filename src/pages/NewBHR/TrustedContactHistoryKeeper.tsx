@@ -193,6 +193,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+  const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -724,6 +725,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const createGuardian = useCallback( async () => {
     if ( !Object.keys( chosenContact ).length ) return
+    setIsGuardianCreationClicked( true )
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
@@ -851,24 +853,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
       } else if ( otp ) {
         info = otp
       }
-
-      if ( publicKey ){
-        updateShare()
-        setTrustedQR(
-          JSON.stringify( {
-            approvedTC: symmetricKey ? true : false,
-            isGuardian: true,
-            requester: WALLET_SETUP.walletName,
-            publicKey,
-            info: info.trim(),
-            uploadedAt:
+      if( isGuardianCreationClicked ){
+        setIsGuardianCreationClicked( false )
+        if ( publicKey ){
+          updateShare()
+          setTrustedQR(
+            JSON.stringify( {
+              approvedTC: symmetricKey ? true : false,
+              isGuardian: true,
+              requester: WALLET_SETUP.walletName,
+              publicKey,
+              info: info.trim(),
+              uploadedAt:
               trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
                 .initiatedAt,
-            type: 'trustedGuardian',
-            ver: DeviceInfo.getVersion(),
-            isFromKeeper: true,
-          } ),
-        )
+              type: 'trustedGuardian',
+              ver: DeviceInfo.getVersion(),
+              isFromKeeper: true,
+            } ),
+          )
+        }
       }
     }
   }, [
@@ -878,6 +882,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     uploadMetaShare,
     updateEphemeralChannelLoader,
     updateTrustedChannelLoader,
+    isGuardianCreationClicked
   ] )
 
   const SendShareModalFunction = useCallback( () => {
