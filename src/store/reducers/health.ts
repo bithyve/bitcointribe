@@ -37,7 +37,8 @@ import {
   INIT_NEW_BHR,
   UPDATE_LEVEL_DATA,
   KEEPER_PROCESS_STATUS,
-  PDF_SUCCESSFULLY_CREATED
+  PDF_SUCCESSFULLY_CREATED,
+  IS_LEVEL_TO_NOT_SETUP
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
@@ -142,6 +143,7 @@ const initialState: {
   }[];
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
+  isLevelToNotSetupStatus: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -198,7 +200,8 @@ const initialState: {
   newBHRFlowStarted: false,
   levelData: null,
   keeperProcessStatus: '',
-  pdfCreatedSuccessfully: false
+  pdfCreatedSuccessfully: false,
+  isLevelToNotSetupStatus: false
 }
 
 export default ( state = initialState, action ) => {
@@ -461,6 +464,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           pdfCreatedSuccessfully: action.payload.status
+        }
+
+      case IS_LEVEL_TO_NOT_SETUP:
+        return {
+          ...state,
+          isLevelToNotSetupStatus: action.payload.status
         }
   }
   return state

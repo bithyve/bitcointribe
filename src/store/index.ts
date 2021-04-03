@@ -174,7 +174,8 @@ import {
   updateKeeperInfoToTrustedChannelWatcher,
   updateKeeperInfoToUnderCustodyWatcher,
   autoShareLevel2KeepersWatcher,
-  downloadSmShareForApprovalWatcher
+  downloadSmShareForApprovalWatcher,
+  setLevelToNotSetupStatusWatcher,
 } from './sagas/health'
 
 import {
@@ -327,6 +328,7 @@ const rootSaga = function* () {
     updateKeeperInfoToUnderCustodyWatcher,
     autoShareLevel2KeepersWatcher,
     downloadSmShareForApprovalWatcher,
+    setLevelToNotSetupStatusWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,

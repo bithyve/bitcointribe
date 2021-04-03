@@ -71,6 +71,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ keeperTypeBottomSheet, setkeeperTypeBottomSheet ] = useState( React.createRef() )
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
+  const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
 
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
@@ -229,6 +230,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const createGuardian = useCallback(
     async ( changeKeeper?: boolean ) => {
+      setIsGuardianCreationClicked( true )
       const firstName = 'Secondary'
       let lastName = 'Device'
       if( index === 0 ) lastName = 'Device1'
@@ -331,27 +333,31 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       if( publicKey ) {
         dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
       }
-      updateShare()
-      setSecondaryQR(
-        JSON.stringify( {
-          isGuardian: true,
-          requester: WALLET_SETUP.walletName,
-          publicKey,
-          info: secondaryKey,
-          uploadedAt:
+      if( isGuardianCreationClicked ){
+        setIsGuardianCreationClicked( false )
+        updateShare()
+        setSecondaryQR(
+          JSON.stringify( {
+            isGuardian: true,
+            requester: WALLET_SETUP.walletName,
+            publicKey,
+            info: secondaryKey,
+            uploadedAt:
             trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
               .initiatedAt,
-          type: 'secondaryDeviceGuardian',
-          ver: DeviceInfo.getVersion(),
-          isFromKeeper: true,
-        } ),
-      )
+            type: 'secondaryDeviceGuardian',
+            ver: DeviceInfo.getVersion(),
+            isFromKeeper: true,
+          } ),
+        )
+      }
     }
   }, [
     SHARES_TRANSFER_DETAILS,
     trustedContacts,
     uploadMetaShare,
     updateEphemeralChannelLoader,
+    isGuardianCreationClicked
   ] )
 
   useEffect( () => {
