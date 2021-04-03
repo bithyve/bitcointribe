@@ -82,6 +82,9 @@ export const DOWNLOAD_SMSHARE_FOR_APPROVAL = 'DOWNLOAD_SMSHARE_FOR_APPROVAL'
 export const INIT_NEW_BHR = 'INIT_NEW_BHR'
 export const UPDATE_LEVEL_DATA = 'UPDATE_LEVEL_DATA'
 export const KEEPER_PROCESS_STATUS = 'KEEPER_PROCESS_STATUS'
+export const PDF_SUCCESSFULLY_CREATED = 'PDF_SUCCESSFULLY_CREATED'
+export const SET_LEVEL_TO_NOT_SETUP = 'SET_LEVEL_TO_NOT_SETUP'
+export const IS_LEVEL_TO_NOT_SETUP = 'IS_LEVEL_TO_NOT_SETUP'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -745,6 +748,30 @@ export const updateLevelData = ( levelData ) =>{
 export const keeperProcessStatus = ( status ) =>{
   return {
     type: KEEPER_PROCESS_STATUS, payload: {
+      status
+    }
+  }
+}
+
+export const pdfSuccessfullyCreated = ( status ) =>{
+  return {
+    type: PDF_SUCCESSFULLY_CREATED, payload: {
+      status
+    }
+  }
+}
+
+export const setLevelToNotSetupStatus = ( ) => {
+  console.log( 'SET_LEVEL_TO_NOT_SETUP' )
+  return {
+    type: SET_LEVEL_TO_NOT_SETUP
+  }
+}
+
+export const setIsLevelToNotSetupStatus = ( status ) =>{
+  console.log( 'IS_LEVEL_TO_NOT_SETUP' )
+  return {
+    type: IS_LEVEL_TO_NOT_SETUP, payload: {
       status
     }
   }

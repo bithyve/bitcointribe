@@ -162,11 +162,11 @@ const HomeHeader = ( {
         }
         if( currentLevel === 1 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade security to level 2', messageTwo: ''
           }
         } else if( currentLevel === 2 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade security to level 3', messageTwo: ''
           }
         } else if( currentLevel == 3 ){
           return {
@@ -223,11 +223,11 @@ const HomeHeader = ( {
             }
             if( currentLevel == 1 ){
               return {
-                isFirstMessageBold: false, messageOne: 'Cloud backup complete, Upgrade security to level 2', messageTwo: ''
+                isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade security to level 2', messageTwo: ''
               }
             } else if( currentLevel === 2 ){
               return {
-                isFirstMessageBold: false, messageOne: 'Double backup complete, Upgrade security to level 3', messageTwo: ''
+                isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade security to level 3', messageTwo: ''
               }
             } else if( currentLevel == 3 ){
               return {
@@ -238,7 +238,7 @@ const HomeHeader = ( {
         }
       } else {
         return {
-          isFirstMessageBold: true, messageOne: 'Upgrade Backup', messageTwo: ' to improve health'
+          isFirstMessageBold: true, messageOne: 'Manage your wallet backup', messageTwo: ''
         }
       }
     }

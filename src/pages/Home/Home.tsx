@@ -37,7 +37,6 @@ import {
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
-  updateMSharesHealth,
   onApprovalStatusChange,
   autoDownloadShareContact,
   uploadSecondaryShareForPK,
@@ -242,7 +241,6 @@ interface HomePropsTypes {
   updateHealthForCloud: any;
   regularAccount: RegularAccount;
   database: any;
-  updateMSharesHealth: any;
   setCardData: any;
   cardDataProps: any;
   fetchKeeperTrustedChannel: any;
@@ -1536,7 +1534,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         fetchTrustedChannel,
         walletName,
         trustedContacts,
-        updateMSharesHealth,
         uploadSecondaryShareForPK,
       } = this.props
 
@@ -2583,7 +2580,6 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     updateHealthForCloud,
-    updateMSharesHealth,
     setCardData,
     fetchKeeperTrustedChannel,
     onApprovalStatusChange,

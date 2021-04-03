@@ -70,6 +70,9 @@ import {
   UPDATE_KEEPERINFO_UNDER_CUSTODY,
   AUTO_SHARE_LEVEL2_KEEPER,
   DOWNLOAD_SMSHARE_FOR_APPROVAL,
+  pdfSuccessfullyCreated,
+  SET_LEVEL_TO_NOT_SETUP,
+  setIsLevelToNotSetupStatus,
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -1497,22 +1500,24 @@ function* uploadEncMetaShareKeeperWorker( { payload } ) {
     }
     console.log( 'updateKeeperInfoToMetaShare payload.previousGuardianName', payload.previousGuardianName )
     console.log( 'updateKeeperInfoToMetaShare trustedContacts.tc.trustedContacts', trustedContacts.tc.trustedContacts )
-    if ( payload.previousGuardianName && trustedContacts.tc.trustedContacts[ payload.previousGuardianName ] ) {
-      trustedContacts.tc.trustedContacts[
-        payload.previousGuardianName
-      ].isGuardian = false
-    } else {
-    // preventing re-uploads till expiry
-      if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ index ] ) {
-        if (
-          Date.now() -
-          DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT <
-        config.TC_REQUEST_EXPIRY
-        ) {
-        // re-upload after 10 minutes (removal sync w/ relayer)
-          yield put( switchS3LoaderKeeper( 'uploadMetaShare' ) )
+    if( trustedContacts.tc.trustedContacts[ payload.previousGuardianName ] ) {
+      if ( payload.previousGuardianName && trustedContacts.tc.trustedContacts[ payload.previousGuardianName ] ) {
+        trustedContacts.tc.trustedContacts[
+          payload.previousGuardianName
+        ].isGuardian = false
+      } else {
+      // preventing re-uploads till expiry
+        if ( DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ index ] ) {
+          if (
+            Date.now() -
+            DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT <
+          config.TC_REQUEST_EXPIRY
+          ) {
+          // re-upload after 10 minutes (removal sync w/ relayer)
+            yield put( switchS3LoaderKeeper( 'uploadMetaShare' ) )
 
-          return
+            return
+          }
         }
       }
     }
@@ -2662,9 +2667,11 @@ function* getPDFDataWorker( { payload } ) {
         }
       } )
     }
+    yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
+    yield put( pdfSuccessfullyCreated( false ) )
     console.log( 'Error EF channel', error )
   }
 }
@@ -2680,6 +2687,7 @@ function* sharePDFWorker( { payload } ) {
     privateKey: string;
   } = yield select( ( state ) => state.health.pdfInfo )
   try {
+    console.log( 'pdfInfo', pdfInfo )
     if ( !pdfInfo.filePath ) throw new Error( 'Personal copy not found/generated' )
 
     const { security } = yield select(
@@ -3729,4 +3737,63 @@ function* downloadSmShareForApprovalWorker( { payload } ) {
 export const downloadSmShareForApprovalWatcher = createWatcher(
   downloadSmShareForApprovalWorker,
   DOWNLOAD_SMSHARE_FOR_APPROVAL
+)
+
+function* setLevelToNotSetupStatusWorker( ) {
+  try {
+    yield put( switchS3LoaderKeeper( 'downloadSmShare' ) )
+    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const service: S3Service = yield select( ( state ) => state.health.service )
+    let toDelete:LevelInfo[]
+    const shareArray = []
+    if( currentLevel > 0 ) {
+      if( currentLevel == 1 && service.levelhealth.metaSharesKeeper.length == 3 && levelHealth[ 1 ] ) {
+        toDelete = levelHealth[ 1 ].levelInfo
+      }
+      if( currentLevel == 2 && service.levelhealth.metaSharesKeeper.length == 5 && levelHealth[ 2 ] ) {
+        toDelete = levelHealth[ 2 ].levelInfo
+      }
+    }
+    if( toDelete ){
+      for ( let i = 0; i < toDelete.length; i++ ) {
+        const element = toDelete[ i ]
+        if( i != 1 ){
+          shareArray.push( {
+            walletId: service.getWalletId().data.walletId,
+            shareId: element.shareId,
+            reshareVersion: element.reshareVersion,
+            updatedAt: 0,
+            status: 'notAccessible',
+            shareType: i == 2 ? 'primaryKeeper' : '',
+            name: ''
+          } )
+        }
+      }
+    }
+    console.log( 'shareArray', shareArray )
+    if( shareArray.length ) {
+      yield put( updateMSharesHealth( shareArray ) )
+      yield put( setIsLevelToNotSetupStatus( true ) )
+      if ( shareArray.length == 3 ){
+        yield put( updateLevelTwoMetaShareStatus( true ) )
+        yield put( isLevel2InitializedStatus() )
+      }
+      if ( shareArray.length == 5 ) {
+        yield put( updateLevelThreeMetaShareStatus( true ) )
+        yield put( isLevel3InitializedStatus() )
+        yield put( updateLevelTwoMetaShareStatus( true ) )
+        yield put( isLevel2InitializedStatus() )
+      }
+      yield put( checkMSharesHealth() )
+    }
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'downloadSmShare' ) )
+    console.log( 'Error EF channel', error )
+  }
+}
+
+export const setLevelToNotSetupStatusWatcher = createWatcher(
+  setLevelToNotSetupStatusWorker,
+  SET_LEVEL_TO_NOT_SETUP
 )
