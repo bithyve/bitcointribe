@@ -70,6 +70,7 @@ import {
   UPDATE_KEEPERINFO_UNDER_CUSTODY,
   AUTO_SHARE_LEVEL2_KEEPER,
   DOWNLOAD_SMSHARE_FOR_APPROVAL,
+  pdfSuccessfullyCreated,
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -2662,9 +2663,11 @@ function* getPDFDataWorker( { payload } ) {
         }
       } )
     }
+    yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
+    yield put( pdfSuccessfullyCreated( false ) )
     console.log( 'Error EF channel', error )
   }
 }
@@ -2680,6 +2683,7 @@ function* sharePDFWorker( { payload } ) {
     privateKey: string;
   } = yield select( ( state ) => state.health.pdfInfo )
   try {
+    console.log( 'pdfInfo', pdfInfo )
     if ( !pdfInfo.filePath ) throw new Error( 'Personal copy not found/generated' )
 
     const { security } = yield select(

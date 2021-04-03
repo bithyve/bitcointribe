@@ -82,6 +82,7 @@ export const DOWNLOAD_SMSHARE_FOR_APPROVAL = 'DOWNLOAD_SMSHARE_FOR_APPROVAL'
 export const INIT_NEW_BHR = 'INIT_NEW_BHR'
 export const UPDATE_LEVEL_DATA = 'UPDATE_LEVEL_DATA'
 export const KEEPER_PROCESS_STATUS = 'KEEPER_PROCESS_STATUS'
+export const PDF_SUCCESSFULLY_CREATED = 'PDF_SUCCESSFULLY_CREATED'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -745,6 +746,15 @@ export const updateLevelData = ( levelData ) =>{
 export const keeperProcessStatus = ( status ) =>{
   return {
     type: KEEPER_PROCESS_STATUS, payload: {
+      status
+    }
+  }
+}
+
+
+export const pdfSuccessfullyCreated = ( status ) =>{
+  return {
+    type: PDF_SUCCESSFULLY_CREATED, payload: {
       status
     }
   }

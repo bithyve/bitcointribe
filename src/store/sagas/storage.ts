@@ -64,7 +64,7 @@ function* fetchDBWorker() {
         },
       } )
       yield put( dbFetched( database ) )
-
+      console.log( 'newBHRFlowStarted', newBHRFlowStarted )
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
         yield put( walletCheckIn() )
