@@ -701,7 +701,7 @@ export const UploadSMSuccessfully = ( isUploaded ) => {
   }
 }
 
-export const deleteSmSharesAndSM = () => {
+export const deletePrivateData = () => {
   return {
     type: DELETE_SM_AND_SMSHARES
   }
