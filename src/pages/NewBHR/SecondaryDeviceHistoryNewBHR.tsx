@@ -73,6 +73,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
+  const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
 
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
 
@@ -854,6 +855,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         />
       </View>
       <BottomSheet
+        onCloseEnd={() => {
+          if( keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ){
+            saveInTransitHistory();
+            ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
+            if ( next ) {
+              props.navigation.goBack()
+            }
+            setTimeout( () => {
+              setIsReshare( true )
+            }, 2 )
+          }
+        }}
         onCloseStart={() => {
           ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
         }}

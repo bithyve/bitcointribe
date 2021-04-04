@@ -45,6 +45,7 @@ export default class S3Service {
       pdfHealthKeeper,
       encryptedSMSecretsKeeper,
       SMMetaSharesKeeper,
+      oldMetaSharesKeeper,
     }: {
       encryptedSecretsKeeper: string[];
       shareIDsKeeper: string[];
@@ -54,6 +55,7 @@ export default class S3Service {
       pdfHealthKeeper: {};
       encryptedSMSecretsKeeper: string[];
       SMMetaSharesKeeper: MetaShare[];
+      oldMetaSharesKeeper: MetaShare[];
     } = levelhealth ? levelhealth : {
       encryptedSecretsKeeper: [],
       shareIDsKeeper: [],
@@ -65,6 +67,7 @@ export default class S3Service {
       },
       encryptedSMSecretsKeeper: [],
       SMMetaSharesKeeper: [],
+      oldMetaSharesKeeper: [],
     }
 
     return new S3Service( mnemonic, {
@@ -83,6 +86,7 @@ export default class S3Service {
       pdfHealthKeeper,
       encryptedSMSecretsKeeper,
       SMMetaSharesKeeper,
+      oldMetaSharesKeeper,
     } )
   };
 
@@ -108,6 +112,7 @@ export default class S3Service {
       pdfHealthKeeper: {};
       encryptedSMSecretsKeeper: string[];
       SMMetaSharesKeeper: MetaShare[];
+      oldMetaSharesKeeper: MetaShare[];
     },
   ) {
     this.levelhealth = new LevelHealth( mnemonic, stateVars )
@@ -755,7 +760,7 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { shares } = this.levelhealth.generateLevel2Shares()
+      const { shares } = this.levelhealth.generateLevel2Shares( answer )
       const { encryptedSecrets } = this.levelhealth.encryptSecrets( shares, answer )
       const { metaShares } = this.levelhealth.createMetaSharesKeeper( secureAssets, tag, questionId, version, question, level )
       return {
@@ -1730,7 +1735,7 @@ export default class S3Service {
     }
   };
 
-  public deleteSmSharesAndSM = async (): Promise<
+  public deletePrivateData = async (): Promise<
     | {
         status: number;
         err?: undefined;
@@ -1743,7 +1748,7 @@ export default class S3Service {
       }
   > => {
     try {
-      await this.levelhealth.deleteSmSharesAndSM()
+      await this.levelhealth.deletePrivateData()
       return {
         status: config.STATUS.SUCCESS
       }
@@ -1761,6 +1766,7 @@ export default class S3Service {
         status: number;
         data: {
           metaShares: MetaShare[];
+          oldMetaShares: MetaShare[];
         };
         err?: undefined;
         message?: undefined;
@@ -1772,10 +1778,10 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { metaShares } = this.levelhealth.updateKeeperInfoToMetaShare( keeperInfo, answer )
+      const { metaShares, oldMetaShares } = this.levelhealth.updateKeeperInfoToMetaShare( keeperInfo, answer )
       return {
         status: config.STATUS.SUCCESS, data: {
-          metaShares
+          metaShares, oldMetaShares
         }
       }
     } catch ( err ) {

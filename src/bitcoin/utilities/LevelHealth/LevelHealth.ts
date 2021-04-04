@@ -664,6 +664,7 @@ export default class LevelHealth {
   public encryptedSecretsKeeper: string[];
   public encryptedSMSecretsKeeper: string[];
   public metaSharesKeeper: MetaShare[];
+  public oldMetaSharesKeeper: MetaShare[];
   public SMMetaSharesKeeper: MetaShare[];
   public healthCheckInitializedKeeper: boolean;
   public pdfHealthKeeper: {};
@@ -676,6 +677,7 @@ export default class LevelHealth {
       encryptedSecretsKeeper: string[];
       shareIDsKeeper: string[];
       metaSharesKeeper: MetaShare[];
+      oldMetaSharesKeeper: MetaShare[];
       healthCheckInitializedKeeper: boolean;
       walletId: string;
       healthCheckStatusKeeper: {};
@@ -707,6 +709,7 @@ export default class LevelHealth {
     }
     this.encryptedSMSecretsKeeper = stateVars ? stateVars.encryptedSMSecretsKeeper : []
     this.SMMetaSharesKeeper = stateVars ? stateVars.SMMetaSharesKeeper : []
+    this.oldMetaSharesKeeper = stateVars ? stateVars.oldMetaSharesKeeper : []
   }
 
   public stringToHex = ( str: string ): string => secrets.str2hex( str );
@@ -734,12 +737,28 @@ export default class LevelHealth {
     }
   };
 
-  public generateLevel2Shares = (): {
+  public generateLevel2Shares = ( answer: string ): {
     shares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+
+    const decryptedShareArr = []
+    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
+      const element = this.metaSharesKeeper[ i ]
+      decryptedShareArr.push( element.encryptedSecret )
+    }
+    const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
+
+    const secretsArr = [] // secrets w/o checksum
+    for ( const secret of decryptedSecrets ) {
+      secretsArr.push( secret.slice( 0, secret.length - 8 ) )
+    }
+
+    const recoveredMnemonicHex = secrets.combine( secretsArr )
+    const PrimaryMnemonics = LevelHealth.hexToString( recoveredMnemonicHex )
+
     const shares = secrets.share(
-      this.stringToHex( this.mnemonic ),
+      this.stringToHex( PrimaryMnemonics ),
       config.SSS_LEVEL2_TOTAL,
       config.SSS_LEVEL2_THRESHOLD,
     )
@@ -1333,6 +1352,7 @@ export default class LevelHealth {
       metaShareArray.push( metaShare )
       index++
     }
+    this.oldMetaSharesKeeper = this.metaSharesKeeper
     this.metaSharesKeeper = metaShareArray
 
     if ( level == 2 && this.metaSharesKeeper.length !== config.SSS_LEVEL1_TOTAL ) {
@@ -1844,21 +1864,27 @@ export default class LevelHealth {
     }
   };
 
-  public deleteSmSharesAndSM = async (): Promise<{ success: boolean }> => {
+  public deletePrivateData = async (): Promise<{ success: boolean }> => {
     this.SMMetaSharesKeeper = []
     this.encryptedSMSecretsKeeper = []
+    this.mnemonic = ''
     return {
       success: true
     }
   };
 
-  public updateKeeperInfoToMetaShare = ( keeperInfo: any, answer: string ): { metaShares: MetaShare[] } => {
+  public updateKeeperInfoToMetaShare = ( keeperInfo: any, answer: string ): { metaShares: MetaShare[], oldMetaShares: MetaShare[]; } => {
     const { encryptedString } = LevelHealth.encryptWithAnswer( JSON.stringify( keeperInfo ), answer )
     for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
       this.metaSharesKeeper[ i ].meta.encryptedKeeperInfo = encryptedString
     }
+    if( this.oldMetaSharesKeeper && this.oldMetaSharesKeeper.length ){
+      for ( let i = 0; i < this.oldMetaSharesKeeper.length; i++ ) {
+        this.oldMetaSharesKeeper[ i ].meta.encryptedKeeperInfo = encryptedString
+      }
+    }
     return {
-      metaShares: this.metaSharesKeeper
+      metaShares: this.metaSharesKeeper, oldMetaShares: this.oldMetaSharesKeeper
     }
   };
 
