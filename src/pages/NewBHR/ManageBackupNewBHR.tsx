@@ -50,7 +50,7 @@ import {
   reShareWithSameKeeper,
   autoShareContact,
   generateSMMetaShares,
-  deleteSmSharesAndSM,
+  deletePrivateData,
   updateKeeperInfoToTrustedChannel,
   secondaryShareDownloaded,
   autoShareToLevel2Keepers,
@@ -146,7 +146,7 @@ interface ManageBackupNewBHRPropsTypes {
   setCloudData: any;
   isSmMetaSharesCreatedFlag: boolean;
   generateSMMetaShares: any;
-  deleteSmSharesAndSM: any;
+  deletePrivateData: any;
   updateKeeperInfoToTrustedChannel: any;
   secondaryShareDownloaded: any
   autoShareToLevel2Keepers: any;
@@ -338,8 +338,6 @@ class ManageBackupNewBHR extends Component<
     const {
       healthLoading,
       cloudBackupStatus,
-      keeperInfo,
-      currentLevel,
       levelHealth
     } = this.props
     if (
@@ -377,15 +375,18 @@ class ManageBackupNewBHR extends Component<
       ) {
         this.props.setCloudData( )
       } else if(
-        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' ) ||
-      ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
+        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' )
+      ) {
+        this.props.deletePrivateData()
+      }
+      else if(
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
       levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
       levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
       ) {
         this.updateCloudData()
       }
     }
-
 
     if( prevProps.levelHealth != this.props.levelHealth ){
       this.autoUploadShare()
@@ -400,8 +401,8 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if( prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 2 ) {
-      this.props.deleteSmSharesAndSM()
+    if( prevProps.s3Service.levelhealth.SMMetaSharesKeeper != this.props.s3Service.levelhealth.SMMetaSharesKeeper && this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' ) ) {
+      this.updateCloudData()
     }
 
     if( this.props.currentLevel == 3 ) {
@@ -1658,7 +1659,7 @@ export default withNavigationFocus(
     updateNewFcm,
     setCloudData,
     generateSMMetaShares,
-    deleteSmSharesAndSM,
+    deletePrivateData,
     updateKeeperInfoToTrustedChannel,
     secondaryShareDownloaded,
     autoShareToLevel2Keepers,

@@ -3283,7 +3283,7 @@ export const uploadRequestedSMShareWatcher = createWatcher(
   UPLOAD_REQUESTED_SMSHARE,
 )
 
-function* deleteSmSharesAndSMWorker() {
+function* deletePrivateDataWorker() {
   try {
     // Transfer: Guardian >>> User
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -3291,7 +3291,8 @@ function* deleteSmSharesAndSMWorker() {
       ( state ) => state.accounts[ SECURE_ACCOUNT ].service
     )
     // Delete Sm shares
-    s3Service.deleteSmSharesAndSM()
+    s3Service.deletePrivateData()
+    console.log( 'deletePrivateDataWorker s3Service', s3Service.levelhealth )
 
     // Delete Sm
     s3ServiceSecure.deleteSecondaryMnemonics()
@@ -3314,8 +3315,8 @@ function* deleteSmSharesAndSMWorker() {
   }
 }
 
-export const deleteSmSharesAndSMWatcher = createWatcher(
-  deleteSmSharesAndSMWorker,
+export const deletePrivateDataWatcher = createWatcher(
+  deletePrivateDataWorker,
   DELETE_SM_AND_SMSHARES,
 )
 
@@ -3326,9 +3327,14 @@ function* updateKeeperInfoToTrustedChannelWorker() {
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
-    const contactKeeper: LevelInfo[] = []
-    const pdfKeeper: LevelInfo[] = []
-    let levelHealthVar: LevelInfo[]
+    const contactKeeper = []
+    const pdfKeeper = []
+    const keeperInfoData = yield select(
+      ( state ) => state.health.keeperInfo
+    )
+    const answer = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.answer )
+    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfoData, answer )
+    let levelHealthVar
     if( currentLevel == 1 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.length ) {
       levelHealthVar = levelHealth[ 1 ].levelInfo
     }
@@ -3336,12 +3342,20 @@ function* updateKeeperInfoToTrustedChannelWorker() {
       levelHealthVar = levelHealth[ 1 ].levelInfo
     }
     else if( currentLevel == 2 && levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.length ) {
-      levelHealthVar = [ ...levelHealth[ 1 ].levelInfo, ...levelHealth[ 2 ].levelInfo ]
+      levelHealthVar = []
+      for ( let i = 0; i < levelHealth[ 2 ].levelInfo.length; i++ ) {
+        const element = levelHealth[ 2 ].levelInfo[ i ]
+        if( levelHealth[ 1 ].levelInfo[ i ] ){
+          levelHealthVar.push( {
+            ...levelHealth[ 1 ].levelInfo[ i ],
+            oldShareId: levelHealth[ 1 ].levelInfo[ i ].shareId
+          } )
+        } else{
+          levelHealthVar.push( element )
+        }
+      }
     }
     else if( currentLevel == 3 && levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.length ) {
-      levelHealthVar = levelHealth[ 2 ].levelInfo
-    }
-    else if( currentLevel == 3 ) {
       levelHealthVar = levelHealth[ 2 ].levelInfo
     }
 
@@ -3358,6 +3372,7 @@ function* updateKeeperInfoToTrustedChannelWorker() {
     }
 
     console.log( 'KEEPER INFO CHANGE contactKeeper', contactKeeper )
+    console.log( 'KEEPER INFO CHANGE pdfKeeper', pdfKeeper )
 
     if( contactKeeper.length ) {
       for ( let i = 0; i < contactKeeper.length; i++ ) {
@@ -3420,18 +3435,31 @@ function* updateKeeperInfoToTrustedChannelWorker() {
 
       const privateKey = pdfInfo.privateKey
       let shareIndex = 3
-      if ( pdfKeeperElement.shareId && s3Service.levelhealth.metaSharesKeeper.length ) {
+      let primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
+      if( pdfKeeperElement.oldShareId && response.data && response.data.oldMetaShares.length ) {
         if (
-          s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == pdfKeeperElement.shareId ) > -1
+          response.data.oldMetaShares.findIndex( ( value ) => value.shareId == pdfKeeperElement.shareId ) > -1
         ) {
-          shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex(
+          shareIndex = response.data.oldMetaShares.findIndex(
             ( value ) => value.shareId == pdfKeeperElement.shareId
           )
         }
+        primaryShare = response.data.oldMetaShares[ shareIndex ]
+      } else {
+        if ( pdfKeeperElement.shareId && s3Service.levelhealth.metaSharesKeeper.length ) {
+          if (
+            s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == pdfKeeperElement.shareId ) > -1
+          ) {
+            shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex(
+              ( value ) => value.shareId == pdfKeeperElement.shareId
+            )
+          }
+          primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
+        }
       }
-      const primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
-      const primaryShareKey = Keeper.getDerivedKey( privateKey )
+      console.log( 'primaryShare', primaryShare )
 
+      const primaryShareKey = Keeper.getDerivedKey( privateKey )
       const primaryData = LevelHealth.encryptMetaShare(
         primaryShare,
         primaryShareKey
