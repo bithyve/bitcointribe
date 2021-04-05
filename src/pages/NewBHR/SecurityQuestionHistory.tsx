@@ -248,7 +248,7 @@ const SecurityQuestionHistory = ( props ) => {
         selectedTitle={'Security Question'}
         selectedTime={props.navigation.state.params.selectedTime}
         selectedStatus={props.navigation.state.params.selectedStatus}
-        moreInfo={'Lorem ipsum dolor'}
+        moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
       />
       <View style={{
