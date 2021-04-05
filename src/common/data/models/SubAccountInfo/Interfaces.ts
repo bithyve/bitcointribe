@@ -10,6 +10,7 @@ import SourceAccountKind from '../../enums/SourceAccountKind'
 
 interface SubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;
