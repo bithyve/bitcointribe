@@ -623,9 +623,9 @@ class ManageBackupNewBHR extends Component<
       !isLevel3Initialized
     ) {
       this.setState( {
-        errorTitle: 'Please first complete Level 2',
+        errorTitle: 'Please complete Level 2',
         errorInfo:
-          'Please check if you have completed above levels first and try to complete levels',
+        'It seems you have not completed Level 2. Please complete Level 2 to proceed'
       } );
       ( this.ErrorBottomSheet as any ).snapTo( 1 )
       return
@@ -637,9 +637,9 @@ class ManageBackupNewBHR extends Component<
       !isLevel2Initialized
     ) {
       this.setState( {
-        errorTitle: 'Please first complete Primary Keeper Setup',
+        errorTitle: 'Please complete Primary Keeper Setup',
         errorInfo:
-          'Please check if you have completed Primary Keeper Setup first and try to complete Primary Keeper Setup',
+          'It seems you have not completed Primary Keeper Setup, please complete Primary Keeper Setup to proceed',
       } );
       ( this.ErrorBottomSheet as any ).snapTo( 1 )
       return
@@ -699,9 +699,9 @@ class ManageBackupNewBHR extends Component<
           }
         } else {
           this.setState( {
-            errorTitle: 'Please first complete Level 1',
+            errorTitle: 'Please complete Level 1',
             errorInfo:
-              'Please check if you have completed Level 1 first and try to complete Level 1.',
+              'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed',
           } );
           ( this.ErrorBottomSheet as any ).snapTo( 1 )
         }
