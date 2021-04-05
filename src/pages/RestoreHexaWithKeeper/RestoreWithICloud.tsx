@@ -952,7 +952,7 @@ class RestoreWithICloud extends Component<
                                   fontSize: RFValue( 10 ),
                                 }}
                               >
-                                {'Backup at level : ' + value.levelStatus}
+                                {'Backup at Level : ' + value.levelStatus}
                               </Text>
                             </View>
                           </View>
@@ -988,7 +988,7 @@ class RestoreWithICloud extends Component<
                 cardTitle={selectedBackup.walletName}
                 levelStatus={
                   selectedBackup.levelStatus
-                    ? name + ' backup at level ' + selectedBackup.levelStatus
+                    ? name + ' backup at Level ' + selectedBackup.levelStatus
                     : ''
                 }
                 proceedButtonText={'Restore'}

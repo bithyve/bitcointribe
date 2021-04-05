@@ -219,8 +219,8 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Level 2',
           status: 'notSetup',
-          keeper1ButtonText: 'Share RK 1',
-          keeper2ButtonText: 'Share RK 2',
+          keeper1ButtonText: 'Share Recovery Key 1',
+          keeper2ButtonText: 'Share Recovery Key 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
@@ -230,8 +230,8 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Level 3',
           status: 'notSetup',
-          keeper1ButtonText: 'Share RK 1',
-          keeper2ButtonText: 'Share RK 2',
+          keeper1ButtonText: 'Share Recovery Key 1',
+          keeper2ButtonText: 'Share Recovery Key 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
@@ -411,50 +411,50 @@ class ManageBackupNewBHR extends Component<
 
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag
+      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 0 && this.props.metaSharesKeeper.length == 3
     ) {
-      if ( this.props.metaSharesKeeper.length == 3 ) {
-        const obj = {
-          id: 2,
-          selectedKeeper: {
-            shareType: 'device',
-            name: 'Secondary Device1',
-            reshareVersion: 0,
-            status: 'notAccessible',
-            updatedAt: 0,
-            shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
-              .shareId,
-            data: {
-            },
+      const obj = {
+        id: 2,
+        selectedKeeper: {
+          shareType: 'device',
+          name: 'Secondary Device1',
+          reshareVersion: 0,
+          status: 'notAccessible',
+          updatedAt: 0,
+          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
+            .shareId,
+          data: {
           },
-          isSetup: true,
-        }
-        this.setState( {
-          selectedKeeper: obj.selectedKeeper,
-        } )
-        // this.goToHistory( obj )
+        },
+        isSetup: true,
       }
-      if ( this.props.metaSharesKeeper.length == 5 ) {
-        const obj = {
-          id: 2,
-          selectedKeeper: {
-            shareType: this.state.selectedKeeperType,
-            name: this.state.selectedKeeperName,
-            reshareVersion: 0,
-            status: 'notAccessible',
-            updatedAt: 0,
-            shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
-              .shareId,
-            data: {
-            },
+      this.setState( {
+        selectedKeeper: obj.selectedKeeper,
+      } )
+    }
+    if (
+      JSON.stringify( prevProps.metaSharesKeeper ) !==
+      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
+    ) {
+      const obj = {
+        id: 2,
+        selectedKeeper: {
+          shareType: this.state.selectedKeeperType,
+          name: this.state.selectedKeeperName,
+          reshareVersion: 0,
+          status: 'notAccessible',
+          updatedAt: 0,
+          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
+            .shareId,
+          data: {
           },
-          isSetup: true,
-        }
-        this.setState( {
-          selectedKeeper: obj.selectedKeeper,
-        } )
-        this.sendApprovalRequestToPK( )
+        },
+        isSetup: true,
       }
+      this.setState( {
+        selectedKeeper: obj.selectedKeeper,
+      } )
+      this.sendApprovalRequestToPK( )
     }
 
     if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
@@ -785,7 +785,7 @@ class ManageBackupNewBHR extends Component<
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
-          'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
+          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
         }
         modalRef={this.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
@@ -949,7 +949,7 @@ class ManageBackupNewBHR extends Component<
               }}>
                 <Text style={styles.backupText}>Wallet Security</Text>
                 <Text style={styles.backupInfoText}>You are</Text>
-                <Text style={styles.backupInfoText}>at level {currentLevel ? currentLevel : ''}
+                <Text style={styles.backupInfoText}>at Level {currentLevel ? currentLevel : ''}
                 </Text>
               </View>:
               <View style={{
@@ -966,7 +966,7 @@ class ManageBackupNewBHR extends Component<
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud backup complete, upgrade security to level 2' : currentLevel === 2 ? 'Double backup complete, upgrade security to level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete level 1' }</Text>
+            }}>{currentLevel === 1 ? 'Cloud backup complete, upgrade security to Level 2' : currentLevel === 2 ? 'Double backup complete, upgrade security to Level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete Level 1' }</Text>
           </View>
           <View
             style={{
@@ -1192,7 +1192,7 @@ class ManageBackupNewBHR extends Component<
                                 <Text
                                   style={{
                                     ...styles.cardButtonText,
-                                    fontSize: RFValue( 11 ),
+                                    fontSize: RFValue( 8 ),
                                     marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
@@ -1252,7 +1252,7 @@ class ManageBackupNewBHR extends Component<
                                 <Text
                                   style={{
                                     ...styles.cardButtonText,
-                                    fontSize: RFValue( 11 ),
+                                    fontSize: RFValue( 8 ),
                                     marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
@@ -1337,12 +1337,12 @@ class ManageBackupNewBHR extends Component<
                                       value.status == 'notSetup'
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    fontSize: RFValue( 11 ),
-                                    marginLeft: wp( '3%' ),
+                                    fontSize: RFValue( 8 ),
+                                    marginLeft: wp( '2%' ),
                                   } }
                                   numberOfLines={1}
                                 >
-                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share RK 1'}
+                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share Recovery Key 1'}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
@@ -1410,17 +1410,16 @@ class ManageBackupNewBHR extends Component<
                                 <Text
                                   style={{
                                     ...styles.cardButtonText,
-                                    fontSize: RFValue( 11 ),
+                                    fontSize: RFValue( 8 ),
                                     color:
                                       value.status == 'notSetup'
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    marginLeft: wp( '3%' ),
-                                    marginRight: wp( '1%' ),
+                                    marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share RK 2'}
+                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share Recovery Key 2'}
                                 </Text>
                               </TouchableOpacity>
                             </View>
@@ -1564,10 +1563,8 @@ class ManageBackupNewBHR extends Component<
           onCloseEnd={() => {
             this.setState( {
               QrBottomSheetsFlag: false
-            } );
-            ( this.QrBottomSheet as any ).snapTo( 0 )
+            } )
           }}
-          onCloseStart={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={( c )=>this.QrBottomSheet=c}
@@ -1579,7 +1576,6 @@ class ManageBackupNewBHR extends Component<
           renderHeader={this.renderQrHeader}
         />
         <BottomSheet
-          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={( c )=>this.loaderBottomSheet = c}
@@ -1760,7 +1756,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
-    width: wp( '22%' ),
+    width: wp( '24%' ),
   },
   levelText: {
     fontSize: RFValue( 18 ),

@@ -127,7 +127,7 @@ const initialState: {
     privateKey: string;
   },
   isSmMetaSharesCreatedFlag: boolean;
-  uploadSMSuccessfully: Boolean;
+  hasSMUploadedSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
   newBHRFlowStarted: boolean;
   levelData: {
@@ -195,7 +195,7 @@ const initialState: {
     privateKey: ''
   },
   isSmMetaSharesCreatedFlag: false,
-  uploadSMSuccessfully: false,
+  hasSMUploadedSuccessfully: false,
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
   levelData: null,
@@ -434,7 +434,7 @@ export default ( state = initialState, action ) => {
       case UPLOAD_SUCCESSFULLY_SM:
         return {
           ...state,
-          uploadSMSuccessfully: action.payload.isUploaded,
+          hasSMUploadedSuccessfully: action.payload.isUploaded,
         }
       case UPDATE_CLOUD_PERMISSION:
         return {
