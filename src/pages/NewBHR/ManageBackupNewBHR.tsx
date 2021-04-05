@@ -836,8 +836,8 @@ class ManageBackupNewBHR extends Component<
   renderLoaderModalContent = () => {
     return (
       <LoaderModal
-        headerText={'Upgrading your backup'}
-        messageText={'It may take a little while as we upgrade/ setup your backup. Do not close the app or go back'}
+        headerText={'Generating your Recovery Keys'}
+        messageText={'It may take a little while as the wallet creates Recovery Keys. Do not close the app or go back'}
         messageText2={''}
         showGif={false}
       />
