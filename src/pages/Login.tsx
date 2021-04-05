@@ -51,7 +51,7 @@ const loaderMessages = [
     subText: '',
   },
   {
-    heading: 'Introducing Donation Accounts',
+    heading: 'Donation Accounts',
     text:
       'Start receiving donations directly in your Hexa Wallet, from anywhere in the world',
     subText: '',
