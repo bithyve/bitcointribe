@@ -225,7 +225,7 @@ const getLevelInfoStatus = ( levelData ) => {
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
     if( levelData[ i ].status == 'notSetup' ) {
-      levelData[ i ].note= 'Setup/Upgrade your backup.'
+      levelData[ i ].note= 'Setup/upgrade your backup.'
     }
     if( levelData[ i ].status == 'bad' ) {
       levelData[ i ].note= 'Backup needs your attention.'
