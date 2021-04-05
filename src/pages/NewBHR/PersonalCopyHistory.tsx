@@ -573,7 +573,7 @@ const PersonalCopyHistory = ( props ) => {
           IsReshare={isReshare}
           data={sortedHistory( personalCopyHistory )}
           confirmDisable={confirmDisable}
-          confirmButtonText={'Confirm'}
+          confirmButtonText={'Share Now'}
           onPressConfirm={() => {
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}

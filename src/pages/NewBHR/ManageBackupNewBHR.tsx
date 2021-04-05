@@ -219,8 +219,8 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Level 2',
           status: 'notSetup',
-          keeper1ButtonText: 'Share RK 1',
-          keeper2ButtonText: 'Share RK 2',
+          keeper1ButtonText: 'Share Recovery Key 1',
+          keeper2ButtonText: 'Share Recovery Key 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
@@ -230,8 +230,8 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Level 3',
           status: 'notSetup',
-          keeper1ButtonText: 'Share RK 1',
-          keeper2ButtonText: 'Share RK 2',
+          keeper1ButtonText: 'Share Recovery Key 1',
+          keeper2ButtonText: 'Share Recovery Key 2',
           keeper1: obj,
           keeper2: obj,
           note:'',
@@ -1192,7 +1192,7 @@ class ManageBackupNewBHR extends Component<
                                 <Text
                                   style={{
                                     ...styles.cardButtonText,
-                                    fontSize: RFValue( 11 ),
+                                    fontSize: RFValue( 8 ),
                                     marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
@@ -1252,7 +1252,7 @@ class ManageBackupNewBHR extends Component<
                                 <Text
                                   style={{
                                     ...styles.cardButtonText,
-                                    fontSize: RFValue( 11 ),
+                                    fontSize: RFValue( 8 ),
                                     marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
@@ -1337,12 +1337,12 @@ class ManageBackupNewBHR extends Component<
                                       value.status == 'notSetup'
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    fontSize: RFValue( 11 ),
-                                    marginLeft: wp( '3%' ),
+                                    fontSize: RFValue( 8 ),
+                                    marginLeft: wp( '2%' ),
                                   } }
                                   numberOfLines={1}
                                 >
-                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share RK 1'}
+                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share Recovery Key 1'}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
@@ -1410,17 +1410,16 @@ class ManageBackupNewBHR extends Component<
                                 <Text
                                   style={{
                                     ...styles.cardButtonText,
-                                    fontSize: RFValue( 11 ),
+                                    fontSize: RFValue( 8 ),
                                     color:
                                       value.status == 'notSetup'
                                         ? Colors.textColorGrey
                                         : Colors.white,
-                                    marginLeft: wp( '3%' ),
-                                    marginRight: wp( '1%' ),
+                                    marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share RK 2'}
+                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share Recovery Key 2'}
                                 </Text>
                               </TouchableOpacity>
                             </View>
@@ -1757,7 +1756,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
-    width: wp( '22%' ),
+    width: wp( '24%' ),
   },
   levelText: {
     fontSize: RFValue( 18 ),

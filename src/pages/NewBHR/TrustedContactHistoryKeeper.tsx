@@ -1159,7 +1159,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           type={'contact'}
           IsReshare={isReshare}
           data={sortedHistory( trustedContactHistory )}
-          confirmButtonText={'Confirm'}
+          confirmButtonText={'Share Now'}
           onPressChange={() => {
             ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
           }}

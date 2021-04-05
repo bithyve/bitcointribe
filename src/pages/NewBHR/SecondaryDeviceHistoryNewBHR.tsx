@@ -837,7 +837,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
-          confirmButtonText={'Confirm'}
+          confirmButtonText={'Share Now'}
           onPressConfirm={() => {
             // (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
             createGuardian();
