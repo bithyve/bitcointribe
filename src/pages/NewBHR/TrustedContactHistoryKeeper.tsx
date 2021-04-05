@@ -924,7 +924,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       return (
         <SendViaLink
           headerText={'Send Request'}
-          subHeaderText={'Send a Keeper request link'}
+          subHeaderText={'Send request to help backup your wallet'}
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
