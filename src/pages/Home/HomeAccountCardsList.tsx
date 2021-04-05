@@ -16,6 +16,7 @@ export type Props = {
   contentContainerStyle?: Record<string, unknown>;
   onCardSelected: ( selectedAccount: AccountShell ) => void;
   onAddNewSelected: () => void;
+  currentLevel: number;
   onEditModeChanged?: ( isActive: boolean ) => void;
 };
 
@@ -55,6 +56,7 @@ const HomeAccountCardsList: React.FC<Props> = ( {
   },
   onCardSelected,
   onAddNewSelected,
+  currentLevel,
   onEditModeChanged = ( _ ) => { },
 }: Props ) => {
   const accountShells = useActiveAccountShells()
@@ -108,6 +110,7 @@ const HomeAccountCardsList: React.FC<Props> = ( {
   return (
     <View style={containerStyle}>
       <HomeAccountCardsGrid
+        currentLevel={currentLevel}
         accountShells={accountShells}
         onCardLongPressed={handleGridCardLongPress}
         onAccountSelected={onCardSelected}

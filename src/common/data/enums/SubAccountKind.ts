@@ -19,7 +19,7 @@ enum SubAccountKind {
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
 
   /**
-   * E.g.: Fast Bitcoins, Swan
+   * E.g.: Fast Bitcoins = 'Bitcoins', Swan
    */
   SERVICE = 'SERVICE',
 

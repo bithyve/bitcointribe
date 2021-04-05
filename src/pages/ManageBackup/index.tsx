@@ -11,6 +11,7 @@ import {
   Platform,
   RefreshControl,
   AsyncStorage,
+  ImageBackground,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Fonts from '../../common/Fonts'
@@ -41,7 +42,7 @@ import moment from 'moment'
 import ManageBackupHelpContents from '../../components/Helper/ManageBackupHelpContents'
 import { walletCheckIn } from '../../store/actions/trustedContacts'
 import Loader from '../../components/loader'
-import config from '../../bitcoin/HexaConfig'
+import AntDesign from 'react-native-vector-icons/AntDesign'
 
 export default function ManageBackup( props ) {
   const [ PersonalCopyQRScannerBottomSheet ] = useState( React.createRef() )
@@ -159,16 +160,16 @@ export default function ManageBackup( props ) {
   const dispatch = useDispatch()
   const s3Service: S3Service = useSelector( ( state ) => state.sss.service )
   const trustedContactsInfo = useSelector(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
+    ( state ) => state.trustedContacts.trustedContactsInfo
   )
   const trustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
+    ( state ) => state.trustedContacts.service
   )
 
   const [ overallHealth, setOverallHealth ] = useState( null )
   const health = useSelector( ( state ) => state.sss.overallHealth )
   const healthLoading = useSelector(
-    ( state ) => state.trustedContacts.loading.walletCheckIn,
+    ( state ) => state.trustedContacts.loading.walletCheckIn
   )
 
   function getImageByType( item ) {
@@ -798,7 +799,7 @@ export default function ManageBackup( props ) {
   }, [ trustedContactsInfo ] )
 
   useEffect( () => {
-    if( healthLoading ) setShowLoader( true )
+    if ( healthLoading ) setShowLoader( true )
     else setShowLoader( false )
   }, [ healthLoading ] )
 
@@ -837,7 +838,7 @@ export default function ManageBackup( props ) {
       autoHighlight()
       AsyncStorage.setItem(
         'AutoHighlightFlags',
-        JSON.stringify( autoHighlightFlags ),
+        JSON.stringify( autoHighlightFlags )
       )
     }
   }, [ autoHighlightFlags, overallHealth ] )
@@ -846,7 +847,7 @@ export default function ManageBackup( props ) {
     if ( overallHealth ) {
       // update acc to overall health (aids post wallet recovery)
       const updatedAutoHighlightFlags = {
-        ...autoHighlightFlags
+        ...autoHighlightFlags,
       }
       if (
         overallHealth.sharesInfo[ 0 ] &&
@@ -895,7 +896,7 @@ export default function ManageBackup( props ) {
         // TODO -- replace this
         AsyncStorage.setItem(
           'AutoHighlightFlags',
-          JSON.stringify( updatedAutoHighlightFlags ),
+          JSON.stringify( updatedAutoHighlightFlags )
         )
       }
     }
@@ -992,7 +993,7 @@ export default function ManageBackup( props ) {
 
   const checkNShowHelperModal = async () => {
     const isManageBackupHelperDone = await AsyncStorage.getItem(
-      'isManageBackupHelperDone',
+      'isManageBackupHelperDone'
     )
     if ( !isManageBackupHelperDone ) {
       await AsyncStorage.setItem( 'isManageBackupHelperDone', 'true' )
@@ -1332,7 +1333,9 @@ export default function ManageBackup( props ) {
       if ( healthCheckInitialized ) {
         // dispatch(checkMSharesHealth());
       } else {
-        // console.log({ healthCheckInitialized });
+        console.log( {
+          healthCheckInitialized
+        } )
         dispatch( initHealthCheck() )
       }
     }
@@ -1477,7 +1480,7 @@ export default function ManageBackup( props ) {
                       item.personalInfo.contactsWalletName &&
                           item.personalInfo.contactsWalletName !== ''
                         ? `${item.personalInfo.contactsWalletName}'s Wallet`
-                        : makeFullName( item ),
+                        : makeFullName( item )
                     )
                     : ''}
                 </Text>
@@ -1515,7 +1518,7 @@ export default function ManageBackup( props ) {
                           : !item.personalInfo.firstName &&
                             item.personalInfo.lastName
                             ? item.personalInfo.lastName
-                            : '',
+                            : ''
                     )
                     : ''}
                 </Text>
@@ -1656,39 +1659,71 @@ export default function ManageBackup( props ) {
   }
 
   return (
-    <View style={{
-      flex: 1
-    }}>
-      <SafeAreaView style={{
-        flex: 0
-      }} />
+    <View
+      style={{
+        flex: 1,
+      }}
+    >
+      <SafeAreaView
+        style={{
+          flex: 0,
+        }}
+      />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{
-        flex: 1, position: 'relative'
-      }}>
-        <View style={CommonStyles.headerContainer}>
-          <TouchableOpacity
-            style={CommonStyles.headerLeftIconContainer}
-            onPress={() => {
-              props.navigation.goBack()
-            }}
-            hitSlop={{
-              top: 20, left: 20, bottom: 20, right: 20
-            }}
-          >
-            <View style={CommonStyles.headerLeftIconInnerContainer}>
+      <View
+        style={{
+          flex: 1,
+          position: 'relative',
+        }}
+      >
+        <View style={styles.modalHeaderTitleView}>
+          <View style={{
+            flex: 1, flexDirection: 'row', alignItems: 'center'
+          }}>
+            <TouchableOpacity
+              onPress={() => props.navigation.goBack()}
+              style={styles.headerBackArrowView}
+            >
               <FontAwesome
                 name="long-arrow-left"
                 color={Colors.blue}
                 size={17}
               />
-            </View>
-          </TouchableOpacity>
+            </TouchableOpacity>
+          </View>
+          {/* <TouchableOpacity
+            onPress={() => {
+              props.navigation.navigate("UpgradeBackup");
+            }}
+            style={styles.rightButton}
+          >
+            <AntDesign
+              name="reload1"
+              color={Colors.blue}
+              size={15}
+              style={{
+                marginLeft: wp("1%"),
+                marginRight: wp("1%"),
+                alignSelf: "center",
+              }}
+            />
+            <Text
+              style={{
+                color: Colors.blue,
+                fontSize: RFValue(12),
+                fontFamily: Fonts.FiraSansRegular,
+                textAlign: "center",
+              }}
+            >
+              Upgrade
+            </Text>
+          </TouchableOpacity> */}
         </View>
-
-        <View style={{
-          flex: 1
-        }}>
+        <View
+          style={{
+            flex: 1,
+          }}
+        >
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -1700,66 +1735,42 @@ export default function ManageBackup( props ) {
               />
             }
           >
-            <View style={{
-              flexDirection: 'row', marginTop: 10
-            }}>
-              <View style={{
-                flex: 2
-              }}>
-                <Text
-                  style={{
-                    ...CommonStyles.headerTitles, marginLeft: 25
-                  }}
-                >
-                    Manage Backup
-                </Text>
-                <Text
-                  style={{
-                    ...CommonStyles.headerTitlesInfoText,
-                    marginLeft: 25,
-                  }}
-                >
-                    The wallet backup is not complete. Please complete the setup
-                    to safeguard against loss of funds
-                </Text>
-                <KnowMoreButton
-                  onpress={() => {
-                    ( WalletBackupAndRecoveryBottomSheet as any ).current.snapTo(
-                      1,
-                    )
-                  }}
-                  containerStyle={{
-                    marginTop: 10, marginLeft: 25
-                  }}
-                  textStyle={{
-                  }}
-                />
-              </View>
-              <View
+            <View style={styles.topHealthView}>
+              <ImageBackground
+                source={require( '../../assets/images/icons/keeper_sheild.png' )}
                 style={{
-                  flex: 1,
-                  justifyContent: 'center',
-                  alignItems: 'center',
+                  ...styles.healthShieldImage, position: 'relative'
                 }}
+                resizeMode={'contain'}
               >
-                {overallHealth ? (
-                  <HomePageShield
-                    circleShadowColor={Colors.borderColor}
-                    shieldImage={require( '../../assets/images/icons/protector_gray.png' )}
-                    shieldStatus={overallHealth.overallStatus}
-                  />
-                ) : (
-                  <HomePageShield
-                    circleShadowColor={Colors.borderColor}
-                    shieldImage={require( '../../assets/images/icons/protector_gray.png' )}
-                    shieldStatus={0}
-                  />
-                )}
+                {/* <View
+                  style={{
+                    backgroundColor: Colors.red,
+                    height: wp("3%"),
+                    width: wp("3%"),
+                    borderRadius: wp("3%") / 2,
+                    position: "absolute",
+                    top: wp("5%"),
+                    right: 0,
+                    borderWidth: 2,
+                    borderColor: Colors.white,
+                  }}
+                /> */}
+              </ImageBackground>
+              <View style={styles.headerSeparator} />
+              <View>
+                <Text style={styles.backupText}>Backup</Text>
+                <Text style={styles.backupInfoText}>Security is</Text>
+                <Text style={styles.backupInfoText}>Not Upgraded</Text>
               </View>
             </View>
-            <View style={{
-              marginBottom: 10
-            }}>
+
+            <View
+              style={{
+                marginBottom: 10,
+                marginTop: wp( '6%' ),
+              }}
+            >
               {pageData.map( ( item ) => {
                 return (
                   <View style={{
@@ -1767,19 +1778,16 @@ export default function ManageBackup( props ) {
                     <TouchableOpacity
                       onPress={() => {
                         if ( item.type == 'secondaryDevice' ) {
-                          props.navigation.navigate(
-                            'SecondaryDeviceHistory',
-                            {
-                              selectedStatus: item.status,
-                              selectedTime: getTime( item.time ),
-                              selectedTitle: getCardTitle( item ),
-                              updateAutoHighlightFlags: () =>
-                                setAutoHighlightFlags( {
-                                  ...autoHighlightFlags,
-                                  secondaryDevice: true,
-                                } ),
-                            },
-                          )
+                          props.navigation.navigate( 'SecondaryDeviceHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime( item.time ),
+                            selectedTitle: getCardTitle( item ),
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags( {
+                                ...autoHighlightFlags,
+                                secondaryDevice: true,
+                              } ),
+                          } )
                         } else if ( item.type == 'contact1' ) {
                           props.navigation.navigate( 'TrustedContactHistory', {
                             selectedStatus: item.status,
@@ -1790,8 +1798,7 @@ export default function ManageBackup( props ) {
                                 ...autoHighlightFlags,
                                 trustedContact1: true,
                               } ),
-                            activateReshare:
-                                autoHighlightFlags.trustedContact1,
+                            activateReshare: autoHighlightFlags.trustedContact1,
                           } )
                         } else if ( item.type == 'contact2' ) {
                           props.navigation.navigate( 'TrustedContactHistory', {
@@ -1803,8 +1810,7 @@ export default function ManageBackup( props ) {
                                 ...autoHighlightFlags,
                                 trustedContact2: true,
                               } ),
-                            activateReshare:
-                                autoHighlightFlags.trustedContact2,
+                            activateReshare: autoHighlightFlags.trustedContact2,
                           } )
                         } else if ( item.type === 'copy1' ) {
                           props.navigation.navigate( 'PersonalCopyHistory', {
@@ -1831,59 +1837,64 @@ export default function ManageBackup( props ) {
                               } ),
                           } )
                         } else if ( item.type == 'security' ) {
-                          props.navigation.navigate(
-                            'SecurityQuestionHistory',
-                            {
-                              selectedStatus: item.status,
-                              selectedTime: getTime( item.time ),
-                              selectedTitle: getCardTitle( item ),
-                              updateAutoHighlightFlags: () =>
-                                setAutoHighlightFlags( {
-                                  ...autoHighlightFlags,
-                                  securityAns: true,
-                                } ),
-                            },
-                          )
+                          props.navigation.navigate( 'SecurityQuestionHistory', {
+                            selectedStatus: item.status,
+                            selectedTime: getTime( item.time ),
+                            selectedTitle: getCardTitle( item ),
+                            updateAutoHighlightFlags: () =>
+                              setAutoHighlightFlags( {
+                                ...autoHighlightFlags,
+                                securityAns: true,
+                              } ),
+                          } )
                         }
                       }}
                       style={{
                         ...styles.manageBackupCard,
                         borderColor: getStatusIcon( item ).color,
                         elevation:
-                            selectedType && item.type == selectedType ? 10 : 0,
+                          selectedType && item.type == selectedType ? 10 : 0,
                         shadowColor:
-                            selectedType && item.type == selectedType
-                              ? Colors.borderColor
-                              : Colors.white,
+                          selectedType && item.type == selectedType
+                            ? Colors.borderColor
+                            : Colors.white,
                         shadowOpacity:
-                            selectedType && item.type == selectedType ? 10 : 0,
+                          selectedType && item.type == selectedType ? 10 : 0,
                         shadowOffset:
-                            selectedType && item.type == selectedType
-                              ? {
-                                width: 0, height: 10
-                              }
-                              : {
-                                width: 0, height: 0
-                              },
+                          selectedType && item.type == selectedType
+                            ? {
+                              width: 0,
+                              height: 10,
+                            }
+                            : {
+                              width: 0,
+                              height: 0,
+                            },
                         shadowRadius:
-                            selectedType && item.type == selectedType ? 10 : 0,
+                          selectedType && item.type == selectedType ? 10 : 0,
                       }}
                     >
                       {getImageIcon( item )}
-                      <View style={{
-                        flex: 1, marginHorizontal: 15
-                      }}>
+                      <View
+                        style={{
+                          flex: 1,
+                          marginHorizontal: 15,
+                        }}
+                      >
                         <Text style={styles.cardTitleText}>
                           {getCardTitle( item )}
                         </Text>
-                        <View style={{
-                          flex: 1, flexDirection: 'row'
-                        }}>
+                        <View
+                          style={{
+                            flex: 1,
+                            flexDirection: 'row',
+                          }}
+                        >
                           <Text style={styles.cardTimeText}>
                             {getCardSubText( item )}
                             {( item.type === 'security' ||
-                                ( item.type === 'secondaryDevice' &&
-                                  item.status !== 'Ugly' ) ) && (
+                              ( item.type === 'secondaryDevice' &&
+                                item.status !== 'Ugly' ) ) && (
                               <Text
                                 style={{
                                   color: Colors.textColorGrey,
@@ -2021,11 +2032,11 @@ export default function ManageBackup( props ) {
               }}
             >
               {autoHighlightFlags.secondaryDevice &&
-                autoHighlightFlags.trustedContact1 &&
-                autoHighlightFlags.trustedContact2 &&
-                autoHighlightFlags.personalCopy1 &&
-                autoHighlightFlags.personalCopy2 &&
-                autoHighlightFlags.securityAns
+              autoHighlightFlags.trustedContact1 &&
+              autoHighlightFlags.trustedContact2 &&
+              autoHighlightFlags.personalCopy1 &&
+              autoHighlightFlags.personalCopy2 &&
+              autoHighlightFlags.securityAns
                 ? 'Confirm Shares'
                 : 'Complete Setup'}
             </Text>
@@ -2069,5 +2080,63 @@ const styles = StyleSheet.create( {
     height: 14,
     resizeMode: 'contain',
     marginLeft: 'auto',
+  },
+  topHealthView: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  healthShieldImage: {
+    width: wp( '17%' ),
+    height: wp( '25%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerSeparator: {
+    backgroundColor: Colors.seaBlue,
+    width: 4,
+    borderRadius: 5,
+    height: wp( '17%' ),
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
+  },
+  backupText: {
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 15 ),
+  },
+  noteText: {
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+  },
+  backupInfoText: {
+    color: Colors.blue,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 18 ),
+  },
+  rightButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 5,
+    backgroundColor: Colors.backgroundColor,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Colors.borderColor,
+  },
+  modalHeaderTitleView: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingRight: 5,
+    paddingBottom: 5,
+    paddingTop: 10,
+    marginLeft: 20,
+    marginRight: 10,
+  },
+  headerBackArrowView: {
+    height: 30,
+    width: 30,
+    justifyContent: 'center',
   },
 } )

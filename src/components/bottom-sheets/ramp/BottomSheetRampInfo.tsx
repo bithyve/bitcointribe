@@ -3,6 +3,8 @@ import { View, StyleSheet, Text, Image } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
+import ListStyles from '../../../common/Styles/ListStyles'
+import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
@@ -10,6 +12,7 @@ import useRampIntegrationState from '../../../utils/hooks/state-selectors/accoun
 import { fetchRampReceiveAddress, fetchRampReservation } from '../../../store/actions/RampIntegration'
 import useRampReservationFetchEffect from '../../../utils/hooks/ramp-integration/UseRampReservationFetchEffect'
 import openLink from '../../../utils/OpenLink'
+import { ListItem } from 'react-native-elements'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -40,13 +43,16 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       setHasButtonBeenPressed( true )
     }
   } )
+
   // eslint-disable-next-line quotes
-  let rampMessage = `Ramp enables purchases of bitcoin using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin. Bitcoin purchased successfully will be transferred to:\n\n- Ramp Account\n- ${rampReceiveAddress}`
-  let rampTitle = 'Buy with Ramp'
+  let rampMessage = 'Ramp enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'
+
+  let rampTitle = 'Buy bitcoin with Ramp'
+
   if( rampFromDeepLink && rampDeepLinkContent ) {
     rampMessage = rampDeepLinkContent.search( 'fail' )>=0
       ? 'Ramp was not able to process your payment. Please try after sometime or use a different payment method'
-      : 'Your order is being processed by Ramp, once successfull the purchased bitcoin will be transferred to your Ramp account'
+      : 'Your order is being processed by Ramp, once successful the purchased bitcoin will be transferred to your Ramp account'
     rampTitle = ( rampDeepLinkContent.search( 'fail' )>=0 )
       ? 'Ramp order failed'
       : 'Order being processed'
@@ -55,13 +61,72 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     ...styles.modalContentContainer
   }}>
     <View style={{
-      height: '90%'
+      height: '92%'
     }}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.modalTitleText}>{rampTitle}</Text>
         <Text style={{
-          ...styles.modalInfoText, marginTop: wp( '1.5%' )
+          ...styles.modalInfoText,
+          marginTop: wp( 1.5 ),
+          marginBottom: wp( 5 ),
         }}>{rampMessage}</Text>
+
+        <View style={{
+          flexDirection: 'row',
+          marginBottom: wp( 5 ),
+        }}>
+          <Image
+            source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+            style={styles.avatarImage}
+            resizeMode="contain"
+          />
+
+          <ListItem.Content style={{
+            flex: 1,
+          }}>
+            <ListItem.Subtitle
+              style={ListStyles.infoHeaderSubtitleText}
+              numberOfLines={1}
+            >
+              bitcoin will be transferred to
+            </ListItem.Subtitle>
+
+            <ListItem.Title
+              style={styles.destinationTitleText}
+              numberOfLines={1}
+            >
+              Ramp Account
+            </ListItem.Title>
+          </ListItem.Content>
+        </View>
+
+        <View style={{
+          flexDirection: 'row',
+        }}>
+          <Image
+            source={require( '../../../assets/images/icons/icon_address_type.png' )}
+            style={styles.avatarImage}
+            resizeMode="contain"
+          />
+
+          <ListItem.Content style={{
+            flex: 1
+          }}>
+            <ListItem.Subtitle
+              style={ListStyles.infoHeaderSubtitleText}
+              numberOfLines={1}
+            >
+              bitcoin will be transferred to
+            </ListItem.Subtitle>
+
+            <ListItem.Title
+              style={styles.destinationTitleText}
+              numberOfLines={1}
+            >
+              {rampReceiveAddress}
+            </ListItem.Title>
+          </ListItem.Content>
+        </View>
       </View>
 
       <View style={{
@@ -74,7 +139,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Proceed to Ramp' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
 
         </AppBottomSheetTouchableWrapper>
         {rampFromBuyMenu
@@ -99,7 +164,6 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           </View>
           : null
         }
-        {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
       </View>
 
     </View>
@@ -112,16 +176,25 @@ const styles = StyleSheet.create( {
   modalContentContainer: {
     backgroundColor: Colors.white,
   },
+  avatarImage: {
+    ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageLarge,
+    marginRight: 14,
+  },
+  destinationTitleText: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 20 ),
+    color: Colors.black,
+  },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '10%' ),
-    marginTop: wp( '5%' ),
-    flex: 1.7
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
+    width: wp( 30 )
   },
   modalInfoText: {
     color: Colors.textColorGrey,

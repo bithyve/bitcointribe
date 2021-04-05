@@ -7,7 +7,9 @@ import {
   TransactionDetails,
   TransactionPrerequisite,
   InputUTXOs,
+  ScannedAddressKind,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../../utilities/Interface'
 
 export default class SecureAccount {
@@ -39,7 +41,7 @@ export default class SecureAccount {
       feeRates,
     }: {
       primaryMnemonic: string;
-      secondaryMnemonic: string;
+      secondaryMnemonic?: string;
       accountName: string;
       accountDescription: string;
       usedAddresses: string[];
@@ -72,7 +74,7 @@ export default class SecureAccount {
         status?: any;
       }>;
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
-      twoFASetup: {
+      twoFASetup?: {
         qrData: string;
         secret: string;
       };
@@ -115,7 +117,7 @@ export default class SecureAccount {
     stateVars?: {
       accountName: string;
       accountDescription: string;
-      secondaryMnemonic: string;
+      secondaryMnemonic?: string;
       usedAddresses: string[];
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -146,7 +148,7 @@ export default class SecureAccount {
         status?: any;
       }>;
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
-      twoFASetup: {
+      twoFASetup?: {
         qrData: string;
         secret: string;
       };
@@ -217,6 +219,18 @@ export default class SecureAccount {
     }
   };
 
+  public setupSecureAccount2 = async () => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.secureHDWallet.setupSecureAccount2(),
+      }
+    } catch ( err ) {
+      return {
+        status: 301, err: err.message, message: ErrMap[ 301 ]
+      }
+    }
+  };
 
   public importSecureAccount = async (
     secondaryXpub: string,
@@ -385,10 +399,10 @@ export default class SecureAccount {
     }
   };
 
-  public removeSecondaryMnemonic = (): { removed: boolean } =>
+  public removeSecondaryMnemonic = (): { removed: Boolean } =>
     this.secureHDWallet.removeSecondaryMnemonic();
 
-  public removeTwoFADetails = (): { removed: boolean } =>
+  public removeTwoFADetails = (): { removed: Boolean } =>
     this.secureHDWallet.removeTwoFADetails();
 
   public isSecondaryMnemonic = ( secondaryMnemonic: string ) =>
@@ -443,7 +457,7 @@ export default class SecureAccount {
   public addressDiff = (
     scannedStr: string,
   ): {
-    type: string;
+      type: ScannedAddressKind | null
   } => this.secureHDWallet.addressDiff( scannedStr );
 
   public decodePaymentURI = (
@@ -584,7 +598,7 @@ export default class SecureAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
   ):
     | {
         status: number;
@@ -890,7 +904,7 @@ export default class SecureAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
@@ -919,9 +933,10 @@ export default class SecureAccount {
       }
   > => {
     try {
+      txnPriority = txnPriority.toLowerCase()
       const { txb } = await this.secureHDWallet.createHDTransaction(
         txPrerequisites,
-        txnPriority.toLowerCase(),
+        txnPriority,
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,
@@ -1062,7 +1077,6 @@ export default class SecureAccount {
       executed = 'tx-broadcast'
       // console.log('---- Transaction Broadcasted ----');
       // console.log({ txid });
-
       this.secureHDWallet.removeSecondaryXpriv()
 
       return {
@@ -1160,4 +1174,31 @@ export default class SecureAccount {
       }
     }
   };
+
+  public getXpubsForAccount = () => {
+    return this.secureHDWallet.getSecureXpubs()
+  };
+
+  public getXpubsForAccount2 = () => {
+    return this.secureHDWallet.getSecureXpubs2()
+  };
+
+  public setSecureXpubsAccount = (
+    secondary: string,
+    bh: string,
+  ): {
+    primary?: string;
+    secondary?: string;
+    bh?: string;
+  } => {
+    return this.secureHDWallet.setSecureXpubs( secondary, bh )
+  };
+
+  public deleteSecondaryMnemonics = () => {
+    return this.secureHDWallet.deleteSecondaryMnemonics()
+  };
+
+  // public getSecondaryMnemonics = () => {
+  //   return this.secureHDWallet.getSecondaryMnemonic()
+  // };
 }

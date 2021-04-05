@@ -1,26 +1,31 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
-import { Card, Overlay } from 'react-native-elements'
+import { View, StyleSheet, Image } from 'react-native'
+import { Card } from 'react-native-elements'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import CardStyles from '../../common/Styles/Cards.js'
 import LinearGradient from 'react-native-linear-gradient'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
+import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
-  isDisabled: boolean;
-  isSelected: boolean;
-  specialTag: string | null;
+  isDisabled?: boolean;
+  isSelected?: boolean;
+  specialTag?: string | null;
+  showsBalance?: boolean;
   containerStyle?: Record<string, unknown>;
 }
 
 const SubAccountOptionCard: React.FC<Props> = ( {
   subAccountInfo,
-  isDisabled,
-  isSelected,
+  isDisabled = false,
+  isSelected = false,
   specialTag = null,
+  showsBalance = false,
   containerStyle = {
   },
 }: Props ) => {
@@ -64,7 +69,17 @@ const SubAccountOptionCard: React.FC<Props> = ( {
     }
   }, [ isSelected ] )
 
+  const unitText = useFormattedUnitText( {
+    bitcoinUnit: subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS
+  } )
 
+  const subtitleText = useMemo( () => {
+    if ( showsBalance ) {
+      return `${subAccountInfo.balances.confirmed} ${unitText}`
+    } else {
+      return subAccountInfo.defaultSubTitle ? subAccountInfo.defaultSubTitle : subAccountInfo.defaultDescription
+    }
+  }, [ showsBalance, subAccountInfo ] )
 
 
   return (
@@ -107,8 +122,12 @@ const SubAccountOptionCard: React.FC<Props> = ( {
         />
 
         <View style={descriptionTextContainerStyle}>
-          <Card.Title style={titleTextStyle} numberOfLines={1}>{subAccountInfo.defaultTitle}</Card.Title>
-          <Card.Title style={subtitleTextStyle}>{subAccountInfo.defaultDescription}</Card.Title>
+          <Card.Title style={titleTextStyle} numberOfLines={1}>
+            {subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: subAccountInfo.defaultTitle}
+          </Card.Title>
+          <Card.Title style={subtitleTextStyle}>
+            {subtitleText}
+          </Card.Title>
         </View>
 
         {isDisabled == false && (

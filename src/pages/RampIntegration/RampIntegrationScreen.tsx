@@ -37,7 +37,7 @@ const actionMenuItems: ActionMenuItem[] = [
   // },
   {
     title: 'Fetch Reservation Code from Ramp',
-    subtitle: 'Buy Bitcoin from Ramp',
+    subtitle: 'Buy bitcoin from Ramp',
     kind: RampActionKind.FETCH_RAMP_RESERVATION,
   },
 ]

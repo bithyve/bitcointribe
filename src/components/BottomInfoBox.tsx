@@ -8,7 +8,7 @@ export default function BottomInfoBox(props) {
   return (
     <View
       style={{
-        marginBottom: 25,
+        marginBottom: 0,
         padding: 20,
         backgroundColor: props.backgroundColor
           ? props.backgroundColor

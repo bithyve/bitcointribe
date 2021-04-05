@@ -40,26 +40,22 @@ import SendShareModal from './SendShareModal'
 import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  EphemeralDataElements,
-  TrustedContactDerivativeAccountElements,
-} from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import {
   updateEphemeralChannel,
-  updateTrustedContactInfoLocally,
+  updateTrustedContactsInfoLocally,
   clearTrustedContactsCache
 } from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import {
-  TRUSTED_CONTACTS,
   REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-} from '../../common/constants/serviceTypes'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
+} from '../../common/constants/wallet-service-types'
+import AccountShell from '../../common/data/models/AccountShell'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 
 const TrustedContactHistory = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -88,7 +84,6 @@ const TrustedContactHistory = ( props ) => {
   const [ SendViaLinkBottomSheet ] = useState(
     React.createRef(),
   )
-  const fcmTokenValue = useSelector( ( state ) => state.preferences.fcmTokenValue )
   const [ SendViaQRBottomSheet ] = useState(
     React.createRef(),
   )
@@ -117,17 +112,13 @@ const TrustedContactHistory = ( props ) => {
     ( state ) => state.trustedContacts.service,
   )
 
-  const regularAccount: RegularAccount = useSelector(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-
-  const testAccount: TestAccount = useSelector(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service,
-  )
-
   const trustedContactsInfo = useSelector(
     ( state ) => state.trustedContacts.trustedContactsInfo,
   )
+  const accountShells: AccountShell[] = useSelector(
+    ( state ) => state.accounts.accountShells,
+  )
+
   const [ isOTPType, setIsOTPType ] = useState( false )
 
   const [ trustedLink, setTrustedLink ] = useState( '' )
@@ -749,9 +740,9 @@ const TrustedContactHistory = ( props ) => {
 
   const updateTrustedContactsInfo = useCallback(
     async ( contact ) => {
-      let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
+      const tcInfo = trustedContactsInfo
 
-      if ( tcInfo ) {
+      if ( tcInfo.length ) {
         if ( tcInfo[ index ] ) {
           let found = false
           for ( let i = 3; i < tcInfo.length; i++ ) {
@@ -774,28 +765,19 @@ const TrustedContactHistory = ( props ) => {
 
         tcInfo[ index ] = contact
       } else {
-        tcInfo = []
         tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
         tcInfo[ 1 ] = null
         tcInfo[ 2 ] = null
         tcInfo[ index ] = contact
       }
-      await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
 
-      dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
     },
     [ index, trustedContactsInfo ],
   )
 
   const createGuardian = useCallback( async () => {
     if ( !Object.keys( chosenContact ).length ) return
-
-    const walletID = await AsyncStorage.getItem( 'walletID' )
-    const FCM = fcmTokenValue
-    //await AsyncStorage.getItem('fcmToken');
-    console.log( {
-      walletID, FCM
-    } )
 
     const contactName = `${chosenContact.firstName} ${
       chosenContact.lastName ? chosenContact.lastName : ''
@@ -813,94 +795,55 @@ const TrustedContactHistory = ( props ) => {
       info = chosenContact.emails[ 0 ].email
     }
 
-    const contactInfo = {
-      contactName,
-      info: info.trim(),
-    }
+    const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
+    Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
+    config.TC_REQUEST_EXPIRY
 
-    let accountNumber = regularAccount.hdWallet.trustedContactToDA[ contactName ]
-    if ( !accountNumber ) {
-      // initialize a trusted derivative account against the following account
-      const res = regularAccount.getDerivativeAccXpub(
-        TRUSTED_CONTACTS,
-        null,
-        contactName,
-      )
-      if ( res.status !== 200 ) {
-        console.log( 'Err occurred while generating derivative account' )
-      } else {
-        // refresh the account number
-        accountNumber = regularAccount.hdWallet.trustedContactToDA[ contactName ]
-      }
-    }
-
-    const trustedReceivingAddress = ( regularAccount.hdWallet.derivativeAccounts[
-      TRUSTED_CONTACTS
-    ][ accountNumber ] as TrustedContactDerivativeAccountElements )
-      .receivingAddress
-
-    const data: EphemeralDataElements = {
-      walletID,
-      FCM,
-      trustedAddress: trustedReceivingAddress,
-      trustedTestAddress: testAccount.hdWallet.receivingAddress,
-    }
-    const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-    const hasTrustedChannel =
-      trustedContact && trustedContact.symmetricKey ? true : false
-    if ( changeContact ) {
+    // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
+    if ( changeContact || shareExpired ) {
       setTrustedLink( '' )
       setTrustedQR( '' )
-      // remove the previous TC
-
-      let previousGuardianName
-      if ( trustedContactsInfo ) {
-        const previousGuardian = trustedContactsInfo[ index ]
-        if ( previousGuardian ) {
-          previousGuardianName = `${previousGuardian.firstName} ${
-            previousGuardian.lastName ? previousGuardian.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-        } else {
-          console.log( 'Previous guardian details missing' )
-        }
-      }
-
-      dispatch(
-        uploadEncMShare( index, contactInfo, data, true, previousGuardianName ),
-      )
       updateTrustedContactsInfo( chosenContact )
       onOTPShare() // enables reshare
-      setChangeContact( false )
-    } else if (
-      !SHARES_TRANSFER_DETAILS[ index ] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
-      config.TC_REQUEST_EXPIRY
-    ) {
-      setTrustedLink( '' )
-      setTrustedQR( '' )
-      dispatch( uploadEncMShare( index, contactInfo, data ) )
-      updateTrustedContactsInfo( chosenContact )
-      onOTPShare() // enables reshare
-    } else if (
-      trustedContact &&
-      !trustedContact.symmetricKey &&
-      trustedContact.ephemeralChannel &&
+      if( changeContact ) setChangeContact( false )
+    } else {
+      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
       trustedContact.ephemeralChannel.initiatedAt &&
       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-      config.TC_REQUEST_EXPIRY &&
-      !hasTrustedChannel
-    ) {
-      setTrustedLink( '' )
-      setTrustedQR( '' )
-      dispatch(
-        updateEphemeralChannel(
-          contactInfo,
-          trustedContact.ephemeralChannel.data[ 0 ],
-        ),
-      )
+      config.TC_REQUEST_EXPIRY? true: false
+      if( !hasTrustedChannel &&
+        isEphemeralChannelExpired ){
+        setTrustedLink( '' )
+        setTrustedQR( '' )
+      }
     }
+
+    const contactInfo = {
+      contactName,
+      info: info? info.trim(): info,
+      isGuardian: true,
+      shareIndex: index,
+      changeContact,
+      legacy: true, // legacy mode(uploadEncMShare)
+    }
+
+    let parentShell: AccountShell
+    accountShells.forEach( ( shell: AccountShell ) => {
+      if( !shell.primarySubAccount.instanceNumber ){
+        if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+      }
+    } )
+    const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+      accountShellID: parentShell.id,
+      isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+    } )
+
+    dispatch(
+      addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
+    )
+
   }, [ SHARES_TRANSFER_DETAILS[ index ], chosenContact, changeContact ] )
 
   useEffect( () => {

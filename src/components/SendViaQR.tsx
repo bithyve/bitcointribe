@@ -1,30 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect } from 'react'
+import { View, Image, Text, StyleSheet, ActivityIndicator } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
-import BottomInfoBox from './BottomInfoBox';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import { nameToInitials } from '../common/CommonFunctions';
-import { ScrollView } from 'react-native-gesture-handler';
-import QRCode from 'react-native-qrcode-svg';
+} from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import BottomInfoBox from './BottomInfoBox'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import { nameToInitials } from '../common/CommonFunctions'
+import { ScrollView } from 'react-native-gesture-handler'
+import QRCode from 'react-native-qrcode-svg'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
-} from '../common/constants/serviceTypes';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+} from '../common/constants/wallet-service-types'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
-export default function SendViaQR(props) {
-  const [contactName, setContactName] = useState('');
-  const amount = props.amount;
-  const contact = props.contact;
-  const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false);
-  const [dropdownBoxList, setDropdownBoxList] = useState([
+export default function SendViaQR( props ) {
+  const [ contactName, setContactName ] = useState( '' )
+  const amount = props.amount
+  const contact = props.contact
+  const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
+  const [ dropdownBoxList, setDropdownBoxList ] = useState( [
     {
       id: '1',
       account_name: 'Test Account',
@@ -40,35 +40,36 @@ export default function SendViaQR(props) {
       account_name: 'Saving Account',
       type: SECURE_ACCOUNT,
     },
-  ]);
-  const [serviceType, setServiceType] = useState(
+  ] )
+  const [ serviceType, setServiceType ] = useState(
     props.serviceType ? props.serviceType : '',
-  );
+  )
   //console.log("amountCurrency", props.amountCurrency);
-  const [Contact, setContact] = useState(props.contact ? props.contact : {});
-  useEffect(() => {
-    if (contact) {
-      setContact(props.contact);
+  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
+  } )
+  useEffect( () => {
+    if ( contact ) {
+      setContact( props.contact )
     }
-  }, [contact]);
+  }, [ contact ] )
 
-  useEffect(() => {
-    if (props.serviceType) {
-      setServiceType(props.serviceType);
+  useEffect( () => {
+    if ( props.serviceType ) {
+      setServiceType( props.serviceType )
     }
-  }, [props.serviceType]);
+  }, [ props.serviceType ] )
 
-  useEffect(() => {
-    let contactName =
+  useEffect( () => {
+    const contactName =
       Contact && Contact.firstName && Contact.lastName
         ? Contact.firstName + ' ' + Contact.lastName
         : Contact && Contact.firstName && !Contact.lastName
           ? Contact.firstName
           : Contact && !Contact.firstName && Contact.lastName
             ? Contact.lastName
-            : '';
-    setContactName(contactName);
-  }, [Contact]);
+            : ''
+    setContactName( contactName )
+  }, [ Contact ] )
 
   const renderVerticalDivider = () => {
     return (
@@ -82,14 +83,14 @@ export default function SendViaQR(props) {
           alignSelf: 'center',
         }}
       />
-    );
-  };
+    )
+  }
 
   const setPhoneNumber = () => {
-    let phoneNumber = Contact.phoneNumbers[0].number;
-    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-    number = number.slice(number.length - 10); // last 10 digits only
-    return number;
+    const phoneNumber = Contact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    return number
   }
 
   return (
@@ -99,14 +100,16 @@ export default function SendViaQR(props) {
           alignItems: 'center',
           flexDirection: 'row',
           paddingRight: 10,
-          paddingBottom: hp('1.5%'),
-          paddingTop: hp('1%'),
+          paddingBottom: hp( '1.5%' ),
+          paddingTop: hp( '1%' ),
           marginLeft: 10,
           marginRight: 10,
-          marginBottom: hp('1.5%'),
+          marginBottom: hp( '1.5%' ),
         }}
       >
-        <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{
+          flex: 1, flexDirection: 'row', alignItems: 'center'
+        }}>
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => {
               props.onPressBack();
@@ -115,14 +118,16 @@ export default function SendViaQR(props) {
           >
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper> */}
-          <View style={{ flex: 1, marginLeft: 5 }}>
+          <View style={{
+            flex: 1, marginLeft: 5
+          }}>
             <Text style={styles.modalHeaderTitleText}>
               {props.headerText ? props.headerText : 'Send Request via QR'}
             </Text>
             <Text
               style={{
                 color: Colors.textColorGrey,
-                fontSize: RFValue(12),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular,
                 paddingTop: 5,
               }}
@@ -135,8 +140,8 @@ export default function SendViaQR(props) {
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
             style={{
-              height: wp('8%'),
-              width: wp('18%'),
+              height: wp( '8%' ),
+              width: wp( '18%' ),
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: Colors.blue,
@@ -148,31 +153,35 @@ export default function SendViaQR(props) {
             <Text
               style={{
                 color: Colors.white,
-                fontSize: RFValue(12),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular,
               }}
             >
               Done
-              </Text>
+            </Text>
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-      <ScrollView contentContainerStyle={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{
+        flex: 1
+      }}>
         <View
           style={{
             marginLeft: 20,
             marginRight: 20,
             justifyContent: 'center',
             alignItems: 'center',
-            marginTop: props.isFromReceive ? 0 : hp('1.7%'),
-            marginBottom: props.isFromReceive ? 0 : hp('1.7%'),
+            marginTop: props.isFromReceive ? 0 : hp( '1.7%' ),
+            marginBottom: props.isFromReceive ? 0 : hp( '1.7%' ),
           }}
         >
           {!props.isFromReceive ? (
             <View>
               {contact && (
                 <View style={styles.contactProfileView}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{
+                    flexDirection: 'row', alignItems: 'center'
+                  }}>
                     <View
                       style={{
                         flexDirection: 'row',
@@ -184,13 +193,15 @@ export default function SendViaQR(props) {
                         borderRadius: 10,
                       }}
                     >
-                      <View style={{ marginLeft: 70 }}>
+                      <View style={{
+                        marginLeft: 70
+                      }}>
                         {props.contactText ? (
                           <Text
                             style={{
                               color: Colors.textColorGrey,
                               fontFamily: Fonts.FiraSansRegular,
-                              fontSize: RFValue(11),
+                              fontSize: RFValue( 11 ),
                               marginLeft: 25,
                               paddingTop: 5,
                               paddingBottom: 3,
@@ -211,7 +222,7 @@ export default function SendViaQR(props) {
                               style={{
                                 color: Colors.textColorGrey,
                                 fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(10),
+                                fontSize: RFValue( 10 ),
                                 marginLeft: 25,
                                 paddingTop: 3,
                               }}
@@ -226,13 +237,13 @@ export default function SendViaQR(props) {
                                 style={{
                                   color: Colors.textColorGrey,
                                   fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue(10),
+                                  fontSize: RFValue( 10 ),
                                   marginLeft: 25,
                                   paddingTop: 3,
                                   paddingBottom: 5,
                                 }}
                               >
-                                {Contact && Contact.emails[0].email}
+                                {Contact && Contact.emails[ 0 ].email}
                               </Text>
                             ) : null}
                       </View>
@@ -246,42 +257,48 @@ export default function SendViaQR(props) {
                           alignItems: 'center',
                           justifyContent: 'center',
                           shadowOpacity: 1,
-                          shadowOffset: { width: 2, height: 2 },
+                          shadowOffset: {
+                            width: 2, height: 2
+                          },
                         }}
                       >
                         <Image
                           source={Contact && Contact.image}
-                          style={{ ...styles.contactProfileImage }}
+                          style={{
+                            ...styles.contactProfileImage
+                          }}
                         />
                       </View>
                     ) : (
-                        <View
+                      <View
+                        style={{
+                          position: 'absolute',
+                          marginLeft: 15,
+                          marginRight: 15,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: Colors.backgroundColor,
+                          width: 70,
+                          height: 70,
+                          borderRadius: 70 / 2,
+                          shadowColor: Colors.shadowBlue,
+                          shadowOpacity: 1,
+                          shadowOffset: {
+                            width: 2, height: 2
+                          },
+                        }}
+                      >
+                        <Text
                           style={{
-                            position: 'absolute',
-                            marginLeft: 15,
-                            marginRight: 15,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            backgroundColor: Colors.backgroundColor,
-                            width: 70,
-                            height: 70,
-                            borderRadius: 70 / 2,
-                            shadowColor: Colors.shadowBlue,
-                            shadowOpacity: 1,
-                            shadowOffset: { width: 2, height: 2 },
+                            textAlign: 'center',
+                            fontSize: RFValue( 20 ),
+                            lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
                           }}
                         >
-                          <Text
-                            style={{
-                              textAlign: 'center',
-                              fontSize: RFValue(20),
-                              lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                            }}
-                          >
-                            {nameToInitials(contactName)}
-                          </Text>
-                        </View>
-                      )}
+                          {nameToInitials( contactName )}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 </View>
               )}
@@ -303,7 +320,7 @@ export default function SendViaQR(props) {
                   <Text
                     style={{
                       color: Colors.textColorGrey,
-                      fontSize: RFValue(12),
+                      fontSize: RFValue( 12 ),
                       fontFamily: Fonts.FiraSansRegular,
                       textAlign: 'center',
                     }}
@@ -327,7 +344,7 @@ export default function SendViaQR(props) {
                   <Text
                     style={{
                       color: Colors.blue,
-                      fontSize: RFValue(13),
+                      fontSize: RFValue( 13 ),
                       fontFamily: Fonts.FiraSansRegular,
                       marginLeft: 5,
                     }}
@@ -351,14 +368,14 @@ export default function SendViaQR(props) {
                       <View style={styles.amountInputImage}>
                         <Image
                           style={styles.textBoxImage}
-                          source={require('../assets/images/icons/icon_bitcoin_gray.png')}
+                          source={require( '../assets/images/icons/icon_bitcoin_gray.png' )}
                         />
                       </View>
                       {renderVerticalDivider()}
                       <Text
                         style={{
                           color: Colors.black,
-                          fontSize: RFValue(20),
+                          fontSize: RFValue( 20 ),
                           fontFamily: Fonts.FiraSansRegular,
                           marginLeft: 10,
                         }}
@@ -368,7 +385,7 @@ export default function SendViaQR(props) {
                       <Text
                         style={{
                           color: Colors.textColorGrey,
-                          fontSize: RFValue(13),
+                          fontSize: RFValue( 13 ),
                           fontFamily: Fonts.FiraSansRegular,
                           marginRight: 5,
                         }}
@@ -384,18 +401,18 @@ export default function SendViaQR(props) {
             </View>
           ) : null}
           <View style={{
-            height: hp('27%'),
+            height: hp( '27%' ),
             justifyContent: 'center',
             marginLeft: 20,
             marginRight: 20,
             alignItems: 'center',
-            marginTop: props.isFromReceive ? 0 : hp('4%')
+            marginTop: props.isFromReceive ? 0 : hp( '4%' )
           }}>
             {!props.QR ? (
               <ActivityIndicator size="large" />
             ) : (
-                <QRCode value={props.QR} size={hp('27%')} />
-              )}
+              <QRCode value={props.QR} size={hp( '27%' )} />
+            )}
           </View>
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
@@ -424,7 +441,9 @@ export default function SendViaQR(props) {
       </ScrollView>
 
       {!props.isFromReceive ? (
-        <View style={{ marginTop: 'auto' }}>
+        <View style={{
+          marginTop: 'auto'
+        }}>
           <BottomInfoBox
             title={props.noteHeader ? props.noteHeader : 'Note'}
             infoText={
@@ -434,12 +453,12 @@ export default function SendViaQR(props) {
         </View>
       ) : null}
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
@@ -469,11 +488,13 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
   },
   contactNameText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
@@ -487,7 +508,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
@@ -497,18 +518,18 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: hp('1%'),
+    marginTop: hp( '1%' ),
     borderBottomWidth: 1,
     borderColor: Colors.borderColor,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1.5%'),
+    paddingBottom: hp( '1.5%' ),
+    paddingTop: hp( '1.5%' ),
   },
   amountInputImage: {
     width: 40,
@@ -519,21 +540,23 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
   },
   textBoxImage: {
-    width: wp('6%'),
-    height: wp('6%'),
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     resizeMode: 'contain',
   },
   dropdownBoxModal: {
     borderRadius: 10,
     borderWidth: 1,
     borderColor: Colors.borderColor,
-    marginTop: hp('1%'),
-    width: wp('90%'),
-    height: hp('18%'),
+    marginTop: hp( '1%' ),
+    width: wp( '90%' ),
+    height: hp( '18%' ),
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
-    shadowOffset: { width: 0, height: 10 },
+    shadowOffset: {
+      width: 0, height: 10
+    },
     backgroundColor: Colors.white,
     position: 'absolute',
     zIndex: 9999,
@@ -550,4 +573,4 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     color: Colors.blue,
   },
-});
+} )

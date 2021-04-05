@@ -8,18 +8,24 @@ const Colors = {
   lightBlue: '#77B9EB',
   blue: '#006CB4',
   green: '#70C1B3',
-  darkGreen:'#33956B',
+  darkGreen: '#33956B',
+  lightGreen: '#70C1B380',
   white: '#ffffff',
   offWhite: '#F5F5F5',
   red: '#FF7761',
   homepageButtonColor: '#2C85C1',
-  yellow:'#F7C910',
+  yellow: '#F7C910',
   shadowYellow: '#fff2cc',
   lightRed:'#FF78614D',
-  backgroundColor1: '#FCFCFC',
+  backgroundColor1: '#FAFAFA', //'#FCFCFC',
   buttonText:'#626262',
   lightTextColor: '#8B8B8B',
   currencyGray: '#d0d0d0',
+  seaBlue: '#CFE8F8',
+  deepBlue: '#04578B',
+  babyGray: '#BCB6B6',
+  greyTextColor: '#656565',
+  coral: '#D35400',
   danube: '#5D8ED1',
   riptide: '#77E3B5',
 
@@ -38,5 +44,4 @@ const Colors = {
   primaryAccentLighter1: '#61ACE1',
   primaryAccentLighter2: '#77B9EB',
 }
-
 export default Colors

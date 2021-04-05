@@ -10,25 +10,42 @@ import {
   Alert,
   Image,
   AppState,
-  InteractionManager
+  InteractionManager,
 } from 'react-native'
 import { Easing } from 'react-native-reanimated'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
+import {
+  heightPercentageToDP,
+  widthPercentageToDP,
+} from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
+
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   FAST_BITCOINS,
-} from '../../common/constants/serviceTypes'
-import { connect } from 'react-redux'
-import { downloadMShare, uploadRequestedShare } from '../../store/actions/sss'
+} from '../../common/constants/wallet-service-types'
+import {
+  downloadMShare,
+  uploadRequestedShare,
+  initHealthCheck,
+} from '../../store/actions/sss'
+import {
+  initializeHealthSetup,
+  onApprovalStatusChange,
+  autoDownloadShareContact,
+  uploadSecondaryShareForPK,
+  downloadSMShard,
+  updateKeeperInfoToUnderCustody,
+  generateMetaShare
+} from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
+import { connect } from 'react-redux'
 import {
   approveTrustedContact,
   fetchEphemeralChannel,
@@ -41,19 +58,25 @@ import {
   fetchNotifications,
   notificationsUpdated,
 } from '../../store/actions/notifications'
-import { setCurrencyCode } from '../../store/actions/preferences'
-import { getCurrencyImageByRegion, isEmpty,  buildVersionExists } from '../../common/CommonFunctions/index'
+import {
+  setCurrencyCode,
+  setCardData,
+} from '../../store/actions/preferences'
+import {
+  getCurrencyImageByRegion,
+  getKeeperInfoFromShareId,
+} from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
 import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import Config from 'react-native-config'
 import RelayServices from '../../bitcoin/services/RelayService'
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import config from '../../bitcoin/HexaConfig'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import HomeHeader from '../../components/home/home-header'
+import HomeHeader from '../../components/home/home-header_update'
+//import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
 import CustomBottomTabs, {
   BottomTab,
@@ -64,7 +87,12 @@ import {
   autoSyncShells,
   addNewAccountShell
 } from '../../store/actions/accounts'
-import { trustedChannelActions } from '../../bitcoin/utilities/Interface'
+import {
+  trustedChannelActions,
+  LevelHealthInterface,
+  MetaShare,
+} from '../../bitcoin/utilities/Interface'
+import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import { withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
@@ -74,6 +102,12 @@ import {
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
+
+import CloudBackup from '../../common/CommonFunctions/CloudBackup'
+import { fetchKeeperTrustedChannel, updateNewFcm } from '../../store/actions/keeper'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import PersonalNode from '../../common/data/models/PersonalNode'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
@@ -102,6 +136,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
+import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -144,6 +179,9 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
+  isBalanceLoading: boolean;
+  addContactModalOpened: boolean;
+  encryptedCloudDataJson: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
   rampFromBuyMenu: boolean | null;
@@ -158,6 +196,8 @@ interface HomePropsTypes {
   exchangeRates?: any[];
 
   accountsState: AccountsState;
+  cloudPermissionGranted: any;
+
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
 
@@ -171,8 +211,14 @@ interface HomePropsTypes {
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
-  s3Service: any;
+  uploadSecondaryShareForPK: any;
+  s3Service: S3Service;
+  initializeHealthSetup: any;
+  initHealthCheck: any;
   overallHealth: any;
+  levelHealth: LevelHealthInterface[];
+  currentLevel: number;
+  keeperInfo: any[];
   autoSyncShells: any;
   clearWyreCache: any;
   clearRampCache: any;
@@ -192,14 +238,30 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
+  updateHealthForCloud: any;
+  regularAccount: RegularAccount;
+  database: any;
+  setCardData: any;
+  cardDataProps: any;
+  fetchKeeperTrustedChannel: any;
+  keeperApproveStatus: any;
+  onApprovalStatusChange: any;
+  secureAccount: any;
+  autoDownloadShareContact: any;
+  accountShells: AccountShell[];
   setVersion: any;
-  versionHistory: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
+  downloadSMShard: any;
   rampFromBuyMenu: boolean | null;
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
+  updateNewFcm: any;
+  setCloudData: any;
+  updateKeeperInfoToUnderCustody: any;
+  generateMetaShare: any;
+  newBHRFlowStarted: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -243,6 +305,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
+      isBalanceLoading: true,
+      addContactModalOpened: false,
+      encryptedCloudDataJson: [],
       wyreDeepLinkContent: null,
       rampDeepLinkContent: null,
       rampFromBuyMenu: null,
@@ -258,7 +323,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onPressNotifications = async () => {
     const notificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' ),
+      await AsyncStorage.getItem( 'notificationList' )
     )
     const tmpList = []
     if ( notificationList ) {
@@ -281,7 +346,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
     setTimeout( () => {
       this.setState( {
-        notificationLoading: false
+        notificationLoading: false,
       } )
     }, 500 )
 
@@ -298,26 +363,31 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       const service = accountsState[ serviceType ].service
       const { type } = service.addressDiff( qrData )
+
       if ( type ) {
         let item
+
         switch ( type ) {
-            case 'address':
+            case ScannedAddressKind.ADDRESS:
               const recipientAddress = qrData
+
               item = {
-                id: recipientAddress,
+                id: recipientAddress
               }
 
               addTransferDetails( serviceType, {
                 selectedContact: item,
               } )
+
               navigation.navigate( 'SendToContact', {
                 selectedContact: item,
                 serviceType,
               } )
               break
 
-            case 'paymentURI':
+            case ScannedAddressKind.PAYMENT_URI:
               let address, options, donationId
+
               try {
                 const res = service.decodePaymentURI( qrData )
                 address = res.address
@@ -334,7 +404,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }
 
               item = {
-                id: address,
+                id: address
               }
 
               addTransferDetails( serviceType, {
@@ -350,13 +420,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 donationId,
               } )
               break
-
-            default:
-              Toast( 'Invalid QR' )
-              break
         }
-
-        return
+      } else {
+        Toast( 'Invalid QR' )
       }
     }
 
@@ -386,6 +452,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               type: scannedData.type,
               isQR: true,
               version: scannedData.ver,
+              isFromKeeper: scannedData.isFromKeeper
+                ? scannedData.isFromKeeper
+                : false,
             }
             this.setState(
               {
@@ -399,14 +468,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                 this.openBottomSheetOnLaunch(
                   BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1,
+                  1
                 )
-              },
+              }
             )
 
             break
 
           case 'secondaryDeviceGuardian':
+            console.log( 'scannedData', scannedData )
             const secondaryDeviceGuardianRequest = {
               isGuardian: scannedData.isGuardian,
               requester: scannedData.requester,
@@ -416,6 +486,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               type: scannedData.type,
               isQR: true,
               version: scannedData.ver,
+              isFromKeeper: true,
             }
 
             this.setState(
@@ -427,9 +498,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               () => {
                 this.openBottomSheetOnLaunch(
                   BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1,
+                  1
                 )
-              },
+              }
             )
 
             break
@@ -453,9 +524,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               () => {
                 this.openBottomSheetOnLaunch(
                   BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1,
+                  1
                 )
-              },
+              }
             )
 
             break
@@ -480,9 +551,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               () => {
                 this.openBottomSheetOnLaunch(
                   BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1,
+                  1
                 )
-              },
+              }
             )
 
             break
@@ -502,16 +573,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               () => {
                 this.openBottomSheetOnLaunch(
                   BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1,
+                  1
                 )
-              },
+              }
             )
             break
 
           case 'ReverseRecoveryQR':
             Alert.alert(
               'Restoration QR Identified',
-              'Restoration QR only works during restoration mode',
+              'Restoration QR only works during restoration mode'
             )
             break
 
@@ -541,7 +612,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
     )
     const date = new Date()
-    date.setHours( date.getHours() + Number( Config.NOTIFICATION_HOUR ) )
+    date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
 
     //let date =  new Date(Date.now() + (3 * 60 * 1000));
     PushNotification.localNotificationSchedule( {
@@ -553,16 +624,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       autoCancel: true,
       soundName: 'default',
       title: 'We have not seen you in a while!',
-      message: 'Opening your app regularly ensures you get all the notifications and security updates', // (required)
+      message:
+        'Opening your app regularly ensures you get all the notifications and security updates', // (required)
       date: date,
       repeatType: 'day',
       allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
     } )
 
-    PushNotification.getScheduledLocalNotifications( ( notiifcations )=>{
+    PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
       console.log( 'SCHEDULE notiifcations', notiifcations )
     } )
-
   };
 
   localNotification = async ( notificationDetails ) => {
@@ -577,7 +648,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
-      ( created ) => console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+      ( created ) =>
+        console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
     )
 
     PushNotification.localNotification( {
@@ -602,7 +674,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       firebase
         .messaging()
         .hasPermission()
-        .then( enabled => {
+        .then( ( enabled ) => {
           if ( enabled ) {
             this.storeFCMToken()
             this.scheduleNotification()
@@ -611,7 +683,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             firebase
               .messaging()
               .requestPermission( {
-                provisional: true
+                provisional: true,
               } )
               .then( () => {
                 this.storeFCMToken()
@@ -641,7 +713,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       await AsyncStorage.setItem( 'fcmToken', fcmToken )
       this.props.updateFCMTokens( fcmArray )
-
+      // Update FCM token to PK
+      this.props.updateNewFcm()
       AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
         // updates the new FCM token to channels post recovery
         if ( recovered ) {
@@ -656,7 +729,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       onNotification: ( notification ) => {
         console.log( 'NOTIFICATION:', notification )
         // process the notification
-        if( notification.data ){
+        if ( notification.data ) {
           this.props.fetchNotifications()
           this.onNotificationOpen( notification )
           // (required) Called when a remote is received or opened, or local notification is opened
@@ -704,7 +777,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const content = JSON.parse( item.data.content )
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' ),
+      await AsyncStorage.getItem( 'notificationList' )
     )
     if ( !asyncNotificationList ) {
       asyncNotificationList = []
@@ -736,7 +809,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     await AsyncStorage.setItem(
       'notificationList',
-      JSON.stringify( asyncNotificationList ),
+      JSON.stringify( asyncNotificationList )
     )
     asyncNotificationList.sort( function ( left, right ) {
       return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
@@ -768,7 +841,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               value: false,
             } )
           }
-        },
+        }
       )
     } catch ( error ) {
       // do nothing
@@ -776,16 +849,33 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    const { navigation, versionHistory } = this.props
+    const {
+      navigation,
+      s3Service,
+      initializeHealthSetup,
+      newBHRFlowStarted
+    } = this.props
     const versionData = []
     this.closeBottomSheet()
     this.calculateNetBalance()
-
     this.appStateListener = AppState.addEventListener(
       'change',
-      this.onAppStateChange,
+      this.onAppStateChange
     )
+    if( newBHRFlowStarted === true )
+    {
+      const { healthCheckInitializedKeeper } = s3Service.levelhealth
+      if ( healthCheckInitializedKeeper === false ) {
+        initializeHealthSetup()
+      }
+    }
 
+    //const { healthCheckInitialized } = s3Service.sss;
+    //   console.log("healthCheckInitialized", healthCheckInitialized);
+    //   if (!healthCheckInitialized) {
+    //     initHealthCheck();
+    //   }
+    // }
     this.bootStrapNotifications()
     this.setUpFocusListener()
     this.getNewTransactionNotifications()
@@ -800,10 +890,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     if ( unhandledDeepLinkURL ) {
       navigation.setParams( {
-        unhandledDeepLinkURL: null
+        unhandledDeepLinkURL: null,
       } )
       this.handleDeepLinking( unhandledDeepLinkURL )
     }
+
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       this.props.autoSyncShells()
@@ -833,7 +924,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     if ( newTransactions.length ) {
       // let asyncNotification = notificationListNew;
       const asyncNotification = JSON.parse(
-        await AsyncStorage.getItem( 'notificationList' ),
+        await AsyncStorage.getItem( 'notificationList' )
       )
       let asyncNotificationList = []
       if ( asyncNotification.length ) {
@@ -878,7 +969,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       //this.props.notificationsUpdated(asyncNotificationList);
       await AsyncStorage.setItem(
         'notificationList',
-        JSON.stringify( asyncNotificationList ),
+        JSON.stringify( asyncNotificationList )
       )
       asyncNotificationList.sort( function ( left, right ) {
         return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
@@ -892,8 +983,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  componentDidUpdate = ( prevProps, prevState ) => {
+    // if ( this.props.cloudPermissionGranted && this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
+    //   this.props.setCloudData()
+    // }
 
-  componentDidUpdate = ( prevProps ) => {
     if (
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
@@ -901,7 +995,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setupNotificationList()
     }
 
-    if ( prevProps.accountsState.accountShells !== this.props.accountsState.accountShells ) {
+    if (
+      prevProps.accountsState.accountShells !==
+      this.props.accountsState.accountShells
+    ) {
       this.calculateNetBalance()
       // this.getNewTransactionNotifications()
     }
@@ -915,6 +1012,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.secondaryDeviceAddressValue
     ) {
       this.setSecondaryDeviceAddresses()
+    }
+
+    if( prevProps.currentLevel == 0 && prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 1 ) {
+      // this.props.generateMetaShare( 2 )
     }
 
     if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
@@ -932,7 +1033,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if ( paymentURI ) {
         try {
           const details = accountsState[ serviceType ].service.decodePaymentURI(
-            paymentURI,
+            paymentURI
           )
           address = details.address
           options = details.options
@@ -962,20 +1063,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  setCloudBackupStatusCallBack = ( share ) =>{
+    this.props.updateHealthForCloud( share )
+  }
+
   handleDeepLinkModal = () => {
     const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
     const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
     const trustedContactRequest = this.props.navigation.getParam(
-      'trustedContactRequest',
+      'trustedContactRequest'
     )
     const userKey = this.props.navigation.getParam( 'userKey' )
 
     if ( custodyRequest ) {
-      this.setState( {
-        custodyRequest
-      }, () => {
-        this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-      } )
+      this.setState(
+        {
+          custodyRequest,
+        },
+        () => {
+          this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
+        }
+      )
     } else if ( recoveryRequest || trustedContactRequest ) {
       this.setState(
         {
@@ -985,13 +1093,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         () => {
           this.openBottomSheetOnLaunch(
             BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1,
+            1
           )
-        },
+        }
       )
     } else if ( userKey ) {
       this.props.navigation.navigate( 'VoucherScanner', {
-        userKey
+        userKey,
       } )
     }
   };
@@ -1019,7 +1127,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   openBottomSheetOnLaunch(
     kind: BottomSheetKind,
-    snapIndex: number | null = null,
+    snapIndex: number | null = null
   ) {
     this.openBottomSheetOnLaunchTimeout = setTimeout( () => {
       this.openBottomSheet( kind, snapIndex )
@@ -1037,7 +1145,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation.dispatch(
         resetToHomeAction( {
           unhandledDeepLinkURL: url,
-        } ),
+        } )
       )
     } else {
       this.handleDeepLinking( url )
@@ -1051,7 +1159,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     console.log( 'Home::handleDeepLinking::URL: ' + url )
 
-    const splits = url.split( '/' )
+    const splits = url ? url.split( '/' ) : []
 
     if ( splits.includes( 'wyre' ) ) {
       this.props.clearWyreCache()
@@ -1089,11 +1197,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           },
           () => {
             this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-          },
+          }
         )
       } else if ( splits[ 6 ] === 'rk' ) {
         const recoveryRequest = {
-          requester, rk: splits[ 7 ]
+          requester,
+          rk: splits[ 7 ],
         }
 
         this.setState(
@@ -1104,17 +1213,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           () => {
             this.openBottomSheetOnLaunch(
               BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1,
+              1
             )
-          },
+          }
         )
       }
     } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
       if ( splits[ 3 ] !== config.APP_STAGE ) {
         Alert.alert(
           'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${splits[ 3 ]
-          }`,
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[ 3 ]
+          }`
         )
       } else {
         const version = splits.pop().slice( 1 )
@@ -1129,6 +1239,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             return
           }
         }
+        let hint = splits[ 8 ]
+        let isFromKeeper = false
+        if ( splits[ 8 ].includes( '_' ) ) {
+          const hintStr = splits[ 8 ].split( '_' )
+          hint = hintStr[ 0 ]
+          isFromKeeper = hintStr[ 1 ] == 'keeper' ? true : false
+        }
 
         const trustedContactRequest = {
           isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
@@ -1137,9 +1254,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           requester: splits[ 5 ],
           encryptedKey: splits[ 6 ],
           hintType: splits[ 7 ],
-          hint: splits[ 8 ],
+          hint,
           uploadedAt: splits[ 9 ],
           version,
+          isFromKeeper,
         }
 
         this.setState(
@@ -1150,9 +1268,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           () => {
             this.openBottomSheetOnLaunch(
               BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1,
+              1
             )
-          },
+          }
         )
       }
     } else if ( splits[ 4 ] === 'rk' ) {
@@ -1172,18 +1290,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         () => {
           this.openBottomSheetOnLaunch(
             BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1,
+            1
           )
+        }
+      )
+    } else if ( splits[ 4 ] === 'scns' ) {
+      const recoveryRequest = {
+        isRecovery: true,
+        requester: splits[ 5 ],
+        encryptedKey: splits[ 6 ],
+        hintType: splits[ 7 ],
+        hint: splits[ 8 ],
+        isPrimaryKeeperRecovery: true,
+      }
+      this.setState(
+        {
+          recoveryRequest,
+          trustedContactRequest: null,
         },
+        () => {
+          this.openBottomSheetOnLaunch(
+            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+            1
+          )
+        }
       )
     } else if ( splits[ 4 ] === 'rrk' ) {
       Alert.alert(
         'Restoration link Identified',
-        'Restoration links only works during restoration mode',
+        'Restoration links only works during restoration mode'
       )
     }
 
-    if ( url.includes( 'fastbitcoins' ) ) {
+    if ( url && url.includes( 'fastbitcoins' ) ) {
       const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
       this.props.navigation.navigate( 'VoucherScanner', {
         userKey
@@ -1205,7 +1344,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.setCurrencyCodeFromAsync()
   };
 
-
   setSecondaryDeviceAddresses = async () => {
     let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue
 
@@ -1214,7 +1352,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
     if (
       secondaryDeviceOtpTemp.findIndex(
-        ( value ) => value.otp == ( this.state.secondaryDeviceOtp as any ).otp,
+        ( value ) => value.otp == ( this.state.secondaryDeviceOtp as any ).otp
       ) == -1
     ) {
       secondaryDeviceOtpTemp.push( this.state.secondaryDeviceOtp )
@@ -1246,7 +1384,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     let totalBalance = 0
     accountShells.forEach( ( accountShell: AccountShell ) => {
-      if( accountShell.primarySubAccount.sourceKind !== SourceAccountKind.TEST_ACCOUNT )
+      if (
+        accountShell.primarySubAccount.sourceKind !==
+        SourceAccountKind.TEST_ACCOUNT
+      )
         totalBalance += AccountShell.getTotalBalance( accountShell )
     } )
 
@@ -1258,14 +1399,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onNotificationListOpen = async () => {
     // let asyncNotificationList = notificationListNew;
     const asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' ),
+      await AsyncStorage.getItem( 'notificationList' )
     )
     if ( asyncNotificationList ) {
       for ( let i = 0; i < asyncNotificationList.length; i++ ) {
         if ( asyncNotificationList[ i ] ) {
           asyncNotificationList[ i ].time = timeFormatter(
             moment( new Date() ),
-            moment( asyncNotificationList[ i ].date ).valueOf(),
+            moment( asyncNotificationList[ i ].date ).valueOf()
           )
         }
       }
@@ -1273,7 +1414,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       await AsyncStorage.setItem(
         'notificationList',
-        JSON.stringify( asyncNotificationList ),
+        JSON.stringify( asyncNotificationList )
       )
       asyncNotificationList.sort( function ( left, right ) {
         return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
@@ -1295,11 +1436,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet()
   };
 
-  onPhoneNumberChange = () => { };
+  onPhoneNumberChange = () => {};
 
   handleBottomTabSelection = ( tab: BottomTab ) => {
     this.setState( {
-      selectedBottomTab: tab
+      selectedBottomTab: tab,
     } )
 
     if ( tab === BottomTab.Transactions ) {
@@ -1328,7 +1469,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Ramp Account',
-              defaultDescription: 'BTC Purchased from Ramp',
+              defaultDescription: 'BTC purchased from Ramp',
               serviceAccountKind: ServiceAccountKind.RAMP,
             } )
 
@@ -1348,7 +1489,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Wyre Account',
-              defaultDescription: 'BTC Purchased from Wyre',
+              defaultDescription: 'BTC purchased from Wyre',
               serviceAccountKind: ServiceAccountKind.WYRE,
             } )
             this.props.addNewAccountShell( newSubAccount )
@@ -1366,176 +1507,207 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
     }
-  }
+  };
 
   processDLRequest = ( key, rejected ) => {
-    const { trustedContactRequest, recoveryRequest } = this.state
-    let {
-      requester,
-      isGuardian,
-      approvedTC,
-      encryptedKey,
-      publicKey,
-      info,
-      isQR,
-      uploadedAt,
-      isRecovery,
-      version,
-    } = trustedContactRequest || recoveryRequest
-    const {
-      UNDER_CUSTODY,
-      uploadRequestedShare,
-      navigation,
-      approveTrustedContact,
-      fetchTrustedChannel,
-      walletName,
-      trustedContacts,
-    } = this.props
+    try {
+      const { trustedContactRequest, recoveryRequest } = this.state
+      let {
+        requester,
+        isGuardian,
+        approvedTC,
+        encryptedKey,
+        publicKey,
+        info,
+        isQR,
+        uploadedAt,
+        isRecovery,
+        version,
+        isFromKeeper,
+        isPrimaryKeeperRecovery,
+      } = trustedContactRequest || recoveryRequest
+      const {
+        UNDER_CUSTODY,
+        uploadRequestedShare,
+        navigation,
+        approveTrustedContact,
+        fetchTrustedChannel,
+        walletName,
+        trustedContacts,
+        uploadSecondaryShareForPK,
+      } = this.props
 
-    if ( !isRecovery ) {
-      if ( requester === walletName ) {
-        Toast( 'Cannot be your own Contact/Guardian' )
-        return
-      }
+      if ( !isRecovery ) {
+        if ( requester === walletName ) {
+          Toast( 'Cannot be your own Contact/Guardian' )
+          return
+        }
 
-      let expiry = config.TC_REQUEST_EXPIRY
-      if ( !semver.valid( version ) ) {
-        // expiry support for 0.7, 0.9 and 1.0
-        expiry = config.LEGACY_TC_REQUEST_EXPIRY
-      }
+        let expiry = config.TC_REQUEST_EXPIRY
+        if ( !semver.valid( version ) ) {
+          // expiry support for 0.7, 0.9 and 1.0
+          expiry = config.LEGACY_TC_REQUEST_EXPIRY
+        }
 
-      if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
-        Alert.alert(
-          `${isQR ? 'QR' : 'Link'} expired!`,
-          `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`,
-        )
-      } else {
-        if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
+        if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
           Alert.alert(
-            'Failed to accept',
-            `You already custody a share against the wallet name: ${requester}`,
+            `${isQR ? 'QR' : 'Link'} expired!`,
+            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`
           )
+        } else {
+          if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
+            Alert.alert(
+              'Failed to accept',
+              `You already custody a share against the wallet name: ${requester}`
+            )
+          } else {
+            if ( !publicKey ) {
+              try {
+                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
+                  .decryptedPub
+                info = key
+              } catch ( err ) {
+                Alert.alert(
+                  'Invalid Number/Email',
+                  'Decryption failed due to invalid input, try again.'
+                )
+                return
+              }
+            }
+
+            let existingContactName
+            Object.keys( trustedContacts.tc.trustedContacts ).forEach(
+              ( contactName ) => {
+                const contact = trustedContacts.tc.trustedContacts[ contactName ]
+                if ( contact.contactsPubKey === publicKey ) {
+                  existingContactName = contactName
+                }
+              }
+            )
+            if ( existingContactName && !approvedTC ) {
+              Toast( 'Contact already exists against this request' )
+              return
+            }
+
+            if ( publicKey && !rejected ) {
+              if ( !approvedTC ) {
+                navigation.navigate( 'ContactsListForAssociateContact', {
+                  postAssociation: ( contact ) => {
+                    let contactName = ''
+                    if ( contact ) {
+                      contactName = `${contact.firstName} ${
+                        contact.lastName ? contact.lastName : ''
+                      }`
+                        .toLowerCase()
+                        .trim()
+                    } else {
+                      // contactName = `${requester}'s Wallet`.toLowerCase();
+                      Alert.alert( 'Contact association failed' )
+                      return
+                    }
+                    if ( !semver.valid( version ) ) {
+                      // for 0.7, 0.9 and 1.0: info remains null
+                      info = null
+                    }
+
+                    const contactInfo = {
+                      contactName,
+                      info,
+                    }
+
+                    approveTrustedContact(
+                      contactInfo,
+                      publicKey,
+                      true,
+                      requester,
+                      isGuardian,
+                      isFromKeeper
+                    )
+                  },
+                  isGuardian,
+                } )
+              } else {
+                if ( !existingContactName ) {
+                  Alert.alert(
+                    'Invalid Link/QR',
+                    'You are not a valid trusted contact for approving this request'
+                  )
+                  return
+                }
+                const contactInfo = {
+                  contactName: existingContactName,
+                  info,
+                }
+
+                fetchTrustedChannel(
+                  contactInfo,
+                  trustedChannelActions.downloadShare,
+                  requester
+                )
+              }
+            } else if ( publicKey && rejected ) {
+              // don't associate; only fetch the payment details from EC
+              // fetchEphemeralChannel(null, null, publicKey);
+            }
+          }
+        }
+      } else {
+        if ( !isPrimaryKeeperRecovery ) {
+          if ( requester === walletName ) {
+            Toast( 'You do not host any key of your own' )
+            return
+          }
+
+          if ( !UNDER_CUSTODY[ requester ] ) {
+            this.setState(
+              {
+                errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
+                errorMessage:
+                  'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
+              },
+              () => {
+                this.openBottomSheet( BottomSheetKind.ERROR )
+              }
+            )
+          } else {
+            if ( !publicKey ) {
+              try {
+                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
+                  .decryptedPub
+              } catch ( err ) {
+                Alert.alert(
+                  'Invalid Number/Email',
+                  'Decryption failed due to invalid input, try again.'
+                )
+              }
+            }
+            if ( publicKey ) {
+              uploadRequestedShare( recoveryRequest.requester, publicKey )
+            }
+          }
         } else {
           if ( !publicKey ) {
             try {
               publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
                 .decryptedPub
-              info = key
             } catch ( err ) {
               Alert.alert(
                 'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.',
-              )
-              return
-            }
-          }
-
-          let existingContactName
-          Object.keys( trustedContacts.tc.trustedContacts ).forEach(
-            ( contactName ) => {
-              const contact = trustedContacts.tc.trustedContacts[ contactName ]
-              if ( contact.contactsPubKey === publicKey ) {
-                existingContactName = contactName
-              }
-            },
-          )
-          if ( existingContactName && !approvedTC ) {
-            Toast( 'Contact already exists against this request' )
-            return
-          }
-
-          if ( publicKey && !rejected ) {
-            if ( !approvedTC ) {
-              navigation.navigate( 'ContactsListForAssociateContact', {
-                postAssociation: ( contact ) => {
-                  let contactName = ''
-                  if ( contact ) {
-                    contactName = `${contact.firstName} ${contact.lastName ? contact.lastName : ''
-                    }`
-                      .toLowerCase()
-                      .trim()
-                  } else {
-                    // contactName = `${requester}'s Wallet`.toLowerCase();
-                    Alert.alert( 'Contact association failed' )
-                    return
-                  }
-                  if ( !semver.valid( version ) ) {
-                    // for 0.7, 0.9 and 1.0: info remains null
-                    info = null
-                  }
-
-                  const contactInfo = {
-                    contactName,
-                    info,
-                  }
-
-                  approveTrustedContact(
-                    contactInfo,
-                    publicKey,
-                    true,
-                    requester,
-                    isGuardian,
-                  )
-                },
-                isGuardian,
-              } )
-            } else {
-              if ( !existingContactName ) {
-                Alert.alert(
-                  'Invalid Link/QR',
-                  'You are not a valid trusted contact for approving this request',
-                )
-                return
-              }
-              const contactInfo = {
-                contactName: existingContactName,
-                info,
-              }
-
-              fetchTrustedChannel(
-                contactInfo,
-                trustedChannelActions.downloadShare,
-                requester,
+                'Decryption failed due to invalid input, try again.'
               )
             }
-          } else if ( publicKey && rejected ) {
-            // don't associate; only fetch the payment details from EC
-            // fetchEphemeralChannel(null, null, publicKey);
           }
-        }
-      }
-    } else {
-      if ( requester === walletName ) {
-        Toast( 'You do not host any key of your own' )
-        return
-      }
 
-      if ( !UNDER_CUSTODY[ requester ] ) {
-        this.setState(
-          {
-            errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
-            errorMessage: 'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
-          },
-          () => {
-            this.openBottomSheet( BottomSheetKind.ERROR )
-          },
-        )
-      } else {
-        if ( !publicKey ) {
-          try {
-            publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-              .decryptedPub
-          } catch ( err ) {
-            Alert.alert(
-              'Invalid Number/Email',
-              'Decryption failed due to invalid input, try again.',
+          if ( publicKey ) {
+            uploadSecondaryShareForPK(
+              recoveryRequest.requester,
+              publicKey.substring( 0, 24 )
             )
           }
         }
-        if ( publicKey ) {
-          uploadRequestedShare( recoveryRequest.requester, publicKey )
-        }
       }
+    } catch ( error ) {
+      console.log( 'PKRECOVERY error', error )
     }
   };
 
@@ -1553,7 +1725,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   openBottomSheet = (
     kind: BottomSheetKind,
-    snapIndex: number | null = null,
+    snapIndex: number | null = null
   ) => {
     this.setState(
       {
@@ -1566,7 +1738,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         } else {
           this.bottomSheetRef.current?.snapTo( snapIndex )
         }
-      },
+      }
     )
   };
 
@@ -1584,15 +1756,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onNotificationClicked = async ( value ) => {
     const asyncNotifications = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' ),
+      await AsyncStorage.getItem( 'notificationList' )
     )
     console.log( 'Notification clicked Home>onNotificationClicked' )
     console.log( 'asyncNotifications ', asyncNotifications )
     console.log( 'notification passed ', value )
 
     const { notificationData } = this.state
-    console.log( 'notificationData from state ', notificationData )
-    const { navigation } = this.props
+    const { navigation, } = this.props
     const tempNotificationData = notificationData
     for ( let i = 0; i < tempNotificationData.length; i++ ) {
       const element = tempNotificationData[ i ]
@@ -1601,12 +1772,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           asyncNotifications &&
           asyncNotifications.length &&
           asyncNotifications.findIndex(
-            ( item ) => item.notificationId == value.notificationId,
+            ( item ) => item.notificationId == value.notificationId
           ) > -1
         ) {
           asyncNotifications[
             asyncNotifications.findIndex(
-              ( item ) => item.notificationId == value.notificationId,
+              ( item ) => item.notificationId == value.notificationId
             )
           ].read = true
         }
@@ -1616,7 +1787,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     await AsyncStorage.setItem(
       'notificationList',
-      JSON.stringify( asyncNotifications ),
+      JSON.stringify( asyncNotifications )
     )
 
     this.setState( {
@@ -1624,7 +1795,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationDataChange: !this.state.notificationDataChange,
     } )
 
-    if ( value.info.includes( 'F&F request accepted by' ) ) {
+    if ( value.info && value.info.includes( 'F&F request accepted by' ) ) {
       navigation.navigate( 'FriendsAndFamily' )
       return
     }
@@ -1654,10 +1825,53 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  onPressElement = ( item ) => {
+    const { navigation } = this.props
+    if ( item.title == 'Backup Health' ) {
+      navigation.navigate( 'ManageBackupNewBHR' )
+      return
+    }
+    if ( item.title == 'Friends and Family' ) {
+      navigation.navigate( 'AddressBookContents' )
+      return
+    } else if ( item.title == 'Wallet Settings' ) {
+      navigation.navigate( 'SettingsContents' )
+      // this.settingsBottomSheetRef.current?.snapTo(1);
+      // setTimeout(() => {
+      //   this.setState({
+      //     tabBarIndex: 0,
+      //   });
+      // }, 10);
+    } else if ( item.title == 'Funding Sources' ) {
+      navigation.navigate( 'ExistingSavingMethods' )
+    } else if ( item.title === 'Hexa Community (Telegram)' ) {
+      const url = 'https://t.me/HexaWallet'
+      Linking.openURL( url )
+        .then( ( data ) => {} )
+        .catch( ( e ) => {
+          alert( 'Make sure Telegram installed on your device' )
+        } )
+      return
+    }
+  };
+
   setupNotificationList = async () => {
+    const {
+      releaseCasesValue,
+      keeperApproveStatus,
+      onApprovalStatusChange,
+      s3Service,
+      levelHealth,
+      notificationList,
+      fetchKeeperTrustedChannel,
+      secureAccount,
+      UNDER_CUSTODY,
+      database,
+      updateKeeperInfoToUnderCustody
+    } = this.props
     // let asyncNotification = notificationListNew;
     const asyncNotification = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' ),
+      await AsyncStorage.getItem( 'notificationList' )
     )
     let asyncNotificationList = []
     if ( asyncNotification ) {
@@ -1667,17 +1881,24 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     }
     const tmpList = asyncNotificationList
-    const { notificationList } = this.props
     if ( notificationList ) {
+      // console.log(
+      //   "notificationList['notifications']",
+      //   notificationList["notifications"]
+      // );
       for ( let i = 0; i < notificationList[ 'notifications' ].length; i++ ) {
         const element = notificationList[ 'notifications' ][ i ]
+        // console.log("element", element);
         let readStatus = false
         if ( element.notificationType == releaseNotificationTopic ) {
           const releaseCases = this.props.releaseCasesValue
           // JSON.parse(
           //   await AsyncStorage.getItem('releaseCases'),
           // );
-          if ( element.body.split( ' ' )[ 1 ] == releaseCases.build ) {
+          if (
+            element.body &&
+            element.body.split( ' ' )[ 1 ] == releaseCases.build
+          ) {
             if ( releaseCases.remindMeLaterClick ) {
               readStatus = false
             }
@@ -1688,22 +1909,135 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             readStatus = true
           }
         }
+
+        if ( element.notificationType == 'newKeeperInfo' ) {
+          const data = JSON.parse( element.data )
+          if ( data.walletName && data.walletId ) {
+            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
+          }
+        }
+        if ( element.notificationType == 'uploadSecondaryShare' ) {
+          const data = JSON.parse( element.data )
+          if ( data.shareID == keeperApproveStatus.shareId ) {
+            onApprovalStatusChange( {
+              status: true,
+              initiatedAt: moment( new Date() ).valueOf(),
+              shareId: data.shareID,
+            } )
+          }
+        }
+        if (
+          element.notificationType == 'secureXpub' &&
+          !database.DECENTRALIZED_BACKUP.PK_SHARE
+        ) {
+          const shareId = s3Service.levelhealth.metaSharesKeeper[ 1 ].shareId
+          const share = getKeeperInfoFromShareId( levelHealth, shareId )
+          fetchKeeperTrustedChannel(
+            shareId,
+            element.notificationType,
+            share.name
+          )
+        }
+        if ( element.notificationType == 'reShare' ) {
+          // console.log('element.notificationType', element.notificationType)
+          // console.log('UNDER_CUSTODY', UNDER_CUSTODY)
+
+          let existingShares: MetaShare[]
+          if ( Object.keys( UNDER_CUSTODY ).length ) {
+            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
+              console.log( tag )
+              return UNDER_CUSTODY[ tag ].META_SHARE
+            } )
+          }
+          if ( existingShares.length ) {
+            console.log(
+              'existingShares.length',
+              existingShares.length,
+              existingShares
+            )
+            if (
+              existingShares.findIndex(
+                ( value ) =>
+                  value.shareId === JSON.parse( element.data ).selectedShareId
+              ) == -1
+            ) {
+              console.log(
+                'element.notificationType 1',
+                element.notificationType
+              )
+              this.props.autoDownloadShareContact(
+                JSON.parse( element.data ).selectedShareId,
+                JSON.parse( element.data ).walletId
+              )
+            }
+          }
+        }
+        if ( element.notificationType == 'smUploadedForPK' ) {
+          if (
+            keeperApproveStatus.shareId == 'PK_recovery' &&
+            keeperApproveStatus.transferDetails &&
+            keeperApproveStatus.transferDetails.key
+          ) {
+            const result = await S3Service.downloadSMShare(
+              keeperApproveStatus.transferDetails.key
+            )
+            if ( result && result.data ) {
+              onApprovalStatusChange( {
+                status: true,
+                initiatedAt: moment( new Date() ).valueOf(),
+                shareId: 'PK_recovery',
+                secondaryShare: result.data.metaShare,
+              } )
+            }
+          }
+
+          let existingShares: MetaShare[]
+          if ( Object.keys( UNDER_CUSTODY ).length ) {
+            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
+              console.log( tag )
+              return UNDER_CUSTODY[ tag ].META_SHARE
+            } )
+          }
+
+          if ( existingShares.length ) {
+            console.log(
+              'existingShares.length',
+              existingShares.length,
+              existingShares
+            )
+            if (
+              existingShares.findIndex(
+                ( value ) =>
+                  value.shareId === JSON.parse( element.data ).selectedShareId
+              ) == -1
+            ) {
+              console.log(
+                'element.notificationType 1',
+                element.notificationType
+              )
+              this.props.autoDownloadShareContact(
+                JSON.parse( element.data ).selectedShareId,
+                JSON.parse( element.data ).walletId
+              )
+            }
+          }
+        }
+
         if (
           asyncNotificationList.findIndex(
-            ( value ) => value.notificationId == element.notificationId,
+            ( value ) => value.notificationId == element.notificationId
           ) > -1
         ) {
           const temp =
             asyncNotificationList[
               asyncNotificationList.findIndex(
-                ( value ) => value.notificationId == element.notificationId,
+                ( value ) => value.notificationId == element.notificationId
               )
             ]
-          if ( element.notificationType == releaseNotificationTopic ) {
-            readStatus = readStatus
-          } else {
+          if ( element.notificationType != releaseNotificationTopic ) {
             readStatus = temp.read
           }
+
           const obj = {
             ...temp,
             read: readStatus,
@@ -1713,13 +2047,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             isMandatory: element.tag == 'mandatory' ? true : false,
             time: timeFormatter(
               moment( new Date() ),
-              moment( element.date ).valueOf(),
+              moment( element.date ).valueOf()
             ),
             date: new Date( element.date ),
           }
           tmpList[
             tmpList.findIndex(
-              ( value ) => value.notificationId == element.notificationId,
+              ( value ) => value.notificationId == element.notificationId
             )
           ] = obj
         } else {
@@ -1730,7 +2064,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             title: element.title,
             time: timeFormatter(
               moment( new Date() ),
-              moment( element.date ).valueOf(),
+              moment( element.date ).valueOf()
             ),
             date: new Date( element.date ),
             info: element.body,
@@ -1756,12 +2090,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
-            ? [ 0, '32%' ]
-            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+            ? [ 0, '67%' ]
+            : Platform.OS == 'ios' ? [ 0, '67%' ] : [ 0, '65%' ]
         case BottomSheetKind.RAMP_STATUS_INFO:
           return ( this.state.rampFromDeepLink )
-            ? [ 0, '32%' ]
-            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+            ? [ 0, '67%' ]
+            : Platform.OS == 'ios' ? [ 0, '67%' ] : [ 0, '65%' ]
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return Platform.OS == 'ios' ? [ 0, '65%' ] : [ 0, '70%' ]
         case BottomSheetKind.CUSTODIAN_REQUEST:
@@ -1802,7 +2136,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
           return (
             <>
-              <BottomSheetHeader title="Buy Bitcoin" onPress={this.closeBottomSheet} />
+              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
@@ -1842,21 +2176,96 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         case BottomSheetKind.CUSTODIAN_REQUEST:
           return (
+            <>
+              <CustodianRequestModalContents
+                userName={custodyRequest.requester}
+                onPressAcceptSecret={() => {
+                  this.closeBottomSheet()
+
+                  if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
+                    Alert.alert(
+                      'Request expired!',
+                      'Please ask the sender to initiate a new request',
+                    )
+                  } else {
+                    if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
+                      Alert.alert(
+                        'Failed to store',
+                        'You cannot custody multiple shares of the same user.',
+                      )
+                    } else {
+                      if ( custodyRequest.isQR ) {
+                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
+                      } else {
+                        navigation.navigate( 'CustodianRequestOTP', {
+                          custodyRequest,
+                        } )
+                      }
+                    }
+                  }
+                }}
+                onPressRejectSecret={() => {
+                  this.closeBottomSheet()
+                  this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
+                }}
+              />
+
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader
+                title="Buy bitcoin with Wyre"
+                onPress={this.closeBottomSheet}
+              />
+              <BottomSheetWyreInfo
+                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
+                wyreFromDeepLink={this.state.wyreFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+              />
+            </>
+          )
+
+        case BottomSheetKind.RAMP_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader
+                title="Buy bitcoin with Ramp"
+                onPress={this.closeBottomSheet}
+              />
+              <BottomSheetRampInfo
+                rampDeepLinkContent={this.state.rampDeepLinkContent}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+              />
+            </>
+          )
+
+        case BottomSheetKind.CUSTODIAN_REQUEST:
+          return (
             <CustodianRequestModalContents
               userName={custodyRequest.requester}
               onPressAcceptSecret={() => {
                 this.closeBottomSheet()
-
                 if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
                   Alert.alert(
                     'Request expired!',
-                    'Please ask the sender to initiate a new request',
+                    'Please ask the sender to initiate a new request'
                   )
                 } else {
                   if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
                     Alert.alert(
                       'Failed to store',
-                      'You cannot custody multiple shares of the same user.',
+                      'You cannot custody multiple shares of the same user.'
                     )
                   } else {
                     if ( custodyRequest.isQR ) {
@@ -1977,26 +2386,28 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   render() {
-    const {
-      netBalance,
-      notificationData,
-      currencyCode,
-    } = this.state
+    const { netBalance, notificationData, currencyCode } = this.state
 
     const {
+      navigation,
       exchangeRates,
       walletName,
       overallHealth,
+      levelHealth,
+      cardDataProps,
+      currentLevel,
     } = this.props
 
     return (
       <ImageBackground
         source={require( '../../assets/images/home-bg.png' )}
         style={{
-          width: '100%', height: '100%', flex: 1
+          width: '100%',
+          height: '100%',
+          flex: 1,
         }}
         imageStyle={{
-          resizeMode: 'stretch'
+          resizeMode: 'stretch',
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
@@ -2017,8 +2428,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             netBalance={netBalance}
             exchangeRates={exchangeRates}
             CurrencyCode={currencyCode}
-            navigation={this.props.navigation}
-            overallHealth={overallHealth}
+            navigation={navigation}
+            currentLevel={currentLevel}
+            //  onSwitchToggle={this.onSwitchToggle}
+            // setCurrencyToggleValue={this.setCurrencyToggleValue}
+            // navigation={this.props.navigation}
+            // overallHealth={overallHealth}
           />
         </View>
 
@@ -2028,6 +2443,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             paddingTop: 36,
             paddingLeft: 14,
           }}
+          currentLevel={currentLevel}
           onAddNewSelected={this.navigateToAddNewAccountScreen}
           onCardSelected={this.handleAccountCardSelection}
         />
@@ -2046,20 +2462,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   width: widthPercentageToDP( 8 ),
                   height: widthPercentageToDP( 8 ),
                   marginTop: widthPercentageToDP( -3 ),
-                  marginBottom: widthPercentageToDP( -3 )
+                  marginBottom: widthPercentageToDP( -3 ),
                 }}
               />
             }
             buttonStyle={{
               ...ButtonStyles.floatingActionButton,
               borderRadius: 9999,
-              paddingHorizontal: widthPercentageToDP( 10 )
+              paddingHorizontal: widthPercentageToDP( 10 ),
             }}
             titleStyle={{
               ...ButtonStyles.floatingActionButtonText,
               marginLeft: 8,
             }}
-            onPress={() => this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )}
+            onPress={() =>
+              this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+            }
           />
         </View>
 
@@ -2101,6 +2519,7 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications,
     accountsState: state.accounts,
+    cloudPermissionGranted: state.health.cloudPermissionGranted,
     currentWyreSubAccount: state.accounts.currentWyreSubAccount,
     currentRampSubAccount: state.accounts.currentRampSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
@@ -2108,9 +2527,11 @@ const mapStateToProps = ( state ) => {
       idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
     UNDER_CUSTODY: idx(
       state,
-      ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY,
+      ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
     ),
-    s3Service: idx( state, ( _ ) => _.sss.service ),
+    cardDataProps: idx( state, ( _ ) => _.preferences.cardData ),
+    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
+    s3Service: idx( state, ( _ ) => _.health.service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     paymentDetails: idx( state, ( _ ) => _.trustedContacts.paymentDetails ),
@@ -2119,10 +2540,18 @@ const mapStateToProps = ( state ) => {
     fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
     secondaryDeviceAddressValue: idx(
       state,
-      ( _ ) => _.preferences.secondaryDeviceAddressValue,
+      ( _ ) => _.preferences.secondaryDeviceAddressValue
     ),
     releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
+    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
+    database: idx( state, ( _ ) => _.storage.database ) || {
+    },
+    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
+    currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
+    keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
+    accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
+    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
   }
 }
 
@@ -2136,6 +2565,9 @@ export default withNavigationFocus(
     approveTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
+    uploadSecondaryShareForPK,
+    initializeHealthSetup,
+    initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,
@@ -2147,8 +2579,18 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    setVersion
-  } )( Home ),
+    updateHealthForCloud,
+    setCardData,
+    fetchKeeperTrustedChannel,
+    onApprovalStatusChange,
+    autoDownloadShareContact,
+    setVersion,
+    downloadSMShard,
+    updateNewFcm,
+    setCloudData,
+    updateKeeperInfoToUnderCustody,
+    generateMetaShare,
+  } )( Home )
 )
 
 const styles = StyleSheet.create( {
@@ -2160,7 +2602,8 @@ const styles = StyleSheet.create( {
     shadowColor: 'black',
     shadowOpacity: 0.4,
     shadowOffset: {
-      width: 2, height: -1
+      width: 2,
+      height: -1,
     },
   },
 

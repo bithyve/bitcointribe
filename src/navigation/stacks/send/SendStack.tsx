@@ -1,41 +1,46 @@
-import React from 'react';
-import { createStackNavigator } from "react-navigation-stack";
-import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions';
-import SendScreen from '../../../pages/Accounts/Send/Send';
-import SendToContactScreen from '../../../pages/Accounts/Send/SendToContact';
-import SendConfirmationScreen from '../../../pages/Accounts/Send/SendConfirmation';
-import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton';
-
+import React from 'react'
+import { createStackNavigator } from 'react-navigation-stack'
+import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import AccountSendContainerScreen from '../../../pages/Accounts/Send/AccountSendContainerScreen'
+import SentAmountForContactFormScreen from '../../../pages/Accounts/Send/SentAmountForContactFormScreen'
+import AccountSendConfirmationContainerScreen from '../../../pages/Accounts/Send/AccountSendConfirmationContainerScreen'
+import OTPAuthenticationScreen from '../../../pages/Accounts/Send/OTPAuthentication'
 
 const SendStack = createStackNavigator(
   {
-    SendRoot: {
-      screen: SendScreen,
-    },
-    SendToContact: {
-      screen: SendToContactScreen,
+    SendRoot: AccountSendContainerScreen,
+    SentAmountForContactForm: {
+      screen: SentAmountForContactFormScreen,
       navigationOptions: {
-        header: null,
+        title: 'Send To Contact'
       },
     },
     SendConfirmation: {
-      screen: SendConfirmationScreen,
+      screen: AccountSendConfirmationContainerScreen,
+      navigationOptions: {
+        title: 'Send Confirmation',
+
+      },
+    },
+    OTPAuthentication: {
+      screen: OTPAuthenticationScreen,
       navigationOptions: {
         header: null,
       },
-    },
+    }
   },
   {
     initialRouteName: 'SendRoot',
-    defaultNavigationOptions: ({ navigation }) => {
+    defaultNavigationOptions: ( { navigation } ) => {
       return {
         ...defaultStackScreenNavigationOptions,
         headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.goBack(); }} />;
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
         },
-      };
+      }
     },
   },
-);
+)
 
-export default SendStack;
+export default SendStack

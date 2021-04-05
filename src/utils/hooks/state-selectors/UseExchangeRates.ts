@@ -1,5 +1,10 @@
-import { useSelector } from 'react-redux'
+import { useMemo } from 'react'
+import useAccountsState from './accounts/UseAccountsState'
 
-const useExchangeRates = () => useSelector( state => state.accounts.exchangeRates )
+export default function useExchangeRates(): unknown {
+  const accountsState = useAccountsState()
 
-export default useExchangeRates
+  return useMemo( () => {
+    return accountsState.exchangeRates
+  }, [ accountsState.exchangeRates ] )
+}

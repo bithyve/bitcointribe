@@ -37,7 +37,7 @@ const actionMenuItems: ActionMenuItem[] = [
   // },
   {
     title: 'Fetch Reservation Code from Wyre',
-    subtitle: 'Buy Bitcoin from Wyre',
+    subtitle: 'Buy bitcoin from Wyre',
     kind: WyreActionKind.FETCH_WYRE_RESERVATION,
   },
 ]

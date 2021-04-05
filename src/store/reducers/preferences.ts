@@ -10,6 +10,9 @@ import {
   SAVING_WARNING,
   INIT_ASYNC_MIGRATION_SUCCESS,
   UPDATE_APPLICATION_STATUS,
+  UPDATE_LAST_SEEN,
+  CARD_DATA,
+  IS_BACKUP_PROCESSING,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
 } from '../actions/preferences'
 import { UPDATE_APP_PREFERENCE } from '../constants'
@@ -28,11 +31,16 @@ const initialState = ip.freeze( {
   isTransactionHelperDoneValue: false,
   isReceiveHelperDoneValue: false,
   savingWarning: false,
+  isSendHelperDoneValue: false,
+  isTwoFASetupDone: false,
   hasShownInitialKnowMoreSendSheet: false,
+  hasCompletedTFASetup: false,
   isContactOpen: false,
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
+  cardData: null,
+  isBackupProcessing: false
 } )
 
 export default ( state = initialState, { type, payload } ) => {
@@ -56,21 +64,25 @@ export default ( state = initialState, { type, payload } ) => {
           ...state,
           fcmTokenValue: payload.fcmTokenValue,
         }
+
       case SECONDARY_DEVICE_ADDRESS_VALUE:
         return {
           ...state,
           secondaryDeviceAddressValue: payload.secondaryDeviceAddressValue,
         }
+
       case RELEASE_CASES_VALUE:
         return {
           ...state,
           releaseCasesValue: payload.releaseCasesValue,
         }
+
       case TEST_ACCOUNT_HELPER_DONE:
         return {
           ...state,
           isTestHelperDoneValue: payload.isTestHelperDoneValue,
         }
+
       case TRANSACTION_HELPER_DONE:
         return {
           ...state,
@@ -105,6 +117,18 @@ export default ( state = initialState, { type, payload } ) => {
         return {
           ...state,
           applicationStatus: payload.status,
+        }
+
+      case UPDATE_LAST_SEEN:
+        return Object.assign( {
+        }, state, {
+          lastSeen: new Date()
+        } )
+
+      case CARD_DATA:
+        return {
+          ...state,
+          cardData: payload.cardData,
         }
 
       default:

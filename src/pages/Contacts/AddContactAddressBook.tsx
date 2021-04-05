@@ -473,7 +473,7 @@ export default function AddContactAddressBook( props ) {
               placeholder="Search"
               placeholderTextColor={Colors.textColorGrey}
               onChangeText={( nameKeyword ) => {
-                nameKeyword = nameKeyword.replace( /[^A-Za-z0-9]/g, '' )
+                nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
                 setSearchName( nameKeyword )
                 filterContacts( nameKeyword )
               }
