@@ -3267,7 +3267,7 @@ function* uploadRequestedSMShareWorker( { payload } ) {
       } )
 
       yield put( UploadSMSuccessfully( true ) )
-      Toast( `${tag}'s Recovery Key sent.` )
+      Toast( `${tag}'s Secondary Key sent.` )
     } else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
     }

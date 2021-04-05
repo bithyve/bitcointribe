@@ -411,50 +411,50 @@ class ManageBackupNewBHR extends Component<
 
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag
+      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 0 && this.props.metaSharesKeeper.length == 3
     ) {
-      if ( this.props.metaSharesKeeper.length == 3 ) {
-        const obj = {
-          id: 2,
-          selectedKeeper: {
-            shareType: 'device',
-            name: 'Secondary Device1',
-            reshareVersion: 0,
-            status: 'notAccessible',
-            updatedAt: 0,
-            shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
-              .shareId,
-            data: {
-            },
+      const obj = {
+        id: 2,
+        selectedKeeper: {
+          shareType: 'device',
+          name: 'Secondary Device1',
+          reshareVersion: 0,
+          status: 'notAccessible',
+          updatedAt: 0,
+          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
+            .shareId,
+          data: {
           },
-          isSetup: true,
-        }
-        this.setState( {
-          selectedKeeper: obj.selectedKeeper,
-        } )
-        // this.goToHistory( obj )
+        },
+        isSetup: true,
       }
-      if ( this.props.metaSharesKeeper.length == 5 ) {
-        const obj = {
-          id: 2,
-          selectedKeeper: {
-            shareType: this.state.selectedKeeperType,
-            name: this.state.selectedKeeperName,
-            reshareVersion: 0,
-            status: 'notAccessible',
-            updatedAt: 0,
-            shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
-              .shareId,
-            data: {
-            },
+      this.setState( {
+        selectedKeeper: obj.selectedKeeper,
+      } )
+    }
+    if (
+      JSON.stringify( prevProps.metaSharesKeeper ) !==
+      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
+    ) {
+      const obj = {
+        id: 2,
+        selectedKeeper: {
+          shareType: this.state.selectedKeeperType,
+          name: this.state.selectedKeeperName,
+          reshareVersion: 0,
+          status: 'notAccessible',
+          updatedAt: 0,
+          shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 3 ]
+            .shareId,
+          data: {
           },
-          isSetup: true,
-        }
-        this.setState( {
-          selectedKeeper: obj.selectedKeeper,
-        } )
-        this.sendApprovalRequestToPK( )
+        },
+        isSetup: true,
       }
+      this.setState( {
+        selectedKeeper: obj.selectedKeeper,
+      } )
+      this.sendApprovalRequestToPK( )
     }
 
     if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
@@ -1564,10 +1564,8 @@ class ManageBackupNewBHR extends Component<
           onCloseEnd={() => {
             this.setState( {
               QrBottomSheetsFlag: false
-            } );
-            ( this.QrBottomSheet as any ).snapTo( 0 )
+            } )
           }}
-          onCloseStart={() => {}}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={( c )=>this.QrBottomSheet=c}
@@ -1579,7 +1577,6 @@ class ManageBackupNewBHR extends Component<
           renderHeader={this.renderQrHeader}
         />
         <BottomSheet
-          onCloseEnd={() => { }}
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={( c )=>this.loaderBottomSheet = c}

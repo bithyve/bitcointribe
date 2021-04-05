@@ -539,7 +539,7 @@ class ContactDetails extends PureComponent<
 
         ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
 
-        UploadSMSuccessfully( null )
+        UploadSMSuccessfully( false )
       }
     } else {
       if (
@@ -562,7 +562,7 @@ class ContactDetails extends PureComponent<
         setTimeout( () => {
           ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
         }, 2 )
-        UploadSuccessfully( null )
+        UploadSuccessfully( false )
       }
     }
   };
@@ -1483,7 +1483,7 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
     ),
-    uploadSMSuccessfullyFlag: idx( state, ( _ ) => _.health.uploadSMSuccessfullyFlag ),
+    uploadSMSuccessfullyFlag: idx( state, ( _ ) => _.health.uploadSMSuccessfully ),
   }
 }
 export default connect( mapStateToProps, {
