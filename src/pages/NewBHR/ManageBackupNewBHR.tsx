@@ -949,7 +949,7 @@ class ManageBackupNewBHR extends Component<
               }}>
                 <Text style={styles.backupText}>Wallet Security</Text>
                 <Text style={styles.backupInfoText}>You are</Text>
-                <Text style={styles.backupInfoText}>at level {currentLevel ? currentLevel : ''}
+                <Text style={styles.backupInfoText}>at Level {currentLevel ? currentLevel : ''}
                 </Text>
               </View>:
               <View style={{
@@ -966,7 +966,7 @@ class ManageBackupNewBHR extends Component<
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud backup complete, upgrade security to level 2' : currentLevel === 2 ? 'Double backup complete, upgrade security to level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete level 1' }</Text>
+            }}>{currentLevel === 1 ? 'Cloud backup complete, upgrade security to Level 2' : currentLevel === 2 ? 'Double backup complete, upgrade security to Level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, complete Level 1' }</Text>
           </View>
           <View
             style={{
