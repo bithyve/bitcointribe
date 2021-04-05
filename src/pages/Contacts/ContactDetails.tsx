@@ -136,7 +136,7 @@ interface ContactDetailsPropTypes {
   addNewSecondarySubAccount: any;
   removeTrustedContact: any;
   uploadRequestedSMShare: any;
-  uploadSMSuccessfullyFlag: Boolean;
+  hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
   uploadingSmShare: any;
 }
@@ -272,7 +272,7 @@ class ContactDetails extends PureComponent<
     if ( prevProps.uploadSuccessfull !== this.props.uploadSuccessfull ) {
       this.generateHelpRestoreQR()
     }
-    if ( prevProps.uploadSMSuccessfullyFlag !== this.props.uploadSMSuccessfullyFlag ) {
+    if ( prevProps.hasSMUploadedSuccessfully !== this.props.hasSMUploadedSuccessfully ) {
       this.generateHelpRestoreQR( true )
     }
     if ( prevProps.errorSending !== this.props.errorSending ) {
@@ -1483,7 +1483,7 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
     ),
-    uploadSMSuccessfullyFlag: idx( state, ( _ ) => _.health.uploadSMSuccessfully ),
+    hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
   }
 }
 export default connect( mapStateToProps, {
