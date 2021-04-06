@@ -17,6 +17,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 export default class WatchOnlyImportedWalletSubAccountInfo
 implements ImportedWalletSubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -30,6 +31,7 @@ implements ImportedWalletSubAccountDescribing {
 
   defaultTitle: string;
   defaultDescription = 'View a non-Hexa wallet as an account';
+  defaultSubTitle: string;
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -37,21 +39,23 @@ implements ImportedWalletSubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC;
 
-  constructor({
+  constructor( {
     id = uuid(),
+    xPub = null,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Watch-Only',
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactions = [],
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = id
+    this.xPub = xPub
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

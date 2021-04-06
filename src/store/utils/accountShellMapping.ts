@@ -33,6 +33,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
+import idx from 'idx'
 
 const initAccountShells = ( services ) => {
   const testAcc: TestAccount = services[ TEST_ACCOUNT ]
@@ -84,12 +85,13 @@ const initAccountShells = ( services ) => {
             derivativeAccount[ accountNumber ].transactions.transactionDetails
 
         const derivativeId = derivativeAccount[ accountNumber ].xpubId
-        const { donee, subject, description } = derivativeAccount[
+        const { donee, subject, description, xpub } = derivativeAccount[
           accountNumber
         ]
         const accShell = new AccountShell( {
           primarySubAccount: new DonationSubAccountInfo( {
             id: derivativeId,
+            xPub: xpub,
             instanceNumber: accountNumber,
             balances: dervBalances,
             transactions: dervTransactions,
@@ -112,6 +114,7 @@ const initAccountShells = ( services ) => {
   const defaultTestShell = new AccountShell( {
     primarySubAccount: new TestSubAccountInfo( {
       id: testAcc.getAccountId(),
+      xPub: testAcc.hdWallet.getXpub(),
       instanceNumber: 0, // default instances(0)
     } ),
     unit: BitcoinUnit.TSATS,
@@ -120,6 +123,7 @@ const initAccountShells = ( services ) => {
   const defaultCheckingShell = new AccountShell( {
     primarySubAccount: new CheckingSubAccountInfo( {
       id: regularAcc.getAccountId(),
+      xPub: regularAcc.hdWallet.getXpub(),
       instanceNumber: 0,
     } ),
     unit: BitcoinUnit.SATS,
@@ -128,6 +132,7 @@ const initAccountShells = ( services ) => {
   const defaultSavingsShell = new AccountShell( {
     primarySubAccount: new SavingsSubAccountInfo( {
       id: secureAcc.getAccountId(),
+      xPub: idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary ),
       instanceNumber: 0,
     } ),
     unit: BitcoinUnit.SATS,
@@ -392,7 +397,7 @@ const updateSecondarySubAccounts = (
               derivativeAccount[ accountNumber ].transactions.transactionDetails
 
           const derivativeId = derivativeAccount[ accountNumber ].xpubId
-
+          const xpub = derivativeAccount[ accountNumber ].xpub
           if ( shell.secondarySubAccounts[ derivativeId ] ) {
             AccountShell.updateSecondarySubAccountBalanceTx(
               shell,
@@ -406,6 +411,7 @@ const updateSecondarySubAccounts = (
                 case DerivativeAccountTypes.TRUSTED_CONTACTS:
                   secondarySubAccount = new TrustedContactsSubAccountInfo( {
                     id: derivativeId,
+                    xPub: xpub,
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     balances: dervBalances,
@@ -417,6 +423,7 @@ const updateSecondarySubAccounts = (
                 case DerivativeAccountTypes.FAST_BITCOINS:
                   secondarySubAccount = new ExternalServiceSubAccountInfo( {
                     id: derivativeId,
+                    xPub: xpub,
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,

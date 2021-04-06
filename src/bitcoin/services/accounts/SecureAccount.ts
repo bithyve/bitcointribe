@@ -605,6 +605,7 @@ export default class SecureAccount {
         data: {
           accountId: string;
           accountNumber: number;
+          accountXpub: string;
         };
         err?: undefined;
         message?: undefined;
@@ -685,6 +686,7 @@ export default class SecureAccount {
           setupSuccessful: boolean;
           accountId: string;
           accountNumber: number;
+          accountXpub: string;
         };
         err?: undefined;
         message?: undefined;
