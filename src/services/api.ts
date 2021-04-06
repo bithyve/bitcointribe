@@ -2,8 +2,8 @@ import axios, { AxiosInstance } from 'axios';
 import config from '../bitcoin/HexaConfig';
 const { RELAY, SIGNING_SERVER, REQUEST_TIMEOUT } = config;
 import { put, call, select } from 'redux-saga/effects'
-import Tor from '../../common/data/models/Tor'
-import { doTorRequest } from '../../utils/TorUtils'
+import Tor from '../common/data/models/Tor'
+import { doTorRequest } from '../utils/TorUtils'
 const URL = '';
 
 interface callReq {
@@ -13,7 +13,7 @@ interface callReq {
 }
 
 export const BH_AXIOS = (request: callReq) => {
-    const activeTor: Tor = yield select( state => state.torSettings.activeTor )
+    const activeTor: Tor = select( state => state.torSettings.activeTor )
     const { method, data } = request;
     const url = `${RELAY}/${request.url}`
 

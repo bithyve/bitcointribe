@@ -1431,7 +1431,7 @@ export default class SecureHDWallet extends Bitcoin {
     try {
       res = await BH_AXIOS({
         method: 'post',
-        url: 'updatePreferences'
+        url: 'updatePreferences',
         data: {
           HEXA_ID,
           donationId: donationAcc.id,

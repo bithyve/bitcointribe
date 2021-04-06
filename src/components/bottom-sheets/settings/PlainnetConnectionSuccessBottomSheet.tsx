@@ -11,7 +11,7 @@ export type Props = {
   onConfirmPressed: () => void;
 };
 
-const TorConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }: Props ) => {
+const PlainnetConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }: Props ) => {
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
@@ -28,7 +28,7 @@ const TorConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }
 
         <View style={styles.headerSection}>
           <Text style={BottomSheetStyles.confirmationMessageHeading}>
-            Successfully connected to the Tor network
+            Successfully made a plainnet connection
           </Text>
         </View>
 
@@ -36,11 +36,7 @@ const TorConnectionSuccessBottomSheet: React.FC<Props> = ( { onConfirmPressed, }
           <Text style={{
             ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
           }}>
-            You can edit your Tor settings from the same screen anytime in the future
-          </Text>
-
-          <Text style={ListStyles.infoHeaderSubtitleText}>
-            You may also switch back to a plainnet connection
+            You can edit your Tor/plainnet settings from the same screen anytime in the future
           </Text>
         </View>
 
@@ -93,4 +89,4 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default TorConnectionSuccessBottomSheet
+export default PLainnetConnectionSuccessBottomSheet
