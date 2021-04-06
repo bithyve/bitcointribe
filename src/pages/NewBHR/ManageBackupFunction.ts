@@ -225,7 +225,7 @@ const getLevelInfoStatus = ( levelData ) => {
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
     if( levelData[ i ].status == 'notSetup' ) {
-      levelData[ i ].note= 'Setup/Upgrade your backup.'
+      levelData[ i ].note= 'Setup/upgrade your backup.'
     }
     if( levelData[ i ].status == 'bad' ) {
       levelData[ i ].note= 'Backup needs your attention.'
@@ -233,21 +233,22 @@ const getLevelInfoStatus = ( levelData ) => {
     if( levelData[ i ].status == 'good' ) {
       levelData[ i ].note= 'Backup is secure.'
     }
-
-    // ONLY ONE ACCESSIBLE
-    if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
-      if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
-      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
-    }
-    // BOTH NOT ACCESSIBLE
-    if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
-      if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
-      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
-    }
-    // BOTH NOT ACCESSIBLE
-    if( levelData[ i ].status == 'good' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ) ){
-      levelData[ i ].keeper1ButtonText = element.keeper1.name
-      levelData[ i ].keeper2ButtonText = element.keeper2.name
+    if( i != 0 ){
+      // ONLY ONE ACCESSIBLE
+      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
+        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
+        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
+      }
+      // BOTH NOT ACCESSIBLE
+      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
+        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
+        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
+      }
+      // BOTH NOT ACCESSIBLE
+      if( levelData[ i ].status == 'good' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ) ){
+        levelData[ i ].keeper1ButtonText = element.keeper1.name
+        levelData[ i ].keeper2ButtonText = element.keeper2.name
+      }
     }
   }
   return levelData

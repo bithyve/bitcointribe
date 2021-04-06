@@ -58,8 +58,7 @@ const TwoFASetup = props => {
             Authenticator in order to setup the 2FA
           </Text>
           <Text style={NavStyles.modalHeaderInfoText}>
-            The authenticator app should be installed on another device
-            like your Keeper Device
+            The authenticator app should be installed on a different device
           </Text>
         </View>
       </View>

@@ -157,16 +157,16 @@ const HomeHeader = ( {
         }
         if( currentLevel == 0 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: ''
           }
         }
         if( currentLevel === 1 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade security to level 2', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Cloud backup complete, please upgrade security to Level 2', messageTwo: ''
           }
         } else if( currentLevel === 2 ){
           return {
-            isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade security to level 3', messageTwo: ''
+            isFirstMessageBold: false, messageOne: 'Double backup complete, please upgrade security to Level 3', messageTwo: ''
           }
         } else if( currentLevel == 3 ){
           return {
@@ -218,16 +218,16 @@ const HomeHeader = ( {
             }
             if( currentLevel == 0 ){
               return {
-                isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+                isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: ''
               }
             }
             if( currentLevel == 1 ){
               return {
-                isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade security to level 2', messageTwo: ''
+                isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade security to Level 2', messageTwo: ''
               }
             } else if( currentLevel === 2 ){
               return {
-                isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade security to level 3', messageTwo: ''
+                isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade security to Level 3', messageTwo: ''
               }
             } else if( currentLevel == 3 ){
               return {
@@ -243,7 +243,7 @@ const HomeHeader = ( {
       }
     }
     return {
-      isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, complete level 1', messageTwo: ''
+      isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: ''
     }
   }
 

@@ -924,7 +924,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       return (
         <SendViaLink
           headerText={'Send Request'}
-          subHeaderText={'Send a Keeper request link'}
+          subHeaderText={'Send request to help backup your wallet'}
           contactText={'Adding as a Keeper:'}
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
@@ -1065,7 +1065,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
-          'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diam nonumy eirmod'
+          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
@@ -1159,7 +1159,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           type={'contact'}
           IsReshare={isReshare}
           data={sortedHistory( trustedContactHistory )}
-          confirmButtonText={'Confirm'}
+          confirmButtonText={'Share Now'}
           onPressChange={() => {
             ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
           }}

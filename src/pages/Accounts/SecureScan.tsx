@@ -143,8 +143,7 @@ const SecureScan = props => {
             Authenticator
           </Text>
           <Text style={NavStyles.modalHeaderInfoText}>
-            The authenticator app should be{'\n'}installed on another device
-            like your Keeper Device
+            The authenticator app should be{'\n'}installed on a different device
           </Text>
         </View>
       </View>
