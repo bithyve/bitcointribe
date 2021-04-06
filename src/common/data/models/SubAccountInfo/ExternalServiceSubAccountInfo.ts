@@ -19,6 +19,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 };
 export default class ExternalServiceSubAccountInfo implements ExternalServiceSubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -33,6 +34,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
 
   defaultTitle: string;
   defaultDescription: string;
+  defaultSubTitle: string;
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -41,6 +43,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
 
   constructor( {
     id = uuid(),
+    xPub = null,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle,
@@ -57,6 +60,7 @@ export default class ExternalServiceSubAccountInfo implements ExternalServiceSub
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
   }: ConstructorProps ) {
     this.id = id
+    this.xPub = xPub
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

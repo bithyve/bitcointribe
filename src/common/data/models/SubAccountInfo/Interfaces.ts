@@ -83,6 +83,7 @@ export type ImportedWalletSubAccountDescribing = SubAccountDescribing
 
 export type SubAccountDescribingConstructorProps = {
   id?: string;
+  xPub?: string;
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;
