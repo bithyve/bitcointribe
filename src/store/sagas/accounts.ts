@@ -605,7 +605,7 @@ function* setupDonationAccountWorker( { payload } ) {
 
   if ( res.status === 200 ) {
     // console.log( { res } )
-    const { setupSuccessful, accountId, accountNumber } = res.data
+    const { setupSuccessful, accountId, accountNumber, accountXpub } = res.data
     if ( !setupSuccessful ) {
       throw new Error( 'Donation account setup failed' )
     }
@@ -622,7 +622,7 @@ function* setupDonationAccountWorker( { payload } ) {
     } )
 
     return {
-      accountId, accountNumber
+      accountId, accountNumber, accountXpub
     }
   } else {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
@@ -820,6 +820,7 @@ export const blindRefreshWatcher = createWatcher(
 
 function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   let subAccountId: string
+  let subAccountXpub: string
   let subAccountInstanceNum: number
 
   const service = yield select(
@@ -843,6 +844,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
         } )
 
         subAccountId = donationInstance.accountId
+        subAccountXpub = donationInstance.accountXpub
         subAccountInstanceNum = donationInstance.accountNumber
         break
 
@@ -871,6 +873,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
           } )
 
           subAccountId = derivativeSetupRes.data.accountId
+          subAccountXpub = derivativeSetupRes.data.accountXpub
           subAccountInstanceNum = derivativeSetupRes.data.accountNumber
         } else console.log( {
           err: derivativeSetupRes.err
@@ -903,6 +906,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
                 } )
 
                 subAccountId = wyreSetupRes.data.accountId
+                subAccountXpub = wyreSetupRes.data.accountXpub
                 subAccountInstanceNum = wyreSetupRes.data.accountNumber
               } else {
                 console.log( {
@@ -934,6 +938,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
                 } )
 
                 subAccountId = rampSetupRes.data.accountId
+                subAccountXpub = rampSetupRes.data.accountXpub
                 subAccountInstanceNum = rampSetupRes.data.accountNumber
               } else {
                 console.log( {
@@ -946,7 +951,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
   }
 
   if ( subAccountId ) return {
-    subAccountId, subAccountInstanceNum
+    subAccountId, subAccountInstanceNum, subAccountXpub
   }
   else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
@@ -1033,11 +1038,12 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
       : BitcoinUnit.SATS
 
   try {
-    const { subAccountId, subAccountInstanceNum } = yield call(
+    const { subAccountId, subAccountInstanceNum, subAccountXpub } = yield call(
       addNewSubAccount,
       subAccountInfo
     )
     subAccountInfo.id = subAccountId
+    subAccountInfo.xPub = subAccountXpub
     subAccountInfo.instanceNumber = subAccountInstanceNum
     const newAccountShell = new AccountShell( {
       unit: bitcoinUnit,
