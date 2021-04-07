@@ -172,7 +172,10 @@ dependencies {
     implementation project(':react-native-reanimated')
     implementation project(':react-native-gesture-handler')
     implementation project(':react-native-push-notification')
-    
+
+    // Tor
+    implementation files("../../node_modules/react-native-tor/android/libs/sifir_android.aar")
+
     compile ('com.google.android.gms:play-services-drive:10.2.0') {
     force = true;
     }
