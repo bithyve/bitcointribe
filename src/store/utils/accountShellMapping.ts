@@ -156,18 +156,20 @@ const updatePrimarySubAccounts = (
   const secureAcc: SecureAccount = services[ SECURE_ACCOUNT ]
 
   const updatedAccountShells = accountShells.map( ( shell: AccountShell ) => {
-    let accountName = ''
-    let accountDescription = ''
     let balances: Balances = {
       confirmed: 0,
       unconfirmed: 0,
     }
     let transactions: TransactionDescribing[] = []
+    let accountName = ''
+    let accountDescription = ''
+    let accountXpub = ''
 
     switch ( shell.primarySubAccount.kind ) {
         case SubAccountKind.TEST_ACCOUNT:
           accountName = testAcc.hdWallet.accountName
           accountDescription = testAcc.hdWallet.accountDescription
+          accountXpub = testAcc.hdWallet.getXpub()
           transactions = testAcc.hdWallet.transactions.transactionDetails
           balances = {
             confirmed: transactions.length
@@ -181,6 +183,7 @@ const updatePrimarySubAccounts = (
           if ( !shell.primarySubAccount.instanceNumber ) {
             accountName = regularAcc.hdWallet.accountName
             accountDescription = regularAcc.hdWallet.accountDescription
+            accountXpub = regularAcc.hdWallet.getXpub()
             balances = {
               confirmed: regularAcc.hdWallet.balances.balance,
               unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
@@ -198,6 +201,7 @@ const updatePrimarySubAccounts = (
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
               accountDescription = subPrimInstance.accountDescription
+              accountXpub = subPrimInstance.xpub
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -212,6 +216,8 @@ const updatePrimarySubAccounts = (
           if ( !shell.primarySubAccount.instanceNumber ) {
             accountName = secureAcc.secureHDWallet.accountName
             accountDescription = secureAcc.secureHDWallet.accountDescription
+            accountXpub = idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary )
+
             balances = {
               confirmed: secureAcc.secureHDWallet.balances.balance,
               unconfirmed: secureAcc.secureHDWallet.balances.unconfirmedBalance,
@@ -230,6 +236,7 @@ const updatePrimarySubAccounts = (
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
               accountDescription = subPrimInstance.accountDescription
+              accountXpub = subPrimInstance.xpub
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -259,6 +266,7 @@ const updatePrimarySubAccounts = (
           if ( donationInstance && donationInstance.balances ) {
             accountName = donationInstance.subject
             accountDescription = donationInstance.description
+            accountXpub = donationInstance.xpub
             balances = {
               confirmed: donationInstance.balances.balance,
               unconfirmed: donationInstance.balances.unconfirmedBalance,
@@ -288,6 +296,7 @@ const updatePrimarySubAccounts = (
                 if ( wyreInstance && wyreInstance.balances ) {
                   accountName = wyreInstance.accountName
                   accountDescription = wyreInstance.accountDescription
+                  accountXpub = wyreInstance.xpub
                   balances = {
                     confirmed: wyreInstance.balances.balance,
                     unconfirmed: wyreInstance.balances.unconfirmedBalance,
@@ -317,6 +326,7 @@ const updatePrimarySubAccounts = (
                 if ( rampInstance && rampInstance.balances ) {
                   accountName = rampInstance.accountName
                   accountDescription = rampInstance.accountDescription
+                  accountXpub = rampInstance.xpub
                   balances = {
                     confirmed: rampInstance.balances.balance,
                     unconfirmed: rampInstance.balances.unconfirmedBalance,
@@ -328,12 +338,20 @@ const updatePrimarySubAccounts = (
           break
     }
 
+    const accountDetails: {
+      accountName?: string,
+      accountDescription?: string,
+      accountXpub?: string,
+     }  = {
+       accountName,
+       accountDescription,
+       accountXpub
+     }
     AccountShell.updatePrimarySubAccountDetails(
       shell,
-      accountName,
-      accountDescription,
       balances,
       transactions,
+      accountDetails
     )
 
     return shell
