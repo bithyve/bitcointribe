@@ -52,16 +52,18 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           },
           imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
         },
-        {
-          title: 'Show xPub',
-          subtitle: 'Show details for this account\'s xPub',
-          screenName: 'ShowXPub',
-          screenParams: {
-            primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
-            accountShellID: accountShell.id,
-          },
-          imageSource: require( '../../../assets/images/HomePageIcons/icon_qr.png' ),
-        },
+        ...( !accountShell.primarySubAccount.isTFAEnabled ? [
+          {
+            title: 'Show xPub',
+            subtitle: 'Show details for this account\'s xPub',
+            screenName: 'ShowXPub',
+            screenParams: {
+              primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
+              accountShellID: accountShell.id,
+            },
+            imageSource: require( '../../../assets/images/HomePageIcons/icon_qr.png' ),
+          }
+        ] : [] ),
         {
           title: 'Account Sync',
           subtitle: 'Completely sync the account',
