@@ -164,7 +164,9 @@ export default class AccountShell {
     subAccId: string,
     newbalance: Balances,
     newTransactions: TransactionDescribing[],
-  ) {
+    accountDetails?: {
+      accountXpub?: string,
+    }  ) {
     let secondarySub = shell.secondarySubAccounts[ subAccId ]
     if ( secondarySub ) {
       secondarySub = {
@@ -172,6 +174,12 @@ export default class AccountShell {
         balances: newbalance,
         transactions: newTransactions,
       }
+
+      if( accountDetails ){
+        const { accountXpub } = accountDetails
+        if( accountXpub ) secondarySub.xPub = accountXpub
+      }
+
       shell.secondarySubAccounts[ subAccId ] = secondarySub
     }
   }
