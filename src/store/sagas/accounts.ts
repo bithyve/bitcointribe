@@ -82,6 +82,7 @@ import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
+import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -1032,6 +1033,9 @@ export const addNewSecondarySubAccountWatcher = createWatcher(
 function* addNewAccountShell( { payload: subAccountInfo, }: {
   payload: SubAccountDescribing;
 } ) {
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const network = accountsState[ REGULAR_ACCOUNT ].service.hdWallet.network
+
   const bitcoinUnit =
     subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
       ? BitcoinUnit.TSATS
@@ -1043,7 +1047,7 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
       subAccountInfo
     )
     subAccountInfo.id = subAccountId
-    subAccountInfo.xPub = subAccountXpub
+    subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
     subAccountInfo.instanceNumber = subAccountInstanceNum
     const newAccountShell = new AccountShell( {
       unit: bitcoinUnit,

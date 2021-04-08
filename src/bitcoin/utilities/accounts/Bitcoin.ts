@@ -1,16 +1,12 @@
 import axios, { AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
-import * as bip39 from 'bip39'
-import bip65 from 'bip65'
+import bs58check from 'bs58check'
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interface'
-import {
-  SUB_PRIMARY_ACCOUNT,
-  TRUSTED_CONTACTS,
-} from '../../../common/constants/wallet-service-types'
+import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
@@ -35,6 +31,19 @@ export default class Bitcoin {
         return ''
       }
     }
+  };
+
+  public static generateYpub = ( xpub: string, network: bitcoinJS.Network ): string => {
+    let data = bs58check.decode( xpub )
+    data = data.slice( 4 )
+    let versionBytes
+    if ( network == bitcoinJS.networks.bitcoin ) {
+      versionBytes = xpub ? '049d7cb2' : '049d7878'
+    } else {
+      versionBytes = xpub ? '044a5262' : '044a4e28'
+    }
+    data = Buffer.concat( [ Buffer.from( versionBytes, 'hex' ), data ] )
+    return bs58check.encode( data )
   };
 
   public network: bitcoinJS.Network;

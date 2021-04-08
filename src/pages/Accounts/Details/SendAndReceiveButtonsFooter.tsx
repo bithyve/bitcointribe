@@ -81,7 +81,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
       return transactionFeeUnitPrefix
     }
 
-    const suffix = averageTxFees[ network ].low.averageTxFee == 1 ? '' : 's'
+    const suffix = averageTxFees && averageTxFees[ network ].low.averageTxFee == 1 ? '' : 's'
 
     return `${transactionFeeUnitPrefix}${suffix}`
   }, [ transactionFeeUnitPrefix, averageTxFees ] )

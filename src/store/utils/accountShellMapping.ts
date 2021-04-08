@@ -1,3 +1,5 @@
+import idx from 'idx'
+import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -33,7 +35,6 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
-import idx from 'idx'
 
 const initAccountShells = ( services ) => {
   const testAcc: TestAccount = services[ TEST_ACCOUNT ]
@@ -47,14 +48,16 @@ const initAccountShells = ( services ) => {
     SourceAccountKind.REGULAR_ACCOUNT,
     SourceAccountKind.SECURE_ACCOUNT,
   ] ) {
-    let derivativeAccounts
+    let derivativeAccounts, network
     switch ( sourceKind ) {
         case SourceAccountKind.REGULAR_ACCOUNT:
           derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+          network = regularAcc.hdWallet.network
           break
 
         case SourceAccountKind.SECURE_ACCOUNT:
           derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+          network = secureAcc.secureHDWallet.network
           break
     }
 
@@ -91,7 +94,7 @@ const initAccountShells = ( services ) => {
         const accShell = new AccountShell( {
           primarySubAccount: new DonationSubAccountInfo( {
             id: derivativeId,
-            xPub: xpub,
+            xPub: Bitcoin.generateYpub( xpub, network ),
             instanceNumber: accountNumber,
             balances: dervBalances,
             transactions: dervTransactions,
@@ -114,7 +117,7 @@ const initAccountShells = ( services ) => {
   const defaultTestShell = new AccountShell( {
     primarySubAccount: new TestSubAccountInfo( {
       id: testAcc.getAccountId(),
-      xPub: testAcc.hdWallet.getXpub(),
+      xPub: Bitcoin.generateYpub( testAcc.hdWallet.getXpub(), testAcc.hdWallet.network ),
       instanceNumber: 0, // default instances(0)
     } ),
     unit: BitcoinUnit.TSATS,
@@ -123,7 +126,7 @@ const initAccountShells = ( services ) => {
   const defaultCheckingShell = new AccountShell( {
     primarySubAccount: new CheckingSubAccountInfo( {
       id: regularAcc.getAccountId(),
-      xPub: regularAcc.hdWallet.getXpub(),
+      xPub: Bitcoin.generateYpub( regularAcc.hdWallet.getXpub(), regularAcc.hdWallet.network ),
       instanceNumber: 0,
     } ),
     unit: BitcoinUnit.SATS,
@@ -132,7 +135,7 @@ const initAccountShells = ( services ) => {
   const defaultSavingsShell = new AccountShell( {
     primarySubAccount: new SavingsSubAccountInfo( {
       id: secureAcc.getAccountId(),
-      xPub: idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary ),
+      xPub: Bitcoin.generateYpub( idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary ), secureAcc.secureHDWallet.network ),
       instanceNumber: 0,
     } ),
     unit: BitcoinUnit.SATS,
@@ -169,7 +172,7 @@ const updatePrimarySubAccounts = (
         case SubAccountKind.TEST_ACCOUNT:
           accountName = testAcc.hdWallet.accountName
           accountDescription = testAcc.hdWallet.accountDescription
-          accountXpub = testAcc.hdWallet.getXpub()
+          accountXpub = Bitcoin.generateYpub( testAcc.hdWallet.getXpub(), testAcc.hdWallet.network )
           transactions = testAcc.hdWallet.transactions.transactionDetails
           balances = {
             confirmed: transactions.length
@@ -183,7 +186,7 @@ const updatePrimarySubAccounts = (
           if ( !shell.primarySubAccount.instanceNumber ) {
             accountName = regularAcc.hdWallet.accountName
             accountDescription = regularAcc.hdWallet.accountDescription
-            accountXpub = regularAcc.hdWallet.getXpub()
+            accountXpub = Bitcoin.generateYpub( regularAcc.hdWallet.getXpub(), regularAcc.hdWallet.network )
             balances = {
               confirmed: regularAcc.hdWallet.balances.balance,
               unconfirmed: regularAcc.hdWallet.balances.unconfirmedBalance,
@@ -201,7 +204,7 @@ const updatePrimarySubAccounts = (
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
               accountDescription = subPrimInstance.accountDescription
-              accountXpub = subPrimInstance.xpub
+              accountXpub = Bitcoin.generateYpub( subPrimInstance.xpub, regularAcc.hdWallet.network )
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -216,7 +219,7 @@ const updatePrimarySubAccounts = (
           if ( !shell.primarySubAccount.instanceNumber ) {
             accountName = secureAcc.secureHDWallet.accountName
             accountDescription = secureAcc.secureHDWallet.accountDescription
-            accountXpub = idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary )
+            accountXpub = Bitcoin.generateYpub( idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary ), secureAcc.secureHDWallet.network )
 
             balances = {
               confirmed: secureAcc.secureHDWallet.balances.balance,
@@ -236,7 +239,7 @@ const updatePrimarySubAccounts = (
             if ( subPrimInstance && subPrimInstance.balances ) {
               accountName = subPrimInstance.accountName
               accountDescription = subPrimInstance.accountDescription
-              accountXpub = subPrimInstance.xpub
+              accountXpub = Bitcoin.generateYpub( subPrimInstance.xpub, secureAcc.secureHDWallet.network )
               balances = {
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
@@ -249,14 +252,16 @@ const updatePrimarySubAccounts = (
 
         case SubAccountKind.DONATION_ACCOUNT:
           const { sourceKind, instanceNumber } = shell.primarySubAccount
-          let derivativeAccounts
+          let derivativeAccounts, network
           switch ( sourceKind ) {
               case SourceAccountKind.REGULAR_ACCOUNT:
                 derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+                network = regularAcc.hdWallet.network
                 break
 
               case SourceAccountKind.SECURE_ACCOUNT:
                 derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+                network = secureAcc.secureHDWallet.network
                 break
           }
           const donationAccounts: DonationDerivativeAccount =
@@ -266,7 +271,8 @@ const updatePrimarySubAccounts = (
           if ( donationInstance && donationInstance.balances ) {
             accountName = donationInstance.subject
             accountDescription = donationInstance.description
-            accountXpub = donationInstance.xpub
+            accountXpub = Bitcoin.generateYpub( donationInstance.xpub, network )
+
             balances = {
               confirmed: donationInstance.balances.balance,
               unconfirmed: donationInstance.balances.unconfirmedBalance,
@@ -279,24 +285,26 @@ const updatePrimarySubAccounts = (
           switch ( ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
               case ServiceAccountKind.WYRE:
                 const { sourceKind, instanceNumber } = shell.primarySubAccount
-                let derivativeAccounts
+                let derivativeAccounts, network
+
                 switch ( sourceKind ) {
                     case SourceAccountKind.REGULAR_ACCOUNT:
                       derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+                      network = regularAcc.hdWallet.network
                       break
 
                     case SourceAccountKind.SECURE_ACCOUNT:
                       derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+                      network = secureAcc.secureHDWallet.network
                       break
                 }
-                const wyreAccounts: WyreDerivativeAccount =
-              derivativeAccounts[ DerivativeAccountTypes.WYRE ]
+                const wyreAccounts: WyreDerivativeAccount = derivativeAccounts[ DerivativeAccountTypes.WYRE ]
                 const wyreInstance: WyreDerivativeAccountElements = wyreAccounts[ instanceNumber ]
 
                 if ( wyreInstance && wyreInstance.balances ) {
                   accountName = wyreInstance.accountName
                   accountDescription = wyreInstance.accountDescription
-                  accountXpub = wyreInstance.xpub
+                  accountXpub = Bitcoin.generateYpub( wyreInstance.xpub, network )
                   balances = {
                     confirmed: wyreInstance.balances.balance,
                     unconfirmed: wyreInstance.balances.unconfirmedBalance,
@@ -304,19 +312,22 @@ const updatePrimarySubAccounts = (
                   transactions = wyreInstance.transactions.transactionDetails
                 }
                 break
+
               case ServiceAccountKind.RAMP:
                 //const { sourceKind, instanceNumber } = shell.primarySubAccount
                 const rampSourceKind = shell.primarySubAccount.sourceKind
                 const rampInstanceNumber = shell.primarySubAccount.instanceNumber
 
-                let rampDerivativeAccounts
+                let rampDerivativeAccounts, rampNetwork
                 switch ( rampSourceKind ) {
                     case SourceAccountKind.REGULAR_ACCOUNT:
                       rampDerivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+                      rampNetwork = regularAcc.hdWallet.network
                       break
 
                     case SourceAccountKind.SECURE_ACCOUNT:
                       rampDerivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+                      rampNetwork = secureAcc.secureHDWallet.network
                       break
                 }
                 const rampAccounts: RampDerivativeAccount =
@@ -326,7 +337,8 @@ const updatePrimarySubAccounts = (
                 if ( rampInstance && rampInstance.balances ) {
                   accountName = rampInstance.accountName
                   accountDescription = rampInstance.accountDescription
-                  accountXpub = rampInstance.xpub
+                  accountXpub = Bitcoin.generateYpub( rampInstance.xpub, rampNetwork )
+
                   balances = {
                     confirmed: rampInstance.balances.balance,
                     unconfirmed: rampInstance.balances.unconfirmedBalance,
@@ -370,18 +382,20 @@ const updateSecondarySubAccounts = (
   const secureAcc: SecureAccount = services[ SECURE_ACCOUNT ]
 
   const updatedAccountShells = accountShells.map( ( shell: AccountShell ) => {
-    let derivativeAccounts
+    let derivativeAccounts, network
     switch ( shell.primarySubAccount.kind ) {
         case SubAccountKind.REGULAR_ACCOUNT:
           if ( !shell.primarySubAccount.instanceNumber )
           // to default checking account
             derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+          network = regularAcc.hdWallet.network
           break
 
         case SubAccountKind.SECURE_ACCOUNT:
           if ( !shell.primarySubAccount.instanceNumber )
           // to default savings account
             derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+          network = secureAcc.secureHDWallet.network
           break
     }
 
@@ -416,12 +430,20 @@ const updateSecondarySubAccounts = (
 
           const derivativeId = derivativeAccount[ accountNumber ].xpubId
           const xpub = derivativeAccount[ accountNumber ].xpub
+          const ypub = Bitcoin.generateYpub( xpub, network )
+          const accountDetails: {
+            accountXpub?: string,
+          } = {
+            accountXpub: ypub
+          }
+
           if ( shell.secondarySubAccounts[ derivativeId ] ) {
             AccountShell.updateSecondarySubAccountBalanceTx(
               shell,
               derivativeId,
               dervBalances,
               dervTransactions,
+              accountDetails
             )
           } else {
             let secondarySubAccount: SubAccountDescribing
@@ -429,7 +451,7 @@ const updateSecondarySubAccounts = (
                 case DerivativeAccountTypes.TRUSTED_CONTACTS:
                   secondarySubAccount = new TrustedContactsSubAccountInfo( {
                     id: derivativeId,
-                    xPub: xpub,
+                    xPub: ypub,
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     balances: dervBalances,
@@ -441,7 +463,7 @@ const updateSecondarySubAccounts = (
                 case DerivativeAccountTypes.FAST_BITCOINS:
                   secondarySubAccount = new ExternalServiceSubAccountInfo( {
                     id: derivativeId,
-                    xPub: xpub,
+                    xPub: ypub,
                     instanceNumber: accountNumber,
                     accountShellID: shell.id,
                     serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
