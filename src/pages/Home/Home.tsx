@@ -2118,7 +2118,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           return [
             -50,
             heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 45 : 30,
             ),
           ]
 
@@ -2387,9 +2387,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.CLOUD_ERROR:
           return (
             <ErrorModalContents
-              title={'Backup Error on Cloud'}
-              info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'}
-              note={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'}
+              title={'Automated Cloud Backup Error'}
+              info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
+              note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
               onPressProceed={()=>{
                 this.props.setCloudData()
                 this.closeBottomSheet()
@@ -2406,6 +2406,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
             />
           )
+
         default:
           break
     }
@@ -2418,9 +2419,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation,
       exchangeRates,
       walletName,
-      overallHealth,
-      levelHealth,
-      cardDataProps,
       currentLevel,
     } = this.props
 
