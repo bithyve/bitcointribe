@@ -23,7 +23,10 @@ import * as RNLocalize from 'react-native-localize'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
@@ -102,8 +105,6 @@ import {
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-
-import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import { fetchKeeperTrustedChannel, updateNewFcm } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -136,7 +137,8 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
+import { setCloudData } from '../../store/actions/cloud'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -155,6 +157,7 @@ export enum BottomSheetKind {
   WYRE_STATUS_INFO,
   RAMP_STATUS_INFO,
   ERROR,
+  CLOUD_ERROR,
 }
 
 interface HomeStateTypes {
@@ -238,7 +241,6 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
-  updateHealthForCloud: any;
   regularAccount: RegularAccount;
   database: any;
   setCardData: any;
@@ -262,6 +264,7 @@ interface HomePropsTypes {
   updateKeeperInfoToUnderCustody: any;
   generateMetaShare: any;
   newBHRFlowStarted: any;
+  cloudBackupStatus: CloudBackupStatus;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -857,6 +860,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } = this.props
     const versionData = []
     this.closeBottomSheet()
+    if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED ) {
+      this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
+    }
     this.calculateNetBalance()
     this.appStateListener = AppState.addEventListener(
       'change',
@@ -984,9 +990,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidUpdate = ( prevProps, prevState ) => {
-    // if ( this.props.cloudPermissionGranted && this.props.levelHealth.length == 1 && this.props.currentLevel == 0 ) {
-    //   this.props.setCloudData()
-    // }
 
     if (
       prevProps.notificationList !== this.props.notificationList ||
@@ -1012,10 +1015,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.secondaryDeviceAddressValue
     ) {
       this.setSecondaryDeviceAddresses()
-    }
-
-    if( prevProps.currentLevel == 0 && prevProps.currentLevel != this.props.currentLevel && this.props.currentLevel == 1 ) {
-      // this.props.generateMetaShare( 2 )
     }
 
     if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
@@ -1062,10 +1061,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       } )
     }
   };
-
-  setCloudBackupStatusCallBack = ( share ) =>{
-    this.props.updateHealthForCloud( share )
-  }
 
   handleDeepLinkModal = () => {
     const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
@@ -2119,6 +2114,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             ),
           ]
 
+        case BottomSheetKind.CLOUD_ERROR:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+            ),
+          ]
+
         case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
         case BottomSheetKind.NOTIFICATIONS_LIST:
           return [ -50, heightPercentageToDP( 82 ) ]
@@ -2380,6 +2383,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
           )
+
+        case BottomSheetKind.CLOUD_ERROR:
+          return (
+            <ErrorModalContents
+              title={'Backup Error on Cloud'}
+              info={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'}
+              note={'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor'}
+              onPressProceed={()=>{
+                this.props.setCloudData()
+                this.closeBottomSheet()
+              }}
+              onPressIgnore={()=> this.closeBottomSheet()}
+              proceedButtonText={'Try Again'}
+              cancelButtonText={'Skip'}
+              isIgnoreButton={true}
+              isBottomImage={true}
+              isBottomImageStyle={styles.cloudErrorModalImage}
+              bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+            />
+          )
         default:
           break
     }
@@ -2552,6 +2575,7 @@ const mapStateToProps = ( state ) => {
     keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
+    cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
   }
 }
 
@@ -2579,7 +2603,6 @@ export default withNavigationFocus(
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
-    updateHealthForCloud,
     setCardData,
     fetchKeeperTrustedChannel,
     onApprovalStatusChange,
@@ -2617,4 +2640,12 @@ const styles = StyleSheet.create( {
     alignSelf: 'flex-end',
     padding: heightPercentageToDP( 1.5 ),
   },
+
+  cloudErrorModalImage: {
+    width: wp( '30%' ),
+    height: wp( '25%' ),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginBottom: hp( '-3%' ),
+  }
 } )
