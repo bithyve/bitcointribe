@@ -45,7 +45,7 @@ import {
   uploadSecondaryShareForPK,
   downloadSMShard,
   updateKeeperInfoToUnderCustody,
-  generateMetaShare
+  updateCloudPermission,
 } from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
@@ -262,9 +262,9 @@ interface HomePropsTypes {
   updateNewFcm: any;
   setCloudData: any;
   updateKeeperInfoToUnderCustody: any;
-  generateMetaShare: any;
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
+  updateCloudPermission: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -860,7 +860,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } = this.props
     const versionData = []
     this.closeBottomSheet()
-    if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED ) {
+    if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
       this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
     }
     this.calculateNetBalance()
@@ -2394,7 +2394,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.props.setCloudData()
                 this.closeBottomSheet()
               }}
-              onPressIgnore={()=> this.closeBottomSheet()}
+              onPressIgnore={()=> {
+                this.props.updateCloudPermission( false )
+                this.closeBottomSheet()
+              }}
               proceedButtonText={'Try Again'}
               cancelButtonText={'Skip'}
               isIgnoreButton={true}
@@ -2612,7 +2615,7 @@ export default withNavigationFocus(
     updateNewFcm,
     setCloudData,
     updateKeeperInfoToUnderCustody,
-    generateMetaShare,
+    updateCloudPermission,
   } )( Home )
 )
 
