@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, createRef } from 'react'
 import { useDispatch } from 'react-redux'
 import {
   StyleSheet,
@@ -29,13 +29,121 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 import Entypo from 'react-native-vector-icons/Entypo'
 import { updateCloudPermission } from '../store/actions/health'
+import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
+import BottomSheet from '@gorhom/bottom-sheet'
+import { BottomSheetView } from '@gorhom/bottom-sheet'
+import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
+import { Easing } from 'react-native-reanimated'
+import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
+
+export enum BottomSheetKind {
+  CLOUD_PERMISSION,
+}
+
+export enum BottomSheetState {
+  Closed,
+  Open,
+}
 
 export default function NewWalletName( props ) {
+
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
-  const [ doCloudBackup, setDoCloudBackup ] = useState( true )
+  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( BottomSheetKind.CLOUD_PERMISSION )
+  const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
+  const bottomSheetRef = createRef<BottomSheet>()
   const dispatch = useDispatch()
+  const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+
+  const renderBottomSheetContent = () =>{
+
+    switch ( currentBottomSheetKind ) {
+        case BottomSheetKind.CLOUD_PERMISSION:
+          return (
+            <CloudPermissionModalContents
+              title={'Automated Cloud Backup'}
+              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              note={''}
+              onPressProceed={( flag )=>{
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', flag )
+                dispatch( updateCloudPermission( flag ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              onPressIgnore={( flag )=> {
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', flag )
+                dispatch( updateCloudPermission( flag ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              autoClose={()=>{
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', true )
+                dispatch( updateCloudPermission( true ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              isRendered={isCloudPermissionRender}
+              bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
+            />
+          )
+
+        default:
+          break
+    }
+  }
+
+  const openBottomSheet = (
+    kind: BottomSheetKind,
+    snapIndex: number | null = null
+  ) => {
+    setBottomSheetState( BottomSheetState.Open )
+    setCurrentBottomSheetKind( kind )
+
+    if ( snapIndex == null ) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.snapTo( snapIndex )
+    }
+  }
+
+  const getBottomSheetSnapPoints = (): any[] => {
+    switch ( currentBottomSheetKind ) {
+        case BottomSheetKind.CLOUD_PERMISSION:
+          return [
+            -50,
+            hp(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+            ),
+          ]
+
+        default:
+          return defaultBottomSheetConfigs.snapPoints
+    }
+  }
+
+  const handleBottomSheetPositionChange = ( newIndex: number ) => {
+    if ( newIndex === 0 ) {
+      onBottomSheetClosed()
+    }
+  }
+
+  const onBottomSheetClosed =()=> {
+    setBottomSheetState( BottomSheetState.Closed )
+    setCurrentBottomSheetKind( null )
+  }
+
+  const closeBottomSheet = () => {
+    setIsCloudPermissionRender( false )
+    bottomSheetRef.current.snapTo( 0 )
+    onBottomSheetClosed()
+  }
 
   return (
     <SafeAreaView style={{
@@ -107,35 +215,6 @@ export default function NewWalletName( props ) {
               }}>
                   No numbers or special characters allowed</Text>
             </View>
-            <TouchableOpacity
-              style={styles.doCloudBackupField}
-              onPress={() => setDoCloudBackup( !doCloudBackup )}
-              activeOpacity={1}
-            >
-              <View style={styles.doCloudBackupFieldContentContainer}>
-                <View>
-                  <Text style={{
-                    ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
-                  }}>
-              Use cloud for the initial backup
-                  </Text>
-                  <Text style={{
-                    ...styles.smallInfoLabelText, fontSize: RFValue( 12 )
-                  }}>
-              (you can also upgrade the wallet security later)
-                  </Text>
-                </View>
-                <View style={styles.checkbox}>
-                  {doCloudBackup && (
-                    <Entypo
-                      name="check"
-                      size={RFValue( 20 )}
-                      color={Colors.green}
-                    />
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
           </ScrollView>
 
           <View style={styles.bottomButtonView}>
@@ -152,10 +231,8 @@ export default function NewWalletName( props ) {
               >
                 <TouchableOpacity
                   onPress={() => {
-                    dispatch( updateCloudPermission( doCloudBackup ) )
-                    props.navigation.navigate( 'NewWalletQuestion', {
-                      walletName,
-                    } )
+                    setIsCloudPermissionRender( true )
+                    openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
                   }}
                   style={styles.buttonView}
                 >
@@ -183,6 +260,23 @@ export default function NewWalletName( props ) {
           ) : null}
         </KeyboardAvoidingView>
       </View>
+      <BottomSheetBackground
+        isVisible={bottomSheetState === BottomSheetState.Open}
+        onPress={closeBottomSheet}
+      />
+      {currentBottomSheetKind != null && (
+        <BottomSheet
+          ref={bottomSheetRef}
+          snapPoints={getBottomSheetSnapPoints()}
+          initialSnapIndex={-1}
+          animationDuration={defaultBottomSheetConfigs.animationDuration}
+          animationEasing={Easing.out( Easing.back( 1 ) )}
+          handleComponent={defaultBottomSheetConfigs.handleComponent}
+          onChange={handleBottomSheetPositionChange}
+        >
+          <BottomSheetView>{renderBottomSheetContent()}</BottomSheetView>
+        </BottomSheet>
+      )}
     </SafeAreaView>
   )
 }
