@@ -383,6 +383,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
+      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+        ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+        createGuardian()
+      }
       // blocking keeper reshare till 100% health
       const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
       if ( blockPCShare ) {
@@ -837,9 +841,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
-          confirmButtonText={'Share Now'}
+          confirmButtonText={''}
           onPressConfirm={() => {
-            // (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
             createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
           }}

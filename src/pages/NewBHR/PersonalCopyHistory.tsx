@@ -213,6 +213,9 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
+      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+        ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      }
     }
   }, [ pdfCreatedSuccessfully ] )
 
