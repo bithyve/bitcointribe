@@ -10,6 +10,7 @@ import SourceAccountKind from '../../enums/SourceAccountKind'
 
 interface SubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
 
   readonly kind: SubAccountKind;
@@ -82,6 +83,7 @@ export type ImportedWalletSubAccountDescribing = SubAccountDescribing
 
 export type SubAccountDescribingConstructorProps = {
   id?: string;
+  xPub?: string;
   accountShellID?: string | null;
   instanceNumber?: number | null;
   defaultTitle?: string;
