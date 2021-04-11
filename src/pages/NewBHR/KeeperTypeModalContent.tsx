@@ -225,6 +225,7 @@ export default function KeeperTypeModalContents( props ) {
         </View>*/}
         <View style={styles.bottomButtonView}>
           <AppBottomSheetTouchableWrapper
+            disabled={!SelectedKeeperType.name}
             onPress={() => {
               props.onPressSetup(
                 SelectedKeeperType.type,
@@ -234,7 +235,7 @@ export default function KeeperTypeModalContents( props ) {
             style={{
               ...styles.successModalButtonView,
               shadowColor: Colors.shadowBlue,
-              backgroundColor: Colors.blue,
+              backgroundColor: !SelectedKeeperType.name ? Colors.lightBlue : Colors.blue,
             }}
           >
             <Text
