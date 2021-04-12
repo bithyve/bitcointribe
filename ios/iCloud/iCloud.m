@@ -34,7 +34,8 @@ RCT_EXPORT_METHOD(downloadBackup:(RCTPromiseResolveBlock)resolve
   NSLog(@"into native download backup");
   iCloudRestore *restore = [[iCloudRestore alloc]init];
   [restore getBackupWithCallback:^(NSString * _Nonnull jsonContent) {
-    resolve(jsonContent);
+     NSLog(@"jsonContent",jsonContent);
+     resolve(jsonContent);
   }];
 }
 

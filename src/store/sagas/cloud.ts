@@ -177,6 +177,10 @@ function* getCloudBackupRecoveryWorker () {
   try {
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
+      if( backedJson === 'failure' ) {
+        yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        return false
+      }
       if ( backedJson ) {
         yield put( setCloudDataRecovery( backedJson ) )
       }
@@ -205,7 +209,8 @@ function* checkCloudBackupWorker ( { payload } ) {
     console.log( 'CloudDataBackup STARTED' )
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      // console.log( 'backedJson', backedJson )
+      console.log( 'backedJson checkCloudBackupWorker', backedJson )
+      if( backedJson === 'failure' ) return false
       if ( backedJson ) {
         const isCloudBackupUpdated = yield call( updateDataWorker, {
           payload: {

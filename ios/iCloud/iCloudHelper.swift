@@ -35,6 +35,7 @@ import CloudKit
     operation.queryCompletionBlock = {(_,err) in
       if let err = err{
         print(err)
+        callback(false)
         return
       }
       print("FETCH OPERATION COMPLETED & DELETE Scheduled for all")
@@ -91,6 +92,7 @@ import CloudKit
       print("queryCompleted")
       if let err = err{
         print(err)
+        callback("failure")
         return
       }
       callback(jsonFromiCloud)
