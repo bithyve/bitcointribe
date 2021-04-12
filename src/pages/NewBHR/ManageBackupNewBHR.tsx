@@ -352,7 +352,7 @@ class ManageBackupNewBHR extends Component<
         this.setState( {
           refreshControlLoader: true
         } )
-      } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING ) ) {
+      } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
         this.setState( {
           refreshControlLoader: false
         } )

@@ -13,6 +13,7 @@ import {
   Platform,
   TextInput,
   InteractionManager,
+  Keyboard,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -231,6 +232,7 @@ export default function NewWalletName( props ) {
               >
                 <TouchableOpacity
                   onPress={() => {
+                    Keyboard.dismiss()
                     setIsCloudPermissionRender( true )
                     openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
                   }}
