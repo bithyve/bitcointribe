@@ -165,7 +165,10 @@ function* servicesEnricherWorker( { payload } ) {
     } else if ( database.VERSION === '1.0' ) {
       dbVersion = '1.0.0'
     }
+
+    let versionUpdated = false
     if ( semver.gt( appVersion, dbVersion ) ) {
+      versionUpdated = true
       if ( dbVersion === '0.7.0' && semver.gte( appVersion, '0.9.0' ) ) {
         // version 0.7.0 support
         console.log( 'Migration running for 0.7.0' )
@@ -278,17 +281,19 @@ function* servicesEnricherWorker( { payload } ) {
           : new KeeperService(),
       }
     }
+
     yield put( servicesEnriched( services ) )
-    if ( migrated ) {
+    if ( versionUpdated ) {
       database.VERSION = DeviceInfo.getVersion()
-      database.SERVICES = {
-        REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
-        TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
-        SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
-        S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
-        TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
-        KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
-      }
+      if( migrated )
+        database.SERVICES = {
+          REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
+          TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
+          SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
+          S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
+          TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+          KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
+        }
       yield call( insertDBWorker, {
         payload: database,
       } )
