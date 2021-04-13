@@ -537,7 +537,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   goToHistory = ( value ) => {
-    const { id, selectedKeeper, isSetup } = value
+    const { id, selectedKeeper, isSetup, isPrimaryKeeper } = value
     console.log( 'VALUE', value )
     const navigationParams = {
       selectedTime: selectedKeeper.updatedAt
@@ -572,6 +572,7 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
+        isPrimaryKeeper,
         index,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
@@ -677,6 +678,7 @@ class ManageBackupNewBHR extends Component<
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
       },
       isSetup: keeper.updatedAt ? false : true,
+      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false
     }
     if ( keeper.updatedAt > 0 ) {
       this.goToHistory( obj )
