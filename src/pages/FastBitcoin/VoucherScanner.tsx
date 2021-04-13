@@ -26,7 +26,7 @@ import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   FAST_BITCOINS,
-} from '../../common/constants/serviceTypes'
+} from '../../common/constants/wallet-service-types'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Entypo from 'react-native-vector-icons/Entypo'
 import Colors from '../../common/Colors'
@@ -54,7 +54,7 @@ import {
   storeFbtcData,
   clearFbtcVoucher,
 } from '../../store/actions/fbtc'
-import Config from 'react-native-config'
+import config from '../../bitcoin/HexaConfig'
 import Loader from '../../components/loader'
 import Toast from '../../components/Toast'
 import moment from 'moment'
@@ -77,7 +77,6 @@ const VoucherScanner = ( props ) => {
     : ''
   const [ bitcoinAddress, setBitcoinAddress ] = useState( '' )
   const QuoteDetails = useSelector( ( state ) => state.fbtc.getQuoteDetails )
-
   const executeOrderDetails = useSelector(
     ( state ) => state.fbtc.executeOrderDetails,
   )
@@ -103,8 +102,8 @@ const VoucherScanner = ( props ) => {
     ( state ) => state.fbtc.accountSyncDetails,
   )
   const [ errorTitle, setErrorTitle ] = useState( '' )
-  const [ errorInfo, setErrorInfo ] = useState( '' )
-  const [ errorNote, setErrorNote ] = useState( '' )
+  const [ errorInfo ] = useState( '' )
+  const [ errorNote ] = useState( '' )
   const [ errorProccedButtonText, setErrorProccedButtonText ] = useState( '' )
   const [ showLoader, setShowLoader ] = useState( false )
   const FBTCAccountData = useSelector( ( state ) => state.fbtc.FBTCAccountData )
@@ -117,23 +116,20 @@ const VoucherScanner = ( props ) => {
     secureBalance: 0,
   } )
 
-  const [ ErrorModalBottomSheet, setErrorModalBottomSheet ] = useState(
+  const [ ErrorModalBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
   const [
     RegistrationSuccessBottomSheet,
-    setRegistrationSuccessBottomSheet,
   ] = useState( React.createRef<BottomSheet>() )
-  const [ QuoteBottomSheet, setQuoteBottomSheet ] = useState(
+  const [ QuoteBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
   const [
     VoucherRedeemSuccessBottomSheet,
-    setVoucherRedeemSuccessBottomSheet,
   ] = useState( React.createRef<BottomSheet>() )
   const [
     AccountVerificationBottomSheet,
-    setAccountVerificationBottomSheet,
   ] = useState( React.createRef<BottomSheet>() )
   const [ Quote, setQuote ] = useState( {
   } )
@@ -299,9 +295,6 @@ const VoucherScanner = ( props ) => {
           await AsyncStorage.setItem(
             'voucherData',
             JSON.stringify( voucherDataTemp ),
-          )
-          const voucherDataAfterAdd = JSON.parse(
-            await AsyncStorage.getItem( 'voucherData' ),
           )
           // console.log("voucherDataAfterAdd",voucherDataAfterAdd);
         } )()
@@ -724,7 +717,7 @@ const VoucherScanner = ( props ) => {
     if ( fBTCAccountData && fBTCAccountData.user_key && bitcoinAddress ) {
       const data = {
         user_key: fBTCAccountData.user_key,
-        wallet_slug: Config.WALLET_SLUG,
+        wallet_slug: config.WALLET_SLUG,
         quote_type: 'voucher',
         quote_token: quoteData.quote_token,
         voucher_code: voucherFromAsync.voucher_code,
@@ -805,9 +798,9 @@ const VoucherScanner = ( props ) => {
   const renderAccountVerificationModalContent = useCallback( () => {
     return (
       <AccountVerification
-        link={Config.FBTC_REGISTRATION_URL}
+        link={config.FBTC_REGISTRATION_URL}
         openLinkVerification={() => {
-          Linking.openURL( Config.FBTC_REGISTRATION_URL )
+          Linking.openURL( config.FBTC_REGISTRATION_URL )
           props.navigation.goBack()
         }}
       />
@@ -975,7 +968,7 @@ const VoucherScanner = ( props ) => {
                 }}
               >
                 <ImageBackground
-                  source={require( '../../assets/images/icons/iPhone-QR.jpg' )}
+                  source={require( '../../assets/images/icons/iPhone-QR.png' )}
                   style={styles.cameraImage}
                 >
                   <View style={{

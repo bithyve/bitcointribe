@@ -21,7 +21,7 @@ import {
 } from '../actions/sss'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { SERVICES_ENRICHED } from '../actions/storage'
-import { S3_SERVICE } from '../../common/constants/serviceTypes'
+import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 
 const initialState: {
   service: S3Service;
@@ -82,10 +82,10 @@ const initialState: {
   mnemonic: '',
   personalCopyIndex: 0,
   personalCopyGenerated: {
-    copy1: null, copy2: null 
+    copy1: null, copy2: null
   },
   personalCopyShared: {
-    copy1: null, copy2: null 
+    copy1: null, copy2: null
   },
   requestedShareUpload: {
   },

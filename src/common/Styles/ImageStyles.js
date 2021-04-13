@@ -44,6 +44,7 @@ const ListStyles = StyleSheet.create( {
     shadowOpacity: 0.37,
     shadowColor: Colors.gray2,
     elevation: 10,
+    padding: 10
   },
 } )
 

@@ -8,7 +8,9 @@ import {
   DerivativeAccounts,
   TransactionDetails,
   TransactionPrerequisite,
+  ScannedAddressKind,
   AverageTxFees,
+  TransactionPrerequisiteElements,
 } from '../Interface'
 
 export default class BaseAccount {
@@ -149,48 +151,13 @@ export default class BaseAccount {
   public addressDiff = (
     scannedStr: string,
   ): {
-    type: string;
+      type: ScannedAddressKind | null;
   } => this.hdWallet.addressDiff( scannedStr );
 
   public getReceivingAddress = (
     derivativeAccountType?: string,
     accountNumber?: number,
   ) => this.hdWallet.getReceivingAddress( derivativeAccountType, accountNumber );
-
-  public getDerivativeAccXpub = (
-    accountType: string,
-    accountNumber?: number,
-    contactName?: string,
-  ):
-    | {
-        status: number;
-        data: string;
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      } => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: this.hdWallet.getDerivativeAccXpub(
-          accountType,
-          accountNumber,
-          contactName.toLowerCase().trim(),
-        ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to generate derivative account\'s xpub',
-      }
-    }
-  };
 
   public getDerivativeAccAddress = async (
     accountType: string,
@@ -348,13 +315,15 @@ export default class BaseAccount {
 
   public setupDerivativeAccount = (
     accountType: string,
-    accountDetails: { accountName?: string; accountDescription?: string },
+    accountDetails?: { accountName?: string; accountDescription?: string },
+    contactName?: string
   ):
     | {
         status: number;
         data: {
           accountId: string;
           accountNumber: number;
+          accountXpub: string;
         };
         err?: undefined;
         message?: undefined;
@@ -368,7 +337,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails ),
+        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactName ),
       }
     } catch ( err ) {
       return {
@@ -434,6 +403,7 @@ export default class BaseAccount {
           setupSuccessful: boolean;
           accountId: string;
           accountNumber: number;
+          accountXpub: string;
         };
         err?: undefined;
         message?: undefined;
@@ -590,8 +560,6 @@ export default class BaseAccount {
         data: {
           txid: any;
           funded: any;
-          balances: any;
-          transactions: any;
         };
         err?: undefined;
         message?: undefined;
@@ -737,7 +705,7 @@ export default class BaseAccount {
   public transferST2 = async (
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    customTxPrerequisites?: any,
+    customTxPrerequisites?: TransactionPrerequisiteElements,
     derivativeAccountDetails?: { type: string; number: number },
     nSequence?: number,
   ): Promise<
@@ -758,9 +726,10 @@ export default class BaseAccount {
   > => {
     let executed = 'tx-init'
     try {
+      txnPriority = txnPriority.toLowerCase()
       const { txb } = await this.hdWallet.createHDTransaction(
         txPrerequisites,
-        txnPriority.toLowerCase(),
+        txnPriority,
         customTxPrerequisites,
         derivativeAccountDetails,
         nSequence,

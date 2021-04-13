@@ -18,6 +18,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen';
 import { getIconByStatus } from './utils';
+import { useDispatch } from 'react-redux';
+import { checkMSharesHealth } from '../../store/actions/health';
 import Colors from '../../common/Colors';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ErrorModalContents from '../../components/ErrorModalContents';
@@ -37,20 +39,20 @@ const SecurityQuestionHistory = (props) => {
   const [securityQuestionsHistory, setSecuirtyQuestionHistory] = useState([
     {
       id: 1,
-      title: 'Security Questions created',
+      title: 'Security Question created',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },
     {
       id: 2,
-      title: 'Security Questions confirmed',
+      title: 'Security Question confirmed',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
     },
     {
       id: 3,
-      title: 'Security Questions unconfirmed',
+      title: 'Security Question unconfirmed',
       date: null,
       info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
     },

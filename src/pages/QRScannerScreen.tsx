@@ -43,12 +43,12 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar barStyle="dark-content" />
 
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View
           style={{
@@ -65,15 +65,15 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         >
 
           <View style={{
-            flexDirection: 'row', alignItems: 'center' 
+            flexDirection: 'row', alignItems: 'center'
           }}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
               hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20 
+                top: 20, left: 20, bottom: 20, right: 20
               }}
               style={{
-                height: 30, width: 30, justifyContent: 'center' 
+                height: 30, width: 30, justifyContent: 'center'
               }}
             >
               <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
@@ -180,7 +180,7 @@ const QRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         </View>
 
         <View style={{
-          marginTop: 'auto' 
+          marginTop: 'auto'
         }} />
 
         {/* TODO: Ideally, this shouldn't be a concern here. We should probably have a separate screen for "Scan Exit Key" that uses a QR Scanning component alongside a component for this info box */}

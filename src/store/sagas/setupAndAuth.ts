@@ -1,44 +1,39 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGenerator } from '../utils/utilities'
+import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 import {
-  INIT_SETUP,
+  SETUP_WALLET,
   CREDS_AUTH,
   STORE_CREDS,
   credsStored,
   credsAuthenticated,
-  setupInitialized,
   switchSetupLoader,
   switchReLogin,
   INIT_RECOVERY,
   CHANGE_AUTH_CRED,
   credsChanged,
   pinChangedFailed,
+  initializeRecoveryCompleted,
+  completedWalletSetup,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
+import { getTestcoins } from '../actions/accounts'
+import { initializeHealthSetup } from '../actions/health'
 // import { timer } from '../../utils'
 
-function* initSetupWorker( { payload } ) {
-  yield put( switchSetupLoader( 'initializing' ) )
-
+function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
-  const {
-    regularAcc,
-    testAcc,
-    secureAcc,
-    s3Service,
-    trustedContacts,
-  } = yield call( serviceGenerator, security.answer )
+  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
-      walletName, security 
+      walletName, security
     },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {
@@ -56,24 +51,33 @@ function* initSetupWorker( { payload } ) {
       SECURE_ACCOUNT: JSON.stringify( secureAcc ),
       S3_SERVICE: JSON.stringify( s3Service ),
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      KEEPERS_INFO: JSON.stringify( keepersInfo ),
     },
     VERSION: DeviceInfo.getVersion(),
   }
   yield call( insertDBWorker, {
-    payload: initialDatabase 
+    payload: initialDatabase
   } )
+
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-  yield put( setupInitialized() )
+
+  // initialize health-check schema on relay
+  yield put( initializeHealthSetup() )
+  yield put( completedWalletSetup( ) )
+
+  // Post Hydration activities
+  // saturate the test account w/ 10K sats
+  yield put( getTestcoins() )
 }
 
-export const initSetupWatcher = createWatcher( initSetupWorker, INIT_SETUP )
+export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 
 function* initRecoveryWorker( { payload } ) {
   const { walletName, security } = payload
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
-      walletName, security 
+      walletName, security
     },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {
@@ -89,8 +93,9 @@ function* initRecoveryWorker( { payload } ) {
   }
 
   yield call( insertDBWorker, {
-    payload: initialDatabase 
+    payload: initialDatabase
   } )
+  yield put( initializeRecoveryCompleted( true ) )
   // yield call(AsyncStorage.setItem, "walletExists", "true");
   // yield put(setupInitialized());
 }
@@ -137,7 +142,7 @@ function* credentialsAuthWorker( { payload } ) {
     key = yield call( Cipher.decrypt, encryptedKey, hash )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     if ( payload.reLogin ) yield put( switchReLogin( false ) )
     else yield put( credsAuthenticated( false ) )
@@ -155,7 +160,7 @@ function* credentialsAuthWorker( { payload } ) {
     // initialize configuration file
     const { activePersonalNode } = yield select( state => state.nodeSettings )
     if( activePersonalNode ) config.connectToPersonalNode( activePersonalNode )
-    
+
     // TODO -- this need to be done on
     yield put( fetchFromDB() )
   }
@@ -190,7 +195,7 @@ function* changeAuthCredWorker( { payload } ) {
     yield put( credsChanged( 'changed' ) )
   } catch ( err ) {
     console.log( {
-      err 
+      err
     } )
     yield put( pinChangedFailed( true ) )
     // Alert.alert('Pin change failed!', err.message);

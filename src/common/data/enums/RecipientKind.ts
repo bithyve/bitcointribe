@@ -1,6 +1,6 @@
 enum RecipientKind {
   CONTACT = 'CONTACT',
-  SUB_ACCOUNT = 'SUB_ACCOUNT',
+  ACCOUNT_SHELL = 'ACCOUNT_SHELL',
   ADDRESS = 'ADDRESS',
 }
 

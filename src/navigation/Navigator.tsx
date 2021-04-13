@@ -6,6 +6,7 @@ import {
 } from 'react-navigation-stack'
 import Launch from '../pages/Launch'
 import Login from '../pages/Login'
+import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
 import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
@@ -22,8 +23,7 @@ import TrustedContacts from '../pages/ManageBackup/TrustedContacts'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import TwoFAToken from '../pages/Accounts/TwoFAToken'
-import TwoFAValidation from '../pages/Accounts/TwoFAValidation'
+import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import QRScannerScreen from '../pages/QRScannerScreen'
 import HealthCheck from '../pages/HealthCheck'
 import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck'
@@ -39,13 +39,13 @@ import SecureScan from '../pages/Accounts/SecureScan'
 import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP'
 import TwoFASetup from '../pages/Accounts/TwoFASetup'
 import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory'
+import SecondaryDeviceHistoryNewBHR from '../pages/NewBHR/SecondaryDeviceHistoryNewBHR';
 import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory'
 import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory'
 import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory'
 import SettingGetNewPin from '../pages/SettingGetNewPin'
 import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact'
 import PasscodeChangeSuccessPage from '../pages/PasscodeChangeSuccessPage'
-import ResetTwoFAHelp from '../pages/Accounts/ResetTwoFAHelp'
 import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret'
 import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds'
 import UpdateApp from '../pages/UpdateApp'
@@ -65,6 +65,28 @@ import SwanIntegrationScreen from '../pages/SwanIntegration/SwanIntegrationScree
 import WyreIntegrationScreen from '../pages/WyreIntegration/WyreIntegrationScreen'
 
 
+import RestoreWithICloud from "../pages/RestoreHexaWithKeeper/RestoreWithICloud";
+import RestoreWithoutICloud from "../pages/RestoreHexaWithKeeper/RestoreWithoutICloud";
+import SettingsContents from '../pages/SettingsContents';
+import SweepFunds from '../pages/SweepFunds/SweepFunds';
+import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount';
+import SweepFundUseExitKey from '../pages/SweepFunds/SweepFundUseExitKey';
+import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation';
+import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey';
+import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup';
+import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys';
+import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity';
+// import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
+import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR';
+// import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
+import SecurityQuestionHistoryNewBHR from '../pages/NewBHR/SecurityQuestionHistory';
+// import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
+// import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
+import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKeeper';
+// import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
+// import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
+import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory';
+
 const SetupNavigator = createStackNavigator(
   {
     Launch,
@@ -80,7 +102,10 @@ const SetupNavigator = createStackNavigator(
     RestoreWalletByContacts,
     RecoveryCommunication,
     NewOwnQuestions,
+    RecoveryQrScanner: QRScannerScreen,
     NewRecoveryOwnQuestions,
+    RestoreWithICloud,
+    ScanRecoveryKey,
     QRScanner: QRScannerScreen,
     UpdateApp: {
       screen: UpdateApp,
@@ -103,7 +128,6 @@ const MODAL_ROUTES = [
   'TrustedContacts',
   'CustodianRequestOTP',
   'CustodianRequestAccepted',
-  'TwoFAToken',
   'HealthCheckSecurityAnswer',
   'Intermediate',
 ]
@@ -129,10 +153,6 @@ const HomeNavigator = createStackNavigator(
     TrustedContacts,
     CustodianRequestOTP,
     CustodianRequestAccepted,
-    Send: {
-      screen: SendStack,
-    },
-    TwoFAToken,
     HealthCheck,
     SecondaryDeviceHealthCheck,
     TrustedContactHealthCheck,
@@ -146,12 +166,12 @@ const HomeNavigator = createStackNavigator(
     SecureScan,
     GoogleAuthenticatorOTP,
     SecondaryDeviceHistory,
+    SecondaryDeviceHistoryNewBHR,
     TrustedContactHistory,
     PersonalCopyHistory,
     SecurityQuestionHistory,
     SettingGetNewPin,
     ContactsListForAssociateContact,
-    ResetTwoFAHelp,
     NewTwoFASecret,
     TwoFASweepFunds,
     SendRequest,
@@ -160,7 +180,28 @@ const HomeNavigator = createStackNavigator(
     ContactDetails,
     Receive,
     PairNewWallet,
+    // ManageBackupKeeper,
+    ManageBackupNewBHR,
+    // SecurityQuestionHistoryKeeper,
+    SecurityQuestionHistoryNewBHR,
+    // KeeperFeatures,
+    // TrustedContactHistoryKeeper,
+    TrustedContactHistoryNewBHR,
+    // KeeperDeviceHistory,
+    // PersonalCopyHistoryKeeper,
+    PersonalCopyHistoryNewBHR,
     NewOwnQuestions,
+    RestoreWithICloud,
+    RestoreWithoutICloud,
+    SettingsContents,
+    SweepFunds,
+    SweepFundsEnterAmount,
+    SweepFundUseExitKey,
+    SweepConfirmation,
+    ScanRecoveryKey,
+    UpgradeBackup,
+    ConfirmKeys,
+    ManageBackupUpgradeSecurity,
     TwoFAValidation,
     TwoFASetup: {
       screen: TwoFASetup,
@@ -228,5 +269,12 @@ const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
   HomeNav: HomeNavigator,
 } )
+
+
+export type BaseNavigationProp = {
+  getParam: ( param: string ) => any;
+  setParams: ( params: Record<string, unknown> ) => void;
+  navigate: ( route: string, params?: Record<string, unknown> ) => void;
+} & Record<string, unknown>;
 
 export default createAppContainer( Navigator )

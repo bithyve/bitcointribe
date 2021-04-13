@@ -18,6 +18,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 export default class TrustedContactsSubAccountInfo
 implements HexaSubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -30,6 +31,7 @@ implements HexaSubAccountDescribing {
   isTFAEnabled: boolean;
 
   defaultTitle: string;
+  defaultSubTitle: string;
   defaultDescription = 'Account with Trusted Contacts';
   customDisplayName: string | null;
   customDescription: string | null;
@@ -37,13 +39,15 @@ implements HexaSubAccountDescribing {
   transactions: TransactionDetails[];
   utxoCompatibilityGroup: UTXOCompatibilityGroup;
 
-  constructor({
+  constructor( {
     id = uuid(),
+    xPub = null,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Trusted Contacts',
+    defaultSubTitle = null,
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
@@ -51,11 +55,14 @@ implements HexaSubAccountDescribing {
     isTFAEnabled = false,
     transactions = [],
     utxoCompatibilityGroup = UTXOCompatibilityGroup.SINGLE_SIG_PUBLIC,
-  }: ConstructorProps) {
+
+  }: ConstructorProps ) {
     this.id = id
+    this.xPub = xPub
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle
+    this.defaultSubTitle = defaultSubTitle
     this.balances = balances
     this.customDisplayName = customDisplayName
     this.customDescription = customDescription

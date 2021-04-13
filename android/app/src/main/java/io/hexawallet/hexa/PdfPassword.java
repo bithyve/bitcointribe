@@ -308,6 +308,62 @@ public class PdfPassword extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public void createPdfKeeper(String pdfData, Callback errorCallback, Callback successCallback) {
+        try {
+            JSONObject jsonObj = new JSONObject(pdfData);
+            Document document = new Document(PageSize.A4);
+            String outPath = Environment.getExternalStorageDirectory() +"/"+jsonObj.getString("fileName");
+            //Create PDFWriter instance.
+            PdfWriter pdfWriter =  PdfWriter.getInstance(document, new FileOutputStream(outPath));
+            document.open();
+            addMetaData(document);
+            addTitlePageKeeper(document,pdfData);
+            document.close();
+            successCallback.invoke(outPath);
+        } catch (Exception e) {
+            errorCallback.invoke(e.getMessage());
+        }
+    }
+
+    private static void addTitlePageKeeper(Document document,String pdfData)
+            throws DocumentException, JSONException {
+        JSONObject jsonObj = new JSONObject(pdfData);
+        JSONArray qrcode = jsonObj.getJSONArray("qrcode");
+        JSONArray qrCodeString = jsonObj.getJSONArray("qrCodeString");
+
+        Paragraph preface = new Paragraph();
+        preface.add(new Paragraph(jsonObj.getString("title"), catFont));
+        preface.add(new Paragraph("Follow the instructions on the app to scan QRs below", subFont));
+        document.add(preface);
+        addEmptyLine(preface, 1);
+        // part 1
+        preface = new Paragraph();
+        preface.add(new Paragraph(
+                "Recovery Key:",
+                subFont));
+        document.add(preface);
+        BarcodeQRCode barcodeQRCode = new BarcodeQRCode(qrcode.getString(0), (int)qrImageSize, (int)qrImageSize, null);
+        Image codeQrImage = barcodeQRCode.getImage();
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
+        document.add(codeQrImage);
+
+        // Exit Key and BitHyve Xpub
+        preface = new Paragraph();
+        preface.add(new Paragraph(
+                "Exit/Regenerate 2FA Key:",
+                catFont));
+        preface.add(new Paragraph(
+                "Use this key to reset the 2FA if you have lost your authenticator app or for transferring your funds from Savings account if the BitHyve server is not responding",
+                smallBold));
+        document.add(preface);
+        barcodeQRCode = new BarcodeQRCode(qrcode.getString(1), (int)qrImageSize, (int)qrImageSize, null);
+        codeQrImage = barcodeQRCode.getImage();
+        codeQrImage.scaleAbsolute(qrImageSize, qrImageSize);
+        document.add(codeQrImage);
+    }
+
+
     private static void addEmptyLine(Paragraph paragraph, int number) {
         for (int i = 0; i < number; i++) {
             paragraph.add(new Paragraph(" "));

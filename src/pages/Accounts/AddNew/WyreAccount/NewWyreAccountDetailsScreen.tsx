@@ -28,7 +28,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const { wyreHostedUrl } = useWyreIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( currentSubAccount.defaultDescription )
+  const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from Wyre' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const canProceed = useMemo( () => {
     return (
@@ -80,7 +80,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
               <Input
                 inputContainerStyle={[ FormStyles.textInputContainer, styles.textInputContainer ]}
                 inputStyle={FormStyles.inputText}
-                placeholder={'Enter An Account Name'}
+                placeholder={'Enter an account name'}
                 placeholderTextColor={FormStyles.placeholderText.color}
                 underlineColorAndroid={FormStyles.placeholderText.color}
                 value={accountName}
@@ -128,7 +128,7 @@ const NewWyreAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
             paddingTop: 0,
             paddingHorizontal: 12,
           }}
-          infoText={'Hexa Wyre Account enables purchases of BTC using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
+          infoText={'Hexa Wyre Account enables BTC purchases using Apple Pay and debit cards.\n\nBy proceeding, you understand that Hexa does not operate the payment and processing of the Wyre service. BTC purchased will be transferred to the Hexa Wyre account.'}
         />
       </View>
     </View>

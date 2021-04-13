@@ -1,22 +1,21 @@
 import axios, { AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
+import bs58check from 'bs58check'
 import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
-import { TransactionDetails, Transactions } from '../Interface'
-import {
-  SUB_PRIMARY_ACCOUNT,
-  TRUSTED_CONTACTS,
-} from '../../../common/constants/serviceTypes'
+import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interface'
+import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 const { REQUEST_TIMEOUT } = config
 
-const bitcoinAxios = axios.create( {
+let bitcoinAxios = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 export default class Bitcoin {
   public static networkType = ( scannedStr: string ) => {
+    scannedStr = scannedStr.replace( 'BITCOIN', 'bitcoin' )
     let address = scannedStr
     if ( scannedStr.slice( 0, 8 ) === 'bitcoin:' ) {
       address = bip21.decode( scannedStr ).address
@@ -32,6 +31,19 @@ export default class Bitcoin {
         return ''
       }
     }
+  };
+
+  public static generateYpub = ( xpub: string, network: bitcoinJS.Network ): string => {
+    let data = bs58check.decode( xpub )
+    data = data.slice( 4 )
+    let versionBytes
+    if ( network == bitcoinJS.networks.bitcoin ) {
+      versionBytes = xpub ? '049d7cb2' : '049d7878'
+    } else {
+      versionBytes = xpub ? '044a5262' : '044a4e28'
+    }
+    data = Buffer.concat( [ Buffer.from( versionBytes, 'hex' ), data ] )
+    return bs58check.encode( data )
   };
 
   public network: bitcoinJS.Network;
@@ -104,6 +116,7 @@ export default class Bitcoin {
     accountType: string,
     contactName?: string,
     primaryAccType?: string,
+    accountName?: string,
     }}
   ): Promise<
   {
@@ -138,7 +151,7 @@ export default class Bitcoin {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs } = accounts[ accountId ]
+        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
         const upToDateTxs: TransactionDetails[] = []
         const txsToUpdate: TransactionDetails[] = []
         const newTxs : TransactionDetails[] = []
@@ -155,6 +168,10 @@ export default class Bitcoin {
               }
             }
           } else upToDateTxs.push( tx )
+
+          if( !cachedTxIdMap[ tx.txid ] ) // backward compatibility (for versions w/o txIdMaps)
+            cachedTxIdMap[ tx.txid ] = [ tx.address ]
+
         } )
 
         accountsTemp[ accountId ] = {
@@ -173,6 +190,9 @@ export default class Bitcoin {
       }
 
       let usedFallBack = false
+      bitcoinAxios = axios.create( {
+        timeout: 4 * REQUEST_TIMEOUT // accounting for blind refresh
+      } )
       try{
         if ( this.network === bitcoinJS.networks.testnet ) {
           res = await bitcoinAxios.post(
@@ -186,6 +206,8 @@ export default class Bitcoin {
           )
         }
       } catch( err ){
+        if( config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN === config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN ) throw new Error( err.message ) // not using own-node
+
         if( !config.USE_ESPLORA_FALLBACK ){
           Toast( 'We could not connect to your node.\nTry connecting to the BitHyve node- Go to settings ....' )
           throw new Error( err.message )
@@ -210,7 +232,7 @@ export default class Bitcoin {
       const synchedAccounts = {
       }
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, contactName } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
         const UTXOs = cachedUTXOs
@@ -334,21 +356,7 @@ export default class Bitcoin {
                     ...[ outgoingTx, incomingTx ],
                   )
                 } else {
-                  let accType = accountType
-                  switch ( accType ) {
-                      case TRUSTED_CONTACTS:
-                        accType = contactName
-                          .split( ' ' )
-                          .map( ( word ) => word[ 0 ].toUpperCase() + word.substring( 1 ) )
-                          .join( ' ' )
-                        break
-
-                      case SUB_PRIMARY_ACCOUNT:
-                        accType = primaryAccType
-                        break
-                  }
-
-                  const transaction = {
+                  const transaction : TransactionDetails = {
                     txid: tx.txid,
                     confirmations: tx.NumberofConfirmations,
                     status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -358,8 +366,9 @@ export default class Bitcoin {
                       : new Date( Date.now() ).toUTCString(),
                     transactionType: tx.TransactionType,
                     amount: tx.Amount,
-                    accountType: accType,
+                    accountType,
                     primaryAccType,
+                    accountName: accountName? accountName: accountType,
                     recipientAddresses: tx.RecipientAddresses,
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(), // only available when tx is confirmed; otherwise set to the current timestamp
@@ -412,9 +421,9 @@ export default class Bitcoin {
         } )
 
         // sort transactions(lastest first)
-        // transactions.transactionDetails.sort( ( tx1, tx2 ) => {
-        //   return tx2.blockTime - tx1.blockTime
-        // } )
+        transactions.transactionDetails.sort( ( tx1, tx2 ) => {
+          return tx2.blockTime - tx1.blockTime
+        } )
 
         synchedAccounts[ accountId ] =  {
           UTXOs,
@@ -540,19 +549,21 @@ export default class Bitcoin {
 
   public addressDiff = (
     scannedStr: string,
-  ): {
-    type: string;
-  } => {
+  ): { type: ScannedAddressKind | null } => {
+    scannedStr = scannedStr.replace( 'BITCOIN', 'bitcoin' )
     if ( this.isPaymentURI( scannedStr ) ) {
       const { address } = this.decodePaymentURI( scannedStr )
-      if ( this.isValidAddress( address ) ) return {
-        type: 'paymentURI'
+      if ( this.isValidAddress( address ) ) {
+        return {
+          type: ScannedAddressKind.PAYMENT_URI
+        }
       }
     } else if ( this.isValidAddress( scannedStr ) ) {
       return {
-        type: 'address'
+        type: ScannedAddressKind.ADDRESS
       }
     }
+
     return {
       type: null
     }
@@ -565,7 +576,7 @@ export default class Bitcoin {
     txid: string;
   }> => {
     let res: AxiosResponse
-    try{
+    try {
       if ( this.network === bitcoinJS.networks.testnet ) {
         res = await bitcoinAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
@@ -590,12 +601,14 @@ export default class Bitcoin {
       return {
         txid: res.data
       }
-    } catch( err ){
+    } catch ( err ) {
       console.log(
         `An error occurred while broadcasting via current node. ${err}`,
       )
 
-      if( config.USE_ESPLORA_FALLBACK ){
+      if( config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX === config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX ) throw new Error( err.message ) // not using own-node
+
+      if ( config.USE_ESPLORA_FALLBACK ) {
         console.log( 'using Hexa node as fallback(tx-broadcast)' )
         try {
           if ( this.network === bitcoinJS.networks.testnet ) {
@@ -625,7 +638,7 @@ export default class Bitcoin {
             txid: res.data
           }
         } catch ( err ) {
-        // console.log(err.message);
+          // console.log(err.message);
           throw new Error( 'Transaction broadcasting failed' )
         }
       } else {
@@ -701,7 +714,7 @@ export default class Bitcoin {
 
     outputs.forEach( ( output ) => {
       if ( !output.addresses && !output.scriptpubkey_address ) {
-        // skip
+        // do nothing
       } else {
         const address = output.addresses
           ? output.addresses[ 0 ]

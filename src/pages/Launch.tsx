@@ -23,11 +23,13 @@ import {
 import config from '../bitcoin/HexaConfig'
 import { connect } from 'react-redux'
 import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility'
+import idx from 'idx'
 
 type LaunchScreenProps = {
   initializeDB: any;
   navigation: any;
   lastSeen: any;
+  databaseInitialized: Boolean;
 }
 
 type LaunchScreenState = { }
@@ -40,12 +42,12 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   }
 
   componentDidMount = () => {
-    this.props.initializeDB()
-
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleAppStateChange )
 
-    this.handleDeepLinking()
+    setTimeout( ()=>{
+      this.postSplashScreenActions()
+    }, 4000 )
   };
 
 
@@ -87,112 +89,116 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     }
   };
 
-  handleDeepLinking = async () => {
+  processDL = async ( url ) => {
+    const splits = url.split( '/' )
+
+    if ( splits[ 5 ] === 'sss' ) {
+      const requester = splits[ 4 ]
+
+      if ( splits[ 6 ] === 'ek' ) {
+        const custodyRequest = {
+          requester,
+          ek: splits[ 7 ],
+          uploadedAt: splits[ 8 ],
+        }
+
+        this.props.navigation.replace( 'Login', {
+          custodyRequest
+        } )
+
+      } else if ( splits[ 6 ] === 'rk' ) {
+        const recoveryRequest = {
+          requester, rk: splits[ 7 ]
+        }
+
+        this.props.navigation.replace( 'Login', {
+          recoveryRequest
+        } )
+      }
+    } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
+      if ( splits[ 3 ] !== config.APP_STAGE ) {
+        Alert.alert(
+          'Invalid deeplink',
+          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+            splits[ 3 ]
+          }`,
+        )
+      } else {
+        const version = splits.pop().slice( 1 )
+
+        if ( version ) {
+          if ( !( await checkAppVersionCompatibility( {
+            relayCheckMethod: splits[ 4 ],
+            version,
+          } ) ) ) {
+            return
+          }
+        }
+
+        const trustedContactRequest = {
+          isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
+          approvedTC: splits[ 4 ] === 'atcg' ? true : false,
+          isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
+          requester: splits[ 5 ],
+          encryptedKey: splits[ 6 ],
+          hintType: splits[ 7 ],
+          hint: splits[ 8 ],
+          uploadedAt: splits[ 9 ],
+          version,
+        }
+
+        this.props.navigation.replace( 'Login', {
+          trustedContactRequest,
+        } )
+      }
+    } else if ( splits[ 4 ] === 'rk' ) {
+      const recoveryRequest = {
+        isRecovery: true,
+        requester: splits[ 5 ],
+        encryptedKey: splits[ 6 ],
+        hintType: splits[ 7 ],
+        hint: splits[ 8 ],
+      }
+      this.props.navigation.replace( 'Login', {
+        recoveryRequest
+      } )
+    } else if ( splits[ 4 ] === 'rrk' ) {
+      Alert.alert(
+        'Restoration link Identified',
+        'Restoration links only works during restoration mode',
+      )
+    } else if ( url.includes( 'fastbitcoins' ) ) {
+      const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
+
+      this.props.navigation.navigate( 'Login', {
+        userKey
+      } )
+    } else {
+      const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
+
+      this.props.navigation.navigate( 'SignUpDetails', {
+        EmailToken
+      } )
+    }
+  }
+
+  postSplashScreenActions = async () => {
     try {
       const url = await Linking.getInitialURL()
+      const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
 
-      console.log( 'Launch::handleDeepLinking::initialURL: ' + url )
+      // initiates the SQL DB
+      if( !this.props.databaseInitialized ) this.props.initializeDB()
 
-      setTimeout( async () => {
-        if ( await AsyncStorage.getItem( 'hasCreds' ) ) {
-          if ( !url ) {
-            this.props.navigation.replace( 'Login' )
-          } else {
-            const splits = url.split( '/' )
-
-            if ( splits[ 5 ] === 'sss' ) {
-              const requester = splits[ 4 ]
-
-              if ( splits[ 6 ] === 'ek' ) {
-                const custodyRequest = {
-                  requester,
-                  ek: splits[ 7 ],
-                  uploadedAt: splits[ 8 ],
-                }
-
-                this.props.navigation.replace( 'Login', {
-                  custodyRequest
-                } )
-
-              } else if ( splits[ 6 ] === 'rk' ) {
-                const recoveryRequest = {
-                  requester, rk: splits[ 7 ]
-                }
-
-                this.props.navigation.replace( 'Login', {
-                  recoveryRequest
-                } )
-              }
-            } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
-              if ( splits[ 3 ] !== config.APP_STAGE ) {
-                Alert.alert(
-                  'Invalid deeplink',
-                  `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-                    splits[ 3 ]
-                  }`,
-                )
-              } else {
-                const version = splits.pop().slice( 1 )
-
-                if ( version ) {
-                  if ( !( await checkAppVersionCompatibility( {
-                    relayCheckMethod: splits[ 4 ],
-                    version,
-                  } ) ) ) {
-                    return
-                  }
-                }
-
-                const trustedContactRequest = {
-                  isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-                  approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-                  isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-                  requester: splits[ 5 ],
-                  encryptedKey: splits[ 6 ],
-                  hintType: splits[ 7 ],
-                  hint: splits[ 8 ],
-                  uploadedAt: splits[ 9 ],
-                  version,
-                }
-
-                this.props.navigation.replace( 'Login', {
-                  trustedContactRequest,
-                } )
-              }
-            } else if ( splits[ 4 ] === 'rk' ) {
-              const recoveryRequest = {
-                isRecovery: true,
-                requester: splits[ 5 ],
-                encryptedKey: splits[ 6 ],
-                hintType: splits[ 7 ],
-                hint: splits[ 8 ],
-              }
-              this.props.navigation.replace( 'Login', {
-                recoveryRequest
-              } )
-            } else if ( splits[ 4 ] === 'rrk' ) {
-              Alert.alert(
-                'Restoration link Identified',
-                'Restoration links only works during restoration mode',
-              )
-            } else if ( url.includes( 'fastbitcoins' ) ) {
-              const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-
-              this.props.navigation.navigate( 'Login', {
-                userKey
-              } )
-            } else {
-              const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
-
-              this.props.navigation.navigate( 'SignUpDetails', {
-                EmailToken
-              } )
-            }
-          }
-        } else {
-          this.props.navigation.replace( 'PasscodeConfirm' )
-        }
-      }, 4000 )
+      // scenario based navigation
+      if ( hasCreds ) {
+        if ( !url )
+          this.props.navigation.replace( 'Login' )
+        else
+          this.processDL( url )
+      } else {
+        this.props.navigation.replace( 'PasscodeConfirm' )
+      }
 
     } catch ( err ) {
       ( this.errorBottomSheet as any ).current.snapTo( 1 )
@@ -263,6 +269,14 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default connect( null, {
+
+
+const mapStateToProps = ( state ) => {
+  return {
+    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized )
+  }
+}
+
+export default connect( mapStateToProps, {
   initializeDB
 } )( Launch )

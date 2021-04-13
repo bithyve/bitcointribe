@@ -70,8 +70,9 @@ const WalletInitializationScreen = props => {
           </Text>
           <TouchableOpacity
             onPress={async () => {
-              if ( await AsyncStorage.getItem( 'recoveryExists' ) ) {
-                props.navigation.navigate( 'RestoreSelectedContactsList' )
+              if (await AsyncStorage.getItem('recoveryExists')) {
+                props.navigation.navigate('RestoreWithICloud');
+                //props.navigation.navigate('RestoreSelectedContactsList');
 
               } else {
                 props.navigation.navigate( 'WalletNameRecovery' )

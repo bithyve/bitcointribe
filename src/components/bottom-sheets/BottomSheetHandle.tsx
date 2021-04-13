@@ -16,10 +16,10 @@ const BottomSheetHandle: React.FC<Props> = ( {
 }: Props ) => {
   return (
     <View style={{
-      ...styles.rootContainer, ...containerStyle 
+      ...styles.rootContainer, ...containerStyle
     }}>
       <View style={{
-        ...styles.handleIndicator, ...handleIndicatorStyle 
+        ...styles.handleIndicator, ...handleIndicatorStyle
       }}></View>
     </View>
   )

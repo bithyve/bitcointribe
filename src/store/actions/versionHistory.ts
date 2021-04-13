@@ -2,7 +2,7 @@ export const SET_VERSIONS_HISTORY = 'SET_VERSIONS_HISTORY'
 export const SET_VERSION = 'SET_VERSION'
 export const RESTORED_VERSIONS_HISTORY = 'RESTORED_VERSIONS_HISTORY'
 
-export const setVersion = (versionType) => {
+export const setVersion = ( versionType ) => {
   return {
     type: SET_VERSION,
     payload: {
@@ -12,20 +12,20 @@ export const setVersion = (versionType) => {
 }
 
 export const setVersionHistory = ( versions ) => {
-  console.log("versions",versions)
-    return {
-      type: SET_VERSIONS_HISTORY,
-      payload: {
-        versions
-      },
-    }
+  console.log( 'versions', versions )
+  return {
+    type: SET_VERSIONS_HISTORY,
+    payload: {
+      versions
+    },
   }
+}
 
-  export const restoredVersionHistory = ( versions ) => {
-    return {
-      type: RESTORED_VERSIONS_HISTORY,
-      payload: {
-        versions
-      },
-    }
-  }  
+export const restoredVersionHistory = ( versions ) => {
+  return {
+    type: RESTORED_VERSIONS_HISTORY,
+    payload: {
+      restoreVersions : versions
+    },
+  }
+}

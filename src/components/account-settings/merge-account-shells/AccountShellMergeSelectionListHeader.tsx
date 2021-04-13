@@ -14,8 +14,8 @@ export type Props = {
   sourceShell: AccountShell;
 };
 
-const AccountShellMergeSelectionListHeader: React.FC<Props> = ({ sourceShell, }: Props) => {
-  const primarySubAccount = usePrimarySubAccountForShell(sourceShell)
+const AccountShellMergeSelectionListHeader: React.FC<Props> = ( { sourceShell, }: Props ) => {
+  const primarySubAccount = usePrimarySubAccountForShell( sourceShell )
 
   return (
     <View style={styles.rootContainer}>
@@ -25,7 +25,7 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({ sourceShell, }:
       }}>
 
         <Image
-          source={getAvatarForSubAccount(primarySubAccount)}
+          source={getAvatarForSubAccount( primarySubAccount )}
           style={styles.avatarImage}
           resizeMode="contain"
         />
@@ -61,25 +61,25 @@ const AccountShellMergeSelectionListHeader: React.FC<Props> = ({ sourceShell, }:
   )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     ...ListStyles.infoHeaderSection,
     paddingHorizontal: 36,
   },
 
   accountShellItemTitleText: {
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
   },
 
   titleLabelText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
   },
 
   balanceCaptionText: {
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMediumItalic,
   },
@@ -88,6 +88,6 @@ const styles = StyleSheet.create({
     ...ImageStyles.thumbnailImageXLarge,
     marginRight: 8,
   },
-})
+} )
 
 export default AccountShellMergeSelectionListHeader
