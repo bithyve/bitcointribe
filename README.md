@@ -1,8 +1,8 @@
-## Building HEXA
+## Setting up Hexa Wallet
 
 ### Prerequisites:
 
-- [Node](https://nodejs.org/en/)
+- [Node](https://nodejs.org/en/) v10.16 and above
 - [Yarn](https://yarnpkg.com/lang/en/)
 - [CocoaPods](https://cocoapods.org/)
 - [Xcode](https://developer.apple.com/xcode/)
@@ -20,11 +20,11 @@ yarn install
 
 #### MacOS or Linux
 
-```sh
-./setup.sh
-```
+On MacOS and Linux there is no need to run `setup.sh` it will run autmatically after `yarn install` completes.
 
 #### Windows
+
+On Windows, if  `setup.bat` does not run on its own after `yarn install` then it can be executed manually. it doesn't really matter if its run twice.
 
 Open `setup.bat` in a text editor and enter your user account name where prompted. If you changed the location of the android sdk during installation, enter the path to the sdk instead of the one already present.
 Then, from the command prompt, run:
@@ -35,26 +35,57 @@ setup.bat
 
 ### Configuring Environment Variables
 
-Make sure you have `.env` similar to `.env.example` in your project's root directory before running Hexa. If this file is not present with the required values then the app will crash.
+**Mainnet configuration**
+
+Make sure you there are no .env files in the project root directory except .env.example
+
+The project will use live configuration by default when no .env file is available.
+
+**Testnet configuration**
+
+Copy the contents on `.env.example` to a new `.env` file and build the app
 
 ```sh
 cp .env.example .env
 ```
 
 
-## Running HEXA
+## Building and Running Hexa Wallet
 
-### Running on iOS
+### Running on simulator
+
+**IOS**
 
 ```
 yarn ios
 ```
 
-### Running on Android
+Alternately XCode can also be used to build and run in a simulator
+
+**Android**
 
 ```
-yarn android
+yarn android or yarn androidDevelopmentDebug
 ```
+
+Alternately Android Studio can also be used to build and run in a simulator
+
+### Running on device
+
+**IOS**
+
+Open `HEXA.xcworkspace` from `<Hexa Root>/iOS` in XCode and use the `product > build for > running` menu option to build and run Hexa Wallet on iPhone. This will work with a correct and updated XCode setup and trusted devices. Further support for running on iPhone is available on react native and xcode development sites and community forums.
+
+**Android**
+
+Ensure device is connected and recognised. Ensure no  Android emulators are running.
+
+```
+yarn android or yarn androidDevelopmentDebug
+```
+
+Alternately Android Studio can also be used to build and run on Android device.
+This will work when Android development environment is setup correctly. Further support is available from react native and Android Studio guides. Please refer https://reactnative.dev/docs/running-on-device for further support.
 
 ## Verify Authenticity of Android APK
 
