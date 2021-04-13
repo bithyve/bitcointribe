@@ -973,7 +973,7 @@ class ManageBackupNewBHR extends Component<
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud backup complete, please upgrade security to Level 2' : currentLevel === 2 ? 'Double backup complete, please upgrade security to Level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, please complete Level 1' }</Text>
+            }}>{currentLevel === 1 ? 'Cloud backup complete, please upgrade security to Level 2' : currentLevel === 2 ? 'Double backup complete, please upgrade security to Level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete. Please complete Level 1' }</Text>
           </View>
           <View
             style={{
@@ -1147,7 +1147,7 @@ class ManageBackupNewBHR extends Component<
                         />
                         <View style={styles.cardView}>
                           <View style={{
-                            width: wp( '55%' )
+                            width: wp( '70%' )
                           }}>
                             <Text
                               numberOfLines={2}
