@@ -2,7 +2,7 @@
 
 ### Prerequisites:
 
-- [Node](https://nodejs.org/en/) v10.16 and above
+- [Node](https://nodejs.org/en/) v10 and above
 - [Yarn](https://yarnpkg.com/lang/en/)
 - [CocoaPods](https://cocoapods.org/)
 - [Xcode](https://developer.apple.com/xcode/)
@@ -16,7 +16,7 @@ cd hexa
 yarn install
 ```
 
-### Running the Setup Script
+### Running Setup Script
 
 #### MacOS or Linux
 
@@ -37,13 +37,13 @@ setup.bat
 
 **Mainnet configuration**
 
-Make sure you there are no .env files in the project root directory except .env.example
+Make sure you there are no `.env` files in the project root directory except `.env.example`
 
-The project will use live configuration by default when no .env file is available.
+The project will use live configuration by default when no `.env` file is available.
 
 **Testnet configuration**
 
-Copy the contents on `.env.example` to a new `.env` file and build the app
+Copy the contents on `.env.example` to a new `.env` file.
 
 ```sh
 cp .env.example .env
@@ -74,7 +74,7 @@ Alternately Android Studio can also be used to build and run in a simulator
 
 **IOS**
 
-Open `HEXA.xcworkspace` from `<Hexa Root>/iOS` in XCode and use the `product > build for > running` menu option to build and run Hexa Wallet on iPhone. This will work with a correct and updated XCode setup and trusted devices. Further support for running on iPhone is available on react native and xcode development sites and community forums.
+Open `HEXA.xcworkspace` from `<Hexa Project Root>/iOS` in XCode and use the `product > build for > running` menu option to build and run Hexa Wallet on iPhone. This will work with a correct and updated XCode setup and only on trusted devices. Further support for running on iPhone is available on react native and xcode development sites and community forums.
 
 **Android**
 
@@ -86,6 +86,16 @@ yarn android or yarn androidDevelopmentDebug
 
 Alternately Android Studio can also be used to build and run on Android device.
 This will work when Android development environment is setup correctly. Further support is available from react native and Android Studio guides. Please refer https://reactnative.dev/docs/running-on-device for further support.
+
+## Common Issues
+
+1. Build fails with one or more errors
+   Makes sure `yarn install` was done after switching to a new branch.
+   If that doesn't help please use `yarn deep-clean` this will remove node modules, flush node cache, fluch metro cache, reinstall node dependencies and re install pods. 
+2. Always make sure metro is running in a new terminal window. If its not it can be started by running `yarn start`in a new termimal from project root.
+3. Notifications dont work in ios simulator and this will show up as an error in the console. Notifications will work when running in a iOS device.
+4. If Apple id or google id is not setup in the simulator then cloud backup will not work and cloud errors will be seen in the console.
+5. Scanner will not work in a simulator so a device will be required to test and debug scanner related features.
 
 ## Verify Authenticity of Android APK
 
