@@ -83,6 +83,7 @@ import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import Loader from '../../components/loader'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -106,6 +107,7 @@ interface ManageBackupNewBHRStateTypes {
   refreshControlLoader: boolean;
   QrBottomSheetsFlag: boolean;
   secondaryShare: MetaShare;
+  showLoader: boolean;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -248,6 +250,7 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader: false,
       QrBottomSheetsFlag: false,
       secondaryShare: null,
+      showLoader: false
     }
   }
 
@@ -350,11 +353,13 @@ class ManageBackupNewBHR extends Component<
 
       if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
-          refreshControlLoader: true
+          refreshControlLoader: true,
+          showLoader: true
         } )
       } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
         this.setState( {
-          refreshControlLoader: false
+          refreshControlLoader: false,
+          showLoader: false
         } )
       }
     }
@@ -1435,6 +1440,7 @@ class ManageBackupNewBHR extends Component<
             } )}
           </View>
         </ScrollView>
+        {this.state.showLoader ? <Loader /> : null}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={( c )=>this.keeperTypeBottomSheet = c}
