@@ -20,6 +20,7 @@ import {
   syncTrustedChannels,
   WALLET_CHECK_IN,
   POST_RECOVERY_CHANNEL_SYNC,
+  MULTI_UPDATE_TRUSTED_CHANNELS,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -35,7 +36,6 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
-  updateWalletImage,
   downloadMShare as downloadMShareSSS,
   uploadEncMShare
 } from '../actions/sss'
@@ -1569,4 +1569,34 @@ function* postRecoveryChannelSyncWorker( {} ) {
 export const postRecoveryChannelSyncWatcher = createWatcher(
   postRecoveryChannelSyncWorker,
   POST_RECOVERY_CHANNEL_SYNC,
+)
+
+function* multiUpdateTrustedChannelsWorker( { payload }: {payload: {data: TrustedDataElements, contacts?: Contacts}} ) {
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const contacts: Contacts = payload.contacts? payload.contacts: trustedContacts.tc.trustedContacts
+  const data: TrustedDataElements = {
+    ...payload.data
+  }
+
+  for( const contactName of Object.keys( contacts ) ){
+    yield call( trustedContacts.updateTrustedChannel, contactName, data )
+  }
+
+  const { SERVICES } = yield select( ( state ) => state.storage.database )
+  const updatedSERVICES = {
+    ...SERVICES,
+    TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+  }
+  yield call( insertDBWorker, {
+    payload: {
+      SERVICES: updatedSERVICES
+    }
+  } )
+}
+
+export const multiUpdateTrustedChannelsWatcher = createWatcher(
+  multiUpdateTrustedChannelsWorker,
+  MULTI_UPDATE_TRUSTED_CHANNELS,
 )

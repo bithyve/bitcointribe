@@ -1,11 +1,12 @@
 // types and action creators: dispatched by components and sagas
+import { Action } from 'redux'
 import {
   TrustedDataElements,
   EphemeralDataElements,
   trustedChannelActions,
   ShareUploadables,
+  Contacts,
 } from '../../bitcoin/utilities/Interface'
-
 import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
@@ -22,6 +23,7 @@ export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
 export const CLEAR_TRUSTED_CONTACTS_CACHE = 'CLEAR_TRUSTED_CONTACTS_CACHE'
+export const MULTI_UPDATE_TRUSTED_CHANNELS = 'MULTI_UPDATE_TRUSTED_CHANNELS'
 
 export const clearTrustedContactsCache = () => {
   return {
@@ -167,6 +169,16 @@ export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
     },
   }
 }
+
+export const multiUpdateTrustedChannels = ( data: TrustedDataElements, contacts?: Contacts ) => {
+  return {
+    type: MULTI_UPDATE_TRUSTED_CHANNELS,
+    payload: {
+      data, contacts
+    }
+  }
+}
+
 
 // types and action creators: dispatched by sagas
 export const TRUSTED_CONTACT_APPROVED = 'TRUSTED_CONTACT_APPROVED'
