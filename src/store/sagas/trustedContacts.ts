@@ -1580,20 +1580,26 @@ function* multiUpdateTrustedChannelsWorker( { payload }: {payload: {data: Truste
     ...payload.data
   }
 
+  let channelUpdated = false
   for( const contactName of Object.keys( contacts ) ){
-    yield call( trustedContacts.updateTrustedChannel, contactName, data )
+    if( contacts[ contactName ].symmetricKey ){
+      yield call( trustedContacts.updateTrustedChannel, contactName, data )
+      channelUpdated = true
+    }
   }
 
-  const { SERVICES } = yield select( ( state ) => state.storage.database )
-  const updatedSERVICES = {
-    ...SERVICES,
-    TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-  }
-  yield call( insertDBWorker, {
-    payload: {
-      SERVICES: updatedSERVICES
+  if( channelUpdated ){
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
     }
-  } )
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+  }
 }
 
 export const multiUpdateTrustedChannelsWatcher = createWatcher(

@@ -19,7 +19,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { walletCheckIn } from '../actions/trustedContacts'
+import { multiUpdateTrustedChannels, walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
 import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
@@ -297,7 +297,6 @@ function* servicesEnricherWorker( { payload } ) {
     if ( versionUpdated ) {
       // update the stored version
       database.VERSION = DeviceInfo.getVersion()
-      // TODO: send version upgrade notification to F&Fs
 
       if( migrated )
         database.SERVICES = {
@@ -311,6 +310,12 @@ function* servicesEnricherWorker( { payload } ) {
       yield call( insertDBWorker, {
         payload: database,
       } )
+
+      // send version upgrade notification to F&Fs
+      const trustedData = {
+        version: database.VERSION
+      }
+      yield put( multiUpdateTrustedChannels( trustedData ) )
     }
   } catch ( err ) {
     console.log( err )
