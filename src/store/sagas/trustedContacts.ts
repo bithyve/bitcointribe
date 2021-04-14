@@ -1596,8 +1596,8 @@ function* sendVersionUpdateNotificationWorker( { payload }: {payload: {version: 
   if( notifReceivers.length ){
     const notification: INotification = {
       notificationType: notificationType.contact,
-      title: 'Friends and Family notification',
-      body: `You have a new transaction from ${walletName}`,
+      title: 'Backup Secured',
+      body: `Your backup (Recovery Key) has been secured with ${walletName} as they are on the latest version now`,
       data: {
       },
       tag: notificationTag.IMP,
