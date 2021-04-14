@@ -81,6 +81,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
+  const [ showNote, setShowNote ] = useState( true )
 
   const s3service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
@@ -423,6 +424,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         setAnswerMasked( text )
                       }}
                       onFocus={() => {
+                        setShowNote( false )
                         setDropdownBoxOpenClose( false )
                         setAnswerInputStyle( styles.inputBoxFocused )
                         if ( answer.length > 0 ) {
@@ -431,6 +433,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         }
                       }}
                       onBlur={() => {
+                        setShowNote( true )
                         setAnswerInputStyle( styles.inputBox )
                         setDropdownBoxOpenClose( false )
                         let temp = ''
@@ -494,6 +497,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       }}
                       onSubmitEditing={handleSubmit}
                       onFocus={() => {
+                        setShowNote( false )
                         setDropdownBoxOpenClose( false )
                         setConfirmAnswerInputStyle( styles.inputBoxFocused )
                         if ( tempAns.length > 0 ) {
@@ -504,6 +508,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         }
                       }}
                       onBlur={() => {
+                        setShowNote( true )
                         setConfirmAnswerInputStyle( styles.inputBox )
                         setDropdownBoxOpenClose( false )
                         let temp = ''
@@ -598,7 +603,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <View style={{
+      {showNote ? <View style={{
         ...styles.bottomButtonView,
       }}>
         {(
@@ -612,9 +617,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorActiveView} />
         </View>
-      </View>
+      </View> : null}
 
-      {!visibleButton ? (
+      {showNote && !visibleButton ? (
         <View
           style={{
             marginBottom:
