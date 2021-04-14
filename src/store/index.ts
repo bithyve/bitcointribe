@@ -117,7 +117,8 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
-  multiUpdateTrustedChannelsWatcher
+  multiUpdateTrustedChannelsWatcher,
+  sendVersionUpdateNotificationWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -287,6 +288,7 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+    sendVersionUpdateNotificationWatcher,
     multiUpdateTrustedChannelsWatcher,
 
     // Health

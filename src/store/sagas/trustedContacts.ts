@@ -21,6 +21,8 @@ import {
   WALLET_CHECK_IN,
   POST_RECOVERY_CHANNEL_SYNC,
   MULTI_UPDATE_TRUSTED_CHANNELS,
+  SEND_VERSION_UPDATE_NOTIFICATION,
+  multiUpdateTrustedChannels,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -1569,6 +1571,54 @@ function* postRecoveryChannelSyncWorker( {} ) {
 export const postRecoveryChannelSyncWatcher = createWatcher(
   postRecoveryChannelSyncWorker,
   POST_RECOVERY_CHANNEL_SYNC,
+)
+
+function* sendVersionUpdateNotificationWorker( { payload }: {payload: {version: string}} ) {
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const { walletName } = yield select(
+    ( state ) => state.storage.database.WALLET_SETUP,
+  )
+
+  const contacts: Contacts = trustedContacts.tc.trustedContacts
+  const notifReceivers = []
+  Object.keys( contacts ).forEach( ( contactName ) => {
+    const contact = contacts[ contactName ]
+    if ( contact.walletID && contact.FCMs ){
+      notifReceivers.push( {
+        walletId: contact.walletID,
+        FCMs: contact.FCMs,
+      } )
+    }
+  } )
+
+  if( notifReceivers.length ){
+    const notification: INotification = {
+      notificationType: notificationType.contact,
+      title: 'Friends and Family notification',
+      body: `You have a new transaction from ${walletName}`,
+      data: {
+      },
+      tag: notificationTag.IMP,
+    }
+
+    yield call(
+      RelayServices.sendNotifications,
+      notifReceivers,
+      notification,
+    )
+
+    const trustedData = {
+      version: payload.version
+    }
+    yield put( multiUpdateTrustedChannels( trustedData ) )
+  }
+}
+
+export const sendVersionUpdateNotificationWatcher = createWatcher(
+  sendVersionUpdateNotificationWorker,
+  SEND_VERSION_UPDATE_NOTIFICATION,
 )
 
 function* multiUpdateTrustedChannelsWorker( { payload }: {payload: {data: TrustedDataElements, contacts?: Contacts}} ) {

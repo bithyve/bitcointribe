@@ -23,6 +23,7 @@ export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
 export const CLEAR_TRUSTED_CONTACTS_CACHE = 'CLEAR_TRUSTED_CONTACTS_CACHE'
+export const SEND_VERSION_UPDATE_NOTIFICATION = 'SEND_VERSION_UPDATE_NOTIFICATION'
 export const MULTI_UPDATE_TRUSTED_CHANNELS = 'MULTI_UPDATE_TRUSTED_CHANNELS'
 
 export const clearTrustedContactsCache = () => {
@@ -167,6 +168,15 @@ export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
     payload: {
       trustedContactsInfo
     },
+  }
+}
+
+export const sendVersionUpdateNotification = ( version: string ) => {
+  return {
+    type: SEND_VERSION_UPDATE_NOTIFICATION,
+    payload: {
+      version
+    }
   }
 }
 
