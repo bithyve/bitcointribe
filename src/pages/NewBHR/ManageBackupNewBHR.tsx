@@ -210,7 +210,7 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Level 1',
           status: 'notSetup',
-          keeper1ButtonText: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
+          keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on GoogleDrive',
           keeper2ButtonText: 'Security Question',
           keeper1: obj,
           keeper2: obj,
