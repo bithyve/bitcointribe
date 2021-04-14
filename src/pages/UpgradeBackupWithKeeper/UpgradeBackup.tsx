@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, createRef } from 'react'
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Platform,
   ImageBackground,
   Keyboard,
+  AsyncStorage,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -46,15 +47,29 @@ import S3Service from '../../bitcoin/services/sss/S3Service'
 import {
   initializeHealthSetup,
   updateMSharesHealth,
+  initLevelTwo,
+  generateMetaShare,
+  keeperProcessStatus,
+  updatedKeeperInfo,
+  generateSMMetaShares
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
 import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper } from '../../store/actions/upgradeToNewBhr'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import config from '../../bitcoin/HexaConfig'
+import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -70,7 +85,12 @@ interface UpgradeBackupStateTypes {
   encryptedCloudDataJson: any;
   isCloudBackupProcessing: Boolean;
   showLoader: boolean;
-
+  isUpgradeDone: boolean;
+  totalKeeper: number;
+  availableKeeperInfo: {shareId: string; type: string;}[];
+  levelToSetup: number;
+  secondaryQR: string;
+  selectedShareId: string;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -81,7 +101,7 @@ interface UpgradeBackupPropsTypes {
   regularAccount: RegularAccount;
   database: any;
   updateHealthForCloud: any;
-  cloudBackupStatus: any;
+  cloudBackupStatus: CloudBackupStatus;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
   keeperInfo: any[];
@@ -94,14 +114,44 @@ interface UpgradeBackupPropsTypes {
   initNewBHRFlow: any;
   versionHistory: any;
   setCloudData: any;
+  overallHealth: any[];
+  generateMetaShare: any;
+  metaSharesKeeper: MetaShare[],
+  initLevelTwo: any;
+  healthCheckInitializedKeeper: boolean;
+  setCloudDataForLevel: any;
+  addNewSecondarySubAccount: any;
+  trustedContacts: TrustedContactsService
+  SHARES_TRANSFER_DETAILS: any;
+  keeperProcessStatus: any;
+  updatedKeeperInfo: any;
+  uploadMetaShare: boolean;
+  updateEphemeralChannelLoader: boolean;
+  keeperProcessStatusFlag: KeeperProcessStatus;
+  isSmMetaSharesCreatedFlag: boolean;
+  generateSMMetaShares: any;
+  autoUploadSecondaryShare: any;
+  trustedContactsInfo: any;
+  autoShareContactKeeper: any;
 }
 
 class UpgradeBackup extends Component<
   UpgradeBackupPropsTypes,
   UpgradeBackupStateTypes
 > {
+  RestoreFromICloud = createRef<BottomSheet>()
+  UpgradingKeeperContact = createRef<BottomSheet>()
+  UpgradePdfKeeper = createRef<BottomSheet>()
+  SecurityQuestionBottomSheet = createRef<BottomSheet>()
+  secondaryDeviceBottomSheet = createRef<BottomSheet>()
   constructor( props ) {
     super( props )
+    this.RestoreFromICloud
+    this.UpgradingKeeperContact
+    this.UpgradePdfKeeper
+    this.SecurityQuestionBottomSheet
+    this.secondaryDeviceBottomSheet
+
     this.state = {
       isCloudBackupProcessing: false,
       selectedIds: [],
@@ -111,7 +161,7 @@ class UpgradeBackup extends Component<
           title: 'App Backup',
           info: 'Lorem ipsum dolor sit',
           subTitle: 'Lorem ipsum dolor sit amet',
-          type: 'backup',
+          type: 'cloud',
           image: require( '../../assets/images/icons/icon_backup.png' ),
           status: 'setup'
         },
@@ -149,143 +199,347 @@ class UpgradeBackup extends Component<
         },
       ],
       selectedContact: [
-        // {
-        //   checked: true,
-        //   contactType: "person",
-        //   emails: [
-        //     {
-        //       email: "floresjoyner@digifad.com",
-        //       id: "826F07EC-4B52-4703-907F-8AEE4F360EA2",
-        //     },
-        //     {
-        //       email: "francinefranks@fossiel.com",
-        //       id: "A3FD9B00-C732-4EEE-96E5-CD0040C6AB19",
-        //     },
-        //   ],
-        //   firstName: "Jessica",
-        //   id: "5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson",
-        //   imageAvailable: false,
-        //   lastName: "Pearson",
-        //   name: "Jessica Pearson",
-        //   phoneNumbers: [
-        //     {
-        //       countryCode: "in",
-        //       id: "BF2490FA-C3B3-4F97-925E-6E07C4B7DB41",
-        //       number: "98247 52009",
-        //       digits: "9824752009",
-        //       label: "home",
-        //     },
-        //     {
-        //       countryCode: "in",
-        //       id: "7F31DFEF-BCFD-457C-A82A-6B88A28DA285",
-        //       number: "(811) 554-3283",
-        //       digits: "8115543283",
-        //       label: "home",
-        //     },
-        //   ],
-        // },
-        // {
-        //   checked: true,
-        //   contactType: "person",
-        //   emails: [
-        //     {
-        //       email: "floresjoyner@digifad.com",
-        //       id: "826F07EC-4B52-4703-907F-8AEE4F360EA2",
-        //     },
-        //     {
-        //       email: "francinefranks@fossiel.com",
-        //       id: "A3FD9B00-C732-4EEE-96E5-CD0040C6AB19",
-        //     },
-        //   ],
-        //   firstName: "Rachel",
-        //   id: "5D447B17-CFE2-4A75-84EE-E4F36CF26436:ABPerson",
-        //   imageAvailable: false,
-        //   lastName: "Zane",
-        //   name: "Rachel Zane",
-        //   phoneNumbers: [
-        //     {
-        //       countryCode: "in",
-        //       id: "BF2490FA-C3B3-4F97-925E-6E07C4B7DB41",
-        //       number: "98247 52009",
-        //       digits: "9824752009",
-        //       label: "home",
-        //     },
-        //     {
-        //       countryCode: "in",
-        //       id: "7F31DFEF-BCFD-457C-A82A-6B88A28DA285",
-        //       number: "(811) 554-3283",
-        //       digits: "8115543283",
-        //       label: "home",
-        //     },
-        //   ],
-        // },
       ],
       showLoader: false,
-
+      isUpgradeDone: false,
+      totalKeeper: 0,
+      availableKeeperInfo: [],
+      levelToSetup: 0,
+      secondaryQR: '',
+      selectedShareId: '',
     }
   }
 
   componentDidMount = () => {
-    this.upgradeProcess()
+    const { trustedContactsInfo, overallHealth } = this.props
+    let TotalKeeper = 1
+    const keepersInfo = []
+    for ( let i = 0; i < overallHealth.sharesInfo.length; i++ ) {
+      const element = overallHealth.sharesInfo[ i ]
+      const type = i == 0 ? 'device' : i == 1 || i == 2 ? 'contact' : 'pdf'
+      const selectedContacts = []
+      if ( ( i == 1 || i == 2 ) && element.updatedAt > 0 && trustedContactsInfo ) {
+        if( trustedContactsInfo.slice( 1, 3 )[ 0 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 0 ] )
+        if( trustedContactsInfo.slice( 1, 3 )[ 1 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 1 ] )
+        this.setState( {
+          selectedContact: selectedContacts
+        } )
+      }
+      if( element.updatedAt > 0 ) {
+        TotalKeeper = TotalKeeper + 1
+        keepersInfo.push( {
+          shareId: element.identifier, type
+        } )
+      }
+    }
+    this.setState( {
+      totalKeeper: TotalKeeper,
+      levelToSetup: TotalKeeper <= 1 ? 1 : TotalKeeper == 2 || TotalKeeper <= 3 ? 2 : 3,
+      availableKeeperInfo: keepersInfo,
+    } )
+    console.log( 'TotalKeeper', TotalKeeper )
+    this.nextToProcess( keepersInfo, TotalKeeper <= 1 ? 1 : TotalKeeper == 2 || TotalKeeper <= 3 ? 2 : 3 )
+    this.updateListData( TotalKeeper <= 1 ? 1 : TotalKeeper == 2 || TotalKeeper <= 3 ? 2 : 3 )
   };
 
-  upgradeProcess = () => {
+  nextToProcess = ( keepersInfo: {shareId: string; type: string}[], levelToSetup: number ) => {
     const { levelHealth } = this.props
     const { listData } = this.state
-    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
-      listData[ 0 ].status = 'accessible'
-      this.props.initNewBHRFlow( true )
-      this.props.navigation.replace( 'ManageBackupNewBHR' )
+    if( levelHealth[ levelToSetup-1 ] ) {
+      if( levelHealth[ levelToSetup-1 ].levelInfo[ 0 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 0 ].shareType == 'cloud' && levelHealth[ levelToSetup-1 ].levelInfo[ 0 ].status == 'notAccessible' ){
+        this.RestoreFromICloud.current.snapTo( 1 )
+      }
+      else if( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].status == 'notAccessible' ){
+        if( keepersInfo.findIndex( value => value.type == 'device' ) > -1 ) {
+          console.log( 'levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId', levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
+          this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
+        } else {
+          this.secondaryDeviceBottomSheet.current.snapTo( 1 )
+          this.createGuardian()
+        }
+      }
+      else if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' ) {
+        if( keepersInfo.findIndex( value => value.type == 'contact' ) > -1 ) {
+          this.UpgradingKeeperContact.current.snapTo( 1 )
+        }
+      }
+    } else {
+      this.RestoreFromICloud.current.snapTo( 1 )
     }
-    else{
-      ( this.refs.RestoreFromICloud as any ).snapTo( 1 )
+
+  }
+
+  updateListData = ( levelToSetup ) => {
+    const { levelHealth } = this.props
+    const { listData } = this.state
+    console.log( 'levelHealth', levelHealth )
+    if( levelHealth[ levelToSetup - 1 ] ) {
+      for ( let i = 0; i < levelHealth[ levelToSetup - 1 ].levelInfo.length; i++ ) {
+        const element = levelHealth[ levelToSetup - 1 ].levelInfo[ i ]
+        if( element.shareType === 'cloud' && element.status === 'accessible' ) {
+          listData[ 0 ].status = 'accessible'
+        }
+        if( i == 2 && element.shareType === 'device' && element.status === 'accessible' ) {
+          listData[ 1 ].status = 'accessible'
+        }
+        else if( ( element.shareType == 'device'|| element.shareType == 'pdf' ) && element.status == 'accessible' ) {
+          listData[ 3 ].status = 'accessible'
+        }
+        if( element.shareType == 'contact' && element.status == 'accessible' ) {
+          listData[ 2 ].status = 'accessible'
+        }
+        if( element.shareType == 'securityQuestion' && element.status == 'accessible' ) {
+          listData[ 4 ].status = 'accessible'
+        }
+      }
     }
-    if( levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo[ 0 ] && levelHealth[ 0 ].levelInfo[ 1 ].status == 'accessible' ){
-      listData[ 4 ].status = 'accessible';
-      ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 1 )
-    }
+    console.log( 'listData', listData )
     this.setState( {
       listData
     } )
   }
 
-  componentDidUpdate = ( prevProps, prevState ) => {
+  componentDidUpdate = ( prevProps ) => {
     if (
-      prevProps.s3Service.levelhealth.healthCheckInitializedKeeper !=
-        this.props.s3Service.levelhealth.healthCheckInitializedKeeper &&
-      this.props.s3Service.levelhealth.healthCheckInitializedKeeper
+      prevProps.levelHealth !=
+        this.props.levelHealth &&
+        prevProps.levelHealth.length == 0 && this.props.levelHealth.length == 1
     ) {
       this.props.setCloudData(  )
     }
-    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) ){
-      if( this.props.levelHealth[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ] && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'accessible' ) {
-        this.setState( {
-          showLoader: false
-        } )
+
+    if( prevProps.cloudBackupStatus != this.props.cloudBackupStatus && ( this.props.cloudBackupStatus === CloudBackupStatus.COMPLETED || this.props.cloudBackupStatus === CloudBackupStatus.PENDING ) ){
+      this.setState( {
+        showLoader: false
+      } )
+      if( this.state.isUpgradeDone == true ) {
+        this.props.initNewBHRFlow( true )
         this.props.navigation.replace( 'ManageBackupNewBHR' )
       }
     }
 
-    if( prevProps.isBackupProcessing.status != this.props.isBackupProcessing.status && !this.props.isBackupProcessing.status ){
-      ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
+    if( prevProps.levelHealth !=
+      this.props.levelHealth &&
+      this.props.levelHealth.length > 1 &&
+      this.props.levelHealth[ this.state.levelToSetup - 1 ].levelInfo[ 0 ].status == 'notAccessible' ) {
+      console.log( 'this.props.levelHealth.length > 1 IN IF', this.props.levelHealth.length > 1 )
+      this.props.setCloudDataForLevel( this.state.levelToSetup )
+    }
+
+    if( prevProps.SHARES_TRANSFER_DETAILS != this.props.SHARES_TRANSFER_DETAILS &&
+      prevProps.trustedContacts != this.props.trustedContacts &&
+      prevProps.uploadMetaShare != this.props.uploadMetaShare &&
+      prevProps.updateEphemeralChannelLoader != this.props.updateEphemeralChannelLoader
+    ){
+      this.setSecondaryDeviceQR()
+    }
+
+    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) ){
+      this.nextToProcess( this.state.availableKeeperInfo, this.state.levelToSetup )
+      this.updateListData( this.state.levelToSetup )
     }
 
   };
-
-  // setCloudBackupStatusCallBack = ( share ) =>{
-  //   this.props.updateHealthForCloud( share )
-  // }
 
   cloudBackup = () => {
-    const { s3Service, initializeHealthSetup } = this.props
-    const { healthCheckInitializedKeeper } = s3Service.levelhealth
-    if ( healthCheckInitializedKeeper === false ) {
-      initializeHealthSetup()
+    this.setState( {
+      showLoader: true
+    } )
+    const { totalKeeper, levelToSetup } = this.state
+    const { initializeHealthSetup, healthCheckInitializedKeeper } = this.props
+    console.log( 'totalKeeper', totalKeeper )
+    console.log( 'levelToSetup', levelToSetup )
+    if( levelToSetup == 1 ) {
+      if( healthCheckInitializedKeeper == false ) {
+        initializeHealthSetup()
+      }
+      this.setState( {
+        isUpgradeDone: true
+      } )
+    } else {
+      this.props.generateMetaShare( levelToSetup, true )
+      if( !this.props.isSmMetaSharesCreatedFlag ){
+        this.props.generateSMMetaShares()
+      }
     }
   };
 
+  createGuardian = async ( ) => {
+    const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
+    const index = 0
+    const firstName = 'Secondary'
+    const lastName = 'Device1'
+
+    const contactName = `${firstName} ${lastName ? lastName : ''}`
+      .toLowerCase()
+      .trim()
+
+    const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+    let info = null
+    if ( trustedContact && trustedContact.secondaryKey ) info = trustedContact.secondaryKey
+
+    // Keeper setup started
+    keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
+    updatedKeeperInfo( {
+      shareId: this.state.selectedShareId,
+      name: contactName,
+      uuid: '',
+      publicKey: '',
+      ephemeralAddress: '',
+      type: 'device',
+      data: {
+        name: contactName, index
+      }
+    } )
+
+    const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+    const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+        trustedContact.ephemeralChannel.initiatedAt &&
+        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+        config.TC_REQUEST_EXPIRY? true: false
+
+    if ( !hasTrustedChannel && isEphemeralChannelExpired ) this.setState( {
+      secondaryQR: ''
+    } )
+
+
+    const contactInfo = {
+      contactName,
+      info: info? info.trim(): null,
+      isGuardian: true,
+      shareIndex: index,
+      shareId: this.state.selectedShareId,
+      changeContact: false,
+    }
+
+    let parentShell: AccountShell
+    accountShells.forEach( ( shell: AccountShell ) => {
+      if( !shell.primarySubAccount.instanceNumber ){
+        if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+      }
+    } )
+    const newSecondarySubAccount: SubAccountDescribing = new TrustedContactsSubAccountInfo( {
+      accountShellID: parentShell.id,
+      isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+    } )
+
+    addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo )
+  }
+
+  setSecondaryDeviceQR = () => {
+    const { uploadMetaShare, updateEphemeralChannelLoader, trustedContacts, keeperProcessStatus, walletName } = this.props
+    const { secondaryQR } = this.state
+    const index = 0
+    if ( uploadMetaShare || updateEphemeralChannelLoader ) {
+      if ( secondaryQR ) this.setState( {
+        secondaryQR: ''
+      } )
+      return
+    }
+
+    const firstName = 'Secondary'
+    let lastName = 'Device'
+    if( index === 0 ) lastName = 'Device1'
+    else if( index === 3 ) lastName = 'Device2'
+    else lastName = 'Device3'
+    const contactName = `${firstName} ${lastName ? lastName : ''}`
+      .toLowerCase()
+      .trim()
+
+    if (
+      trustedContacts.tc.trustedContacts[ contactName ] &&
+      trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
+    ) {
+      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
+        contactName
+      ]
+      if( publicKey ) {
+        keeperProcessStatus( KeeperProcessStatus.COMPLETED )
+      }
+      this.updateShare()
+      this.setState( {
+        secondaryQR:
+        JSON.stringify( {
+          isGuardian: true,
+          requester: walletName,
+          publicKey,
+          info: secondaryKey,
+          uploadedAt:
+          trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
+            .initiatedAt,
+          type: 'secondaryDeviceGuardian',
+          ver: DeviceInfo.getVersion(),
+          isFromKeeper: true,
+        } )
+      } )
+    }
+  }
+
+  updateShare = () => {
+    const index = 0
+    let contactName = 'Secondary Device'
+    if( index === 0 ) contactName = 'Secondary Device1'
+    else if( index === 3 ) contactName = 'Secondary Device2'
+    else contactName = 'Secondary Device3'
+    const shareArray = [
+      {
+        walletId: this.props.s3Service.getWalletId().data.walletId,
+        shareId: this.state.selectedShareId,
+        reshareVersion: 0,
+        updatedAt: moment( new Date() ).valueOf(),
+        name: contactName,
+        shareType: 'device',
+        status: 'notAccessible',
+      },
+    ]
+    console.log( 'shareArray', shareArray )
+    this.props.updateMSharesHealth( shareArray )
+  }
+
+  saveInTransitHistory = async () => {
+    const index = 0
+    const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
+    if ( shareHistory ) {
+      const updatedShareHistory = [ ...shareHistory ]
+      updatedShareHistory[ index ] = {
+        ...updatedShareHistory[ index ],
+        inTransit: Date.now(),
+      }
+      await AsyncStorage.setItem(
+        'shareHistory',
+        JSON.stringify( updatedShareHistory ),
+      )
+    }
+  }
+
+  renderSecondaryDeviceContents = () => {
+    console.log( this.state.secondaryQR )
+    return (
+      <SecondaryDevice
+        secondaryQR={this.state.secondaryQR}
+        onPressOk={async () => {
+          this.saveInTransitHistory()
+          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+        }}
+        onPressBack={() => {
+          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+        }}
+      />
+    )
+  }
+
+  renderSecondaryDeviceHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+        }}
+      />
+    )
+  }
+
   render() {
-    const { listData, selectedIds, selectedContact, isCloudBackupProcessing, showLoader } = this.state
+    const { listData, selectedContact, isCloudBackupProcessing, showLoader } = this.state
     const { navigation } = this.props
     return (
       <View style={{
@@ -325,7 +579,7 @@ class UpgradeBackup extends Component<
           flex: 1
         }}>
           {listData.map( ( item, index ) => (
-            <View style={styles.greyBox}>
+            <View key={index} style={styles.greyBox}>
               <View>
                 <ImageBackground
                   source={require( '../../assets/images/icons/Ellipse.png' )}
@@ -470,7 +724,7 @@ class UpgradeBackup extends Component<
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'RestoreFromICloud'}
+          ref={this.RestoreFromICloud}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -478,13 +732,10 @@ class UpgradeBackup extends Component<
               : hp( '60%' ),
           ]}
           renderContent={() => {
-            let name
-            if ( Platform.OS == 'ios' ) name = 'iCloud'
-            else name = 'GDrive'
             return (
               <RestoreFromICloud
                 isLoading={isCloudBackupProcessing}
-                title={'Keeper on ' + name}
+                title={'Keeper on ' + Platform.OS == 'ios' ? 'iCloud' : 'GDrive'}
                 subText={
                   'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
                 }
@@ -493,19 +744,15 @@ class UpgradeBackup extends Component<
                 }
                 cardInfo={'Store Backup'}
                 cardTitle={'Hexa Wallet Backup'}
-                cardSubInfo={name + ' backup'}
+                cardSubInfo={Platform.OS == 'ios' ? 'iCloud' : 'GDrive' + ' backup'}
                 proceedButtonText={'Backup'}
                 backButtonText={'Back'}
-                modalRef={this.refs.RestoreFromICloud}
+                modalRef={this.RestoreFromICloud}
                 onPressProceed={() => {
-                  this.setState( {
-                    isCloudBackupProcessing: true, showLoader: true
-                  } )
                   this.cloudBackup()
-                  // (this.refs.SetupPrimaryKeeperBottomSheet as any).snapTo(1);
                 }}
                 onPressBack={() => {
-                  ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
+                  this.RestoreFromICloud.current.snapTo( 0 )
                 }}
               />
             )
@@ -513,68 +760,30 @@ class UpgradeBackup extends Component<
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
+                this.RestoreFromICloud.current.snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'SetupPrimaryKeeperBottomSheet'}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '60%' )
-              : hp( '70' ),
-          ]}
-          renderContent={() => (
-            <SetupPrimaryKeeper
-              title={'Setup Primary Keeper\non a Personal Device'}
-              subText={
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
-              }
-              textToCopy={'http://hexawallet.io/keeperapp'}
-              info={
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
-              }
-              proceedButtonText={'Proceed'}
-              backButtonText={'Back'}
-              onPressBack={() => {
-                ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 0 )
-              }}
-              onPressContinue={() => {
-                ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 0 );
-                ( this.refs.UpgradingKeeperContact as any ).snapTo( 1 )
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <SmallHeaderModal
-              onPressHeader={() =>
-                ( this.refs.SetupPrimaryKeeperBottomSheet as any ).snapTo( 0 )
-              }
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={'SecurityQuestionBottomSheet'}
+          ref={this.SecurityQuestionBottomSheet}
           snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
           renderContent={() => (
             <SecurityQuestion
               onFocus={() => {
                 if ( Platform.OS == 'ios' )
-                  ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 2 )
+                  this.SecurityQuestionBottomSheet.current.snapTo( 2 )
               }}
               onBlur={() => {
                 if ( Platform.OS == 'ios' )
-                  ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 1 )
+                  this.SecurityQuestionBottomSheet.current.snapTo( 1 )
               }}
               onPressConfirm={async () => {
                 Keyboard.dismiss()
                 navigation.navigate( 'ConfirmKeys' )
                 setTimeout( () => {
-                  ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 0 )
+                  this.SecurityQuestionBottomSheet.current.snapTo( 0 )
                 }, 2 )
               }}
             />
@@ -582,7 +791,7 @@ class UpgradeBackup extends Component<
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() => {
-                ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 0 )
+                this.SecurityQuestionBottomSheet.current.snapTo( 0 )
               }}
             />
           )}
@@ -590,7 +799,7 @@ class UpgradeBackup extends Component<
 
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'UpgradingKeeperContact'}
+          ref={this.UpgradingKeeperContact}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -610,22 +819,23 @@ class UpgradeBackup extends Component<
                 selectedContactArray={selectedContact}
                 proceedButtonText={'Proceed'}
                 onPressProceed={() => {
-                  ( this.refs.UpgradingKeeperContact as any ).snapTo( 0 );
-                  ( this.refs.UpgradePdfKeeper as any ).snapTo( 1 )
+                  this.UpgradingKeeperContact.current.snapTo( 0 )
+                  // this.UpgradePdfKeeper.current.snapTo( 1 )
+                  this.props.autoShareContactKeeper( this.state.selectedContact, this.state.availableKeeperInfo )
                 }}
               /> )
             }}}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                ( this.refs.UpgradingKeeperContact as any ).snapTo( 0 )
+                this.UpgradingKeeperContact.current.snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'UpgradePdfKeeper'}
+          ref={this.UpgradePdfKeeper}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -641,23 +851,39 @@ class UpgradeBackup extends Component<
               info={
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
               }
-              modalRef={this.refs.UpgradePdfKeeper}
+              modalRef={this.UpgradePdfKeeper}
               onPressSetup={() => {
-                ( this.refs.UpgradePdfKeeper as any ).snapTo( 0 );
-                ( this.refs.SecurityQuestionBottomSheet as any ).snapTo( 1 )
+                this.UpgradePdfKeeper.current.snapTo( 0 )
+                this.SecurityQuestionBottomSheet.current.snapTo( 1 )
               }}
               onPressBack={() => {
-                ( this.refs.UpgradePdfKeeper as any ).snapTo( 0 )
+                this.UpgradePdfKeeper.current.snapTo( 0 )
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                ( this.refs.UpgradePdfKeeper as any ).snapTo( 0 )
+                this.UpgradePdfKeeper.current.snapTo( 0 )
               }
             />
           )}
+        />
+        <BottomSheet
+          onCloseEnd={() => {
+            if( this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ){
+              this.saveInTransitHistory()
+              this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+            }
+          }}
+          onCloseStart={() => {
+            this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+          }}
+          enabledInnerScrolling={true}
+          ref={this.secondaryDeviceBottomSheet}
+          snapPoints={[ -30, hp( '85%' ) ]}
+          renderContent={this.renderSecondaryDeviceContents}
+          renderHeader={this.renderSecondaryDeviceHeader}
         />
       </View>
     )
@@ -686,7 +912,14 @@ const mapStateToProps = ( state ) => {
     activePersonalNode: idx( state, ( _ ) => _.nodeSettings.activePersonalNode ),
     isBackupProcessing: idx( state, ( _ ) => _.preferences.isBackupProcessing ) || false,
     versionHistory: idx( state, ( _ ) => _.versionHistory.versions ),
-
+    metaSharesKeeper: idx( state, ( _ ) => _.health.service.levelhealth.metaSharesKeeper ),
+    healthCheckInitializedKeeper: idx( state, ( _ ) => _.health.service.levelhealth.healthCheckInitializedKeeper ),
+    SHARES_TRANSFER_DETAILS:  idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS ),
+    uploadMetaShare: idx( state, ( _ ) => _.health.loading.uploadMetaShare ),
+    updateEphemeralChannelLoader: idx( state, ( _ ) => _.trustedContacts.loading.updateEphemeralChannel ),
+    keeperProcessStatusFlag: idx( state, ( _ ) => _.state.health.keeperProcessStatus ),
+    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.health.isSmMetaSharesCreatedFlag ),
+    trustedContactsInfo: idx( state, ( _ ) => _.trustedContacts.trustedContactsInfo ),
   }
 }
 
@@ -697,7 +930,16 @@ export default withNavigationFocus(
     updateHealthForCloud,
     updateMSharesHealth,
     initNewBHRFlow,
-    setCloudData
+    setCloudData,
+    generateMetaShare,
+    initLevelTwo,
+    setCloudDataForLevel,
+    addNewSecondarySubAccount,
+    keeperProcessStatus,
+    updatedKeeperInfo,
+    generateSMMetaShares,
+    autoUploadSecondaryShare,
+    autoShareContactKeeper
   } )( UpgradeBackup )
 )
 

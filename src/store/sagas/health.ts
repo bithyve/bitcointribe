@@ -122,7 +122,7 @@ import { ErrorSending } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import RelayServices from '../../bitcoin/services/RelayService'
 import generatePDFKeeper from '../utils/generatePDFKeeper'
-import { getKeeperInfoFromShareId } from '../../common/CommonFunctions'
+import { generateRandomString, getKeeperInfoFromShareId } from '../../common/CommonFunctions'
 import Keeper from '../../bitcoin/utilities/Keeper'
 import { ec as EC } from 'elliptic'
 const ec = new EC( 'curve25519' )
@@ -138,6 +138,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import Toast from '../../components/Toast'
 import { restoredVersionHistory } from '../actions/versionHistory'
 import { getVersions } from '../../common/utilities'
+import { initLevels } from '../actions/upgradeToNewBhr'
 
 function* initHealthWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -146,7 +147,7 @@ function* initHealthWorker() {
   if ( initialized ) return
   yield put( initLoader( true ) )
   const res = yield call( s3Service.initializeHealthKeeper )
-  console.log( 'healt initHealthWorker', res )
+  console.log( 'health initHealthWorker', res )
   if ( res.status === 200 ) {
 
     // Update status
@@ -187,7 +188,7 @@ function* generateMetaSharesWorker( { payload } ) {
     ( state ) => state.storage.database.WALLET_SETUP
   )
   const appVersion = DeviceInfo.getVersion()
-  const { level } = payload
+  const { level, isUpgrade } = payload
   const { answer, questionId, question } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP.security
   )
@@ -222,8 +223,9 @@ function* generateMetaSharesWorker( { payload } ) {
           ( state ) => state.health.isLevel2Initialized
         )
         if ( !isLevel2Initialized ) {
-          yield put( initLevelTwo( level ) )
           yield put( updateLevelTwoMetaShareStatus( true ) )
+          if( isUpgrade ) yield put( initLevels( level ) )
+          else yield put( initLevelTwo( level ) )
         }
       }
       if ( level == 3 ) {
@@ -231,8 +233,9 @@ function* generateMetaSharesWorker( { payload } ) {
           ( state ) => state.health.isLevel3Initialized
         )
         if ( !isLevel3Initialized ) {
-          yield put( initLevelTwo( level ) )
           yield put( updateLevelThreeMetaShareStatus( true ) )
+          if( isUpgrade ) yield put( initLevels( level ) )
+          else yield put( initLevelTwo( level ) )
         }
       }
       const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -561,10 +564,23 @@ function* updateHealthLevel2Worker( { payload } ) {
       ( state ) => state.health.isLevel2Initialized
     )
   }
+  console.log( 'isLevelInitialized', isLevelInitialized )
   if ( !isLevelInitialized ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const Health = yield select( ( state ) => state.health.levelHealth )
-    const SecurityQuestionHealth = Health[ 0 ].levelInfo[ 1 ]
+    let SecurityQuestionHealth
+    const randomIdForSecurityQ = generateRandomString( 8 )
+    if( Health[ 0 ] && Health[ 0 ].levelInfo && Health[ 0 ].levelInfo[ 1 ] ) SecurityQuestionHealth = Health[ 0 ].levelInfo[ 1 ]
+    else {
+      SecurityQuestionHealth = {
+        shareType: 'securityQuestion',
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareId: randomIdForSecurityQ,
+        reshareVersion: 0,
+      }
+    }
+    console.log( 'SecurityQuestionHealth', SecurityQuestionHealth )
     yield put( initLoader( true ) )
     const res = yield call(
       s3Service.updateHealthLevel2,
@@ -2471,6 +2487,7 @@ function* autoDownloadShareContactWorker( { payload } ) {
             ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
             [ TContacts[ index ].contactsWalletName ]: {
               META_SHARE: res.data.data.metaShare,
+              SECONDARY_SHARE: res.data.data.secondaryShare ? res.data.data.secondaryShare : null,
             },
           },
         }

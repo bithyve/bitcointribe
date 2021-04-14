@@ -220,10 +220,10 @@ export const updateMSharesLoader = ( beingLoaded ) => {
   }
 }
 
-export const generateMetaShare = ( level ) => {
+export const generateMetaShare = ( level, isUpgrade? ) => {
   return {
     type: GENERATE_META_SHARE, payload: {
-      level
+      level, isUpgrade
     }
   }
 }

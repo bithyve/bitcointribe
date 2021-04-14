@@ -923,6 +923,34 @@ export default class S3Service {
     }
   };
 
+  public initLevels = async ( SecurityQuestionHealth, level ): Promise<
+    | {
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.levelhealth.initLevels( SecurityQuestionHealth, level ),
+      }
+    } catch ( err ) {
+      return {
+        status: 513, err: err.message, message: ErrMap[ 513 ]
+      }
+    }
+  };
+
   public checkHealth = async (): Promise<
     | {
         status: number;
