@@ -83,6 +83,7 @@ import QRModal from '../Accounts/QRModal'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import Loader from '../../components/loader'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -106,6 +107,7 @@ interface ManageBackupNewBHRStateTypes {
   refreshControlLoader: boolean;
   QrBottomSheetsFlag: boolean;
   secondaryShare: MetaShare;
+  showLoader: boolean;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -248,6 +250,7 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader: false,
       QrBottomSheetsFlag: false,
       secondaryShare: null,
+      showLoader: false
     }
   }
 
@@ -350,11 +353,13 @@ class ManageBackupNewBHR extends Component<
 
       if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
-          refreshControlLoader: true
+          refreshControlLoader: true,
+          showLoader: true
         } )
       } else if ( !healthLoading && ( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.PENDING || cloudBackupStatus === CloudBackupStatus.FAILED ) ) {
         this.setState( {
-          refreshControlLoader: false
+          refreshControlLoader: false,
+          showLoader: false
         } )
       }
     }
@@ -537,7 +542,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   goToHistory = ( value ) => {
-    const { id, selectedKeeper, isSetup } = value
+    const { id, selectedKeeper, isSetup, isPrimaryKeeper } = value
     console.log( 'VALUE', value )
     const navigationParams = {
       selectedTime: selectedKeeper.updatedAt
@@ -572,6 +577,7 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
+        isPrimaryKeeper,
         index,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
@@ -677,6 +683,7 @@ class ManageBackupNewBHR extends Component<
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
       },
       isSetup: keeper.updatedAt ? false : true,
+      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false
     }
     if ( keeper.updatedAt > 0 ) {
       this.goToHistory( obj )
@@ -1433,6 +1440,7 @@ class ManageBackupNewBHR extends Component<
             } )}
           </View>
         </ScrollView>
+        {this.state.showLoader ? <Loader /> : null}
         <BottomSheet
           enabledInnerScrolling={true}
           ref={( c )=>this.keeperTypeBottomSheet = c}

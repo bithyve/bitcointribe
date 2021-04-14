@@ -76,6 +76,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
 
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
+  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -852,7 +853,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           }}
           changeButtonText={'Change Keeper'}
           onPressChange={() => {
-            ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            if( isPrimaryKeeper ){
+              setSelectedKeeperType( 'device' )
+              setSelectedKeeperName( 'Secondary Device1' )
+              sendApprovalRequestToPK( )
+            } else{
+              ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            }
             // (ChangeBottomSheet as any).current.snapTo(1);
           }}
         />
