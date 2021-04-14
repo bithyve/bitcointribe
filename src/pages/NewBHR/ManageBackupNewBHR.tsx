@@ -284,7 +284,7 @@ class ManageBackupNewBHR extends Component<
       levelData: levelData.levelData,
       isError: levelData.isError,
     } )
-    this.setSelectedCards()
+    //this.setSelectedCards()
   };
 
   setSelectedCards = () => {
@@ -542,7 +542,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   goToHistory = ( value ) => {
-    const { id, selectedKeeper, isSetup, isPrimaryKeeper } = value
+    const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
     console.log( 'VALUE', value )
     const navigationParams = {
       selectedTime: selectedKeeper.updatedAt
@@ -578,6 +578,7 @@ class ManageBackupNewBHR extends Component<
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
         isPrimaryKeeper,
+        isChangeKeeperAllow,
         index,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
@@ -601,6 +602,7 @@ class ManageBackupNewBHR extends Component<
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,
+        isChangeKeeperAllow
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
       ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
@@ -608,7 +610,8 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate(
         'PersonalCopyHistoryNewBHR',
-        navigationParams
+        navigationParams,
+        isChangeKeeperAllow
       )
     }
   };
@@ -673,7 +676,7 @@ class ManageBackupNewBHR extends Component<
       selectedKeeper: keeper,
       selectedLevelId: value.id,
     } )
-
+    console.log( 'this.props.metaSharesKeeper.length', this.props.metaSharesKeeper.length )
     const obj = {
       id: value.id,
       selectedKeeper: {
@@ -683,7 +686,8 @@ class ManageBackupNewBHR extends Component<
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
       },
       isSetup: keeper.updatedAt ? false : true,
-      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false
+      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false,
+      isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && this.props.metaSharesKeeper.length === 5 ? false : true
     }
     if ( keeper.updatedAt > 0 ) {
       this.goToHistory( obj )
@@ -868,6 +872,7 @@ class ManageBackupNewBHR extends Component<
   }
 
   keeperButtonText = ( buttonText, number ) =>{
+    console.log( 'buttonText', buttonText, number )
     if( !buttonText ) return 'Share Recovery Key ' + number
     switch ( buttonText ) {
         case 'Secondary Device1': return 'Personal Device1'
@@ -981,7 +986,9 @@ class ManageBackupNewBHR extends Component<
           </View>
           <View style={{
             justifyContent:'center',
-            alignItems:'center'
+            alignItems:'center',
+            marginLeft: 10,
+            marginRight: 10
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular

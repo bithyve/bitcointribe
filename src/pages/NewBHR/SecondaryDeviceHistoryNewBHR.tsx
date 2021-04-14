@@ -77,6 +77,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -863,6 +864,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
           changeButtonText={'Change Keeper'}
+          isChangeKeeperAllow={isChangeKeeperAllow}
           onPressChange={() => {
             if( isPrimaryKeeper ){
               setSelectedKeeperType( 'device' )

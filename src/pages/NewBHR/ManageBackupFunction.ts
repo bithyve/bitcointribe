@@ -259,6 +259,9 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
       }
       // BOTH ACCESSIBLE
       if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
+        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
+        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
+
         levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, upgrade to Backup Level 3' : 'Multi Key Backup is accessible'
       }
       // ONLY ONE ACCESSIBLE
