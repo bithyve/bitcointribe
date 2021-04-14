@@ -1010,7 +1010,7 @@ class ManageBackupNewBHR extends Component<
                       borderRadius: 10,
                       marginTop: wp( '7%' ),
                       backgroundColor:
-                        value.status == 'good' || value.status == 'bad'
+                        value.status == 'good'
                           ? Colors.blue
                           : Colors.backgroundColor,
                       shadowRadius:
@@ -1031,7 +1031,7 @@ class ManageBackupNewBHR extends Component<
                       <View style={{
                         flexDirection: 'row'
                       }}>
-                        {value.status == 'good' || value.status == 'bad' ? (
+                        {value.status == 'good' ? (
                           <View
                             style={{
                               ...styles.cardHealthImageView,
@@ -1074,7 +1074,7 @@ class ManageBackupNewBHR extends Component<
                           style={{
                             ...styles.cardButtonView,
                             backgroundColor:
-                              value.status == 'notSetup'
+                              value.status == 'notSetup' || value.status == 'bad'
                                 ? Colors.white
                                 : Colors.deepBlue,
                           }}
@@ -1083,7 +1083,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.cardButtonText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                               width:'auto'
@@ -1104,7 +1104,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.levelText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                             }}
@@ -1115,7 +1115,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.levelInfoText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                               width: wp( '55%' )
@@ -1133,7 +1133,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.manageButtonText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.black
                                   : Colors.white,
                             }}
@@ -1148,7 +1148,7 @@ class ManageBackupNewBHR extends Component<
                                 : 'arrowright'
                             }
                             color={
-                              value.status == 'notSetup'
+                              value.status == 'notSetup'|| value.status == 'bad'
                                 ? Colors.black
                                 : Colors.white
                             }
@@ -1172,7 +1172,7 @@ class ManageBackupNewBHR extends Component<
                               numberOfLines={2}
                               style={{
                                 color:
-                                  value.status == 'notSetup'
+                                  value.status == 'notSetup'|| value.status == 'bad'
                                     ? Colors.textColorGrey
                                     : Colors.white,
                                 fontFamily: Fonts.FiraSansRegular,
@@ -1231,7 +1231,7 @@ class ManageBackupNewBHR extends Component<
                                   ...styles.appBackupButton,
                                   borderColor:
                                   value.keeper2.status == 'accessible'
-                                    ? value.status == 'notSetup'
+                                    ? value.status == 'notSetup'|| value.status == 'bad'
                                       ? Colors.white
                                       : Colors.deepBlue
                                     : Colors.red,
@@ -1299,14 +1299,14 @@ class ManageBackupNewBHR extends Component<
                                 style={{
                                   ...styles.appBackupButton,
                                   backgroundColor:
-                                    value.status == 'notSetup'
+                                    value.status == 'notSetup'|| value.status == 'bad'
                                       ? Colors.white
                                       : Colors.deepBlue,
                                   paddingLeft: wp( '3%' ),
                                   paddingRight: wp( '3%' ),
                                   borderColor:
                                     value.keeper1.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                      ? value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
@@ -1360,7 +1360,7 @@ class ManageBackupNewBHR extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     color:
-                                      value.status == 'notSetup'
+                                      value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.textColorGrey
                                         : Colors.white,
                                     fontSize: RFValue( 8 ),
@@ -1375,14 +1375,14 @@ class ManageBackupNewBHR extends Component<
                                 style={{
                                   ...styles.appBackupButton,
                                   backgroundColor:
-                                    value.status == 'notSetup'
+                                    value.status == 'notSetup'|| value.status == 'bad'
                                       ? Colors.white
                                       : Colors.deepBlue,
                                   paddingLeft: wp( '3%' ),
                                   paddingRight: wp( '3%' ),
                                   borderColor:
                                     value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                      ? value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
@@ -1438,7 +1438,7 @@ class ManageBackupNewBHR extends Component<
                                     ...styles.cardButtonText,
                                     fontSize: RFValue( 8 ),
                                     color:
-                                      value.status == 'notSetup'
+                                      value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.textColorGrey
                                         : Colors.white,
                                     marginLeft: wp( '2%' ),
