@@ -2112,7 +2112,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           return [
             -50,
             heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 50,
             ),
           ]
 
@@ -2120,7 +2120,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           return [
             -50,
             heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 45 : 30,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 45 : 50,
             ),
           ]
 
