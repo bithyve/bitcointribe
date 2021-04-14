@@ -19,13 +19,12 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { upgradeReducer, walletCheckIn } from '../actions/trustedContacts'
+import { sendVersionUpdateNotification, walletCheckIn } from '../actions/trustedContacts'
 import KeeperService from '../../bitcoin/services/KeeperService'
 import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
 import { updateWalletImage } from '../actions/sss'
-import { TrustedContactsState } from '../reducers/trustedContacts'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -48,7 +47,6 @@ function* initServicesWorker() {
 }
 
 export const initServicesWatcher = createWatcher( initServicesWorker, INITIALIZE_SERVICES )
-
 
 function* fetchDBWorker() {
   try {
@@ -73,8 +71,6 @@ function* fetchDBWorker() {
         }else{
           yield put( updateWalletImage() )
         }
-
-
       }
     } else {
       // DB would be absent during wallet setup
@@ -136,17 +132,42 @@ function* servicesEnricherWorker( { payload } ) {
 
     let dbVersion = database.VERSION
     let appVersion = DeviceInfo.getVersion()
-    if ( appVersion === '0.7' ) {
-      appVersion = '0.7.0'
+
+    // standardize initial app version's semver
+    switch( appVersion ){
+        case '0.7':
+          appVersion = '0.7.0'
+          break
+
+        case '0.8':
+          appVersion = '0.8.0'
+          break
+
+        case '0.9':
+          appVersion = '0.9.0'
+          break
     }
-    if ( appVersion === '0.8' ) {
-      appVersion = '0.8.0'
+
+    if ( !database.VERSION ) dbVersion = '0.7.0'
+    // standardize initial db version's semver
+    switch( database.VERSION ){
+        case '0.8':
+          dbVersion = '0.8.0'
+          break
+
+        case '0.9':
+          dbVersion = '0.9.0'
+          break
+
+        case '1.0':
+          dbVersion = '1.0.0'
+          break
     }
-    if ( appVersion === '0.9' ) {
-      appVersion = '0.9.0'
-    }
+
     let services
     let migrated = false
+    let versionUpdated = false
+
     const {
       REGULAR_ACCOUNT,
       TEST_ACCOUNT,
@@ -156,16 +177,9 @@ function* servicesEnricherWorker( { payload } ) {
       KEEPERS_INFO,
     } = database.SERVICES
 
-    if ( !database.VERSION ) {
-      dbVersion = '0.7.0'
-    } else if ( database.VERSION === '0.8' ) {
-      dbVersion = '0.8.0'
-    } else if ( database.VERSION === '0.9' ) {
-      dbVersion = '0.9.0'
-    } else if ( database.VERSION === '1.0' ) {
-      dbVersion = '1.0.0'
-    }
+
     if ( semver.gt( appVersion, dbVersion ) ) {
+      versionUpdated = true
       if ( dbVersion === '0.7.0' && semver.gte( appVersion, '0.9.0' ) ) {
         // version 0.7.0 support
         console.log( 'Migration running for 0.7.0' )
@@ -278,20 +292,27 @@ function* servicesEnricherWorker( { payload } ) {
           : new KeeperService(),
       }
     }
+
     yield put( servicesEnriched( services ) )
-    if ( migrated ) {
+    if ( versionUpdated ) {
+      // update the stored version
       database.VERSION = DeviceInfo.getVersion()
-      database.SERVICES = {
-        REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
-        TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
-        SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
-        S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
-        TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
-        KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
-      }
+
+      if( migrated )
+        database.SERVICES = {
+          REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
+          TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
+          SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
+          S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
+          TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+          KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
+        }
       yield call( insertDBWorker, {
         payload: database,
       } )
+
+      // send version upgrade notification to F&Fs
+      yield put( sendVersionUpdateNotification( database.VERSION ) )
     }
   } catch ( err ) {
     console.log( err )
