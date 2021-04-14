@@ -811,21 +811,17 @@ function* blindRefreshWorker() {
     const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
-    // console.log("deltaTxs",deltaTxs);
-    const rescanTxs : RescannedTransactionData[]= []
-    deltaTxs.forEach( ( deltaTx )=>{
-      rescanTxs.push( {
-        details: deltaTx,
-      } )
-    } )
-    yield put( rescanSucceeded( rescanTxs ) )
     if ( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
   }
-  // console.log("netDeltaTxs",netDeltaTxs);
 
+  const rescanTxs : RescannedTransactionData[]= []
+  netDeltaTxs.forEach( ( deltaTx )=>{
+    rescanTxs.push( {
+      details: deltaTx,
+    } )
+  } )
+  yield put( rescanSucceeded( rescanTxs ) )
   yield put( blindRefreshStarted( false ) )
-
-  return netDeltaTxs
 }
 
 export const blindRefreshWatcher = createWatcher(
