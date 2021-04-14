@@ -42,6 +42,7 @@ import {
   ContactInfo,
   clearAccountSyncCache,
   BLIND_REFRESH,
+  blindRefreshStarted,
   GET_ALL_ACCOUNTS_DATA,
   setAllAccountsData,
   fetchReceiveAddressSucceeded,
@@ -792,6 +793,7 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* blindRefreshWorker() {
+  yield put( blindRefreshStarted( true ) )
   const netDeltaTxs: TransactionDescribing[] = []
   for ( const accountKind of [ SourceAccountKind.TEST_ACCOUNT, SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ) {
     const payload = {
@@ -811,7 +813,15 @@ function* blindRefreshWorker() {
     } )
     if ( deltaTxs.length ) netDeltaTxs.push( ...deltaTxs )
   }
-  return netDeltaTxs
+
+  const rescanTxs : RescannedTransactionData[]= []
+  netDeltaTxs.forEach( ( deltaTx )=>{
+    rescanTxs.push( {
+      details: deltaTx,
+    } )
+  } )
+  yield put( rescanSucceeded( rescanTxs ) )
+  yield put( blindRefreshStarted( false ) )
 }
 
 export const blindRefreshWatcher = createWatcher(
