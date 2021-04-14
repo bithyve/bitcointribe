@@ -45,7 +45,7 @@ export const modifyLevelStatus = (
     isError = true
   }
 
-  const levelDataUpdated = getLevelInfoStatus( levelData )
+  const levelDataUpdated = getLevelInfoStatus( levelData, currentLevel )
   callBack( levelDataUpdated )
   return {
     levelData: levelDataUpdated, isError
@@ -221,9 +221,25 @@ const getModifiedData = ( keeperInfo, levelHealthVar ) => {
   return levelHealthVar
 }
 
-const getLevelInfoStatus = ( levelData ) => {
+const noteText = ( i, currentLevel ) => {
+  switch ( i ) {
+      case 1:
+        if( currentLevel === 0 ) return 'First complete Level 1, before proceeding with Level 2'
+        if( currentLevel === 1 ) return 'Share the Recovery Key(s) to upgrade your backup to Level 2'
+      case 2:
+        if( currentLevel === 0 ) return 'First complete Level 2, before proceeding with Level 3'
+        if( currentLevel === 1 ) return 'First complete Level 2, before proceeding with Level 3'
+        if( currentLevel === 2 ) return 'Share the Recovery Key(s) to upgrade your backup to Level 3'
+      default:
+        break
+  }
+  return 'Share the Recovery Key(s) to upgrade your backup'
+}
+
+const getLevelInfoStatus = ( levelData, currentLevel ) => {
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
+    console.log( 'LVELEDATA', levelData, currentLevel )
     if( i == 0 ){
       // Not SETUP
       if( levelData[ i ].status == 'notSetup' ) {
@@ -233,17 +249,17 @@ const getLevelInfoStatus = ( levelData ) => {
         levelData[ i ].note= 'Backup needs your attention'
       }
       if( levelData[ i ].status == 'good' ) {
-        levelData[ i ].note= 'Backup is secure'
+        levelData[ i ].note= 'Backup Level 1 is secure, upgrade to Backup Level 2'
       }
     }
     if( i == 1 || i == 2 ) {
       // NOT SETUP
       if( levelData[ i ].status == 'notSetup' && i == 1 || i == 2 ) {
-        levelData[ i ].note = 'Share your Recovery Keys with personal devices, contacts or as a PDF'
+        levelData[ i ].note = noteText( i, currentLevel )
       }
       // BOTH ACCESSIBLE
       if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
-        levelData[ i ].note = i == 1 ? 'Double Backup is accessible' : 'Multi Key Backup is accessible'
+        levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, upgrade to Backup Level 3' : 'Multi Key Backup is accessible'
       }
       // ONLY ONE ACCESSIBLE
       if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){

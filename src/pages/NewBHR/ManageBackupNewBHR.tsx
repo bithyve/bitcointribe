@@ -973,7 +973,7 @@ class ManageBackupNewBHR extends Component<
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud Backup complete, please upgrade security to Level 2' : currentLevel === 2 ? 'Double Backup complete, please upgrade security to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete. Please complete Level 1' }</Text>
+            }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, you can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, please complete Level 1' }</Text>
           </View>
           <View
             style={{
