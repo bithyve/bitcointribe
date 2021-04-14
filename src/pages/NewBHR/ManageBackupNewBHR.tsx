@@ -867,6 +867,18 @@ class ManageBackupNewBHR extends Component<
     )
   }
 
+  keeperButtonText = ( buttonText, number ) =>{
+    if( !buttonText ) return 'Share Recovery Key ' + number
+    switch ( buttonText ) {
+        case 'Secondary Device1': return 'Personal Device1'
+        case 'Secondary Device2': return 'Personal Device2'
+        case 'Secondary Device3': return 'Personal Device3'
+
+        default:
+          return buttonText
+    }
+  }
+
   render() {
     const {
       levelData,
@@ -1349,7 +1361,7 @@ class ManageBackupNewBHR extends Component<
                                   } }
                                   numberOfLines={1}
                                 >
-                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share Recovery Key 1'}
+                                  {this.keeperButtonText( value.keeper1ButtonText, '1' )}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
@@ -1426,7 +1438,7 @@ class ManageBackupNewBHR extends Component<
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share Recovery Key 2'}
+                                  {this.keeperButtonText( value.keeper2ButtonText, '2' )}
                                 </Text>
                               </TouchableOpacity>
                             </View>

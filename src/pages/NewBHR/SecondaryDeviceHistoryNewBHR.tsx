@@ -819,6 +819,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     dispatch( updateMSharesHealth( shareArray ) )
   }
 
+  const deviceText = ( text ) =>{
+    switch ( text ) {
+        case 'Secondary Device1': return 'Personal Device1'
+        case 'Secondary Device2': return 'Personal Device2'
+        case 'Secondary Device3': return 'Personal Device3'
+
+        default:
+          return text
+    }
+  }
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -829,10 +840,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={props.navigation.state.params.selectedTime}
         selectedStatus={props.navigation.state.params.selectedStatus}
-        moreInfo={props.navigation.state.params.selectedTitle}
+        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
       <View style={{
