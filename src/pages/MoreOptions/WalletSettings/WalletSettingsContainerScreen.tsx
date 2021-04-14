@@ -13,6 +13,7 @@ import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
+import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 
 export type Props = {
   navigation: any;
@@ -28,6 +29,14 @@ interface MenuOption {
 
 const versionString = `Version ${DeviceInfo.getVersion()} (${DeviceInfo.getBuildNumber()})`
 
+
+const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
+
 const menuOptions: MenuOption[] = [
   {
     title: 'Manage Passcode',
@@ -41,13 +50,13 @@ const menuOptions: MenuOption[] = [
     imageSource: require( '../../../assets/images/icons/country.png' ),
     screenName: 'ChangeCurrency',
   },
-  // {
-  //   title: 'Full Rescan',
-  //   subtitle: 'Completely sync the account',
-  //   imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
-  //   onOptionPressed: handleRescanListItemSelection,
-  // },
-  //
+  {
+    title: 'Full Rescan',
+    subtitle: 'Completely sync the account',
+    imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
+    onOptionPressed: handleRescanListItemSelection,
+  },
+  
   {
     title: 'Version History',
     subtitle: 'Version History',
@@ -62,13 +71,6 @@ const menuOptions: MenuOption[] = [
 ]
 
 
-const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
-
-
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
       menuOption.onOptionPressed()
@@ -78,21 +80,7 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
   }
 
   function handleRescanListItemSelection() {
-    Alert.alert(
-      'Re-scan your Account',
-      'Re-scanning all your accounts may take some time.',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Continue',
-          onPress: showRescanningBottomSheet,
-          style: 'default',
-        },
-      ]
-    )
+    showRescanningPromptBottomSheet()
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
@@ -103,6 +91,25 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       accountShellID: transactionData.accountShell.id,
     } )
   }
+
+  const showRescanningPromptBottomSheet = useCallback( () => {
+    presentBottomSheet(
+      <AccountShellRescanningPromptBottomSheet
+        onContinue={() => {
+          dismissBottomSheet()
+          setTimeout( () => {
+            showRescanningBottomSheet()
+          }, 800 )
+        }}
+        onDismiss={dismissBottomSheet}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '33%' ],
+      },
+    )
+  }, [ presentBottomSheet, dismissBottomSheet ] )
+
 
   const showRescanningBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -118,7 +125,6 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       },
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
-
 
   return (
     <View style={styles.modalContainer}>

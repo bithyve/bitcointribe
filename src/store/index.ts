@@ -117,6 +117,8 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
+  multiUpdateTrustedChannelsWatcher,
+  sendVersionUpdateNotificationWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -196,9 +198,6 @@ import {
   readFileWatcher,
   uplaodFileWatcher,
 } from './sagas/cloud'
-
-import { fromPrivateKey } from 'bip32'
-import reducer from './reducers/fbtc'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
 const rootSaga = function* () {
@@ -289,6 +288,8 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+    sendVersionUpdateNotificationWatcher,
+    multiUpdateTrustedChannelsWatcher,
 
     // Health
     initHealthWatcher,

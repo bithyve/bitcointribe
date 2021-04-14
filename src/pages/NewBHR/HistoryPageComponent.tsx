@@ -148,7 +148,7 @@ const HistoryPageComponent = ( props ) => {
             </Text>
           </TouchableOpacity>: null
         }
-        {props.IsReshare && (
+        {props.IsReshare && props.isChangeKeeperAllow && (
           <TouchableOpacity
             disabled={props.disableChange ? props.disableChange : false}
             onPress={() => props.onPressChange()}

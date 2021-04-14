@@ -10,7 +10,7 @@ export type RescannedTransactionData = {
   primaryTitleText?: string;
   subtitleText?: string;
   avatarImage?: ImageSourcePropType;
-  accountShell: AccountShell;
+  accountShell?: AccountShell;
 }
 
 export type WalletRescanningState = {

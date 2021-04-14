@@ -158,12 +158,6 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     alignSelf: 'center',
     width: '100%',
-    elevation: 10,
-    shadowColor: Colors.borderColor,
-    shadowOpacity: 10,
-    shadowOffset: {
-      width: 0, height: 2
-    },
   },
   headerText: {
     color: Colors.white,

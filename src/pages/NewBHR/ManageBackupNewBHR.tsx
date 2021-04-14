@@ -210,7 +210,7 @@ class ManageBackupNewBHR extends Component<
         {
           levelName: 'Level 1',
           status: 'notSetup',
-          keeper1ButtonText: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
+          keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on GoogleDrive',
           keeper2ButtonText: 'Security Question',
           keeper1: obj,
           keeper2: obj,
@@ -284,7 +284,7 @@ class ManageBackupNewBHR extends Component<
       levelData: levelData.levelData,
       isError: levelData.isError,
     } )
-    this.setSelectedCards()
+    //this.setSelectedCards()
   };
 
   setSelectedCards = () => {
@@ -542,7 +542,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   goToHistory = ( value ) => {
-    const { id, selectedKeeper, isSetup, isPrimaryKeeper } = value
+    const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
     console.log( 'VALUE', value )
     const navigationParams = {
       selectedTime: selectedKeeper.updatedAt
@@ -578,6 +578,7 @@ class ManageBackupNewBHR extends Component<
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
         isPrimaryKeeper,
+        isChangeKeeperAllow,
         index,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
@@ -601,6 +602,7 @@ class ManageBackupNewBHR extends Component<
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,
+        isChangeKeeperAllow
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
       ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
@@ -608,7 +610,8 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate(
         'PersonalCopyHistoryNewBHR',
-        navigationParams
+        navigationParams,
+        isChangeKeeperAllow
       )
     }
   };
@@ -673,7 +676,7 @@ class ManageBackupNewBHR extends Component<
       selectedKeeper: keeper,
       selectedLevelId: value.id,
     } )
-
+    console.log( 'this.props.metaSharesKeeper.length', this.props.metaSharesKeeper.length )
     const obj = {
       id: value.id,
       selectedKeeper: {
@@ -683,7 +686,8 @@ class ManageBackupNewBHR extends Component<
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
       },
       isSetup: keeper.updatedAt ? false : true,
-      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false
+      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false,
+      isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && this.props.metaSharesKeeper.length === 5 ? false : true
     }
     if ( keeper.updatedAt > 0 ) {
       this.goToHistory( obj )
@@ -867,6 +871,19 @@ class ManageBackupNewBHR extends Component<
     )
   }
 
+  keeperButtonText = ( buttonText, number ) =>{
+    console.log( 'buttonText', buttonText, number )
+    if( !buttonText ) return 'Share Recovery Key ' + number
+    switch ( buttonText ) {
+        case 'Secondary Device1': return 'Personal Device1'
+        case 'Secondary Device2': return 'Personal Device2'
+        case 'Secondary Device3': return 'Personal Device3'
+
+        default:
+          return buttonText
+    }
+  }
+
   render() {
     const {
       levelData,
@@ -969,11 +986,13 @@ class ManageBackupNewBHR extends Component<
           </View>
           <View style={{
             justifyContent:'center',
-            alignItems:'center'
+            alignItems:'center',
+            marginLeft: 10,
+            marginRight: 10
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud backup complete, please upgrade security to Level 2' : currentLevel === 2 ? 'Double backup complete, please upgrade security to Level 3' : currentLevel === 3 ? 'Multi-key backup complete' : 'Cloud backup incomplete, please complete Level 1' }</Text>
+            }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, you can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, please complete Level 1' }</Text>
           </View>
           <View
             style={{
@@ -991,7 +1010,7 @@ class ManageBackupNewBHR extends Component<
                       borderRadius: 10,
                       marginTop: wp( '7%' ),
                       backgroundColor:
-                        value.status == 'good' || value.status == 'bad'
+                        value.status == 'good'
                           ? Colors.blue
                           : Colors.backgroundColor,
                       shadowRadius:
@@ -1012,7 +1031,7 @@ class ManageBackupNewBHR extends Component<
                       <View style={{
                         flexDirection: 'row'
                       }}>
-                        {value.status == 'good' || value.status == 'bad' ? (
+                        {value.status == 'good' ? (
                           <View
                             style={{
                               ...styles.cardHealthImageView,
@@ -1055,7 +1074,7 @@ class ManageBackupNewBHR extends Component<
                           style={{
                             ...styles.cardButtonView,
                             backgroundColor:
-                              value.status == 'notSetup'
+                              value.status == 'notSetup' || value.status == 'bad'
                                 ? Colors.white
                                 : Colors.deepBlue,
                           }}
@@ -1064,7 +1083,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.cardButtonText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                               width:'auto'
@@ -1085,7 +1104,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.levelText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                             }}
@@ -1096,7 +1115,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.levelInfoText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                               width: wp( '55%' )
@@ -1114,7 +1133,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.manageButtonText,
                               color:
-                                value.status == 'notSetup'
+                                value.status == 'notSetup'|| value.status == 'bad'
                                   ? Colors.black
                                   : Colors.white,
                             }}
@@ -1129,7 +1148,7 @@ class ManageBackupNewBHR extends Component<
                                 : 'arrowright'
                             }
                             color={
-                              value.status == 'notSetup'
+                              value.status == 'notSetup'|| value.status == 'bad'
                                 ? Colors.black
                                 : Colors.white
                             }
@@ -1147,13 +1166,13 @@ class ManageBackupNewBHR extends Component<
                         />
                         <View style={styles.cardView}>
                           <View style={{
-                            width: wp( '55%' )
+                            width: wp( '70%' )
                           }}>
                             <Text
                               numberOfLines={2}
                               style={{
                                 color:
-                                  value.status == 'notSetup'
+                                  value.status == 'notSetup'|| value.status == 'bad'
                                     ? Colors.textColorGrey
                                     : Colors.white,
                                 fontFamily: Fonts.FiraSansRegular,
@@ -1212,7 +1231,7 @@ class ManageBackupNewBHR extends Component<
                                   ...styles.appBackupButton,
                                   borderColor:
                                   value.keeper2.status == 'accessible'
-                                    ? value.status == 'notSetup'
+                                    ? value.status == 'notSetup'|| value.status == 'bad'
                                       ? Colors.white
                                       : Colors.deepBlue
                                     : Colors.red,
@@ -1280,14 +1299,14 @@ class ManageBackupNewBHR extends Component<
                                 style={{
                                   ...styles.appBackupButton,
                                   backgroundColor:
-                                    value.status == 'notSetup'
+                                    value.status == 'notSetup'|| value.status == 'bad'
                                       ? Colors.white
                                       : Colors.deepBlue,
                                   paddingLeft: wp( '3%' ),
                                   paddingRight: wp( '3%' ),
                                   borderColor:
                                     value.keeper1.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                      ? value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
@@ -1341,7 +1360,7 @@ class ManageBackupNewBHR extends Component<
                                   style={{
                                     ...styles.cardButtonText,
                                     color:
-                                      value.status == 'notSetup'
+                                      value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.textColorGrey
                                         : Colors.white,
                                     fontSize: RFValue( 8 ),
@@ -1349,21 +1368,21 @@ class ManageBackupNewBHR extends Component<
                                   } }
                                   numberOfLines={1}
                                 >
-                                  {value.keeper1ButtonText ? value.keeper1ButtonText : 'Share Recovery Key 1'}
+                                  {this.keeperButtonText( value.keeper1ButtonText, '1' )}
                                 </Text>
                               </TouchableOpacity>
                               <TouchableOpacity
                                 style={{
                                   ...styles.appBackupButton,
                                   backgroundColor:
-                                    value.status == 'notSetup'
+                                    value.status == 'notSetup'|| value.status == 'bad'
                                       ? Colors.white
                                       : Colors.deepBlue,
                                   paddingLeft: wp( '3%' ),
                                   paddingRight: wp( '3%' ),
                                   borderColor:
                                     value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'
+                                      ? value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.white
                                         : Colors.deepBlue
                                       : Colors.red,
@@ -1419,14 +1438,14 @@ class ManageBackupNewBHR extends Component<
                                     ...styles.cardButtonText,
                                     fontSize: RFValue( 8 ),
                                     color:
-                                      value.status == 'notSetup'
+                                      value.status == 'notSetup'|| value.status == 'bad'
                                         ? Colors.textColorGrey
                                         : Colors.white,
                                     marginLeft: wp( '2%' ),
                                   }}
                                   numberOfLines={1}
                                 >
-                                  {value.keeper2ButtonText ? value.keeper2ButtonText :'Share Recovery Key 2'}
+                                  {this.keeperButtonText( value.keeper2ButtonText, '2' )}
                                 </Text>
                               </TouchableOpacity>
                             </View>

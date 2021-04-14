@@ -116,6 +116,7 @@ const PersonalCopyHistory = ( props ) => {
   const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
 
 
   useEffect( () => {
@@ -588,6 +589,7 @@ const PersonalCopyHistory = ( props ) => {
             );
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}
+          isChangeKeeperAllow={isChangeKeeperAllow}
           changeButtonText={'Change Keeper'}
           onPressChange={() => {
             ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
