@@ -139,6 +139,7 @@ interface ContactDetailsPropTypes {
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
   uploadingSmShare: any;
+  newBHRFlowStarted : any;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -1044,7 +1045,7 @@ class ContactDetails extends PureComponent<
   };
 
   render() {
-    const { navigation, uploading, uploadingSmShare } = this.props
+    const { navigation, uploading, uploadingSmShare, newBHRFlowStarted } = this.props
     const {
       contact,
       Loading,
@@ -1291,24 +1292,25 @@ class ContactDetails extends PureComponent<
                   )}
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.bottomButton,
-                }}
-                onPress={() => this.onHelpRestore( true )}
-              >
-                <Image
-                  source={require( '../../assets/images/icons/icon_restore.png' )}
-                  style={styles.buttonImage}
-                />
-                <View>
-                  {uploadingSmShare ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>Help SM Key</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
+              { newBHRFlowStarted ? (
+                <TouchableOpacity
+                  style={{
+                    ...styles.bottomButton,
+                  }}
+                  onPress={() => this.onHelpRestore( true )}
+                >
+                  <Image
+                    source={require( '../../assets/images/icons/icon_restore.png' )}
+                    style={styles.buttonImage}
+                  />
+                  <View>
+                    {uploadingSmShare ? (
+                      <ActivityIndicator size="small" />
+                    ) : (
+                      <Text style={styles.buttonText}>Help SM Key</Text>
+                    )}
+                  </View>
+                </TouchableOpacity> ) : null}
               {encryptedExitKey ? (
                 <TouchableOpacity
                   style={{
@@ -1484,6 +1486,7 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
     ),
     hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
+    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
   }
 }
 export default connect( mapStateToProps, {
