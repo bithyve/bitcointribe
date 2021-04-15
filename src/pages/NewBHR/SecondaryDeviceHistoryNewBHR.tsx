@@ -76,6 +76,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
 
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
+  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -383,6 +385,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
+      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+        ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+        createGuardian()
+      }
       // blocking keeper reshare till 100% health
       const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
       if ( blockPCShare ) {
@@ -814,6 +820,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     dispatch( updateMSharesHealth( shareArray ) )
   }
 
+  const deviceText = ( text ) =>{
+    switch ( text ) {
+        case 'Secondary Device1': return 'Personal Device1'
+        case 'Secondary Device2': return 'Personal Device2'
+        case 'Secondary Device3': return 'Personal Device3'
+
+        default:
+          return text
+    }
+  }
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -824,10 +841,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={props.navigation.state.params.selectedTime}
         selectedStatus={props.navigation.state.params.selectedStatus}
-        moreInfo={props.navigation.state.params.selectedTitle}
+        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
       <View style={{
@@ -837,9 +854,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           type={'secondaryDevice'}
           IsReshare={isReshare}
           data={sortedHistory( secondaryDeviceHistory )}
-          confirmButtonText={'Share Now'}
+          confirmButtonText={''}
           onPressConfirm={() => {
-            // (secondaryDeviceMessageBottomSheet as any).current.snapTo(1);
             createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
           }}
@@ -848,8 +864,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
           changeButtonText={'Change Keeper'}
+          isChangeKeeperAllow={isChangeKeeperAllow}
           onPressChange={() => {
-            ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            if( isPrimaryKeeper ){
+              setSelectedKeeperType( 'device' )
+              setSelectedKeeperName( 'Secondary Device1' )
+              sendApprovalRequestToPK( )
+            } else{
+              ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            }
             // (ChangeBottomSheet as any).current.snapTo(1);
           }}
         />

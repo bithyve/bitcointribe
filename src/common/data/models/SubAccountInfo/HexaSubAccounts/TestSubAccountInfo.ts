@@ -16,6 +16,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {};
 
 export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -27,6 +28,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   isTFAEnabled: boolean;
 
   defaultTitle: string;
+  defaultSubTitle: string;
   defaultDescription = 'Learn Bitcoin';
   customDisplayName: string | null;
   customDescription: string | null;
@@ -35,21 +37,23 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
   utxoCompatibilityGroup: UTXOCompatibilityGroup =
     UTXOCompatibilityGroup.TESTNET;
 
-  constructor({
+  constructor( {
     id = uuid(),
+    xPub = null,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Test Account',
     balances = {
-      confirmed: 0, unconfirmed: 0 
+      confirmed: 0, unconfirmed: 0
     },
     customDisplayName = null,
     customDescription = null,
     visibility = AccountVisibility.DEFAULT,
     isTFAEnabled = false,
     transactions = [],
-  }: ConstructorProps) {
+  }: ConstructorProps ) {
     this.id = id
+    this.xPub = xPub
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

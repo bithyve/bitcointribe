@@ -189,11 +189,20 @@ class RestoreWithICloud extends Component<
       cloudData,
       walletCheckIn,
       initNewBHRFlow,
-      setVersion
+      setVersion,
+      cloudBackupStatus
     } = this.props
     if( prevProps.cloudData !== cloudData ){
       this.getData( cloudData )
     }
+
+    if( prevProps.cloudBackupStatus !== cloudBackupStatus && cloudBackupStatus === CloudBackupStatus.FAILED ){
+      this.setState( ( state ) => ( {
+        showLoader: false,
+      } ) );
+      ( this.refs.BackupNotFound as any ).snapTo( 1 )
+    }
+
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
       await AsyncStorage.setItem( 'walletExists', 'true' )
       await AsyncStorage.setItem( 'walletRecovered', 'true' )

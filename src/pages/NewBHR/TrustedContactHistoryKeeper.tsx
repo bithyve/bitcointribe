@@ -194,6 +194,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -226,6 +227,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( () => {
     ( async () => {
+      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+        setTimeout( () => {
+          setLoadContacts( true )
+        }, 2 );
+        ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
+      }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
       const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
@@ -1172,6 +1179,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressReshare={() => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
+          isChangeKeeperAllow={isChangeKeeperAllow}
           reshareButtonText={'Reshare Keeper'}
           changeButtonText={'Change Keeper'}
         />

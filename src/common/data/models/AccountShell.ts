@@ -130,15 +130,22 @@ export default class AccountShell {
    */
   static updatePrimarySubAccountDetails(
     shell: AccountShell,
-    accountName: string,
-    accountDescription: string,
     newbalance: Balances,
     newTransactions: TransactionDescribing[],
+    accountDetails?: {
+      accountName?: string,
+      accountDescription?: string,
+      accountXpub?: string,
+    }
   ) {
-    if( accountName ) shell.primarySubAccount.customDisplayName = accountName
-    if( accountDescription ) shell.primarySubAccount.customDescription = accountDescription
     shell.primarySubAccount.balances = newbalance
     shell.primarySubAccount.transactions = newTransactions
+    if( accountDetails ){
+      const { accountName, accountDescription, accountXpub } = accountDetails
+      if( accountName ) shell.primarySubAccount.customDisplayName = accountName
+      if( accountDescription ) shell.primarySubAccount.customDescription = accountDescription
+      if( accountXpub ) shell.primarySubAccount.xPub = accountXpub
+    }
   }
 
   static addSecondarySubAccount(
@@ -157,7 +164,9 @@ export default class AccountShell {
     subAccId: string,
     newbalance: Balances,
     newTransactions: TransactionDescribing[],
-  ) {
+    accountDetails?: {
+      accountXpub?: string,
+    }  ) {
     let secondarySub = shell.secondarySubAccounts[ subAccId ]
     if ( secondarySub ) {
       secondarySub = {
@@ -165,6 +174,12 @@ export default class AccountShell {
         balances: newbalance,
         transactions: newTransactions,
       }
+
+      if( accountDetails ){
+        const { accountXpub } = accountDetails
+        if( accountXpub ) secondarySub.xPub = accountXpub
+      }
+
       shell.secondarySubAccounts[ subAccId ] = secondarySub
     }
   }

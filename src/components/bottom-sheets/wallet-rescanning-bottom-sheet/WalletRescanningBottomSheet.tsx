@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo,  } from 'react'
 import { View, Text, StyleSheet, ImageBackground, Image, ActivityIndicator } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { useDispatch,useSelector } from 'react-redux'
 import Colors from '../../../common/Colors'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import AccountShell from '../../../common/data/models/AccountShell'
@@ -9,13 +9,12 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { refreshAccountShell } from '../../../store/actions/accounts'
+import { blindRefresh, refreshAccountShell } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
-import useWalletRescanningState from '../../../utils/hooks/state-selectors/wallet-rescanning/UseWalletRescanningState'
-import sampleRescannedTransactionDetails from '../account-shell-rescanning-bottom-sheet/sample-rescanned-transaction-details'
 import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
 import useSyncStatusForAccountShellID from '../../../utils/hooks/account-utils/UseSyncStatusForAccountShellID'
+import useFoundTransactionsFromReScan from '../../../utils/hooks/state-selectors/wallet-rescanning/UseFoundTransactionsFromRescan'
 
 export type Props = {
   onDismiss: () => void;
@@ -36,12 +35,7 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
 
   const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
-  useEffect( () => {
-    dispatch( refreshAccountShell( accountShell, {
-      autoSync: false,
-      hardRefresh: true,
-    } ) )
-  }, [] )
+  
 
   return (
     <View style={{
@@ -69,11 +63,15 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
   onDismiss,
   onTransactionDataSelected,
 }: Props ) => {
+  const dispatch = useDispatch();
+  const { refreshed } = useSelector(state => state.accounts)
 
-  // const foundTransactions = useFoundTransactionsFromReScan()
-  const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
-  const walletRescanningState = useWalletRescanningState()
-
+  useEffect( () => {
+    dispatch(blindRefresh())
+  }, [] )
+  const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
+  //const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
+  //console.log("foundTransactions",foundTransactions);
   return (
     <View style={styles.rootContainer}>
       <View style={styles.backgroundImageContainer}>
@@ -97,7 +95,7 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
           Re-scanning your account may take some time
         </Text>
 
-        {walletRescanningState.isScanInProgress && (
+        {refreshed && (
           <ActivityIndicator
             style={{
               marginBottom: 18
@@ -107,30 +105,33 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
           />
         )}
 
-        <ScanningProgressText accountShell={walletRescanningState.accountShellBeingScanned} />
+        {/* <ScanningProgressText accountShell={accountShell} /> */}
 
-        {walletRescanningState.hasScanSucceeded && (
+        {!refreshed && (
           <>
             <View style={styles.sectionDivider} />
-            <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
 
-            <TransactionsFoundDuringRescanList
-              containerStyle={{
-                marginTop: 18,
-                maxHeight: heightPercentageToDP( 30 ),
-              }}
-              transactionsDetailItems={foundTransactions}
-              onTransactionDataSelected={onTransactionDataSelected}
-            />
-
-            <View style={{
-              marginTop: 'auto'
-            }} />
+            {foundTransactions.length > 0 && (
+              <>
+                <Text style={ListStyles.listItemTitle}>Transactions Found</Text>
+                <TransactionsFoundDuringRescanList
+                  containerStyle={{
+                    marginTop: 18,
+                    maxHeight: heightPercentageToDP( 30 ),
+                  }}
+                  transactionsDetailItems={foundTransactions}
+                  onTransactionDataSelected={onTransactionDataSelected}
+                />
+              </>
+            ) || (
+              <Text
+                style={ListStyles.listItemTitle}
+              >
+                No transactions were found during the re-scan.
+              </Text>
+            )}
 
             <View style={styles.footerSectionContainer}>
-              {/* <Text style={HeadingStyles.sectionSubHeadingText}>Did you find the transactions you were looking for?</Text>
-              <Text style={HeadingStyles.sectionSubHeadingText}>If you didn't, we recommend doing a full re-scan</Text> */}
-
               <View style={styles.actionButtonContainer}>
                 <TouchableOpacity
                   onPress={onDismiss}
@@ -138,27 +139,6 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
                 >
                   <Text style={ButtonStyles.actionButtonText}>OK</Text>
                 </TouchableOpacity>
-
-                {/* <TouchableOpacity
-              onPress={handleFullRescanButtonPress}
-              style={ButtonStyles.primaryActionButton}
-            >
-              <Text style={ButtonStyles.actionButtonText}>Full Rescan</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={handleBackButtonPress}
-              style={{
-                ...ButtonStyles.primaryActionButton,
-                marginRight: 8,
-                backgroundColor: 'transparent',
-              }}
-            >
-              <Text style={{
-                ...ButtonStyles.actionButtonText,
-                color: Colors.blue,
-              }}>Back</Text>
-            </TouchableOpacity> */}
               </View>
             </View>
           </>
@@ -202,3 +182,5 @@ const styles = StyleSheet.create( {
 } )
 
 export default WalletRescanningBottomSheet
+
+

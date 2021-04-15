@@ -13,7 +13,7 @@ import ButtonBlue from '../../../components/ButtonBlue'
 const SELECTABLE_VISIBILITY_OPTIONS = [
   AccountVisibility.DEFAULT,
   AccountVisibility.HIDDEN,
-  AccountVisibility.DURESS,
+  // AccountVisibility.DURESS,   // Disabled until duress mode is implemented later
 ]
 
 export type Props = {

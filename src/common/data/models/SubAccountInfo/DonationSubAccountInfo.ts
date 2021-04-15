@@ -20,6 +20,7 @@ type ConstructorProps = SubAccountDescribingConstructorProps & {
 export default class DonationSubAccountInfo
 implements DonationSubAccountDescribing {
   id: string;
+  xPub: string;
   accountShellID: string | null;
   instanceNumber: number;
 
@@ -32,6 +33,7 @@ implements DonationSubAccountDescribing {
 
   defaultTitle: string;
   defaultDescription: string;
+  defaultSubTitle: string;
   customDisplayName: string | null;
   customDescription: string | null;
 
@@ -48,6 +50,7 @@ implements DonationSubAccountDescribing {
 
   constructor( {
     id = uuid(),
+    xPub = null,
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = '',
@@ -65,6 +68,7 @@ implements DonationSubAccountDescribing {
     utxoCompatibilityGroup = UTXOCompatibilityGroup.MULTI_SIG_PUBLIC,
   }: ConstructorProps ) {
     this.id = id
+    this.xPub = xPub
     this.accountShellID = accountShellID
     this.instanceNumber = instanceNumber
     this.defaultTitle = defaultTitle

@@ -125,28 +125,30 @@ const HistoryPageComponent = ( props ) => {
         </View>
       )}
       <View style={styles.bottomButtonView}>
-        <TouchableOpacity
-          onPress={() => {
-            props.IsReshare ? props.onPressReshare() : props.onPressConfirm()
-          }}
-          style={{
-            ...styles.successModalButtonView,
-            backgroundColor: props.confirmDisable ? Colors.lightBlue : Colors.blue
-          }}
-          disabled={props.confirmDisable ? props.confirmDisable : false}
-        >
-          <Text
-            style={{
-              ...styles.proceedButtonText,
-              color: Colors.white,
+        {props.confirmButtonText || props.IsReshare ?
+          <TouchableOpacity
+            onPress={() => {
+              props.IsReshare ? props.onPressReshare() : props.onPressConfirm()
             }}
+            style={{
+              ...styles.successModalButtonView,
+              backgroundColor: props.confirmDisable ? Colors.lightBlue : Colors.blue
+            }}
+            disabled={props.confirmDisable ? props.confirmDisable : false}
           >
-            {props.IsReshare
-              ? props.reshareButtonText
-              : props.confirmButtonText}
-          </Text>
-        </TouchableOpacity>
-        {props.IsReshare && (
+            <Text
+              style={{
+                ...styles.proceedButtonText,
+                color: Colors.white,
+              }}
+            >
+              {props.IsReshare
+                ? props.reshareButtonText
+                : props.confirmButtonText}
+            </Text>
+          </TouchableOpacity>: null
+        }
+        {props.IsReshare && props.isChangeKeeperAllow && (
           <TouchableOpacity
             disabled={props.disableChange ? props.disableChange : false}
             onPress={() => props.onPressChange()}

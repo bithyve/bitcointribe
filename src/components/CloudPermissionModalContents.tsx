@@ -1,5 +1,5 @@
-import React from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Image, Text, StyleSheet, Platform } from 'react-native'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -7,9 +7,50 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import DeviceInfo from 'react-native-device-info'
 
-export default function ErrorModalContents( props ) {
+export default function CloudPermissionModalContents( props ) {
+  const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
+  const [ timeLeft, setTimeLeft ] = useState( null )
+  const [ intervalRef, setIntervalRef ] = useState( null )
+
+  const getElusiveTimer = () =>{
+    return timerArray.map( ( value, key )=>{
+      return <View key={key} style={{
+        backgroundColor: value ? Colors.lightBlue : Colors.white, width: wp( '2%' ), height: wp( '10%' ), borderRadius: 4
+      }}/>
+    } )
+  }
+
+  useEffect( ()=>{
+    if( props.isRendered ){
+      setTimeLeft( 3 )
+    }
+  }, [ props.isRendered ] )
+
+  useEffect( () => {
+    if( timeLeft===0 ){
+      props.autoClose()
+      setTimeLeft( null )
+    }
+    if ( !timeLeft ) return
+    const intervalId = setInterval( () => {
+      setTimeLeft( timeLeft - 1 )
+      if( timeLeft - 1 == 2 ){ setTimerArray( [ 1, 1, 0 ] )
+      } else if( timeLeft - 1 == 1 ){
+        setTimerArray( [ 1, 0, 0 ] )
+      }
+      else if( timeLeft - 1 == 0 ){
+        setTimerArray( [ 0, 0, 0 ] )
+      }
+    }, 1000 )
+    console.log( 'timeLeft', timeLeft )
+    setIntervalRef( intervalId )
+    return () => { clearInterval( intervalId ) }
+  }, [ timeLeft ] )
+
+
   return (
     <View style={{
       ...styles.modalContentContainer, height: '100%'
@@ -17,7 +58,9 @@ export default function ErrorModalContents( props ) {
       <View style={{
         height: '100%'
       }}>
-        <View style={styles.successModalHeaderView}>
+        <View style={{
+          ...styles.successModalHeaderView, flexDirection:'row', alignItems:'center'
+        }}>
           <Text
             style={{
               color: props.headerTextColor
@@ -30,19 +73,27 @@ export default function ErrorModalContents( props ) {
             {props.title}
             {props.titleNextLine ? '\n' + props.titleNextLine : null}
           </Text>
+          <View style={{
+            flexDirection:'row', justifyContent:'space-between', alignItems: 'center', width: wp( '10%' ), alignSelf: 'auto', marginLeft: 'auto', elevation: 5, shadowColor: Colors.babyGray, shadowOffset: {
+              width: 0, height: 3
+            }, shadowOpacity: 1, shadowRadius: 4
+          }}>
+            {getElusiveTimer()}
+          </View>
+        </View>
+        <View style={styles.successModalAmountView}>
           {props.info ? (
             <Text
               style={{
                 ...styles.modalInfoText,
                 marginTop: wp( '1.5%' ),
+                marginBottom: hp( '3%' ),
                 color: Colors.lightTextColor,
               }}
             >
               {props.info}
             </Text>
           ) : null}
-        </View>
-        <View style={styles.successModalAmountView}>
           {props.note ? (
             <Text
               style={{
@@ -71,14 +122,14 @@ export default function ErrorModalContents( props ) {
         ) : null}
         <View
           style={{
-            height: hp( '18%' ),
+            height: hp( '14%' ),
             flexDirection: 'row',
             marginTop: 'auto',
             alignItems: 'center',
           }}
         >
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressProceed()}
+            onPress={() => { clearInterval( intervalRef ); props.onPressProceed( true ) }}
             style={{
               ...styles.successModalButtonView,
               shadowColor: props.buttonShadowColor
@@ -97,41 +148,39 @@ export default function ErrorModalContents( props ) {
                   : Colors.white,
               }}
             >
-              {props.proceedButtonText}
+              {'Backup'}
             </Text>
           </AppBottomSheetTouchableWrapper>
-          {props.isIgnoreButton && (
-            <AppBottomSheetTouchableWrapper
-              onPress={() => props.onPressIgnore()}
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => { clearInterval( intervalRef ); props.onPressIgnore( false )}}
+            style={{
+              height: wp( '13%' ),
+              width: wp( '25%' ),
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+              paddingLeft: wp( '8%' ),
+            }}
+          >
+            <Text
               style={{
-                height: wp( '13%' ),
-                width: wp( '35%' ),
-                justifyContent: 'center',
-                alignItems: 'center',
+                ...styles.proceedButtonText,
+                color: props.buttonTextColor
+                  ? props.buttonTextColor
+                  : Colors.blue,
               }}
             >
-              <Text
-                style={{
-                  ...styles.proceedButtonText,
-                  color: props.buttonTextColor
-                    ? props.buttonTextColor
-                    : Colors.blue,
-                }}
-              >
-                {props.cancelButtonText ? props.cancelButtonText : 'Ignore'}
-              </Text>
-            </AppBottomSheetTouchableWrapper>
-          )}
-          {props.isBottomImage && (
-            <Image
-              source={
-                props.bottomImage
-                  ? props.bottomImage
-                  : require( '../assets/images/icons/noInternet.png' )
-              }
-              style={props.isBottomImageStyle ? props.isBottomImageStyle : styles.successModalImage}
-            />
-          )}
+              {'Skip'}
+            </Text>
+          </AppBottomSheetTouchableWrapper>
+          <Image
+            source={
+              props.bottomImage
+                ? props.bottomImage
+                : require( '../assets/images/icons/noInternet.png' )
+            }
+            style={styles.successModalImage}
+          />
         </View>
       </View>
     </View>
@@ -165,11 +214,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    elevation: 10,
+    elevation: 6,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15
+      width: 10, height: 10
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
@@ -177,10 +226,10 @@ const styles = StyleSheet.create( {
   },
   successModalImage: {
     width: wp( '30%' ),
-    height: wp( '35%' ),
+    height: wp( '25%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginRight: -5,
+    marginBottom: Platform.OS == 'ios' && DeviceInfo.hasNotch() ? -15 : 5,
   },
   proceedButtonText: {
     color: Colors.white,
