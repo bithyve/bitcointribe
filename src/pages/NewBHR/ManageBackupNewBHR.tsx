@@ -161,6 +161,7 @@ interface ManageBackupNewBHRPropsTypes {
   keeperProcessStatus: any;
   setLevelToNotSetupStatus: any;
   isLevelToNotSetupStatus: boolean;
+  initLoading: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -462,7 +463,7 @@ class ManageBackupNewBHR extends Component<
       this.sendApprovalRequestToPK( )
     }
 
-    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
+    if( prevProps.initLoading !== this.props.initLoading && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
       this.goToHistory( {
         id: 2,
         selectedKeeper: this.state.selectedKeeper,
@@ -1645,6 +1646,8 @@ const mapStateToProps = ( state ) => {
     ),
     healthLoading: idx( state, ( _ ) => _.health.loading.checkMSharesHealth ),
     keeperSetupStatus: idx( state, ( _ ) => _.health.loading.keeperSetupStatus ),
+    initLoading: idx( state, ( _ ) => _.health.loading.initLoader ),
+
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
     secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),

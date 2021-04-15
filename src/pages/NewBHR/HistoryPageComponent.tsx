@@ -125,7 +125,7 @@ const HistoryPageComponent = ( props ) => {
         </View>
       )}
       <View style={styles.bottomButtonView}>
-        {props.confirmButtonText || props.IsReshare ?
+        {props.confirmButtonText || props.IsReshare || !props.isVersionMismatch ?
           <TouchableOpacity
             onPress={() => {
               props.IsReshare ? props.onPressReshare() : props.onPressConfirm()
@@ -148,7 +148,7 @@ const HistoryPageComponent = ( props ) => {
             </Text>
           </TouchableOpacity>: null
         }
-        {props.IsReshare && props.isChangeKeeperAllow && (
+        {( !props.isVersionMismatch ) || props.IsReshare && props.isChangeKeeperAllow && (
           <TouchableOpacity
             disabled={props.disableChange ? props.disableChange : false}
             onPress={() => props.onPressChange()}

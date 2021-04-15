@@ -26,6 +26,7 @@ import KnowMoreButton from '../../components/KnowMoreButton'
 import { uploadEncMShareKeeper } from '../../store/actions/health'
 import {
   EphemeralDataElements,
+  Keepers,
   LevelHealthInterface,
   TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
@@ -78,6 +79,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
+  const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -394,12 +396,32 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       if ( blockPCShare ) {
         setBlockReshare( blockPCShare )
       }
+      const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
+      const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
+      const trustedData = trustedContactsInfo[ contactName ]
+
+      console.log( 'trustedData.trustedChannel', trustedData.trustedChannel.data[ 1 ] )
+      if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
+        if( trustedData.trustedChannel.data[ 1 ] && trustedData.trustedChannel.data[ 1 ].data.version < '1.6.0' ) {
+          setTimeout( () => {
+            setErrorMessageHeader( 'Error sending Recovery Key' )
+            setErrorMessage(
+              'your keeper need to update app / come online',
+            )
+            setIsVersionMismatch( true )
+          }, 2 );
+          ( ErrorBottomSheet as any ).current.snapTo( 1 )
+        }
+      }
+
+      console.log( 'trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel', trustedContacts.tc.trustedContacts, props.navigation.getParam( 'selectedKeeper' ) )
       // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
       //   AsyncStorage.setItem('blockPCShare', 'true');
       //   setBlockReshare(blockPCShare);
       // }
     } )()
   }, [] )
+
 
   const renderSecondaryDeviceContents = useCallback( () => {
     console.log( secondaryQR )
@@ -865,6 +887,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           }}
           changeButtonText={'Change Keeper'}
           isChangeKeeperAllow={isChangeKeeperAllow}
+          isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
               setSelectedKeeperType( 'device' )
