@@ -43,6 +43,52 @@ import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+let messageIndex = 0
+const LOADER_MESSAGE_TIME = 2000
+const loaderMessages = [
+  {
+    heading: 'Bootstrapping Accounts',
+    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+    subText: '',
+  },
+  {
+    heading: 'Filling Test Account with test sats',
+    text:
+      'Preloaded Test Account is the best place to start your Bitcoin journey',
+    subText: '',
+  },
+  {
+    heading: 'Generating Recovery Keys',
+    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+    subText: '',
+  },
+  {
+    heading: 'Manage Backup',
+    text:
+      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 1 - Automated Cloud Backup',
+    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
+    subText: '',
+  },
+  {
+    heading: 'Level 2 - Double Backup',
+    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 3 - Multi-key Backup',
+    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
+    subText: '',
+  }
+]
+
+const getNextMessage = () => {
+  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
+  return loaderMessages[ messageIndex++ ]
+}
 
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
@@ -214,24 +260,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const setLoaderMessages = () => {
-    setTimeout( () => {
-      setMessage( 'Bootstrapping Accounts' )
-      setSubTextMessage(
-        'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-      )
-      setTimeout( () => {
-        setMessage( 'Filling Test Account with test sats' )
-        setSubTextMessage(
-          'Preloaded Test Account is the best place to start your Bitcoin journey',
-        )
-        setTimeout( () => {
-          setMessage( 'Generating Recovery Keys' )
-          setSubTextMessage(
-            'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
-          )
-        }, 3000 )
-      }, 3000 )
-    }, 3000 )
+    setInterval( () => {
+      const newMessage = getNextMessage()
+      setMessage( newMessage.heading )
+      setSubTextMessage( newMessage.text )
+    }, LOADER_MESSAGE_TIME )
   }
 
   const renderLoaderModalContent = useCallback( () => {
