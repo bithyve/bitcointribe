@@ -27,7 +27,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
     <View style={styles.rootContainer}>
       <View style={styles.headerSectionContainer}>
         <Text style={HeadingStyles.sectionSubHeadingText}>
-          xPub details for this account.
+          xPub details for this account
         </Text>
       </View>
 
@@ -47,7 +47,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
         <BottomInfoBox
           title={'Note'}
           infoText={
-            'The QR code is your xPub address.'
+            'This xPub is for this particular account only and not for the whole wallet. Each account has its own xPub'
           }
         />
       </View>
@@ -81,10 +81,6 @@ XPubDetailsScreen.navigationOptions = ( { navigation } ): NavigationOptions => {
     ...defaultStackScreenNavigationOptions,
 
     title: `${primarySubAccountName} xPub`,
-
-    headerLeft: () => {
-      return <SmallNavHeaderBackButton onPress={navigation.goBack} />
-    },
   }
 }
 
