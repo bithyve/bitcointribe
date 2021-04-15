@@ -71,6 +71,14 @@ const SubAccountSettingsStack = createStackNavigator(
     },
     ShowXPub: {
       screen: XPubDetailsScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      },
     },
     MergeAccounts: {
       screen: AccountSettingsMergeAccountShellsScreen,
