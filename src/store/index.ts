@@ -200,7 +200,7 @@ import {
   uplaodFileWatcher,
 } from './sagas/cloud'
 
-import { initLevelsWatcher, setCloudDataForLevelWatcher, autoShareSecondaryWatcher, autoShareContactKeeperWatcher } from './sagas/upgradeToNewBhr'
+import { initLevelsWatcher, setCloudDataForLevelWatcher, autoShareSecondaryWatcher, autoShareContactKeeperWatcher, updateAvailableKeeperDataWatcher } from './sagas/upgradeToNewBhr'
 
 import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
@@ -379,7 +379,8 @@ const rootSaga = function* () {
     initLevelsWatcher,
     setCloudDataForLevelWatcher,
     autoShareSecondaryWatcher,
-    autoShareContactKeeperWatcher
+    autoShareContactKeeperWatcher,
+    updateAvailableKeeperDataWatcher
   ]
 
   yield all(

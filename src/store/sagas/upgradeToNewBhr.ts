@@ -8,9 +8,11 @@ import {
   AUTO_UPLOAD_SECONDARY,
   SET_CLOUD_FOR_LEVEL,
   AUTO_UPLOAD_CONTACT,
+  UPDATE_AVAILABLE_KEEPER_DATA,
+  setAvailableKeeperData,
+  updateAvailableKeeperData,
 } from '../actions/upgradeToNewBhr'
-import { checkMSharesHealth, healthCheckInitialized, initializeHealthSetup, initLevelTwo, initNewBHRFlow, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
-import { generateMetaShare } from '../actions/health'
+import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -24,7 +26,6 @@ function* initLevelsWorker( { payload } ) {
   try {
     const { level } = payload
     yield put( switchUpgradeLoader( 'initLevels' ) )
-    yield put( initNewBHRFlow( true ) )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const randomIdForSecurityQ = generateRandomString( 8 )
     const SecurityQuestionHealth = {
@@ -101,7 +102,7 @@ export const setCloudDataForLevelWatcher = createWatcher(
 
 function* autoShareSecondaryWorker( { payload } ) {
   try {
-    // yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
+    yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
     const { shareId } = payload
     console.log( 'autoShareSecondaryWorker payload', payload )
     const name = 'Secondary Device1'
@@ -128,7 +129,9 @@ function* autoShareSecondaryWorker( { payload } ) {
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const share: MetaShare = metaShares.find( value => value.shareId == shareId )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
-    const oldKeeperInfo = trustedContactsInfo[ 'Secondary Device' ]
+    const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
+    const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && oldKeeperInfo.trustedChannel.data[ 1 ].data.version == '1.6.0' ? 'accessible' : 'notAccessible'
+    console.log( 'autoShareSecondaryWorker oldKeeperInfo', oldKeeperInfo )
     const data: TrustedDataElements = {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
@@ -160,7 +163,7 @@ function* autoShareSecondaryWorker( { payload } ) {
           updatedAt: moment( new Date() ).valueOf(),
           shareType: 'device',
           name: name,
-          status: 'accessible',
+          status: status,
         },
       ] ) )
       const notification: INotification = {
@@ -180,8 +183,9 @@ function* autoShareSecondaryWorker( { payload } ) {
         } ],
         notification
       )
+      yield put( updateAvailableKeeperData( 'primary' ) )
     }
-    // yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
+    yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
   } catch ( error ) {
     console.log( 'error', error )
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
@@ -195,94 +199,138 @@ export const autoShareSecondaryWatcher = createWatcher(
 
 function* autoShareContactKeeperWorker( { payload } ) {
   try {
-    // yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
+    yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
-    // console.log( 'autoShareContactKeeperWorker payload', payload )
-    // const name = 'Secondary Device1'
-    // const s3Service: S3Service = yield select( ( state ) => state.health.service )
-    // yield put( updatedKeeperInfo( {
-    //   shareId: shareId,
-    //   name: name,
-    //   uuid: '',
-    //   publicKey: '',
-    //   ephemeralAddress: '',
-    //   type: 'device',
-    //   data: {
-    //     name: name, index: 0
-    //   }
-    // } ) )
-    // const walletId = s3Service.getWalletId().data.walletId
-    // const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
-    // const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    // console.log( 'autoShareContactKeeperWorker keeperInfo', keeperInfo )
-    // const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
-    // console.log( 'autoShareContactKeeperWorker response', response )
-    // const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
-    // const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
-    // const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
-    // const share: MetaShare = metaShares.find( value => value.shareId == shareId )
-    // const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
-    // const oldKeeperInfo = trustedContactsInfo[ 'Secondary Device' ]
-    // const data: TrustedDataElements = {
-    //   metaShare: share,
-    //   secondaryShare: secondaryMetaShares[ 1 ]
-    // }
-    // console.log( 'autoShareSecondaryWorker data', data )
-    // const res = yield call(
-    //   trustedContacts.updateTrustedChannel,
-    //   'Secondary Device',
-    //   data,
-    //   false
-    // )
-    // console.log( 'updateTrustedChannel res', res )
-    // if ( res.status == 200 ) {
-    //   const updatedSERVICES = {
-    //     ...SERVICES,
-    //     S3_SERVICE: JSON.stringify( s3Service ),
-    //     TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-    //   }
-    //   yield call( insertDBWorker, {
-    //     payload: {
-    //       SERVICES: updatedSERVICES
-    //     },
-    //   } )
-    //   yield put( updateMSharesHealth( [
-    //     {
-    //       walletId: walletId,
-    //       shareId: shareId,
-    //       reshareVersion: share.meta.reshareVersion,
-    //       updatedAt: moment( new Date() ).valueOf(),
-    //       shareType: 'device',
-    //       name: name,
-    //       status: 'accessible',
-    //     },
-    //   ] ) )
-    //   const notification: INotification = {
-    //     notificationType: notificationType.reShare,
-    //     title: 'New share uploaded',
-    //     body: 'New share uploaded.',
-    //     data: JSON.stringify( {
-    //       selectedShareId: shareId, walletId: walletId
-    //     } ),
-    //     tag: notificationTag.IMP,
-    //     date: new Date(),
-    //   }
-    //   const ress = yield fork(
-    //     RelayServices.sendNotifications,
-    //     [ {
-    //       walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
-    //     } ],
-    //     notification
-    //   )
-    // }
-    // yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
+    for ( let i = 0; i < shareIds.length; i++ ) {
+      const element = shareIds[ i ]
+      const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
+        ? contactList[ i ].firstName + ' ' + contactList[ i ].lastName
+        : contactList[ i ] && contactList[ i ].firstName && !contactList[ i ].lastName
+          ? contactList[ i ].firstName
+          : contactList[ i ] && !contactList[ i ].firstName && contactList[ i ].lastName
+            ? contactList[ i ].lastName
+            : ''
+      yield put( updatedKeeperInfo(  {
+        shareId: element,
+        name,
+        uuid: '',
+        publicKey: '',
+        ephemeralAddress: '',
+        type: 'contact',
+        data: {
+          ...contactList[ i ], index: i + 1
+        }
+      } ) )
+    }
+    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const walletId = s3Service.getWalletId().data.walletId
+    const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
+    const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
+    console.log( 'autoShareContactKeeperWorker keeperInfo', keeperInfo )
+    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
+    const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
+    const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
+    console.log( 'autoShareContactKeeperWorker response', response )
+    for ( let i = 0; i < shareIds.length; i++ ) {
+      const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
+        ? contactList[ i ].firstName + ' ' + contactList[ i ].lastName
+        : contactList[ i ] && contactList[ i ].firstName && !contactList[ i ].lastName
+          ? contactList[ i ].firstName
+          : contactList[ i ] && !contactList[ i ].firstName && contactList[ i ].lastName
+            ? contactList[ i ].lastName
+            : ''
+      const shareId = shareIds[ i ]
+      const share: MetaShare = metaShares.find( value => value.shareId == shareId )
+      const oldKeeperInfo = trustedContactsInfo[ name.toLowerCase() ]
+      const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && oldKeeperInfo.trustedChannel.data[ 1 ].data.version == '1.6.0' ? 'accessible' : 'notAccessible'
+      const data: TrustedDataElements = {
+        metaShare: share,
+        secondaryShare: secondaryMetaShares[ 1 ]
+      }
+      console.log( 'autoShareSecondaryWorker data', data )
+      const res = yield call(
+        trustedContacts.updateTrustedChannel,
+        name,
+        data,
+        false
+      )
+      console.log( 'updateTrustedChannel res', res )
+      if ( res.status == 200 ) {
+        const updatedSERVICES = {
+          ...SERVICES,
+          S3_SERVICE: JSON.stringify( s3Service ),
+          TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+        }
+        yield call( insertDBWorker, {
+          payload: {
+            SERVICES: updatedSERVICES
+          },
+        } )
+        yield put( updateMSharesHealth( [
+          {
+            walletId: walletId,
+            shareId: shareId,
+            reshareVersion: share.meta.reshareVersion,
+            updatedAt: moment( new Date() ).valueOf(),
+            shareType: 'contact',
+            name: name,
+            status: status,
+          },
+        ] ) )
+        const notification: INotification = {
+          notificationType: notificationType.reShare,
+          title: 'New share uploaded',
+          body: 'New share uploaded.',
+          data: JSON.stringify( {
+            selectedShareId: shareId, walletId: walletId
+          } ),
+          tag: notificationTag.IMP,
+          date: new Date(),
+        }
+        const ress = yield fork(
+          RelayServices.sendNotifications,
+          [ {
+            walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
+          } ],
+          notification
+        )
+      }
+      yield put( updateAvailableKeeperData( 'contact' ) )
+    }
+    yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   } catch ( error ) {
     console.log( 'error', error )
-    yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
+    yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   }
 }
 
 export const autoShareContactKeeperWatcher = createWatcher(
   autoShareContactKeeperWorker,
   AUTO_UPLOAD_CONTACT,
+)
+
+function* updateAvailableKeeperDataWorker( { payload } ) {
+  try {
+    yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
+    const { type } = payload
+    const availableKeeperData: {shareId: string; type: string; status?: boolean}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
+    for ( let i = 0; i < availableKeeperData.length; i++ ) {
+      const element = availableKeeperData[ i ]
+      if( element.type == type ) {
+        availableKeeperData[ i ].status = true
+      }
+    }
+    yield put( setAvailableKeeperData( availableKeeperData ) )
+    yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
+  } catch ( error ) {
+    console.log( 'error', error )
+    yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
+  }
+}
+
+export const updateAvailableKeeperDataWatcher = createWatcher(
+  updateAvailableKeeperDataWorker,
+  UPDATE_AVAILABLE_KEEPER_DATA,
 )
