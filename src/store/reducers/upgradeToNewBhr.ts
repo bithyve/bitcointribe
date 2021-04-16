@@ -2,7 +2,8 @@ import {
   UPGRADE_LOADING,
   SET_UPGRADE_PROCESS_STATUS,
   SET_AVAILABLE_KEEPER_DATA,
-  UPDATE_LEVEL_TO_SETUP
+  UPDATE_LEVEL_TO_SETUP,
+  UPGRADE_LEVEL_INIT_STATUS
 } from '../actions/upgradeToNewBhr'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
@@ -16,8 +17,9 @@ const initialState: {
       updateAvailKeeperDataStatus: boolean;
     };
     upgradeProcessStatus: KeeperProcessStatus;
-    availableKeeperData: {shareId: string; type: string; status?: boolean}[];
+    availableKeeperData: {shareId: string; type: string; count: number; status?: boolean; contactDetails?: any}[];
     levelToSetup: number;
+    isUpgradeLevelInitialized: boolean;
   } = {
     loading: {
       initLevel2: false,
@@ -29,7 +31,8 @@ const initialState: {
     },
     upgradeProcessStatus: KeeperProcessStatus.PENDING,
     availableKeeperData: [],
-    levelToSetup: 0
+    levelToSetup: 0,
+    isUpgradeLevelInitialized: false
   }
 
 export default ( state = initialState, action ) => {
@@ -63,6 +66,11 @@ export default ( state = initialState, action ) => {
           levelToSetup: action.payload.level,
         }
 
+      case UPGRADE_LEVEL_INIT_STATUS:
+        return {
+          ...state,
+          isUpgradeLevelInitialized: true,
+        }
   }
   return state
 }

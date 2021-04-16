@@ -15,6 +15,7 @@ export const SET_UPGRADE_PROCESS_STATUS = 'SET_UPGRADE_PROCESS_STATUS'
 export const SET_AVAILABLE_KEEPER_DATA = 'SET_AVAILABLE_KEEPER_DATA'
 export const UPDATE_AVAILABLE_KEEPER_DATA = 'UPDATE_AVAILABLE_KEEPER_DATA'
 export const UPDATE_LEVEL_TO_SETUP = 'UPDATE_LEVEL_TO_SETUP'
+export const UPGRADE_LEVEL_INIT_STATUS = 'UPGRADE_LEVEL_INIT_STATUS'
 
 export const switchUpgradeLoader = ( beingLoaded ) => {
   // console.log("Called s3 Loading", new Date())
@@ -73,10 +74,10 @@ export const setAvailableKeeperData = ( availableKeeperData ) => {
   }
 }
 
-export const updateAvailableKeeperData = ( type ) => {
+export const updateAvailableKeeperData = ( type, name? ) => {
   return {
     type: UPDATE_AVAILABLE_KEEPER_DATA, payload: {
-      type
+      type, name
     }
   }
 }
@@ -86,5 +87,11 @@ export const updateLevelToSetup = ( level ) => {
     type: UPDATE_LEVEL_TO_SETUP, payload: {
       level
     }
+  }
+}
+
+export const isUpgradeLevelInitializedStatus = ( ) => {
+  return {
+    type: UPGRADE_LEVEL_INIT_STATUS
   }
 }

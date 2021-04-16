@@ -142,13 +142,14 @@ interface UpgradeBackupPropsTypes {
   setUpgradeProcessStatus: any;
   upgradeProcessStatus: KeeperProcessStatus;
   setAvailableKeeperData: any;
-  availableKeeperData: {shareId: string; type: string; status?: boolean}[];
+  availableKeeperData: {shareId: string; type: string; count: number; status?: boolean; contactDetails?: any;}[];
   updateLevelToSetup: any;
   levelToSetup: number;
   updateAvailableKeeperData: any;
   trustedChannelsSetupSync: any;
   confirmPDFShared: any;
   getPDFData: any;
+  isUpgradeLevelInitialized: boolean;
 }
 
 class UpgradeBackup extends Component<
@@ -236,8 +237,8 @@ class UpgradeBackup extends Component<
     this.props.trustedChannelsSetupSync()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
-    let keepersInfo: {shareId: string; type: string; status?: boolean}[] = [ {
-      shareId: '', type: 'cloud'
+    let keepersInfo: {shareId: string; type: string; count: number; contactDetails?: any; status?: boolean}[] = [ {
+      shareId: '', type: 'cloud', count: 0
     } ]
     let selectedContacts = []
     for ( let i = 0; i < overallHealth.sharesInfo.length; i++ ) {
@@ -253,23 +254,21 @@ class UpgradeBackup extends Component<
           selectedContact: selectedContacts
         } )
       }
-
-      // if( i == 0 && element.updatedAt == 0 ) {
-      //   TotalKeeper = TotalKeeper + 1
-      //   keepersInfo.push( {
-      //     shareId: element.shareId, type
-      //   } )
-      // }
-      if( element.updatedAt > 0 && keepersInfo.findIndex( value=>value.type =='pdf' ) == -1 ) {
+      if( trustedContactsInfo.slice( 1, 3 ).length && element.updatedAt > 0 && type == 'contact' ){
+        keepersInfo.push( {
+          shareId: element.shareId, type, count: selectedContacts.length, contactDetails: trustedContactsInfo.slice( 1, 3 )[ i - 1 ]
+        } )
+      }
+      else if( type != 'contact' && element.updatedAt > 0 && keepersInfo.findIndex( value=>value.type =='pdf' ) == -1 ) {
         TotalKeeper = TotalKeeper + 1
         keepersInfo.push( {
-          shareId: element.shareId, type
+          shareId: element.shareId, type, count: 0
         } )
       }
     }
     if( TotalKeeper > 1 && keepersInfo.findIndex( value=>value.type == 'primary' ) == -1 ) {
       keepersInfo.splice( 0, 0, {
-        shareId: '', type: 'primary'
+        shareId: '', type: 'primary', count: 0
       } )
     }
     let levelToSetup = TotalKeeper == 1 || TotalKeeper == 2 ? 1 : TotalKeeper == 3 || TotalKeeper <= 4 ? 2 : 3
@@ -295,8 +294,11 @@ class UpgradeBackup extends Component<
         if( element.type == 'cloud' && !element.status ){
           console.log( 'nextToProcess cloud element', element )
           this.RestoreFromICloud.current.snapTo( 1 )
+          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+          this.UpgradingKeeperContact.current.snapTo( 0 )
+          return
         }
-        else if( element.type == 'primary' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] ) {
+        if( element.type == 'primary' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] ) {
           console.log( 'nextToProcess primary element', element )
           if( overallHealth.sharesInfo[ 0 ].updatedAt > 0 ){
             this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
@@ -304,32 +306,57 @@ class UpgradeBackup extends Component<
             this.secondaryDeviceBottomSheet.current.snapTo( 1 )
             this.createGuardian()
           }
+          this.RestoreFromICloud.current.snapTo( 0 )
+          this.UpgradingKeeperContact.current.snapTo( 0 )
+          return
         }
-        else if( element.type == 'contact' && !element.status && ( overallHealth.sharesInfo[ 1 ].updatedAt > 0 || overallHealth.sharesInfo[ 2 ].updatedAt > 0 ) && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
+        if( element.type == 'contact' && !element.status && ( overallHealth.sharesInfo[ 1 ].updatedAt > 0 || overallHealth.sharesInfo[ 2 ].updatedAt > 0 ) && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
           console.log( 'nextToProcess contact element', element )
-          console.log( 'selectedContact', selectedContact )
-
-          if( selectedContact.length && selectedContact.length == 2 ) {
+          if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 ) {
+            if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' ) {
+              this.setState( {
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+              } )
+            } else if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' ) {
+              this.setState( {
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
+              } )
+            }else if( levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' ) {
+              this.setState( {
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+              } )
+            }
+          }
+          else if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup < 3 ) {
+            const selectedShareId = levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId
             this.setState( {
-              selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+              selectedShareId: [ selectedShareId ]
             } )
           } else if( selectedContact.length && selectedContact.length == 1 ) {
             this.setState( {
               selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
             } )
           }
+          this.RestoreFromICloud.current.snapTo( 0 )
+          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
           this.UpgradingKeeperContact.current.snapTo( 1 )
+          return
         }
-        else if( element.type == 'pdf' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] && ( overallHealth.sharesInfo[ 3 ].updatedAt > 0 || overallHealth.sharesInfo[ 4 ].updatedAt > 0 ) ) {
+        if( element.type == 'pdf' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] && ( overallHealth.sharesInfo[ 3 ].updatedAt > 0 || overallHealth.sharesInfo[ 4 ].updatedAt > 0 ) ) {
           console.log( 'nextToProcess pdf element', element )
           this.setState( {
             selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
           } )
-          this.UpgradePdfKeeper.current.snapTo( 1 )
+          this.RestoreFromICloud.current.snapTo( 0 )
+          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+          this.UpgradingKeeperContact.current.snapTo( 0 )
+          this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
+          return
         }
       }
     } else {
       this.RestoreFromICloud.current.snapTo( 1 )
+      return
     }
   }
 
@@ -354,6 +381,7 @@ class UpgradeBackup extends Component<
   }
 
   componentDidUpdate = ( prevProps, prevState ) => {
+    const { levelHealth } = this.props
     if (
       prevProps.levelHealth !=
         this.props.levelHealth &&
@@ -373,7 +401,9 @@ class UpgradeBackup extends Component<
     if( prevProps.levelHealth !=
       this.props.levelHealth &&
       this.props.levelHealth.length > 1 &&
-      this.props.levelHealth[ this.props.levelToSetup - 1 ].levelInfo[ 0 ].status == 'notAccessible' ) {
+      this.props.levelHealth[ this.props.levelToSetup - 1 ].levelInfo[ 0 ].status == 'notAccessible' &&
+      this.props.isUpgradeLevelInitialized &&
+      ( this.props.availableKeeperData.length > 0 && this.props.availableKeeperData.findIndex( value => value.type == 'cloud' && value.status  != true ) > -1 ) ) {
       this.props.setCloudDataForLevel( this.props.levelToSetup )
     }
 
@@ -431,6 +461,17 @@ class UpgradeBackup extends Component<
     if( prevProps.availableKeeperData != this.props.availableKeeperData ){
       console.log( 'availableKeeperData', this.props.availableKeeperData )
     }
+
+    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) ){
+      if(
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
+    levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
+    levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' ) ||
+    ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' )
+      ) {
+        this.props.setCloudDataForLevel( this.props.levelToSetup )
+      }
+    }
   };
 
   cloudBackup = () => {
@@ -462,8 +503,6 @@ class UpgradeBackup extends Component<
       .trim()
 
     const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-    let info = null
-    if ( trustedContact && trustedContact.secondaryKey ) info = trustedContact.secondaryKey
 
     // Keeper setup started
     keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
@@ -489,10 +528,13 @@ class UpgradeBackup extends Component<
       secondaryQR: ''
     } )
 
+    console.log( 'hasTrustedChannel', hasTrustedChannel )
+    console.log( 'isEphemeralChannelExpired', isEphemeralChannelExpired )
+
 
     const contactInfo = {
       contactName,
-      info: info? info.trim(): null,
+      info: null,
       isGuardian: true,
       shareIndex: index,
       shareId: this.state.selectedShareId[ 0 ],
@@ -509,6 +551,8 @@ class UpgradeBackup extends Component<
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
+
+    console.log( 'newSecondarySubAccount', newSecondarySubAccount )
 
     addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo )
   }
@@ -1194,6 +1238,7 @@ const mapStateToProps = ( state ) => {
     upgradeProcessStatus: idx( state, ( _ ) => _.upgradeToNewBhr.upgradeProcessStatus ),
     availableKeeperData: idx( state, ( _ ) => _.upgradeToNewBhr.availableKeeperData ),
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
+    isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
   }
 }
 

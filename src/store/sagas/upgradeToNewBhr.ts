@@ -11,6 +11,7 @@ import {
   UPDATE_AVAILABLE_KEEPER_DATA,
   setAvailableKeeperData,
   updateAvailableKeeperData,
+  isUpgradeLevelInitializedStatus,
 } from '../actions/upgradeToNewBhr'
 import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { generateRandomString } from '../../common/CommonFunctions'
@@ -55,6 +56,7 @@ function* initLevelsWorker( { payload } ) {
       } )
       // Update Health to reducer
       yield put( checkMSharesHealth() )
+      yield put( isUpgradeLevelInitializedStatus() )
       if ( level == 2 ) yield put( isLevel2InitializedStatus() )
       if ( level == 3 ) yield put( isLevel2InitializedStatus() ); yield put( isLevel3InitializedStatus() )
     }
@@ -195,6 +197,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
+    const contactListToMarkDone = []
     for ( let i = 0; i < shareIds.length; i++ ) {
       const element = shareIds[ i ]
       const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
@@ -216,10 +219,12 @@ function* autoShareContactKeeperWorker( { payload } ) {
         }
       } ) )
     }
+    const availableKeeperData: {shareId: string; type: string; count: number; status?: boolean;}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     console.log( 'autoShareContactKeeperWorker keeperInfo', keeperInfo )
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
@@ -235,6 +240,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
           : contactList[ i ] && !contactList[ i ].firstName && contactList[ i ].lastName
             ? contactList[ i ].lastName
             : ''
+      contactListToMarkDone.push( name )
       const shareId = shareIds[ i ]
       const share: MetaShare = metaShares.find( value => value.shareId == shareId )
       const oldKeeperInfo = trustedContactsInfo[ name.toLowerCase() ]
@@ -291,7 +297,11 @@ function* autoShareContactKeeperWorker( { payload } ) {
           notification
         )
       }
-      yield put( updateAvailableKeeperData( 'contact' ) )
+      const contactCount = availableKeeperData.find( value=>value.type == 'contact' ).count
+      for ( let i = 0; i < contactListToMarkDone.length; i++ ) {
+        const element = contactListToMarkDone[ i ]
+        yield put( updateAvailableKeeperData( 'contact', contactListToMarkDone[ i ] ) )
+      }
     }
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   } catch ( error ) {
@@ -308,11 +318,22 @@ export const autoShareContactKeeperWatcher = createWatcher(
 function* updateAvailableKeeperDataWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
-    const { type } = payload
-    const availableKeeperData: {shareId: string; type: string; status?: boolean}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
+    const { type, name } = payload
+    const availableKeeperData: {shareId: string; type: string; count: number; status?: boolean; contactDetails: any;}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
     for ( let i = 0; i < availableKeeperData.length; i++ ) {
       const element = availableKeeperData[ i ]
-      if( element.type == type ) {
+      if( element.type == type && type == 'contact' ) {
+        const contactDetails = element.contactDetails
+        const Name = contactDetails && contactDetails.firstName && contactDetails.lastName
+          ? contactDetails.firstName + ' ' + contactDetails.lastName
+          : contactDetails && contactDetails.firstName && !contactDetails.lastName
+            ? contactDetails.firstName
+            : contactDetails && !contactDetails.firstName && contactDetails.lastName
+              ? contactDetails.lastName
+              : ''
+        if( Name == name ) availableKeeperData[ i ].status = true
+      }
+      else if( element.type == type && type != 'contact' ) {
         availableKeeperData[ i ].status = true
       }
     }

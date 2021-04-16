@@ -1707,12 +1707,8 @@ export default class S3Service {
       } => {
     try {
       const { shares } = this.levelhealth.generateSMShares( secondaryMnemonic )
-      console.log( 'secondaryMnemonic', secondaryMnemonic )
-      console.log( 'shares', shares )
       const { encryptedSecrets } = this.levelhealth.encryptSecrets( shares, answer, true )
-      console.log( 'shares', shares )
       const { metaShares } = this.levelhealth.createSMMetaSharesKeeper( secondaryMnemonic, tag, questionId, version, question )
-      console.log( 'metaShares', metaShares )
       return {
         status: config.STATUS.SUCCESS, data: {
           encryptedSecrets, metaShares
