@@ -1,6 +1,6 @@
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING, CALCULATE_CUSTOM_FEE, CUSTOM_FEE_CALCULATED, RESET_SEND_STATE, CUSTOM_SEND_MAX_CALCULATED, CLEAR_SEND_MAX_FEE, RESET_SEND_STAGE1 } from '../actions/sending'
+import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIENT_SELECTED_FOR_AMOUNT_SETTING, SEND_MAX_FEE_CALCULATED, SEND_STAGE1_EXECUTED, EXECUTE_SEND_STAGE1, FEE_INTEL_MISSING, SEND_STAGE2_EXECUTED, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, SEND_STAGE3_EXECUTED, EXECUTE_ALTERNATE_SEND_STAGE2, ALTERNATE_SEND_STAGE2_EXECUTED, AMOUNT_FOR_RECIPIENT_UPDATED, RECIPIENT_REMOVED_FROM_SENDING, CALCULATE_CUSTOM_FEE, CUSTOM_FEE_CALCULATED, RESET_SEND_STATE, CUSTOM_SEND_MAX_CALCULATED, CLEAR_SEND_MAX_FEE, RESET_SEND_STAGE1, UDPATE_DONATION_NOTE } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
@@ -71,7 +71,6 @@ export type SendingState = {
   }
 
   donationDetails: {
-    donationId: string | null;
     donationNote: string | null;
   }
 
@@ -117,7 +116,6 @@ const INITIAL_STATE: SendingState = {
 
   // donation variables(used during the donation send flow)
   donationDetails: {
-    donationId: null,
     donationNote: null,
   },
 
@@ -424,6 +422,14 @@ const sendingReducer = ( state: SendingState = INITIAL_STATE, action ): SendingS
         return {
           ...state,
           sendMaxFee: 0
+        }
+
+      case UDPATE_DONATION_NOTE:
+        return {
+          ...state,
+          donationDetails: {
+            donationNote: action.payload.donationNote
+          }
         }
 
       default:

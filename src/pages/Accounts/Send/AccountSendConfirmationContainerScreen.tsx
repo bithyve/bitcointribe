@@ -29,6 +29,7 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 export type NavigationParams = {
 };
@@ -54,6 +55,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
   const sendingState = useSendingState()
+  const donationId = useDonationIdFromSelectedRecipients()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
@@ -171,8 +173,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         dispatch( sendTxNotification() )
 
         //dispatch donation note action during donation tx
-        if( sendingState.donationDetails.donationId ){
-          const { donationId, donationNote } = sendingState.donationDetails
+        const { donationNote } = sendingState.donationDetails
+        if( donationId &&  donationNote ){
           dispatch( sendDonationNote( {
             txid,
             donationId: donationId,

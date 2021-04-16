@@ -16,7 +16,6 @@ export interface RecipientDescribing {
 
 export interface AddressRecipientDescribing extends RecipientDescribing {
   donationID: string | null;
-  donationNote: string | null;
 }
 
 export interface ContactRecipientDescribing extends RecipientDescribing {

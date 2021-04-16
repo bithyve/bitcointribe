@@ -21,7 +21,7 @@ import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity, useBottomSheetModal } from '@gorhom/bottom-sheet'
-import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
+import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending, updateDonationNote } from '../../../store/actions/sending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
@@ -32,6 +32,7 @@ import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-uti
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import idx from 'idx'
+import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 export type NavigationParams = {
 };
@@ -61,6 +62,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const [ noteText, setNoteText ] = useState( '' )
   const sendingState = useSendingState()
+  const donationId = useDonationIdFromSelectedRecipients()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
@@ -96,6 +98,12 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     dispatch( executeSendStage1( {
       accountShellID: sourceAccountShell.id
     } ) )
+
+    // update donation note
+    if( donationId && noteText )
+      dispatch( updateDonationNote( {
+        donationNote: noteText
+      } ) )
   }
 
   function handleAddRecipientButtonPress() {
@@ -206,7 +214,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
           onSendMaxPressed={handleSendMaxPress}
         />
 
-        {sourcePrimarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT && (
+        { donationId && (
           <View style={styles.textInputFieldWrapper}>
             <Input
               containerStyle={styles.textInputContainer}
