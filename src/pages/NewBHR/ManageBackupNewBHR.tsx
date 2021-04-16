@@ -988,8 +988,9 @@ class ManageBackupNewBHR extends Component<
           <View style={{
             justifyContent:'center',
             alignItems:'center',
-            marginLeft: 10,
-            marginRight: 10
+            width: wp( '85%' ),
+            marginLeft: 30,
+            marginRight: 30
           }}>
             <Text style={{
               color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular

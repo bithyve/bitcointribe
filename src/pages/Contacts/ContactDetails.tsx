@@ -1307,7 +1307,7 @@ class ContactDetails extends PureComponent<
                     {uploadingSmShare ? (
                       <ActivityIndicator size="small" />
                     ) : (
-                      <Text style={styles.buttonText}>Help SM Key</Text>
+                      <Text style={styles.buttonText}>Show Secondary Key</Text>
                     )}
                   </View>
                 </TouchableOpacity> ) : null}

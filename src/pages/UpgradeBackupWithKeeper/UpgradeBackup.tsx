@@ -239,29 +239,38 @@ class UpgradeBackup extends Component<
     let keepersInfo: {shareId: string; type: string; status?: boolean}[] = [ {
       shareId: '', type: 'cloud'
     } ]
-    const selectedContacts = []
+    let selectedContacts = []
     for ( let i = 0; i < overallHealth.sharesInfo.length; i++ ) {
       const element = overallHealth.sharesInfo[ i ]
       const type = i == 0 ? 'primary' : i == 1 || i == 2 ? 'contact' : 'pdf'
+      console.log( 'trustedContactsInfo', trustedContactsInfo )
       if ( ( i == 1 || i == 2 ) && element.updatedAt > 0 && trustedContactsInfo ) {
         if( trustedContactsInfo.slice( 1, 3 )[ 0 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 0 ] )
         if( trustedContactsInfo.slice( 1, 3 )[ 1 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 1 ] )
+        const setSelectedContacts = new Set( selectedContacts )
+        selectedContacts = Array.from( setSelectedContacts )
         this.setState( {
           selectedContact: selectedContacts
         } )
       }
-      if( i == 0 && element.updatedAt == 0 ) {
-        TotalKeeper = TotalKeeper + 1
-        keepersInfo.push( {
-          shareId: element.shareId, type
-        } )
-      }
+
+      // if( i == 0 && element.updatedAt == 0 ) {
+      //   TotalKeeper = TotalKeeper + 1
+      //   keepersInfo.push( {
+      //     shareId: element.shareId, type
+      //   } )
+      // }
       if( element.updatedAt > 0 && keepersInfo.findIndex( value=>value.type =='pdf' ) == -1 ) {
         TotalKeeper = TotalKeeper + 1
         keepersInfo.push( {
           shareId: element.shareId, type
         } )
       }
+    }
+    if( TotalKeeper > 1 && keepersInfo.findIndex( value=>value.type == 'primary' ) == -1 ) {
+      keepersInfo.splice( 0, 0, {
+        shareId: '', type: 'primary'
+      } )
     }
     let levelToSetup = TotalKeeper == 1 || TotalKeeper == 2 ? 1 : TotalKeeper == 3 || TotalKeeper <= 4 ? 2 : 3
     if( !this.props.levelToSetup ){
@@ -298,6 +307,8 @@ class UpgradeBackup extends Component<
         }
         else if( element.type == 'contact' && !element.status && ( overallHealth.sharesInfo[ 1 ].updatedAt > 0 || overallHealth.sharesInfo[ 2 ].updatedAt > 0 ) && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
           console.log( 'nextToProcess contact element', element )
+          console.log( 'selectedContact', selectedContact )
+
           if( selectedContact.length && selectedContact.length == 2 ) {
             this.setState( {
               selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
@@ -969,12 +980,9 @@ class UpgradeBackup extends Component<
             return (
               <RestoreFromICloud
                 isLoading={isCloudBackupProcessing}
-                title={'Keeper on ' + Platform.OS == 'ios' ? 'iCloud' : 'GDrive'}
+                title={Platform.OS == 'ios' ? 'iCloud Backup' : 'GDrive Backup'}
                 subText={
-                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
-                }
-                info={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                  'Hexa will use the cloud to backup your wallet'
                 }
                 cardInfo={'Store Backup'}
                 cardTitle={'Hexa Wallet Backup'}
@@ -982,6 +990,7 @@ class UpgradeBackup extends Component<
                 proceedButtonText={'Backup'}
                 backButtonText={'Back'}
                 modalRef={this.RestoreFromICloud}
+                isUpgradeBackup={true}
                 onPressProceed={() => {
                   this.cloudBackup()
                 }}
