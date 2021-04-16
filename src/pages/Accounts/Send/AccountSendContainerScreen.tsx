@@ -90,14 +90,12 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       const options = decodingResult.options
 
       // checking for donationId to send note
-      if ( options?.message ) {
-        const rawMessage = options.message
-        donationID = rawMessage.split( ':' ).pop().trim()
+      if ( options?.message )
+        donationID = options.message.split( ':' ).pop().trim()
+
+      if ( options?.amount )
         amount = options.amount
-      }
-      if ( options?.amount ) {
-        amount = options.amount
-      }
+
     } catch ( err ) {
       Alert.alert( 'Unable to decode payment URI' )
       return
