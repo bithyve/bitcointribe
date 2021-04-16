@@ -1020,12 +1020,6 @@ export default class LevelHealth {
         }
         levelInfo.push( obj )
       }
-      console.log( 'initLevels levelInfo', JSON.stringify( {
-        HEXA_ID,
-        walletID: this.walletId,
-        level: _level,
-        levelInfo,
-      } ) )
       let res: AxiosResponse
       try {
         res = await BH_AXIOS.post( 'initLevels', {
@@ -1545,7 +1539,6 @@ export default class LevelHealth {
     }
     if( isSmShares ){
       this.encryptedSMSecretsKeeper = encryptedSecretsTmp
-      console.log( 'this.encryptedSMSecretsKeeper', this.encryptedSMSecretsKeeper )
     }else{
       this.encryptedSecretsKeeper = encryptedSecretsTmp
       this.shareIDsKeeper = shareIDs // preserving just the online(relay-transmitted) shareIDs
@@ -1884,7 +1877,6 @@ export default class LevelHealth {
       index++
     }
     this.SMMetaSharesKeeper = metaShareArray
-    console.log( 'this.SMMetaSharesKeeper', this.SMMetaSharesKeeper )
     return {
       metaShares: this.SMMetaSharesKeeper
     }

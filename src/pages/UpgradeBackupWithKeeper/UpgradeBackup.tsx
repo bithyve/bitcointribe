@@ -12,6 +12,7 @@ import {
   ImageBackground,
   Keyboard,
   AsyncStorage,
+  PermissionsAndroid,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -53,6 +54,8 @@ import {
   keeperProcessStatus,
   updatedKeeperInfo,
   generateSMMetaShares,
+  confirmPDFShared,
+  getPDFData
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -71,6 +74,8 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
+import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
+import ErrorModalContents from '../../components/ErrorModalContents'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -89,6 +94,9 @@ interface UpgradeBackupStateTypes {
   totalKeeper: number;
   secondaryQR: string;
   selectedShareId: string[];
+  errorMessage: string;
+  errorMessageHeader: string;
+  hasStoragePermission: boolean;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -139,6 +147,8 @@ interface UpgradeBackupPropsTypes {
   levelToSetup: number;
   updateAvailableKeeperData: any;
   trustedChannelsSetupSync: any;
+  confirmPDFShared: any;
+  getPDFData: any;
 }
 
 class UpgradeBackup extends Component<
@@ -150,6 +160,9 @@ class UpgradeBackup extends Component<
   UpgradePdfKeeper = createRef<BottomSheet>()
   SecurityQuestionBottomSheet = createRef<BottomSheet>()
   secondaryDeviceBottomSheet = createRef<BottomSheet>()
+  PersonalCopyShareBottomSheet = createRef<BottomSheet>()
+  ErrorBottomSheet = createRef<BottomSheet>()
+  storagePermissionBottomSheet = createRef<BottomSheet>()
   constructor( props ) {
     super( props )
     this.RestoreFromICloud
@@ -157,6 +170,9 @@ class UpgradeBackup extends Component<
     this.UpgradePdfKeeper
     this.SecurityQuestionBottomSheet
     this.secondaryDeviceBottomSheet
+    this.PersonalCopyShareBottomSheet
+    this.ErrorBottomSheet
+    this.storagePermissionBottomSheet
 
     this.state = {
       isCloudBackupProcessing: false,
@@ -210,6 +226,9 @@ class UpgradeBackup extends Component<
       totalKeeper: 0,
       secondaryQR: '',
       selectedShareId: [],
+      errorMessage: '',
+      errorMessageHeader: '',
+      hasStoragePermission: false,
     }
   }
 
@@ -217,7 +236,7 @@ class UpgradeBackup extends Component<
     this.props.trustedChannelsSetupSync()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
-    const keepersInfo = [ {
+    let keepersInfo: {shareId: string; type: string; status?: boolean}[] = [ {
       shareId: '', type: 'cloud'
     } ]
     const selectedContacts = []
@@ -231,7 +250,12 @@ class UpgradeBackup extends Component<
           selectedContact: selectedContacts
         } )
       }
-      console.log( 'element', element )
+      if( i == 0 && element.updatedAt == 0 ) {
+        TotalKeeper = TotalKeeper + 1
+        keepersInfo.push( {
+          shareId: element.shareId, type
+        } )
+      }
       if( element.updatedAt > 0 && keepersInfo.findIndex( value=>value.type =='pdf' ) == -1 ) {
         TotalKeeper = TotalKeeper + 1
         keepersInfo.push( {
@@ -239,21 +263,16 @@ class UpgradeBackup extends Component<
         } )
       }
     }
-    if( keepersInfo.findIndex( value=>value.type == 'primary' ) == -1 && TotalKeeper > 1 ) keepersInfo.push( {
-      shareId: '', type: 'primary'
-    } )
-    // console.log( 'keepersInfo', keepersInfo )
-    const levelToSetup = TotalKeeper == 1 || TotalKeeper == 2 ? 1 : TotalKeeper == 3 || TotalKeeper <= 4 ? 2 : 3
+    let levelToSetup = TotalKeeper == 1 || TotalKeeper == 2 ? 1 : TotalKeeper == 3 || TotalKeeper <= 4 ? 2 : 3
     if( !this.props.levelToSetup ){
       this.props.updateLevelToSetup( levelToSetup )
-    }
+    } else levelToSetup = this.props.levelToSetup
     if( !this.props.availableKeeperData.length ){
       this.props.setAvailableKeeperData( keepersInfo )
-    }
+    } else keepersInfo = this.props.availableKeeperData
     this.setState( {
       totalKeeper: TotalKeeper,
     } )
-    // console.log( 'TotalKeeper', TotalKeeper )
     this.nextToProcess( keepersInfo, levelToSetup, selectedContacts )
     this.updateListData( keepersInfo )
   };
@@ -263,11 +282,13 @@ class UpgradeBackup extends Component<
     if( levelHealth[ levelToSetup-1 ] ){
       for ( let i = 0; i < keepersInfo.length; i++ ) {
         const element = keepersInfo[ i ]
-        console.log( 'nextToProcess element', element )
+        // console.log( 'nextToProcess element', element )
         if( element.type == 'cloud' && !element.status ){
+          console.log( 'nextToProcess cloud element', element )
           this.RestoreFromICloud.current.snapTo( 1 )
         }
         else if( element.type == 'primary' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] ) {
+          console.log( 'nextToProcess primary element', element )
           if( overallHealth.sharesInfo[ 0 ].updatedAt > 0 ){
             this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
           } else {
@@ -276,6 +297,7 @@ class UpgradeBackup extends Component<
           }
         }
         else if( element.type == 'contact' && !element.status && ( overallHealth.sharesInfo[ 1 ].updatedAt > 0 || overallHealth.sharesInfo[ 2 ].updatedAt > 0 ) && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
+          console.log( 'nextToProcess contact element', element )
           if( selectedContact.length && selectedContact.length == 2 ) {
             this.setState( {
               selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
@@ -288,6 +310,7 @@ class UpgradeBackup extends Component<
           this.UpgradingKeeperContact.current.snapTo( 1 )
         }
         else if( element.type == 'pdf' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] && ( overallHealth.sharesInfo[ 3 ].updatedAt > 0 || overallHealth.sharesInfo[ 4 ].updatedAt > 0 ) ) {
+          console.log( 'nextToProcess pdf element', element )
           this.setState( {
             selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
           } )
@@ -314,13 +337,12 @@ class UpgradeBackup extends Component<
         }
       }
     }
-    console.log( 'listData', listData )
     this.setState( {
       listData
     } )
   }
 
-  componentDidUpdate = ( prevProps ) => {
+  componentDidUpdate = ( prevProps, prevState ) => {
     if (
       prevProps.levelHealth !=
         this.props.levelHealth &&
@@ -377,6 +399,26 @@ class UpgradeBackup extends Component<
 
     if( this.props.levelHealth[ this.props.levelToSetup - 1 ] && this.props.levelHealth[ this.props.levelToSetup - 1 ].levelInfo[ 2 ] && JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.props.levelHealth[ this.props.levelToSetup - 1 ].levelInfo[ 2 ].status == 'accessible' ) {
       this.props.updateAvailableKeeperData( 'primary' )
+    }
+
+    if( prevState.hasStoragePermission != this.state.hasStoragePermission ) {
+      if( Platform.OS === 'ios' ) {
+        this.storagePermissionBottomSheet.current.snapTo( 0 )
+        this.setState( {
+          hasStoragePermission: true
+        } )
+      } else {
+        this.state.hasStoragePermission
+          ? this.storagePermissionBottomSheet.current.snapTo( 0 )
+          : this.storagePermissionBottomSheet.current.snapTo( 1 )
+      }
+      if( this.state.hasStoragePermission  ){
+        this.props.getPDFData( this.state.selectedShareId[ 0 ] )
+      }
+    }
+
+    if( prevProps.availableKeeperData != this.props.availableKeeperData ){
+      console.log( 'availableKeeperData', this.props.availableKeeperData )
     }
   };
 
@@ -526,7 +568,6 @@ class UpgradeBackup extends Component<
         status: 'notAccessible',
       },
     ]
-    console.log( 'shareArray', shareArray )
     this.props.updateMSharesHealth( shareArray )
   }
 
@@ -547,7 +588,6 @@ class UpgradeBackup extends Component<
   }
 
   renderSecondaryDeviceContents = () => {
-    console.log( this.state.secondaryQR )
     return (
       <SecondaryDevice
         secondaryQR={this.state.secondaryQR}
@@ -567,6 +607,166 @@ class UpgradeBackup extends Component<
       <ModalHeader
         onPressHeader={() => {
           this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+        }}
+      />
+    )
+  }
+
+  renderPersonalCopyShareModalContent = () => {
+    return (
+      <PersonalCopyShareModal
+        removeHighlightingFromCard={() => {}}
+        selectedPersonalCopy={null}
+        personalCopyDetails={null}
+        onPressBack={() => {
+          this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
+        }}
+        onPressShare={() => {}}
+        onPressConfirm={() => {
+          try {
+            this.props.keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
+            this.props.confirmPDFShared( this.state.selectedShareId[ 0 ] )
+            this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
+          } catch ( err ) {
+            this.props.keeperProcessStatus( '' )
+          }
+        }}
+      />
+    )
+  }
+
+  renderPersonalCopyShareModalHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
+        }}
+      />
+    )
+  }
+
+  getStoragePermission = async () => {
+    // await checkStoragePermission()
+    if ( Platform.OS === 'android' ) {
+      const granted = await this.requestStoragePermission()
+      if ( !granted ) {
+        this.setState( {
+          errorMessage: 'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
+          hasStoragePermission: false
+        } )
+        this.storagePermissionBottomSheet.current.snapTo( 0 )
+        this.ErrorBottomSheet.current.snapTo( 1 )
+        return
+      }
+      else {
+        this.storagePermissionBottomSheet.current.snapTo( 0 )
+        this.setState( {
+          hasStoragePermission: true
+        } )
+      }
+    }
+
+    if ( Platform.OS === 'ios' ) {
+      this.setState( {
+        hasStoragePermission: true
+      } )
+      return
+    }
+  }
+
+  requestStoragePermission = async () => {
+    try {
+      const result = await PermissionsAndroid.requestMultiple( [
+        PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+        PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
+      ] )
+      if(
+        result[ 'android.permission.READ_EXTERNAL_STORAGE' ] === PermissionsAndroid.RESULTS.GRANTED
+        &&
+        result[ 'android.permission.WRITE_EXTERNAL_STORAGE' ] === PermissionsAndroid.RESULTS.GRANTED
+      ) {
+        return true
+      }
+      else {
+        return false
+      }
+    } catch ( err ) {
+      console.warn( err )
+      return false
+    }
+  }
+
+  renderErrorModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={this.ErrorBottomSheet}
+        title={this.state.errorMessageHeader}
+        info={this.state.errorMessage}
+        proceedButtonText={'Try again'}
+        onPressProceed={() => {
+          this.ErrorBottomSheet.current.snapTo( 0 )
+        }}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+      />
+    )
+  }
+
+  renderErrorModalHeader = () => {
+    return (
+      <ModalHeader
+      />
+    )
+  }
+
+  checkStoragePermission = async () =>  {
+    if( Platform.OS==='android' ) {
+      const [ read, write ] = [
+        await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
+        await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE )
+      ]
+      if( read && write ) {
+        this.setState( {
+          hasStoragePermission: true
+        } )
+        return true
+      }
+      else {
+        this.setState( {
+          hasStoragePermission: false
+        } )
+        return false
+      }
+    }
+
+  }
+
+  renderStoragePermissionModalContent = () => {
+    this.checkStoragePermission()
+    return (
+      <ErrorModalContents
+        modalRef={this.storagePermissionBottomSheet}
+        title={'Why do we need access to your files and storage?'}
+        info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
+        otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
+        proceedButtonText={'Continue'}
+        isIgnoreButton={false}
+        onPressProceed={() => {
+          this.getStoragePermission()
+        }}
+        onPressIgnore={() => {
+        }}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+      />
+    )
+  }
+
+  renderStoragePermissionModalHeader = () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          this.storagePermissionBottomSheet.current.snapTo( 0 )
         }}
       />
     )
@@ -919,6 +1119,34 @@ class UpgradeBackup extends Component<
           renderContent={this.renderSecondaryDeviceContents}
           renderHeader={this.renderSecondaryDeviceHeader}
         />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={this.PersonalCopyShareBottomSheet}
+          snapPoints={[ -50, hp( '85%' ) ]}
+          renderContent={this.renderPersonalCopyShareModalContent}
+          renderHeader={this.renderPersonalCopyShareModalHeader}
+        />
+        <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={this.ErrorBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
+          ]}
+          renderContent={this.renderErrorModalContent}
+          renderHeader={this.renderErrorModalHeader}
+        />
+        <BottomSheet
+          enabledInnerScrolling={true}
+          ref={this.storagePermissionBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '55%' ) : hp( '60%' ),
+          ]}
+          renderContent={this.renderStoragePermissionModalContent}
+          renderHeader={this.renderStoragePermissionModalHeader}
+        />
       </View>
     )
   }
@@ -982,6 +1210,8 @@ export default withNavigationFocus(
     updateLevelToSetup,
     updateAvailableKeeperData,
     trustedChannelsSetupSync,
+    confirmPDFShared,
+    getPDFData
   } )( UpgradeBackup )
 )
 

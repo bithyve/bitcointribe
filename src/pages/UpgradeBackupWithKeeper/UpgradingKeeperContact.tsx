@@ -26,7 +26,6 @@ const UpgradingKeeperContact = ( {
   proceedButtonText,
   onPressProceed,
 } ) => {
-  console.log( 'selectedContactArray', selectedContactArray )
   return (
     <View style={{
       ...styles.modalContentContainer, height: '100%'

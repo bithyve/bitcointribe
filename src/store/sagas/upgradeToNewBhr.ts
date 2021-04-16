@@ -104,7 +104,6 @@ function* autoShareSecondaryWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
     const { shareId } = payload
-    console.log( 'autoShareSecondaryWorker payload', payload )
     const name = 'Secondary Device1'
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     yield put( updatedKeeperInfo( {
@@ -121,9 +120,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    console.log( 'autoShareSecondaryWorker keeperInfo', keeperInfo )
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
-    console.log( 'autoShareSecondaryWorker response', response )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
@@ -131,19 +128,16 @@ function* autoShareSecondaryWorker( { payload } ) {
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
     const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && oldKeeperInfo.trustedChannel.data[ 1 ].data.version == '1.6.0' ? 'accessible' : 'notAccessible'
-    console.log( 'autoShareSecondaryWorker oldKeeperInfo', oldKeeperInfo )
     const data: TrustedDataElements = {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
     }
-    console.log( 'autoShareSecondaryWorker data', data )
     const res = yield call(
       trustedContacts.updateTrustedChannel,
       'Secondary Device',
       data,
       false
     )
-    console.log( 'updateTrustedChannel res', res )
     if ( res.status == 200 ) {
       const updatedSERVICES = {
         ...SERVICES,

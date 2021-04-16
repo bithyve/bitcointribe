@@ -42,7 +42,6 @@ export const setCloudDataForLevel = ( level ) => {
 }
 
 export const autoUploadSecondaryShare = ( shareId ) => {
-  console.log( 'autoUploadSecondaryShare shareId', shareId )
   return {
     type: AUTO_UPLOAD_SECONDARY, payload: {
       shareId
@@ -51,7 +50,6 @@ export const autoUploadSecondaryShare = ( shareId ) => {
 }
 
 export const autoShareContactKeeper = ( contactList, shareIds ) => {
-  console.log( 'autoUploadSecondaryShare shareId', shareIds )
   return {
     type: AUTO_UPLOAD_CONTACT, payload: {
       contactList, shareIds

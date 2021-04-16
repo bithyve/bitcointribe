@@ -285,7 +285,6 @@ export const checkSharesHealthWatcher = createWatcher(
 function* updateSharesHealthWorker( { payload } ) {
   // // set a timelapse for auto update and enable instantaneous manual update
   try {
-    console.log( 'modifyLevelStatus payload.shares', payload )
     yield put( updateMSharesLoader( true ) )
     const res = yield call( S3Service.updateHealthKeeper, payload.shares )
     if ( res.status === 200 ) {
@@ -3153,19 +3152,6 @@ function* generateSMMetaSharesWorker() {
   )
 
   const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
-  console.log( 'question', question )
-  console.log( 'questionId', questionId )
-  // if( questionId === 0 ){
-  //   console.log("inside if questionId",questionId);
-
-  //   question = yield select(
-  //     (state) => state.storage.database.WALLET_SETUP.security
-  //   );
-  //   console.log("inside if question",question);
-
-  // }
-  // console.log("question",question);
-  // console.log("questionId",questionId);
 
   const res = yield call(
     s3Service.generateSMShares,
@@ -3176,25 +3162,19 @@ function* generateSMMetaSharesWorker() {
     appVersion,
     questionId === '0' ? question: '',
   )
-  console.log( 'generateSMShares res', res )
   if ( res.status === 200 ) {
     if( res.data.metaShares && res.data.metaShares.length ){
       yield put( isSmMetaSharesCreated() )
     }
-    console.log( 'res.data.metaShares', res.data )
-    console.log( 's3Service', s3Service.levelhealth )
     const { SERVICES, DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
     const updatedDECENTRALIZED_BACKUP = {
       ...DECENTRALIZED_BACKUP,
       PK_SHARE: res.data.metaShares[ 0 ]
     }
-    console.log( 'updatedDECENTRALIZED_BACKUP', updatedDECENTRALIZED_BACKUP )
-    console.log( 'updatedSERVICES s3Service', s3Service )
     const updatedSERVICES = {
       ...SERVICES,
       S3_SERVICE: JSON.stringify( s3Service ),
     }
-    console.log( 'updatedSERVICES', updatedSERVICES )
     yield call( insertDBWorker, {
       payload: {
         SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP
