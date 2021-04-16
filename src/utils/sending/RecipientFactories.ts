@@ -22,7 +22,6 @@ export function makeAddressRecipientDescription( {
     displayedName: '@',
     avatarImageSource: null,
     donationID,
-    donationNote: null,
   }
 }
 
