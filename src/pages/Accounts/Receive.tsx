@@ -28,8 +28,10 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import BottomSheet from 'reanimated-bottom-sheet'
 
 import {
+  SECURE_ACCOUNT,
   TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 
@@ -45,10 +47,25 @@ import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import SmallHeaderModal from '../../components/SmallHeaderModal'
+import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
+import idx from 'idx'
+import TwoFASetupWarningModal from './TwoFASetupWarningModal'
+import DeviceInfo from 'react-native-device-info'
 
 export default function Receive( props ) {
 
   const [ ReceiveHelperBottomSheet ] = useState( React.createRef() )
+  const [ isReceiveHelperDone, setIsReceiveHelperDone ] = useState( true )
+  const isReceiveHelperDoneValue = useSelector( ( state ) =>
+    idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
+  )
+
+  const savingWarning = useSelector( ( state ) =>
+    idx( state, ( _ ) => _.preferences.savingWarning ),
+  )
+
+  const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
 
   const [ amount, setAmount ] = useState( '' )
   const [ serviceType ] = useState(
@@ -82,6 +99,62 @@ export default function Receive( props ) {
     dispatch( setReceiveHelper( true ) )
     if ( ReceiveHelperBottomSheet.current )
       ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
+  }
+
+  const onPressReceiveHelperHeader = () => {
+    if ( isReceiveHelperDone ) {
+      if ( ReceiveHelperBottomSheet.current )
+        ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
+      setTimeout( () => {
+        setIsReceiveHelperDone( false )
+      }, 10 )
+    } else {
+      if ( ReceiveHelperBottomSheet.current )
+        ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
+    }
+  }
+
+  const checkNShowHelperModal = async () => {
+    const isReceiveHelperDone1 = isReceiveHelperDoneValue
+    if ( !isReceiveHelperDone1 ) {
+      await AsyncStorage.getItem( 'isReceiveHelperDone' )
+    }
+    if ( !isReceiveHelperDone1 && serviceType == TEST_ACCOUNT ) {
+      dispatch( setReceiveHelper( true ) )
+      //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
+      setTimeout( () => {
+        setIsReceiveHelperDone( true )
+      }, 10 )
+      setTimeout( () => {
+        if ( ReceiveHelperBottomSheet.current )
+          ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
+      }, 1000 )
+    } else {
+      setTimeout( () => {
+        setIsReceiveHelperDone( false )
+      }, 10 )
+    }
+  }
+
+  useEffect( () => {
+    checkNShowHelperModal()
+    //(async () => {
+    if ( serviceType === SECURE_ACCOUNT ) {
+      if ( !savingWarning ) {
+        //await AsyncStorage.getItem('savingsWarning')
+        // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
+        if ( SecureReceiveWarningBottomSheet.current )
+          ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 1 )
+        dispatch( setSavingWarning( true ) )
+        //await AsyncStorage.setItem('savingsWarning', 'true');
+      }
+    }
+    //})();
+  }, [] )
+
+  const onPressOkOf2FASetupWarning = () => {
+    if ( SecureReceiveWarningBottomSheet.current )
+      ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 0 )
   }
 
   const showReceiveAmountBottomSheet = useCallback( () => {
@@ -237,6 +310,53 @@ export default function Receive( props ) {
           </View>
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
+
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ReceiveHelperBottomSheet as any}
+        snapPoints={[ -50, hp( '89%' ) ]}
+        renderContent={() => (
+          <ReceiveHelpContents
+            titleClicked={() => {
+              if ( ReceiveHelperBottomSheet.current )
+                ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
+            }}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            borderColor={Colors.blue}
+            backgroundColor={Colors.blue}
+            onPressHeader={() => onPressReceiveHelperHeader()}
+          />
+        )}
+      />
+
+      <BottomSheet
+        enabledInnerScrolling={true}
+        enabledGestureInteraction={false}
+        ref={SecureReceiveWarningBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
+        ]}
+        renderContent={() => (
+          <TwoFASetupWarningModal
+            onPressOk={() => onPressOkOf2FASetupWarning()}
+            //onPressManageBackup={() => props.navigation.replace('ManageBackup')}
+          />
+        )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            borderColor={Colors.borderColor}
+            backgroundColor={Colors.white}
+            // onPressHeader={() => {
+            //   if (SecureReceiveWarningBottomSheet.current)
+            //     (SecureReceiveWarningBottomSheet as any).current.snapTo(0);
+            // }}
+          />
+        )}
+      />
     </View>
   )
 }
