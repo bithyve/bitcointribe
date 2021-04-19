@@ -208,8 +208,8 @@ class UpgradeBackup extends Component<
           status: 'setup'
         },
         {
-          title: 'Security Question Upgrade',
-          subTitle: 'Lorem ipsum dolor sit amet',
+          title: 'Security Question',
+          subTitle: 'Security Question Upgrade',
           type: 'securityQuestion',
           image: require( '../../assets/images/icons/icon_question.png' ),
           status: 'setup'
