@@ -407,4 +407,23 @@ export default class TrustedContactsService {
       }
     }
   };
+
+  public initTCFromOldTC = (
+    oldContactName: string,
+    newContactName: string,
+  ) => {
+    try {
+      return {
+        status: true,
+        data: this.tc.initTCFromOldTC( oldContactName, newContactName )
+          .status,
+      }
+    } catch ( err ) {
+      return {
+        status: false,
+        err: err.message,
+        message: 'Failed to finalize keeper',
+      }
+    }
+  };
 }

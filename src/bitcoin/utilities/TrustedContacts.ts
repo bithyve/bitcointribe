@@ -1060,4 +1060,23 @@ export default class TrustedContacts {
       throw new Error( 'No trusted channels to update' )
     }
   };
+
+  public initTCFromOldTC = (
+    oldContactName: string,
+    newContactName: string,
+  ): {
+    status: boolean;
+  } => {
+    try {
+      this.trustedContacts[ newContactName ] = this.trustedContacts[ oldContactName ]
+      return {
+        status: true
+      }
+    } catch ( error ) {
+      console.log( 'error finalize keeper', error )
+      return {
+        status: false,
+      }
+    }
+  };
 }

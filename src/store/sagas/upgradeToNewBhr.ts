@@ -134,6 +134,7 @@ function* autoShareSecondaryWorker( { payload } ) {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
     }
+    const ress = yield call( trustedContacts.initTCFromOldTC( 'Secondary Device', name ) )
     const res = yield call(
       trustedContacts.updateTrustedChannel,
       'Secondary Device',
