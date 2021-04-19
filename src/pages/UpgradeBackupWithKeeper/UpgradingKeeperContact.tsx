@@ -137,7 +137,7 @@ const UpgradingKeeperContact = ( {
             marginBottom: hp( '1%' ),
           }}
         >
-          <Text style={styles.modalInfoText}>{info}</Text>
+          {info ? <Text style={styles.modalInfoText}>{info}</Text> : null}
         </View>
         <View style={styles.bottomButtonsView}>
           <AppBottomSheetTouchableWrapper

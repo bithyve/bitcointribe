@@ -81,7 +81,6 @@ interface UpgradeBackupStateTypes {
   selectedIds: any[];
   listData: {
     title: String;
-    info: String;
     subTitle: String;
     type: String;
     image: any;
@@ -181,40 +180,35 @@ class UpgradeBackup extends Component<
       encryptedCloudDataJson: [],
       listData: [
         {
-          title: 'App Backup',
-          info: 'Lorem ipsum dolor sit',
-          subTitle: 'Lorem ipsum dolor sit amet',
+          title: 'Wallet Backup',
+          subTitle: Platform.OS == 'ios' ? 'iCloud Backup' : 'GDrive Backup',
           type: 'cloud',
           image: require( '../../assets/images/icons/icon_backup.png' ),
           status: 'setup'
         },
         {
-          title: 'Primary Keeper',
-          info: 'Lorem ipsum dolor sit',
-          subTitle: 'Lorem ipsum dolor sit amet',
+          title: 'Primary Backup',
+          subTitle: 'Backup',
           type: 'primary',
           image: require( '../../assets/images/icons/icon_secondarydevice.png' ),
           status: 'setup'
         },
         {
-          title: 'Keeper Contacts',
-          info: 'Lorem ipsum dolor sit',
-          subTitle: 'Lorem ipsum dolor sit amet',
+          title: 'Contacts Backup',
+          subTitle: 'Backup upgrade',
           type: 'contact',
           image: require( '../../assets/images/icons/icon_contact.png' ),
           status: 'setup'
         },
         {
-          title: 'Keeper Device & PDF Keepers',
-          info: 'Lorem ipsum dolor sit',
-          subTitle: 'Lorem ipsum dolor sit amet',
+          title: 'Upgrade Backup Device and PDF Backup',
+          subTitle: 'Device and PDF Backup upgrade',
           type: 'pdf',
           image: require( '../../assets/images/icons/files-and-folders-2.png' ),
           status: 'setup'
         },
         {
-          title: 'Security Question',
-          info: 'Lorem ipsum dolor sit',
+          title: 'Security Question Upgrade',
           subTitle: 'Lorem ipsum dolor sit amet',
           type: 'securityQuestion',
           image: require( '../../assets/images/icons/icon_question.png' ),
@@ -859,7 +853,7 @@ class UpgradeBackup extends Component<
                 {'Upgrade Backup'}
               </Text>
               <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-                Lorem ipsum dolor sit amet consetetur sadipscing
+              Simply follow the steps below to secure your Recovery Keys better
               </Text>
             </View>
           </View>
@@ -925,7 +919,7 @@ class UpgradeBackup extends Component<
                       {item.title}
                     </Text>
                   </Text>
-                  <Text style={styles.greyBoxText}>{item.info}</Text>
+                  {/* <Text style={styles.greyBoxText}>{item.info}</Text> */}
                 </View>
                 <View
                   style={{
@@ -1008,7 +1002,7 @@ class UpgradeBackup extends Component<
           backgroundColor={Colors.white}
           title={'Note'}
           infoText={
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna.'
+            'Once completed, you would have a three tiered backup. Always ensure that you backup your wallet till the highest level called the Multi-Key Backup'
           }
         />
         <BottomSheet
@@ -1017,16 +1011,16 @@ class UpgradeBackup extends Component<
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '50%' )
-              : hp( '60%' ),
+              ? hp( '40%' )
+              : hp( '50%' ),
           ]}
           renderContent={() => {
             return (
               <RestoreFromICloud
                 isLoading={isCloudBackupProcessing}
-                title={Platform.OS == 'ios' ? 'iCloud Backup' : 'GDrive Backup'}
+                title={Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Gdrive'}
                 subText={
-                  'Hexa will use the cloud to backup your wallet'
+                  'Completing the steps below secures your wallet at a basic level'
                 }
                 cardInfo={'Store Backup'}
                 cardTitle={'Hexa Wallet Backup'}
@@ -1096,13 +1090,11 @@ class UpgradeBackup extends Component<
           renderContent={() => {
             if( selectedContact.length ){
               return ( <UpgradingKeeperContact
-                title={'Upgrading Keeper Contacts'}
+                title={'Upgrade backup of Recovery Keys stored with Contacts'}
                 subText={
-                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
+                  'You could retain the Recovery Keys with the same contacts who have them currently'
                 }
-                info={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
-                }
+                info={''}
                 selectedContactArray={selectedContact}
                 proceedButtonText={'Proceed'}
                 onPressProceed={() => {
@@ -1131,7 +1123,7 @@ class UpgradeBackup extends Component<
           ]}
           renderContent={() => (
             <UpgradePdfKeeper
-              title={'Upgrade PDF Keeper'}
+              title={'Upgrade PDF Backup'}
               subText={
                 'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
               }
