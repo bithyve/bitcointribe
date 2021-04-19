@@ -20,6 +20,7 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import RecipientAvatar from '../../components/RecipientAvatar'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import RecipientKind from '../../common/data/enums/RecipientKind'
+import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 
 export type Props = {
   recipient: RecipientDescribing;
@@ -37,6 +38,8 @@ function RecipientComponent( {
   const unitText = useFormattedUnitText( {
     bitcoinUnit: accountKind == TEST_ACCOUNT ? BitcoinUnit.TSATS : BitcoinUnit.SATS
   } )
+
+  const unitAmount = useFormattedAmountText( recipient.amount )
 
   const displayedNameText = useMemo( () => {
     if ( recipient.kind === RecipientKind.ADDRESS ) {
@@ -97,7 +100,7 @@ function RecipientComponent( {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {recipient.amount} {unitText}
+            {unitAmount} {unitText}
           </Text>
         </View>
 
