@@ -214,7 +214,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
           onSendMaxPressed={handleSendMaxPress}
         />
 
-        { donationId && (
+        { donationId ? (
           <View style={styles.textInputFieldWrapper}>
             <Input
               containerStyle={styles.textInputContainer}
@@ -235,7 +235,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
               autoCompleteType="off"
             />
           </View>
-        )}
+        ): null}
       </View>
 
       <View style={styles.footerSection}>
