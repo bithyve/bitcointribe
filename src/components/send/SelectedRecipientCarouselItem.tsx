@@ -14,6 +14,7 @@ import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitT
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import useAmountBeingSentToRecipient from '../../utils/hooks/state-selectors/sending/UseAmountBeingSentToRecipient'
+import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
 
 
 export type Props = {
@@ -30,7 +31,7 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
   containerStyle = {
   },
 }: Props ) => {
-  const designatedAmount = useAmountBeingSentToRecipient( recipient )
+  const designatedAmount = useFormattedAmountText( useAmountBeingSentToRecipient( recipient ) )
 
   const unitText = !currencyCode ? useFormattedUnitText( {
     currencyKind: CurrencyKind.FIAT
