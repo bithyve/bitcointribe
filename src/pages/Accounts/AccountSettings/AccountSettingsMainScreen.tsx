@@ -89,15 +89,15 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       //   screenName: 'ReassignTransactionsMainOptions',
       //   imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
       // },
-      {
-        title: 'Account Visibility',
-        subtitle: 'Configure for different privacy-sensitive contexts',
-        screenName: 'EditVisibility',
-        screenParams: {
-          accountShellID: accountShell.id,
-        },
-        imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
-      },
+      // {
+      //   title: 'Account Visibility',
+      //   subtitle: 'Configure for different privacy-sensitive contexts',
+      //   screenName: 'EditVisibility',
+      //   screenParams: {
+      //     accountShellID: accountShell.id,
+      //   },
+      //   imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
+      // },
       // {
       //   title: 'Merge Account',
       //   subtitle: `Move all transactions to another Hexa account`,
