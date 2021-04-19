@@ -37,38 +37,38 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
   } = useBottomSheetModal()
 
 
-const menuOptions: MenuOption[] = [
-  {
-    title: 'Manage Passcode',
-    subtitle: 'Change your passcode',
-    imageSource: require( '../../../assets/images/icons/managepin.png' ),
-    screenName: 'ManagePasscode',
-  },
-  {
-    title: 'Change Currency',
-    subtitle: 'Choose your currency',
-    imageSource: require( '../../../assets/images/icons/country.png' ),
-    screenName: 'ChangeCurrency',
-  },
-  {
-    title: 'Full Rescan',
-    subtitle: 'Completely sync the account',
-    imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
-    onOptionPressed: handleRescanListItemSelection,
-  },
-  
-  {
-    title: 'Version History',
-    subtitle: 'Version History',
-    imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
-    screenName: 'VersionHistory',
-  },
+  const menuOptions: MenuOption[] = [
+    {
+      title: 'Manage Passcode',
+      subtitle: 'Change your passcode',
+      imageSource: require( '../../../assets/images/icons/managepin.png' ),
+      screenName: 'ManagePasscode',
+    },
+    {
+      title: 'Change Currency',
+      subtitle: 'Choose your currency',
+      imageSource: require( '../../../assets/images/icons/country.png' ),
+      screenName: 'ChangeCurrency',
+    },
+    // {
+    //   title: 'Full Rescan',
+    //   subtitle: 'Completely sync the account',
+    //   imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
+    //   onOptionPressed: handleRescanListItemSelection,
+    // },
+
+    {
+      title: 'Version History',
+      subtitle: 'Version History',
+      imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
+      screenName: 'VersionHistory',
+    },
   // {
   //   title: 'Hexa Release',
   //   subtitle: versionString,
   //   imageSource: require( '../../../assets/images/icons/settings.png' ),
   // },
-]
+  ]
 
 
   function handleOptionSelection( menuOption: MenuOption ) {
