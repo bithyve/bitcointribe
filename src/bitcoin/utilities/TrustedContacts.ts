@@ -1064,19 +1064,13 @@ export default class TrustedContacts {
   public initTCFromOldTC = (
     oldContactName: string,
     newContactName: string,
-  ): {
-    status: boolean;
-  } => {
+  ) => {
     try {
       this.trustedContacts[ newContactName ] = this.trustedContacts[ oldContactName ]
-      return {
-        status: true
-      }
+      return true
     } catch ( error ) {
       console.log( 'error finalize keeper', error )
-      return {
-        status: false,
-      }
+      return false
     }
   };
 }

@@ -13,6 +13,7 @@ import {
   Keyboard,
   AsyncStorage,
   PermissionsAndroid,
+  RefreshControl,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -27,7 +28,8 @@ import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
   clearPaymentDetails,
-  trustedChannelsSetupSync
+  trustedChannelsSetupSync,
+  updateTrustedContactsInfoLocally
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -77,7 +79,6 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
 import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import { RefreshControl } from 'react-native'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -155,6 +156,7 @@ interface UpgradeBackupPropsTypes {
   getPDFData: any;
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
+  updateTrustedContactsInfoLocally: any;
 }
 
 class UpgradeBackup extends Component<
@@ -296,7 +298,6 @@ class UpgradeBackup extends Component<
         const element = keepersInfo[ i ]
         // console.log( 'nextToProcess element', element )
         if( element.type == 'cloud' && !element.status ){
-          console.log( 'nextToProcess cloud element', element )
           this.RestoreFromICloud.current.snapTo( 1 )
           this.secondaryDeviceBottomSheet.current.snapTo( 0 )
           this.UpgradingKeeperContact.current.snapTo( 0 )
@@ -306,37 +307,29 @@ class UpgradeBackup extends Component<
           this.setState( {
             selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ]
           } )
-          console.log( 'nextToProcess primary element', element )
           if( overallHealth.sharesInfo[ 0 ].updatedAt > 0 ){
             this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
           } else {
             this.secondaryDeviceBottomSheet.current.snapTo( 1 )
-            this.setState( {
-              isGuardianCreationClicked: true
-            } )
-            this.createGuardian()
+            this.createGuardian( [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ] )
           }
           this.RestoreFromICloud.current.snapTo( 0 )
           this.UpgradingKeeperContact.current.snapTo( 0 )
           return
         }
         if( element.type == 'contact' && !element.status && ( overallHealth.sharesInfo[ 1 ].updatedAt > 0 || overallHealth.sharesInfo[ 2 ].updatedAt > 0 ) && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
-          console.log( 'nextToProcess contact element', element )
           if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 ) {
             if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
-              console.log( 'IF' )
               this.setState( {
                 contactToShow: selectedContact,
                 selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
               } )
             } else if( ( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status === 'notAccessible' && this.props.isUpgradeLevelInitialized ) || ( levelHealth[ levelToSetup-2 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-2 ].levelInfo[ 3 ].status === 'notAccessible' ) ) {
-              console.log( '3' )
               this.setState( {
                 contactToShow: [ selectedContact[ 0 ] ],
                 selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
               } )
             } else if( levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' ) {
-              console.log( '4' )
               this.setState( {
                 contactToShow: [ selectedContact[ 1 ] ],
                 selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
@@ -345,13 +338,11 @@ class UpgradeBackup extends Component<
           }
           else if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup < 3 ) {
             const selectedShareId = levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId
-            console.log( 'ssss' )
             this.setState( {
               contactToShow: [ selectedContact[ 0 ] ],
               selectedShareId: [ selectedShareId ]
             } )
           } else if( selectedContact.length && selectedContact.length == 1 ) {
-            console.log( 'qwqw' )
             this.setState( {
               contactToShow: selectedContact,
               selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
@@ -363,7 +354,6 @@ class UpgradeBackup extends Component<
           return
         }
         if( element.type == 'pdf' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] && ( overallHealth.sharesInfo[ 3 ].updatedAt > 0 || overallHealth.sharesInfo[ 4 ].updatedAt > 0 ) ) {
-          console.log( 'nextToProcess pdf element', element )
           this.setState( {
             selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
           } )
@@ -403,7 +393,7 @@ class UpgradeBackup extends Component<
   componentDidUpdate = ( prevProps, prevState ) => {
 
     if( prevState.secondaryQR != this.state.secondaryQR ){
-      console.log( 'prevState.secondaryQR != this.state.secondaryQR secondaryQR', this.state.secondaryQR )
+      console.log( 'CreateGuardian this.state.secondaryQR', this.state.secondaryQR )
     }
 
     const { levelHealth } = this.props
@@ -436,11 +426,11 @@ class UpgradeBackup extends Component<
     console.log( 'this.props.trustedContacts', this.props.trustedContacts )
     console.log( 'this.props.uploadMetaShare', this.props.uploadMetaShare )
     console.log( 'this.props.updateEphemeralChannelLoader', this.props.updateEphemeralChannelLoader )
+    console.log( 'this.props.updateEphemeralChannelLoader', this.props.updateEphemeralChannelLoader )
     if( this.props.SHARES_TRANSFER_DETAILS[ 0 ] &&
       this.props.trustedContacts &&
       !this.props.uploadMetaShare &&
       !this.props.updateEphemeralChannelLoader &&
-      prevState.isGuardianCreationClicked != this.state.isGuardianCreationClicked &&
       this.state.isGuardianCreationClicked
     ) {
       console.log( 'this.props.SHARES_TRANSFER_DETAILS[ 0 ] INSIDE IF', this.props.SHARES_TRANSFER_DETAILS[ 0 ] )
@@ -510,8 +500,10 @@ class UpgradeBackup extends Component<
     this.setState( {
       showLoader: true
     } )
+
     const { levelToSetup } = this.props
     const { initializeHealthSetup, healthCheckInitializedKeeper } = this.props
+    this.props.setUpgradeProcessStatus( KeeperProcessStatus.IN_PROGRESS )
     if( levelToSetup == 1 ) {
       if( healthCheckInitializedKeeper == false ) {
         initializeHealthSetup()
@@ -524,20 +516,14 @@ class UpgradeBackup extends Component<
     }
   };
 
-  createGuardian = ( ) => {
+  createGuardian = ( shareId ) => {
     if( !this.state.isGuardianCreationClicked ){
       try {
-        const shareExpired =  !this.props.SHARES_TRANSFER_DETAILS[ 0 ] ||
-        Date.now() - this.props.SHARES_TRANSFER_DETAILS[ 0 ].UPLOADED_AT >
-        config.TC_REQUEST_EXPIRY
-        console.log( 'shareExpired', shareExpired )
-        if( !shareExpired ) {
-          this.setSecondaryDeviceQR()
-          return
-        }
+        this.setState( {
+          isGuardianCreationClicked: true
+        } )
         console.log( 'STARTED createGuardian', this.state.selectedShareId )
         const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
-        const index = 0
         const firstName = 'Secondary'
         const lastName = 'Device1'
 
@@ -546,44 +532,61 @@ class UpgradeBackup extends Component<
           .trim()
 
         const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+        let info = null
+        if ( trustedContact && trustedContact.secondaryKey ) info = trustedContact.secondaryKey
 
+        const shareExpired =  !this.props.SHARES_TRANSFER_DETAILS[ 0 ] ||
+        Date.now() - this.props.SHARES_TRANSFER_DETAILS[ 0 ].UPLOADED_AT >
+        config.TC_REQUEST_EXPIRY
         // Keeper setup started
         keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
         updatedKeeperInfo( {
-          shareId: this.state.selectedShareId[ 0 ],
+          shareId: shareId,
           name: contactName,
           uuid: '',
           publicKey: '',
           ephemeralAddress: '',
           type: 'device',
           data: {
-            name: contactName, index
+            name: contactName, index: 0
           }
         } )
 
-        const hasTrustedChannel = trustedContact && trustedContact.symmetricKey ? true : false
-        const isEphemeralChannelExpired = trustedContact && trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY? true: false
+        if ( shareExpired ) {
+          this.setState( {
+            secondaryQR: ''
+          } )
+          this.updateTrustedContactsInfo( {
+            firstName, lastName
+          } )
+          // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
+        } else {
+          const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+          const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+          trustedContact.ephemeralChannel.initiatedAt &&
+          Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+          config.TC_REQUEST_EXPIRY? true: false
 
-        if ( !hasTrustedChannel && isEphemeralChannelExpired ) this.setState( {
-          secondaryQR: ''
-        } )
-        console.log( 'createGuardian !hasTrustedChannel && isEphemeralChannelExpired', !hasTrustedChannel && isEphemeralChannelExpired )
-        console.log( 'createGuardian hasTrustedChannel', hasTrustedChannel )
-        console.log( 'createGuardian isEphemeralChannelExpired', isEphemeralChannelExpired )
-
+          if (
+            !hasTrustedChannel &&
+            isEphemeralChannelExpired
+          ) this.setState( {
+            secondaryQR: ''
+          } )
+          console.log( 'createGuardian !hasTrustedChannel && isEphemeralChannelExpired', !hasTrustedChannel && isEphemeralChannelExpired )
+          console.log( 'createGuardian hasTrustedChannel', hasTrustedChannel )
+          console.log( 'createGuardian isEphemeralChannelExpired', isEphemeralChannelExpired )
+        }
 
         const contactInfo = {
           contactName,
-          info: null,
+          info: info? info.trim(): null,
           isGuardian: true,
-          shareIndex: index,
-          shareId: this.state.selectedShareId[ 0 ],
+          shareIndex: 0,
+          shareId: shareId,
           changeContact: false,
         }
-
+        console.log( 'createGuardian contactInfo', contactInfo )
         let parentShell: AccountShell
         accountShells.forEach( ( shell: AccountShell ) => {
           if( !shell.primarySubAccount.instanceNumber ){
@@ -594,9 +597,7 @@ class UpgradeBackup extends Component<
           accountShellID: parentShell.id,
           isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
         } )
-
         console.log( 'createGuardian newSecondarySubAccount', newSecondarySubAccount )
-
         addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo )
       } catch ( error ) {
         console.log( 'error', error )
@@ -604,21 +605,32 @@ class UpgradeBackup extends Component<
     }
   }
 
+  updateTrustedContactsInfo = async ( contact ) => {
+    const tcInfo = this.props.trustedContactsInfo
+
+    if ( tcInfo.length ) {
+      tcInfo[ 0 ] = contact
+    } else {
+      tcInfo[ 0 ] = contact
+      tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+      tcInfo[ 2 ] = undefined
+    }
+    console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
+    this.props.updateTrustedContactsInfoLocally( tcInfo )
+  }
+
   setSecondaryDeviceQR = () => {
     try {
+      console.log( 'STARTED setSecondaryDeviceQR' )
       const { uploadMetaShare, updateEphemeralChannelLoader, trustedContacts, keeperProcessStatus, walletName } = this.props
       const { secondaryQR } = this.state
       const index = 0
-      console.log( 'uploadMetaShare', uploadMetaShare )
-      console.log( 'updateEphemeralChannelLoader', updateEphemeralChannelLoader )
       if ( uploadMetaShare || updateEphemeralChannelLoader ) {
         if ( secondaryQR ) this.setState( {
           secondaryQR: ''
         } )
         return
       }
-
-      console.log( 'setSecondaryDeviceQRthis.state.isGuardianCreationClicked', this.state.isGuardianCreationClicked )
 
       const firstName = 'Secondary'
       let lastName = 'Device'
@@ -629,8 +641,7 @@ class UpgradeBackup extends Component<
         .toLowerCase()
         .trim()
 
-      console.log( 'contactName', contactName )
-      console.log( 'trustedContacts.tc.trustedContacts[ contactName ]', trustedContacts.tc.trustedContacts[ contactName ] )
+      console.log( 'createGuardian contactName', contactName )
       if (
         trustedContacts.tc.trustedContacts[ contactName ] &&
       trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
@@ -638,13 +649,13 @@ class UpgradeBackup extends Component<
         const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
           contactName
         ]
-        console.log( 'trustedContacts.tc.trustedContacts[ contactName ]', trustedContacts.tc.trustedContacts[ contactName ] )
-        // if( publicKey ) {
-        //   keeperProcessStatus( KeeperProcessStatus.COMPLETED )
-        // }
+        console.log( 'createGuardian contactName', contactName )
+        if( publicKey ) {
+          keeperProcessStatus( KeeperProcessStatus.COMPLETED )
+        }
         if( this.state.isGuardianCreationClicked ){
           this.updateShare()
-          console.log( 'trustedContacts.tc.trustedContacts[ contactName ]', trustedContacts.tc.trustedContacts[ contactName ] )
+          console.log( 'createGuardian trustedContacts.tc.trustedContacts[ contactName ]', trustedContacts.tc.trustedContacts[ contactName ] )
           this.setState( {
             secondaryQR: JSON.stringify( {
               isGuardian: true,
@@ -682,7 +693,6 @@ class UpgradeBackup extends Component<
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-        status: 'notAccessible',
       },
     ]
     this.props.updateMSharesHealth( shareArray )
@@ -929,7 +939,7 @@ class UpgradeBackup extends Component<
         <ScrollView
           refreshControl={
             <RefreshControl
-              onRefresh={this.props.checkMSharesHealth()}
+              onRefresh={()=>this.props.checkMSharesHealth()}
               refreshing={this.state.isRefreshing}
             />
           }
@@ -1333,7 +1343,8 @@ export default withNavigationFocus(
     trustedChannelsSetupSync,
     confirmPDFShared,
     getPDFData,
-    checkMSharesHealth
+    checkMSharesHealth,
+    updateTrustedContactsInfoLocally
   } )( UpgradeBackup )
 )
 

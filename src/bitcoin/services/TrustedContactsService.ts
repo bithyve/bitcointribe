@@ -408,21 +408,34 @@ export default class TrustedContactsService {
     }
   };
 
-  public initTCFromOldTC = (
+  public initTCFromOldTC = async (
     oldContactName: string,
     newContactName: string,
-  ) => {
+  ): Promise<
+    | {
+        status: number;
+        data: boolean;
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
     try {
       return {
-        status: true,
+        status: config.STATUS.SUCCESS,
         data: this.tc.initTCFromOldTC( oldContactName, newContactName )
-          .status,
       }
     } catch ( err ) {
+      console.log( 'err', err )
       return {
-        status: false,
+        status: 0o1,
         err: err.message,
-        message: 'Failed to finalize keeper',
+        message: 'Failed to update contact',
       }
     }
   };

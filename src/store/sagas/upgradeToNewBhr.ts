@@ -134,7 +134,7 @@ function* autoShareSecondaryWorker( { payload } ) {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
     }
-    const ress = yield call( trustedContacts.initTCFromOldTC( 'Secondary Device', name ) )
+    const ress = yield call( trustedContacts.initTCFromOldTC, 'Secondary Device', name )
     const res = yield call(
       trustedContacts.updateTrustedChannel,
       'Secondary Device',
@@ -225,7 +225,6 @@ function* autoShareContactKeeperWorker( { payload } ) {
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     console.log( 'autoShareContactKeeperWorker keeperInfo', keeperInfo )
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
