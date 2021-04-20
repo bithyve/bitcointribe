@@ -134,7 +134,8 @@ function* autoShareSecondaryWorker( { payload } ) {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
     }
-    const ress = yield call( trustedContacts.initTCFromOldTC, 'Secondary Device', name )
+    const ress = yield call( trustedContacts.initTCFromOldTC, 'Secondary Device'.toLowerCase(), name.toLowerCase() )
+    console.log( 'autoShareSecondaryWorker trustedContacts', trustedContacts )
     const res = yield call(
       trustedContacts.updateTrustedChannel,
       'Secondary Device',
@@ -225,13 +226,11 @@ function* autoShareContactKeeperWorker( { payload } ) {
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    console.log( 'autoShareContactKeeperWorker keeperInfo', keeperInfo )
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
-    console.log( 'autoShareContactKeeperWorker response', response )
     for ( let i = 0; i < shareIds.length; i++ ) {
       const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
         ? contactList[ i ].firstName + ' ' + contactList[ i ].lastName
@@ -249,14 +248,12 @@ function* autoShareContactKeeperWorker( { payload } ) {
         metaShare: share,
         secondaryShare: secondaryMetaShares[ 1 ]
       }
-      console.log( 'autoShareSecondaryWorker data', data )
       const res = yield call(
         trustedContacts.updateTrustedChannel,
         name,
         data,
         false
       )
-      console.log( 'updateTrustedChannel res', res )
       if ( res.status == 200 ) {
         const updatedSERVICES = {
           ...SERVICES,
