@@ -224,12 +224,12 @@ const getModifiedData = ( keeperInfo, levelHealthVar ) => {
 const noteText = ( i, currentLevel ) => {
   switch ( i ) {
       case 1:
-        if( currentLevel === 0 ) return 'First complete Level 1, before proceeding with Level 2'
-        if( currentLevel === 1 ) return 'Share the Recovery Key(s) to upgrade your backup to Level 2'
+        if( currentLevel === 0 ) return 'First complete Level 1, \nbefore proceeding with Level 2'
+        if( currentLevel === 1 ) return 'Share the Recovery Key(s) to \nupgrade your backup to Level 2'
       case 2:
-        if( currentLevel === 0 ) return 'First complete Level 2, before proceeding with Level 3'
-        if( currentLevel === 1 ) return 'First complete Level 2, before proceeding with Level 3'
-        if( currentLevel === 2 ) return 'Share the Recovery Key(s) to upgrade your backup to Level 3'
+        if( currentLevel === 0 ) return 'First complete Level 2, \nbefore proceeding with Level 3'
+        if( currentLevel === 1 ) return 'First complete Level 2, \nbefore proceeding with Level 3'
+        if( currentLevel === 2 ) return 'Share the Recovery Key(s) to \nupgrade your backup to Level 3'
       default:
         break
   }
@@ -249,7 +249,7 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
         levelData[ i ].note= 'Backup needs your attention'
       }
       if( levelData[ i ].status == 'good' ) {
-        levelData[ i ].note= 'Backup Level 1 is secure, upgrade to Backup Level 2'
+        levelData[ i ].note= 'Backup Level 1 is secure, \nupgrade to Backup Level 2'
       }
     }
     if( i == 1 || i == 2 ) {
@@ -262,7 +262,7 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
         if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
         if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
 
-        levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, upgrade to Backup Level 3' : 'Multi Key Backup is accessible'
+        levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Multi Key Backup is accessible'
       }
       // ONLY ONE ACCESSIBLE
       if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
