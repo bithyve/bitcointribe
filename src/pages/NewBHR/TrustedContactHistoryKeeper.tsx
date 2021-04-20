@@ -1156,7 +1156,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'contact',
-        status: 'notAccessible',
       },
     ] ) )
   }

@@ -835,7 +835,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-        status: 'notAccessible',
       },
     ]
     console.log( 'shareArray', shareArray )
