@@ -13,7 +13,7 @@ import {
 
 import { createWatcher } from '../utils/utilities'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import { RAMP } from '../../common/constants/serviceTypes'
+import { RAMP } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 

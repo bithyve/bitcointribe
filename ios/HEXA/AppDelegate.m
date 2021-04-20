@@ -22,6 +22,8 @@
  
 @end
 
+#import "HEXA-Swift.h"
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application
@@ -70,6 +72,10 @@
   rootViewController.view = rootView;
   self.window.rootViewController = rootViewController;
   [self.window makeKeyAndVisible];
+
+  //Calling iCloud restore on App launch to get the latest copy of backup from iCloud.
+  iCloudRestore *restore = [[iCloudRestore alloc] init];
+
   return YES;
 }
 

@@ -21,7 +21,7 @@ export default function QuoteConfirmation( props ) {
             Confirm FastBitcoins{'\n'}Voucher Quote
           </Text>
           <Text style={{
-            ...styles.modalInfoText, marginTop: wp( '1.5%' ) 
+            ...styles.modalInfoText, marginTop: wp( '1.5%' )
           }}>
             The amount of sats for your voucher is shown below
           </Text>
@@ -37,19 +37,19 @@ export default function QuoteConfirmation( props ) {
             Voucher {props.voucherNumber}
           </Text>
           <View style={{
-            flexDirection: 'row', marginTop: 10 
+            flexDirection: 'row', marginTop: 10
           }}>
             <View style={{
-              flex: 2 
+              flex: 2
             }}>
               <Text style={{
-                ...styles.modalTitleText, fontSize: RFValue( 12 ) 
+                ...styles.modalTitleText, fontSize: RFValue( 12 )
               }}>
                 Purchased for
               </Text>
             </View>
             <View style={{
-              flex: 3 
+              flex: 3
             }}>
               <View
                 style={{
@@ -66,19 +66,19 @@ export default function QuoteConfirmation( props ) {
             </View>
           </View>
           <View style={{
-            flexDirection: 'row', marginTop: 10 
+            flexDirection: 'row', marginTop: 10
           }}>
             <View style={{
-              flex: 2 
+              flex: 2
             }}>
               <Text style={{
-                ...styles.modalTitleText, fontSize: RFValue( 12 ) 
+                ...styles.modalTitleText, fontSize: RFValue( 12 )
               }}>
                 Redeem Amount
               </Text>
             </View>
             <View style={{
-              flex: 3 
+              flex: 3
             }}>
               <View
                 style={{
@@ -96,10 +96,10 @@ export default function QuoteConfirmation( props ) {
             </View>
           </View>
           <View style={{
-            flexDirection: 'row', marginTop: 10 
+            flexDirection: 'row', marginTop: 10
           }}>
             <View style={{
-              flex: 2 
+              flex: 2
             }}>
               <Text
                 style={{
@@ -112,7 +112,7 @@ export default function QuoteConfirmation( props ) {
               </Text>
             </View>
             <View style={{
-              flex: 3 
+              flex: 3
             }}>
               <View
                 style={{
@@ -163,11 +163,11 @@ export default function QuoteConfirmation( props ) {
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressRedeem()}
             style={{
-              ...styles.successModalButtonView 
+              ...styles.successModalButtonView
             }}
           >
             {props.loading && props.loading == true ? (
-              <ActivityIndicator size="small" />
+              <ActivityIndicator color={Colors.white} size="small" />
             ) : (
               <Text style={styles.proceedButtonText}>Redeem Voucher</Text>
             )}
@@ -182,7 +182,7 @@ export default function QuoteConfirmation( props ) {
             }}
           >
             <Text style={{
-              ...styles.proceedButtonText, color: Colors.blue 
+              ...styles.proceedButtonText, color: Colors.blue
             }}>
               Back
             </Text>
@@ -233,7 +233,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',

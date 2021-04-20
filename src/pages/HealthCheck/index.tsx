@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import {
   StyleSheet,
   View,
@@ -9,51 +9,51 @@ import {
   Text,
   Image,
   FlatList,
-} from 'react-native';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import Fonts from '../../common/Fonts';
-import Colors from '../../common/Colors';
-import CommonStyles from '../../common/Styles/Styles';
-import { widthPercentageToDP } from 'react-native-responsive-screen';
-import { RFValue } from 'react-native-responsive-fontsize';
-import KnowMoreButton from '../../components/KnowMoreButton';
-import { useDispatch, useSelector } from 'react-redux';
-import { initHealthCheck, checkMSharesHealth } from '../../store/actions/sss';
-import S3Service from '../../bitcoin/services/sss/S3Service';
-import HomePageShield from '../../components/HomePageShield';
+} from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import Fonts from '../../common/Fonts'
+import Colors from '../../common/Colors'
+import CommonStyles from '../../common/Styles/Styles'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
+import { RFValue } from 'react-native-responsive-fontsize'
+import KnowMoreButton from '../../components/KnowMoreButton'
+import { useDispatch, useSelector } from 'react-redux'
+import { initHealthCheck } from '../../store/actions/sss'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import HomePageShield from '../../components/HomePageShield'
 
 
-function getImageByType(type) {
-  if (type == 'secondaryDevice') {
-    return require('../../assets/images/icons/icon_secondarydevice.png');
-  } else if (type == 'contact') {
-    return require('../../assets/images/icons/icon_user.png');
-  } else if (type == 'cloud') {
-    return require('../../assets/images/icons/icon_cloud.png');
+function getImageByType( type ) {
+  if ( type == 'secondaryDevice' ) {
+    return require( '../../assets/images/icons/icon_secondarydevice.png' )
+  } else if ( type == 'contact' ) {
+    return require( '../../assets/images/icons/icon_user.png' )
+  } else if ( type == 'cloud' ) {
+    return require( '../../assets/images/icons/icon_cloud.png' )
   }
-  if (type == 'note') {
-    return require('../../assets/images/icons/note.png');
-  } else if (type == 'security') {
-    return require('../../assets/images/icons/icon_securityquestion.png');
+  if ( type == 'note' ) {
+    return require( '../../assets/images/icons/note.png' )
+  } else if ( type == 'security' ) {
+    return require( '../../assets/images/icons/icon_securityquestion.png' )
   }
 }
 
-export default function HealthCheck(props) {
+export default function HealthCheck( props ) {
   const [
     ,
-  ] = useState(React.createRef());
+  ] = useState( React.createRef() )
   const [] = useState(
     React.createRef(),
-  );
+  )
   const [] = useState(
     React.createRef(),
-  );
-  const [] = useState(React.createRef());
-  const [selectedType] = useState('');
-  const [] = useState('Ugly');
-  const [] = useState([]);
+  )
+  const [] = useState( React.createRef() )
+  const [ selectedType ] = useState( '' )
+  const [] = useState( 'Ugly' )
+  const [] = useState( [] )
 
-  const [pageData, setPageData] = useState([
+  const [ pageData, setPageData ] = useState( [
     {
       title: 'Secondary Device',
       time: '1 months ago',
@@ -96,92 +96,101 @@ export default function HealthCheck(props) {
       type: 'security',
       route: '',
     },
-  ]);
+  ] )
 
-  const getIconByStatus = (status) => {
-    if (status == 'Ugly') {
-      return require('../../assets/images/icons/icon_error_red.png');
-    } else if (status == 'Bad') {
-      return require('../../assets/images/icons/icon_error_yellow.png');
-    } else if (status == 'Good') {
-      return require('../../assets/images/icons/icon_check.png');
+  const getIconByStatus = ( status ) => {
+    if ( status == 'Ugly' ) {
+      return require( '../../assets/images/icons/icon_error_red.png' )
+    } else if ( status == 'Bad' ) {
+      return require( '../../assets/images/icons/icon_error_yellow.png' )
+    } else if ( status == 'Good' ) {
+      return require( '../../assets/images/icons/icon_check.png' )
     }
-  };
+  }
 
-  const dispatch = useDispatch();
-  const s3Service: S3Service = useSelector((state) => state.sss.service);
-  useEffect(() => {
+  const dispatch = useDispatch()
+  const s3Service: S3Service = useSelector( ( state ) => state.sss.service )
+  useEffect( () => {
     //WalletBackupAndRecoveryBottomSheet.current.snapTo(1);
-    if (!s3Service.sss.healthCheckInitialized) dispatch(initHealthCheck());
-  }, []);
+    if ( !s3Service.sss.healthCheckInitialized ) dispatch( initHealthCheck() )
+  }, [] )
 
-  const { overallHealth } = useSelector((state) => state.sss);
+  const { overallHealth } = useSelector( ( state ) => state.sss )
 
-  useEffect(() => {
-    if (overallHealth) {
-      const updatedPageData = [...pageData];
-      updatedPageData.forEach((data) => {
-        switch (data.title) {
-          case 'Secondary Device':
-            if (overallHealth.sharesInfo[0].shareStage === 'Good') {
-              data.status = 'Good';
-            } else if (overallHealth.sharesInfo[0].shareStage === 'Bad') {
-              data.status = 'Bad';
-            } else if (overallHealth.sharesInfo[0].shareStage === 'Ugly') {
-              data.status = 'Ugly';
-            }
-            break;
+  useEffect( () => {
+    if ( overallHealth ) {
+      const updatedPageData = [ ...pageData ]
+      updatedPageData.forEach( ( data ) => {
+        switch ( data.title ) {
+            case 'Secondary Device':
+              if ( overallHealth.sharesInfo[ 0 ].shareStage === 'Good' ) {
+                data.status = 'Good'
+              } else if ( overallHealth.sharesInfo[ 0 ].shareStage === 'Bad' ) {
+                data.status = 'Bad'
+              } else if ( overallHealth.sharesInfo[ 0 ].shareStage === 'Ugly' ) {
+                data.status = 'Ugly'
+              }
+              break
 
-          case 'Trusted Contact 1':
-            if (overallHealth.sharesInfo[1].shareStage === 'Good') {
-              data.status = 'Good';
-            } else if (overallHealth.sharesInfo[1].shareStage === 'Bad') {
-              data.status = 'Bad';
-            } else if (overallHealth.sharesInfo[1].shareStage === 'Ugly') {
-              data.status = 'Ugly';
-            }
-            break;
+            case 'Trusted Contact 1':
+              if ( overallHealth.sharesInfo[ 1 ].shareStage === 'Good' ) {
+                data.status = 'Good'
+              } else if ( overallHealth.sharesInfo[ 1 ].shareStage === 'Bad' ) {
+                data.status = 'Bad'
+              } else if ( overallHealth.sharesInfo[ 1 ].shareStage === 'Ugly' ) {
+                data.status = 'Ugly'
+              }
+              break
 
-          case 'Trusted Contact 2':
-            if (overallHealth.sharesInfo[2].shareStage === 'Good') {
-              data.status = 'Good';
-            } else if (overallHealth.sharesInfo[2].shareStage === 'Bad') {
-              data.status = 'Bad';
-            } else if (overallHealth.sharesInfo[2].shareStage === 'Ugly') {
-              data.status = 'Ugly';
-            }
-            break;
+            case 'Trusted Contact 2':
+              if ( overallHealth.sharesInfo[ 2 ].shareStage === 'Good' ) {
+                data.status = 'Good'
+              } else if ( overallHealth.sharesInfo[ 2 ].shareStage === 'Bad' ) {
+                data.status = 'Bad'
+              } else if ( overallHealth.sharesInfo[ 2 ].shareStage === 'Ugly' ) {
+                data.status = 'Ugly'
+              }
+              break
 
-          case 'Security Questions':
-            if (overallHealth.qaStatus === 'Good') {
-              data.status = 'Good';
-            } else if (overallHealth.qaStatus === 'Bad') {
-              data.status = 'Bad';
-            } else if (overallHealth.qaStatus === 'Ugly') {
-              data.status = 'Ugly';
-            }
-            break;
+            case 'Security Questions':
+              if ( overallHealth.qaStatus === 'Good' ) {
+                data.status = 'Good'
+              } else if ( overallHealth.qaStatus === 'Bad' ) {
+                data.status = 'Bad'
+              } else if ( overallHealth.qaStatus === 'Ugly' ) {
+                data.status = 'Ugly'
+              }
+              break
 
-          default:
-            break;
+            default:
+              break
         }
-      });
-      setPageData(updatedPageData);
+      } )
+      setPageData( updatedPageData )
     }
-  }, [overallHealth]);
+  }, [ overallHealth ] )
+
 
   return (
-    <View style={{ flex: 1 }}>
-      <SafeAreaView style={{ flex: 0 }} />
+    <View style={{
+      flex: 1
+    }}>
+      <SafeAreaView style={{
+        flex: 0
+      }} />
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={{ flex: 1 }}>
+      <View style={{
+        flex: 1
+      }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
             style={CommonStyles.headerLeftIconContainer}
             onPress={() => {
-              props.navigation.goBack();
+              props.navigation.goBack()
             }}
-            hitSlop={{ top: 20, left: 20, bottom: 20, right: 20 }}
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
+            }}
           >
             <View style={CommonStyles.headerLeftIconInnerContainer}>
               <FontAwesome
@@ -192,31 +201,44 @@ export default function HealthCheck(props) {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
-            style={{ marginLeft: 'auto', marginRight: 10 }}
+            style={{
+              marginLeft: 'auto', marginRight: 10
+            }}
             onPress={() => { }}
           >
             <Image
-              source={require('../../assets/images/icons/icon_settings_blue.png')}
+              source={require( '../../assets/images/icons/icon_settings_blue.png' )}
               style={styles.image}
             />
           </TouchableOpacity>
         </View>
         <ScrollView>
-          <View style={{ flexDirection: 'row', marginTop: 10 }}>
-            <View style={{ flex: 2 }}>
-              <Text style={{ ...CommonStyles.headerTitles, marginLeft: 25 }}>
+          <View style={{
+            flexDirection: 'row', marginTop: 10
+          }}>
+            <View style={{
+              flex: 2
+            }}>
+              <Text style={{
+                ...CommonStyles.headerTitles, marginLeft: 25
+              }}>
                 Health Check
               </Text>
               <Text
-                style={{ ...CommonStyles.headerTitlesInfoText, marginLeft: 25 }}
+                style={{
+                  ...CommonStyles.headerTitlesInfoText, marginLeft: 25
+                }}
               >
                 The wallet backup is not complete. Please complete the setup to
                 safeguard against loss of funds
               </Text>
               <KnowMoreButton
                 onpress={() => { }}
-                containerStyle={{ marginTop: 10, marginLeft: 25 }}
-                textStyle={{}}
+                containerStyle={{
+                  marginTop: 10, marginLeft: 25
+                }}
+                textStyle={{
+                }}
               />
             </View>
             <View
@@ -229,33 +251,33 @@ export default function HealthCheck(props) {
               {overallHealth ? (
                 <HomePageShield
                   circleShadowColor={Colors.borderColor}
-                  shieldImage={require('../../assets/images/icons/protector_gray.png')}
+                  shieldImage={require( '../../assets/images/icons/protector_gray.png' )}
                   shieldStatus={overallHealth.overallStatus}
                 />
               ) : (
-                  <HomePageShield
-                    circleShadowColor={Colors.borderColor}
-                    shieldImage={require('../../assets/images/icons/protector_gray.png')}
-                    shieldStatus={0}
-                  />
-                )}
+                <HomePageShield
+                  circleShadowColor={Colors.borderColor}
+                  shieldImage={require( '../../assets/images/icons/protector_gray.png' )}
+                  shieldStatus={0}
+                />
+              )}
             </View>
           </View>
           <FlatList
             data={pageData}
             extraData={selectedType}
-            renderItem={({ item }) => (
+            renderItem={( { item } ) => (
               <View>
                 <TouchableOpacity
                   onPress={() =>
-                    props.navigation.navigate(item.route, {
+                    props.navigation.navigate( item.route, {
                       index:
                         item.title === 'Trusted Contact 1'
                           ? 1
                           : item.title === 'Trusted Contact 2'
                             ? 2
                             : undefined,
-                    })
+                    } )
                   }
                   style={{
                     ...styles.manageBackupCard,
@@ -277,17 +299,23 @@ export default function HealthCheck(props) {
                       selectedType && item.type == selectedType ? 10 : 0,
                     shadowOffset:
                       selectedType && item.type == selectedType
-                        ? { width: 0, height: 10 }
-                        : { width: 0, height: 0 },
+                        ? {
+                          width: 0, height: 10
+                        }
+                        : {
+                          width: 0, height: 0
+                        },
                     shadowRadius:
                       selectedType && item.type == selectedType ? 10 : 0,
                   }}
                 >
                   <Image
                     style={styles.cardImage}
-                    source={getImageByType(item.type)}
+                    source={getImageByType( item.type )}
                   />
-                  <View style={{ marginLeft: 15 }}>
+                  <View style={{
+                    marginLeft: 15
+                  }}>
                     <Text style={styles.cardTitleText}>{item.title}</Text>
                     <Text style={styles.cardTimeText}>
                       Last backup{' '}
@@ -304,7 +332,7 @@ export default function HealthCheck(props) {
                   </View>
                   <Image
                     style={styles.cardIconImage}
-                    source={getIconByStatus(item.status)}
+                    source={getIconByStatus( item.status )}
                   />
                 </TouchableOpacity>
               </View>
@@ -313,14 +341,14 @@ export default function HealthCheck(props) {
         </ScrollView>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   image: {
-    width: widthPercentageToDP(5),
-    height: widthPercentageToDP(5),
-    resizeMode: "contain",
+    width: widthPercentageToDP( 5 ),
+    height: widthPercentageToDP( 5 ),
+    resizeMode: 'contain',
   },
   manageBackupCard: {
     padding: 20,
@@ -340,13 +368,13 @@ const styles = StyleSheet.create({
   },
   cardTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   cardTimeText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(10),
+    fontSize: RFValue( 10 ),
   },
   cardIconImage: {
     width: 12,
@@ -354,4 +382,4 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginLeft: 'auto',
   },
-});
+} )

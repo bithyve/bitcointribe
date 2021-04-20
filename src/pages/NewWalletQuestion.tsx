@@ -30,24 +30,71 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { initializeSetup } from '../store/actions/setupAndAuth'
+import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
-import { getTestcoins } from '../store/actions/accounts'
-import { TEST_ACCOUNT } from '../common/constants/serviceTypes'
 
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
+import { initializeHealthSetup, initNewBHRFlow } from '../store/actions/health'
+import {  setCloudData } from '../store/actions/cloud'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+let messageIndex = 0
+const LOADER_MESSAGE_TIME = 2000
+const loaderMessages = [
+  {
+    heading: 'Bootstrapping Accounts',
+    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+    subText: '',
+  },
+  {
+    heading: 'Filling Test Account with test sats',
+    text:
+      'Preloaded Test Account is the best place to start your Bitcoin journey',
+    subText: '',
+  },
+  {
+    heading: 'Generating Recovery Keys',
+    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+    subText: '',
+  },
+  {
+    heading: 'Manage Backup',
+    text:
+      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 1 - Automated Cloud Backup',
+    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
+    subText: '',
+  },
+  {
+    heading: 'Level 2 - Double Backup',
+    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 3 - Multi-key Backup',
+    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
+    subText: '',
+  }
+]
+
+const getNextMessage = () => {
+  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
+  return loaderMessages[ messageIndex++ ]
+}
 
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function NewWalletQuestion( props ) {
+export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
   const [ message, setMessage ] = useState( 'Creating your wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
@@ -76,66 +123,85 @@ export default function NewWalletQuestion( props ) {
   const [ tempAns, setTempAns ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { isInitialized } = useSelector( ( state ) => state.setupAndAuth )
+  const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
-  const accounts = useSelector( ( state ) => state.accounts )
-  const testAccService = accounts[ TEST_ACCOUNT ].service
+  const [ showNote, setShowNote ] = useState( true )
+
+  const s3service = useSelector( ( state ) => state.health.service )
+  const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
+  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
+  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
+  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+
 
   useEffect( () => {
-    ( async () => {
-      if ( testAccService ) {
-        const { balances } = testAccService.hdWallet
-        const netBalance = testAccService
-          ? balances.balance + balances.unconfirmedBalance
-          : 0
-        if ( !netBalance ) {
-          dispatch( getTestcoins( TEST_ACCOUNT ) )
-        }
-      }
-    } )()
-  }, [ testAccService ] )
-
-  useEffect( () => {
-    ( async () => {
-      if ( isLoaderStart ) {
-        const security = {
-          question: dropdownBoxValue.question,
-          answer,
-        }
-        dispatch( initializeSetup( walletName, security ) )
-        dispatch(setVersion('Current'));
-        const current = Date.now()
-        await AsyncStorage.setItem(
-          'SecurityAnsTimestamp',
-          JSON.stringify( current ),
-        )
-        const securityQuestionHistory = {
-          created: current,
-        }
-        await AsyncStorage.setItem(
-          'securityQuestionHistory',
-          JSON.stringify( securityQuestionHistory ),
-        )
-      }
-    } )()
-  }, [ isLoaderStart ] )
-
-  useEffect( () => {
-    if (
-      isInitialized
-      // exchangeRates &&
-      // balances.testBalance &&
-      // transactions.length > 0
-    ) {
+    if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       ( loaderBottomSheet as any ).current.snapTo( 0 )
-      // dispatch(accountsSynched(true)); // to switch the color of the amount on the account tiles at home
-      dispatch( walletCheckIn() ) // fetches exchange rates
-      props.navigation.navigate( 'HomeNav' )
+      props.navigation.navigate( 'HomeNav', {
+        walletName,
+      } )
     }
-  }, [ isInitialized ] )
+  }, [ cloudBackupStatus ] )
 
+  useEffect( () => {
+    if( walletSetupCompleted ){
+      console.log( 'walletSetupCompleted****', walletSetupCompleted )
+
+      dispatch( walletCheckIn() )
+    }
+  }, [ walletSetupCompleted ] )
+
+  useEffect( () => {
+    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      if( cloudPermissionGranted ){
+        dispatch( setCloudData() )
+      } else{
+        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        props.navigation.navigate( 'HomeNav', {
+          walletName,
+        } ) }
+    }
+  }, [ walletSetupCompleted, levelHealth ] )
+
+  const checkCloudLogin = () =>{
+    showLoader()
+    const security = {
+      questionId: dropdownBoxValue.id,
+      question: dropdownBoxValue.question,
+      answer,
+    }
+    dispatch( setupWallet( walletName, security ) )
+    dispatch( initNewBHRFlow( true ) )
+    dispatch( setVersion( 'Current' ) )
+    const current = Date.now()
+    AsyncStorage.setItem(
+      'SecurityAnsTimestamp',
+      JSON.stringify( current ),
+    )
+    const securityQuestionHistory = {
+      created: current,
+    }
+    AsyncStorage.setItem(
+      'securityQuestionHistory',
+      JSON.stringify( securityQuestionHistory ),
+    )
+  }
+
+  const showLoader = () => {
+    ( loaderBottomSheet as any ).current.snapTo( 1 )
+    setLoaderMessages()
+    setTimeout( () => {
+      setElevation( 0 )
+    }, 0.2 )
+    setTimeout( () => {
+      setIsLoaderStart( true )
+      setIsEditable( false )
+      setIsDisabled( true )
+    }, 2 )
+  }
 
   const handleSubmit = () => {
     setConfirmAnswer( tempAns )
@@ -173,20 +239,12 @@ export default function NewWalletQuestion( props ) {
   }, [ confirmAnswer ] )
 
 
+
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={() => {
-          ( loaderBottomSheet as any ).current.snapTo( 1 )
-          seLoaderMessages()
-          setTimeout( () => {
-            setElevation( 0 )
-          }, 0.2 )
-          setTimeout( () => {
-            setIsLoaderStart( true )
-            setIsEditable( false )
-            setIsDisabled( true )
-          }, 2 )
+        onPress={async () => {
+          checkCloudLogin()
         }}
         style={{
           ...styles.buttonView, elevation: Elevation
@@ -201,25 +259,37 @@ export default function NewWalletQuestion( props ) {
     )
   }
 
-  const seLoaderMessages = () => {
+  const setLoaderMessages = () => {
     setTimeout( () => {
-      setMessage( 'Bootstrapping Accounts' )
-      setSubTextMessage(
-        'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-      )
+      const newMessage = getNextMessage()
+      setMessage( newMessage.heading )
+      setSubTextMessage( newMessage.text )
       setTimeout( () => {
-        setMessage( 'Filling Test Account with test sats' )
-        setSubTextMessage(
-          'Preloaded Test Account is the best place to start your Bitcoin journey',
-        )
+        const newMessage = getNextMessage()
+        setMessage( newMessage.heading )
+        setSubTextMessage( newMessage.text )
         setTimeout( () => {
-          setMessage( 'Generating Recovery Keys' )
-          setSubTextMessage(
-            'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
-          )
-        }, 3000 )
-      }, 3000 )
-    }, 3000 )
+          const newMessage = getNextMessage()
+          setMessage( newMessage.heading )
+          setSubTextMessage( newMessage.text )
+          setTimeout( () => {
+            const newMessage = getNextMessage()
+            setMessage( newMessage.heading )
+            setSubTextMessage( newMessage.text )
+            setTimeout( () => {
+              const newMessage = getNextMessage()
+              setMessage( newMessage.heading )
+              setSubTextMessage( newMessage.text )
+              setTimeout( () => {
+                const newMessage = getNextMessage()
+                setMessage( newMessage.heading )
+                setSubTextMessage( newMessage.text )
+              }, LOADER_MESSAGE_TIME )
+            }, LOADER_MESSAGE_TIME )
+          }, LOADER_MESSAGE_TIME )
+        }, LOADER_MESSAGE_TIME )
+      }, LOADER_MESSAGE_TIME )
+    }, LOADER_MESSAGE_TIME )
   }
 
   const renderLoaderModalContent = useCallback( () => {
@@ -412,6 +482,7 @@ export default function NewWalletQuestion( props ) {
                         setAnswerMasked( text )
                       }}
                       onFocus={() => {
+                        setShowNote( false )
                         setDropdownBoxOpenClose( false )
                         setAnswerInputStyle( styles.inputBoxFocused )
                         if ( answer.length > 0 ) {
@@ -420,6 +491,7 @@ export default function NewWalletQuestion( props ) {
                         }
                       }}
                       onBlur={() => {
+                        setShowNote( true )
                         setAnswerInputStyle( styles.inputBox )
                         setDropdownBoxOpenClose( false )
                         let temp = ''
@@ -483,6 +555,7 @@ export default function NewWalletQuestion( props ) {
                       }}
                       onSubmitEditing={handleSubmit}
                       onFocus={() => {
+                        setShowNote( false )
                         setDropdownBoxOpenClose( false )
                         setConfirmAnswerInputStyle( styles.inputBoxFocused )
                         if ( tempAns.length > 0 ) {
@@ -493,6 +566,7 @@ export default function NewWalletQuestion( props ) {
                         }
                       }}
                       onBlur={() => {
+                        setShowNote( true )
                         setConfirmAnswerInputStyle( styles.inputBox )
                         setDropdownBoxOpenClose( false )
                         let temp = ''
@@ -503,7 +577,7 @@ export default function NewWalletQuestion( props ) {
                         handleSubmit()
                       }}
                     />
-                    {confirmAnswer ? (
+                    {tempAns ? (
                       <TouchableWithoutFeedback
                         onPress={() => {
                           setHideShowConfirmAnswer( !hideShowConfirmAnswer )
@@ -586,47 +660,47 @@ export default function NewWalletQuestion( props ) {
             </TouchableOpacity>
           </View>
         </ScrollView>
-        </KeyboardAvoidingView>
-        <View style={{
-          ...styles.bottomButtonView,
-        }}>
-          {(
-            answer.trim() == confirmAnswer.trim() &&
+      </KeyboardAvoidingView>
+      {showNote ? <View style={{
+        ...styles.bottomButtonView,
+      }}>
+        {(
+          answer.trim() === confirmAnswer.trim() &&
             confirmAnswer.trim() &&
-            answer.trim() && answerError.length == 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          <View style={styles.statusIndicatorView}>
-            <View style={styles.statusIndicatorInactiveView} />
-            <View style={styles.statusIndicatorActiveView} />
-          </View>
+            answer.trim() && answerError.length === 0
+        ) && (
+          setButtonVisible()
+        ) || null}
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
         </View>
-        
-        {!visibleButton ? (
-          <View
-            style={{
-              marginBottom:
+      </View> : null}
+
+      {showNote && !visibleButton ? (
+        <View
+          style={{
+            marginBottom:
                 Platform.OS == 'ios' && DeviceInfo.hasNotch ? hp( '1%' ) : 0,
-            }}
-          >
-            <BottomInfoBox
-              title={'This answer is used to encrypt your wallet'}
-              infoText={'It is extremely important that only you'}
-              italicText={' know and remember the answer'}
-            />
-          </View>
-        ) : null}
-        <BottomSheet
-          onCloseEnd={() => { }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
-      
+          }}
+        >
+          <BottomInfoBox
+            title={'This answer is used to encrypt your wallet'}
+            infoText={'It is extremely important that only you'}
+            italicText={' know and remember the answer'}
+          />
+        </View>
+      ) : null}
+      <BottomSheet
+        onCloseEnd={() => { }}
+        enabledGestureInteraction={false}
+        enabledInnerScrolling={true}
+        ref={loaderBottomSheet}
+        snapPoints={[ -50, hp( '100%' ) ]}
+        renderContent={renderLoaderModalContent}
+        renderHeader={renderLoaderModalHeader}
+      />
+
     </View>
   )
 }

@@ -15,7 +15,7 @@ import {
 } from 'react-native-responsive-screen'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { useDispatch, useSelector } from 'react-redux'
-import { SECURE_ACCOUNT, TEST_ACCOUNT, REGULAR_ACCOUNT, } from '../../common/constants/serviceTypes'
+import { SECURE_ACCOUNT, TEST_ACCOUNT, REGULAR_ACCOUNT, } from '../../common/constants/wallet-service-types'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -46,20 +46,20 @@ const SweepFundsFromExistingAccount = props => {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={styles.modalHeaderTitleView}>
         <View style={{
-          flex: 1, flexDirection: 'row', alignItems: 'center' 
+          flex: 1, flexDirection: 'row', alignItems: 'center'
         }}>
           <TouchableOpacity
             onPress={() => { props.navigation.goBack() }}
             style={{
-              height: 30, width: 30, justifyContent: 'center' 
+              height: 30, width: 30, justifyContent: 'center'
             }}
-            hitSlop={{ 
-              top: 20, left: 20, bottom: 20, right: 20 
+            hitSlop={{
+              top: 20, left: 20, bottom: 20, right: 20
             }}
           >
             <FontAwesome
@@ -78,10 +78,10 @@ const SweepFundsFromExistingAccount = props => {
           borderColor: Colors.borderColor,
         }}>
           <Text style={{
-            color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 14 ) 
+            color: Colors.blue, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 14 )
           }}>Your new wallet{'\n'}and back-up is ready</Text>
           <Text style={{
-            color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 10 ) 
+            color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 10 )
           }}>You can now sweep funds from your existing wallet to{'\n'}the new wallet</Text>
         </View>
       </View>
@@ -91,7 +91,7 @@ const SweepFundsFromExistingAccount = props => {
           <View style={styles.listElements}>
             <Image style={styles.listElementsIconImage} source={value.image} />
             <View style={{
-              flex: 1, 
+              flex: 1,
             }}>
               <Text style={styles.listElementsTitle}>{value.title}</Text>
               <Text style={styles.listElementsInfo}>
@@ -102,7 +102,7 @@ const SweepFundsFromExistingAccount = props => {
         )}
       </ScrollView>
       <View style={{
-        margin: 20, 
+        margin: 20,
       }}>
         <View style={{
         }}>
@@ -110,22 +110,22 @@ const SweepFundsFromExistingAccount = props => {
           <Text style={styles.listElementsInfo}>453143 sats</Text>
         </View>
         <View style={{
-          flexDirection: 'row', marginTop:20, marginBottom:20 
+          flexDirection: 'row', marginTop:20, marginBottom:20
         }}>
           <TouchableOpacity onPress={()=>{props.navigation.navigate( 'NewWalletGenerationOTP' )}} style={{
             height: wp( '13%' ), width: wp( '40%' ), backgroundColor: Colors.blue, justifyContent: 'center', alignItems: 'center', borderRadius: 10, elevation: 10,
             shadowColor: Colors.shadowBlue,
             shadowOpacity: 1,
             shadowOffset: {
-              width: 15, height: 15 
-            }, 
+              width: 15, height: 15
+            },
           }}><Text style={{
               color: Colors.white,
               fontSize: RFValue( 13 ),
               fontFamily: Fonts.FiraSansMedium
             }}>Confirm</Text></TouchableOpacity>
           <TouchableOpacity style={{
-            height: wp( '13%' ), width: wp( '30%' ), justifyContent: 'center', alignItems: 'center', borderRadius: 10 
+            height: wp( '13%' ), width: wp( '30%' ), justifyContent: 'center', alignItems: 'center', borderRadius: 10
           }}><Text style={{
               color: Colors.blue,
               fontSize: RFValue( 13 ),

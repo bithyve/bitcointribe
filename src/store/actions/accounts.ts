@@ -1,16 +1,9 @@
 import { Action } from 'redux'
-import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 // types and action creators: dispatched by components and sagas
-export const FETCH_TRANSACTIONS = 'FETCH_TRANSACTIONS'
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
-export const TRANSFER_ST1 = 'TRANSFER_ST1'
-export const TRANSFER_ST2 = 'TRANSFER_ST2'
-export const ALTERNATE_TRANSFER_ST2 = 'ALTERNATE_TRANSFER_ST2'
-export const TRANSFER_ST3 = 'TRANSFER_ST3'
 export const GET_TESTCOINS = 'GET_TESTCOINS'
 export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
@@ -23,7 +16,6 @@ export const SYNC_VIA_XPUB_AGENT = 'SYNC_VIA_XPUB_AGENT'
 export const GENERATE_SECONDARY_XPRIV = 'GENERATE_SECONDARY_XPRIV'
 export const RESET_TWO_FA = 'RESET_TWO_FA'
 export const RUN_TEST = 'RUN_TEST'
-export const FETCH_DERIVATIVE_ACC_XPUB = 'FETCH_DERIVATIVE_ACC_XPUB'
 export const FETCH_DERIVATIVE_ACC_BALANCE_TX =
   'FETCH_DERIVATIVE_ACC_BALANCE_TX'
 export const REMOVE_TWO_FA = 'REMOVE_TWO_FA'
@@ -57,6 +49,7 @@ export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
+export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
 
 export const getAllAccountsData = () => {
   return {
@@ -73,14 +66,6 @@ export const setAllAccountsData = ( accounts ) => {
   }
 }
 
-
-export const fetchTransactions = ( serviceType, service? ) => {
-  return {
-    type: FETCH_TRANSACTIONS, payload: {
-      serviceType, service
-    }
-  }
-}
 
 export const fetchBalanceTx = (
   serviceType: string,
@@ -102,77 +87,9 @@ export const fetchBalanceTx = (
   }
 }
 
-export const transferST1 = (
-  serviceType,
-  recipients,
-  averageTxFees,
-  derivativeAccountDetails?: { type: string; number: number }
-) => {
+export const getTestcoins = ( ) => {
   return {
-    type: TRANSFER_ST1,
-    payload: {
-      serviceType,
-      recipients,
-      averageTxFees,
-      derivativeAccountDetails,
-    },
-  }
-}
-
-export const transferST2 = (
-  serviceType,
-  txnPriority,
-  customTxPrerequisites?,
-  derivativeAccountDetails?: { type: string; number: number },
-  nSequence?
-) => {
-  return {
-    type: TRANSFER_ST2,
-    payload: {
-      serviceType,
-      txnPriority,
-      customTxPrerequisites,
-      derivativeAccountDetails,
-      nSequence,
-    },
-  }
-}
-
-export const alternateTransferST2 = (
-  serviceType,
-  txnPriority,
-  customTxPrerequisites?,
-  derivativeAccountDetails?: { type: string; number: number },
-  nSequence?
-) => {
-  return {
-    type: ALTERNATE_TRANSFER_ST2,
-    payload: {
-      serviceType,
-      txnPriority,
-      customTxPrerequisites,
-      derivativeAccountDetails,
-      nSequence,
-    },
-  }
-}
-
-export const transferST3 = ( serviceType, token ) => {
-  //Secure account specific
-  return {
-    type: TRANSFER_ST3, payload: {
-      serviceType, token
-    }
-  }
-}
-
-export const getTestcoins = ( serviceType ) => {
-  // Test account specific
-  // console.log("Called getTestcoins", new Date())
-  return {
-    type: GET_TESTCOINS, payload: {
-      serviceType
-    }
+    type: GET_TESTCOINS,
   }
 }
 
@@ -245,11 +162,6 @@ export const validateTwoFA = ( token: number ) => {
   }
 }
 
-export const removeTwoFA = () => {
-  return {
-    type: REMOVE_TWO_FA,
-  }
-}
 export const fetchFeeAndExchangeRates = () => {
   return {
     type: FETCH_FEE_AND_EXCHANGE_RATES
@@ -277,15 +189,6 @@ export const resetTwoFA = ( secondaryMnemonic ) => {
 export const runTest = () => {
   return {
     type: RUN_TEST
-  }
-}
-
-export const fetchDerivativeAccXpub = ( accountType, accountNumber? ) => {
-  return {
-    type: FETCH_DERIVATIVE_ACC_XPUB,
-    payload: {
-      accountType, accountNumber
-    },
   }
 }
 
@@ -417,14 +320,16 @@ export const addNewAccountShell = (
   }
 }
 
+export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, paymentDetails?: {amount: string, address: string}, legacy?: boolean}
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
-  parentShell: AccountShell
+  parentShell: AccountShell,
+  contactInfo?: ContactInfo,
 ) => {
   return {
     type: ADD_NEW_SECONDARY_SUBACCOUNT,
     payload: {
-      secondarySubAccount, parentShell
+      secondarySubAccount, parentShell, contactInfo
     },
   }
 }
@@ -550,17 +455,8 @@ export const accountShellOrderedToFront = (
 // types and action creators (saga): dispatched by saga workers
 export const TESTCOINS_RECEIVED = 'TESTCOINS_RECEIVED'
 export const TRANSACTIONS_FETCHED = 'TRANSACTIONS_FETCHED'
-export const TRANSFER_ST1_EXECUTED = 'TRANSFER_ST1_EXECUTED'
-export const TRANSFER_ST1_FAILED = 'TRANSFER_ST1_FAILED'
-export const TRANSFER_ST2_EXECUTED = 'TRANSFER_ST2_EXECUTED'
-export const TRANSFER_ST2_FAILED = 'TRANSFER_ST2_FAILED'
-export const TRANSFER_ST3_EXECUTED = 'TRANSFER_SECURE_ST3_EXECUTED'
-export const TRANSFER_ST3_FAILED = 'TRANSFER_ST3_FAILED'
-export const ACCOUNTS_LOADING = 'ACCOUNTS_LOADING'
 export const ACCOUNTS_SYNCHED = 'ACCOUNTS_SYNCHED'
 export const EXCHANGE_RATE_CALCULATED = 'EXCHANGE_RATE_CALCULATED'
-export const ALTERNATE_TRANSFER_ST2_EXECUTED =
-  'ALTERNATE_TRANSFER_ST2_EXECUTED'
 export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
@@ -576,12 +472,11 @@ export const TRANSACTION_REASSIGNMENT_FAILED =
   'TRANSACTION_REASSIGNMENT_FAILED'
 export const ACCOUNT_SHELL_MERGE_SUCCEEDED = 'ACCOUNT_SHELL_MERGE_SUCCEEDED'
 export const ACCOUNT_SHELL_MERGE_FAILED = 'ACCOUNT_SHELL_MERGE_FAILED'
+export const BLIND_REFRESH_STARTED = 'BLIND_REFRESH_STARTED'
 
-export const testcoinsReceived = ( serviceType, service ) => {
+export const testcoinsReceived = ( ) => {
   return {
-    type: TESTCOINS_RECEIVED, payload: {
-      serviceType, service
-    }
+    type: TESTCOINS_RECEIVED
   }
 }
 
@@ -589,63 +484,6 @@ export const transactionsFetched = ( serviceType, transactions ) => {
   return {
     type: TRANSACTIONS_FETCHED, payload: {
       serviceType, transactions
-    }
-  }
-}
-
-export const executedST1 = ( serviceType, result ) => {
-  return {
-    type: TRANSFER_ST1_EXECUTED, payload: {
-      serviceType, result
-    }
-  }
-}
-
-export const failedST1 = ( serviceType, errorDetails ) => {
-  return {
-    type: TRANSFER_ST1_FAILED, payload: {
-      serviceType, errorDetails
-    }
-  }
-}
-
-export const executedST2 = ( serviceType, result ) => {
-  return {
-    type: TRANSFER_ST2_EXECUTED, payload: {
-      serviceType, result
-    }
-  }
-}
-
-export const failedST2 = ( serviceType, errorDetails ) => {
-  return {
-    type: TRANSFER_ST2_FAILED, payload: {
-      serviceType, errorDetails
-    }
-  }
-}
-
-export const executedST3 = ( serviceType, result ) => {
-  // Secure account specific
-  return {
-    type: TRANSFER_ST3_EXECUTED, payload: {
-      serviceType, result
-    }
-  }
-}
-
-export const failedST3 = ( serviceType, errorDetails ) => {
-  return {
-    type: TRANSFER_ST3_FAILED, payload: {
-      serviceType, errorDetails
-    }
-  }
-}
-
-export const switchLoader = ( serviceType, beingLoaded ) => {
-  return {
-    type: ACCOUNTS_LOADING, payload: {
-      serviceType, beingLoaded
     }
   }
 }
@@ -663,15 +501,6 @@ export const exchangeRatesCalculated = ( exchangeRates ) => {
     type: EXCHANGE_RATE_CALCULATED, payload: {
       exchangeRates
     }
-  }
-}
-
-export const alternateTransferST2Executed = ( serviceType, result ) => {
-  return {
-    type: ALTERNATE_TRANSFER_ST2_EXECUTED,
-    payload: {
-      serviceType, result
-    },
   }
 }
 
@@ -694,14 +523,6 @@ export const twoFAResetted = ( resetted ) => {
   return {
     type: TWO_FA_RESETTED, payload: {
       resetted
-    }
-  }
-}
-
-export const settedDonationAccount = ( serviceType, successful ) => {
-  return {
-    type: SETTED_DONATION_ACC, payload: {
-      serviceType, successful
     }
   }
 }
@@ -795,6 +616,13 @@ export const accountShellMergeSucceeded = (
   }
 }
 
+export const blindRefreshStarted = ( refreshed ) => {
+  return {
+    type: BLIND_REFRESH_STARTED, payload: {
+      refreshed
+    }
+  }
+}
 
 export const fetchReceiveAddress = (
   subAccountInfo?: SubAccountDescribing
@@ -820,5 +648,16 @@ export const fetchReceiveAddressSucceeded = ( receiveAddress: string ) => {
 export const clearReceiveAddress = ( ) => {
   return {
     type: CLEAR_RECEIVE_ADDRESS,
+  }
+}
+
+export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, serviceType ) => {
+  return {
+    type: CREATE_SM_N_RESETTFA_OR_XPRIV,
+    payload: {
+      qrdata,
+      QRModalHeader,
+      serviceType
+    },
   }
 }

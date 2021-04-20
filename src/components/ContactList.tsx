@@ -218,7 +218,6 @@ export default function ContactList( props ) {
   }, [] )
 
   const filterContacts = ( keyword ) => {
-    //console.log('contactData.length', contactData);
     if ( contactData.length > 0 ) {
       if ( !keyword.length ) {
         setFilterContactData( contactData )
@@ -457,7 +456,7 @@ export default function ContactList( props ) {
           placeholder="Search"
           placeholderTextColor={Colors.textColorGrey}
           onChangeText={( nameKeyword ) => {
-            nameKeyword = nameKeyword.replace( /[^A-Za-z0-9]/g, '' )
+            nameKeyword = nameKeyword.replace( /[^A-Za-z0-9 ]/g, '' )
             setSearchName( nameKeyword )
             filterContacts( nameKeyword )
           }
@@ -553,7 +552,7 @@ export default function ContactList( props ) {
             }}
           >
             {approvingTrustedContact ? (
-              <ActivityIndicator size={'small'} />
+              <ActivityIndicator color={Colors.white} size={'small'} />
             ) : (
               <Text style={styles.buttonText}>Confirm & Proceed</Text>
             )}

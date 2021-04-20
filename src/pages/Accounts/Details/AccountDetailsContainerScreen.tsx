@@ -27,7 +27,7 @@ import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfig
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
-import { fetchFeeAndExchangeRates, refreshAccountShell, removeTwoFA } from '../../../store/actions/accounts'
+import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/actions/accounts'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
@@ -36,15 +36,17 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/serviceTypes'
+import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
 import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
+import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
+import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
+import idx from 'idx'
 
 export type Props = {
   navigation: any;
 };
-
 
 enum SectionKind {
   ACCOUNT_CARD,
@@ -57,7 +59,6 @@ const sectionListItemKeyExtractor = ( index ) => String( index )
 
 const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const dispatch = useDispatch()
-
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
@@ -65,10 +66,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const accountTransactions = AccountShell.getAllTransactions( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
+  let derivativeAccountKind: any = primarySubAccount.kind
 
-  let derivativeAccountKind
   switch( primarySubAccount.kind ){
       case SubAccountKind.REGULAR_ACCOUNT:
       case SubAccountKind.SECURE_ACCOUNT:
@@ -128,7 +128,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }
 
   function navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType ) {
-
     navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
       accountNumber,
@@ -253,14 +252,14 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   useEffect( ()=>{
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    const serviceType = primarySubAccount.sourceKind
-    if ( serviceType === SECURE_ACCOUNT && accountsState[ serviceType ].service.secureHDWallet.twoFASetup ) {
-      navigation.navigate( 'TwoFASetup', {
-        twoFASetup:
-          accountsState[ serviceType ].service.secureHDWallet
-            .twoFASetup,
-      } )
-      // dispatch( removeTwoFA() )
+    if ( primarySubAccount.isTFAEnabled ) {
+      const twoFASetupDetails = idx( accountsState, ( _ )=> _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      const twoFAValid = idx( accountsState, ( _ )=> _.twoFAHelpFlags.twoFAValid )
+
+      if( twoFASetupDetails && !twoFAValid )
+        navigation.navigate( 'TwoFASetup', {
+          twoFASetup: twoFASetupDetails,
+        } )
     }
   }, [ primarySubAccount.sourceKind ] )
 
@@ -312,7 +311,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           return (
             <View style={styles.viewSectionContainer}>
               <TransactionsPreviewSection
-                transactions={accountTransactions.slice( 0, 3 )}
+                transactions={AccountShell.getAllTransactions( accountShell ).slice( 0, 3 )}
                 availableBalance={AccountShell.getSpendableBalance( accountShell )}
                 bitcoinUnit={accountShell.unit}
                 isTestAccount={primarySubAccount.kind === SubAccountKind.TEST_ACCOUNT}
@@ -332,12 +331,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
               <View style={styles.footerSection}>
                 <SendAndReceiveButtonsFooter
                   onSendPressed={() => {
+                    dispatch( sourceAccountSelectedForSending( accountShell ) )
+
                     navigation.navigate( 'Send', {
-                      serviceType: primarySubAccount.sourceKind,
-                      averageTxFees,
-                      spendableBalance: AccountShell.getSpendableBalance( accountShell ),
-                      derivativeAccountDetails,
-                      accountShellID,
+                      subAccountKind: primarySubAccount.kind,
                     } )
                   }}
                   onReceivePressed={() => {
@@ -375,7 +372,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         },
       },
     ]
-  }, [ accountTransactions, accountShell ] )
+  }, [ accountShell ] )
 
   return (
     <View style={styles.rootContainer}>

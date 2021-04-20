@@ -1,14 +1,14 @@
-import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React, { Component } from 'react'
+import { View, Text, StyleSheet } from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
-export default function BottomInfoBox(props) {
+export default function BottomInfoBox( props ) {
   return (
     <View
       style={{
-        marginBottom: 25,
+        marginBottom: 10,
         padding: 20,
         backgroundColor: props.backgroundColor
           ? props.backgroundColor
@@ -23,7 +23,7 @@ export default function BottomInfoBox(props) {
       <Text
         style={{
           color: props.titleColor ? props.titleColor : Colors.blue,
-          fontSize: RFValue(13),
+          fontSize: RFValue( 13 ),
           marginBottom: 2,
           fontFamily: Fonts.FiraSansRegular,
         }}
@@ -36,7 +36,7 @@ export default function BottomInfoBox(props) {
           <Text
             style={{
               color: Colors.textColorGrey,
-              fontSize: RFValue(12),
+              fontSize: RFValue( 12 ),
               fontFamily: Fonts.FiraSansRegular,
               textDecorationLine: 'underline',
             }}
@@ -51,7 +51,7 @@ export default function BottomInfoBox(props) {
               fontFamily: Fonts.FiraSansMediumItalic,
               fontWeight: 'bold',
               fontStyle: 'italic',
-              fontSize: RFValue(12),
+              fontSize: RFValue( 12 ),
             }}
           >
             {props.italicText}
@@ -59,12 +59,12 @@ export default function BottomInfoBox(props) {
         ) : null}
       </Text>
     </View>
-  );
+  )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   bottomNoteInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
   },
-});
+} )

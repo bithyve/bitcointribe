@@ -8,6 +8,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
+import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
 
 export type Props = {
@@ -32,6 +33,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
 
   const accountShell = useAccountShellForID( accountShellID )
+  const primarySubAccount = usePrimarySubAccountForShell( accountShell )
 
   const {
     present: presentBottomSheet,
@@ -50,9 +52,21 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
           },
           imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
         },
+        ...( !accountShell.primarySubAccount.isTFAEnabled ? [
+          {
+            title: 'Show xPub',
+            subtitle: 'Show details for this account\'s xPub',
+            screenName: 'ShowXPub',
+            screenParams: {
+              primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
+              accountShellID: accountShell.id,
+            },
+            imageSource: require( '../../../assets/images/HomePageIcons/icon_qr.png' ),
+          }
+        ] : [] ),
         {
           title: 'Account Sync',
-          subtitle: 'Completely sync the account',
+          subtitle: 'Manually scan the account',
           imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
           onOptionPressed: handleRescanListItemSelection,
         },
@@ -61,10 +75,10 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         {
           title: '2FA Settings',
           subtitle: 'Reset 2FA or no server response',
-          screenName: 'ResetTwoFAHelp',
+          screenName: 'SubAccountTFAHelp',
           imageSource: require( '../../../assets/images/icons/icon_merge_blue.png' ),
         }
-      ] : [] )
+      ] : [] ),
 
       // 📝 These items are being commented out until their functionality is fully implemented.
       // See: https://github.com/bithyve/hexa/issues/2243
@@ -77,9 +91,12 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       // },
       // {
       //   title: 'Account Visibility',
-      //   subtitle: `Configure for different privacy-sensitive contexts`,
+      //   subtitle: 'Configure for different privacy-sensitive contexts',
       //   screenName: 'EditVisibility',
-      //   imageSource: require('../../../assets/images/icons/icon_checking_blue_visibility.png'),
+      //   screenParams: {
+      //     accountShellID: accountShell.id,
+      //   },
+      //   imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
       // },
       // {
       //   title: 'Merge Account',

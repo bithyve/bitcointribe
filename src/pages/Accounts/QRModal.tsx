@@ -21,12 +21,13 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 
 export default function QRModal( props ) {
-  const [ openCameraFlag, setOpenCameraFlag ] = useState( false )
+  const [ openCameraFlag, setOpenCameraFlag ] = useState( false );
 
   const barcodeRecognized = async ( barcodes ) => {
     if ( barcodes.data ) {
+      console.log("barcodes.data",barcodes.data);
       setOpenCameraFlag( false )
-      props.modalRef ? props.modalRef.current.snapTo( 1 ) : '' // closes modal
+      props.modalRef && props.modalRef.current ? props.modalRef.current.snapTo( 1 ) : props.modalRef.snapTo( 1 ) // closes modal
       props.onQrScan( getFormattedStringFromQRString( barcodes.data ) )
     }
   }
@@ -148,7 +149,7 @@ export default function QRModal( props ) {
               }}
             >
               <ImageBackground
-                source={require( '../../assets/images/icons/iPhone-QR.jpg' )}
+                source={require( '../../assets/images/icons/iPhone-QR.png' )}
                 style={{
                   width: wp( '90%' ),
                   height: wp( '90%' ),
@@ -283,6 +284,25 @@ export default function QRModal( props ) {
           />}
         </View>
       </ScrollView>
+      {props.isFromKeeperDeviceHistory && <View style={styles.bottomButtonView}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => props.onPressContinue()}
+              style={{
+                ...styles.successModalButtonView,
+                shadowColor: Colors.shadowBlue,
+                backgroundColor: Colors.blue,
+              }}
+            >
+              <Text
+                style={{
+                  ...styles.proceedButtonText,
+                  color: Colors.white,
+                }}
+              >
+                Continue
+              </Text>
+            </AppBottomSheetTouchableWrapper>
+          </View>}
     </View>
   )
 }
@@ -322,4 +342,27 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular
   },
-} )
+  successModalButtonView: {
+    height: wp('13%'),
+    width: wp('35%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    elevation: 10,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: { width: 15, height: 15 },
+    backgroundColor: Colors.blue,
+    marginLeft: wp('8%'),
+  },
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue(13),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  bottomButtonView: {
+    height: 'auto',
+    paddingBottom: wp('8%'),
+    marginTop: wp('5%')
+  },
+});

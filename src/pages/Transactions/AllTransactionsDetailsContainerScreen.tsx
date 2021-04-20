@@ -5,7 +5,7 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { TransactionDetails } from '../../bitcoin/utilities/Interface'
 import { widthPercentageToDP, heightPercentageToDP } from 'react-native-responsive-screen'
-import { SUB_PRIMARY_ACCOUNT } from '../../common/constants/serviceTypes'
+import { SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
 import openLink from '../../utils/OpenLink'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import moment from 'moment'
@@ -67,7 +67,7 @@ const getImageByAccountType = ( accountType, primaryAccType? ) => {
                     : require( '../../assets/images/icons/icon_regular.png' )
           }
           style={{
-            width: widthPercentageToDP( '12%' ), height: widthPercentageToDP( '12%' ) 
+            width: widthPercentageToDP( '12%' ), height: widthPercentageToDP( '12%' )
           }}
         />
       </View>
@@ -142,7 +142,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
 
           <FontAwesome
             style={{
-              marginLeft: 'auto' 
+              marginLeft: 'auto'
             }}
             name={
               transaction.transactionType == 'Received'
@@ -159,7 +159,7 @@ const AllTransactionsDetailsContainerScreen: React.FC<Props> = ( { navigation, }
         </View>
       </View>
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={styles.infoCardView}>
           <Text

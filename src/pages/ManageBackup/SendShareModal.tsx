@@ -1,5 +1,5 @@
-import React, { Component, useState, useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { Component, useState, useCallback, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   View,
   Image,
@@ -9,49 +9,56 @@ import {
   AsyncStorage,
   Alert,
   ActivityIndicator,
-} from 'react-native';
-import Colors from '../../common/Colors';
-import Fonts from '../../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+} from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { nameToInitials } from '../../common/CommonFunctions';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import { EphemeralDataElements } from '../../bitcoin/utilities/Interface';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
-import config from '../../bitcoin/HexaConfig';
-import { uploadEncMShare, ErrorSending } from '../../store/actions/sss';
+} from 'react-native-responsive-screen'
+import { nameToInitials } from '../../common/CommonFunctions'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import { EphemeralDataElements } from '../../bitcoin/utilities/Interface'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import config from '../../bitcoin/HexaConfig'
+import { uploadEncMShare, ErrorSending } from '../../store/actions/sss'
 
-export default function SendShareModal(props) {
-  const contact = props.contact;
-  const index = props.index; // synching w/ share indexes in DB
+export default function SendShareModal( props ) {
+  const contact = props.contact
+  const index = props.index // synching w/ share indexes in DB
 
-  const [Contact, setContact] = useState(props.contact ? props.contact : {});
+  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
+  } )
   // const [changeContact, setChangeContact] = useState(false);
-  const { loading } = useSelector((state) => state.sss);
+  const { loading } = useSelector( ( state ) => state.sss )
 
-  useEffect(() => {
-    if (contact) {
-      setContact(props.contact);
+  useEffect( () => {
+    if ( contact ) {
+      setContact( props.contact )
     }
-  }, [contact]);
+  }, [ contact ] )
 
   // useEffect(() => {
   //   if (props.changeContact) setChangeContact(true);
   // }, [props.changeContact]);
   const setPhoneNumber = () =>{
-    let phoneNumber = Contact.phoneNumbers[0].number;
-    let number = phoneNumber.replace(/[^0-9]/g, ''); // removing non-numeric characters
-    number = number.slice(number.length - 10); // last 10 digits only
-    return number;
+    const phoneNumber = Contact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    return number
   }
 
   return (
-    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-      <View style={{ height: '100%' }}>
-        <View style={{ marginTop: hp('3.5%'), marginBottom: hp('2%') }}>
+    <View style={{
+      ...styles.modalContentContainer, height: '100%'
+    }}>
+      <View style={{
+        height: '100%'
+      }}>
+        <View style={{
+          marginTop: hp( '3.5%' ), marginBottom: hp( '2%' )
+        }}>
           <Text style={styles.commModeModalHeaderText}>
             Send Recovery Key{'\n'}to contact
           </Text>
@@ -61,7 +68,9 @@ export default function SendShareModal(props) {
           </Text>
         </View>
         <View style={styles.contactProfileView}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{
+            flexDirection: 'row', alignItems: 'center'
+          }}>
             <View
               style={{
                 flexDirection: 'row',
@@ -73,13 +82,15 @@ export default function SendShareModal(props) {
                 borderRadius: 10,
               }}
             >
-              <View style={{ marginLeft: 70 }}>
+              <View style={{
+                marginLeft: 70
+              }}>
                 {props.textHeader ? (
                   <Text
                     style={{
                       color: Colors.textColorGrey,
                       fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(11),
+                      fontSize: RFValue( 11 ),
                       marginLeft: 25,
                       paddingTop: 5,
                       paddingBottom: 3,
@@ -92,40 +103,40 @@ export default function SendShareModal(props) {
                   {Contact && Contact.firstName && Contact.lastName
                     ? Contact.firstName + ' ' + Contact.lastName
                     : Contact && Contact.firstName && !Contact.lastName
-                    ? Contact.firstName
-                    : Contact && !Contact.firstName && Contact.lastName
-                    ? Contact.lastName
-                    : ''}
+                      ? Contact.firstName
+                      : Contact && !Contact.firstName && Contact.lastName
+                        ? Contact.lastName
+                        : ''}
                 </Text>
                 {Contact &&
                 Contact.phoneNumbers &&
                 Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {setPhoneNumber()}
-                    {/* {Contact.phoneNumbers[0].digits} */}
-                  </Text>
-                ) : Contact && Contact.emails && Contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue(10),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {Contact && Contact.emails[0].email}
-                  </Text>
-                ) : null}
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue( 10 ),
+                        marginLeft: 25,
+                        paddingTop: 3,
+                      }}
+                    >
+                      {setPhoneNumber()}
+                      {/* {Contact.phoneNumbers[0].digits} */}
+                    </Text>
+                  ) : Contact && Contact.emails && Contact.emails.length ? (
+                    <Text
+                      style={{
+                        color: Colors.textColorGrey,
+                        fontFamily: Fonts.FiraSansRegular,
+                        fontSize: RFValue( 10 ),
+                        marginLeft: 25,
+                        paddingTop: 3,
+                        paddingBottom: 5,
+                      }}
+                    >
+                      {Contact && Contact.emails[ 0 ].email}
+                    </Text>
+                  ) : null}
               </View>
             </View>
             {Contact && Contact.imageAvailable ? (
@@ -137,12 +148,16 @@ export default function SendShareModal(props) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
+                  shadowOffset: {
+                    width: 2, height: 2
+                  },
                 }}
               >
                 <Image
                   source={Contact && Contact.image}
-                  style={{ ...styles.contactProfileImage }}
+                  style={{
+                    ...styles.contactProfileImage
+                  }}
                 />
               </View>
             ) : (
@@ -159,24 +174,26 @@ export default function SendShareModal(props) {
                   borderRadius: 70 / 2,
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
-                  shadowOffset: { width: 2, height: 2 },
+                  shadowOffset: {
+                    width: 2, height: 2
+                  },
                 }}
               >
                 <Text
                   style={{
                     textAlign: 'center',
-                    fontSize: RFValue(20),
-                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
+                    fontSize: RFValue( 20 ),
+                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
                   }}
                 >
                   {nameToInitials(
                     Contact && Contact.firstName && Contact.lastName
                       ? Contact.firstName + ' ' + Contact.lastName
                       : Contact && Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : Contact && !Contact.firstName && Contact.lastName
-                      ? Contact.lastName
-                      : '',
+                        ? Contact.firstName
+                        : Contact && !Contact.firstName && Contact.lastName
+                          ? Contact.lastName
+                          : '',
                   )}
                 </Text>
               </View>
@@ -184,7 +201,9 @@ export default function SendShareModal(props) {
           </View>
         </View>
         <Text
-          style={{ ...styles.commModeModalInfoText, marginBottom: hp('3.5%') }}
+          style={{
+            ...styles.commModeModalInfoText, marginBottom: hp( '3.5%' )
+          }}
         >
           You can choose to send the Key via phone or email or via QR if your
           contact is nearby
@@ -198,16 +217,18 @@ export default function SendShareModal(props) {
             marginLeft: 25,
             marginRight: 25,
             marginTop: 'auto',
-            marginBottom: hp('4%'),
+            marginBottom: hp( '4%' ),
             justifyContent: 'space-evenly',
             alignItems: 'center',
             shadowColor: Colors.shadowBlue,
             shadowOpacity: 1,
-            shadowOffset: { width: 15, height: 15 },
+            shadowOffset: {
+              width: 15, height: 15
+            },
           }}
         >
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressViaLink(index)}
+            onPress={() => props.onPressViaLink( index )}
             disabled={loading.uploadMetaShare}
             style={styles.buttonInnerView}
           >
@@ -215,25 +236,27 @@ export default function SendShareModal(props) {
               <ActivityIndicator size="small" />
             ) : (
               <Image
-                source={require('../../assets/images/icons/openlink.png')}
+                source={require( '../../assets/images/icons/openlink.png' )}
                 style={styles.buttonImage}
               />
             )}
             <Text style={styles.buttonText}>Share</Text>
           </AppBottomSheetTouchableWrapper>
           <View
-            style={{ width: 1, height: 30, backgroundColor: Colors.white }}
+            style={{
+              width: 1, height: 30, backgroundColor: Colors.white
+            }}
           />
           <AppBottomSheetTouchableWrapper
             style={styles.buttonInnerView}
             disabled={loading.uploadMetaShare}
-            onPress={() => props.onPressViaQr(index)}
+            onPress={() => props.onPressViaQr( index )}
           >
             {loading.uploadMetaShare ? (
               <ActivityIndicator size="small" />
             ) : (
               <Image
-                source={require('../../assets/images/icons/qr-code.png')}
+                source={require( '../../assets/images/icons/qr-code.png' )}
                 style={styles.buttonImage}
               />
             )}
@@ -243,10 +266,10 @@ export default function SendShareModal(props) {
         </View>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -254,17 +277,17 @@ const styles = StyleSheet.create({
   commModeModalHeaderText: {
     color: Colors.blue,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     marginLeft: 25,
     marginRight: 25,
   },
   commModeModalInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     marginLeft: 25,
     marginRight: 25,
-    marginTop: hp('0.7%'),
+    marginTop: hp( '0.7%' ),
   },
   contactProfileView: {
     flexDirection: 'row',
@@ -272,8 +295,8 @@ const styles = StyleSheet.create({
     marginRight: 25,
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: hp('3.5%'),
-    marginTop: hp('1.7%'),
+    marginBottom: hp( '3.5%' ),
+    marginTop: hp( '1.7%' ),
   },
   contactProfileImage: {
     width: 70,
@@ -283,7 +306,7 @@ const styles = StyleSheet.create({
   },
   contactNameText: {
     color: Colors.black,
-    fontSize: RFValue(20),
+    fontSize: RFValue( 20 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 25,
   },
@@ -297,7 +320,7 @@ const styles = StyleSheet.create({
     height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    width: wp('30%'),
+    width: wp( '30%' ),
   },
   buttonImage: {
     width: 20,
@@ -307,8 +330,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: Colors.white,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10,
   },
-});
+} )

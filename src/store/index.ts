@@ -9,16 +9,19 @@ import storageReducer from './reducers/storage'
 import setupAndAuthReducer from './reducers/setupAndAuth'
 import accountsReducer from './reducers/accounts'
 import sssReducer from './reducers/sss'
+import healthReducer from './reducers/health'
 import fBTCReducers from './reducers/fbtc'
 import notificationsReducer from './reducers/notifications'
+import sendingReducer from './reducers/sending'
 import trustedContactsReducer from './reducers/trustedContacts'
 import { persistStore, persistReducer } from 'redux-persist'
 import preferencesReducer from './reducers/preferences'
-import loaders from './reducers/loaders'
+import keeper from './reducers/keeper'
 import swanIntegrationReducer from './reducers/SwanIntegration'
 import wyreIntegrationReducer from './reducers/WyreIntegration'
 import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
+import cloudReducer from './reducers/cloud'
 
 
 const config = {
@@ -29,13 +32,14 @@ const config = {
 
 import {
   initDBWatcher,
+  initServicesWatcher,
   fetchDBWatcher,
   insertDBWatcher,
   servicesEnricherWatcher,
 } from './sagas/storage'
 
 import {
-  initSetupWatcher,
+  setupWalletWatcher,
   initRecoveryWatcher,
   credentialStorageWatcher,
   credentialsAuthWatcher,
@@ -43,20 +47,12 @@ import {
 } from './sagas/setupAndAuth'
 
 import {
-  fetchTransactionsWatcher,
-  transferST1Watcher,
-  transferST2Watcher,
   testcoinsWatcher,
-  transferST3Watcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
-  alternateTransferST2Watcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
-  fetchDerivativeAccXpubWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  validateTwoFAWatcher,
-  removeTwoFAWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
   addNewAccountShellWatcher,
@@ -70,12 +66,13 @@ import {
   autoSyncShellsWatcher,
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
-  fetchReceiveAddressWatcher
+  fetchReceiveAddressWatcher,
+  validateTwoFAWatcher,
+  createSmNResetTFAOrXPrivWatcher
 } from './sagas/accounts'
 
 import {
   initHCWatcher,
-  generateMetaSharesWatcher,
   uploadEncMetaShareWatcher,
   downloadMetaShareWatcher,
   updateMSharesHealthWatcher,
@@ -110,7 +107,6 @@ import {
 } from './sagas/notifications'
 
 import {
-  initializedTrustedContactWatcher,
   approveTrustedContactWatcher,
   fetchTrustedChannelWatcher,
   fetchEphemeralChannelWatcher,
@@ -121,6 +117,8 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
+  multiUpdateTrustedChannelsWatcher,
+  sendVersionUpdateNotificationWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -143,6 +141,67 @@ import {
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
 
+import {
+  initHealthWatcher,
+  checkSharesHealthWatcher,
+  updateSharesHealthWatcher,
+  generateMetaSharesWatcher,
+  createAndUploadOnEFChannelWatcher,
+  updateHealthLevel2Watcher,
+  recoverWalletFromIcloudWatcher,
+  downloadShareWatcher,
+  recoverWalletHealthWatcher,
+  downloadMetaShareHealthWatcher,
+  cloudMetaShareHealthWatcher,
+  fetchWalletImageHealthWatcher,
+  uploadEncMetaShareKeeperWatcher,
+  sendApprovalRequestWatcher,
+  downloadSMShareWatcher,
+  recoverMnemonicHealthWatcher,
+  reShareWithSameKeeperWatcher,
+  autoShareContactWatcher,
+  autoDownloadShareContactWatcher,
+  getPDFDataWatcher,
+  sharePDFWatcher,
+  confirmPDFSharedWatcher,
+  downloadPdfShareHealthWatcher,
+  updatedKeeperInfoWatcher,
+  uploadSMShareWatcher,
+  updateWalletImageHealthWatcher,
+  emptyShareTransferDetailsForContactChangeWatcher,
+  removeUnwantedUnderCustodySharesWatcher,
+  uploadSecondaryShareForPKWatcher,
+  generateSMMetaSharesWatcher,
+  uploadSMShareKeeperWatcher,
+  uploadRequestedSMShareWatcher,
+  deletePrivateDataWatcher,
+  updateKeeperInfoToTrustedChannelWatcher,
+  updateKeeperInfoToUnderCustodyWatcher,
+  autoShareLevel2KeepersWatcher,
+  downloadSmShareForApprovalWatcher,
+  setLevelToNotSetupStatusWatcher,
+} from './sagas/health'
+
+import {
+  fetchKeeperTrustedChannelWatcher,
+  updateNewFCMWatcher
+} from './sagas/keeper'
+
+import {
+  cloudWatcher,
+  updateHealthForCloudStatusWatcher,
+  updateHealthForCloudWatcher,
+  getCloudBackupRecoveryWatcher,
+  checkCloudBackupWatcher,
+  GoogleDriveLoginWatcher,
+  updateDataWatcher,
+  createFileWatcher,
+  checkFileIsAvailableWatcher,
+  readFileWatcher,
+  uplaodFileWatcher,
+} from './sagas/cloud'
+
+import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -152,26 +211,19 @@ const rootSaga = function* () {
     servicesEnricherWatcher,
 
     // wallet setup watcher
-    initSetupWatcher,
+    initServicesWatcher,
+    setupWalletWatcher,
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
     changeAuthCredWatcher,
 
     // accounts watchers
-    fetchTransactionsWatcher,
     fetchBalanceTxWatcher,
-    transferST1Watcher,
-    transferST2Watcher,
-    alternateTransferST2Watcher,
-    transferST3Watcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
     resetTwoFAWatcher,
-    validateTwoFAWatcher,
-    removeTwoFAWatcher,
-    fetchDerivativeAccXpubWatcher,
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
@@ -187,10 +239,11 @@ const rootSaga = function* () {
     blindRefreshWatcher,
     getAllAccountsDataWatcher,
     fetchReceiveAddressWatcher,
+    validateTwoFAWatcher,
+    createSmNResetTFAOrXPrivWatcher,
 
     // sss watchers
     initHCWatcher,
-    generateMetaSharesWatcher,
     uploadEncMetaShareWatcher,
     downloadMetaShareWatcher,
     generatePersonalCopyWatcher,
@@ -227,7 +280,6 @@ const rootSaga = function* () {
     fetchNotificationsWatcher,
 
     // Trusted Contacts
-    initializedTrustedContactWatcher,
     approveTrustedContactWatcher,
     removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
@@ -238,6 +290,51 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+    sendVersionUpdateNotificationWatcher,
+    multiUpdateTrustedChannelsWatcher,
+
+    // Health
+    initHealthWatcher,
+    checkSharesHealthWatcher,
+    updateSharesHealthWatcher,
+    generateMetaSharesWatcher,
+    createAndUploadOnEFChannelWatcher,
+    updateHealthLevel2Watcher,
+    recoverWalletFromIcloudWatcher,
+    downloadShareWatcher,
+    recoverWalletHealthWatcher,
+    downloadMetaShareHealthWatcher,
+    cloudMetaShareHealthWatcher,
+    fetchWalletImageHealthWatcher,
+    updateWalletImageHealthWatcher,
+    uploadEncMetaShareKeeperWatcher,
+    sendApprovalRequestWatcher,
+    recoverMnemonicHealthWatcher,
+    downloadSMShareWatcher,
+    reShareWithSameKeeperWatcher,
+    autoShareContactWatcher,
+    autoDownloadShareContactWatcher,
+    getPDFDataWatcher,
+    sharePDFWatcher,
+    confirmPDFSharedWatcher,
+    downloadPdfShareHealthWatcher,
+    updatedKeeperInfoWatcher,
+    uploadSMShareWatcher,
+    emptyShareTransferDetailsForContactChangeWatcher,
+    removeUnwantedUnderCustodySharesWatcher,
+    uploadSecondaryShareForPKWatcher,
+    generateSMMetaSharesWatcher,
+    uploadSMShareKeeperWatcher,
+    uploadRequestedSMShareWatcher,
+    deletePrivateDataWatcher,
+    updateKeeperInfoToTrustedChannelWatcher,
+    updateKeeperInfoToUnderCustodyWatcher,
+    autoShareLevel2KeepersWatcher,
+    downloadSmShareForApprovalWatcher,
+    setLevelToNotSetupStatusWatcher,
+    // Keeper saga
+    fetchKeeperTrustedChannelWatcher,
+    updateNewFCMWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
@@ -254,6 +351,28 @@ const rootSaga = function* () {
 
     //VersionHistory integration
     versionHistoryWatcher,
+
+    //cloud Integration
+    cloudWatcher,
+    updateHealthForCloudStatusWatcher,
+    updateHealthForCloudWatcher,
+    getCloudBackupRecoveryWatcher,
+    checkCloudBackupWatcher,
+    GoogleDriveLoginWatcher,
+    updateDataWatcher,
+    createFileWatcher,
+    checkFileIsAvailableWatcher,
+    readFileWatcher,
+    uplaodFileWatcher,
+    // Sending
+    executeSendStage1Watcher,
+    executeSendStage2Watcher,
+    executeAlternateSendStage2Watcher,
+    executeSendStage3Watcher,
+    calculateSendMaxFeeWatcher,
+    calculateCustomFeeWatcher,
+    sendTxNotificationWatcher,
+    sendDonationNoteWatcher,
   ]
 
   yield all(
@@ -277,17 +396,20 @@ const rootReducer = combineReducers( {
   setupAndAuth: setupAndAuthReducer,
   accounts: accountsReducer,
   sss: sssReducer,
+  health: healthReducer,
   fbtc: fBTCReducers,
   nodeSettings: nodeSettingsReducer,
   notifications: notificationsReducer,
+  sending: sendingReducer,
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
-  loaders,
+  keeper,
   swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,
   rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
+  cloud: cloudReducer,
 } )
 
 export default function makeStore() {

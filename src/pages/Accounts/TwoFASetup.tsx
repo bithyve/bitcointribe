@@ -26,7 +26,7 @@ const TwoFASetup = props => {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={CommonStyles.headerContainer}>
@@ -38,7 +38,7 @@ const TwoFASetup = props => {
             }
           }
           hitSlop={{
-            top: 20, left: 20, bottom: 20, right: 20 
+            top: 20, left: 20, bottom: 20, right: 20
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -48,7 +48,7 @@ const TwoFASetup = props => {
       </View>
       <View style={NavStyles.modalHeaderTitleView}>
         <View style={{
-          marginTop: hp( '1%' ) 
+          marginTop: hp( '1%' )
         }}>
           <Text style={NavStyles.modalHeaderTitleText}>
             Setup Two Factor Authentication
@@ -58,8 +58,7 @@ const TwoFASetup = props => {
             Authenticator in order to setup the 2FA
           </Text>
           <Text style={NavStyles.modalHeaderInfoText}>
-            The authenticator app should be installed on another device
-            like your Keeper Device
+            The authenticator app should be installed on a different device
           </Text>
         </View>
       </View>
@@ -68,10 +67,10 @@ const TwoFASetup = props => {
         <CopyThisText text={secret} />
       </View>
       <View style={{
-        margin: 20 
+        margin: 20
       }}>
         <View style={{
-          flexDirection: 'row', marginTop: 20, marginBottom: 20 
+          flexDirection: 'row', marginTop: 20, marginBottom: 20
         }}>
           <TouchableOpacity
             onPress={
@@ -90,7 +89,7 @@ const TwoFASetup = props => {
               shadowColor: Colors.shadowBlue,
               shadowOpacity: 1,
               shadowOffset: {
-                width: 15, height: 15 
+                width: 15, height: 15
               },
             }}
           >

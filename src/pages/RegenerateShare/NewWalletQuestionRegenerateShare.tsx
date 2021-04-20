@@ -106,7 +106,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
         {!loading.initializing ? (
           <Text style={styles.buttonText}>Confirm & Proceed</Text>
         ) : (
-          <ActivityIndicator size="small" />
+          <ActivityIndicator color={Colors.white} size="small" />
         )}
       </TouchableOpacity>
     )
@@ -114,11 +114,11 @@ export default function NewWalletQuestionRegenerateShare( props ) {
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -139,7 +139,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
 
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
@@ -147,7 +147,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
           <TouchableOpacity
             activeOpacity={10}
             style={{
-              flex: 1 
+              flex: 1
             }}
             onPress={() => {
               setDropdownBoxOpenClose( false )
@@ -179,7 +179,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                 </Text>
                 <Ionicons
                   style={{
-                    marginLeft: 'auto' 
+                    marginLeft: 'auto'
                   }}
                   name={
                     dropdownBoxOpenClose ? 'ios-arrow-up' : 'ios-arrow-down'
@@ -229,7 +229,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
               ) : null}
               {dropdownBoxValue.id ? (
                 <View style={{
-                  marginTop: 15 
+                  marginTop: 15
                 }}>
                   <View
                     style={{
@@ -267,7 +267,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                     >
                       <Feather
                         style={{
-                          marginLeft: 'auto', padding: 10 
+                          marginLeft: 'auto', padding: 10
                         }}
                         size={15}
                         color={Colors.blue}
@@ -326,7 +326,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                     >
                       <Feather
                         style={{
-                          marginLeft: 'auto', padding: 10 
+                          marginLeft: 'auto', padding: 10
                         }}
                         size={15}
                         color={Colors.blue}
@@ -337,7 +337,7 @@ export default function NewWalletQuestionRegenerateShare( props ) {
                 </View>
               ) : (
                 <View style={{
-                  marginTop: 15 
+                  marginTop: 15
                 }} />
               )}
 
@@ -421,7 +421,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     alignItems: 'center',
@@ -436,7 +436,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     backgroundColor: Colors.blue,
   },
@@ -485,7 +485,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
   },
@@ -510,7 +510,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 0, height: 10 
+      width: 0, height: 10
     },
     backgroundColor: Colors.white,
   },

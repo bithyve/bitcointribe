@@ -203,4 +203,33 @@ export default class Relay {
       throw new Error( 'Failed fetch fee and exchange rates' )
     }
   };
+
+  public static sendKeeperNotifications = async (
+    receivers: string[],
+    notification: INotification,
+  ) => {
+    try {
+      let res: AxiosResponse;
+      let obj = {
+        HEXA_ID,
+        receivers,
+        notification,
+      };
+      try {
+        res = await BH_AXIOS.post('sendKeeperNotifications', {
+          HEXA_ID,
+          receivers,
+          notification,
+        });
+        const { sent } = res.data;
+        if (!sent) throw new Error();
+        return { sent };
+      } catch (err) {
+        if (err.response) throw new Error(err.response.data.err);
+        if (err.code) throw new Error(err.code);
+      }
+    } catch (err) {
+      throw new Error('Failed to deliver notification');
+    }
+  };
 }

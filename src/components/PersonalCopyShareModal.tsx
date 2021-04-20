@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react'
 import {
   StyleSheet,
   View,
@@ -8,28 +8,28 @@ import {
   Platform,
   AsyncStorage,
   TouchableOpacity,
-} from 'react-native';
+} from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import Icons from '../common/Icons';
-import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
-import { useDispatch } from 'react-redux';
-import BottomInfoBox from './BottomInfoBox';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { sharePersonalCopy } from '../store/actions/sss';
-import BottomSheet from 'reanimated-bottom-sheet';
-import ModalHeader from './ModalHeader';
+} from 'react-native-responsive-screen'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import Icons from '../common/Icons'
+import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
+import { useDispatch } from 'react-redux'
+import BottomInfoBox from './BottomInfoBox'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { sharePersonalCopy } from '../store/actions/sss'
+import BottomSheet from 'reanimated-bottom-sheet'
+import ModalHeader from './ModalHeader'
 
-export default function PersonalCopyShareModal(props) {
+export default function PersonalCopyShareModal( props ) {
   // const [flagRefreshing, setFagRefreshing] = useState(false);
-  const [isShared, setIsShared] = useState(false)
-  const [mailOptionsBottomSheet, setMailOptionsBottomSheet] = useState(React.createRef());
-  const [personalCopyShareOptions, setPersonalCopyShareOptions] = useState([
+  const [ isShared, setIsShared ] = useState( false )
+  const [ mailOptionsBottomSheet, setMailOptionsBottomSheet ] = useState( React.createRef() )
+  const [ personalCopyShareOptions, setPersonalCopyShareOptions ] = useState( [
     {
       id: 1,
       title: 'Sending Email',
@@ -55,83 +55,97 @@ export default function PersonalCopyShareModal(props) {
         'Make sure that you delete the message from your device once it is sent',
       imageIcon: Icons.manageBackup.PersonalCopy.icloud,
     },
-  ]);
+  ] )
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-  const onShare = async (shareOption, isEmailOtherOptions) => {
-    dispatch(sharePersonalCopy(shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions));
-    props.onPressShare();
-  };
+  const onShare = async ( shareOption, isEmailOtherOptions ) => {
+    dispatch( sharePersonalCopy( shareOption.type, props.selectedPersonalCopy, isEmailOtherOptions ) )
+    props.onPressShare()
+  }
 
   const onConfirm = async () => {
-    props.onPressConfirm();
-  };
+    props.onPressConfirm()
+  }
 
   const disableSharingOption = useCallback(
-    (shareOption) => {
-      if (!props.personalCopyDetails) return false;
+    ( shareOption ) => {
+      if ( !props.personalCopyDetails ) return false
 
       const alternateCopy =
         props.personalCopyDetails[
           props.selectedPersonalCopy.type === 'copy1' ? 'copy2' : 'copy1'
-        ];
-      if (alternateCopy && alternateCopy.sharingDetails) {
+        ]
+      if ( alternateCopy && alternateCopy.sharingDetails ) {
         return alternateCopy.sharingDetails.shareVia == shareOption.type
           ? true
-          : false;
+          : false
       } else {
-        return false;
+        return false
       }
     },
-    [props.personalCopyDetails, props.selectedPersonalCopy],
-  );
+    [ props.personalCopyDetails, props.selectedPersonalCopy ],
+  )
 
   const renderMailOptionsHeader = () => {
     return(
       <ModalHeader
         onPressHeader={() => {
-          (mailOptionsBottomSheet as any).current.snapTo(0);
+          ( mailOptionsBottomSheet as any ).current.snapTo( 0 )
         }}
       />
-    );
+    )
   }
 
   const renderMailOptionsContent = () => {
     return(
-      <View style={{height:hp('20%'), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: Colors.white}}>
-        <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
-            onShare(personalCopyShareOptions[0], false);
-            setIsShared(true);
-          }}
+      <View style={{
+        height:hp( '20%' ), flexDirection: 'row', alignItems: 'center', justifyContent: 'space-evenly', backgroundColor: Colors.white
+      }}>
+        <TouchableOpacity style={{
+          flexDirection: 'column', alignItems: 'center'
+        }} onPress={() => {
+          onShare( personalCopyShareOptions[ 0 ], false )
+          setIsShared( true )
+        }}
         >
-          <Image style={{height: wp('15%'), width: wp('15%')}} source={require('../assets/images/icons/ios_mail.png')} />
-          <Text style={{color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: 5,}}>Mail</Text>
+          <Image style={{
+            height: wp( '15%' ), width: wp( '15%' )
+          }} source={require( '../assets/images/icons/ios_mail.png' )} />
+          <Text style={{
+            color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: 5,
+          }}>Mail</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={{flexDirection: 'column', alignItems: 'center'}} onPress={() => {
-            onShare(personalCopyShareOptions[0], true);
-            setIsShared(true);
-          }}
+        <TouchableOpacity style={{
+          flexDirection: 'column', alignItems: 'center'
+        }} onPress={() => {
+          onShare( personalCopyShareOptions[ 0 ], true )
+          setIsShared( true )
+        }}
         >
-          <Image style={{height: wp('15%'), width: wp('15%'), borderWidth: 1, borderColor: Colors.textColorGrey, borderRadius: 10}} source={require('../assets/images/icons/icon_more.png')} />
-          <Text style={{color: Colors.textColorGrey, fontSize: RFValue(11), fontFamily: Fonts.FiraSansRegular, marginTop: 5,}}>More Options</Text>
+          <Image style={{
+            height: wp( '15%' ), width: wp( '15%' ), borderWidth: 1, borderColor: Colors.textColorGrey, borderRadius: 10
+          }} source={require( '../assets/images/icons/icon_more.png' )} />
+          <Text style={{
+            color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: 5,
+          }}>More Options</Text>
         </TouchableOpacity>
       </View>
-    );
+    )
   }
 
   return (
-    <View style={[styles.modalContainer]}>
+    <View style={[ styles.modalContainer ]}>
       <View
         style={{
           borderBottomWidth: 1,
           borderColor: Colors.borderColor,
           flexDirection: 'row',
           paddingRight: 10,
-          paddingBottom: hp('1.5%'),
+          paddingBottom: hp( '1.5%' ),
           marginRight: 10,
-          marginBottom: hp('1.5%'),
-          paddingTop: hp('0.5%'),
+          marginBottom: hp( '1.5%' ),
+          paddingTop: hp( '0.5%' ),
           alignItems: 'center',
           marginLeft: 20,
         }}
@@ -139,34 +153,38 @@ export default function PersonalCopyShareModal(props) {
         <Text
           style={{
             color: Colors.blue,
-            fontSize: RFValue(18),
+            fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansMedium,
           }}
         >
           Store personal copy PDF
         </Text>
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={{
+        flex: 1
+      }}>
         <FlatList
           data={personalCopyShareOptions}
           extraData={props.personalCopyDetails}
-          renderItem={({ item, index }) => (
+          renderItem={( { item, index } ) => (
             <View>
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
-                  if(item.type === 'Email' && Platform.OS == 'ios') {
-                    (mailOptionsBottomSheet as any).current.snapTo(1);
+                  if( item.type === 'Email' && Platform.OS == 'ios' ) {
+                    ( mailOptionsBottomSheet as any ).current.snapTo( 1 )
                   }
                   else {
-                    onShare(item, false);
-                    setIsShared(true)
+                    onShare( item, false )
+                    setIsShared( true )
                   }
                 }}
-                disabled={disableSharingOption(item)}
+                disabled={disableSharingOption( item )}
                 style={[
                   styles.listElements,
-                  disableSharingOption(item)
-                    ? { backgroundColor: Colors.borderColor }
+                  disableSharingOption( item )
+                    ? {
+                      backgroundColor: Colors.borderColor
+                    }
                     : null,
                 ]}
               >
@@ -174,7 +192,9 @@ export default function PersonalCopyShareModal(props) {
                   style={styles.listElementsIconImage}
                   source={item.imageIcon}
                 />
-                <View style={{ justifyContent: 'space-between', flex: 1 }}>
+                <View style={{
+                  justifyContent: 'space-between', flex: 1
+                }}>
                   <Text style={styles.listElementsTitle}>{item.title}</Text>
                   <Text style={styles.listElementsInfo}>{item.info}</Text>
                 </View>
@@ -183,7 +203,9 @@ export default function PersonalCopyShareModal(props) {
                     name="ios-arrow-forward"
                     color={Colors.textColorGrey}
                     size={15}
-                    style={{ alignSelf: 'center' }}
+                    style={{
+                      alignSelf: 'center'
+                    }}
                   />
                 </View>
               </AppBottomSheetTouchableWrapper>
@@ -199,13 +221,13 @@ export default function PersonalCopyShareModal(props) {
               />
             </View>
           )}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={( item, index ) => index.toString()}
         />
         <AppBottomSheetTouchableWrapper
           disabled={isShared? false : true}
           onPress={() => {
             // console.log('Confirm');
-            onConfirm();
+            onConfirm()
           }}
           style={{
             ...styles.proceedButtonView,
@@ -213,9 +235,9 @@ export default function PersonalCopyShareModal(props) {
             backgroundColor:
               isShared ? Colors.blue : Colors.lightBlue,
           }}
-          >
-            <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
-          </AppBottomSheetTouchableWrapper>
+        >
+          <Text style={styles.proceedButtonText}>Yes, I have shared</Text>
+        </AppBottomSheetTouchableWrapper>
       </View>
       <BottomInfoBox
         title={'Security question and answer'}
@@ -228,16 +250,16 @@ export default function PersonalCopyShareModal(props) {
         ref={mailOptionsBottomSheet as any}
         snapPoints={[
           -50,
-          hp('20%')
+          hp( '20%' )
         ]}
         renderHeader={renderMailOptionsHeader}
         renderContent={renderMailOptionsContent}
       />
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,
@@ -262,21 +284,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     paddingRight: 10,
-    paddingBottom: hp('1.5%'),
-    paddingTop: hp('1%'),
+    paddingBottom: hp( '1.5%' ),
+    paddingTop: hp( '1%' ),
     marginLeft: 10,
     marginRight: 10,
-    marginBottom: hp('1.5%'),
+    marginBottom: hp( '1.5%' ),
   },
   modalHeaderTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   modalHeaderInfoText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(12),
+    fontSize: RFValue( 12 ),
     marginTop: 5,
   },
   listElements: {
@@ -290,13 +312,13 @@ const styles = StyleSheet.create({
   },
   listElementsTitle: {
     color: Colors.blue,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     marginLeft: 13,
     fontFamily: Fonts.FiraSansRegular,
   },
   listElementsInfo: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     marginLeft: 13,
     marginTop: 5,
     fontFamily: Fonts.FiraSansRegular,
@@ -314,21 +336,23 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   proceedButtonView: {
-    marginTop: hp('4%'),
-    marginBottom: hp('2%'),
-    height: wp('13%'),
-    width: wp('40%'),
+    marginTop: hp( '4%' ),
+    marginBottom: hp( '2%' ),
+    height: wp( '13%' ),
+    width: wp( '40%' ),
     alignSelf: 'center',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
-});
+} )

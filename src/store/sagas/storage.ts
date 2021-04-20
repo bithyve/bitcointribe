@@ -1,5 +1,5 @@
-import { call, delay, put, select } from 'redux-saga/effects'
-import { createWatcher } from '../utils/utilities'
+import { call, put, select } from 'redux-saga/effects'
+import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
 import {
   INIT_DB,
   dbInitialized,
@@ -19,9 +19,12 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { AsyncStorage } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { updateWalletImage } from '../actions/sss'
-import { walletCheckIn } from '../actions/trustedContacts'
+import { sendVersionUpdateNotification, walletCheckIn } from '../actions/trustedContacts'
+import KeeperService from '../../bitcoin/services/KeeperService'
+import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
+import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
+import { updateWalletImage } from '../actions/sss'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -36,23 +39,38 @@ function* initDBWorker() {
 
 export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
 
+function* initServicesWorker() {
+  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  yield put( servicesInitialized( {
+    regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo
+  } ) )
+}
+
+export const initServicesWatcher = createWatcher( initServicesWorker, INITIALIZE_SERVICES )
+
 function* fetchDBWorker() {
   try {
     // let t = timer('fetchDBWorker')
     const key = yield select( ( state ) => state.storage.key )
+    const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
+
     const database = yield call( dataManager.fetch, key )
     if ( key && database ) {
       yield call( servicesEnricherWorker, {
         payload: {
-          database
-        }
+          database,
+        },
       } )
       yield put( dbFetched( database ) )
-
+      console.log( 'newBHRFlowStarted', newBHRFlowStarted )
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
         yield put( walletCheckIn() )
-        yield put( updateWalletImage() )
+        if( newBHRFlowStarted === true ){
+          yield put( updateWalletImageHealth() )
+        }else{
+          yield put( updateWalletImage() )
+        }
       }
     } else {
       // DB would be absent during wallet setup
@@ -83,7 +101,7 @@ export function* insertDBWorker( { payload } ) {
       dataManager.insert,
       updatedDB,
       key,
-      insertedIntoDB,
+      insertedIntoDB
     )
     if ( !inserted ) {
       // dispatch failure
@@ -94,8 +112,8 @@ export function* insertDBWorker( { payload } ) {
     // !insertedIntoDB ? yield put( enrichServices( updatedDB ) ) : null; // enriching services post initial insertion
     yield call( servicesEnricherWorker, {
       payload: {
-        database: updatedDB
-      }
+        database: updatedDB,
+      },
     } )
   } catch ( err ) {
     console.log( err )
@@ -114,35 +132,54 @@ function* servicesEnricherWorker( { payload } ) {
 
     let dbVersion = database.VERSION
     let appVersion = DeviceInfo.getVersion()
-    if ( appVersion === '0.7' ) {
-      appVersion = '0.7.0'
+
+    // standardize initial app version's semver
+    switch( appVersion ){
+        case '0.7':
+          appVersion = '0.7.0'
+          break
+
+        case '0.8':
+          appVersion = '0.8.0'
+          break
+
+        case '0.9':
+          appVersion = '0.9.0'
+          break
     }
-    if ( appVersion === '0.8' ) {
-      appVersion = '0.8.0'
+
+    if ( !database.VERSION ) dbVersion = '0.7.0'
+    // standardize initial db version's semver
+    switch( database.VERSION ){
+        case '0.8':
+          dbVersion = '0.8.0'
+          break
+
+        case '0.9':
+          dbVersion = '0.9.0'
+          break
+
+        case '1.0':
+          dbVersion = '1.0.0'
+          break
     }
-    if ( appVersion === '0.9' ) {
-      appVersion = '0.9.0'
-    }
+
+    let services
+    let migrated = false
+    let versionUpdated = false
+
     const {
       REGULAR_ACCOUNT,
       TEST_ACCOUNT,
       SECURE_ACCOUNT,
       S3_SERVICE,
       TRUSTED_CONTACTS,
+      KEEPERS_INFO,
     } = database.SERVICES
 
-    let services
-    let migrated = false
-    if ( !database.VERSION ) {
-      dbVersion = '0.7.0'
-    } else if ( database.VERSION === '0.8' ) {
-      dbVersion = '0.8.0'
-    } else if ( database.VERSION === '0.9' ) {
-      dbVersion = '0.9.0'
-    } else if ( database.VERSION === '1.0' ) {
-      dbVersion = '1.0.0'
-    }
+
     if ( semver.gt( appVersion, dbVersion ) ) {
+      versionUpdated = true
       if ( dbVersion === '0.7.0' && semver.gte( appVersion, '0.9.0' ) ) {
         // version 0.7.0 support
         console.log( 'Migration running for 0.7.0' )
@@ -152,12 +189,13 @@ function* servicesEnricherWorker( { payload } ) {
           SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
           S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
           TRUSTED_CONTACTS: new TrustedContactsService(),
+          KEEPERS_INFO: new KeeperService(),
         }
         // hydrating new/missing async storage variables
         yield call(
           AsyncStorage.setItem,
           'walletID',
-          services.S3_SERVICE.sss.walletId,
+          services.S3_SERVICE.sss.walletId
         )
 
         migrated = true
@@ -171,6 +209,9 @@ function* servicesEnricherWorker( { payload } ) {
           TRUSTED_CONTACTS: TRUSTED_CONTACTS
             ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
             : new TrustedContactsService(),
+          KEEPERS_INFO: KEEPERS_INFO
+            ? KeeperService.fromJSON( KEEPERS_INFO )
+            : new KeeperService(),
         }
       }
 
@@ -185,24 +226,56 @@ function* servicesEnricherWorker( { payload } ) {
           migrated = true
         }
       }
-
-      if( semver.lt( dbVersion, '1.4.5' ) ){
+      if ( semver.lt( dbVersion, '1.4.5' ) ) {
         // update sub-account instances count
         const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
         const secureAccount: SecureAccount = services.SECURE_ACCOUNT
 
-        for( const accountType of Object.keys( config.DERIVATIVE_ACC ) ){
+        for ( const accountType of Object.keys( config.DERIVATIVE_ACC ) ) {
           let instanceCount = 5
-          if( accountType == 'TRUSTED_CONTACTS' ){
+          if ( accountType == 'TRUSTED_CONTACTS' ) {
             instanceCount = 20
           }
-          regularAccount.hdWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
-          secureAccount.secureHDWallet.derivativeAccounts[ accountType ].instance.max = instanceCount
+          regularAccount.hdWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
+          secureAccount.secureHDWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
         }
 
         console.log( 'Updated sub-account instances count' )
         services.REGULAR_ACCOUNT = regularAccount
         services.SECURE_ACCOUNT = secureAccount
+
+        migrated = true
+      }
+
+      if ( semver.lt( dbVersion, '1.4.6' ) ) {
+        // update sub-account instances count
+        const regularAccount: RegularAccount = services.REGULAR_ACCOUNT
+        const secureAccount: SecureAccount = services.SECURE_ACCOUNT
+
+        for ( const accountType of Object.keys( config.DERIVATIVE_ACC ) ) {
+          let instanceCount = 5
+          if ( accountType == 'TRUSTED_CONTACTS' ) {
+            instanceCount = 20
+          }
+          regularAccount.hdWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
+          secureAccount.secureHDWallet.derivativeAccounts[
+            accountType
+          ].instance.max = instanceCount
+        }
+
+        console.log( 'Updated sub-account instances count' )
+        services.REGULAR_ACCOUNT = regularAccount
+        services.SECURE_ACCOUNT = secureAccount
+
+        console.log( 'services.TRUSTED_CONTACTS', services.TRUSTED_CONTACTS )
+        services.KEEPERS_INFO = new KeeperService()
+        //yield put( upgradeReducer( ) )
         migrated = true
       }
     } else {
@@ -214,21 +287,32 @@ function* servicesEnricherWorker( { payload } ) {
         TRUSTED_CONTACTS: TRUSTED_CONTACTS
           ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
           : new TrustedContactsService(),
+        KEEPERS_INFO: KEEPERS_INFO
+          ? KeeperService.fromJSON( KEEPERS_INFO )
+          : new KeeperService(),
       }
     }
+
     yield put( servicesEnriched( services ) )
-    if ( migrated ) {
+    if ( versionUpdated ) {
+      // update the stored version
       database.VERSION = DeviceInfo.getVersion()
-      database.SERVICES = {
-        REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
-        TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
-        SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
-        S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
-        TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
-      }
+
+      if( migrated )
+        database.SERVICES = {
+          REGULAR_ACCOUNT: JSON.stringify( services.REGULAR_ACCOUNT ),
+          TEST_ACCOUNT: JSON.stringify( services.TEST_ACCOUNT ),
+          SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
+          S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
+          TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
+          KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
+        }
       yield call( insertDBWorker, {
-        payload: database
+        payload: database,
       } )
+
+      // send version upgrade notification to F&Fs
+      yield put( sendVersionUpdateNotification( database.VERSION ) )
     }
   } catch ( err ) {
     console.log( err )
@@ -237,5 +321,5 @@ function* servicesEnricherWorker( { payload } ) {
 
 export const servicesEnricherWatcher = createWatcher(
   servicesEnricherWorker,
-  ENRICH_SERVICES,
+  ENRICH_SERVICES
 )

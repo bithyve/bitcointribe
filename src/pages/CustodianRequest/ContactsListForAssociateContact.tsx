@@ -16,7 +16,7 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateTrustedContactInfoLocally } from '../../store/actions/trustedContacts'
+import { updateTrustedContactsInfoLocally } from '../../store/actions/trustedContacts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
@@ -56,8 +56,8 @@ const ContactsListForAssociateContact = ( props ) => {
       .trim()
     setApprovingContact( selectedContactName )
 
-    let tcInfo = trustedContactsInfo ? [ ...trustedContactsInfo ] : null
-    if ( tcInfo ) {
+    const tcInfo = trustedContactsInfo
+    if ( tcInfo.length ) {
       if (
         tcInfo.findIndex( ( trustedContact ) => {
           if ( !trustedContact ) return false
@@ -82,13 +82,11 @@ const ContactsListForAssociateContact = ( props ) => {
         return
       }
     } else {
-      tcInfo = []
       tcInfo[ 3 ] = associatedContact
-
       postAssociation( associatedContact )
     }
-    await AsyncStorage.setItem( 'TrustedContactsInfo', JSON.stringify( tcInfo ) )
-    dispatch( updateTrustedContactInfoLocally( tcInfo ) )
+
+    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
   }
 
   const { approvedTrustedContacts } = useSelector(
@@ -196,7 +194,7 @@ const ContactsListForAssociateContact = ( props ) => {
             }}
           >
             {approvingTrustedContact ? (
-              <ActivityIndicator size={'small'} />
+              <ActivityIndicator color={Colors.white} size={'small'} />
             ) : (
               <Text
                 style={{

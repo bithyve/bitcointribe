@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, createRef } from 'react'
+import { useDispatch } from 'react-redux'
 import {
   StyleSheet,
   View,
@@ -11,6 +12,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput,
+  InteractionManager,
+  Keyboard,
 } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
@@ -25,17 +28,131 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import DeviceInfo from 'react-native-device-info'
 import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
+import Entypo from 'react-native-vector-icons/Entypo'
+import { updateCloudPermission } from '../store/actions/health'
+import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
+import BottomSheet from '@gorhom/bottom-sheet'
+import { BottomSheetView } from '@gorhom/bottom-sheet'
+import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
+import { Easing } from 'react-native-reanimated'
+import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
+
+export enum BottomSheetKind {
+  CLOUD_PERMISSION,
+}
+
+export enum BottomSheetState {
+  Closed,
+  Open,
+}
 
 export default function NewWalletName( props ) {
+
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
+  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( BottomSheetKind.CLOUD_PERMISSION )
+  const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
+  const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
+  const bottomSheetRef = createRef<BottomSheet>()
+  const dispatch = useDispatch()
+  const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+
+  const renderBottomSheetContent = () =>{
+
+    switch ( currentBottomSheetKind ) {
+        case BottomSheetKind.CLOUD_PERMISSION:
+          return (
+            <CloudPermissionModalContents
+              title={'Automated Cloud Backup'}
+              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              note={''}
+              onPressProceed={( flag )=>{
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', flag )
+                dispatch( updateCloudPermission( flag ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              onPressIgnore={( flag )=> {
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', flag )
+                dispatch( updateCloudPermission( flag ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              autoClose={()=>{
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', true )
+                dispatch( updateCloudPermission( true ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              isRendered={isCloudPermissionRender}
+              bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
+            />
+          )
+
+        default:
+          break
+    }
+  }
+
+  const openBottomSheet = (
+    kind: BottomSheetKind,
+    snapIndex: number | null = null
+  ) => {
+    setBottomSheetState( BottomSheetState.Open )
+    setCurrentBottomSheetKind( kind )
+
+    if ( snapIndex == null ) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.snapTo( snapIndex )
+    }
+  }
+
+  const getBottomSheetSnapPoints = (): any[] => {
+    switch ( currentBottomSheetKind ) {
+        case BottomSheetKind.CLOUD_PERMISSION:
+          return [
+            -50,
+            hp(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
+            ),
+          ]
+
+        default:
+          return defaultBottomSheetConfigs.snapPoints
+    }
+  }
+
+  const handleBottomSheetPositionChange = ( newIndex: number ) => {
+    if ( newIndex === 0 ) {
+      onBottomSheetClosed()
+    }
+  }
+
+  const onBottomSheetClosed =()=> {
+    setBottomSheetState( BottomSheetState.Closed )
+    setCurrentBottomSheetKind( null )
+  }
+
+  const closeBottomSheet = () => {
+    setIsCloudPermissionRender( false )
+    bottomSheetRef.current.snapTo( 0 )
+    onBottomSheetClosed()
+  }
+
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={CommonStyles.headerContainer}>
           <TouchableOpacity
@@ -55,7 +172,7 @@ export default function NewWalletName( props ) {
         </View>
         <KeyboardAvoidingView
           style={{
-            flex: 1 
+            flex: 1
           }}
           behavior={Platform.OS == 'ios' ? 'padding' : ''}
           enabled
@@ -90,12 +207,12 @@ export default function NewWalletName( props ) {
               autoCorrect={false}
               autoCompleteType="off"
             />
-            <View style={{ 
-              marginLeft: 20, 
+            <View style={{
+              marginLeft: 20,
             }}>
-              <Text style={{ 
+              <Text style={{
                 fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey, 
+                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
               }}>
                   No numbers or special characters allowed</Text>
             </View>
@@ -109,15 +226,15 @@ export default function NewWalletName( props ) {
                   shadowColor: Colors.shadowBlue,
                   shadowOpacity: 1,
                   shadowOffset: {
-                    width: 15, height: 15 
+                    width: 15, height: 15
                   },
                 }}
               >
                 <TouchableOpacity
                   onPress={() => {
-                    props.navigation.navigate( 'NewWalletQuestion', {
-                      walletName,
-                    } )
+                    Keyboard.dismiss()
+                    setIsCloudPermissionRender( true )
+                    openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
                   }}
                   style={styles.buttonView}
                 >
@@ -133,7 +250,7 @@ export default function NewWalletName( props ) {
 
           {walletName.trim() == '' ? (
             <View style={{
-              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0 
+              marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
             }}>
               <BottomInfoBox
                 title={'We do not store this'}
@@ -145,6 +262,23 @@ export default function NewWalletName( props ) {
           ) : null}
         </KeyboardAvoidingView>
       </View>
+      <BottomSheetBackground
+        isVisible={bottomSheetState === BottomSheetState.Open}
+        onPress={closeBottomSheet}
+      />
+      {currentBottomSheetKind != null && (
+        <BottomSheet
+          ref={bottomSheetRef}
+          snapPoints={getBottomSheetSnapPoints()}
+          initialSnapIndex={-1}
+          animationDuration={defaultBottomSheetConfigs.animationDuration}
+          animationEasing={Easing.out( Easing.back( 1 ) )}
+          handleComponent={defaultBottomSheetConfigs.handleComponent}
+          onChange={handleBottomSheetPositionChange}
+        >
+          <BottomSheetView>{renderBottomSheetContent()}</BottomSheetView>
+        </BottomSheet>
+      )}
     </SafeAreaView>
   )
 }
@@ -192,7 +326,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 10,
     shadowOffset: {
-      width: 2, height: 2 
+      width: 2, height: 2
     },
     backgroundColor: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
@@ -245,5 +379,37 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightBlue,
     borderRadius: 10,
     marginLeft: 5,
+  },
+  checkbox: {
+    width: wp( '7%' ),
+    height: wp( '7%' ),
+    borderRadius: 7,
+    backgroundColor: Colors.white,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    marginLeft: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  doCloudBackupField: {
+    borderRadius: 10,
+    backgroundColor: Colors.backgroundColor,
+    justifyContent: 'center',
+    marginBottom: 36,
+    marginHorizontal: 14,
+    paddingHorizontal: 10,
+    padding:10,
+    marginTop: hp( '5%' ),
+  },
+  doCloudBackupFieldContentContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  smallInfoLabelText: {
+    backgroundColor: Colors.backgroundColor,
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
   },
 } )
