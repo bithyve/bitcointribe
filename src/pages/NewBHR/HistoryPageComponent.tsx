@@ -98,9 +98,9 @@ const HistoryPageComponent = ( props ) => {
           flex: 1
         }}>
           <ScrollView>
-            {[ 1, 2, 3, 4 ].map( () => {
+            {[ 1, 2, 3, 4 ].map( ( index ) => {
               return (
-                <View style={styles.waterMarkCard}>
+                <View style={styles.waterMarkCard} key={index}>
                   <View>
                     <View style={styles.waterMarkCardTextOne} />
                     <View style={styles.waterMarkCardTextTwo} />
@@ -148,7 +148,7 @@ const HistoryPageComponent = ( props ) => {
             </Text>
           </TouchableOpacity>: null
         }
-        {( !props.isVersionMismatch ) || props.IsReshare && props.isChangeKeeperAllow && (
+        {( !props.isVersionMismatch && props.IsReshare && props.isChangeKeeperAllow ) ?
           <TouchableOpacity
             disabled={props.disableChange ? props.disableChange : false}
             onPress={() => props.onPressChange()}
@@ -168,8 +168,8 @@ const HistoryPageComponent = ( props ) => {
             >
               {props.changeButtonText}
             </Text>
-          </TouchableOpacity>
-        )}
+          </TouchableOpacity> : null
+        }
       </View>
     </View>
   )
