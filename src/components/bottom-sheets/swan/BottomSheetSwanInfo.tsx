@@ -70,12 +70,12 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
       swanFromBuyMenu = false
       if( hasCreateWithdrawalWalletOnSwanSucceeded )
         console.log( 'CREATE NEW ACCOUNT NOW!' )
-      // TODO:: create Swan Account action dispatch
+      // TODO:1: create Swan Account action dispatch
     }
   }, [ hasCreateWithdrawalWalletOnSwanCompleted ] )
 
-  // TODO:: Link Hexa Wallet with Swan Withdrawal Wallet
-  // TODO:: Store Swan Account Shell as permanent
+  // TODO:2: Link Hexa Wallet with Swan Withdrawal Wallet
+  // TODO:3: Store Swan Account Shell as permanent
 
   return ( <View style={{
     ...styles.modalContentContainer
