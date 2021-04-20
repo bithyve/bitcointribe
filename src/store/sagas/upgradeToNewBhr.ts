@@ -129,7 +129,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     const share: MetaShare = metaShares.find( value => value.shareId == shareId )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
-    const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && oldKeeperInfo.trustedChannel.data[ 1 ].data.version == '1.6.0' ? 'accessible' : 'notAccessible'
+    const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && Number( oldKeeperInfo.trustedChannel.data[ 1 ].data.version ) >= Number( '1.5.0' ) ? 'accessible' : 'notAccessible'
     const data: TrustedDataElements = {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
@@ -243,7 +243,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
       const shareId = shareIds[ i ]
       const share: MetaShare = metaShares.find( value => value.shareId == shareId )
       const oldKeeperInfo = trustedContactsInfo[ name.toLowerCase() ]
-      const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && oldKeeperInfo.trustedChannel.data[ 1 ].data.version == '1.6.0' ? 'accessible' : 'notAccessible'
+      const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && Number( oldKeeperInfo.trustedChannel.data[ 1 ].data.version ) >= Number( '1.5.0' ) ? 'accessible' : 'notAccessible'
       const data: TrustedDataElements = {
         metaShare: share,
         secondaryShare: secondaryMetaShares[ 1 ]
