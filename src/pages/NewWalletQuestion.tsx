@@ -260,10 +260,35 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const setLoaderMessages = () => {
-    setInterval( () => {
+    setTimeout( () => {
       const newMessage = getNextMessage()
       setMessage( newMessage.heading )
       setSubTextMessage( newMessage.text )
+      setTimeout( () => {
+        const newMessage = getNextMessage()
+        setMessage( newMessage.heading )
+        setSubTextMessage( newMessage.text )
+        setTimeout( () => {
+          const newMessage = getNextMessage()
+          setMessage( newMessage.heading )
+          setSubTextMessage( newMessage.text )
+          setTimeout( () => {
+            const newMessage = getNextMessage()
+            setMessage( newMessage.heading )
+            setSubTextMessage( newMessage.text )
+            setTimeout( () => {
+              const newMessage = getNextMessage()
+              setMessage( newMessage.heading )
+              setSubTextMessage( newMessage.text )
+              setTimeout( () => {
+                const newMessage = getNextMessage()
+                setMessage( newMessage.heading )
+                setSubTextMessage( newMessage.text )
+              }, LOADER_MESSAGE_TIME )
+            }, LOADER_MESSAGE_TIME )
+          }, LOADER_MESSAGE_TIME )
+        }, LOADER_MESSAGE_TIME )
+      }, LOADER_MESSAGE_TIME )
     }, LOADER_MESSAGE_TIME )
   }
 
