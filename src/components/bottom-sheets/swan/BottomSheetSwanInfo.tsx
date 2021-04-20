@@ -63,7 +63,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
     }
   }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken ] )
 
-
   // When withdrawal wallet has been created
   // a new Swan service account should be created in Hexa
   useEffect( ()=>{
@@ -71,22 +70,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
       swanFromBuyMenu = false
       if( hasCreateWithdrawalWalletOnSwanSucceeded )
         console.log( 'CREATE NEW ACCOUNT NOW!' )
-        // dispatch( addNewAccountShell( {
-        // } ) )
+      // TODO:: create Swan Account action dispatch
     }
   }, [ hasCreateWithdrawalWalletOnSwanCompleted ] )
-  /*
-  // when new Swan Account is created
-  // send xpub to Swan
-  useEffect( ()=>{
-    if( swanFromDeepLink ) {
-      swanFromBuyMenu = false
-      if( hasRedeemSwanCodeForTokenSucceeded )
-        dispatch( linkSwanWallet( {
-        } ) )
-    }
-  }, [ linkSwanWalletSucceeded ] )
-*/
+
+  // TODO:: Link Hexa Wallet with Swan Withdrawal Wallet
+  // TODO:: Store Swan Account Shell as permanent
+
   return ( <View style={{
     ...styles.modalContentContainer
   }}>

@@ -20,15 +20,30 @@ export type SwanIntegrationState = {
   code_challenge: string | null,
   state: string | null,
   nonce: number | null,
+
   hasFetchSwanAuthenticationUrlInitiated: boolean | null,
   hasFetchSwanAuthenticationUrlSucceeded: boolean | null,
   hasFetchSwanAuthenticationUrlCompleted: boolean | null,
+
   hasRedeemSwanCodeForTokenSucceeded: boolean | null,
   hasRedeemSwanCodeForTokenCompleted: boolean | null,
   hasRedeemSwanCodeForTokenInitiated: boolean | null,
+
   hasCreateWithdrawalWalletOnSwanSucceeded: boolean | null,
   hasCreateWithdrawalWalletOnSwanCompleted: boolean | null,
   hasCreateWithdrawalWalletOnSwanInitiated: boolean | null,
+
+  // TODO:: Create temperory swan account in hexa
+  hasSwanAccountCreationInitiated: boolean | null,
+  hasSwanAccountCreationCompleted: boolean | null,
+  hasSwanAccountCreationSucceeded: boolean | null,
+  swanAccountShell: Object | null, // temperory swan account shell object
+
+  // TODO:: Reducers for linking Hexa Wallet with Swan Withdrawal Wallet
+
+
+
+  // The below values are currently not being used
   swanAuthenticatedToken: string | null,
   isSwanRedeemCodeInProgress: boolean | null,
   swanToken: string | null
@@ -65,9 +80,15 @@ const INITIAL_STATE: SwanIntegrationState = {
   hasFetchSwanAuthenticationUrlInitiated: false,
   hasFetchSwanAuthenticationUrlSucceeded: false,
   hasFetchSwanAuthenticationUrlCompleted: false,
+
   hasRedeemSwanCodeForTokenSucceeded: false,
   hasRedeemSwanCodeForTokenCompleted: false,
   hasRedeemSwanCodeForTokenInitiated: false,
+
+  hasSwanAccountCreationSucceeded: false,
+  hasSwanAccountCreationCompleted: false,
+  hasSwanAccountCreationInitiated: false,
+
   hasCreateWithdrawalWalletOnSwanSucceeded: false,
   hasCreateWithdrawalWalletOnSwanCompleted: false,
   hasCreateWithdrawalWalletOnSwanInitiated: false,
