@@ -9,19 +9,14 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 
 type AddressRecipientFactoryProps = {
   address: string;
-  donationID?: string | null;
 };
 
-export function makeAddressRecipientDescription( {
-  address,
-  donationID = null,
-}: AddressRecipientFactoryProps ): AddressRecipientDescribing {
+export function makeAddressRecipientDescription( { address, }: AddressRecipientFactoryProps ): AddressRecipientDescribing {
   return {
     id: address,
     kind: RecipientKind.ADDRESS,
     displayedName: '@',
     avatarImageSource: null,
-    donationID,
   }
 }
 
