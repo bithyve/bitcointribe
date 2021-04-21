@@ -67,6 +67,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import semver from 'semver'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -245,7 +246,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const trustedData = trustedContactsInfo[ contactName ]
 
     if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
-      if( trustedData.trustedChannel.data[ 1 ] && trustedData.trustedChannel.data[ 1 ].data.version < '1.6.0' ) {
+      if( trustedData.trustedChannel.data[ 1 ] && semver.lt( trustedData.trustedChannel.data[ 1 ].data.version, '1.6.0' ) ) {
         setTimeout( () => {
           setErrorMessageHeader( 'Error sending Recovery Key' )
           setErrorMessage(
