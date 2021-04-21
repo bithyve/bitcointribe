@@ -14,7 +14,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, resetSendStage1, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
+import { executeAlternateSendStage2, executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
 import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
 import TransactionPriority from '../../../common/data/enums/TransactionPriority'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
@@ -29,7 +29,6 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
-import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 export type NavigationParams = {
 };
@@ -55,7 +54,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const usingExitKey = useExitKeyForSending()
   const sendingState = useSendingState()
-  const donationId = useDonationIdFromSelectedRecipients()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
@@ -171,17 +169,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
         dispatch( sendTxNotification() )
-
-        //dispatch donation note action during donation tx
-        const { donationNote } = sendingState.donationDetails
-        if( donationId &&  donationNote ){
-          dispatch( sendDonationNote( {
-            txid,
-            donationId: donationId,
-            donationNote: donationNote,
-          } ) )
-        }
-
         showSendSuccessBottomSheet()
       } else {
         navigation.navigate( 'OTPAuthentication' )

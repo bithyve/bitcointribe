@@ -389,18 +389,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
 
             case ScannedAddressKind.PAYMENT_URI:
-              let address, options, donationId
+              let address, options
 
               try {
                 const res = service.decodePaymentURI( qrData )
                 address = res.address
                 options = res.options
 
-                // checking for donationId to send note
-                if ( options && options.message ) {
-                  const rawMessage = options.message
-                  donationId = rawMessage.split( ':' ).pop().trim()
-                }
               } catch ( err ) {
                 Alert.alert( 'Unable to decode payment URI' )
                 return
@@ -420,7 +415,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 bitcoinAmount: options.amount
                   ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
                   : '',
-                donationId,
               } )
               break
         }

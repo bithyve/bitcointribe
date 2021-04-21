@@ -724,24 +724,3 @@ export const sendTxNotificationWatcher = createWatcher(
   sendTxNotificationWorker,
   SEND_TX_NOTIFICATION,
 )
-
-
-function* sendDonationNoteWorker( { payload }: {payload: {
-  txid: string
-  donationId: string
-  donationNote: string
-}} ) {
-  const sendingState: SendingState = yield select( ( state ) => state.sending )
-  if ( sendingState.sourceAccountShell.primarySubAccount.kind == SubAccountKind.DONATION_ACCOUNT ) {
-    const txNote = {
-      txId: payload.txid,
-      note: payload.donationNote
-    }
-    RelayServices.sendDonationNote( payload.donationId, txNote )
-  }
-}
-
-export const sendDonationNoteWatcher = createWatcher(
-  sendDonationNoteWorker,
-  SEND_DONATION_NOTE,
-)

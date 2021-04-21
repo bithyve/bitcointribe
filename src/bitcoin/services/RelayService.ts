@@ -171,39 +171,6 @@ export default class RelayServices {
     }
   };
 
-  public static sendDonationNote = async (
-    donationId: string,
-    txNote: { txId: string; note: string }
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          added: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await Relay.sendDonationNote( donationId, txNote ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to deliver donation note',
-      }
-    }
-  };
-
   public static fetchFeeAndExchangeRates = async () => {
     try {
       return {
@@ -239,14 +206,14 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendKeeperNotifications(receivers, notification),
-      };
-    } catch (err) {
+        data: await Relay.sendKeeperNotifications( receivers, notification ),
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to deliver notifications',
-      };
+      }
     }
   };
 }

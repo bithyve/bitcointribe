@@ -54,12 +54,6 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         const res = service.decodePaymentURI( dataString )
         const address = res.address
         const options = res.options
-        let donationId = null
-        // checking for donationId to send note
-        if ( options && options.message ) {
-          const rawMessage = options.message
-          donationId = rawMessage.split( ':' ).pop().trim()
-        }
 
         onSend( address, options.amount )
       }
