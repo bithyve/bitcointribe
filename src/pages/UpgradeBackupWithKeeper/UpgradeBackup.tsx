@@ -425,9 +425,9 @@ class UpgradeBackup extends Component<
       this.nextToProcess( availableKeeperData, levelToSetup, selectedContact )
       this.updateListData( availableKeeperData )
     }
-
-    if( upgradeProcessStatus == KeeperProcessStatus.COMPLETED ){
-      initNewBHRFlow( true )
+    console.log( 'this.props.upgradeProcessStatus', this.props.upgradeProcessStatus )
+    if( this.props.upgradeProcessStatus == KeeperProcessStatus.COMPLETED ){
+      this.props.initNewBHRFlow( true )
       this.props.navigation.replace( 'ManageBackupNewBHR' )
     }
 
@@ -438,6 +438,7 @@ class UpgradeBackup extends Component<
         generateSMMetaShares()
       }
     }
+    console.log( 'this.props.availableKeeperData.length', this.props.availableKeeperData.length )
 
     if( ( availableKeeperData.length > 0 && availableKeeperData.findIndex( value => !value.status ) == -1 ) ) {
       setUpgradeProcessStatus( KeeperProcessStatus.COMPLETED )
@@ -700,11 +701,7 @@ class UpgradeBackup extends Component<
 
   renderSecondaryDeviceHeader = () => {
     return (
-      <ModalHeader
-        onPressHeader={() => {
-          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
-        }}
-      />
+      <ModalHeader/>
     )
   }
 
@@ -733,11 +730,7 @@ class UpgradeBackup extends Component<
 
   renderPersonalCopyShareModalHeader = () => {
     return (
-      <ModalHeader
-        onPressHeader={() => {
-          this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
-        }}
-      />
+      <ModalHeader/>
     )
   }
 
@@ -860,11 +853,7 @@ class UpgradeBackup extends Component<
 
   renderStoragePermissionModalHeader = () => {
     return (
-      <ModalHeader
-        onPressHeader={() => {
-          this.storagePermissionBottomSheet.current.snapTo( 0 )
-        }}
-      />
+      <ModalHeader/>
     )
   }
 
@@ -1060,6 +1049,7 @@ class UpgradeBackup extends Component<
           }
         />
         <BottomSheet
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.RestoreFromICloud}
           snapPoints={[
@@ -1094,14 +1084,12 @@ class UpgradeBackup extends Component<
           }}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() =>
-                this.RestoreFromICloud.current.snapTo( 0 )
-              }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.SecurityQuestionBottomSheet}
           snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
           renderContent={() => (
@@ -1125,15 +1113,13 @@ class UpgradeBackup extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => {
-                this.SecurityQuestionBottomSheet.current.snapTo( 0 )
-              }}
             />
           )}
         />
 
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.UpgradingKeeperContact}
           snapPoints={[
             -50,
@@ -1159,14 +1145,12 @@ class UpgradeBackup extends Component<
             }}}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() =>
-                this.UpgradingKeeperContact.current.snapTo( 0 )
-              }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.UpgradePdfKeeper}
           snapPoints={[
             -50,
@@ -1195,9 +1179,6 @@ class UpgradeBackup extends Component<
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() =>
-                this.UpgradePdfKeeper.current.snapTo( 0 )
-              }
             />
           )}
         />
@@ -1212,6 +1193,7 @@ class UpgradeBackup extends Component<
             this.secondaryDeviceBottomSheet.current.snapTo( 0 )
           }}
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.secondaryDeviceBottomSheet}
           snapPoints={[ -30, hp( '85%' ) ]}
           renderContent={this.renderSecondaryDeviceContents}
@@ -1219,6 +1201,7 @@ class UpgradeBackup extends Component<
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.PersonalCopyShareBottomSheet}
           snapPoints={[ -50, hp( '85%' ) ]}
           renderContent={this.renderPersonalCopyShareModalContent}
@@ -1237,6 +1220,7 @@ class UpgradeBackup extends Component<
         />
         <BottomSheet
           enabledInnerScrolling={true}
+          enabledGestureInteraction={false}
           ref={this.storagePermissionBottomSheet}
           snapPoints={[
             -50,
