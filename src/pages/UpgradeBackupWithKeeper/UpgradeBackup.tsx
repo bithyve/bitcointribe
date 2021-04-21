@@ -99,6 +99,7 @@ interface UpgradeBackupStateTypes {
   contactToShow: any[];
   isGuardianCreationClicked: boolean;
   isRefreshing: boolean;
+  pdfProcessStarted: boolean;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -154,6 +155,7 @@ interface UpgradeBackupPropsTypes {
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
   updateTrustedContactsInfoLocally: any;
+  pdfInfo: { publicKey: string; privateKey: string; filePath: string;}
 }
 
 class UpgradeBackup extends Component<
@@ -302,7 +304,7 @@ class UpgradeBackup extends Component<
           this.setState( {
             selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ]
           } )
-          if( overallHealth.sharesInfo[ 0 ].updatedAt > 0 ){
+          if( overallHealth.sharesInfo[ 0 ].updatedAt > 0 ) {
             this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
           } else {
             this.secondaryDeviceBottomSheet.current.snapTo( 1 )
@@ -312,7 +314,7 @@ class UpgradeBackup extends Component<
           this.UpgradingKeeperContact.current.snapTo( 0 )
           return
         }
-        if( element.type == 'contact' && !element.status && ( overallHealth.sharesInfo[ 1 ].updatedAt > 0 || overallHealth.sharesInfo[ 2 ].updatedAt > 0 ) && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
+        if( element.type == 'contact' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
           if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 ) {
             if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
               this.setState( {
@@ -346,16 +348,33 @@ class UpgradeBackup extends Component<
           this.RestoreFromICloud.current.snapTo( 0 )
           this.secondaryDeviceBottomSheet.current.snapTo( 0 )
           this.UpgradingKeeperContact.current.snapTo( 1 )
+          this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
           return
         }
-        if( element.type == 'pdf' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] && ( overallHealth.sharesInfo[ 3 ].updatedAt > 0 || overallHealth.sharesInfo[ 4 ].updatedAt > 0 ) ) {
+        if( element.type == 'pdf' && !element.status ) {
           this.setState( {
-            selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
+            showLoader: true,
+            pdfProcessStarted: true
           } )
+          let shareId = []
+          if( selectedContact.length == 0 && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ) {
+            shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
+          } else if( selectedContact.length == 1 && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
+            shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+          } else if( selectedContact.length == 2 && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] ) {
+            shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
+          }
+          this.setState( {
+            selectedShareId: shareId
+          } )
+          console.log( 'checkStoragePermission shareId', shareId )
+          if( shareId.length ){
+            this.checkStoragePermission()
+          }
           this.RestoreFromICloud.current.snapTo( 0 )
           this.secondaryDeviceBottomSheet.current.snapTo( 0 )
           this.UpgradingKeeperContact.current.snapTo( 0 )
-          this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
+          // this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
           return
         }
       }
@@ -474,13 +493,19 @@ class UpgradeBackup extends Component<
         setCloudDataForLevel( levelToSetup )
       }
     }
+
+    if( this.props.pdfInfo.filePath !=='' && this.state.pdfProcessStarted && this.state.showLoader ){
+      this.setState( {
+        showLoader: false
+      } )
+      this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
+    }
   };
 
   cloudBackup = () => {
     this.setState( {
       showLoader: true
     } )
-
     const { levelToSetup } = this.props
     const { initializeHealthSetup, healthCheckInitializedKeeper } = this.props
     this.props.setUpgradeProcessStatus( KeeperProcessStatus.IN_PROGRESS )
@@ -626,6 +651,18 @@ class UpgradeBackup extends Component<
         }
         if( this.state.isGuardianCreationClicked ){
           this.updateShare()
+          console.log( 'secondaryQR', JSON.stringify( {
+            isGuardian: true,
+            requester: walletName,
+            publicKey,
+            info: secondaryKey,
+            uploadedAt:
+            trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
+              .initiatedAt,
+            type: 'secondaryDeviceGuardian',
+            ver: DeviceInfo.getVersion(),
+            isFromKeeper: true,
+          } ) )
           this.setState( {
             secondaryQR: JSON.stringify( {
               isGuardian: true,
@@ -717,6 +754,10 @@ class UpgradeBackup extends Component<
         onPressShare={() => {}}
         onPressConfirm={() => {
           try {
+            this.setState( {
+              pdfProcessStarted: false
+            } )
+            this.props.updateAvailableKeeperData( 'pdf' )
             this.props.keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
             this.props.confirmPDFShared( this.state.selectedShareId[ 0 ] )
             this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
@@ -831,7 +872,6 @@ class UpgradeBackup extends Component<
   }
 
   renderStoragePermissionModalContent = () => {
-    this.checkStoragePermission()
     return (
       <ErrorModalContents
         modalRef={this.storagePermissionBottomSheet}
@@ -1268,6 +1308,7 @@ const mapStateToProps = ( state ) => {
     availableKeeperData: idx( state, ( _ ) => _.upgradeToNewBhr.availableKeeperData ),
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
+    pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
   }
 }
 
