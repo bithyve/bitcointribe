@@ -232,11 +232,14 @@ class UpgradeBackup extends Component<
       errorMessageHeader: '',
       hasStoragePermission: false,
       isGuardianCreationClicked: false,
-      isRefreshing: false
+      isRefreshing: false,
+      pdfProcessStarted: false
     }
   }
 
   componentDidMount = () => {
+    console.log( 'this.levelHealth', this.props.levelHealth )
+    console.log( 'this.levelToSetup', this.props.levelToSetup )
     this.props.checkMSharesHealth()
     this.props.trustedChannelsSetupSync()
     const { trustedContactsInfo, overallHealth } = this.props
@@ -276,6 +279,8 @@ class UpgradeBackup extends Component<
       } )
     }
     let levelToSetup = TotalKeeper == 1 || TotalKeeper == 2 ? 1 : TotalKeeper == 3 || TotalKeeper <= 4 ? 2 : 3
+    console.log( 'TotalKeeper', TotalKeeper )
+    console.log( 'keepersInfo', keepersInfo )
     if( !this.props.levelToSetup ){
       this.props.updateLevelToSetup( levelToSetup )
     } else levelToSetup = this.props.levelToSetup
@@ -426,6 +431,8 @@ class UpgradeBackup extends Component<
     if( prevProps.levelHealth !=
       levelHealth &&
       levelHealth.length > 1 &&
+      levelHealth[ levelToSetup - 1 ] &&
+      levelHealth[ levelToSetup - 1 ].levelInfo[ 0 ] &&
       levelHealth[ levelToSetup - 1 ].levelInfo[ 0 ].status == 'notAccessible' &&
       isUpgradeLevelInitialized &&
       ( availableKeeperData.length > 0 && availableKeeperData.findIndex( value => value.type == 'cloud' && value.status  != true ) > -1 ) ) {
@@ -450,7 +457,7 @@ class UpgradeBackup extends Component<
       this.props.navigation.replace( 'ManageBackupNewBHR' )
     }
 
-    if( prevProps.currentLevel != currentLevel && levelToSetup == currentLevel && ( availableKeeperData.length > 0 && availableKeeperData.findIndex( value => !value.status ) > -1 ) ) {
+    if( prevProps.currentLevel != currentLevel && levelToSetup == currentLevel && levelHealth[ levelToSetup - 1 ].levelInfo[ 0 ].status == 'accessible' && ( availableKeeperData.length > 0 && availableKeeperData.findIndex( value => !value.status ) > -1 ) ) {
       updateLevelToSetup( currentLevel + 1 )
       generateMetaShare( currentLevel + 1 )
       if( !isSmMetaSharesCreatedFlag ){
@@ -607,7 +614,6 @@ class UpgradeBackup extends Component<
 
   updateTrustedContactsInfo = async ( contact ) => {
     const tcInfo = this.props.trustedContactsInfo
-
     if ( tcInfo.length ) {
       tcInfo[ 0 ] = contact
     } else {
@@ -753,6 +759,7 @@ class UpgradeBackup extends Component<
         }}
         onPressShare={() => {}}
         onPressConfirm={() => {
+          console.log( 'On confirm', this.state.selectedShareId[ 0 ] )
           try {
             this.setState( {
               pdfProcessStarted: false
