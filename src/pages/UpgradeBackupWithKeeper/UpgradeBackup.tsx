@@ -57,7 +57,7 @@ import {
   getPDFData,
   checkMSharesHealth,
 } from '../../store/actions/health'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -76,6 +76,8 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import SecondaryDevice from '../NewBHR/SecondaryDeviceNewBHR'
 import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import QRModal from '../Accounts/QRModal'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -100,6 +102,8 @@ interface UpgradeBackupStateTypes {
   isGuardianCreationClicked: boolean;
   isRefreshing: boolean;
   pdfProcessStarted: boolean;
+  QrBottomSheetsFlag: boolean;
+  secondaryMnemonics: string;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -155,7 +159,8 @@ interface UpgradeBackupPropsTypes {
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
   updateTrustedContactsInfoLocally: any;
-  pdfInfo: { publicKey: string; privateKey: string; filePath: string;}
+  pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
+  secureAccount: SecureAccount;
 }
 
 class UpgradeBackup extends Component<
@@ -170,6 +175,8 @@ class UpgradeBackup extends Component<
   PersonalCopyShareBottomSheet = createRef<BottomSheet>()
   ErrorBottomSheet = createRef<BottomSheet>()
   storagePermissionBottomSheet = createRef<BottomSheet>()
+  QrBottomSheet = createRef<BottomSheet>();
+
   constructor( props ) {
     super( props )
     this.RestoreFromICloud
@@ -180,7 +187,7 @@ class UpgradeBackup extends Component<
     this.PersonalCopyShareBottomSheet
     this.ErrorBottomSheet
     this.storagePermissionBottomSheet
-
+    this.QrBottomSheet
     this.state = {
       isCloudBackupProcessing: false,
       selectedIds: [],
@@ -233,7 +240,9 @@ class UpgradeBackup extends Component<
       hasStoragePermission: false,
       isGuardianCreationClicked: false,
       isRefreshing: false,
-      pdfProcessStarted: false
+      pdfProcessStarted: false,
+      QrBottomSheetsFlag: false,
+      secondaryMnemonics: ''
     }
   }
 
@@ -295,7 +304,7 @@ class UpgradeBackup extends Component<
   };
 
   nextToProcess = ( keepersInfo: {shareId: string; type: string; status?: boolean}[], levelToSetup: number, selectedContact: any[] ) => {
-    const { levelHealth, overallHealth } = this.props
+    const { levelHealth, overallHealth, secureAccount } = this.props
     if( levelHealth[ levelToSetup-1 ] ){
       for ( let i = 0; i < keepersInfo.length; i++ ) {
         const element = keepersInfo[ i ]
@@ -384,7 +393,10 @@ class UpgradeBackup extends Component<
         }
       }
     } else {
-      this.RestoreFromICloud.current.snapTo( 1 )
+      if( !secureAccount.secureHDWallet.secondaryMnemonic )
+        ( this.QrBottomSheet as any ).snapTo( 1 )
+      else
+        this.RestoreFromICloud.current.snapTo( 1 )
       return
     }
   }
@@ -501,7 +513,7 @@ class UpgradeBackup extends Component<
       }
     }
 
-    if( this.props.pdfInfo.filePath !=='' && this.state.pdfProcessStarted && this.state.showLoader ){
+    if( this.props.pdfInfo.filePath !=='' && this.state.pdfProcessStarted ){
       this.setState( {
         showLoader: false
       } )
@@ -523,7 +535,7 @@ class UpgradeBackup extends Component<
     } else {
       this.props.generateMetaShare( levelToSetup, true )
       if( !this.props.isSmMetaSharesCreatedFlag ){
-        this.props.generateSMMetaShares()
+        this.props.generateSMMetaShares( this.state.secondaryMnemonics )
       }
     }
   };
@@ -726,6 +738,61 @@ class UpgradeBackup extends Component<
       )
     }
   }
+
+  renderQrContent = () => {
+    return (
+      <QRModal
+        isFromKeeperDeviceHistory={false}
+        QRModalHeader={'QR scanner'}
+        title={'Note'}
+        infoText={
+          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+        }
+        modalRef={this.QrBottomSheet}
+        isOpenedFlag={this.state.QrBottomSheetsFlag}
+        onQrScan={async( qrScannedData ) => {
+          console.log( 'qrscannerd', qrScannedData )
+          this.setState( {
+            secondaryMnemonics: qrScannedData
+          } )
+          // this.props.generateSMMetaShares( qrScannedData )
+          this.setState( {
+            QrBottomSheetsFlag: false
+          } );
+          ( this.QrBottomSheet as any ).snapTo( 0 )
+        }}
+        onBackPress={() => {
+          this.setState( {
+            QrBottomSheetsFlag: false
+          } )
+          if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
+        }}
+        onPressContinue={async() => {
+          // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          // try {
+          //   if ( qrScannedData ) {
+          //     this.props.downloadSmShareForApproval( qrScannedData )
+          //     this.setState( {
+          //       QrBottomSheetsFlag: false
+          //     } )
+          //   }
+          // } catch ( err ) {
+          //   console.log( {
+          //     err
+          //   } )
+          // }
+        }}
+      />
+    )
+  }
+
+  renderQrHeader = () => {
+    return (
+      <ModalHeader
+      />
+    )
+  }
+
 
   renderSecondaryDeviceContents = () => {
     return (
@@ -1096,6 +1163,27 @@ class UpgradeBackup extends Component<
           }
         />
         <BottomSheet
+          onOpenEnd={() => {
+            this.setState( {
+              QrBottomSheetsFlag: true
+            } )
+          }}
+          onCloseEnd={() => {
+            this.setState( {
+              QrBottomSheetsFlag: false
+            } )
+          }}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={( c )=>this.QrBottomSheet=c}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '90%' ) : hp( '89%' ),
+          ]}
+          renderContent={this.renderQrContent}
+          renderHeader={this.renderQrHeader}
+        />
+        <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.RestoreFromICloud}
@@ -1316,6 +1404,7 @@ const mapStateToProps = ( state ) => {
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
     pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
+    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
   }
 }
 

@@ -3138,7 +3138,9 @@ export const uploadSecondaryShareForPKWatcher = createWatcher(
   UPLOAD_SM_SHARE_FOR_PK,
 )
 
-function* generateSMMetaSharesWorker() {
+function* generateSMMetaSharesWorker( { payload } ) {
+  const { SM } = payload
+  console.log( 'PAYLOAD SM', SM )
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const { walletName } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP
@@ -3151,7 +3153,7 @@ function* generateSMMetaSharesWorker() {
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
+  const secondaryMnemonic = SM && SM ? SM : secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
 
   const res = yield call(
     s3Service.generateSMShares,

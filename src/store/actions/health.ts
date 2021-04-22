@@ -662,9 +662,12 @@ export const uploadSecondaryShareForPK = ( tag, encryptedKey, otp? ) => {
   }
 }
 
-export const generateSMMetaShares = () => {
+export const generateSMMetaShares = ( SM? ) => {
   return {
-    type: GENERATE_SM_META_SHARE
+    type: GENERATE_SM_META_SHARE,
+    payload: {
+      SM
+    }
   }
 }
 
