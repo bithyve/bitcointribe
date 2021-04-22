@@ -6,6 +6,9 @@ import {
   DerivativeAccounts,
   TrustedContactDerivativeAccount,
   DonationDerivativeAccount,
+  SwanDerivativeAccount,
+  RampDerivativeAccount,
+  WyreDerivativeAccount,
 } from './utilities/Interface'
 import Config from 'react-native-config'
 import {
@@ -69,10 +72,10 @@ class HexaConfig {
   };
   public SSS_TOTAL: number = Config.BIT_SSS_TOTAL ? parseInt( Config.BIT_SSS_TOTAL.trim(), 10 ) : 5;
   public SSS_THRESHOLD: number = Config.BIT_SSS_THRESHOLD ? parseInt( Config.BIT_SSS_THRESHOLD.trim(), 10 ) : 3;
-  public SSS_LEVEL1_TOTAL: number = Config.BIT_SSS_LEVEL1_TOTAL ? parseInt(Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10) : 3;
-  public SSS_LEVEL1_THRESHOLD: number = Config.BIT_SSS_LEVEL1_THRESHOLD ? parseInt(Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10) : 2;
-  public SSS_LEVEL2_TOTAL: number = Config.BIT_SSS_LEVEL2_TOTAL ? parseInt(Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10) : 5;
-  public SSS_LEVEL2_THRESHOLD: number = Config.BIT_SSS_LEVEL2_THRESHOLD ? parseInt(Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10) : 3;
+  public SSS_LEVEL1_TOTAL: number = Config.BIT_SSS_LEVEL1_TOTAL ? parseInt( Config.BIT_SSS_LEVEL1_TOTAL.trim(), 10 ) : 3;
+  public SSS_LEVEL1_THRESHOLD: number = Config.BIT_SSS_LEVEL1_THRESHOLD ? parseInt( Config.BIT_SSS_LEVEL1_THRESHOLD.trim(), 10 ) : 2;
+  public SSS_LEVEL2_TOTAL: number = Config.BIT_SSS_LEVEL2_TOTAL ? parseInt( Config.BIT_SSS_LEVEL2_TOTAL.trim(), 10 ) : 5;
+  public SSS_LEVEL2_THRESHOLD: number = Config.BIT_SSS_LEVEL2_THRESHOLD ? parseInt( Config.BIT_SSS_LEVEL2_THRESHOLD.trim(), 10 ) : 3;
   public MSG_ID_LENGTH: number = Config.BIT_MSG_ID_LENGTH ? parseInt( Config.BIT_MSG_ID_LENGTH.trim(), 10 ) : 12;
   public CHUNK_SIZE: number = Config.BIT_CHUNK_SIZE ? parseInt( Config.BIT_CHUNK_SIZE.trim(), 10 ) : 3;
   public CHECKSUM_ITR: number = Config.BIT_CHECKSUM_ITR ? parseInt( Config.BIT_CHECKSUM_ITR.trim(), 10 ) : 2;
@@ -116,7 +119,7 @@ class HexaConfig {
   public NOTIFICATION_HOUR = Config.NOTIFICATION_HOUR ? parseInt( Config.NOTIFICATION_HOUR.trim(), 10 ) : 336
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
-  public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt(Config.KP_REQUEST_EXPIRY.trim(), 10) : 86400000;
+  public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt( Config.KP_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {
@@ -174,7 +177,7 @@ class HexaConfig {
     },
   };
 
-  public WYRE: DerivativeAccount = {
+  public WYRE: WyreDerivativeAccount = {
     series: Config.BIT_WYRE_SERIES ? parseInt( Config.BIT_WYRE_SERIES.trim(), 10 ) : 21,
     instance: {
       max: Config.BIT_WYRE_INSTANCE_COUNT ? parseInt( Config.BIT_WYRE_INSTANCE_COUNT.trim(), 10 ) : 5,
@@ -182,10 +185,18 @@ class HexaConfig {
     },
   };
 
-  public RAMP: DerivativeAccount = {
+  public RAMP: RampDerivativeAccount = {
     series: Config.BIT_RAMP_SERIES ? parseInt( Config.BIT_RAMP_SERIES.trim(), 10 ) : 31,
     instance: {
       max: Config.BIT_RAMP_INSTANCE_COUNT ? parseInt( Config.BIT_RAMP_INSTANCE_COUNT.trim(), 10 ) : 5,
+      using: 0,
+    },
+  };
+
+  public SWAN: SwanDerivativeAccount = {
+    series: Config.BIT_SWAN_SERIES ? parseInt( Config.BIT_SWAN_SERIES.trim(), 10 ) : 41,
+    instance: {
+      max: Config.BIT_SWAN_INSTANCE_COUNT ? parseInt( Config.BIT_SWAN_INSTANCE_COUNT.trim(), 10 ) : 5,
       using: 0,
     },
   };
@@ -213,6 +224,7 @@ class HexaConfig {
     FAST_BITCOINS: this.FAST_BITCOINS,
     WYRE: this.WYRE,
     RAMP: this.RAMP,
+    SWAN: this.SWAN,
     TRUSTED_CONTACTS: this.TRUSTED_CONTACTS,
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };

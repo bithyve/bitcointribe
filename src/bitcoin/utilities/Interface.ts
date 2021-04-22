@@ -190,7 +190,8 @@ export enum DerivativeAccountTypes {
   TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
   WYRE = 'WYRE',
-  RAMP = 'RAMP'
+  RAMP = 'RAMP',
+  SWAN = 'SWAN'
 }
 
 // Base Dervative Account
@@ -293,6 +294,21 @@ export interface RampDerivativeAccount {
     using: number;
   };
   [accounts: number]: RampDerivativeAccountElements;
+}
+
+export interface SwanDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface SwanDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: SwanDerivativeAccountElements;
 }
 
 export interface DerivativeAccounts {
