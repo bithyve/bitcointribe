@@ -33,6 +33,7 @@ import {
   WYRE,
   RAMP,
   FAST_BITCOINS,
+  SWAN,
 } from '../../../common/constants/wallet-service-types'
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -908,6 +909,8 @@ export default class HDSegwitWallet extends Bitcoin {
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
+        case RAMP:
+        case SWAN:
           const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
           accountNumber = derivativeAcc.instance.using + 1
@@ -947,26 +950,6 @@ export default class HDSegwitWallet extends Bitcoin {
             accountId = derivativeInstance.xpubId
             accountXpub = derivativeInstance.xpub
           }
-          break
-
-        case RAMP:
-          const RampDerivativeAcc: DerivativeAccount = this
-            .derivativeAccounts[ accountType ]
-          const RampInUse = RampDerivativeAcc.instance.using
-          accountNumber = RampInUse + 1
-          this.generateDerivativeXpub( accountType, accountNumber )
-          const RampDerivativeInstance: DerivativeAccountElements = this
-            .derivativeAccounts[ accountType ][ accountNumber ]
-          const RampUpdatedDervInstance = {
-            ...RampDerivativeInstance,
-            accountName: accountDetails.accountName,
-            accountDescription: accountDetails.accountDescription,
-          }
-          this.derivativeAccounts[ accountType ][
-            accountNumber
-          ] = RampUpdatedDervInstance
-          accountId = RampUpdatedDervInstance.xpubId
-          accountXpub = RampUpdatedDervInstance.xpub
           break
     }
 
