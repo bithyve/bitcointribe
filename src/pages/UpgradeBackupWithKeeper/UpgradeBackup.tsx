@@ -920,7 +920,7 @@ class UpgradeBackup extends Component<
             flex: 1, flexDirection: 'row'
           }}>
             <TouchableOpacity
-              onPress={() => navigation.goBack()}
+              onPress={() => navigation.replace( 'Home' )}
               style={styles.headerBackArrowView}
             >
               <FontAwesome
@@ -1124,7 +1124,7 @@ class UpgradeBackup extends Component<
                   this.cloudBackup()
                 }}
                 onPressBack={() => {
-                  this.RestoreFromICloud.current.snapTo( 0 )
+                  navigation.replace( 'Home' )
                 }}
               />
             )

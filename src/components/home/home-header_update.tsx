@@ -385,15 +385,15 @@ const HomeHeader = ( {
         <TouchableOpacity
           onPress={() => {
             console.log( 'newBHRFlowStarted', newBHRFlowStarted )
-            if( upgradeProcessStatus == KeeperProcessStatus.IN_PROGRESS ){
-              navigation.navigate( 'UpgradeBackup' )
+            // if( upgradeProcessStatus == KeeperProcessStatus.IN_PROGRESS ){
+            //   navigation.navigate( 'UpgradeBackup' )
+            // } else {
+            if ( newBHRFlowStarted === true ) {
+              navigation.navigate( 'ManageBackupNewBHR' )
             } else {
-              if ( newBHRFlowStarted === true ) {
-                navigation.navigate( 'ManageBackupNewBHR' )
-              } else {
-                navigation.navigate( 'ManageBackup' )
-              }
+              navigation.navigate( 'UpgradeBackup' )
             }
+            //}
           }}
           style={styles.manageBackupMessageView}
         >
