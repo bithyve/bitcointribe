@@ -247,8 +247,8 @@ class UpgradeBackup extends Component<
   }
 
   componentDidMount = () => {
-    console.log( 'this.levelHealth', this.props.levelHealth )
-    console.log( 'this.levelToSetup', this.props.levelToSetup )
+    // console.log( 'this.levelHealth', this.props.levelHealth )
+    // console.log( 'this.levelToSetup', this.props.levelToSetup )
     this.props.checkMSharesHealth()
     this.props.trustedChannelsSetupSync()
     const { trustedContactsInfo, overallHealth } = this.props
@@ -330,12 +330,7 @@ class UpgradeBackup extends Component<
         }
         if( element.type == 'contact' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] || levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
           if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 ) {
-            if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
-              this.setState( {
-                contactToShow: selectedContact,
-                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
-              } )
-            } else if( ( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status === 'notAccessible' && this.props.isUpgradeLevelInitialized ) || ( levelHealth[ levelToSetup-2 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-2 ].levelInfo[ 3 ].status === 'notAccessible' ) ) {
+            if( ( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status === 'notAccessible' && this.props.isUpgradeLevelInitialized ) || ( levelHealth[ levelToSetup-2 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-2 ].levelInfo[ 3 ].status === 'notAccessible' ) ) {
               this.setState( {
                 contactToShow: [ selectedContact[ 0 ] ],
                 selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
@@ -344,6 +339,12 @@ class UpgradeBackup extends Component<
               this.setState( {
                 contactToShow: [ selectedContact[ 1 ] ],
                 selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+              } )
+            }
+            else if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
+              this.setState( {
+                contactToShow: selectedContact,
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
               } )
             }
           }
@@ -381,7 +382,7 @@ class UpgradeBackup extends Component<
           this.setState( {
             selectedShareId: shareId
           } )
-          console.log( 'checkStoragePermission shareId', shareId )
+          // console.log( 'checkStoragePermission shareId', shareId )
           if( shareId.length ){
             this.checkStoragePermission()
           }
@@ -463,7 +464,7 @@ class UpgradeBackup extends Component<
       this.nextToProcess( availableKeeperData, levelToSetup, selectedContact )
       this.updateListData( availableKeeperData )
     }
-    console.log( 'this.props.upgradeProcessStatus', this.props.upgradeProcessStatus )
+    // console.log( 'this.props.upgradeProcessStatus', this.props.upgradeProcessStatus )
     if( this.props.upgradeProcessStatus == KeeperProcessStatus.COMPLETED ){
       this.props.initNewBHRFlow( true )
       this.props.navigation.replace( 'ManageBackupNewBHR' )
@@ -476,7 +477,10 @@ class UpgradeBackup extends Component<
         generateSMMetaShares()
       }
     }
-    console.log( 'this.props.availableKeeperData.length', this.props.availableKeeperData.length )
+    console.log( 'this.props.availableKeeperData', this.props.availableKeeperData )
+    console.log( 'currentLevel', this.props.currentLevel )
+    console.log( 'levelTosetup', this.props.levelToSetup )
+    console.log( 'levelHealth', this.props.levelHealth )
 
     if( ( availableKeeperData.length > 0 && availableKeeperData.findIndex( value => !value.status ) == -1 ) ) {
       setUpgradeProcessStatus( KeeperProcessStatus.COMPLETED )
@@ -826,7 +830,7 @@ class UpgradeBackup extends Component<
         }}
         onPressShare={() => {}}
         onPressConfirm={() => {
-          console.log( 'On confirm', this.state.selectedShareId[ 0 ] )
+          // console.log( 'On confirm', this.state.selectedShareId[ 0 ] )
           try {
             this.setState( {
               pdfProcessStarted: false

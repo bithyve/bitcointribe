@@ -59,7 +59,9 @@ function* initLevelsWorker( { payload } ) {
       yield put( checkMSharesHealth() )
       yield put( isUpgradeLevelInitializedStatus() )
       if ( level == 2 ) yield put( isLevel2InitializedStatus() )
-      if ( level == 3 ) yield put( isLevel2InitializedStatus() ); yield put( isLevel3InitializedStatus() )
+      if ( level == 3 ) {
+        yield put( isLevel2InitializedStatus() ); yield put( isLevel3InitializedStatus() )
+      }
     }
     yield put( switchUpgradeLoader( 'initLevels' ) )
   } catch ( error ) {
