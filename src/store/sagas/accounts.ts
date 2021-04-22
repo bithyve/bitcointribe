@@ -925,6 +925,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
                 } )
               }
               break
+
             case ServiceAccountKind.RAMP:
               const rampAccountDetails = {
                 accountName: subAccountInfo.customDisplayName,
@@ -957,6 +958,39 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
                 } )
               }
               break
+
+            case ServiceAccountKind.SWAN:
+              const swanAccountDetails = {
+                accountName: subAccountInfo.customDisplayName,
+                accountDescription: subAccountInfo.customDescription,
+              }
+              const swanSetupRes = yield call(
+                service.setupDerivativeAccount,
+                DerivativeAccountTypes.SWAN,
+                swanAccountDetails
+              )
+
+              if ( swanSetupRes.status === 200 ) {
+                const { SERVICES } = yield select( ( state ) => state.storage.database )
+                const updatedSERVICES = {
+                  ...SERVICES,
+                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
+                }
+                yield call( insertDBWorker, {
+                  payload: {
+                    SERVICES: updatedSERVICES
+                  }
+                } )
+
+                subAccountId = swanSetupRes.data.accountId
+                subAccountXpub = swanSetupRes.data.accountXpub
+                subAccountInstanceNum = swanSetupRes.data.accountNumber
+              } else {
+                console.log( {
+                  err: swanSetupRes.err
+                } )
+              }
+              break
         }
         break
   }
@@ -968,7 +1002,7 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
 }
 
 
-function* createServiceSubAccount ( secondarySubAccount: ExternalServiceSubAccountDescribing, parentShell: AccountShell ) {
+function* createServiceSecondarySubAccount ( secondarySubAccount: ExternalServiceSubAccountDescribing, parentShell: AccountShell ) {
   const service = yield select(
     ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
   )
@@ -1030,7 +1064,7 @@ function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccou
         break
 
       case SubAccountKind.SERVICE:
-        yield call( createServiceSubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
+        yield call( createServiceSecondarySubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
         break
   }
 }
