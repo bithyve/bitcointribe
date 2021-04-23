@@ -133,11 +133,6 @@ export default function Login( props ) {
 
   const dispatch = useDispatch()
 
-  // This will reset the sync status for all shells
-  useEffect( ()=>{
-    dispatch( clearAccountSyncCache() )
-  }, [] )
-
   const { isAuthenticated, authenticationFailed } = useSelector(
     ( state ) => state.setupAndAuth,
   )
@@ -219,6 +214,9 @@ export default function Login( props ) {
       }
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
+          // This will reset the sync status for all shells
+          dispatch( clearAccountSyncCache() )
+
           setTimeout( () => {
             if ( loaderBottomSheet.current ) {
               loaderBottomSheet.current.snapTo( 0 )
