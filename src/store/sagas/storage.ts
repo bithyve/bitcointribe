@@ -25,6 +25,7 @@ import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
 import { updateWalletImage } from '../actions/sss'
+import { clearAccountSyncCache } from '../actions/accounts'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -65,7 +66,14 @@ function* fetchDBWorker() {
       console.log( 'newBHRFlowStarted', newBHRFlowStarted )
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
+
+        // sync the wallet w/ Relay
         yield put( walletCheckIn() )
+
+        // reset the sync status for all account shells
+        yield put( clearAccountSyncCache() )
+
+        // update wallet image on Relay
         if( newBHRFlowStarted === true ){
           yield put( updateWalletImageHealth() )
         }else{
