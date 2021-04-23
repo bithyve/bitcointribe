@@ -132,7 +132,7 @@ function* autoShareSecondaryWorker( { payload } ) {
     const share: MetaShare = metaShares.find( value => value.shareId == shareId )
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const oldKeeperInfo  = trustedContactsInfo[ 'Secondary Device'.toLowerCase() ]
-    const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && semver.gte( oldKeeperInfo.trustedChannel.data[ 1 ].data.version, '1.5.0' ) ? 'accessible' : 'notAccessible'
+    const status = 'accessible'
     const data: TrustedDataElements = {
       metaShare: share,
       secondaryShare: secondaryMetaShares[ 1 ]
@@ -224,7 +224,6 @@ function* autoShareContactKeeperWorker( { payload } ) {
         }
       } ) )
     }
-    const availableKeeperData: {shareId: string; type: string; count: number; status?: boolean;}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
@@ -246,7 +245,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
       const shareId = shareIds[ i ]
       const share: MetaShare = metaShares.find( value => value.shareId == shareId )
       const oldKeeperInfo = trustedContactsInfo[ name.toLowerCase() ]
-      const status = oldKeeperInfo.trustedChannel && oldKeeperInfo.trustedChannel.data[ 1 ] && oldKeeperInfo.trustedChannel.data[ 1 ].data && semver.gte( oldKeeperInfo.trustedChannel.data[ 1 ].data.version, '1.5.0' ) ? 'accessible' : 'notAccessible'
+      const status = 'accessible'
       const data: TrustedDataElements = {
         metaShare: share,
         secondaryShare: secondaryMetaShares[ 1 ]
@@ -297,11 +296,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
           notification
         )
       }
-      const contactCount = availableKeeperData.find( value=>value.type == 'contact' ).count
-      for ( let i = 0; i < contactListToMarkDone.length; i++ ) {
-        const element = contactListToMarkDone[ i ]
-        yield put( updateAvailableKeeperData( 'contact', contactListToMarkDone[ i ] ) )
-      }
+      yield put( updateAvailableKeeperData( contactList[ i ] && contactList[ i ].type, name ) )
     }
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   } catch ( error ) {
@@ -318,11 +313,11 @@ export const autoShareContactKeeperWatcher = createWatcher(
 function* updateAvailableKeeperDataWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
-    const { type, name } = payload
+    const { type, name }: {type: string; name:string} = payload
     const availableKeeperData: {shareId: string; type: string; count: number; status?: boolean; contactDetails: any;}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
     for ( let i = 0; i < availableKeeperData.length; i++ ) {
       const element = availableKeeperData[ i ]
-      if( element.type == type && type == 'contact' ) {
+      if( element.type == type && ( type == 'contact1' || type == 'contact2' ) ) {
         const contactDetails = element.contactDetails
         const Name = contactDetails && contactDetails.firstName && contactDetails.lastName
           ? contactDetails.firstName + ' ' + contactDetails.lastName
@@ -333,7 +328,7 @@ function* updateAvailableKeeperDataWorker( { payload } ) {
               : ''
         if( Name == name ) availableKeeperData[ i ].status = true
       }
-      else if( element.type == type && type != 'contact' ) {
+      else if( element.type == type && ( type != 'contact1' && type != 'contact2' ) ) {
         availableKeeperData[ i ].status = true
       }
     }
