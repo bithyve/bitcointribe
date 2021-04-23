@@ -124,6 +124,7 @@ const initialState: {
     filePath: string;
     publicKey: string;
     privateKey: string;
+    updatedAt: number;
   },
   isSmMetaSharesCreatedFlag: boolean;
   hasSMUploadedSuccessfully: Boolean;
@@ -191,7 +192,8 @@ const initialState: {
   pdfInfo: {
     filePath: '',
     publicKey: '',
-    privateKey: ''
+    privateKey: '',
+    updatedAt: 0
   },
   isSmMetaSharesCreatedFlag: false,
   hasSMUploadedSuccessfully: false,

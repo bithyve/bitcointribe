@@ -2600,6 +2600,7 @@ function* getPDFDataWorker( { payload } ) {
       }
       let publicKey = pdfInfo.publicKey
       let privateKey = pdfInfo.privateKey
+      let pdfPath = pdfInfo.filePath
       if ( pdfInfo.publicKey === '' && pdfInfo.privateKey === '' ) {
         console.log( 'INSIDE IF' )
         const keyPair = ec.genKeyPair()
@@ -2636,53 +2637,51 @@ function* getPDFDataWorker( { payload } ) {
         secondaryData.encryptedMetaShare,
         secondaryData.messageId
       )
-      if ( res1.success && res2.success ) {
-        const qrData = [
-          JSON.stringify( {
-            type: 'pdf',
-            encryptedData: LevelHealth.encryptWithAnswer(
-              primaryShareObject,
-              WALLET_SETUP.security.answer
-            ).encryptedString,
-          } ),
-          JSON.stringify( {
-            type: 'pdf',
-            encryptedData: LevelHealth.encryptWithAnswer(
-              secondaryShareObject,
-              WALLET_SETUP.security.answer
-            ).encryptedString,
-          } ),
-        ]
-        const pdfData = {
-          qrData: qrData,
-        }
-        const pdfPath = yield call(
-          generatePDFKeeper,
-          pdfData,
-          `Hexa_Recovery_Key_${WALLET_SETUP.walletName}.pdf`,
-          `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
-        )
-        console.log( 'pdfPath', pdfPath )
-        yield put( setPDFInfo( {
-          filePath: pdfPath, publicKey, privateKey
-        } ) )
-        yield put( onApprovalStatusChange( {
-          status: false,
-          initiatedAt: 0,
-          shareId: '',
-        } ) )
+      const qrData = [
+        JSON.stringify( {
+          type: 'pdf',
+          encryptedData: LevelHealth.encryptWithAnswer(
+            primaryShareObject,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+        } ),
+        JSON.stringify( {
+          type: 'pdf',
+          encryptedData: LevelHealth.encryptWithAnswer(
+            secondaryShareObject,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+        } ),
+      ]
+      const pdfData = {
+        qrData: qrData,
       }
-      const updatedSERVICES = {
-        ...SERVICES,
-        S3_SERVICE: JSON.stringify( s3Service ),
-      }
-
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
+      pdfPath = yield call(
+        generatePDFKeeper,
+        pdfData,
+        `Hexa_Recovery_Key_${WALLET_SETUP.walletName}.pdf`,
+        `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
+      )
+      yield put( setPDFInfo( {
+        filePath: pdfPath, publicKey, privateKey, updatedAt: moment( new Date() ).valueOf()
+      } ) )
+      yield put( onApprovalStatusChange( {
+        status: false,
+        initiatedAt: 0,
+        shareId: '',
+      } ) )
     }
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify( s3Service ),
+    }
+
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+
     yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {

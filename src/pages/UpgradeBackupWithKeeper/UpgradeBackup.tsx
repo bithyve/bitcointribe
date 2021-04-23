@@ -346,7 +346,7 @@ class UpgradeBackup extends Component<
           return
         }
         // CONTACT
-        if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 && this.props.isUpgradeLevelInitialized && ( ( element.type == 'contact2' && !element.status ) && ( keepersInfo[ i - 1 ].type == 'contact1' && !keepersInfo[ i - 1 ].status ) ) ) {
+        if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 && this.props.isUpgradeLevelInitialized && ( ( element.type == 'contact1' && !element.status ) && ( keepersInfo[ i + 1 ].type == 'contact2' && !keepersInfo[ i + 1 ].status ) ) ) {
           console.log( 'CONTACT1' )
           if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
             this.setState( {
@@ -433,6 +433,12 @@ class UpgradeBackup extends Component<
       for ( let i = 0; i < listData.length; i++ ) {
         const element = listData[ i ]
         if( availableKeeperData.findIndex( value=>value.type == 'cloud' && value.status === true ) > -1 &&listData[ i ].type == 'cloud' ){
+          listData[ i ].status = 'accessible'
+        }
+        else if( availableKeeperData.findIndex( value=> value.type == 'contact2' ) > -1 && availableKeeperData.findIndex( value=> value.type == 'contact2' && value.status === true ) > -1 && listData[ i ].type == 'contact' ){
+          listData[ i ].status = 'accessible'
+        }
+        else if( availableKeeperData.findIndex( value=> value.type == 'contact1' ) > -1 && availableKeeperData.findIndex( value=> value.type == 'contact1' && value.status === true ) > -1 && listData[ i ].type == 'contact' ){
           listData[ i ].status = 'accessible'
         }
         else if( availableKeeperData.findIndex( value=>value.type == element.type && value.status === true ) > -1 ){
@@ -546,7 +552,7 @@ class UpgradeBackup extends Component<
       }
     }
 
-    if( this.props.pdfInfo.filePath !=='' && this.state.pdfProcessStarted ){
+    if( JSON.stringify( prevProps.pdfInfo ) != JSON.stringify( this.props.pdfInfo ) && this.props.pdfInfo.filePath !=='' && this.state.pdfProcessStarted && availableKeeperData.findIndex( value=> value.type == 'pdf' && !value.status ) > -1 ){
       this.setState( {
         showLoader: false
       } )
@@ -784,14 +790,15 @@ class UpgradeBackup extends Component<
         modalRef={this.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
+          console.log( 'qrScannedData', qrScannedData )
           this.setState( {
-            secondaryMnemonics: qrScannedData
-          } )
-          // this.props.generateSMMetaShares( qrScannedData )
-          this.setState( {
+            secondaryMnemonics: qrScannedData,
             QrBottomSheetsFlag: false
-          } );
-          ( this.QrBottomSheet as any ).snapTo( 0 )
+          } )
+          setTimeout( () => {
+            ( this.QrBottomSheet as any ).snapTo( 0 )
+            this.RestoreFromICloud.current.snapTo( 1 )
+          }, 2 )
         }}
         onBackPress={() => {
           this.setState( {
