@@ -360,7 +360,7 @@ class UpgradeBackup extends Component<
           this.UpgradingKeeperContact.current.snapTo( 1 )
           this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
           return
-        } else if( selectedContact.length && this.props.isUpgradeLevelInitialized && ( element.type == 'contact1' || element.type == 'contact2' ) ) {
+        } else if( selectedContact.length && ( element.type == 'contact1' || element.type == 'contact2' ) ) {
           console.log( 'CONTACT@' )
           if( element.type == 'contact1' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ){
             this.setState( {
