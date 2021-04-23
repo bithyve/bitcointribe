@@ -28,7 +28,6 @@ import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import RelayServices from '../bitcoin/services/RelayService'
 import { initMigration } from '../store/actions/preferences'
-import { clearAccountSyncCache } from '../store/actions/accounts'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
 
@@ -214,9 +213,6 @@ export default function Login( props ) {
       }
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
-          // This will reset the sync status for all shells
-          dispatch( clearAccountSyncCache() )
-
           setTimeout( () => {
             if ( loaderBottomSheet.current ) {
               loaderBottomSheet.current.snapTo( 0 )
