@@ -1,3 +1,6 @@
+import AccountShell from '../../common/data/models/AccountShell'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+
 export const CLEAR_SWAN_CACHE = 'CLEAR_SWAN_CACHE'
 export const FETCH_SWAN_AUTHENTICATION_URL_STARTED = 'FETCH_SWAN_AUTHENTICATION_URL_STARTED'
 export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
@@ -26,6 +29,12 @@ export const ADD_SWAN_METADATA_FAILED = 'ADD_SWAN_METADATA_FAILED'
 export const ADD_SWAN_METADATA_SUCCEEDED = 'ADD_SWAN_METADATA_SUCCEEDED'
 export const ADD_SWAN_METADATA_COMPLETED = 'ADD_SWAN_METADATA_COMPLETED'
 
+export const CREATE_TEMP_SWAN_ACCOUNT_SHELL = 'CREATE_TEMP_SWAN_ACCOUNT_SHELL'
+export const TEMP_SWAN_ACCOUNT_SHELL_CREATED = 'TEMP_SWAN_ACCOUNT_SHELL_CREATED'
+
+export const CREATE_SWAN_ACCOUNT_SHELL = 'CREATE_SWAN_ACCOUNT_SHELL'
+export const SWAN_ACCOUNT_SHELL_CREATED = 'SWAN_ACCOUNT_SHELL_CREATED'
+
 
 export enum SwanActionKind {
   CLEAR_SWAN_CACHE,
@@ -36,6 +45,7 @@ export enum SwanActionKind {
   CREATE_WITHDRAWAL_WALLET_ON_SWAN,
   CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED,
   AUTHENTICATE,
+  CREATE_TEMP_SWAN_ACCOUNT_SHELL,
   CREATE_SWAN_ACCOUNT_SHELL,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
   SYNC_SWAN_ACCOUNT_DATA
@@ -119,6 +129,39 @@ export const createWithdrawalWalletOnSwanSucceeded = ( data ) => {
     }
   }
 }
+
+export const createTempSwanAccountShell = ( payload: SubAccountDescribing ) => {
+  return {
+    type: CREATE_TEMP_SWAN_ACCOUNT_SHELL,
+    payload,
+  }
+}
+
+export const tempSwanAccountShellCreated = ( swanAccountShell: AccountShell ) => {
+  return {
+    type: TEMP_SWAN_ACCOUNT_SHELL_CREATED,
+    payload: {
+      swanAccountShell
+    }
+  }
+}
+
+export const createSwanAccountShell = ( payload: SubAccountDescribing ) => {
+  return {
+    type: CREATE_SWAN_ACCOUNT_SHELL,
+    payload
+  }
+}
+
+export const swanAccountShellCreated = ( swanAccountShell: AccountShell ) => {
+  return {
+    type: SWAN_ACCOUNT_SHELL_CREATED,
+    payload : {
+      swanAccountShell
+    }
+  }
+}
+
 export const linkSwanWallet = ( data ) => {
   return {
     type: LINK_SWAN_WALLET,
