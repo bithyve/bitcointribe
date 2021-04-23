@@ -923,6 +923,34 @@ export default class S3Service {
     }
   };
 
+  public initLevels = async ( SecurityQuestionHealth, level ): Promise<
+    | {
+        status: number;
+        data: {
+          success: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.levelhealth.initLevels( SecurityQuestionHealth, level ),
+      }
+    } catch ( err ) {
+      return {
+        status: 513, err: err.message, message: ErrMap[ 513 ]
+      }
+    }
+  };
+
   public checkHealth = async (): Promise<
     | {
         status: number;
@@ -1679,12 +1707,8 @@ export default class S3Service {
       } => {
     try {
       const { shares } = this.levelhealth.generateSMShares( secondaryMnemonic )
-      console.log( 'secondaryMnemonic', secondaryMnemonic )
-      console.log( 'shares', shares )
       const { encryptedSecrets } = this.levelhealth.encryptSecrets( shares, answer, true )
-      console.log( 'shares', shares )
       const { metaShares } = this.levelhealth.createSMMetaSharesKeeper( secondaryMnemonic, tag, questionId, version, question )
-      console.log( 'metaShares', metaShares )
       return {
         status: config.STATUS.SUCCESS, data: {
           encryptedSecrets, metaShares

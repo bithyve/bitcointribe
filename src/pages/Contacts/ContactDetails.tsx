@@ -156,6 +156,7 @@ interface ContactDetailsStateTypes {
   trustedContactHistory: any;
   SMShareQR: string;
   qrModalTitle: string;
+  isSmSharePresent: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -173,6 +174,7 @@ class ContactDetails extends PureComponent<
   itemIndex: any;
   index: any;
   setIsSendDisabledListener: any;
+  ContactName: any;
 
   constructor( props ) {
     super( props )
@@ -228,13 +230,19 @@ class ContactDetails extends PureComponent<
           // info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
         },
       ],
-      qrModalTitle: ''
+      qrModalTitle: '',
+      isSmSharePresent: false,
     }
 
     this.Contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
     this.itemIndex = this.props.navigation.state.params.index
     this.index = this.props.navigation.state.params.shareIndex
+    this.ContactName = `${this.Contact.firstName} ${
+      this.Contact.lastName ? this.Contact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
   }
 
   componentDidMount() {
@@ -285,6 +293,12 @@ class ContactDetails extends PureComponent<
       } );
       ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       this.props.ErrorSending( null )
+    }
+
+    if( this.contactsType == 'I\'m Keeper of' && this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ] && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ].SECONDARY_SHARE && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ].SECONDARY_SHARE.shareId ){
+      this.setState( {
+        isSmSharePresent: true
+      } )
     }
     this.updateContactDetailsUI()
   }
@@ -1292,7 +1306,7 @@ class ContactDetails extends PureComponent<
                   )}
                 </View>
               </TouchableOpacity>
-              { newBHRFlowStarted ? (
+              { this.state.isSmSharePresent ? (
                 <TouchableOpacity
                   style={{
                     ...styles.bottomButton,
@@ -1307,10 +1321,11 @@ class ContactDetails extends PureComponent<
                     {uploadingSmShare ? (
                       <ActivityIndicator size="small" />
                     ) : (
-                      <Text style={styles.buttonText}>Help SM Key</Text>
+                      <Text style={styles.buttonText}>Show Secondary Key</Text>
                     )}
                   </View>
-                </TouchableOpacity> ) : null}
+                </TouchableOpacity>
+              ) : null}
               {encryptedExitKey ? (
                 <TouchableOpacity
                   style={{

@@ -262,7 +262,17 @@ const SecondaryDeviceHistory = ( props ) => {
       const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
         contactName
       ]
-
+      console.log( 'OBHR Secondary Qr',  JSON.stringify( {
+        isGuardian: true,
+        requester: WALLET_SETUP.walletName,
+        publicKey,
+        info: secondaryKey,
+        uploadedAt:
+    trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
+      .initiatedAt,
+        type: 'secondaryDeviceGuardian',
+        ver: DeviceInfo.getVersion(),
+      } ) )
       setSecondaryQR(
         JSON.stringify( {
           isGuardian: true,

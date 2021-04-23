@@ -220,10 +220,10 @@ export const updateMSharesLoader = ( beingLoaded ) => {
   }
 }
 
-export const generateMetaShare = ( level ) => {
+export const generateMetaShare = ( level, isUpgrade? ) => {
   return {
     type: GENERATE_META_SHARE, payload: {
-      level
+      level, isUpgrade
     }
   }
 }
@@ -662,9 +662,12 @@ export const uploadSecondaryShareForPK = ( tag, encryptedKey, otp? ) => {
   }
 }
 
-export const generateSMMetaShares = () => {
+export const generateSMMetaShares = ( SM? ) => {
   return {
-    type: GENERATE_SM_META_SHARE
+    type: GENERATE_SM_META_SHARE,
+    payload: {
+      SM
+    }
   }
 }
 

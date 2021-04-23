@@ -161,6 +161,7 @@ interface ManageBackupNewBHRPropsTypes {
   keeperProcessStatus: any;
   setLevelToNotSetupStatus: any;
   isLevelToNotSetupStatus: boolean;
+  initLoading: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -462,7 +463,7 @@ class ManageBackupNewBHR extends Component<
       this.sendApprovalRequestToPK( )
     }
 
-    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
+    if( prevProps.initLoading !== this.props.initLoading && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
       this.goToHistory( {
         id: 2,
         selectedKeeper: this.state.selectedKeeper,
@@ -987,12 +988,13 @@ class ManageBackupNewBHR extends Component<
           <View style={{
             justifyContent:'center',
             alignItems:'center',
-            marginLeft: 10,
-            marginRight: 10
+            width: wp( '85%' ),
+            marginLeft: 30,
+            marginRight: 30
           }}>
             <Text style={{
-              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, you can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, please complete Level 1' }</Text>
+              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, textAlign: 'center'
+            }}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
           </View>
           <View
             style={{
@@ -1645,6 +1647,8 @@ const mapStateToProps = ( state ) => {
     ),
     healthLoading: idx( state, ( _ ) => _.health.loading.checkMSharesHealth ),
     keeperSetupStatus: idx( state, ( _ ) => _.health.loading.keeperSetupStatus ),
+    initLoading: idx( state, ( _ ) => _.health.loading.initLoader ),
+
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
     secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
