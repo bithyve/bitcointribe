@@ -9,7 +9,8 @@ import {
   LINK_SWAN_WALLET_FAILED,
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
-  LINK_SWAN_WALLET
+  LINK_SWAN_WALLET,
+  TEMP_SWAN_ACCOUNT_SHELL_CREATED
 } from '../actions/SwanIntegration'
 
 
@@ -89,13 +90,14 @@ const INITIAL_STATE: SwanIntegrationState = {
   hasSwanAccountCreationCompleted: false,
   hasSwanAccountCreationInitiated: false,
 
+  swanAccountShell: null,
+
   hasCreateWithdrawalWalletOnSwanSucceeded: false,
   hasCreateWithdrawalWalletOnSwanCompleted: false,
   hasCreateWithdrawalWalletOnSwanInitiated: false,
   swanAuthenticatedToken: null,
   isSwanRedeemCodeInProgress: false,
   swanToken: null,
-
 
   swanTokenDetails: null,
   swanWalletDetails: null,
@@ -120,15 +122,18 @@ const INITIAL_STATE: SwanIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
+
       case CLEAR_SWAN_CACHE:
         return {
           ...INITIAL_STATE
         }
+
       case FETCH_SWAN_AUTHENTICATION_URL_STARTED:
         return {
           ...state,
           hasFetchSwanAuthenticationUrlInitiated: true
         }
+
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
           ...state,
@@ -146,11 +151,13 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasRedeemSwanCodeForTokenCompleted: false,
           hasRedeemSwanCodeForTokenInitiated: false,
         }
+
       case REDEEM_SWAN_CODE_FOR_TOKEN_STARTED:
         return {
           ...state,
           hasRedeemSwanCodeForTokenInitiated: true,
         }
+
       case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
         console.log( 'REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED ', action.payload )
         return {
@@ -162,11 +169,13 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasCreateWithdrawalWalletOnSwanCompleted: false,
           hasCreateWithdrawalWalletOnSwanInitiated: false,
         }
+
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
         return {
           ...state,
           hasCreateWithdrawalWalletOnSwanInitiated: true,
         }
+
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED:
         console.log( 'CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED ', action.payload )
         return {
@@ -175,6 +184,13 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           hasCreateWithdrawalWalletOnSwanCompleted: true,
           swanWalletId: action.payload.data.swanWalletId
         }
+
+      case TEMP_SWAN_ACCOUNT_SHELL_CREATED:
+        return {
+          ...state,
+          swanAccountShell: action.payload.swanAccountShell
+        }
+
       case LINK_SWAN_WALLET:
         return {
           ...state,

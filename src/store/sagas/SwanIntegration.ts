@@ -13,7 +13,9 @@ import {
 
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
-  linkSwanWalletFailed
+  linkSwanWalletFailed,
+  tempSwanAccountShellCreated,
+  CREATE_TEMP_SWAN_ACCOUNT_SHELL
 } from '../actions/SwanIntegration'
 
 import {
@@ -25,6 +27,13 @@ import { createWatcher } from '../utils/utilities'
 
 import { generatePKCEParameters } from '../lib/swan'
 import Config from '../../bitcoin/HexaConfig'
+import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { AccountsState } from '../reducers/accounts'
+import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
+import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import AccountShell from '../../common/data/models/AccountShell'
+import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
+import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
 const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
@@ -97,12 +106,12 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     ( state ) => state.swanIntegration
   )
   const res = {
-    'entity': 'wallet', 
+    'entity': 'wallet',
     'item': {
-      'btcAddress': 'tb1qdx0pd4h65d7mekkhk7n6jwzfwgqath7s9l2fum', 
-      'displayName': 'Stacking Sats (Hexa)', 
-      'id': 'd313d589-32bf-4635-923a-a5585a15a0d1', 
-      'isConfirmed': true, 
+      'btcAddress': 'tb1qdx0pd4h65d7mekkhk7n6jwzfwgqath7s9l2fum',
+      'displayName': 'Stacking Sats (Hexa)',
+      'id': 'd313d589-32bf-4635-923a-a5585a15a0d1',
+      'isConfirmed': true,
       'metadata': {
         'arbitraryMetadata': [ Object ], 'oidc': [ Object ]
       }, 'walletAddressId': '7669a64f-5014-46ca-b809-85b606a86e58'
@@ -123,6 +132,51 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   } ) )
 }
 
+
+function* addTempSwanAccountShell( { payload: subAccountInfo, }: {
+  payload: SubAccountDescribing;
+} ) {
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const network = accountsState[ REGULAR_ACCOUNT ].service.hdWallet.network
+
+  const bitcoinUnit = BitcoinUnit.SATS
+
+  try {
+    const swanAccountDetails = {
+      accountName: subAccountInfo.customDisplayName,
+      accountDescription: subAccountInfo.customDescription,
+    }
+    const service = yield select(
+      ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
+    )
+    const res = yield call(
+      service.setupDerivativeAccount,
+      DerivativeAccountTypes.SWAN,
+      swanAccountDetails
+    )
+
+    const subAccountId = res.data.accountId
+    const subAccountXpub = res.data.accountXpub
+    const subAccountInstanceNum = res.data.accountNumber
+
+    subAccountInfo.id = subAccountId
+    subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
+    subAccountInfo.instanceNumber = subAccountInstanceNum
+
+    const swanAccountShell = new AccountShell( {
+      unit: bitcoinUnit,
+      primarySubAccount: subAccountInfo,
+      displayOrder: 1,
+    } )
+
+    yield put( tempSwanAccountShellCreated( swanAccountShell ) )
+
+  } catch ( error ) {
+    console.log( 'addNewAccountShell saga::error: ' + error )
+  }
+}
+
+export const addTempSwanAccountShellWatcher = createWatcher( addTempSwanAccountShell, CREATE_TEMP_SWAN_ACCOUNT_SHELL )
 
 function* linkSwanWalletWorker( { payload } ) {
   /*

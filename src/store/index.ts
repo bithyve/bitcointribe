@@ -127,7 +127,8 @@ import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, s
 import {
   fetchSwanAuthenticationUrlWatcher,
   redeemSwanCodeForTokenWatcher,
-  createWithdrawalWalletOnSwanWatcher
+  createWithdrawalWalletOnSwanWatcher,
+  addTempSwanAccountShellWatcher
 } from './sagas/SwanIntegration'
 
 import {
@@ -340,6 +341,7 @@ const rootSaga = function* () {
     fetchSwanAuthenticationUrlWatcher,
     redeemSwanCodeForTokenWatcher,
     createWithdrawalWalletOnSwanWatcher,
+    addTempSwanAccountShellWatcher,
 
     // Wyre Integration
     fetchWyreReservationWatcher,
