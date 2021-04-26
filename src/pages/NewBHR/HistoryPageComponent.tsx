@@ -28,11 +28,11 @@ const HistoryPageComponent = ( props ) => {
   return (
     <View style={{
       flex: 1
-    }}>
+    }} >
       {props.data && props.data.length ? (
         <View style={{
           flex: 1
-        }}>
+        }} >
           <ScrollView>
             {props.data.map( ( value, index ) => {
               return (
@@ -49,10 +49,11 @@ const HistoryPageComponent = ( props ) => {
                     style={
                       SelectedOption == value.id
                         ? {
-                          flexDirection: 'column'
+                          flexDirection: 'column',
                         }
                         : {
-                          flexDirection: 'row', alignItems: 'center'
+                          flexDirection: 'row',
+                          alignItems: 'center',
                         }
                     }
                   >
@@ -124,52 +125,92 @@ const HistoryPageComponent = ( props ) => {
           </View>
         </View>
       )}
-      <View style={styles.bottomButtonView}>
-        {props.confirmButtonText || props.IsReshare || !props.isVersionMismatch ?
+      <View>
+        {props.onConfirm ?
           <TouchableOpacity
-            onPress={() => {
-              props.IsReshare ? props.onPressReshare() : props.onPressConfirm()
-            }}
             style={{
-              ...styles.successModalButtonView,
-              backgroundColor: props.confirmDisable ? Colors.lightBlue : Colors.blue
+              marginLeft: wp( '8%' ),
+              marginBottom: -wp( '5%' ),
+              height: wp( '7%' ),
+              width: 'auto',
+              justifyContent:'center'
             }}
-            disabled={props.confirmDisable ? props.confirmDisable : false}
+            onPress={() => props.onConfirm()}
           >
             <Text
               style={{
-                ...styles.proceedButtonText,
-                color: Colors.white,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansRegular,
+                color: Colors.textColorGrey,
               }}
             >
-              {props.IsReshare
-                ? props.reshareButtonText
-                : props.confirmButtonText}
+            Click here To{' '}
+              <Text
+                style={{
+                  color: Colors.blue,
+                }}
+              >
+              confirm
+              </Text>{' '}
+            share
             </Text>
-          </TouchableOpacity>: null
-        }
-        {( !props.isVersionMismatch && props.IsReshare && props.isChangeKeeperAllow ) ?
-          <TouchableOpacity
-            disabled={props.disableChange ? props.disableChange : false}
-            onPress={() => props.onPressChange()}
-            style={{
-              marginLeft: 10,
-              height: wp( '13%' ),
-              width: wp( '40%' ),
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <Text
-              style={{
-                ...styles.proceedButtonText,
-                color: props.disableChange ? Colors.lightBlue : Colors.blue,
-              }}
-            >
-              {props.changeButtonText}
-            </Text>
-          </TouchableOpacity> : null
-        }
+          </TouchableOpacity>
+          : null}
+        <View style={styles.bottomButtonView}>
+          {props.confirmButtonText ||
+          props.IsReshare ||
+          !props.isVersionMismatch ? (
+              <TouchableOpacity
+                onPress={() => {
+                  props.IsReshare
+                    ? props.onPressReshare()
+                    : props.onPressConfirm()
+                }}
+                style={{
+                  ...styles.successModalButtonView,
+                  backgroundColor: props.confirmDisable
+                    ? Colors.lightBlue
+                    : Colors.blue,
+                }}
+                disabled={props.confirmDisable ? props.confirmDisable : false}
+              >
+                <Text
+                  style={{
+                    ...styles.proceedButtonText,
+                    color: Colors.white,
+                  }}
+                >
+                  {props.IsReshare
+                    ? props.reshareButtonText
+                    : props.confirmButtonText}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+          {!props.isVersionMismatch &&
+          props.IsReshare &&
+          props.isChangeKeeperAllow ? (
+              <TouchableOpacity
+                disabled={props.disableChange ? props.disableChange : false}
+                onPress={() => props.onPressChange()}
+                style={{
+                  marginLeft: 10,
+                  height: wp( '13%' ),
+                  width: wp( '40%' ),
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    ...styles.proceedButtonText,
+                    color: props.disableChange ? Colors.lightBlue : Colors.blue,
+                  }}
+                >
+                  {props.changeButtonText}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+        </View>
       </View>
     </View>
   )
@@ -188,7 +229,8 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15
+      width: 15,
+      height: 15,
     },
     backgroundColor: Colors.blue,
     alignSelf: 'center',

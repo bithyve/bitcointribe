@@ -620,11 +620,13 @@ export const sharePDF = (
 
 export const confirmPDFShared = (
   shareId: string,
+  scannedData: string
 ) => {
   return {
     type: CONFIRM_PDF_SHARED,
     payload: {
-      shareId
+      shareId,
+      scannedData
     },
   }
 }

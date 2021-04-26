@@ -5,40 +5,38 @@ import {
   ShareUploadables,
   TrustedData,
   TrustedDataElements,
-} from '../utilities/Interface';
-import config from '../HexaConfig';
-import Keeper from '../utilities/Keeper';
+} from '../utilities/Interface'
+import config from '../HexaConfig'
+import Keeper from '../utilities/Keeper'
 
 export default class KeeperService {
-  public static fromJSON = (json: string) => {
-    const { keeper } = JSON.parse(json);
-    const {
-      keepers,
-    }: {
+  public static fromJSON = ( json: string ) => {
+    const { keeper } = JSON.parse( json )
+    const { keepers, }: {
       keepers: Keeper;
-    } = keeper;
+    } = keeper
 
-    return new KeeperService({
+    return new KeeperService( {
       keepers,
-    });
+    } )
   };
 
   public keeper: Keeper;
-  constructor(stateVars?) {
-    this.keeper = new Keeper(stateVars);
+  constructor( stateVars? ) {
+    this.keeper = new Keeper( stateVars )
   }
 
   public static encryptPub = (
     publicKey: string,
     key: string,
-  ): { encryptedPub: string } => Keeper.encryptPub(publicKey, key);
+  ): { encryptedPub: string } => Keeper.encryptPub( publicKey, key );
 
   public static decryptPub = (
     encryptedPub: string,
     key: string,
   ): {
     decryptedPub: string;
-  } => Keeper.decryptPub(encryptedPub, key);
+  } => Keeper.decryptPub( encryptedPub, key );
 
   public initializeKeeper = (
     shareId: string,
@@ -62,14 +60,14 @@ export default class KeeperService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.keeper.initializeKeeper(shareId.trim(), encKey, otp),
-      };
-    } catch (err) {
+        data: this.keeper.initializeKeeper( shareId.trim(), encKey, otp ),
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to setup keeper',
-      };
+      }
     }
   };
 
@@ -116,14 +114,14 @@ export default class KeeperService {
           EfChannelAddress,
           trustedChannelAddress,
         ),
-      };
-    } catch (err) {
-      console.log("err",err);
+      }
+    } catch ( err ) {
+      console.log( 'err', err )
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to finalize keeper',
-      };
+      }
     }
   };
 
@@ -146,15 +144,15 @@ export default class KeeperService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.keeper.initKeeperFromOldKeeper(oldShareId, newShareId)
+        data: this.keeper.initKeeperFromOldKeeper( oldShareId, newShareId )
           .status,
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to finalize keeper',
-      };
+      }
     }
   };
 
@@ -207,13 +205,13 @@ export default class KeeperService {
           fetch,
           privateKey,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to update ephemeral channel',
-      };
+      }
     }
   };
 
@@ -253,13 +251,13 @@ export default class KeeperService {
           fetch,
           shareUploadables,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to update keeper',
-      };
+      }
     }
   };
 
@@ -285,14 +283,14 @@ export default class KeeperService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.keeper.fetchTrustedChannel(shareId.trim(), walletName),
-      };
-    } catch (err) {
+        data: await this.keeper.fetchTrustedChannel( shareId.trim(), walletName ),
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
-      };
+      }
     }
   };
 
@@ -324,13 +322,13 @@ export default class KeeperService {
           otp,
           encryptedDynamicNonPMDD,
         ),
-      };
-    } catch (err) {
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from Keeper',
-      };
+      }
     }
   };
 }
