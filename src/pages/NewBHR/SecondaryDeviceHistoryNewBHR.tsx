@@ -872,11 +872,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Reshare Keeper'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
-          changeButtonText={'Change Keeper'}
+          changeButtonText={'Change'}
           isChangeKeeperAllow={isChangeKeeperAllow}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {

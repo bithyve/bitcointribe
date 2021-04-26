@@ -1,43 +1,47 @@
-import React from "react";
-import { View, Text, StyleSheet, ActivityIndicator, Image } from "react-native";
-import Colors from "../../common/Colors";
-import Fonts from "../../common/Fonts";
-import { RFValue } from "react-native-responsive-fontsize";
+import React from 'react'
+import { View, Text, StyleSheet, ActivityIndicator, Image } from 'react-native'
+import Colors from '../../common/Colors'
+import Fonts from '../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from "react-native-responsive-screen";
-import { AppBottomSheetTouchableWrapper } from "../../components/AppBottomSheetTouchableWrapper";
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 
-export default function ContactListForRestore(props) {
-  let { contactList }: { contactList: any[] } = props;
+export default function ContactListForRestore( props ) {
+  const { contactList }: { contactList: any[] } = props
   return (
     <View style={styles.modalContentContainer}>
       <View style={styles.successModalHeaderView}>
         <Text style={styles.headerTitleText}>{props.title}</Text>
         <Text style={styles.headerInfoText}>{props.subText}</Text>
       </View>
-      {contactList.map((contact, index) => {
-        let data = contact.data;
-        console.log("data", data);
+      {contactList.map( ( contact, index ) => {
+        const data = contact.data
+        console.log( 'data', data )
         return (
           <AppBottomSheetTouchableWrapper
             activeOpacity={10}
-            onPress={() => props.onPressCard(contact, index)}
-            style={{ justifyContent: "center", alignItems: "center" }}
+            onPress={() => props.onPressCard( contact, index )}
+            style={{
+              justifyContent: 'center', alignItems: 'center'
+            }}
           >
             <View style={styles.greyBox}>
               <View style={styles.greyBoxImage}>
                 <Image
-                  source={require("../../assets/images/icons/icon_contact.png")}
+                  source={require( '../../assets/images/icons/icon_contact.png' )}
                   style={styles.cardImage}
                 />
               </View>
-              <View style={{ marginLeft: 10 }}>
+              <View style={{
+                marginLeft: 10
+              }}>
                 <Text
                   style={{
                     ...styles.greyBoxText,
-                    fontSize: RFValue(20),
+                    fontSize: RFValue( 20 ),
                   }}
                 >
                   {contact.name}
@@ -45,76 +49,74 @@ export default function ContactListForRestore(props) {
                 <Text
                   style={{
                     ...styles.greyBoxText,
-                    fontSize: RFValue(10),
+                    fontSize: RFValue( 10 ),
                   }}
                 >
                   {data && data.phoneNumbers && data.phoneNumbers.length
-                    ? data.phoneNumbers[0].number
+                    ? data.phoneNumbers[ 0 ].number
                     : data && data.emails && data.emails.length
-                    ? data.emails[0].email
-                    : ""}
+                      ? data.emails[ 0 ].email
+                      : ''}
                 </Text>
               </View>
             </View>
           </AppBottomSheetTouchableWrapper>
-        );
-      })}
-      <View style={styles.successModalAmountView}>
-        <Text style={styles.bottomInfoText}>{props.info}</Text>
-      </View>
+        )
+      } )}
+
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: "100%",
+    height: '100%',
     backgroundColor: Colors.white,
   },
   headerTitleText: {
     color: Colors.blue,
-    fontSize: RFValue(18),
+    fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
   },
   headerInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginTop: wp("1.5%"),
+    marginTop: wp( '1.5%' ),
   },
   bottomInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginBottom: hp("1%"),
-    marginTop: "auto",
+    marginBottom: hp( '1%' ),
+    marginTop: 'auto',
   },
   successModalHeaderView: {
-    marginRight: wp("8%"),
-    marginLeft: wp("8%"),
-    marginTop: wp("4%"),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '4%' ),
   },
   successModalAmountView: {
-    justifyContent: "center",
-    marginRight: wp("8%"),
-    marginLeft: wp("8%"),
-    marginTop: "auto",
+    justifyContent: 'center',
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: 'auto',
   },
   greyBox: {
-    width: wp("90%"),
+    width: wp( '90%' ),
     borderRadius: 10,
     backgroundColor: Colors.backgroundColor1,
     padding: 10,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   greyBoxImage: {
-    width: wp("15%"),
-    height: wp("15%"),
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "white",
-    borderRadius: wp("15%") / 2,
+    width: wp( '15%' ),
+    height: wp( '15%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: wp( '15%' ) / 2,
     borderColor: Colors.white,
     borderWidth: 1,
     shadowOffset: {
@@ -129,12 +131,12 @@ const styles = StyleSheet.create({
   greyBoxText: {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
   },
   cardImage: {
-    width: wp("7%"),
-    height: wp("7%"),
-    resizeMode: "contain",
-    marginBottom: wp("1%"),
+    width: wp( '7%' ),
+    height: wp( '7%' ),
+    resizeMode: 'contain',
+    marginBottom: wp( '1%' ),
   },
-});
+} )

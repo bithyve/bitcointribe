@@ -551,6 +551,15 @@ const PersonalCopyHistory = ( props ) => {
     }
   }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
 
+  const deviceText = ( text ) =>{
+    switch ( text ) {
+        case 'Keeper PDF': return 'PDF Backup'
+
+        default:
+          return text
+    }
+  }
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -563,10 +572,10 @@ const PersonalCopyHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={props.navigation.state.params.selectedTime}
         selectedStatus={props.navigation.state.params.selectedStatus}
-        moreInfo={props.navigation.state.params.selectedTitle}
+        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
       <View style={{
@@ -581,7 +590,7 @@ const PersonalCopyHistory = ( props ) => {
           onPressConfirm={() => {
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Restore Keeper'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             console.log(
               'onPressReshare PersonalCopyShareBottomSheet',
@@ -590,7 +599,7 @@ const PersonalCopyHistory = ( props ) => {
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}
           isChangeKeeperAllow={isChangeKeeperAllow}
-          changeButtonText={'Change Keeper'}
+          changeButtonText={'Change'}
           onPressChange={() => {
             ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
           }}

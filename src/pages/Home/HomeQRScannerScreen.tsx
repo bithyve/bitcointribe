@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import getFormattedStringFromQRString from '../../utils/qr-codes/GetFormattedStringFromQRData'
 import ListStyles from '../../common/Styles/ListStyles'
@@ -100,75 +100,75 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
   return (
     <View style={styles.rootContainer}>
-      <KeyboardAwareScrollView
-        resetScrollToCoords={{
-          x: 0, y: 0
-        }}
-        scrollEnabled={false}
-        style={styles.rootContainer}
-      >
-        <HeaderSection />
-
-        <CoveredQRCodeScanner
-          onCodeScanned={handleBarcodeRecognized}
-          containerStyle={{
-            marginBottom: 16
+      <ScrollView>
+        <KeyboardAwareScrollView
+          resetScrollToCoords={{
+            x: 0, y: 0
           }}
-        />
-
-        <View style={styles.viewSectionContainer}>
-          <RecipientAddressTextInputSection
-            containerStyle={{
-              margin: 0, padding: 0
-            }}
-            placeholder="Enter address manually"
-            sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
-            onAddressEntered={( address ) => {
-              onSend( address, 0 )
-            }}
-          />
-        </View>
-
-        <View
-          style={styles.floatingActionButtonContainer}
+          scrollEnabled={false}
+          style={styles.rootContainer}
         >
-          <Button
-            raised
-            title="Receive bitcoin"
-            icon={
-              <Image
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                style={{
-                  width: widthPercentageToDP( 4 ),
-                  height: widthPercentageToDP( 4 ),
-                  resizeMode: 'contain',
-                }}
-              />
-            }
-            buttonStyle={{
-              ...ButtonStyles.floatingActionButton,
-              borderRadius: 9999,
-              paddingHorizontal: widthPercentageToDP( 5 )
+          <HeaderSection />
+
+          <CoveredQRCodeScanner
+            onCodeScanned={handleBarcodeRecognized}
+            containerStyle={{
+              marginBottom: 16
             }}
-            titleStyle={{
-              ...ButtonStyles.floatingActionButtonText,
-              marginLeft: 8,
-            }}
-            onPress={() => { navigation.navigate( 'ReceiveQR' )}}
           />
-        </View>
-        <View style={{
-          marginTop: 'auto'
-        }}>
-          <BottomInfoBox
-            style
-            title="What can you scan?"
-            infoText="
-          Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request, or a restore request
-        "
-          />
-        </View>
-      </KeyboardAwareScrollView>
+
+          <View style={styles.viewSectionContainer}>
+            <RecipientAddressTextInputSection
+              containerStyle={{
+                margin: 0, padding: 0
+              }}
+              placeholder="Enter address manually"
+              sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
+              onAddressEntered={( address ) => {
+                onSend( address, 0 )
+              }}
+            />
+          </View>
+
+          <View
+            style={styles.floatingActionButtonContainer}
+          >
+            <Button
+              raised
+              title="Receive bitcoin"
+              icon={
+                <Image
+                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                  style={{
+                    width: widthPercentageToDP( 4 ),
+                    height: widthPercentageToDP( 4 ),
+                    resizeMode: 'contain',
+                  }}
+                />
+              }
+              buttonStyle={{
+                ...ButtonStyles.floatingActionButton,
+                borderRadius: 9999,
+                paddingHorizontal: widthPercentageToDP( 5 )
+              }}
+              titleStyle={{
+                ...ButtonStyles.floatingActionButtonText,
+                marginLeft: 8,
+              }}
+              onPress={() => { navigation.navigate( 'ReceiveQR' )}}
+            />
+          </View>
+          <View style={{
+            marginTop: 'auto'
+          }}>
+            <BottomInfoBox
+              style
+              title="What can you scan?"
+              infoText="Scan a bitcoin address, a Hexa Friends and Family request, a Hexa Keeper request, or a restore request"
+            />
+          </View>
+        </KeyboardAwareScrollView>
+      </ScrollView>
     </View>
   )
 }
