@@ -479,7 +479,12 @@ export default class HDSegwitWallet extends Bitcoin {
       if( blindRefresh ){
         if( !this.derivativeAccounts[ accountType ][ accountNumber ] ){
           // blind derv-account generation
-          this.generateDerivativeXpub( accountType, accountNumber, contactName );
+          this.generateDerivativeXpub( accountType, accountNumber )
+          if( accountType === TRUSTED_CONTACTS ){
+            ( this.derivativeAccounts[ accountType ][ accountNumber ] as TrustedContactDerivativeAccountElements ).contactName = contactName
+            this.trustedContactToDA[ contactName ] = accountNumber
+          }
+
           ( this.derivativeAccounts[ accountType ][ accountNumber ] as DerivativeAccountElements ).blindGeneration = true
         }
         await this.syncDerivativeAccGapLimit( accountType, accountNumber )
