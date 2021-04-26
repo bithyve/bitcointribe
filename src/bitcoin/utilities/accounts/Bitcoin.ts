@@ -191,7 +191,7 @@ export default class Bitcoin {
 
       let usedFallBack = false
       bitcoinAxios = axios.create( {
-        timeout: 4 * REQUEST_TIMEOUT // accounting for blind refresh
+        timeout: 7 * REQUEST_TIMEOUT // accounting for blind refresh
       } )
       try{
         if ( this.network === bitcoinJS.networks.testnet ) {
