@@ -251,6 +251,11 @@ class RestoreWithICloud extends Component<
     }
   };
 
+  componentWillUnmount = () =>{
+    console.log( 'Inside componentWillUnmount' )
+    this.props.clearCloudCache()
+  }
+
   updateList = () => {
     //console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state
@@ -640,7 +645,6 @@ class RestoreWithICloud extends Component<
       otp,
       isOtpType,
     } = this.state
-    console.log( 'listData', listData )
     const { navigation, database } = this.props
     let name
     if ( Platform.OS == 'ios' ) name = 'iCloud'
@@ -853,6 +857,7 @@ class RestoreWithICloud extends Component<
               // this.onCreatLink();
             }}
             style={styles.buttonInnerView}
+            disabled={contactList.length ? false : true}
           >
             <Image
               source={require( '../../assets/images/icons/openlink.png' )}
@@ -1039,12 +1044,9 @@ class RestoreWithICloud extends Component<
           renderContent={() => {
             return (
               <ContactListForRestore
-                title={'Select Contact to Create link'}
+                title={'Select Contact'}
                 subText={
-                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
-                }
-                info={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                  'Select contact to send a Wallet Restore request link'
                 }
                 contactList={contactList}
                 modalRef={this.refs.ContactListForRestore}

@@ -647,9 +647,9 @@ class ManageBackupNewBHR extends Component<
       !isLevel2Initialized
     ) {
       this.setState( {
-        errorTitle: 'Please complete Primary Keeper Setup',
+        errorTitle: 'Please complete Personal Device Setup',
         errorInfo:
-          'It seems you have not completed Primary Keeper Setup, please complete Primary Keeper Setup to proceed',
+          'It seems you have not completed Personal Device setup, please complete Personal Device setup to proceed',
       } );
       ( this.ErrorBottomSheet as any ).snapTo( 1 )
       return
@@ -879,7 +879,7 @@ class ManageBackupNewBHR extends Component<
         case 'Secondary Device1': return 'Personal Device1'
         case 'Secondary Device2': return 'Personal Device2'
         case 'Secondary Device3': return 'Personal Device3'
-
+        case 'Keeper PDF': return 'PDF Backup'
         default:
           return buttonText
     }

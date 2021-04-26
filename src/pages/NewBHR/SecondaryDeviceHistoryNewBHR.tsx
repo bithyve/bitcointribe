@@ -379,10 +379,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
-      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
-        ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-        createGuardian()
-      }
+      // if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+      //   ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+      //   createGuardian()
+      // }
       // blocking keeper reshare till 100% health
       const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
       if ( blockPCShare ) {
@@ -872,11 +872,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Reshare Keeper'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
-          changeButtonText={'Change Keeper'}
+          changeButtonText={'Change'}
           isChangeKeeperAllow={isChangeKeeperAllow}
           isVersionMismatch={isVersionMismatch}
           onPressChange={() => {

@@ -1202,8 +1202,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
           isVersionMismatch={isVersionMismatch}
           isChangeKeeperAllow={isChangeKeeperAllow}
-          reshareButtonText={'Reshare Keeper'}
-          changeButtonText={'Change Keeper'}
+          reshareButtonText={'Reshare'}
+          changeButtonText={'Change'}
         />
       </View>
       <BottomSheet
