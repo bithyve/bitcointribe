@@ -50,13 +50,12 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       imageSource: require( '../../../assets/images/icons/country.png' ),
       screenName: 'ChangeCurrency',
     },
-    // {
-    //   title: 'Full Rescan',
-    //   subtitle: 'Completely sync the account',
-    //   imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
-    //   onOptionPressed: handleRescanListItemSelection,
-    // },
-
+    {
+      title: 'Full Rescan',
+      subtitle: 'Completely sync the account',
+      imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
+      onOptionPressed: handleRescanListItemSelection,
+    },
     {
       title: 'Version History',
       subtitle: 'Version History',
