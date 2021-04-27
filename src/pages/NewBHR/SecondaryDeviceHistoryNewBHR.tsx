@@ -22,32 +22,24 @@ import moment from 'moment'
 import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
-import KnowMoreButton from '../../components/KnowMoreButton'
-import { uploadEncMShareKeeper } from '../../store/actions/health'
 import {
-  EphemeralDataElements,
+  Keepers,
   LevelHealthInterface,
-  TrustedContactDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  updateEphemeralChannel,
   updateTrustedContactsInfoLocally,
 } from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
-  SECURE_ACCOUNT,
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import ApproveSetup from './ApproveSetup'
@@ -57,6 +49,7 @@ import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import semver from 'semver'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -78,6 +71,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
+  const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -385,21 +379,41 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
-      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
-        ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-        createGuardian()
-      }
+      // if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+      //   ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+      //   createGuardian()
+      // }
       // blocking keeper reshare till 100% health
       const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
       if ( blockPCShare ) {
         setBlockReshare( blockPCShare )
       }
+      const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
+      const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
+      const trustedData = trustedContactsInfo[ contactName ]
+
+      console.log( 'trustedData.trustedChannel', trustedData.trustedChannel.data[ 1 ] )
+      if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
+        if( trustedData.trustedChannel.data[ 1 ] && semver.lt( trustedData.trustedChannel.data[ 1 ].data.version, '1.6.0' ) ) {
+          setTimeout( () => {
+            setErrorMessageHeader( 'Error sending Recovery Key' )
+            setErrorMessage(
+              'your keeper need to update app / come online',
+            )
+            setIsVersionMismatch( true )
+          }, 2 );
+          ( ErrorBottomSheet as any ).current.snapTo( 1 )
+        }
+      }
+
+      console.log( 'trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel', trustedContacts.tc.trustedContacts, props.navigation.getParam( 'selectedKeeper' ) )
       // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
       //   AsyncStorage.setItem('blockPCShare', 'true');
       //   setBlockReshare(blockPCShare);
       // }
     } )()
   }, [] )
+
 
   const renderSecondaryDeviceContents = useCallback( () => {
     console.log( secondaryQR )
@@ -813,7 +827,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-        status: 'notAccessible',
       },
     ]
     console.log( 'shareArray', shareArray )
@@ -859,12 +872,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Reshare Keeper'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
-          changeButtonText={'Change Keeper'}
+          changeButtonText={'Change'}
           isChangeKeeperAllow={isChangeKeeperAllow}
+          isVersionMismatch={isVersionMismatch}
           onPressChange={() => {
             if( isPrimaryKeeper ){
               setSelectedKeeperType( 'device' )

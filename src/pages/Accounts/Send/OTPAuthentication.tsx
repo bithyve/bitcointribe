@@ -29,6 +29,7 @@ import { resetStackToAccountDetails } from '../../../navigation/actions/Navigati
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 
 export default function OTPAuthenticationScreen( { navigation } ) {
@@ -39,6 +40,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const dispatch = useDispatch()
   const sendingState = useSendingState()
+  const donationId = useDonationIdFromSelectedRecipients()
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -133,8 +135,8 @@ export default function OTPAuthenticationScreen( { navigation } ) {
         dispatch( sendTxNotification() )
 
         //dispatch donation note action during donation tx
-        if( sendingState.donationDetails.donationId ){
-          const { donationId, donationNote } = sendingState.donationDetails
+        const { donationNote } = sendingState.donationDetails
+        if( donationId && donationNote ){
           dispatch( sendDonationNote( {
             txid,
             donationId: donationId,

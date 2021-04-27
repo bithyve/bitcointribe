@@ -139,6 +139,7 @@ interface ContactDetailsPropTypes {
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
   uploadingSmShare: any;
+  newBHRFlowStarted : any;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -155,6 +156,7 @@ interface ContactDetailsStateTypes {
   trustedContactHistory: any;
   SMShareQR: string;
   qrModalTitle: string;
+  isSmSharePresent: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -172,6 +174,7 @@ class ContactDetails extends PureComponent<
   itemIndex: any;
   index: any;
   setIsSendDisabledListener: any;
+  ContactName: any;
 
   constructor( props ) {
     super( props )
@@ -227,13 +230,19 @@ class ContactDetails extends PureComponent<
           // info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
         },
       ],
-      qrModalTitle: ''
+      qrModalTitle: '',
+      isSmSharePresent: false,
     }
 
     this.Contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
     this.itemIndex = this.props.navigation.state.params.index
     this.index = this.props.navigation.state.params.shareIndex
+    this.ContactName = `${this.Contact.firstName} ${
+      this.Contact.lastName ? this.Contact.lastName : ''
+    }`
+      .toLowerCase()
+      .trim()
   }
 
   componentDidMount() {
@@ -284,6 +293,12 @@ class ContactDetails extends PureComponent<
       } );
       ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       this.props.ErrorSending( null )
+    }
+
+    if( this.contactsType == 'I\'m Keeper of' && this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ] && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ].SECONDARY_SHARE && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ].SECONDARY_SHARE.shareId ){
+      this.setState( {
+        isSmSharePresent: true
+      } )
     }
     this.updateContactDetailsUI()
   }
@@ -1044,7 +1059,7 @@ class ContactDetails extends PureComponent<
   };
 
   render() {
-    const { navigation, uploading, uploadingSmShare } = this.props
+    const { navigation, uploading, uploadingSmShare, newBHRFlowStarted } = this.props
     const {
       contact,
       Loading,
@@ -1291,24 +1306,26 @@ class ContactDetails extends PureComponent<
                   )}
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  ...styles.bottomButton,
-                }}
-                onPress={() => this.onHelpRestore( true )}
-              >
-                <Image
-                  source={require( '../../assets/images/icons/icon_restore.png' )}
-                  style={styles.buttonImage}
-                />
-                <View>
-                  {uploadingSmShare ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={styles.buttonText}>Help SM Key</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
+              { this.state.isSmSharePresent ? (
+                <TouchableOpacity
+                  style={{
+                    ...styles.bottomButton,
+                  }}
+                  onPress={() => this.onHelpRestore( true )}
+                >
+                  <Image
+                    source={require( '../../assets/images/icons/icon_restore.png' )}
+                    style={styles.buttonImage}
+                  />
+                  <View>
+                    {uploadingSmShare ? (
+                      <ActivityIndicator size="small" />
+                    ) : (
+                      <Text style={styles.buttonText}>Show Secondary Key</Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ) : null}
               {encryptedExitKey ? (
                 <TouchableOpacity
                   style={{
@@ -1484,6 +1501,7 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
     ),
     hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
+    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
   }
 }
 export default connect( mapStateToProps, {

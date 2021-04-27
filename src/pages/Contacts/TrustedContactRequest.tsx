@@ -319,7 +319,7 @@ export default function TrustedContactRequest( props ) {
               {!props.isRecovery ? (
                 <Text style={styles.modalTitleText}>
                   {props.isGuardian
-                    ? 'Keeper Request'
+                    ? 'Backup Request'
                     : 'Friends and Family Request'}
                 </Text>
               ) : (
@@ -330,7 +330,7 @@ export default function TrustedContactRequest( props ) {
               }}>
                 {props.inputType
                   ? 'Accept the request to add your contact to Friends and Family'
-                  : 'Looks like someone wants to be your Keeper'}
+                  : 'You have a request for securing the Recovery Key'}
               </Text>
             </View>
             <View style={styles.box}>
