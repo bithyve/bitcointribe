@@ -406,6 +406,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   >
                     {dropdownBoxList.map( ( value, index ) => (
                       <TouchableOpacity
+                        key={index}
                         onPress={() => {
                           setTimeout( () => {
                             setDropdownBoxValue( value )
