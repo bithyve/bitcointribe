@@ -225,15 +225,15 @@ const noteText = ( i, currentLevel ) => {
   switch ( i ) {
       case 1:
         if( currentLevel === 0 ) return 'First complete Level 1, \nbefore proceeding with Level 2'
-        if( currentLevel === 1 ) return 'Share the Recovery Key(s) to \nupgrade your backup to Level 2'
+        if( currentLevel === 1 ) return 'Share the Recovery Keys to \nupgrade your backup to Level 2'
       case 2:
         if( currentLevel === 0 ) return 'First complete Level 2, \nbefore proceeding with Level 3'
         if( currentLevel === 1 ) return 'First complete Level 2, \nbefore proceeding with Level 3'
-        if( currentLevel === 2 ) return 'Share the Recovery Key(s) to \nupgrade your backup to Level 3'
+        if( currentLevel === 2 ) return 'Share the Recovery Keys to \nupgrade your backup to Level 3'
       default:
         break
   }
-  return 'Share the Recovery Key(s) to upgrade your backup'
+  return 'Share the Recovery Keys to upgrade your backup'
 }
 
 const changeNameForSeconday = ( name ) =>{
