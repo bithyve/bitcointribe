@@ -255,36 +255,39 @@ class UpgradeBackup extends Component<
       shareId: '', type: 'cloud', count: 0
     } ]
     let selectedContacts = []
-    for ( let i = 0; i < overallHealth.sharesInfo.length; i++ ) {
-      const element = overallHealth.sharesInfo[ i ]
-      const type = i == 0 ? 'primary' : i == 1 ? 'contact1' : i == 2 ? 'contact2' : 'pdf'
-      if ( ( i == 1 || i == 2 ) && element.updatedAt > 0 && trustedContactsInfo ) {
-        if( trustedContactsInfo.slice( 1, 3 )[ 0 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 0 ] )
-        if( trustedContactsInfo.slice( 1, 3 )[ 1 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 1 ] )
-        const setSelectedContacts = new Set( selectedContacts )
-        selectedContacts = Array.from( setSelectedContacts )
-        this.setState( {
-          selectedContact: selectedContacts
-        } )
+    if( overallHealth && overallHealth.sharesInfo ) {
+      for ( let i = 0; i < overallHealth.sharesInfo.length; i++ ) {
+        const element = overallHealth.sharesInfo[ i ]
+        const type = i == 0 ? 'primary' : i == 1 ? 'contact1' : i == 2 ? 'contact2' : 'pdf'
+        if ( ( i == 1 || i == 2 ) && element.updatedAt > 0 && trustedContactsInfo ) {
+          if( trustedContactsInfo.slice( 1, 3 )[ 0 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 0 ] )
+          if( trustedContactsInfo.slice( 1, 3 )[ 1 ] ) selectedContacts.push( trustedContactsInfo.slice( 1, 3 )[ 1 ] )
+          const setSelectedContacts = new Set( selectedContacts )
+          selectedContacts = Array.from( setSelectedContacts )
+          this.setState( {
+            selectedContact: selectedContacts
+          } )
+        }
+        if( trustedContactsInfo.slice( 1, 3 ).length && element.updatedAt > 0 && ( type == 'contact1' || type == 'contact2' ) ){
+          TotalKeeper = TotalKeeper + 1
+          keepersInfo.push( {
+            shareId: element.shareId, type, count: selectedContacts.length, contactDetails: trustedContactsInfo.slice( 1, 3 )[ i - 1 ]
+          } )
+        }
+        if( ( type != 'contact1' && type != 'contact2' ) && element.updatedAt > 0 && keepersInfo.findIndex( value=>value.type =='pdf' ) == -1 ) {
+          TotalKeeper = TotalKeeper + 1
+          keepersInfo.push( {
+            shareId: element.shareId, type, count: 0
+          } )
+        }
       }
-      if( trustedContactsInfo.slice( 1, 3 ).length && element.updatedAt > 0 && ( type == 'contact1' || type == 'contact2' ) ){
-        TotalKeeper = TotalKeeper + 1
-        keepersInfo.push( {
-          shareId: element.shareId, type, count: selectedContacts.length, contactDetails: trustedContactsInfo.slice( 1, 3 )[ i - 1 ]
-        } )
-      }
-      if( ( type != 'contact1' && type != 'contact2' ) && element.updatedAt > 0 && keepersInfo.findIndex( value=>value.type =='pdf' ) == -1 ) {
-        TotalKeeper = TotalKeeper + 1
-        keepersInfo.push( {
-          shareId: element.shareId, type, count: 0
+      if( TotalKeeper > 1 && keepersInfo.findIndex( value=>value.type == 'primary' ) == -1 ) {
+        keepersInfo.splice( 0, 0, {
+          shareId: '', type: 'primary', count: 0
         } )
       }
     }
-    if( TotalKeeper > 1 && keepersInfo.findIndex( value=>value.type == 'primary' ) == -1 ) {
-      keepersInfo.splice( 0, 0, {
-        shareId: '', type: 'primary', count: 0
-      } )
-    }
+
     let levelToSetup = TotalKeeper == 1 || TotalKeeper == 2 ? 1 : TotalKeeper == 3 || TotalKeeper <= 4 ? 2 : 3
     if( !this.props.levelToSetup ){
       this.props.updateLevelToSetup( levelToSetup )
@@ -323,96 +326,98 @@ class UpgradeBackup extends Component<
           this.UpgradingKeeperContact.current.snapTo( 0 )
           return
         }
+        if( overallHealth && overallHealth.sharesInfo ) {
         // SECONDARY
-        if( element.type == 'primary' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] ) {
-          console.log( 'PRIMASRY' )
-          this.setState( {
-            selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ]
-          } )
-          if( overallHealth.sharesInfo[ 0 ].updatedAt > 0 ) {
+          if( element.type == 'primary' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 2 ] ) {
+            console.log( 'PRIMASRY' )
             this.setState( {
-              showLoader: true,
+              selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ]
             } )
-            this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
-          } else {
-            this.setState( {
-              showLoader: false,
-            } )
-            this.secondaryDeviceBottomSheet.current.snapTo( 1 )
-            this.createGuardian( [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ] )
+            if( overallHealth && overallHealth.sharesInfo[ 0 ] && overallHealth.sharesInfo[ 0 ].updatedAt > 0 ) {
+              this.setState( {
+                showLoader: true,
+              } )
+              this.props.autoUploadSecondaryShare( levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId )
+            } else {
+              this.setState( {
+                showLoader: false,
+              } )
+              this.secondaryDeviceBottomSheet.current.snapTo( 1 )
+              this.createGuardian( [ levelHealth[ levelToSetup-1 ].levelInfo[ 2 ].shareId ] )
+            }
+            this.RestoreFromICloud.current.snapTo( 0 )
+            this.UpgradingKeeperContact.current.snapTo( 0 )
+            return
           }
-          this.RestoreFromICloud.current.snapTo( 0 )
-          this.UpgradingKeeperContact.current.snapTo( 0 )
-          return
-        }
-        // CONTACT
-        if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 && this.props.isUpgradeLevelInitialized && ( ( element.type == 'contact1' && !element.status ) && ( keepersInfo[ i + 1 ].type == 'contact2' && !keepersInfo[ i + 1 ].status ) ) ) {
-          console.log( 'CONTACT1' )
-          if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
-            this.setState( {
-              showLoader: false,
-              contactToShow: selectedContact,
-              selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
-            } )
-          }
-          this.RestoreFromICloud.current.snapTo( 0 )
-          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
-          this.UpgradingKeeperContact.current.snapTo( 1 )
-          this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
-          return
-        } else if( selectedContact.length && ( element.type == 'contact1' || element.type == 'contact2' ) ) {
-          console.log( 'CONTACT@' )
-          if( element.type == 'contact1' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ){
-            this.setState( {
-              showLoader: false,
-              contactToShow: [ selectedContact[ 0 ] ],
-              selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
-            } )
+          // CONTACT
+          if( selectedContact.length && selectedContact.length == 2 && this.props.levelToSetup == 3 && this.props.isUpgradeLevelInitialized && ( ( element.type == 'contact1' && !element.status ) && ( keepersInfo[ i + 1 ].type == 'contact2' && !keepersInfo[ i + 1 ].status ) ) ) {
+            console.log( 'CONTACT1' )
+            if( levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].status == 'notAccessible' && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].status == 'notAccessible' && this.props.isUpgradeLevelInitialized ) {
+              this.setState( {
+                showLoader: false,
+                contactToShow: selectedContact,
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId, levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+              } )
+            }
             this.RestoreFromICloud.current.snapTo( 0 )
             this.secondaryDeviceBottomSheet.current.snapTo( 0 )
             this.UpgradingKeeperContact.current.snapTo( 1 )
             this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
             return
-          }
-          if( element.type == 'contact2' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ){
-            this.setState( {
-              showLoader: false,
-              contactToShow: [ selectedContact[ 1 ] ],
-              selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
-            } )
-            this.RestoreFromICloud.current.snapTo( 0 )
-            this.secondaryDeviceBottomSheet.current.snapTo( 0 )
-            this.UpgradingKeeperContact.current.snapTo( 1 )
-            this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
-            return
-          }
+          } else if( selectedContact.length && ( element.type == 'contact1' || element.type == 'contact2' ) ) {
+            console.log( 'CONTACT@' )
+            if( element.type == 'contact1' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ){
+              this.setState( {
+                showLoader: false,
+                contactToShow: [ selectedContact[ 0 ] ],
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
+              } )
+              this.RestoreFromICloud.current.snapTo( 0 )
+              this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+              this.UpgradingKeeperContact.current.snapTo( 1 )
+              this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
+              return
+            }
+            if( element.type == 'contact2' && !element.status && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ){
+              this.setState( {
+                showLoader: false,
+                contactToShow: [ selectedContact[ 1 ] ],
+                selectedShareId: [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+              } )
+              this.RestoreFromICloud.current.snapTo( 0 )
+              this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+              this.UpgradingKeeperContact.current.snapTo( 1 )
+              this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
+              return
+            }
           // return
-        }
+          }
 
-        if( element.type == 'pdf' && !element.status ) {
-          console.log( 'PDF' )
-          this.setState( {
-            pdfProcessStarted: true
-          } )
-          let shareId = []
-          if( selectedContact.length == 0 && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ) {
-            shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
-          } else if( selectedContact.length == 1 && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
-            shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
-          } else if( selectedContact.length == 2 && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] ) {
-            shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
+          if( element.type == 'pdf' && !element.status ) {
+            console.log( 'PDF' )
+            this.setState( {
+              pdfProcessStarted: true
+            } )
+            let shareId = []
+            if( selectedContact.length == 0 && levelHealth[ levelToSetup-1 ].levelInfo[ 3 ] ) {
+              shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 3 ].shareId ]
+            } else if( selectedContact.length == 1 && levelHealth[ levelToSetup-1 ].levelInfo[ 4 ] ) {
+              shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 4 ].shareId ]
+            } else if( selectedContact.length == 2 && levelHealth[ levelToSetup-1 ].levelInfo[ 5 ] ) {
+              shareId = [ levelHealth[ levelToSetup-1 ].levelInfo[ 5 ].shareId ]
+            }
+            this.setState( {
+              selectedShareId: shareId
+            } )
+            if( shareId.length ){
+              this.checkStoragePermission()
+            }
+            this.RestoreFromICloud.current.snapTo( 0 )
+            this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+            this.UpgradingKeeperContact.current.snapTo( 0 )
+            // this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
+            return
           }
-          this.setState( {
-            selectedShareId: shareId
-          } )
-          if( shareId.length ){
-            this.checkStoragePermission()
-          }
-          this.RestoreFromICloud.current.snapTo( 0 )
-          this.secondaryDeviceBottomSheet.current.snapTo( 0 )
-          this.UpgradingKeeperContact.current.snapTo( 0 )
-          // this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
-          return
         }
       }
     } else {
