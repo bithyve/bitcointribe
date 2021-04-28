@@ -84,7 +84,7 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
-
+import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
@@ -108,6 +108,7 @@ interface ManageBackupNewBHRStateTypes {
   QrBottomSheetsFlag: boolean;
   secondaryShare: MetaShare;
   showLoader: boolean;
+  knowMoreType: string;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -179,6 +180,7 @@ class ManageBackupNewBHR extends Component<
   QrBottomSheet: any;
   ApprovePrimaryKeeperBottomSheet: any
   loaderBottomSheet: any
+  knowMoreBottomSheet: any
 
   constructor( props ) {
     super( props )
@@ -191,6 +193,7 @@ class ManageBackupNewBHR extends Component<
     this.QrBottomSheet
     this.ApprovePrimaryKeeperBottomSheet
     this.loaderBottomSheet
+    this.knowMoreBottomSheet = React.createRef( )
 
     const obj = {
       shareType: '',
@@ -251,7 +254,8 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader: false,
       QrBottomSheetsFlag: false,
       secondaryShare: null,
-      showLoader: false
+      showLoader: false,
+      knowMoreType: 'manageBackup'
     }
   }
 
@@ -872,6 +876,27 @@ class ManageBackupNewBHR extends Component<
     )
   }
 
+  renderKnowMoreModalContent = () => {
+    return ( <MBNewBhrKnowMoreSheetContents
+      type={this.state.knowMoreType}
+      titleClicked={()=>{this.knowMoreBottomSheet.snapTo( 0 )}}
+      containerStyle={{
+        shadowOpacity: 0,
+      }}
+    /> )
+  }
+
+  renderKnowMoreModalHeader = () => {
+    return (
+      <ModalHeader
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          this.knowMoreBottomSheet.snapTo( 0 )
+        }}
+      />
+    )
+  }
+
   keeperButtonText = ( buttonText, number ) =>{
     console.log( 'buttonText', buttonText, number )
     if( !buttonText ) return 'Share Recovery Key ' + number
@@ -1073,6 +1098,12 @@ class ManageBackupNewBHR extends Component<
                           />
                         )}
                         <TouchableOpacity
+                          onPress={()=>{
+                            this.setState( {
+                              knowMoreType: value.id == 1 ? 'level1' : value.id == 2 ? 'level2' : 'level3'
+                            } )
+                            this.knowMoreBottomSheet.snapTo( 1 )
+                          }}
                           style={{
                             ...styles.cardButtonView,
                             backgroundColor:
@@ -1611,6 +1642,14 @@ class ManageBackupNewBHR extends Component<
           snapPoints={[ -50, hp( '100%' ) ]}
           renderContent={this.renderLoaderModalContent}
           renderHeader={this.renderLoaderModalHeader}
+        />
+        <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={( c )=>this.knowMoreBottomSheet = c}
+          snapPoints={[ -50, hp( '95%' ) ]}
+          renderContent={this.renderKnowMoreModalContent}
+          renderHeader={this.renderKnowMoreModalHeader}
         />
       </View>
     )
