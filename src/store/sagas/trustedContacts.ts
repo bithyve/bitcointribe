@@ -20,6 +20,9 @@ import {
   syncTrustedChannels,
   WALLET_CHECK_IN,
   POST_RECOVERY_CHANNEL_SYNC,
+  MULTI_UPDATE_TRUSTED_CHANNELS,
+  SEND_VERSION_UPDATE_NOTIFICATION,
+  multiUpdateTrustedChannels,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -35,7 +38,6 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
-  updateWalletImage,
   downloadMShare as downloadMShareSSS,
   uploadEncMShare
 } from '../actions/sss'
@@ -125,7 +127,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       )
     }
   }
-
   const trustedReceivingAddress = ( regularAccount.hdWallet
     .derivativeAccounts[ TRUSTED_CONTACTS ][
       accountNumber
@@ -149,7 +150,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
     Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
     config.TC_REQUEST_EXPIRY
-
 
     if ( changeContact ) {
       let previousGuardianName: string
@@ -533,8 +533,6 @@ function* updateEphemeralChannelWorker( { payload } ) {
     yield put( switchTCLoading( 'updateEphemeralChannel' ) )
 
     let trustedContacts: TrustedContactsService = payload.trustedContacts
-    console.log( 'trustedContacts updateEphemeralChannelWorker', trustedContacts )
-    console.log( ' updateEphemeralChannelWorker payload', payload )
 
     if ( !trustedContacts )
       trustedContacts = yield select( ( state ) => state.trustedContacts.service )
@@ -567,7 +565,6 @@ function* updateEphemeralChannelWorker( { payload } ) {
       fetch,
       payload.shareUploadables,
     )
-    console.log( 'updateEphemeralChannelWorker res', res )
 
 
     if ( generatedKey ) {
@@ -1569,4 +1566,88 @@ function* postRecoveryChannelSyncWorker( {} ) {
 export const postRecoveryChannelSyncWatcher = createWatcher(
   postRecoveryChannelSyncWorker,
   POST_RECOVERY_CHANNEL_SYNC,
+)
+
+function* sendVersionUpdateNotificationWorker( { payload }: {payload: {version: string}} ) {
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const { walletName } = yield select(
+    ( state ) => state.storage.database.WALLET_SETUP,
+  )
+
+  const contacts: Contacts = trustedContacts.tc.trustedContacts
+  const notifReceivers = []
+  Object.keys( contacts ).forEach( ( contactName ) => {
+    const contact = contacts[ contactName ]
+    if ( contact.walletID && contact.FCMs ){
+      notifReceivers.push( {
+        walletId: contact.walletID,
+        FCMs: contact.FCMs,
+      } )
+    }
+  } )
+
+  if( notifReceivers.length ){
+    const notification: INotification = {
+      notificationType: notificationType.contact,
+      title: 'Backup Secured',
+      body: `Your backup (Recovery Key) has been secured with ${walletName} as they are on the latest version now`,
+      data: {
+      },
+      tag: notificationTag.IMP,
+    }
+
+    yield call(
+      RelayServices.sendNotifications,
+      notifReceivers,
+      notification,
+    )
+
+    const trustedData = {
+      version: payload.version
+    }
+    yield put( multiUpdateTrustedChannels( trustedData ) )
+  }
+}
+
+export const sendVersionUpdateNotificationWatcher = createWatcher(
+  sendVersionUpdateNotificationWorker,
+  SEND_VERSION_UPDATE_NOTIFICATION,
+)
+
+function* multiUpdateTrustedChannelsWorker( { payload }: {payload: {data: TrustedDataElements, contacts?: Contacts}} ) {
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const contacts: Contacts = payload.contacts? payload.contacts: trustedContacts.tc.trustedContacts
+  const data: TrustedDataElements = {
+    ...payload.data
+  }
+
+  let channelUpdated = false
+  for( const contactName of Object.keys( contacts ) ){
+    if( contacts[ contactName ].symmetricKey ){
+      yield call( trustedContacts.updateTrustedChannel, contactName, data )
+      channelUpdated = true
+    }
+  }
+
+  if( channelUpdated ){
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+    }
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+  }
+}
+
+export const multiUpdateTrustedChannelsWatcher = createWatcher(
+  multiUpdateTrustedChannelsWorker,
+  MULTI_UPDATE_TRUSTED_CHANNELS,
 )

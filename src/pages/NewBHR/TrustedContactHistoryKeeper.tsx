@@ -42,6 +42,7 @@ import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
+  Keepers,
   LevelHealthInterface,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
@@ -66,6 +67,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import semver from 'semver'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -194,6 +196,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
+  const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -226,11 +230,36 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( () => {
     ( async () => {
+      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+        setTimeout( () => {
+          setLoadContacts( true )
+        }, 2 );
+        ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
+      }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
       const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
       setSelectedShareId( shareId )
     } )()
+    const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
+    const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
+    const trustedData = trustedContactsInfo[ contactName ]
+
+    if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
+      if( trustedData.trustedChannel.data[ 1 ] && semver.lt( trustedData.trustedChannel.data[ 1 ].data.version, '1.6.0' ) ) {
+        setTimeout( () => {
+          setErrorMessageHeader( 'Error sending Recovery Key' )
+          setErrorMessage(
+            'your keeper need to update app / come online',
+          )
+          setIsVersionMismatch( true )
+        }, 2 );
+        ( ErrorBottomSheet as any ).current.snapTo( 1 )
+      }
+    }
+
+    console.log( 'trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel', trustedContacts.tc.trustedContacts, props.navigation.getParam( 'selectedKeeper' ) )
+
     setContactInfo()
   }, [] )
 
@@ -1128,7 +1157,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'contact',
-        status: 'notAccessible',
       },
     ] ) )
   }
@@ -1172,8 +1200,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
           onPressReshare={() => {
             ( ReshareBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Reshare Keeper'}
-          changeButtonText={'Change Keeper'}
+          isVersionMismatch={isVersionMismatch}
+          isChangeKeeperAllow={isChangeKeeperAllow}
+          reshareButtonText={'Reshare'}
+          changeButtonText={'Change'}
         />
       </View>
       <BottomSheet

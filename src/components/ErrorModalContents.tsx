@@ -1,25 +1,29 @@
-import React from 'react';
-import { View, Image, Text, StyleSheet } from 'react-native';
-import Colors from '../common/Colors';
-import Fonts from '../common/Fonts';
-import { RFValue } from 'react-native-responsive-fontsize';
+import React from 'react'
+import { View, Image, Text, StyleSheet } from 'react-native'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper';
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from '../components/AppBottomSheetTouchableWrapper'
 
-export default function ErrorModalContents(props) {
+export default function ErrorModalContents( props ) {
   return (
-    <View style={{ ...styles.modalContentContainer, height: '100%' }}>
-      <View style={{ height: '100%' }}>
+    <View style={{
+      ...styles.modalContentContainer, height: '100%'
+    }}>
+      <View style={{
+        height: '100%'
+      }}>
         <View style={styles.successModalHeaderView}>
           <Text
             style={{
               color: props.headerTextColor
                 ? props.headerTextColor
                 : Colors.blue,
-              fontSize: RFValue(18),
+              fontSize: RFValue( 18 ),
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
@@ -30,7 +34,7 @@ export default function ErrorModalContents(props) {
             <Text
               style={{
                 ...styles.modalInfoText,
-                marginTop: wp('1.5%'),
+                marginTop: wp( '1.5%' ),
                 color: Colors.lightTextColor,
               }}
             >
@@ -43,7 +47,7 @@ export default function ErrorModalContents(props) {
             <Text
               style={{
                 ...styles.modalInfoText,
-                marginBottom: hp('1%'),
+                marginBottom: hp( '1%' ),
                 marginTop: 'auto',
               }}
             >
@@ -57,7 +61,7 @@ export default function ErrorModalContents(props) {
             <Text
               style={{
                 ...styles.modalInfoText,
-                marginBottom: hp('1%'),
+                marginBottom: hp( '1%' ),
                 marginTop: 'auto',
               }}
             >
@@ -67,7 +71,7 @@ export default function ErrorModalContents(props) {
         ) : null}
         <View
           style={{
-            height: hp('18%'),
+            height: hp( '18%' ),
             flexDirection: 'row',
             marginTop: 'auto',
             alignItems: 'center',
@@ -93,15 +97,15 @@ export default function ErrorModalContents(props) {
                   : Colors.white,
               }}
             >
-            {props.proceedButtonText}
+              {props.proceedButtonText}
             </Text>
           </AppBottomSheetTouchableWrapper>
           {props.isIgnoreButton && (
             <AppBottomSheetTouchableWrapper
               onPress={() => props.onPressIgnore()}
               style={{
-                height: wp('13%'),
-                width: wp('35%'),
+                height: wp( '13%' ),
+                width: wp( '35%' ),
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
@@ -123,62 +127,64 @@ export default function ErrorModalContents(props) {
               source={
                 props.bottomImage
                   ? props.bottomImage
-                  : require('../assets/images/icons/noInternet.png')
+                  : require( '../assets/images/icons/noInternet.png' )
               }
-              style={styles.successModalImage}
+              style={props.isBottomImageStyle ? props.isBottomImageStyle : styles.successModalImage}
             />
           )}
         </View>
       </View>
     </View>
-  );
+  )
 }
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContentContainer: {
     height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: wp('8%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: wp( '8%' ),
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue(11),
+    fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   successModalAmountView: {
     justifyContent: 'center',
-    marginRight: wp('8%'),
-    marginLeft: wp('8%'),
-    marginTop: hp('2%'),
+    marginRight: wp( '8%' ),
+    marginLeft: wp( '8%' ),
+    marginTop: hp( '2%' ),
   },
   successModalButtonView: {
-    height: wp('13%'),
-    width: wp('35%'),
+    height: wp( '13%' ),
+    width: wp( '35%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
     elevation: 10,
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
-    shadowOffset: { width: 15, height: 15 },
+    shadowOffset: {
+      width: 15, height: 15
+    },
     backgroundColor: Colors.blue,
     alignSelf: 'center',
-    marginLeft: wp('8%'),
+    marginLeft: wp( '8%' ),
   },
   successModalImage: {
-    width: wp('30%'),
-    height: wp('35%'),
+    width: wp( '30%' ),
+    height: wp( '35%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
     marginRight: -5,
   },
   proceedButtonText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
   },
-});
+} )

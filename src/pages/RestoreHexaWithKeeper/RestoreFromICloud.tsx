@@ -55,7 +55,7 @@ export default function RestoreFromICloud( props ) {
               {props.levelStatus ? props.levelStatus : ''}
             </Text>
           </View>
-          <View style={styles.arrowIconView}>
+          {!props.isUpgradeBackup ? <View style={styles.arrowIconView}>
             <Ionicons
               name="ios-arrow-down"
               color={Colors.textColorGrey}
@@ -64,7 +64,7 @@ export default function RestoreFromICloud( props ) {
                 alignSelf: 'center'
               }}
             />
-          </View>
+          </View> : null}
         </View>
       </AppBottomSheetTouchableWrapper>
       {props.info ? <View style={styles.successModalAmountView}>
@@ -147,6 +147,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( '8%' ),
     marginLeft: wp( '8%' ),
     marginTop: wp( '4%' ),
+    marginBottom: wp( '4%' ),
   },
   successModalAmountView: {
     justifyContent: 'center',

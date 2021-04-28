@@ -34,10 +34,20 @@ export default function SecondaryDeviceModelContents( props ) {
       >
         <Text style={NavStyles.modalHeaderTitleText}>Scan QR Code</Text>
       </View>
+
+      <Text style={{
+        color: Colors.textColorGrey,
+        fontSize: RFValue( 12 ),
+        fontFamily: Fonts.FiraSansRegular,
+        marginLeft: 20,
+        marginRight: 20
+      }}>
+  Open the QR scanner at the bottom of the Home screen on another Personal Device running Hexa app and scan this QR
+      </Text>
       <View style={NavStyles.modalContentView}>
         {!props.secondaryQR ? (
           <View style={{
-            height: hp( '27%' ), justifyContent: 'center'
+            height: hp( '27%' ), justifyContent: 'center',
           }}>
             <ActivityIndicator size="large" animating color={Colors.gray1}/>
           </View>
@@ -68,12 +78,6 @@ export default function SecondaryDeviceModelContents( props ) {
           </Text>
         </AppBottomSheetTouchableWrapper>
       </View>
-      <BottomInfoBox
-        title={'Share your Recovery Key'}
-        infoText={
-          'Open the QR scanner at the bottom of the Home screen on your Keeper Device and scan this QR'
-        }
-      />
     </View>
   )
 }

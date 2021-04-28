@@ -23,6 +23,8 @@ import useAvailableTransactionPriorities from '../../../utils/hooks/sending-util
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
+import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
+import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing;
@@ -48,10 +50,6 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
       sourceSubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
       ? NetworkKind.TESTNET : NetworkKind.MAINNET
   }, [ sourceSubAccount.sourceKind, config ] )
-
-  const formattedUnitText = useMemo( () => {
-    return bitcoinDisplayUnit === BitcoinUnit.SATS ? 'Sats' : 'T-Sats'
-  }, [ bitcoinDisplayUnit ] )
 
   const showCustomPriorityBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -172,7 +170,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                 ...styles.priorityTableText,
                 flex: 1,
               }}>
-                {transactionFeeInfo[ priority ].amount} {formattedUnitText}
+                {useFormattedAmountText( transactionFeeInfo[ priority ].amount )} {useFormattedUnitText( {
+                  bitcoinUnit: BitcoinUnit.SATS,
+                } )}
               </Text>
             </View>
           )

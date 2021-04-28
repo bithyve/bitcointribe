@@ -323,6 +323,7 @@ export default class BaseAccount {
         data: {
           accountId: string;
           accountNumber: number;
+          accountXpub: string;
         };
         err?: undefined;
         message?: undefined;
@@ -402,6 +403,7 @@ export default class BaseAccount {
           setupSuccessful: boolean;
           accountId: string;
           accountNumber: number;
+          accountXpub: string;
         };
         err?: undefined;
         message?: undefined;

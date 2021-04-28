@@ -116,6 +116,7 @@ const PersonalCopyHistory = ( props ) => {
   const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
 
 
   useEffect( () => {
@@ -213,6 +214,9 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
+      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+        ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      }
     }
   }, [ pdfCreatedSuccessfully ] )
 
@@ -260,8 +264,7 @@ const PersonalCopyHistory = ( props ) => {
         onPressShare={() => {}}
         onPressConfirm={() => {
           try {
-            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-            dispatch( confirmPDFShared( selectedKeeper.shareId ) );
+            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) );
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
             if (
               props.navigation.getParam( 'prevKeeperType' ) &&
@@ -276,10 +279,7 @@ const PersonalCopyHistory = ( props ) => {
                 )
               )
             }
-            const popAction = StackActions.pop( {
-              n: isChange ? 2 : 1
-            } )
-            props.navigation.dispatch( popAction )
+            setIsReshare( true )
           } catch ( err ) {
             dispatch( keeperProcessStatus( '' ) )
             console.log( 'error', err )
@@ -499,30 +499,27 @@ const PersonalCopyHistory = ( props ) => {
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
+          'Please confirm this share by scanning the 1st Qr from pdf.'
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          setIsApprovalStarted( true )
-          dispatch( downloadSmShareForApproval( qrScannedData ) )
-          setQrBottomSheetsFlag( false )
+          dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
+          const popAction = StackActions.pop( {
+            n: isChange ? 2 : 1
+          } )
+          props.navigation.dispatch( popAction )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          // setIsApprovalStarted( true )
-          // const qrScannedData = '{"requester":"ShivaniH","publicKey":"XCi8FEPHHE8mqVJxRuZQNCrJ","uploadedAt":1615528421395,"type":"ReverseRecoveryQR","ver":"1.4.6"}'
-          // try {
-          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
-          //   setQrBottomSheetsFlag( false )
-          // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
-          // }
+          const qrScannedData = '{"type":"pdf","encryptedData":"35c329e9d0ffa374bf2a9589173578c0bdc8727c4e7a3cb5c6862854717a1c88657751643790a4c48308060e8d4adf47ec647b475cbdc2ced65b2b91c8a2beb1","encryptedKey":"814a3670890461aa790a66385bf3068bdf04f13d296b8a06d6716adf9622b0ac9cbe9b7593e7894efb77afd1a9280588f24a50d300d44e3d37c840a41947232c3b0272fe57465c96e1d09892591a7259"}'
+          dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
+          setQrBottomSheetsFlag( false )
         }}
       />
     )
@@ -547,6 +544,15 @@ const PersonalCopyHistory = ( props ) => {
     }
   }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
 
+  const deviceText = ( text ) =>{
+    switch ( text ) {
+        case 'Keeper PDF': return 'PDF Backup'
+
+        default:
+          return text
+    }
+  }
+
   return (
     <View style={{
       flex: 1, backgroundColor: Colors.backgroundColor
@@ -559,10 +565,10 @@ const PersonalCopyHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={props.navigation.state.params.selectedTitle}
+        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={props.navigation.state.params.selectedTime}
         selectedStatus={props.navigation.state.params.selectedStatus}
-        moreInfo={props.navigation.state.params.selectedTitle}
+        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />
       <View style={{
@@ -573,11 +579,14 @@ const PersonalCopyHistory = ( props ) => {
           IsReshare={isReshare}
           data={sortedHistory( personalCopyHistory )}
           confirmDisable={confirmDisable}
+          onConfirm={ isReshare && selectedKeeper.status == 'notAccessible' ? ()=>{
+            ( QrBottomSheet as any ).current.snapTo( 1 )
+          } : null}
           confirmButtonText={'Share Now'}
           onPressConfirm={() => {
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Restore Keeper'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             console.log(
               'onPressReshare PersonalCopyShareBottomSheet',
@@ -585,7 +594,8 @@ const PersonalCopyHistory = ( props ) => {
             );
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}
-          changeButtonText={'Change Keeper'}
+          isChangeKeeperAllow={isChangeKeeperAllow}
+          changeButtonText={'Change'}
           onPressChange={() => {
             ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
           }}

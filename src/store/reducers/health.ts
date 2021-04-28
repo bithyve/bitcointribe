@@ -14,7 +14,6 @@ import {
   UPDATE_EFCHANNEL_LOADING_STATUS,
   IS_LEVEL_TWO_METASHARE,
   IS_LEVEL_THREE_METASHARE,
-  KEEPER_INFO,
   IS_LEVEL2_INITIALIZED,
   SHARE_RECEIVED,
   DOWNLOADED_MSHARE_HEALTH,
@@ -125,6 +124,7 @@ const initialState: {
     filePath: string;
     publicKey: string;
     privateKey: string;
+    updatedAt: number;
   },
   isSmMetaSharesCreatedFlag: boolean;
   hasSMUploadedSuccessfully: Boolean;
@@ -192,7 +192,8 @@ const initialState: {
   pdfInfo: {
     filePath: '',
     publicKey: '',
-    privateKey: ''
+    privateKey: '',
+    updatedAt: 0
   },
   isSmMetaSharesCreatedFlag: false,
   hasSMUploadedSuccessfully: false,

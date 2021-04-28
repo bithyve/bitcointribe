@@ -43,6 +43,52 @@ import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+let messageIndex = 0
+const LOADER_MESSAGE_TIME = 2000
+const loaderMessages = [
+  {
+    heading: 'Bootstrapping Accounts',
+    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+    subText: '',
+  },
+  {
+    heading: 'Filling Test Account with test sats',
+    text:
+      'Preloaded Test Account is the best place to start your Bitcoin journey',
+    subText: '',
+  },
+  {
+    heading: 'Generating Recovery Keys',
+    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+    subText: '',
+  },
+  {
+    heading: 'Manage Backup',
+    text:
+      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 1 - Automated Cloud Backup',
+    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
+    subText: '',
+  },
+  {
+    heading: 'Level 2 - Double Backup',
+    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 3 - Multi-key Backup',
+    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
+    subText: '',
+  }
+]
+
+const getNextMessage = () => {
+  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
+  return loaderMessages[ messageIndex++ ]
+}
 
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
@@ -81,6 +127,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
+  const [ showNote, setShowNote ] = useState( true )
 
   const s3service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
@@ -214,23 +261,35 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const setLoaderMessages = () => {
     setTimeout( () => {
-      setMessage( 'Bootstrapping Accounts' )
-      setSubTextMessage(
-        'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-      )
+      const newMessage = getNextMessage()
+      setMessage( newMessage.heading )
+      setSubTextMessage( newMessage.text )
       setTimeout( () => {
-        setMessage( 'Filling Test Account with test sats' )
-        setSubTextMessage(
-          'Preloaded Test Account is the best place to start your Bitcoin journey',
-        )
+        const newMessage = getNextMessage()
+        setMessage( newMessage.heading )
+        setSubTextMessage( newMessage.text )
         setTimeout( () => {
-          setMessage( 'Generating Recovery Keys' )
-          setSubTextMessage(
-            'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
-          )
-        }, 3000 )
-      }, 3000 )
-    }, 3000 )
+          const newMessage = getNextMessage()
+          setMessage( newMessage.heading )
+          setSubTextMessage( newMessage.text )
+          setTimeout( () => {
+            const newMessage = getNextMessage()
+            setMessage( newMessage.heading )
+            setSubTextMessage( newMessage.text )
+            setTimeout( () => {
+              const newMessage = getNextMessage()
+              setMessage( newMessage.heading )
+              setSubTextMessage( newMessage.text )
+              setTimeout( () => {
+                const newMessage = getNextMessage()
+                setMessage( newMessage.heading )
+                setSubTextMessage( newMessage.text )
+              }, LOADER_MESSAGE_TIME )
+            }, LOADER_MESSAGE_TIME )
+          }, LOADER_MESSAGE_TIME )
+        }, LOADER_MESSAGE_TIME )
+      }, LOADER_MESSAGE_TIME )
+    }, LOADER_MESSAGE_TIME )
   }
 
   const renderLoaderModalContent = useCallback( () => {
@@ -347,6 +406,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   >
                     {dropdownBoxList.map( ( value, index ) => (
                       <TouchableOpacity
+                        key={index}
                         onPress={() => {
                           setTimeout( () => {
                             setDropdownBoxValue( value )
@@ -423,6 +483,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         setAnswerMasked( text )
                       }}
                       onFocus={() => {
+                        setShowNote( false )
                         setDropdownBoxOpenClose( false )
                         setAnswerInputStyle( styles.inputBoxFocused )
                         if ( answer.length > 0 ) {
@@ -431,6 +492,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         }
                       }}
                       onBlur={() => {
+                        setShowNote( true )
                         setAnswerInputStyle( styles.inputBox )
                         setDropdownBoxOpenClose( false )
                         let temp = ''
@@ -494,6 +556,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       }}
                       onSubmitEditing={handleSubmit}
                       onFocus={() => {
+                        setShowNote( false )
                         setDropdownBoxOpenClose( false )
                         setConfirmAnswerInputStyle( styles.inputBoxFocused )
                         if ( tempAns.length > 0 ) {
@@ -504,6 +567,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                         }
                       }}
                       onBlur={() => {
+                        setShowNote( true )
                         setConfirmAnswerInputStyle( styles.inputBox )
                         setDropdownBoxOpenClose( false )
                         let temp = ''
@@ -598,7 +662,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-      <View style={{
+      {showNote ? <View style={{
         ...styles.bottomButtonView,
       }}>
         {(
@@ -612,9 +676,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           <View style={styles.statusIndicatorInactiveView} />
           <View style={styles.statusIndicatorActiveView} />
         </View>
-      </View>
+      </View> : null}
 
-      {!visibleButton ? (
+      {showNote && !visibleButton ? (
         <View
           style={{
             marginBottom:

@@ -51,7 +51,7 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
           </Text>
         </>
       ) || syncStatus == SyncStatus.COMPLETED && (
-        <Text style={ListStyles.infoHeaderSubtitleText}>All accounts scanned</Text>
+        <Text style={ListStyles.infoHeaderSubtitleText}>Account synced</Text>
       )}
     </View>
   )
@@ -88,7 +88,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
 
       <View style={styles.mainContentContainer}>
         <Text style={BottomSheetStyles.confirmationMessageHeading}>
-          Scanning your Account
+          {syncStatus == SyncStatus.COMPLETED ? 'Account Synced' : 'Account Sync in progress'}
         </Text>
 
         <Text style={{

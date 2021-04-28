@@ -36,6 +36,6 @@ Loader.propTypes = {
 }
 
 Loader.defaultProps = {
-  backgroundColor: 'rgba(1,1,1,0.05)',
+  backgroundColor: 'rgba(1,1,1,0.4)',
   indicatorColor: Color.gray1,
 }

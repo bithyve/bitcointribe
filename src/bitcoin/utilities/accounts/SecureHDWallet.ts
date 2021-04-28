@@ -1172,9 +1172,12 @@ export default class SecureHDWallet extends Bitcoin {
   ): {
     accountId: string;
     accountNumber: number;
+    accountXpub: string;
   } => {
     let accountId: string
     let accountNumber: number
+    let accountXpub: string
+
     switch ( accountType ) {
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
@@ -1195,6 +1198,7 @@ export default class SecureHDWallet extends Bitcoin {
             accountNumber
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
+          accountXpub = updatedDervInstance.xpub
           break
         case RAMP:
           const rampDerivativeAcc: DerivativeAccount = this
@@ -1213,12 +1217,13 @@ export default class SecureHDWallet extends Bitcoin {
             accountNumber
           ] = rampUpdatedDervInstance
           accountId = rampUpdatedDervInstance.xpubId
+          accountXpub = rampUpdatedDervInstance.xpub
           break
     }
 
     if ( !accountId ) throw new Error( `Failed to setup ${accountType} account` )
     return {
-      accountId, accountNumber
+      accountId, accountNumber, accountXpub
     }
   };
 
@@ -1275,6 +1280,7 @@ export default class SecureHDWallet extends Bitcoin {
     setupSuccessful: boolean;
     accountId: string;
     accountNumber: number;
+    accountXpub: string;
   }> => {
     const accountType = DONATION_ACCOUNT
     let donationAccounts: DonationDerivativeAccount = this.derivativeAccounts[
@@ -1346,7 +1352,7 @@ export default class SecureHDWallet extends Bitcoin {
     }
 
     return {
-      setupSuccessful, accountId: xpubId, accountNumber
+      setupSuccessful, accountId: xpubId, accountNumber, accountXpub: xpub
     }
   };
 

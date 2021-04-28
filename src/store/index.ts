@@ -22,6 +22,7 @@ import wyreIntegrationReducer from './reducers/WyreIntegration'
 import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
+import upgradeToNewBhr from './reducers/upgradeToNewBhr'
 
 
 const config = {
@@ -117,6 +118,8 @@ import {
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
+  multiUpdateTrustedChannelsWatcher,
+  sendVersionUpdateNotificationWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -196,6 +199,8 @@ import {
   readFileWatcher,
   uplaodFileWatcher,
 } from './sagas/cloud'
+
+import { initLevelsWatcher, setCloudDataForLevelWatcher, autoShareSecondaryWatcher, autoShareContactKeeperWatcher, updateAvailableKeeperDataWatcher } from './sagas/upgradeToNewBhr'
 
 import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
@@ -289,6 +294,8 @@ const rootSaga = function* () {
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
+    sendVersionUpdateNotificationWatcher,
+    multiUpdateTrustedChannelsWatcher,
 
     // Health
     initHealthWatcher,
@@ -368,6 +375,12 @@ const rootSaga = function* () {
     calculateCustomFeeWatcher,
     sendTxNotificationWatcher,
     sendDonationNoteWatcher,
+    // upgrade
+    initLevelsWatcher,
+    setCloudDataForLevelWatcher,
+    autoShareSecondaryWatcher,
+    autoShareContactKeeperWatcher,
+    updateAvailableKeeperDataWatcher
   ]
 
   yield all(
@@ -405,6 +418,7 @@ const rootReducer = combineReducers( {
   rampIntegration: rampIntegrationReducer,
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
+  upgradeToNewBhr: upgradeToNewBhr,
 } )
 
 export default function makeStore() {

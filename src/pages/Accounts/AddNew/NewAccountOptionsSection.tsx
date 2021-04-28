@@ -9,6 +9,7 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
+import Toast from '../../../components/Toast'
 
 export interface Props {
   choices: SubAccountDescribing[];
@@ -54,7 +55,15 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
           return false
     }
   }
-
+  // Adding the below function to be used for displaying
+  // toast if an account is already created
+  function handleOptionSelected( subAccountInfo )  {
+    const accountKindSelected = ( subAccountInfo as ExternalServiceSubAccountInfo ).serviceAccountKind
+    if( ( accountKindSelected==ServiceAccountKind.RAMP ) && isServiceSubAccountCreationSupported( ( subAccountInfo as ExternalServiceSubAccountInfo ).serviceAccountKind ) )
+      Toast( 'Account already created' )
+    else
+      onOptionSelected( subAccountInfo )
+  }
   function isServiceSubAccountCreationSupported( serviceAccountKind: ServiceAccountKind ): boolean {
     switch ( serviceAccountKind ) {
         case ServiceAccountKind.FAST_BITCOINS:

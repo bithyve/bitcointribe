@@ -13,6 +13,7 @@ import ReassignTransactionsMainOptionsScreen from '../../../pages/Accounts/Accou
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import TransactionDetailsContainerScreen from '../../../pages/Accounts/Transactions/TransactionDetailsContainerScreen'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
+import XPubDetailsScreen from '../../../pages/Accounts/AccountSettings/XPubDetailsScreen'
 
 const SubAccountSettingsStack = createStackNavigator(
   {
@@ -66,6 +67,17 @@ const SubAccountSettingsStack = createStackNavigator(
       screen: AccountSettingsEditVisibilityScreen,
       navigationOptions: {
         title: 'Account Visibility',
+      },
+    },
+    ShowXPub: {
+      screen: XPubDetailsScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          ...defaultStackScreenNavigationOptions,
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+          },
+        }
       },
     },
     MergeAccounts: {
