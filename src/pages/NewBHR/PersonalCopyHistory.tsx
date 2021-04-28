@@ -280,10 +280,6 @@ const PersonalCopyHistory = ( props ) => {
               )
             }
             setIsReshare( true )
-            // const popAction = StackActions.pop( {
-            //   n: isChange ? 2 : 1
-            // } )
-            // props.navigation.dispatch( popAction )
           } catch ( err ) {
             dispatch( keeperProcessStatus( '' ) )
             console.log( 'error', err )
@@ -509,7 +505,12 @@ const PersonalCopyHistory = ( props ) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-          setQrBottomSheetsFlag( false )
+          setQrBottomSheetsFlag( false );
+          ( QrBottomSheet as any ).current.snapTo( 0 )
+          const popAction = StackActions.pop( {
+            n: isChange ? 2 : 1
+          } )
+          props.navigation.dispatch( popAction )
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )

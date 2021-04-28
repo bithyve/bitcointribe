@@ -407,7 +407,7 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if( prevProps.s3Service.levelhealth.SMMetaSharesKeeper != this.props.s3Service.levelhealth.SMMetaSharesKeeper && this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' ) ) {
+    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       this.updateCloudData()
     }
 
