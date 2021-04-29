@@ -46,6 +46,7 @@ const FooterButton: React.FC<FooterButtonProps> = ( {
         ...styles.buttonContainer,
         ...style
       }}
+      delayPressIn={0}
     >
       <View style={styles.buttonImageContainer}>
         <Image source={imageSource} style={styles.buttonImage} />

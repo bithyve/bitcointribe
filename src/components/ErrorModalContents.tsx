@@ -88,6 +88,7 @@ export default function ErrorModalContents( props ) {
                 ? props.buttonColor
                 : Colors.blue,
             }}
+            delayPressIn={0}
           >
             <Text
               style={{
@@ -109,6 +110,7 @@ export default function ErrorModalContents( props ) {
                 justifyContent: 'center',
                 alignItems: 'center',
               }}
+              delayPressIn={0}
             >
               <Text
                 style={{
