@@ -806,7 +806,7 @@ class UpgradeBackup extends Component<
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           if( this.state.isPdfConfirm ){
-            this.props.confirmPDFSharedFromUpgrade( this.state.selectedShareId[ 0 ], qrScannedData )
+            this.props.confirmPDFSharedFromUpgrade( this.state.selectedShareId[ 0 ], qrScannedData );
             ( this.QrBottomSheet as any ).snapTo( 0 )
             this.setState( {
               showLoader: true
@@ -891,7 +891,7 @@ class UpgradeBackup extends Component<
             this.setState( {
               pdfProcessStarted: false,
               isPdfConfirm: true,
-              qrScannerText: 'Please confirm this share by scanning the 1st Qr from pdf.'
+              qrScannerText: 'Open your PDF copy and scan the first QR for approval.'
             } );
             ( this.QrBottomSheet as any ).snapTo( 1 )
             this.props.keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
