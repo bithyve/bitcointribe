@@ -46,7 +46,6 @@ const getPdfPath = async ( pdfData: any ) => {
         return await err
       },
       async ( path: any ) => {
-        // console.log({ path });
         return await path
       },
     )

@@ -631,7 +631,7 @@ export default function ManageBackup( props ) {
   }
 
   const getScannerData = ( data ) => {
-    console.log( 'data', data )
+    // console.log( 'data', data )
   }
 
   const [ autoHighlightFlags, setAutoHighlightFlags ] = useState( {
