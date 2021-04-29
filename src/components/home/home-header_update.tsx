@@ -38,6 +38,7 @@ import { currencyKindSet } from '../../store/actions/preferences'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
+import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -86,6 +87,10 @@ const HomeHeader = ( {
   const prefersBitcoin = useMemo( () => {
     return currencyKind === CurrencyKind.BITCOIN
   }, [ currencyKind ] )
+
+  const upgradeProcessStatus = useSelector(
+    ( state ) => state.upgradeToNewBhr.upgradeProcessStatus
+  )
 
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold } = getMessageToShow()
@@ -380,11 +385,15 @@ const HomeHeader = ( {
         <TouchableOpacity
           onPress={() => {
             console.log( 'newBHRFlowStarted', newBHRFlowStarted )
+            // if( upgradeProcessStatus == KeeperProcessStatus.IN_PROGRESS ){
+            //   navigation.navigate( 'UpgradeBackup' )
+            // } else {
             if ( newBHRFlowStarted === true ) {
               navigation.navigate( 'ManageBackupNewBHR' )
             } else {
-              navigation.navigate( 'ManageBackup' )
+              navigation.navigate( 'UpgradeBackup' )
             }
+            //}
           }}
           style={styles.manageBackupMessageView}
         >

@@ -417,7 +417,7 @@ export interface TrustedDataElements {
       qrData: string;
       secret: string;
   };
-  secondaryShare?: MetaShare[];
+  secondaryShare?: MetaShare;
   keeperInfo?: string;
 }
 export interface TrustedData {

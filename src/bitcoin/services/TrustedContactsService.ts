@@ -407,4 +407,36 @@ export default class TrustedContactsService {
       }
     }
   };
+
+  public initTCFromOldTC = async (
+    oldContactName: string,
+    newContactName: string,
+  ): Promise<
+    | {
+        status: number;
+        data: boolean;
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: this.tc.initTCFromOldTC( oldContactName, newContactName )
+      }
+    } catch ( err ) {
+      console.log( 'err', err )
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update contact',
+      }
+    }
+  };
 }

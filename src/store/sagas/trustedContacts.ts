@@ -127,7 +127,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       )
     }
   }
-
   const trustedReceivingAddress = ( regularAccount.hdWallet
     .derivativeAccounts[ TRUSTED_CONTACTS ][
       accountNumber
@@ -151,7 +150,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
     Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
     config.TC_REQUEST_EXPIRY
-
 
     if ( changeContact ) {
       let previousGuardianName: string
@@ -535,8 +533,6 @@ function* updateEphemeralChannelWorker( { payload } ) {
     yield put( switchTCLoading( 'updateEphemeralChannel' ) )
 
     let trustedContacts: TrustedContactsService = payload.trustedContacts
-    console.log( 'trustedContacts updateEphemeralChannelWorker', trustedContacts )
-    console.log( ' updateEphemeralChannelWorker payload', payload )
 
     if ( !trustedContacts )
       trustedContacts = yield select( ( state ) => state.trustedContacts.service )
@@ -569,7 +565,6 @@ function* updateEphemeralChannelWorker( { payload } ) {
       fetch,
       payload.shareUploadables,
     )
-    console.log( 'updateEphemeralChannelWorker res', res )
 
 
     if ( generatedKey ) {

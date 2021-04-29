@@ -1691,9 +1691,9 @@ export default function ManageBackup( props ) {
               />
             </TouchableOpacity>
           </View>
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
-              props.navigation.navigate("UpgradeBackup");
+              props.navigation.navigate( 'UpgradeBackup' )
             }}
             style={styles.rightButton}
           >
@@ -1702,22 +1702,22 @@ export default function ManageBackup( props ) {
               color={Colors.blue}
               size={15}
               style={{
-                marginLeft: wp("1%"),
-                marginRight: wp("1%"),
-                alignSelf: "center",
+                marginLeft: wp( '1%' ),
+                marginRight: wp( '1%' ),
+                alignSelf: 'center',
               }}
             />
             <Text
               style={{
                 color: Colors.blue,
-                fontSize: RFValue(12),
+                fontSize: RFValue( 12 ),
                 fontFamily: Fonts.FiraSansRegular,
-                textAlign: "center",
+                textAlign: 'center',
               }}
             >
               Upgrade
             </Text>
-          </TouchableOpacity> */}
+          </TouchableOpacity>
         </View>
         <View
           style={{
@@ -1771,9 +1771,9 @@ export default function ManageBackup( props ) {
                 marginTop: wp( '6%' ),
               }}
             >
-              {pageData.map( ( item ) => {
+              {pageData.map( ( item, index ) => {
                 return (
-                  <View style={{
+                  <View key={index} style={{
                   }}>
                     <TouchableOpacity
                       onPress={() => {
