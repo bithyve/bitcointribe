@@ -15,6 +15,7 @@ const initialState: {
       secondarySetupAutoShare: boolean;
       contactSetupAutoShare: boolean;
       updateAvailKeeperDataStatus: boolean;
+      pdfDataConfirm: boolean;
     };
     upgradeProcessStatus: KeeperProcessStatus;
     availableKeeperData: {shareId: string; type: string; count: number; status?: boolean; contactDetails?: any}[];
@@ -28,6 +29,7 @@ const initialState: {
       secondarySetupAutoShare: false,
       contactSetupAutoShare: false,
       updateAvailKeeperDataStatus: false,
+      pdfDataConfirm: false,
     },
     upgradeProcessStatus: KeeperProcessStatus.PENDING,
     availableKeeperData: [],
