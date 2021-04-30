@@ -9,8 +9,6 @@ const initialState = ip.freeze( {
   errorTitle: null,
   errorInfo: null,
   status: LevelStatus.PENDING,
-  level1Status: LevelStatus.PENDING,
-  personalDeviceStatus: LevelStatus.PENDING,
   isTypeBottomSheetOpen: false,
 } )
 
@@ -24,22 +22,10 @@ export default ( state = initialState, { type, payload } ) => {
           status: payload.status,
         }
 
-      case IS_PERSONAL_DEVICE_COMPLETE:
-        return {
-          ...state,
-          personalDeviceStatus: payload.personalDeviceStatus,
-        }
-
       case NAVIGATING_HISTORY_PAGE:
         return {
           ...state,
           navigationObj: payload.navigationObj,
-        }
-
-      case IS_LEVEL_ONE_COMPLETE:
-        return {
-          ...state,
-          level1Status: payload.level1Status,
         }
 
       case TYPE_BOTTOMSHEET_OPEN:
