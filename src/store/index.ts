@@ -206,6 +206,8 @@ import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
+import newBHR from './reducers/newBHR'
+import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -380,7 +382,10 @@ const rootSaga = function* () {
     setCloudDataForLevelWatcher,
     autoShareSecondaryWatcher,
     autoShareContactKeeperWatcher,
-    updateAvailableKeeperDataWatcher
+    updateAvailableKeeperDataWatcher,
+
+    //newBHR
+    onPressKeeperChannelWatcher,
   ]
 
   yield all(
@@ -419,6 +424,7 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
+  newBHR: newBHR
 } )
 
 export default function makeStore() {
