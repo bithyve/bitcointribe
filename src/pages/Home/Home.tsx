@@ -209,7 +209,7 @@ interface HomePropsTypes {
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-
+  currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
   walletName: string;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
@@ -1483,6 +1483,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
+          if ( !this.props.currentSwanSubAccount ) {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: 'Swan Account',
+              defaultDescription: 'BTC purchased from Swan',
+              serviceAccountKind: ServiceAccountKind.WYRE,
+            } )
+            this.props.addNewAccountShell( newSubAccount )
+            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
+            //   currentSubAccount: newSubAccount,
+            // } )
+          }
           this.props.clearSwanCache()
           this.setState( {
             swanFromBuyMenu: true,
@@ -2597,6 +2609,7 @@ const mapStateToProps = ( state ) => {
     cloudPermissionGranted: state.health.cloudPermissionGranted,
     currentWyreSubAccount: state.accounts.currentWyreSubAccount,
     currentRampSubAccount: state.accounts.currentRampSubAccount,
+    currentSwanSubAccount: state.accounts.currentSwanSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
