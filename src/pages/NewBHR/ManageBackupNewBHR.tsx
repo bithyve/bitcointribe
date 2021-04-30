@@ -516,7 +516,8 @@ class ManageBackupNewBHR extends Component<
     if( prevProps.isTypeBottomSheetOpen !== this.props.isTypeBottomSheetOpen && this.props.isTypeBottomSheetOpen === true ){
       this.setState( {
         showLoader: false
-      } );
+      } )
+      this.props.setIsKeeperTypeBottomSheetOpen( false );
       ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
     }
 
