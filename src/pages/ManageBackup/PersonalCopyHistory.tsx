@@ -489,7 +489,7 @@ const PersonalCopyHistory = ( props ) => {
             : 'Scan the Exit Key'
         }
         infoText={
-          'Open your PDF copy which is password protected with your Security Question\'s answer'
+          'Open the PDF file which was backed up earlier and scan the first QR code'
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}

@@ -53,7 +53,6 @@ import {
   keeperProcessStatus,
   updatedKeeperInfo,
   generateSMMetaShares,
-  confirmPDFShared,
   getPDFData,
   checkMSharesHealth,
 } from '../../store/actions/health'
@@ -65,7 +64,7 @@ import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
 import { setCloudData, updateHealthForCloud, } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper, setUpgradeProcessStatus, setAvailableKeeperData, updateLevelToSetup, updateAvailableKeeperData } from '../../store/actions/upgradeToNewBhr'
+import { setCloudDataForLevel, autoUploadSecondaryShare, autoShareContactKeeper, setUpgradeProcessStatus, setAvailableKeeperData, updateLevelToSetup, updateAvailableKeeperData, confirmPDFSharedFromUpgrade } from '../../store/actions/upgradeToNewBhr'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
@@ -104,6 +103,8 @@ interface UpgradeBackupStateTypes {
   pdfProcessStarted: boolean;
   QrBottomSheetsFlag: boolean;
   secondaryMnemonics: string;
+  isPdfConfirm: boolean;
+  qrScannerText: string;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -154,7 +155,7 @@ interface UpgradeBackupPropsTypes {
   levelToSetup: number;
   updateAvailableKeeperData: any;
   trustedChannelsSetupSync: any;
-  confirmPDFShared: any;
+  confirmPDFSharedFromUpgrade: any;
   getPDFData: any;
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
@@ -242,7 +243,9 @@ class UpgradeBackup extends Component<
       isRefreshing: false,
       pdfProcessStarted: false,
       QrBottomSheetsFlag: false,
-      secondaryMnemonics: ''
+      secondaryMnemonics: '',
+      isPdfConfirm: false,
+      qrScannerText: ''
     }
   }
 
@@ -396,6 +399,7 @@ class UpgradeBackup extends Component<
           if( element.type == 'pdf' && !element.status ) {
             console.log( 'PDF' )
             this.setState( {
+              showLoader: false,
               pdfProcessStarted: true
             } )
             let shareId = []
@@ -409,8 +413,15 @@ class UpgradeBackup extends Component<
             this.setState( {
               selectedShareId: shareId
             } )
-            if( shareId.length ){
-              this.checkStoragePermission()
+            if( this.props.pdfInfo.filePath !=='' ){
+              this.setState( {
+                showLoader: false
+              } )
+              this.PersonalCopyShareBottomSheet.current.snapTo( 1 )
+            } else {
+              if( shareId.length ){
+                this.checkStoragePermission()
+              }
             }
             this.RestoreFromICloud.current.snapTo( 0 )
             this.secondaryDeviceBottomSheet.current.snapTo( 0 )
@@ -422,7 +433,8 @@ class UpgradeBackup extends Component<
       }
     } else {
       this.setState( {
-        showLoader: false
+        showLoader: false,
+        qrScannerText: 'Scan last qr from pdf or scan secondary qr from personal device.'
       } )
       if( !secureAccount.secureHDWallet.secondaryMnemonic )
         ( this.QrBottomSheet as any ).snapTo( 1 )
@@ -789,21 +801,26 @@ class UpgradeBackup extends Component<
         isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
-        infoText={
-          'Please approve this request by scanning the Secondary Key stored with any of the other backups'
-        }
+        infoText={this.state.qrScannerText}
         modalRef={this.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          console.log( 'qrScannedData', qrScannedData )
-          this.setState( {
-            secondaryMnemonics: qrScannedData,
-            QrBottomSheetsFlag: false
-          } )
-          setTimeout( () => {
+          if( this.state.isPdfConfirm ){
+            this.props.confirmPDFSharedFromUpgrade( this.state.selectedShareId[ 0 ], qrScannedData );
             ( this.QrBottomSheet as any ).snapTo( 0 )
-            this.RestoreFromICloud.current.snapTo( 1 )
-          }, 2 )
+            this.setState( {
+              showLoader: true
+            } )
+          } else {
+            this.setState( {
+              secondaryMnemonics: qrScannedData,
+              QrBottomSheetsFlag: false
+            } )
+            setTimeout( () => {
+              ( this.QrBottomSheet as any ).snapTo( 0 )
+              this.RestoreFromICloud.current.snapTo( 1 )
+            }, 2 )
+          }
         }}
         onBackPress={() => {
           this.setState( {
@@ -870,14 +887,14 @@ class UpgradeBackup extends Component<
         }}
         onPressShare={() => {}}
         onPressConfirm={() => {
-          // console.log( 'On confirm', this.state.selectedShareId[ 0 ] )
           try {
             this.setState( {
-              pdfProcessStarted: false
-            } )
-            this.props.updateAvailableKeeperData( 'pdf' )
+              pdfProcessStarted: false,
+              isPdfConfirm: true,
+              qrScannerText: 'Open your PDF copy and scan the first QR for approval.'
+            } );
+            ( this.QrBottomSheet as any ).snapTo( 1 )
             this.props.keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
-            this.props.confirmPDFShared( this.state.selectedShareId[ 0 ] )
             this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
           } catch ( err ) {
             this.props.keeperProcessStatus( '' )
@@ -1477,7 +1494,7 @@ export default withNavigationFocus(
     updateLevelToSetup,
     updateAvailableKeeperData,
     trustedChannelsSetupSync,
-    confirmPDFShared,
+    confirmPDFSharedFromUpgrade,
     getPDFData,
     checkMSharesHealth,
     updateTrustedContactsInfoLocally

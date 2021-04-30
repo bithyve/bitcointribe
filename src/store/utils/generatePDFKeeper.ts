@@ -18,17 +18,12 @@ export default async ( pdfData, fileName, title ) => {
     qrCodeString,
   }
   const pdfPath = await getPdfPath( pdfDatas )
-  console.log( {
-    pdfPath
-  } )
   return pdfPath
 }
 const getPdfPath = async ( pdfData: any ) => {
   if( pdfData ){
-    console.log( 'PDFDATA', pdfData )
     if ( Platform.OS == 'ios' ) {
       const PdfPassword = await NativeModules.PdfPassword
-      console.log( 'PADFPASSWORD', PdfPassword )
       return await PdfPassword.createPdfKeeper( JSON.stringify( pdfData ) )
     } else {
       const PdfPassword = await NativeModules.PdfPassword
@@ -38,7 +33,6 @@ const getPdfPath = async ( pdfData: any ) => {
           return await err
         },
         async ( path: any ) => {
-        // console.log({ path });
           return await path
         },
       )

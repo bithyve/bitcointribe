@@ -189,9 +189,6 @@ const TrustedContactHistory = ( props ) => {
         .toLowerCase()
         .trim()
       const tcInstance = trustedContacts.tc.trustedContacts[ contactName ]
-      console.log( {
-        tcInstance
-      } )
       if ( tcInstance ) {
         if ( tcInstance.symmetricKey ) {
           setGuardianExists( true )
@@ -647,9 +644,6 @@ const TrustedContactHistory = ( props ) => {
     const appVersion = DeviceInfo.getVersion()
     if ( chosenContact.phoneNumbers && chosenContact.phoneNumbers.length ) {
       const phoneNumber = chosenContact.phoneNumbers[ 0 ].number
-      console.log( {
-        phoneNumber
-      } )
       let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
       number = number.slice( number.length - 10 ) // last 10 digits only
       const numHintType = 'num'
@@ -673,9 +667,6 @@ const TrustedContactHistory = ( props ) => {
         `/${numHint}` +
         `/${uploadedAt}` +
         `/v${appVersion}`
-      console.log( {
-        numberDL
-      } )
       setIsOTPType( false )
       setTrustedLink( numberDL )
       setActivateReshare( true )
@@ -702,9 +693,6 @@ const TrustedContactHistory = ( props ) => {
         `/${emailHint}` +
         `/${uploadedAt}` +
         `/v${appVersion}`
-      console.log( {
-        emailDL
-      } )
       setIsOTPType( false )
       setTrustedLink( emailDL )
       setActivateReshare( true )
@@ -863,9 +851,6 @@ const TrustedContactHistory = ( props ) => {
       }`
         .toLowerCase()
         .trim()
-      console.log( {
-        contactName
-      } )
       if ( !trustedContacts.tc.trustedContacts[ contactName ] ) return
 
       createDeepLink()
