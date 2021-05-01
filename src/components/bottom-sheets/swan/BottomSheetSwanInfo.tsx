@@ -15,8 +15,8 @@ import { createWithdrawalWalletOnSwan, fetchSwanAuthenticationUrl, redeemSwanCod
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 import { addNewAccountShell } from '../../../store/actions/accounts'
+import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 
-let boottomSheetRenderCount = 0
 type Props = {
   swanDeepLinkContent: string | null;
   swanFromDeepLink: boolean | null;
@@ -25,14 +25,14 @@ type Props = {
 }
 
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDeepLink, swanFromBuyMenu, onClickSetting }: Props ) => {
-  console.log( {
-    boottomSheetRenderCount: boottomSheetRenderCount++, swanFromBuyMenu, swanFromDeepLink
-  } )
   const dispatch = useDispatch()
   const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted, hasCreateWithdrawalWalletOnSwanSucceeded, hasCreateWithdrawalWalletOnSwanCompleted, hasCreateWithdrawalWalletOnSwanInitiated } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+  const { currentSwanSubAccount } = useAccountsState()
+  const [ swanAccountSetupCompleted, setSwanAccountSetupCompleted ] = useState( !( currentSwanSubAccount == null ) )
+
   function handleProceedButtonPress() {
-    if ( swanFromBuyMenu ) {
+    if ( swanFromBuyMenu && !swanAccountSetupCompleted ) {
       if( !hasFetchSwanAuthenticationUrlInitiated ) {
         setHasButtonBeenPressed( true )
         dispatch( fetchSwanAuthenticationUrl( {
@@ -42,23 +42,23 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
   }
 
   useEffect( ()=>{
-    if ( swanFromBuyMenu ) {
-      console.log( {
-        swanAuthenticationUrl
-      } )
+    console.log( '***-> State changed hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ', hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl )
+    if ( swanFromBuyMenu && !swanAccountSetupCompleted ) {
       if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
     }
   }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )
 
-  if( swanFromDeepLink && !hasRedeemSwanCodeForTokenInitiated ) {
+  if( swanFromDeepLink && !swanAccountSetupCompleted && !hasRedeemSwanCodeForTokenInitiated ) {
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
 
   useEffect( ()=>{
+    console.log( '***-> State changed hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken ', hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken )
     if( swanFromDeepLink ) {
       swanFromBuyMenu = false
       if( hasRedeemSwanCodeForTokenSucceeded )
         dispatch( createWithdrawalWalletOnSwan( {
+          minBtcThreshold: 0.5
         } ) )
     }
   }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken ] )

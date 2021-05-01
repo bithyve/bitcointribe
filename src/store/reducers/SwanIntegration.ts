@@ -176,7 +176,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
-        console.log('action.payload', action.payload)
         return {
           ...state,
           minBtcThreshold: action.payload.data.minBtcThreshold || 0.0005,
