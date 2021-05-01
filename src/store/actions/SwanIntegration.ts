@@ -115,9 +115,12 @@ export const createWithdrawalWalletOnSwan = ( data ) => {
   }
 }
 
-export const createWithdrawalWalletOnSwanInitiated = () => {
+export const createWithdrawalWalletOnSwanInitiated = ( data ) => {
   return {
     type: CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED,
+    payload : {
+      data
+    }
   }
 }
 

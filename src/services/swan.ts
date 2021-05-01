@@ -45,3 +45,29 @@ export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey,
     }
   }
 }
+
+
+export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThreshold } ) => {
+  try {
+    const data = {
+      walletId, minBtcThreshold
+    }
+    const headers= {
+      'Authorization': `Bearer ${access_token}`,
+      'Content-Type': 'application/json'
+    }
+    console.log( 'about to create wallet with ', data, headers )
+    const config = {
+      method: 'POST',
+      headers,
+      data
+    }
+    return SWAN_AXIOS.post( 'v1/automatic-withdrawal', config )
+
+  } catch ( error ) {
+    console.log( 'error calling swan ', error )
+    return {
+      error
+    }
+  }
+}

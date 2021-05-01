@@ -15,6 +15,7 @@ import {
 
 
 export type SwanIntegrationState = {
+  swanErrorCode: string | null,
   isSwanAuthenticationInProgress: boolean | null,
   swanAuthenticationUrl: string | null,
   code_verifier: string | null,
@@ -29,6 +30,8 @@ export type SwanIntegrationState = {
   hasRedeemSwanCodeForTokenSucceeded: boolean | null,
   hasRedeemSwanCodeForTokenCompleted: boolean | null,
   hasRedeemSwanCodeForTokenInitiated: boolean | null,
+
+  minBtcThreshold: number | 0.0005,
 
   hasCreateWithdrawalWalletOnSwanSucceeded: boolean | null,
   hasCreateWithdrawalWalletOnSwanCompleted: boolean | null,
@@ -72,6 +75,7 @@ export type SwanIntegrationState = {
 }
 
 const INITIAL_STATE: SwanIntegrationState = {
+  swanErrorCode: '',
   isSwanAuthenticationInProgress: false,
   swanAuthenticationUrl: null,
   code_challenge: null,
@@ -86,6 +90,7 @@ const INITIAL_STATE: SwanIntegrationState = {
   hasRedeemSwanCodeForTokenCompleted: false,
   hasRedeemSwanCodeForTokenInitiated: false,
 
+  minBtcThreshold: 0.0005,
   hasSwanAccountCreationSucceeded: false,
   hasSwanAccountCreationCompleted: false,
   hasSwanAccountCreationInitiated: false,
@@ -171,13 +176,14 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
+        console.log('action.payload', action.payload)
         return {
           ...state,
+          minBtcThreshold: action.payload.data.minBtcThreshold || 0.0005,
           hasCreateWithdrawalWalletOnSwanInitiated: true,
         }
 
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED:
-        console.log( 'CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED ', action.payload )
         return {
           ...state,
           hasCreateWithdrawalWalletOnSwanSucceeded: true,

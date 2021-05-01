@@ -5,8 +5,6 @@ import { asyncPkceChallenge } from 'react-native-pkce-challenge'
 
 
 export const generatePKCEParameters = async () => {
-  console.log( ' made it to generator' )
-
   const challenge = await asyncPkceChallenge()
   console.log( {
     challenge
