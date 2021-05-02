@@ -1,6 +1,7 @@
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
+export const UPDATE_SWAN_STATUS = 'UPDATE_SWAN_STATUS'
 export const CLEAR_SWAN_CACHE = 'CLEAR_SWAN_CACHE'
 export const FETCH_SWAN_AUTHENTICATION_URL_STARTED = 'FETCH_SWAN_AUTHENTICATION_URL_STARTED'
 export const FETCH_SWAN_AUTHENTICATION_URL = 'FETCH_SWAN_AUTHENTICATION_URL'
@@ -37,6 +38,7 @@ export const SWAN_ACCOUNT_SHELL_CREATED = 'SWAN_ACCOUNT_SHELL_CREATED'
 
 
 export enum SwanActionKind {
+  UPDATE_SWAN_STATUS,
   CLEAR_SWAN_CACHE,
   FETCH_SWAN_AUTHENTICATION_URL,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
@@ -49,6 +51,15 @@ export enum SwanActionKind {
   CREATE_SWAN_ACCOUNT_SHELL,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
   SYNC_SWAN_ACCOUNT_DATA
+}
+
+export const updateSwanStatus = ( data ) => {
+  return {
+    type: UPDATE_SWAN_STATUS,
+    payload: {
+      data
+    }
+  }
 }
 
 export const clearSwanCache = ( ) => {

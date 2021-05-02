@@ -1,4 +1,6 @@
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import {
+  UPDATE_SWAN_STATUS,
   CLEAR_SWAN_CACHE,
   FETCH_SWAN_AUTHENTICATION_URL_STARTED,
   FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED,
@@ -16,6 +18,7 @@ import {
 
 export type SwanIntegrationState = {
   swanErrorCode: string | null,
+  swanAccountCreationStatus: SwanAccountCreationStatus | null,
   isSwanAuthenticationInProgress: boolean | null,
   swanAuthenticationUrl: string | null,
   code_verifier: string | null,
@@ -76,6 +79,7 @@ export type SwanIntegrationState = {
 
 const INITIAL_STATE: SwanIntegrationState = {
   swanErrorCode: '',
+  swanAccountCreationStatus: null,
   isSwanAuthenticationInProgress: false,
   swanAuthenticationUrl: null,
   code_challenge: null,
@@ -127,7 +131,11 @@ const INITIAL_STATE: SwanIntegrationState = {
 
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
-
+      case UPDATE_SWAN_STATUS:
+        return {
+          ...state,
+          swanAccountCreationStatus: action.payload.data
+        }
       case CLEAR_SWAN_CACHE:
         return {
           ...INITIAL_STATE
@@ -142,6 +150,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
           ...state,
+          swanAccountCreationStatus: SwanAccountCreationStatus.INITIAL_USER_AUTHENTICATION_IN_PROGRESS,
           isSwanAuthenticationInProgress: true,
           hasFetchSwanAuthenticationUrlInitiated: true,
           hasFetchSwanAuthenticationUrlSucceeded: true,
@@ -164,7 +173,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED:
-        console.log( 'REDEEM_SWAN_CODE_FOR_TOKEN_SUCCEEDED ', action.payload )
         return {
           ...state,
           hasRedeemSwanCodeForTokenSucceeded: true,
@@ -185,6 +193,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED:
         return {
           ...state,
+          swanAccountCreationStatus: SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY,
           hasCreateWithdrawalWalletOnSwanSucceeded: true,
           hasCreateWithdrawalWalletOnSwanCompleted: true,
           swanWalletId: action.payload.data.swanWalletId

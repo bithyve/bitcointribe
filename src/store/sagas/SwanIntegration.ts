@@ -113,39 +113,17 @@ export const createWithdrawalWalletOnSwanWatcher = createWatcher(
 )
 export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   yield put( createWithdrawalWalletOnSwanInitiated( payload.data.minBtcThreshold ) )
-  yield call( addTempSwanAccountShell, {
-    payload: new ExternalServiceSubAccountInfo( {
-      instanceNumber: 1,
-      defaultTitle: 'Swan Account',
-      defaultDescription: 'BTC purchased from Swan',
-      serviceAccountKind: ServiceAccountKind.WYRE,
-    } )
-  } )
 
   const { swanAuthenticatedToken, swanAccountShell, minBtcThreshold } = yield select(
     ( state ) => state.swanIntegration
   )
-  console.log( {
-    swanAccountShell
-  } )
 
   const swanXpub = swanAccountShell.primarySubAccount.xPub
-  const res = {
-    'entity': 'wallet',
-    'item': {
-      'btcAddress': 'tb1qdx0pd4h65d7mekkhk7n6jwzfwgqath7s9l2fum',
-      'displayName': 'Stacking Sats (Hexa)',
-      'id': 'd313d589-32bf-4635-923a-a5585a15a0d1',
-      'isConfirmed': true,
-      'metadata': {
-        'arbitraryMetadata': [ Object ], 'oidc': [ Object ]
-      }, 'walletAddressId': '7669a64f-5014-46ca-b809-85b606a86e58'
-    }
-  }
+
   const swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
     access_token: swanAuthenticatedToken,
     extendedPublicKey: swanXpub,
-    displayName: 'Stacking Sats (Hexa)',
+    displayName: 'BTC purchased from Swan',
     metadata: {
       foo: 'bar'
     }
