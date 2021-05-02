@@ -6,11 +6,12 @@ import ListStyles from '../../../../common/Styles/ListStyles'
 import { Input, Button } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
 import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import SwanAccountCreationStatus from '../../../../common/data/enums/SwanAccountCreationStatus'
 import useSwanIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import BottomInfoBox from '../../../../components/BottomInfoBox'
 import { fetchSwanAuthenticationUrl } from '../../../../store/actions/SwanIntegration'
 import openLink from '../../../../utils/OpenLink'
-
+import { createTempSwanAccountShell, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
 export type Props = {
   navigation: any;
 };
@@ -47,7 +48,11 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   }
 
   useEffect( ()=>{
-    if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) openLink( swanAuthenticationUrl )
+    if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
+      openLink( swanAuthenticationUrl )
+      dispatch( updateSwanStatus( SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED ) )
+      dispatch( createTempSwanAccountShell( currentSubAccount ) )
+    }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
 
   return (

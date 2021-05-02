@@ -126,6 +126,9 @@ import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
@@ -134,13 +137,11 @@ import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKi
 import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache } from '../../store/actions/SwanIntegration'
+import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -186,8 +187,6 @@ interface HomeStateTypes {
   isLoadContacts: boolean;
   lastActiveTime: string;
   swanDeepLinkContent: string | null;
-  swanFromBuyMenu: boolean | null;
-  swanFromDeepLink: boolean | null;
   isBalanceLoading: boolean;
   addContactModalOpened: boolean;
   encryptedCloudDataJson: any;
@@ -232,6 +231,7 @@ interface HomePropsTypes {
   clearWyreCache: any;
   clearRampCache: any;
   clearSwanCache: any;
+  updateSwanStatus: any;
   addNewAccountShell: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -249,8 +249,6 @@ interface HomePropsTypes {
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
   swanDeepLinkContent: string | null;
-  swanFromBuyMenu: boolean | null;
-  swanFromDeepLink: boolean | null;
   regularAccount: RegularAccount;
   database: any;
   setCardData: any;
@@ -319,8 +317,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
       swanDeepLinkContent: null,
-      swanFromBuyMenu: null,
-      swanFromDeepLink: null,
       isBalanceLoading: true,
       addContactModalOpened: false,
       encryptedCloudDataJson: [],
@@ -1174,9 +1170,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.clearSwanCache()
       this.setState( {
         swanDeepLinkContent:url,
-        swanFromDeepLink: true,
-        swanFromBuyMenu: false
       }, () => {
+        this.props.updateSwanStatus( SwanAccountCreationStatus.ROUTED_BACK_FROM_SWAN )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
 
@@ -1497,10 +1492,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           }
           this.props.clearSwanCache()
           this.setState( {
-            swanFromBuyMenu: true,
-            swanFromDeepLink: false,
             swanDeepLinkContent: null
           }, () => {
+            this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
             this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
           } )
           break
@@ -2129,9 +2123,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.SWAN_STATUS_INFO:
-          return ( this.state.swanFromDeepLink )
-            ? Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
-            : Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '67%' ]
@@ -2201,8 +2193,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <>
               <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
               <BottomSheetSwanInfo
-                swanFromDeepLink={this.state.swanFromDeepLink}
-                swanFromBuyMenu={this.state.swanFromBuyMenu}
                 swanDeepLinkContent={this.state.swanDeepLinkContent}
                 onClickSetting={() => {
                   this.closeBottomSheet()
@@ -2661,6 +2651,7 @@ export default withNavigationFocus(
     clearWyreCache,
     clearRampCache,
     clearSwanCache,
+    updateSwanStatus,
     addNewAccountShell,
     addTransferDetails,
     clearPaymentDetails,
