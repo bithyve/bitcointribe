@@ -117,7 +117,7 @@ const SecurityQuestionHistory = ( props ) => {
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
         info={'Question Successfully Backed Up'}
-        note={'Hexa will remind you to help\nremember the answer'}
+        note={''}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
         onPressProceed={() => {
@@ -126,6 +126,7 @@ const SecurityQuestionHistory = ( props ) => {
           props.navigation.goBack()
         }}
         isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/illustration.png' )}
       />
     )
   }, [] )
@@ -288,7 +289,7 @@ const SecurityQuestionHistory = ( props ) => {
         ref={HealthCheckSuccessBottomSheet as any}
         snapPoints={[
           -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '37%' ) : hp( '45%' ),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '27%' ) : hp( '35%' ),
         ]}
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}

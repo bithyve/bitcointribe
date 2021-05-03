@@ -262,7 +262,6 @@ const SecondaryDeviceHistory = ( props ) => {
       const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
         contactName
       ]
-
       setSecondaryQR(
         JSON.stringify( {
           isGuardian: true,
@@ -291,9 +290,6 @@ const SecondaryDeviceHistory = ( props ) => {
       .toLowerCase()
       .trim()
     const tcInstance = trustedContacts.tc.trustedContacts[ contactName ]
-    console.log( {
-      tcInstance
-    } )
     if ( tcInstance ) {
       if ( tcInstance.symmetricKey ) {
         setGuardianExists( true )

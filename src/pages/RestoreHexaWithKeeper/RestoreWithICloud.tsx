@@ -76,7 +76,47 @@ import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedConta
 import { getCloudDataRecovery, clearCloudCache } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setVersion } from '../../store/actions/versionHistory'
-
+const LOADER_MESSAGE_TIME = 2000
+let messageIndex = 0
+const loaderMessages = [
+  {
+    heading: 'Bootstrapping Accounts',
+    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
+    subText: '',
+  },
+  {
+    heading: 'Filling Test Account with test sats',
+    text:
+      'Preloaded Test Account is the best place to start your Bitcoin journey',
+    subText: '',
+  },
+  {
+    heading: 'Generating Recovery Keys',
+    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
+    subText: '',
+  },
+  {
+    heading: 'Manage Backup',
+    text:
+      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 1 - Automated Cloud Backup',
+    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
+    subText: '',
+  },
+  {
+    heading: 'Level 2 - Double Backup',
+    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
+    subText: '',
+  },
+  {
+    heading: 'Level 3 - Multi-key Backup',
+    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
+    subText: '',
+  }
+]
 interface RestoreWithICloudStateTypes {
   selectedIds: any[];
   listData: any[];
@@ -94,6 +134,7 @@ interface RestoreWithICloudStateTypes {
   otp: string;
   renderTimer: boolean;
   isLinkCreated: boolean;
+  loaderMessage: {heading:string; text: string; subText?: string;};
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -133,36 +174,59 @@ class RestoreWithICloud extends Component<
   RestoreWithICloudPropsTypes,
   RestoreWithICloudStateTypes
 > {
-  constructor( props ) {
-    super( props )
-    this.state = {
-      selectedIds: [],
-      listData: [],
-      walletsArray: [],
-      cloudBackup: false,
-      hideShow: false,
-      selectedBackup: {
-        data: '',
-        dateTime: '',
-        walletId: '',
-        walletName: '',
-        levelStatus: '',
-        shares: '',
-        keeperData: '',
-      },
-      metaShares: [],
-      showLoader: false,
-      refreshControlLoader: false,
-      selectedContact: {
-      },
-      linkToRequest: '',
-      contactList: [],
-      isOtpType: false,
-      otp: '',
-      renderTimer: false,
-      isLinkCreated: false,
+    RestoreFromICloud: any;
+    ContactListForRestore: any;
+    RestoreSuccess: any;
+    BackupNotFound: any;
+    RestoreWallet: any;
+    loaderBottomSheet: any;
+    ErrorBottomSheet: any;
+    SendViaLinkBottomSheet: any;
+    shareOtpWithTrustedContactBottomSheet: any;
+
+    constructor( props ) {
+      super( props )
+      this.RestoreFromICloud = React.createRef()
+      this.ContactListForRestore = React.createRef()
+      this.RestoreSuccess = React.createRef()
+      this.BackupNotFound = React.createRef()
+      this.RestoreWallet = React.createRef()
+      this.loaderBottomSheet = React.createRef()
+      this.ErrorBottomSheet = React.createRef()
+      this.SendViaLinkBottomSheet = React.createRef()
+      this.shareOtpWithTrustedContactBottomSheet = React.createRef()
+
+      this.state = {
+        selectedIds: [],
+        listData: [],
+        walletsArray: [],
+        cloudBackup: false,
+        hideShow: false,
+        selectedBackup: {
+          data: '',
+          dateTime: '',
+          walletId: '',
+          walletName: '',
+          levelStatus: '',
+          shares: '',
+          keeperData: '',
+        },
+        metaShares: [],
+        showLoader: false,
+        refreshControlLoader: false,
+        selectedContact: {
+        },
+        linkToRequest: '',
+        contactList: [],
+        isOtpType: false,
+        otp: '',
+        renderTimer: false,
+        isLinkCreated: false,
+        loaderMessage:  {
+          heading:'Creating your wallet', text: 'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
+        },
+      }
     }
-  }
 
   componentDidMount = () => {
     this.cloudData()
@@ -200,7 +264,7 @@ class RestoreWithICloud extends Component<
       this.setState( ( state ) => ( {
         showLoader: false,
       } ) );
-      ( this.refs.BackupNotFound as any ).snapTo( 1 )
+      ( this.BackupNotFound as any ).current.snapTo( 1 )
     }
 
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
@@ -210,8 +274,8 @@ class RestoreWithICloud extends Component<
       initNewBHRFlow( true )
       checkMSharesHealth()
       walletCheckIn()
-      if ( this.refs.loaderBottomSheet as any )
-        ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
+      if ( this.loaderBottomSheet as any )
+        ( this.loaderBottomSheet as any ).current.snapTo( 0 )
       this.props.navigation.navigate( 'HomeNav' )
     }
 
@@ -226,16 +290,16 @@ class RestoreWithICloud extends Component<
     }
 
     if ( prevProps.walletRecoveryFailed !== walletRecoveryFailed ) {
-      if ( this.refs.loaderBottomSheet as any )
-        ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
+      if ( this.loaderBottomSheet as any )
+        ( this.loaderBottomSheet as any ).current.snapTo( 0 )
     }
 
     if( prevProps.errorReceiving !== this.props.errorReceiving && this.props.errorReceiving === true ){
       this.setState( {
         showLoader: false
       } )
-      if ( this.refs.loaderBottomSheet as any )
-        ( this.refs.loaderBottomSheet as any ).snapTo( 0 )
+      if ( this.loaderBottomSheet as any )
+        ( this.loaderBottomSheet as any ).current.snapTo( 0 )
     }
 
     if (
@@ -250,6 +314,11 @@ class RestoreWithICloud extends Component<
       this.onCreatLink()
     }
   };
+
+  componentWillUnmount = () =>{
+    console.log( 'Inside componentWillUnmount' )
+    this.props.clearCloudCache()
+  }
 
   updateList = () => {
     //console.log("INSIDE updateList");
@@ -307,7 +376,7 @@ class RestoreWithICloud extends Component<
 
     if ( shares.length === 2 && selectedBackup.levelStatus === 2 ) {
       //console.log("INSIDE IF SHARES", shares.length, selectedBackup.levelStatus);
-      ( this.refs.loaderBottomSheet as any ).snapTo( 1 )
+      this.showLoaderModal()
       this.recoverWallet(
         selectedBackup.levelStatus,
         KeeperData,
@@ -315,7 +384,7 @@ class RestoreWithICloud extends Component<
       )
     } else if ( shares.length === 3 && selectedBackup.levelStatus === 3 ) {
       // console.log("INSIDE IF SHARES ### 3", shares.length, selectedBackup.levelStatus);
-      ( this.refs.loaderBottomSheet as any ).snapTo( 1 )
+      this.showLoaderModal()
       this.recoverWallet(
         selectedBackup.levelStatus,
         KeeperData,
@@ -351,12 +420,12 @@ class RestoreWithICloud extends Component<
         walletsArray: newArray,
         showLoader: false,
       } ) );
-      ( this.refs.RestoreFromICloud as any ).snapTo( 1 )
+      ( this.RestoreFromICloud as any ).current.snapTo( 1 )
     } else {
       this.setState( ( state ) => ( {
         showLoader: false,
       } ) );
-      ( this.refs.BackupNotFound as any ).snapTo( 1 )
+      ( this.BackupNotFound as any ).current.snapTo( 1 )
     }
   };
 
@@ -413,12 +482,12 @@ class RestoreWithICloud extends Component<
         listData: listDataArray
       } );
       // if(selectedBackup.type == "device"){
-      ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
+      ( this.RestoreFromICloud as any ).current.snapTo( 0 )
     } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
-      ( this.refs.loaderBottomSheet as any ).snapTo( 1 )
+      this.showLoaderModal()
       recoverWalletUsingIcloud( decryptedCloudDataJson )
     } else {
-      ( this.refs.ErrorBottomSheet as any ).snapTo( 1 )
+      ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
     }
   };
 
@@ -624,6 +693,54 @@ class RestoreWithICloud extends Component<
     this.downloadSecret( 1 )
   };
 
+  setLoaderMessages = () => {
+    setTimeout( () => {
+      const newMessage = this.getNextMessage()
+      this.setState( {
+        loaderMessage: newMessage
+      } )
+      setTimeout( () => {
+        const newMessage = this.getNextMessage()
+        this.setState( {
+          loaderMessage: newMessage
+        } )
+        setTimeout( () => {
+          const newMessage = this.getNextMessage()
+          this.setState( {
+            loaderMessage: newMessage
+          } )
+          setTimeout( () => {
+            const newMessage = this.getNextMessage()
+            this.setState( {
+              loaderMessage: newMessage
+            } )
+            setTimeout( () => {
+              const newMessage = this.getNextMessage()
+              this.setState( {
+                loaderMessage: newMessage
+              } )
+              setTimeout( () => {
+                const newMessage = this.getNextMessage()
+                this.setState( {
+                  loaderMessage: newMessage
+                } )
+              }, LOADER_MESSAGE_TIME )
+            }, LOADER_MESSAGE_TIME )
+          }, LOADER_MESSAGE_TIME )
+        }, LOADER_MESSAGE_TIME )
+      }, LOADER_MESSAGE_TIME )
+    }, LOADER_MESSAGE_TIME )
+  }
+
+  showLoaderModal = () => {
+    this.loaderBottomSheet.current.snapTo( 1 )
+    this.setLoaderMessages()
+  }
+  getNextMessage = () => {
+    if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
+    return loaderMessages[ messageIndex++ ]
+  }
+
   render() {
     const {
       hideShow,
@@ -640,7 +757,6 @@ class RestoreWithICloud extends Component<
       otp,
       isOtpType,
     } = this.state
-    console.log( 'listData', listData )
     const { navigation, database } = this.props
     let name
     if ( Platform.OS == 'ios' ) name = 'iCloud'
@@ -702,6 +818,7 @@ class RestoreWithICloud extends Component<
             listData.map( ( item, index ) => {
               return (
                 <TouchableOpacity
+                  key={index}
                   style={{
                     ...styles.cardsView,
                     borderBottomWidth: index == 2 ? 0 : 4,
@@ -849,10 +966,11 @@ class RestoreWithICloud extends Component<
           <TouchableOpacity
             onPress={() => {
               // alert("test");
-              ( this.refs.ContactListForRestore as any ).snapTo( 1 )
+              ( this.ContactListForRestore as any ).current.snapTo( 1 )
               // this.onCreatLink();
             }}
             style={styles.buttonInnerView}
+            disabled={contactList.length ? false : true}
           >
             <Image
               source={require( '../../assets/images/icons/openlink.png' )}
@@ -904,9 +1022,10 @@ class RestoreWithICloud extends Component<
 
               <View style={styles.dropDownView}>
                 <ScrollView>
-                  {walletsArray.map( ( value ) => {
+                  {walletsArray.map( ( value, index ) => {
                     return (
                       <TouchableOpacity
+                        key={index}
                         activeOpacity={10}
                         onPress={() => {
                           console.log( 'onPress' )
@@ -976,7 +1095,7 @@ class RestoreWithICloud extends Component<
         ) : null}
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'RestoreFromICloud'}
+          ref={this.RestoreFromICloud}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1002,13 +1121,13 @@ class RestoreWithICloud extends Component<
                 }
                 proceedButtonText={'Restore'}
                 backButtonText={'Back'}
-                modalRef={this.refs.RestoreFromICloud}
+                modalRef={this.RestoreFromICloud}
                 onPressProceed={() => {
-                  //(this.refs.RestoreFromICloud as any).snapTo(0);
+                  //(this.RestoreFromICloud as any).current.snapTo(0);
                   this.restoreWallet()
                 }}
                 onPressBack={() => {
-                  ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
+                  ( this.RestoreFromICloud as any ).current.snapTo( 0 )
                 }}
                 onPressCard={() => {
                   console.log( 'ajfjkh asd', hideShow )
@@ -1022,14 +1141,14 @@ class RestoreWithICloud extends Component<
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                ( this.refs.RestoreFromICloud as any ).snapTo( 0 )
+                ( this.RestoreFromICloud as any ).current.snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'ContactListForRestore'}
+          ref={this.ContactListForRestore}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1039,21 +1158,18 @@ class RestoreWithICloud extends Component<
           renderContent={() => {
             return (
               <ContactListForRestore
-                title={'Select Contact to Create link'}
+                title={'Select Contact'}
                 subText={
-                  'Lorem ipsum dolor sit amet consetetur sadipscing elitr, sed diamnonumy eirmod'
-                }
-                info={
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed doeiusmod tempor incididunt ut labore et dolore.'
+                  'Select contact to send a Wallet Restore request link'
                 }
                 contactList={contactList}
-                modalRef={this.refs.ContactListForRestore}
+                modalRef={this.ContactListForRestore}
                 onPressCard={( contact, index ) => {
                   this.setState( {
                     selectedContact: contact
                   } );
-                  ( this.refs.ContactListForRestore as any ).snapTo( 0 );
-                  ( this.refs.SendViaLinkBottomSheet as any ).snapTo( 1 )
+                  ( this.ContactListForRestore as any ).current.snapTo( 0 );
+                  ( this.SendViaLinkBottomSheet as any ).current.snapTo( 1 )
                   this.createLink( contact, index )
                 }}
               />
@@ -1062,14 +1178,14 @@ class RestoreWithICloud extends Component<
           renderHeader={() => (
             <ModalHeader
               onPressHeader={() =>
-                ( this.refs.ContactListForRestore as any ).snapTo( 0 )
+                ( this.ContactListForRestore as any ).current.snapTo( 0 )
               }
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'RestoreSuccess'}
+          ref={this.RestoreSuccess}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1078,24 +1194,24 @@ class RestoreWithICloud extends Component<
           ]}
           renderContent={() => (
             <RestoreSuccess
-              modalRef={this.refs.RestoreSuccess}
+              modalRef={this.RestoreSuccess}
               onPressProceed={() => {
-                ( this.refs.RestoreSuccess as any ).snapTo( 0 )
+                ( this.RestoreSuccess as any ).current.snapTo( 0 )
               }}
               onPressBack={() => {
-                ( this.refs.RestoreSuccess as any ).snapTo( 0 )
+                ( this.RestoreSuccess as any ).current.snapTo( 0 )
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => ( this.refs.RestoreSuccess as any ).snapTo( 0 )}
+              onPressHeader={() => ( this.RestoreSuccess as any ).current.snapTo( 0 )}
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'BackupNotFound'}
+          ref={this.BackupNotFound}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1104,25 +1220,25 @@ class RestoreWithICloud extends Component<
           ]}
           renderContent={() => (
             <ICloudBackupNotFound
-              modalRef={this.refs.BackupNotFound}
+              modalRef={this.BackupNotFound}
               onPressProceed={() => {
-                ( this.refs.BackupNotFound as any ).snapTo( 0 )
+                ( this.BackupNotFound as any ).current.snapTo( 0 )
                 navigation.navigate( 'RestoreSelectedContactsList' )
               }}
               onPressBack={() => {
-                ( this.refs.BackupNotFound as any ).snapTo( 0 )
+                ( this.BackupNotFound as any ).current.snapTo( 0 )
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => ( this.refs.BackupNotFound as any ).snapTo( 0 )}
+              onPressHeader={() => ( this.BackupNotFound as any ).current.snapTo( 0 )}
             />
           )}
         />
         <BottomSheet
           enabledInnerScrolling={true}
-          ref={'RestoreWallet'}
+          ref={this.RestoreWallet}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1131,25 +1247,25 @@ class RestoreWithICloud extends Component<
           ]}
           renderContent={() => (
             <RestoreWallet
-              modalRef={this.refs.RestoreWallet}
+              modalRef={this.RestoreWallet}
               onPressProceed={() => {
-                ( this.refs.RestoreWallet as any ).snapTo( 0 )
+                ( this.RestoreWallet as any ).current.snapTo( 0 )
               }}
               onPressBack={() => {
-                ( this.refs.RestoreWallet as any ).snapTo( 0 )
+                ( this.RestoreWallet as any ).current.snapTo( 0 )
               }}
             />
           )}
           renderHeader={() => (
             <ModalHeader
-              onPressHeader={() => ( this.refs.RestoreWallet as any ).snapTo( 0 )}
+              onPressHeader={() => ( this.RestoreWallet as any ).current.snapTo( 0 )}
             />
           )}
         />
         <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={'loaderBottomSheet'}
+          ref={this.loaderBottomSheet}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1157,12 +1273,7 @@ class RestoreWithICloud extends Component<
               : hp( '100%' ),
           ]}
           renderContent={() => (
-            <LoaderModal
-              headerText={'Creating your wallet'}
-              messageText={
-                'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
-              }
-            />
+            <LoaderModal headerText={this.state.loaderMessage.heading} messageText={this.state.loaderMessage.text} />
           )}
           renderHeader={() => (
             <View
@@ -1182,7 +1293,7 @@ class RestoreWithICloud extends Component<
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
-          ref={'ErrorBottomSheet'}
+          ref={this.ErrorBottomSheet}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1191,14 +1302,14 @@ class RestoreWithICloud extends Component<
           ]}
           renderContent={() => (
             <ErrorModalContents
-              modalRef={this.refs.ErrorBottomSheet}
+              modalRef={this.ErrorBottomSheet}
               title={'Error receiving Recovery Key'}
               info={
                 'There was an error while receiving your Recovery Key, please try again'
               }
               proceedButtonText={'Try again'}
               onPressProceed={() => {
-                ( this.refs.ErrorBottomSheet as any ).snapTo( 0 )
+                ( this.ErrorBottomSheet as any ).current.snapTo( 0 )
               }}
               isBottomImage={true}
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
@@ -1207,7 +1318,7 @@ class RestoreWithICloud extends Component<
           renderHeader={() => (
             <ModalHeader
             // onPressHeader={() => {
-            //   (this.refs.ErrorBottomSheet as any).snapTo(0);
+            //   (this.ErrorBottomSheet as any).current.snapTo(0);
             // }}
             />
           )}
@@ -1215,7 +1326,7 @@ class RestoreWithICloud extends Component<
         <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
-          ref={'SendViaLinkBottomSheet'}
+          ref={this.SendViaLinkBottomSheet}
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
@@ -1234,18 +1345,17 @@ class RestoreWithICloud extends Component<
               } hours`}
               link={linkToRequest}
               onPressBack={() => {
-                if ( this.refs.SendViaLinkBottomSheet )
-                  ( this.refs.SendViaLinkBottomSheet as any ).snapTo( 0 )
+                if ( this.SendViaLinkBottomSheet )
+                  ( this.SendViaLinkBottomSheet as any ).current.snapTo( 0 )
               }}
               onPressDone={() => {
                 if ( isOtpType ) {
                   this.setState( {
                     renderTimer: true
                   } );
-                  ( this.refs
-                    .shareOtpWithTrustedContactBottomSheet as any ).snapTo( 1 )
+                  ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
                 }
-                ( this.refs.SendViaLinkBottomSheet as any ).snapTo( 0 )
+                ( this.SendViaLinkBottomSheet as any ).current.snapTo( 0 )
               }}
             />
           )}
@@ -1254,7 +1364,7 @@ class RestoreWithICloud extends Component<
         <BottomSheet
           onCloseEnd={() => { }}
           enabledInnerScrolling={true}
-          ref={'shareOtpWithTrustedContactBottomSheet'}
+          ref={this.shareOtpWithTrustedContactBottomSheet}
           snapPoints={[ -30, hp( '65%' ) ]}
           renderContent={() => (
             <ShareOtpWithTrustedContact
@@ -1263,7 +1373,7 @@ class RestoreWithICloud extends Component<
                 this.setState( {
                   renderTimer: false
                 } );
-                ( this.refs.shareOtpWithTrustedContactBottomSheet as any ).snapTo(
+                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
                   0
                 )
               }}
@@ -1271,7 +1381,7 @@ class RestoreWithICloud extends Component<
                 this.setState( {
                   renderTimer: false
                 } );
-                ( this.refs.shareOtpWithTrustedContactBottomSheet as any ).snapTo(
+                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
                   0
                 )
               }}
@@ -1284,7 +1394,7 @@ class RestoreWithICloud extends Component<
                 this.setState( {
                   renderTimer: false
                 } );
-                ( this.refs.shareOtpWithTrustedContactBottomSheet as any ).snapTo(
+                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
                   0
                 )
               }}

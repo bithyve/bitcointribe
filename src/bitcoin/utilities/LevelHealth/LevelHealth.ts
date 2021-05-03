@@ -741,21 +741,23 @@ export default class LevelHealth {
     shares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
+    let PrimaryMnemonics = this.mnemonic
+    if( !PrimaryMnemonics ){
+      const decryptedShareArr = []
+      for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
+        const element = this.metaSharesKeeper[ i ]
+        decryptedShareArr.push( element.encryptedSecret )
+      }
+      const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
 
-    const decryptedShareArr = []
-    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
-      const element = this.metaSharesKeeper[ i ]
-      decryptedShareArr.push( element.encryptedSecret )
+      const secretsArr = [] // secrets w/o checksum
+      for ( const secret of decryptedSecrets ) {
+        secretsArr.push( secret.slice( 0, secret.length - 8 ) )
+      }
+
+      const recoveredMnemonicHex = secrets.combine( secretsArr )
+      PrimaryMnemonics = LevelHealth.hexToString( recoveredMnemonicHex )
     }
-    const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
-
-    const secretsArr = [] // secrets w/o checksum
-    for ( const secret of decryptedSecrets ) {
-      secretsArr.push( secret.slice( 0, secret.length - 8 ) )
-    }
-
-    const recoveredMnemonicHex = secrets.combine( secretsArr )
-    const PrimaryMnemonics = LevelHealth.hexToString( recoveredMnemonicHex )
 
     const shares = secrets.share(
       this.stringToHex( PrimaryMnemonics ),
@@ -973,9 +975,67 @@ export default class LevelHealth {
           level: _level,
           levelInfo,
         } )
+        console.log( 'updateHealthLevel2 res', res )
       } catch ( err ) {
+        console.log( 'updateHealthLevel2 err', err )
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
+      }
+      return {
+        success: res.data.updateSuccessful,
+        message: '',
+      }
+    }
+    return {
+      success: false,
+      message: 'Something went wrong!',
+    }
+  };
+
+  public initLevels = async ( SecurityQuestionHealth, _level ): Promise<{
+    success: boolean;
+    message: string;
+  }> => {
+    const levelInfo = []
+    if ( this.metaSharesKeeper.length ) {
+      levelInfo[ 0 ] = {
+        shareType: 'cloud',
+        updatedAt: 0,
+        status: 'notAccessible',
+        shareId: this.metaSharesKeeper[ 0 ].shareId,
+        reshareVersion: 0,
+      }
+      levelInfo[ 1 ] = SecurityQuestionHealth
+      for ( let i = 1; i < this.metaSharesKeeper.length; i++ ) {
+        const element = this.metaSharesKeeper[ i ]
+        let shareType = ''
+        if ( i == 0 ) shareType = 'cloud'
+        if ( i == 1 ) shareType = 'primaryKeeper'
+        const obj = {
+          shareType: shareType,
+          updatedAt: 0,
+          status: 'notAccessible',
+          shareId: element.shareId,
+          reshareVersion: 0,
+        }
+        levelInfo.push( obj )
+      }
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'initLevels', {
+          HEXA_ID,
+          walletID: this.walletId,
+          level: _level,
+          levelInfo,
+        } )
+        console.log( 'initLevels res', res )
+      } catch ( err ) {
+        console.log( 'initLevels err', err )
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      if( res.data.updateSuccessful ){
+        this.healthCheckInitializedKeeper = true
       }
       return {
         success: res.data.updateSuccessful,
@@ -1479,7 +1539,6 @@ export default class LevelHealth {
     }
     if( isSmShares ){
       this.encryptedSMSecretsKeeper = encryptedSecretsTmp
-      console.log( 'this.encryptedSMSecretsKeeper', this.encryptedSMSecretsKeeper )
     }else{
       this.encryptedSecretsKeeper = encryptedSecretsTmp
       this.shareIDsKeeper = shareIDs // preserving just the online(relay-transmitted) shareIDs
@@ -1818,7 +1877,6 @@ export default class LevelHealth {
       index++
     }
     this.SMMetaSharesKeeper = metaShareArray
-    console.log( 'this.SMMetaSharesKeeper', this.SMMetaSharesKeeper )
     return {
       metaShares: this.SMMetaSharesKeeper
     }

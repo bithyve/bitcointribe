@@ -84,7 +84,7 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
-
+import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
@@ -108,6 +108,7 @@ interface ManageBackupNewBHRStateTypes {
   QrBottomSheetsFlag: boolean;
   secondaryShare: MetaShare;
   showLoader: boolean;
+  knowMoreType: string;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -161,6 +162,7 @@ interface ManageBackupNewBHRPropsTypes {
   keeperProcessStatus: any;
   setLevelToNotSetupStatus: any;
   isLevelToNotSetupStatus: boolean;
+  initLoading: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -178,6 +180,7 @@ class ManageBackupNewBHR extends Component<
   QrBottomSheet: any;
   ApprovePrimaryKeeperBottomSheet: any
   loaderBottomSheet: any
+  knowMoreBottomSheet: any
 
   constructor( props ) {
     super( props )
@@ -190,6 +193,7 @@ class ManageBackupNewBHR extends Component<
     this.QrBottomSheet
     this.ApprovePrimaryKeeperBottomSheet
     this.loaderBottomSheet
+    this.knowMoreBottomSheet = React.createRef( )
 
     const obj = {
       shareType: '',
@@ -250,7 +254,8 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader: false,
       QrBottomSheetsFlag: false,
       secondaryShare: null,
-      showLoader: false
+      showLoader: false,
+      knowMoreType: 'manageBackup'
     }
   }
 
@@ -406,7 +411,7 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if( prevProps.s3Service.levelhealth.SMMetaSharesKeeper != this.props.s3Service.levelhealth.SMMetaSharesKeeper && this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' ) ) {
+    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       this.updateCloudData()
     }
 
@@ -462,7 +467,7 @@ class ManageBackupNewBHR extends Component<
       this.sendApprovalRequestToPK( )
     }
 
-    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( this.props.levelHealth ) && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
+    if( prevProps.initLoading !== this.props.initLoading && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
       this.goToHistory( {
         id: 2,
         selectedKeeper: this.state.selectedKeeper,
@@ -646,9 +651,9 @@ class ManageBackupNewBHR extends Component<
       !isLevel2Initialized
     ) {
       this.setState( {
-        errorTitle: 'Please complete Primary Keeper Setup',
+        errorTitle: 'Please complete Personal Device Setup',
         errorInfo:
-          'It seems you have not completed Primary Keeper Setup, please complete Primary Keeper Setup to proceed',
+          'It seems you have not completed Personal Device setup, please complete Personal Device setup to proceed',
       } );
       ( this.ErrorBottomSheet as any ).snapTo( 1 )
       return
@@ -871,6 +876,27 @@ class ManageBackupNewBHR extends Component<
     )
   }
 
+  renderKnowMoreModalContent = () => {
+    return ( <MBNewBhrKnowMoreSheetContents
+      type={this.state.knowMoreType}
+      titleClicked={()=>{this.knowMoreBottomSheet.snapTo( 0 )}}
+      containerStyle={{
+        shadowOpacity: 0,
+      }}
+    /> )
+  }
+
+  renderKnowMoreModalHeader = () => {
+    return (
+      <ModalHeader
+        backgroundColor={Colors.blue}
+        onPressHeader={() => {
+          this.knowMoreBottomSheet.snapTo( 0 )
+        }}
+      />
+    )
+  }
+
   keeperButtonText = ( buttonText, number ) =>{
     console.log( 'buttonText', buttonText, number )
     if( !buttonText ) return 'Share Recovery Key ' + number
@@ -878,7 +904,7 @@ class ManageBackupNewBHR extends Component<
         case 'Secondary Device1': return 'Personal Device1'
         case 'Secondary Device2': return 'Personal Device2'
         case 'Secondary Device3': return 'Personal Device3'
-
+        case 'Keeper PDF': return 'PDF Backup'
         default:
           return buttonText
     }
@@ -987,12 +1013,13 @@ class ManageBackupNewBHR extends Component<
           <View style={{
             justifyContent:'center',
             alignItems:'center',
-            marginLeft: 10,
-            marginRight: 10
+            width: wp( '85%' ),
+            marginLeft: 30,
+            marginRight: 30
           }}>
             <Text style={{
-              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular
-            }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, you can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, please complete Level 1' }</Text>
+              color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, textAlign: 'center'
+            }}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
           </View>
           <View
             style={{
@@ -1071,6 +1098,12 @@ class ManageBackupNewBHR extends Component<
                           />
                         )}
                         <TouchableOpacity
+                          onPress={()=>{
+                            this.setState( {
+                              knowMoreType: value.id == 1 ? 'level1' : value.id == 2 ? 'level2' : 'level3'
+                            } )
+                            this.knowMoreBottomSheet.snapTo( 1 )
+                          }}
                           style={{
                             ...styles.cardButtonView,
                             backgroundColor:
@@ -1610,6 +1643,14 @@ class ManageBackupNewBHR extends Component<
           renderContent={this.renderLoaderModalContent}
           renderHeader={this.renderLoaderModalHeader}
         />
+        <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={( c )=>this.knowMoreBottomSheet = c}
+          snapPoints={[ -50, hp( '95%' ) ]}
+          renderContent={this.renderKnowMoreModalContent}
+          renderHeader={this.renderKnowMoreModalHeader}
+        />
       </View>
     )
   }
@@ -1645,6 +1686,8 @@ const mapStateToProps = ( state ) => {
     ),
     healthLoading: idx( state, ( _ ) => _.health.loading.checkMSharesHealth ),
     keeperSetupStatus: idx( state, ( _ ) => _.health.loading.keeperSetupStatus ),
+    initLoading: idx( state, ( _ ) => _.health.loading.initLoader ),
+
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
     secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),

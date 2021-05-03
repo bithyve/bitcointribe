@@ -122,7 +122,7 @@ import { ErrorSending } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import RelayServices from '../../bitcoin/services/RelayService'
 import generatePDFKeeper from '../utils/generatePDFKeeper'
-import { getKeeperInfoFromShareId } from '../../common/CommonFunctions'
+import { generateRandomString, getKeeperInfoFromShareId } from '../../common/CommonFunctions'
 import Keeper from '../../bitcoin/utilities/Keeper'
 import { ec as EC } from 'elliptic'
 const ec = new EC( 'curve25519' )
@@ -138,6 +138,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import Toast from '../../components/Toast'
 import { restoredVersionHistory } from '../actions/versionHistory'
 import { getVersions } from '../../common/utilities'
+import { initLevels } from '../actions/upgradeToNewBhr'
 
 function* initHealthWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -146,7 +147,7 @@ function* initHealthWorker() {
   if ( initialized ) return
   yield put( initLoader( true ) )
   const res = yield call( s3Service.initializeHealthKeeper )
-  console.log( 'healt initHealthWorker', res )
+  console.log( 'health initHealthWorker', res )
   if ( res.status === 200 ) {
 
     // Update status
@@ -187,7 +188,7 @@ function* generateMetaSharesWorker( { payload } ) {
     ( state ) => state.storage.database.WALLET_SETUP
   )
   const appVersion = DeviceInfo.getVersion()
-  const { level } = payload
+  const { level, isUpgrade } = payload
   const { answer, questionId, question } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP.security
   )
@@ -222,8 +223,9 @@ function* generateMetaSharesWorker( { payload } ) {
           ( state ) => state.health.isLevel2Initialized
         )
         if ( !isLevel2Initialized ) {
-          yield put( initLevelTwo( level ) )
           yield put( updateLevelTwoMetaShareStatus( true ) )
+          if( isUpgrade ) yield put( initLevels( level ) )
+          else yield put( initLevelTwo( level ) )
         }
       }
       if ( level == 3 ) {
@@ -231,11 +233,12 @@ function* generateMetaSharesWorker( { payload } ) {
           ( state ) => state.health.isLevel3Initialized
         )
         if ( !isLevel3Initialized ) {
-          yield put( initLevelTwo( level ) )
           yield put( updateLevelThreeMetaShareStatus( true ) )
+          if( isUpgrade ) yield put( initLevels( level ) )
+          else yield put( initLevelTwo( level ) )
         }
       }
-      const s3Service: S3Service = yield select( ( state ) => state.health.service )
+
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
         ...SERVICES,
@@ -282,7 +285,6 @@ export const checkSharesHealthWatcher = createWatcher(
 function* updateSharesHealthWorker( { payload } ) {
   // // set a timelapse for auto update and enable instantaneous manual update
   try {
-    console.log( 'modifyLevelStatus payload.shares', payload )
     yield put( updateMSharesLoader( true ) )
     const res = yield call( S3Service.updateHealthKeeper, payload.shares )
     if ( res.status === 200 ) {
@@ -561,10 +563,23 @@ function* updateHealthLevel2Worker( { payload } ) {
       ( state ) => state.health.isLevel2Initialized
     )
   }
+  console.log( 'isLevelInitialized', isLevelInitialized )
   if ( !isLevelInitialized ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const Health = yield select( ( state ) => state.health.levelHealth )
-    const SecurityQuestionHealth = Health[ 0 ].levelInfo[ 1 ]
+    let SecurityQuestionHealth
+    const randomIdForSecurityQ = generateRandomString( 8 )
+    if( Health[ 0 ] && Health[ 0 ].levelInfo && Health[ 0 ].levelInfo[ 1 ] ) SecurityQuestionHealth = Health[ 0 ].levelInfo[ 1 ]
+    else {
+      SecurityQuestionHealth = {
+        shareType: 'securityQuestion',
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareId: randomIdForSecurityQ,
+        reshareVersion: 0,
+      }
+    }
+    console.log( 'SecurityQuestionHealth', SecurityQuestionHealth )
     yield put( initLoader( true ) )
     const res = yield call(
       s3Service.updateHealthLevel2,
@@ -2471,6 +2486,7 @@ function* autoDownloadShareContactWorker( { payload } ) {
             ...DECENTRALIZED_BACKUP.UNDER_CUSTODY,
             [ TContacts[ index ].contactsWalletName ]: {
               META_SHARE: res.data.data.metaShare,
+              SECONDARY_SHARE: res.data.data.secondaryShare ? res.data.data.secondaryShare : null,
             },
           },
         }
@@ -2526,7 +2542,7 @@ function* getPDFDataWorker( { payload } ) {
     ) {
       shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == shareId )
     }
-    const primaryShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
+    const primaryShare: MetaShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
     const obj = {
       shareId: primaryShare.shareId,
       name: 'Keeper PDF',
@@ -2578,12 +2594,12 @@ function* getPDFDataWorker( { payload } ) {
       } = yield select( ( state ) => state.health.pdfInfo )
       const walletId = s3Service.levelhealth.walletId
 
-
       if ( isReShare ) {
         yield call( s3Service.reshareMetaShareKeeper, shareIndex )
       }
       let publicKey = pdfInfo.publicKey
       let privateKey = pdfInfo.privateKey
+      let pdfPath = pdfInfo.filePath
       if ( pdfInfo.publicKey === '' && pdfInfo.privateKey === '' ) {
         console.log( 'INSIDE IF' )
         const keyPair = ec.genKeyPair()
@@ -2620,53 +2636,67 @@ function* getPDFDataWorker( { payload } ) {
         secondaryData.encryptedMetaShare,
         secondaryData.messageId
       )
-      if ( res1.success && res2.success ) {
-        const qrData = [
-          JSON.stringify( {
-            type: 'pdf',
-            encryptedData: LevelHealth.encryptWithAnswer(
-              primaryShareObject,
-              WALLET_SETUP.security.answer
-            ).encryptedString,
-          } ),
-          JSON.stringify( {
-            type: 'pdf',
-            encryptedData: LevelHealth.encryptWithAnswer(
-              secondaryShareObject,
-              WALLET_SETUP.security.answer
-            ).encryptedString,
-          } ),
-        ]
-        const pdfData = {
-          qrData: qrData,
-        }
-        const pdfPath = yield call(
-          generatePDFKeeper,
-          pdfData,
-          `Hexa_Recovery_Key_${WALLET_SETUP.walletName}.pdf`,
-          `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
-        )
-        console.log( 'pdfPath', pdfPath )
-        yield put( setPDFInfo( {
-          filePath: pdfPath, publicKey, privateKey
-        } ) )
-        yield put( onApprovalStatusChange( {
-          status: false,
-          initiatedAt: 0,
-          shareId: '',
-        } ) )
+      const shareArray = [
+        {
+          walletId: walletId,
+          shareId: primaryShare.shareId,
+          reshareVersion: primaryShare.meta.reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          name: 'Keeper PDF',
+          shareType: 'pdf',
+          status: 'notAccessible',
+        },
+      ]
+      yield put( updateMSharesHealth( shareArray ) )
+      const qrData = [
+        JSON.stringify( {
+          type: 'pdf',
+          encryptedData: LevelHealth.encryptWithAnswer(
+            primaryShareObject,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+          encryptedKey: LevelHealth.encryptWithAnswer(
+            primaryShare.shareId,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+        } ),
+        JSON.stringify( {
+          type: 'pdf',
+          encryptedData: LevelHealth.encryptWithAnswer(
+            secondaryShareObject,
+            WALLET_SETUP.security.answer
+          ).encryptedString,
+        } ),
+      ]
+      const pdfData = {
+        qrData: qrData,
       }
-      const updatedSERVICES = {
-        ...SERVICES,
-        S3_SERVICE: JSON.stringify( s3Service ),
-      }
-
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
+      pdfPath = yield call(
+        generatePDFKeeper,
+        pdfData,
+        `Hexa_Recovery_Key_${WALLET_SETUP.walletName}.pdf`,
+        `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
+      )
+      yield put( setPDFInfo( {
+        filePath: pdfPath, publicKey, privateKey, updatedAt: moment( new Date() ).valueOf()
+      } ) )
+      yield put( onApprovalStatusChange( {
+        status: false,
+        initiatedAt: 0,
+        shareId: '',
+      } ) )
     }
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify( s3Service ),
+    }
+
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+
     yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
   } catch ( error ) {
@@ -2822,10 +2852,11 @@ export const sharePDFWatcher = createWatcher( sharePDFWorker, SHARE_PDF )
 function* confirmPDFSharedWorker( { payload } ) {
   try {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
-    const { shareId } = payload
+    const { shareId, scannedData } = payload
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const walletId = s3Service.levelhealth.walletId
+    const answer = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.answer )
     let shareIndex = 3
     if (
       shareId &&
@@ -2834,25 +2865,27 @@ function* confirmPDFSharedWorker( { payload } ) {
     ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
     }
-
-    const shareArray = [
-      {
-        walletId: walletId,
-        shareId: shareId,
-        reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
-        updatedAt: moment( new Date() ).valueOf(),
-        name: 'Keeper PDF',
-        shareType: 'pdf',
-        status: 'accessible',
-      },
-    ]
-    yield put( updateMSharesHealth( shareArray ) )
-
-    yield put( onApprovalStatusChange( {
-      status: false,
-      initiatedAt: 0,
-      shareId: '',
-    } ) )
+    const scannedObj: {type: string, encryptedKey: string; encryptedData: string} = JSON.parse( scannedData )
+    const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
+    if( decryptedData == shareId ){
+      const shareArray = [
+        {
+          walletId: walletId,
+          shareId: shareId,
+          reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          name: 'Keeper PDF',
+          shareType: 'pdf',
+          status: 'accessible',
+        },
+      ]
+      yield put( updateMSharesHealth( shareArray ) )
+      yield put( onApprovalStatusChange( {
+        status: false,
+        initiatedAt: 0,
+        shareId: '',
+      } ) )
+    }
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'pdfDataConfirm' ) )
@@ -2900,40 +2933,42 @@ export const updatedKeeperInfoWatcher = createWatcher(
 )
 
 function* uploadSMShareWorker( { payload } ) {
-  try {
-    // yield put(switchS3LoaderKeeper("pdfDataProcess"));
-    const { encryptedKey, otp } = payload
-    const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
-    const levelHealth: LevelHealthInterface[] = yield select(
-      ( state ) => state.health.levelHealth
-    )
-    const currentLevel: number = yield select(
-      ( state ) => state.health.currentLevel
-    )
-    const keeper: KeeperService = yield select( ( state ) => state.keeper.service )
-    // TODO get primaryKeeper shareID
+  /** Commented because this is used for KBHR flow*/
 
-    const PKShareId =
-      currentLevel == 2 || currentLevel == 1
-        ? levelHealth[ 1 ].levelInfo[ 2 ].shareId
-        : levelHealth[ 1 ].levelInfo[ 2 ].shareId
-    const res = yield call(
-      keeper.fetchTrustedChannel,
-      PKShareId,
-      WALLET_SETUP.walletName
-    )
-    if ( res.status == 200 ) {
-      const data: TrustedDataElements = res.data.data
-      const secondaryShare = data.pdfShare
-      yield call( uploadSecondaryShareWorker, {
-        payload: {
-          encryptedKey, metaShare: secondaryShare, otp
-        }
-      } )
-    }
-  } catch ( error ) {
-    console.log( 'Error updatedKeeperInfoWorker', error )
-  }
+  // try {
+  //   // yield put(switchS3LoaderKeeper("pdfDataProcess"));
+  //   const { encryptedKey, otp } = payload
+  //   const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
+  //   const levelHealth: LevelHealthInterface[] = yield select(
+  //     ( state ) => state.health.levelHealth
+  //   )
+  //   const currentLevel: number = yield select(
+  //     ( state ) => state.health.currentLevel
+  //   )
+  //   const keeper: KeeperService = yield select( ( state ) => state.keeper.service )
+  //   // TODO get primaryKeeper shareID
+
+  //   const PKShareId =
+  //     currentLevel == 2 || currentLevel == 1
+  //       ? levelHealth[ 1 ].levelInfo[ 2 ].shareId
+  //       : levelHealth[ 1 ].levelInfo[ 2 ].shareId
+  //   const res = yield call(
+  //     keeper.fetchTrustedChannel,
+  //     PKShareId,
+  //     WALLET_SETUP.walletName
+  //   )
+  //   if ( res.status == 200 ) {
+  //     const data: TrustedDataElements = res.data.data
+  //     const secondaryShare = data.pdfShare
+  //     yield call( uploadSecondaryShareWorker, {
+  //       payload: {
+  //         encryptedKey, metaShare: secondaryShare, otp
+  //       }
+  //     } )
+  //   }
+  // } catch ( error ) {
+  //   console.log( 'Error updatedKeeperInfoWorker', error )
+  // }
 }
 
 export const uploadSMShareWatcher = createWatcher(
@@ -3122,7 +3157,9 @@ export const uploadSecondaryShareForPKWatcher = createWatcher(
   UPLOAD_SM_SHARE_FOR_PK,
 )
 
-function* generateSMMetaSharesWorker() {
+function* generateSMMetaSharesWorker( { payload } ) {
+  const { SM } = payload
+  console.log( 'PAYLOAD SM', SM )
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const { walletName } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP
@@ -3135,21 +3172,7 @@ function* generateSMMetaSharesWorker() {
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
 
-  const secondaryMnemonic = secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
-  console.log( 'question', question )
-  console.log( 'questionId', questionId )
-  // if( questionId === 0 ){
-  //   console.log("inside if questionId",questionId);
-
-  //   question = yield select(
-  //     (state) => state.storage.database.WALLET_SETUP.security
-  //   );
-  //   console.log("inside if question",question);
-
-  // }
-  // console.log("question",question);
-  // console.log("questionId",questionId);
-
+  const secondaryMnemonic = SM && SM ? SM : secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
   const res = yield call(
     s3Service.generateSMShares,
     secondaryMnemonic,
@@ -3159,25 +3182,19 @@ function* generateSMMetaSharesWorker() {
     appVersion,
     questionId === '0' ? question: '',
   )
-  console.log( 'generateSMShares res', res )
   if ( res.status === 200 ) {
     if( res.data.metaShares && res.data.metaShares.length ){
       yield put( isSmMetaSharesCreated() )
     }
-    console.log( 'res.data.metaShares', res.data )
-    console.log( 's3Service', s3Service.levelhealth )
     const { SERVICES, DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
     const updatedDECENTRALIZED_BACKUP = {
       ...DECENTRALIZED_BACKUP,
       PK_SHARE: res.data.metaShares[ 0 ]
     }
-    console.log( 'updatedDECENTRALIZED_BACKUP', updatedDECENTRALIZED_BACKUP )
-    console.log( 'updatedSERVICES s3Service', s3Service )
     const updatedSERVICES = {
       ...SERVICES,
       S3_SERVICE: JSON.stringify( s3Service ),
     }
-    console.log( 'updatedSERVICES', updatedSERVICES )
     yield call( insertDBWorker, {
       payload: {
         SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP
