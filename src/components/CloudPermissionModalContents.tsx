@@ -73,13 +73,13 @@ export default function CloudPermissionModalContents( props ) {
             {props.title}
             {props.titleNextLine ? '\n' + props.titleNextLine : null}
           </Text>
-          <View style={{
+          {props.isRendered && <View style={{
             flexDirection:'row', justifyContent:'space-between', alignItems: 'center', width: wp( '10%' ), alignSelf: 'auto', marginLeft: 'auto', elevation: 5, shadowColor: Colors.babyGray, shadowOffset: {
               width: 0, height: 3
             }, shadowOpacity: 1, shadowRadius: 4
           }}>
             {getElusiveTimer()}
-          </View>
+          </View>}
         </View>
         <View style={styles.successModalAmountView}>
           {props.info ? (
