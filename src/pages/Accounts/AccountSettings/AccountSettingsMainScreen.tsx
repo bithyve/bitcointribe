@@ -61,13 +61,13 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
               primarySubAccountName: primarySubAccount.customDisplayName || primarySubAccount.defaultTitle,
               accountShellID: accountShell.id,
             },
-            imageSource: require( '../../../assets/images/HomePageIcons/icon_qr.png' ),
+            imageSource: require( '../../../assets/images/icons/xpub.png' ),
           }
         ] : [] ),
         {
           title: 'Account Sync',
           subtitle: 'Manually scan the account',
-          imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
+          imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
           onOptionPressed: handleRescanListItemSelection,
         },
       ],
