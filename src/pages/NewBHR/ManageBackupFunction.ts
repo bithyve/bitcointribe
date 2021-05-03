@@ -70,13 +70,13 @@ const checkLevelHealth = (
         // console.log( 'modifyLevelStatus index == 2 && currentLevel > 0 && levelHealthVar[ index ]' )
         levelData[ index ].keeper1 = levelHealthVar[ index ] && levelHealthVar[ index ].levelInfo ? levelHealthVar[ index ].levelInfo[ index2 ] : levelData[ index2 ].keeper1
         levelData[ index ].keeper2 = levelHealthVar[ index ] && levelHealthVar[ index ].levelInfo[ index2 ] ? levelHealthVar[ index ].levelInfo[ index2 ] : levelData[ index2 ].keeper2
-        levelData[ index ].status = checkStatus( levelHealthVar, index, index2 )
+        levelData[ index ].status = checkStatus( levelHealthVar, index, index2, currentLevel )
       }
       else if( index != 0 && currentLevel > 0 ){
         // console.log( 'modifyLevelStatus index != 0 && currentLevel > 0' )
         levelData[ index-1 ].keeper1 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
         levelData[ index-1 ].keeper2 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
-        levelData[ index-1 ].status = checkStatus( levelHealthVar, currentLevel - 1, 0 )
+        levelData[ index-1 ].status = checkStatus( levelHealthVar, currentLevel - 1, 0, currentLevel )
       }
       else if( index == 0 && currentLevel == 0 ){
         // console.log( 'modifyLevelStatus index == 0 && currentLevel == 0' )
@@ -84,43 +84,43 @@ const checkLevelHealth = (
         levelData[ index ].keeper1.name = 'Cloud'
         levelData[ index ].keeper2 = levelHealthVar[ 0 ] && levelHealthVar[ 0 ].levelInfo[ 1 ] ? levelHealthVar[ 0 ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
         levelData[ index ].keeper2.name = 'Security Question'
-        levelData[ index ].status = checkStatus( levelHealthVar, 0, 0 )
+        levelData[ index ].status = checkStatus( levelHealthVar, 0, 0, currentLevel )
       }
       levelData[ index ].status = 'notSetup'
       return levelData
     } else {
       // console.log( 'modifyLevelStatus ELSE' )
-      const status = checkStatus( levelHealthVar, index, index2 )
+      const status = checkStatus( levelHealthVar, index, index2, currentLevel )
       if( levelHealthVar[ 0 ] && currentLevel > 0 ){
         levelData[ 0 ].keeper1 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
         levelData[ 0 ].keeper1.name = 'Cloud'
         levelData[ 0 ].keeper2 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
         levelData[ 0 ].keeper2.name = 'Security Question'
-        levelData[ 0 ].status = checkStatus( levelHealthVar, currentLevel - 1, 0 )
+        levelData[ 0 ].status = checkStatus( levelHealthVar, currentLevel - 1, 0, currentLevel )
       }
       if ( levelHealthVar[ 0 ] && currentLevel == 0 ) {
         levelData[ 0 ].keeper1 = levelHealthVar[ currentLevel ] && levelHealthVar[ currentLevel ].levelInfo ? levelHealthVar[ currentLevel ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
         levelData[ 0 ].keeper1.name = 'Cloud'
         levelData[ 0 ].keeper2 = levelHealthVar[ currentLevel ] && levelHealthVar[ currentLevel ].levelInfo[ 1 ] ? levelHealthVar[ currentLevel ].levelInfo[ 1 ] : levelData[ 0 ].keeper2
         levelData[ 0 ].keeper2.name = 'Security Question'
-        levelData[ 0 ].status = checkStatus( levelHealthVar, 0, 0 )
+        levelData[ 0 ].status = checkStatus( levelHealthVar, 0, 0, currentLevel )
       }
       if ( levelHealthVar[ 1 ] ) {
         if ( currentLevel === 3 ) {
           levelData[ 1 ].keeper1 = levelHealthVar[ 2 ].levelInfo[ 2 ]
           levelData[ 1 ].keeper2 = levelHealthVar[ 2 ].levelInfo[ 3 ]
-          levelData[ 1 ].status = checkStatus( levelHealthVar, 2, 2 )
+          levelData[ 1 ].status = checkStatus( levelHealthVar, 2, 2, currentLevel )
         }
         else {
           levelData[ 1 ].keeper1 = levelHealthVar[ 1 ].levelInfo[ 2 ]
           levelData[ 1 ].keeper2 = levelHealthVar[ 1 ].levelInfo[ 3 ]
-          levelData[ 1 ].status = checkStatus( levelHealthVar, 1, 2 )
+          levelData[ 1 ].status = checkStatus( levelHealthVar, 1, 2, currentLevel )
         }
       }
       if ( levelHealthVar[ 2 ] ) {
         levelData[ 2 ].keeper1 = levelHealthVar[ 2 ].levelInfo[ 4 ]
         levelData[ 2 ].keeper2 = levelHealthVar[ 2 ].levelInfo[ 5 ]
-        levelData[ 2 ].status = checkStatus( levelHealthVar, 2, 4 )
+        levelData[ 2 ].status = checkStatus( levelHealthVar, 2, 4, currentLevel )
       }
     }
     // console.log( 'modifyLevelStatus levelData', levelData )
@@ -130,7 +130,7 @@ const checkLevelHealth = (
   }
 }
 
-const checkStatus = ( levelHealthVar: any[], index: number, index2: number ) => {
+const checkStatus = ( levelHealthVar: any[], index: number, index2: number, currentLevel: number ) => {
   let status = 'notSetup'
   let goodCount = 0; let badCount = 0
   if( levelHealthVar[ index ] && levelHealthVar[ index ].levelInfo ) {
@@ -139,7 +139,8 @@ const checkStatus = ( levelHealthVar: any[], index: number, index2: number ) => 
       if( element.status == 'accessible' ) goodCount++
       if( element.status == 'notAccessible' ) badCount++
     }
-    if( goodCount == levelHealthVar[ index ].levelInfo.length ) status = 'good'
+    if( index + 1 > currentLevel ) status = 'notSetup'
+    else if( goodCount == levelHealthVar[ index ].levelInfo.length ) status = 'good'
     else if( goodCount < levelHealthVar[ index ].levelInfo.length ) status = 'bad'
     // console.log( 'modifyLevelStatus badCount', badCount )
     // console.log( 'modifyLevelStatus goodCount', goodCount )
@@ -246,7 +247,6 @@ const changeNameForSeconday = ( name ) =>{
 const getLevelInfoStatus = ( levelData, currentLevel ) => {
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
-    console.log( 'LVELEDATA', levelData, currentLevel )
     if( i == 0 ){
       // Not SETUP
       if( levelData[ i ].status == 'notSetup' ) {
@@ -272,7 +272,7 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
         levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Multi Key Backup is accessible'
       }
       // ONLY ONE ACCESSIBLE
-      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
+      if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
         let name = ''
         if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
         if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
@@ -282,15 +282,13 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
         levelData[ i ].note = 'Your backup stored with '  + changeNameForSeconday( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
       }
       // BOTH NOT ACCESSIBLE
-      if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
+      if( ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
         let name = ''
         if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
         if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
         levelData[ i ].note = 'Your backup stored with '  + changeNameForSeconday( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
       }
     }
-    console.log( 'element', element )
-
   }
   return levelData
 }

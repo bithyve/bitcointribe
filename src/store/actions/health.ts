@@ -85,6 +85,7 @@ export const KEEPER_PROCESS_STATUS = 'KEEPER_PROCESS_STATUS'
 export const PDF_SUCCESSFULLY_CREATED = 'PDF_SUCCESSFULLY_CREATED'
 export const SET_LEVEL_TO_NOT_SETUP = 'SET_LEVEL_TO_NOT_SETUP'
 export const IS_LEVEL_TO_NOT_SETUP = 'IS_LEVEL_TO_NOT_SETUP'
+export const SET_HEALTH_STATUS = 'SET_HEALTH_STATUS'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -190,10 +191,10 @@ export const ErrorSending = ( isFailed ) => {
   }
 }
 
-export const updateMSharesHealth = ( shares ) => {
+export const updateMSharesHealth = ( shares, isNeedToUpdateCurrentLevel? ) => {
   return {
     type: UPDATE_SHARES_HEALTH, payload: {
-      shares
+      shares, isNeedToUpdateCurrentLevel
     }
   }
 }
@@ -779,5 +780,11 @@ export const setIsLevelToNotSetupStatus = ( status ) =>{
     type: IS_LEVEL_TO_NOT_SETUP, payload: {
       status
     }
+  }
+}
+
+export const setHealthStatus = ( ) =>{
+  return {
+    type: SET_HEALTH_STATUS
   }
 }

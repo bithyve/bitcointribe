@@ -512,6 +512,7 @@ export default class LevelHealth {
         name?: string;
       },
     ],
+    isNeedToUpdateCurrentLevel?: boolean
   ): Promise<{
     updationInfo: Array<{
       walletId: string;
@@ -541,6 +542,7 @@ export default class LevelHealth {
       res = await BH_AXIOS.post( 'updateSharesHealth2', {
         HEXA_ID,
         toUpdate: shares,
+        isNeedToUpdateCurrentLevel: isNeedToUpdateCurrentLevel
       } )
       console.log( 'updateSharesHealth2 res', res )
     } catch ( err ) {

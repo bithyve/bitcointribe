@@ -73,6 +73,7 @@ import {
   pdfSuccessfullyCreated,
   SET_LEVEL_TO_NOT_SETUP,
   setIsLevelToNotSetupStatus,
+  SET_HEALTH_STATUS,
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -286,7 +287,7 @@ function* updateSharesHealthWorker( { payload } ) {
   // // set a timelapse for auto update and enable instantaneous manual update
   try {
     yield put( updateMSharesLoader( true ) )
-    const res = yield call( S3Service.updateHealthKeeper, payload.shares )
+    const res = yield call( S3Service.updateHealthKeeper, payload.shares, payload.isNeedToUpdateCurrentLevel )
     if ( res.status === 200 ) {
       if ( res.data.updationResult ) {
         const s3Service: S3Service = yield select(
@@ -499,7 +500,7 @@ function* createAndUploadOnEFChannelWorker( { payload } ) {
               status: 'notAccessible',
             },
           ]
-          yield put( updateMSharesHealth( shareArray ) )
+          yield put( updateMSharesHealth( shareArray, false ) )
           const obj = {
             shareId: share.shareId,
             name: ScannedData.walletName,
@@ -569,7 +570,11 @@ function* updateHealthLevel2Worker( { payload } ) {
     const Health = yield select( ( state ) => state.health.levelHealth )
     let SecurityQuestionHealth
     const randomIdForSecurityQ = generateRandomString( 8 )
-    if( Health[ 0 ] && Health[ 0 ].levelInfo && Health[ 0 ].levelInfo[ 1 ] ) SecurityQuestionHealth = Health[ 0 ].levelInfo[ 1 ]
+    if( Health[ 0 ] && Health[ 0 ].levelInfo && Health[ 0 ].levelInfo[ 1 ] ){
+      SecurityQuestionHealth = {
+        ...Health[ 0 ].levelInfo[ 1 ], shareId: randomIdForSecurityQ,
+      }
+    }
     else {
       SecurityQuestionHealth = {
         shareType: 'securityQuestion',
@@ -760,7 +765,7 @@ export function* downloadMetaShareWorker( { payload } ) {
             status: 'accessible',
           },
         ]
-        yield put( updateMSharesHealth( shareArray ) )
+        yield put( updateMSharesHealth( shareArray, false ) )
       }
       // yield call(updateDynamicNonPMDDWorker, { payload: { dynamicNonPMDD } }); // upload updated dynamic nonPMDD (TODO: time-based?)
       yield put( downloadedMShare( otp, true ) )
@@ -2262,7 +2267,7 @@ function* reShareWithSameKeeperWorker( { payload } ) {
                 status: 'accessible',
               },
             ]
-            yield put( updateMSharesHealth( shareArray ) )
+            yield put( updateMSharesHealth( shareArray, false ) )
           }
 
           if ( oldKeeperInfo.keeperUUID ) {
@@ -2383,7 +2388,7 @@ function* autoShareContactWorker( { payload } ) {
               status: 'accessible',
             },
           ]
-          yield put( updateMSharesHealth( shareArray ) )
+          yield put( updateMSharesHealth( shareArray, false ) )
           const notification: INotification = {
             notificationType: notificationType.reShare,
             title: 'New share uploaded',
@@ -2647,7 +2652,7 @@ function* getPDFDataWorker( { payload } ) {
           status: 'notAccessible',
         },
       ]
-      yield put( updateMSharesHealth( shareArray ) )
+      yield put( updateMSharesHealth( shareArray, false ) )
       const qrData = [
         JSON.stringify( {
           type: 'pdf',
@@ -2879,7 +2884,7 @@ function* confirmPDFSharedWorker( { payload } ) {
           status: 'accessible',
         },
       ]
-      yield put( updateMSharesHealth( shareArray ) )
+      yield put( updateMSharesHealth( shareArray, true ) )
       yield put( onApprovalStatusChange( {
         status: false,
         initiatedAt: 0,
@@ -3678,7 +3683,7 @@ function* autoShareLevel2KeepersWorker( { payload } ) {
                 name: element.name,
                 status: 'accessible',
               },
-            ] ) )
+            ], false ) )
             const notification: INotification = {
               notificationType: notificationType.reShare,
               title: 'New share uploaded',
@@ -3730,7 +3735,7 @@ function* autoShareLevel2KeepersWorker( { payload } ) {
                 name: element.name,
                 status: 'accessible',
               },
-            ] ) )
+            ], false ) )
           }
         }
       }
@@ -3818,7 +3823,7 @@ function* setLevelToNotSetupStatusWorker( ) {
     }
     console.log( 'shareArray', shareArray )
     if( shareArray.length ) {
-      yield put( updateMSharesHealth( shareArray ) )
+      yield put( updateMSharesHealth( shareArray, false ) )
       yield put( setIsLevelToNotSetupStatus( true ) )
       if ( shareArray.length == 3 ){
         yield put( updateLevelTwoMetaShareStatus( true ) )
@@ -3841,4 +3846,48 @@ function* setLevelToNotSetupStatusWorker( ) {
 export const setLevelToNotSetupStatusWatcher = createWatcher(
   setLevelToNotSetupStatusWorker,
   SET_LEVEL_TO_NOT_SETUP
+)
+
+function* setHealthStatusWorker( ) {
+  try {
+    yield put( switchS3LoaderKeeper( 'downloadSmShare' ) )
+    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const service: S3Service = yield select( ( state ) => state.health.service )
+    const TIME_SLOTS = config.HEALTH_STATUS.TIME_SLOTS
+    const shareArray = []
+    if( currentLevel && levelHealth[ currentLevel - 1 ] && levelHealth[ currentLevel - 1 ].levelInfo ){
+      const element = levelHealth[ currentLevel - 1 ]
+      for ( let i = 1; i < element.levelInfo.length; i++ ) {
+        const element2 = element.levelInfo[ i ]
+        if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
+          const delta = Math.abs( Date.now() - element2.updatedAt )
+          const minutes = Math.round( delta / ( 60 * 1000 ) )
+          if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
+            levelHealth[ currentLevel - 1 ].levelInfo[ i ].status = 'notAccessible'
+            shareArray.push( {
+              walletId: service.getWalletId().data.walletId,
+              shareId: element2.shareId,
+              reshareVersion: element2.reshareVersion,
+              status: 'notAccessible',
+            } )
+          }
+        }
+      }
+    }
+
+    console.log( 'SET_HEALTH_STATUS shareArray', shareArray )
+    if( shareArray.length ){
+      yield put( updateMSharesHealth( shareArray, true ) )
+    }
+    console.log( 'SET_HEALTH_STATUS levelHealth', levelHealth )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'downloadSmShare' ) )
+    console.log( 'Error EF channel', error )
+  }
+}
+
+export const setHealthStatusWatcher = createWatcher(
+  setHealthStatusWorker,
+  SET_HEALTH_STATUS
 )

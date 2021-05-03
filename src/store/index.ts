@@ -179,6 +179,7 @@ import {
   autoShareLevel2KeepersWatcher,
   downloadSmShareForApprovalWatcher,
   setLevelToNotSetupStatusWatcher,
+  setHealthStatusWatcher
 } from './sagas/health'
 
 import {
@@ -200,7 +201,14 @@ import {
   uplaodFileWatcher,
 } from './sagas/cloud'
 
-import { initLevelsWatcher, setCloudDataForLevelWatcher, autoShareSecondaryWatcher, autoShareContactKeeperWatcher, updateAvailableKeeperDataWatcher, confirmPDFSharedFromUpgradeWatcher } from './sagas/upgradeToNewBhr'
+import {
+  initLevelsWatcher,
+  setCloudDataForLevelWatcher,
+  autoShareSecondaryWatcher,
+  autoShareContactKeeperWatcher,
+  updateAvailableKeeperDataWatcher,
+  confirmPDFSharedFromUpgradeWatcher,
+} from './sagas/upgradeToNewBhr'
 
 import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
@@ -336,6 +344,7 @@ const rootSaga = function* () {
     autoShareLevel2KeepersWatcher,
     downloadSmShareForApprovalWatcher,
     setLevelToNotSetupStatusWatcher,
+    setHealthStatusWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,
