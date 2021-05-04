@@ -1,7 +1,8 @@
 import config from '../../src/bitcoin/HexaConfig'
-const { HEXA_ID } = config
+const { HEXA_ID, SWAN_BASE_URL } = config
 import { BH_AXIOS, SWAN_AXIOS } from './api'
-
+import axios from 'axios'
+import qs from 'querystring'
 export const redeemAuthCodeForToken = ( { code, state, code_verifier } ) => {
   try {
     const body = {
@@ -21,22 +22,25 @@ export const redeemAuthCodeForToken = ( { code, state, code_verifier } ) => {
   }
 }
 
-export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey, displayName, metadata } ) => {
+export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey, displayName } ) => {
   try {
+
     const data = {
-      extendedPublicKey, displayName, metadata
+      extendedPublicKey, displayName
     }
+
     const headers= {
       'Authorization': `Bearer ${access_token}`,
       'Content-Type': 'application/json'
     }
     console.log( 'about to create wallet with ', data, headers )
-    const config = {
+
+    return axios( {
       method: 'POST',
+      url: `${SWAN_BASE_URL}v1/wallets`,
       headers,
       data
-    }
-    return SWAN_AXIOS.post( 'v1/wallets', config )
+    } )
 
   } catch ( error ) {
     console.log( 'error calling swan ', error )
@@ -59,11 +63,17 @@ export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThres
     console.log( 'about to create wallet with ', data, headers )
     const config = {
       method: 'POST',
+      url: `${SWAN_BASE_URL}v1/automatic-withdrawal`,
       headers,
       data
     }
-    return SWAN_AXIOS.post( 'v1/automatic-withdrawal', config )
 
+    return axios( {
+      method: 'POST',
+      url: `${SWAN_BASE_URL}v1/automatic-withdrawal`,
+      headers,
+      data
+    } )
   } catch ( error ) {
     console.log( 'error calling swan ', error )
     return {

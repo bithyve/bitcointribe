@@ -46,9 +46,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
 
 
   function handleThresholdAmount() {
-    if( !swanAccountSetupCompleted && !hasRedeemSwanCodeForTokenInitiated ) {
-      dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
-    }
+    dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
 
   //useEffect( ()=>{
@@ -87,46 +85,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         // renderSuccessMessage()
         break
   }
-  //}, [ swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted, hasCreateWithdrawalWalletOnSwanSucceeded, hasCreateWithdrawalWalletOnSwanCompleted, hasCreateWithdrawalWalletOnSwanInitiated ] )
-
-  // useEffect( ()=>{
-  //   if ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) {
-  //     if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
-  //       openLink( swanAuthenticationUrl )
-  //       const newSubAccount = new ExternalServiceSubAccountInfo( {
-  //         instanceNumber: 1,
-  //         defaultTitle: 'Swan Account',
-  //         defaultDescription: 'BTC purchased from Swan',
-  //         serviceAccountKind: ServiceAccountKind.WYRE,
-  //       } )
-  //       dispatch( createTempSwanAccountShell( newSubAccount ) )
-  //     }
-  //   }
-  // }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )
-
-
-
-  // useEffect( ()=>{
-  //   if( swanAccountCreationStatus == SwanAccountCreationStatus.ROUTED_BACK_FROM_SWAN ) {
-  //     if( hasRedeemSwanCodeForTokenSucceeded )
-  //       dispatch( createWithdrawalWalletOnSwan( {
-  //         minBtcThreshold: 0.5
-  //       } ) )
-  //   }
-  // }, [ hasRedeemSwanCodeForTokenCompleted, swanAuthenticatedToken ] )
-
-  // // When withdrawal wallet has been created
-  // // a new Swan service account should be created in Hexa
-  // useEffect( ()=>{
-  //   if( swanAccountCreationStatus == SwanAccountCreationStatus.ROUTED_BACK_FROM_SWAN ) {
-  //     if( hasCreateWithdrawalWalletOnSwanSucceeded )
-  //       console.log( 'CREATE NEW ACCOUNT NOW!' )
-  //     // TODO:1: create Swan Account action dispatch
-  //   }
-  // }, [ hasCreateWithdrawalWalletOnSwanCompleted ] )
-
-  // // TODO:2: Link Hexa Wallet with Swan Withdrawal Wallet
-  // // TODO:3: Store Swan Account Shell as permanent
 
   const renderContent = () =>{
     switch ( swanAccountCreationStatus ) {
@@ -148,24 +106,16 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}>Click Proceed Button: </Text> )
           break
         case SwanAccountCreationStatus.ROUTED_BACK_FROM_SWAN:
+          console.log( '@@@=> ', swanAccountCreationStatus )
           // requestThresholdAmount()
-          console.log( '@@@=> ', swanAccountCreationStatus )
-          return( <Text style={{
-            ...styles.modalInfoText, marginTop: wp( '2%' )
-          }}>Ask for Threshold Amount: </Text> )
-
-
-          break
-        case SwanAccountCreationStatus.WITHDRAWAL_WALLET_CREATED:
-          console.log( '@@@=> ', swanAccountCreationStatus )
-          break
-        case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          console.log( '@@@=> ', swanAccountCreationStatus )
-          // renderSuccessMessage()
           return(
+
             <View style={{
               flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
             }}>
+              <Text style={{
+                ...styles.modalInfoText, marginTop: wp( '2%' )
+              }}>Ask for Threshold Amount: </Text>
               <AppBottomSheetTouchableWrapper
                 // disabled={hasButtonBeenPressed}
                 onPress={handleThresholdAmount}
@@ -173,12 +123,40 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
                   ...styles.successModalButtonView
                 }}
               >
-                <Text style={styles.proceedButtonText}>{'OK'}</Text>
+                <Text style={styles.proceedButtonText}>{'Link Swan Wallet'}</Text>
 
               </AppBottomSheetTouchableWrapper>
               {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
             </View>
           )
+
+          break
+        case SwanAccountCreationStatus.WITHDRAWAL_WALLET_CREATED:
+          console.log( '@@@=> ', swanAccountCreationStatus )
+
+          return( <Text style={{
+            ...styles.modalInfoText, marginTop: wp( '2%' )
+          }}>Withdrawal Wallet Created: </Text> )
+
+
+          break
+        case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
+          console.log( '@@@=> ', swanAccountCreationStatus )
+          // renderSuccessMessage()
+
+          return(
+
+            <AppBottomSheetTouchableWrapper
+              onPress={onClickSetting}
+              style={{
+                ...styles.successModalButtonView
+              }}
+            >
+              <Text style={styles.proceedButtonText}>{'OK'}</Text>
+            </AppBottomSheetTouchableWrapper> )
+
+
+
           break
     }
   }
@@ -219,7 +197,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             ...styles.successModalButtonView
           }}
         >
-          <Text style={styles.proceedButtonText}>{swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ? 'Proceed to Swan' : 'OK'}</Text>
+          <Text style={styles.proceedButtonText}>{swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ? 'Proceed to Swan' : '.'}</Text>
 
         </AppBottomSheetTouchableWrapper>
         {swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED
