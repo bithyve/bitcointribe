@@ -510,3 +510,89 @@ export const updateAccountShells = (
 
   return updatedAccountShells
 }
+
+const restorePrimarySubAccounts = (
+  services,
+  accountShells: AccountShell[],
+) => {
+  // helps restore front-end data model for ejected-derivative accounts(w/ txsFound) post blind-sync
+  let derivativeAccounts, network
+  const regularAcc: RegularAccount = services[ REGULAR_ACCOUNT ]
+  const secureAcc: SecureAccount = services[ SECURE_ACCOUNT ]
+
+  for ( const accountKind of [ SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ) {
+    switch ( accountKind ) {
+        case SourceAccountKind.REGULAR_ACCOUNT:
+          derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+          network = regularAcc.hdWallet.network
+          break
+
+        case SourceAccountKind.SECURE_ACCOUNT:
+          derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+          network = secureAcc.secureHDWallet.network
+          break
+    }
+
+    if ( !derivativeAccounts ) continue
+
+    for ( const dAccountType of config.EJECTED_ACCOUNTS ) {
+      const derivativeAccount: DerivativeAccount =
+        derivativeAccounts[ dAccountType ]
+
+      if ( derivativeAccount && derivativeAccount.instance.using ) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          const derivativeId = derivativeAccount[ accountNumber ].xpubId
+
+          // rotate to find subAccountId
+          let exists = false
+          for( const shell of accountShells ){
+            if( shell.primarySubAccount.id === derivativeId ) exists = true
+          }
+          if( exists ) continue
+          else {
+            // TODO: generate account shell
+
+            // let dervBalances: Balances = {
+            //   confirmed: 0,
+            //   unconfirmed: 0,
+            // }
+            // let dervTransactions: TransactionDescribing[] = []
+
+            // if ( derivativeAccount[ accountNumber ].balances )
+            //   dervBalances = {
+            //     confirmed: derivativeAccount[ accountNumber ].balances.balance,
+            //     unconfirmed:
+            //       derivativeAccount[ accountNumber ].balances.unconfirmedBalance,
+            //   }
+
+            // if ( derivativeAccount[ accountNumber ].transactions )
+            //   dervTransactions =
+            //     derivativeAccount[ accountNumber ].transactions.transactionDetails
+
+            // const xpub = derivativeAccount[ accountNumber ].xpub
+            // const ypub = Bitcoin.generateYpub( xpub, network )
+
+
+            // subAccountInfo.id = subAccountId
+            // subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
+            // subAccountInfo.instanceNumber = subAccountInstanceNum
+            // const newAccountShell = new AccountShell( {
+            //   unit: bitcoinUnit,
+            //   primarySubAccount: subAccountInfo,
+            //   displayOrder: 1,
+            // } )
+            // yield put( newAccountShellAdded( {
+            //   accountShell: newAccountShell
+            // } ) )
+            // yield put( accountShellOrderedToFront( newAccountShell ) )
+
+          }
+        }
+      }
+    }
+  }
+}
