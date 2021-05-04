@@ -236,7 +236,7 @@ const noteText = ( i, currentLevel ) => {
   return 'Share the Recovery Keys to upgrade your backup'
 }
 
-const changeNameForSeconday = ( name ) =>{
+const changeNameForSecondary = ( name ) =>{
   if( name === 'Secondary Device1' || name === 'Secondary Device2' ){
     return name.replace( 'Secondary', 'Personal' )
   }
@@ -278,15 +278,17 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
         if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
 
         if( element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ) name = element.keeper1.name
+        else name = 'Recovery Key 1'
         if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name = element.keeper2.name
-        levelData[ i ].note = 'Your backup stored with '  + changeNameForSeconday( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
+        else name = 'Recovery Key 2'
+        levelData[ i ].note = 'Your backup stored with '  + changeNameForSecondary( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
       }
       // BOTH NOT ACCESSIBLE
       if( levelData[ i ].status == 'bad' && ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
         let name = ''
         if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
         if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
-        levelData[ i ].note = 'Your backup stored with '  + changeNameForSeconday( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
+        levelData[ i ].note = 'Your backup stored with '  + changeNameForSecondary( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
       }
     }
     console.log( 'element', element )
