@@ -2,7 +2,7 @@ import { call, delay, put, select } from 'redux-saga/effects'
 import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import { generateMetaShare, generateSMMetaShares } from '../actions/health'
-import { navigateToHistoryPage, ON_PRESS_KEEPER, setIsKeeperTypeBottomSheetOpen, setIsLevel1Complete, setIsLevel2Complete, setIsPersonalDeviceComplete, setLevelCompletionError } from '../actions/newBHR'
+import { navigateToHistoryPage, ON_PRESS_KEEPER, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError } from '../actions/newBHR'
 import { createWatcher } from '../utils/utilities'
 
 
@@ -19,14 +19,11 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const secureAccount = yield select( ( state ) => state.accounts[ SECURE_ACCOUNT ].service )
     const metaSharesKeeper = yield select( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
     const isSmMetaSharesCreatedFlag = yield select( ( state ) => state.health.isSmMetaSharesCreatedFlag )
+    console.log( 'currentLevel', currentLevel )
 
-    if (
-      currentLevel == 1 &&
-      value.id == 3 &&
-      !isLevelThreeMetaShareCreated &&
-      !isLevel3Initialized
-    ){
-      yield put( setLevelCompletionError( 'Please complete Level 2', 'It seems you have not completed Level 2. Please complete Level 2 to proceed', LevelStatus.FAILED ) )
+    if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){
+      yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
+      return
     } else if (
       currentLevel == 1 &&
       number == 2 &&
@@ -35,9 +32,18 @@ function* onPressKeeperChannelWorker( { payload } ) {
       !isLevel2Initialized
     ) {
       yield put( setLevelCompletionError( 'Please complete Personal Device Setup', 'It seems you have not completed Personal Device setup, please complete Personal Device setup to proceed', LevelStatus.FAILED ) )
+      return
+    } else if (
+      ( currentLevel == 1 &&
+      value.id == 3 &&
+      !isLevelThreeMetaShareCreated &&
+      !isLevel3Initialized )
+    ){
+      yield put( setLevelCompletionError( 'Please complete Level 2', 'It seems you have not completed Level 2. Please complete Level 2 to proceed', LevelStatus.FAILED ) )
+      return
     }
     const keeper = number == 1 ? value.keeper1 : value.keeper2
-    console.log( 'value.id, number', value.id, number )
+
     const obj = {
       id: value.id,
       selectedKeeper: {
@@ -53,24 +59,21 @@ function* onPressKeeperChannelWorker( { payload } ) {
     if ( keeper.updatedAt > 0 ) {
       yield put( navigateToHistoryPage( obj ) )
     } else {
-      if ( value.id === 2 && number == 1 ) {
-        if ( currentLevel == 1 ) {
-          if ( !isLevel2Initialized && !isLevelTwoMetaShareCreated &&
+      if ( value.id === 2 && number === 1 && currentLevel === 1 ) {
+        if ( !isLevel2Initialized && !isLevelTwoMetaShareCreated &&
           value.id == 2 && metaSharesKeeper.length != 3
-          ) {
-            yield put( generateMetaShare( value.id ) )
-          } else {
-            yield put( navigateToHistoryPage( obj ) )
-          }
-          if( !isSmMetaSharesCreatedFlag ){
-            yield put( generateSMMetaShares() )
-          }
+        ) {
+          yield put( generateMetaShare( value.id ) )
         } else {
-          yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
+          yield put( navigateToHistoryPage( obj ) )
         }
-      } else if ( ( value.id === 2 && number === 2 && isLevelTwoMetaShareCreated &&
-        isLevel2Initialized ) || value.id === 3 ) {
-        console.log( 'INSIDE else' )
+        if( !isSmMetaSharesCreatedFlag ){
+          yield put( generateSMMetaShares() )
+        }
+      } else {
+        // if ( ( value.id === 2 && number === 2 && isLevelTwoMetaShareCreated &&
+        //   isLevel2Initialized ) || ( value.id === 3 && isLevelThreeMetaShareCreated &&
+        //     isLevel3Initialized ) )
         yield put( setIsKeeperTypeBottomSheetOpen( true ) )
       }
     }
