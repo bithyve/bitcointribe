@@ -1,15 +1,30 @@
 import moment from 'moment'
-import { NativeModules, Platform } from 'react-native'
+import { AsyncStorage, NativeModules, Platform } from 'react-native'
 import { call, fork, put, select, spawn } from 'redux-saga/effects'
 import { CloudData } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus } from '../actions/cloud'
+import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory } from '../actions/cloud'
 import { updateMSharesHealth } from '../actions/health'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
+
+const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[] ) => {
+
+  console.log( 'cloudBackupHistory', cloudBackupHistory )
+  const obj ={
+    title,
+    confirmed: Date.now(),
+    date: Date.now(),
+  }
+  const updatedCloudBackupHistory = cloudBackupHistory
+  updatedCloudBackupHistory.push( obj )
+  console.log( 'updatedCloudBackupHistory', updatedCloudBackupHistory )
+  return updatedCloudBackupHistory
+}
+
 
 function* cloudWorker( { payload } ) {
   try{
@@ -26,6 +41,7 @@ function* cloudWorker( { payload } ) {
       const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
       const versionHistory = yield select( ( state ) => state.versionHistory.versions )
       const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
+      const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
 
       let encryptedCloudDataJson
       const shares =
@@ -74,7 +90,15 @@ function* cloudWorker( { payload } ) {
             share
           }
         } )
+        const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+        console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
+
+        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
       } else{
+        const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
       }
 
