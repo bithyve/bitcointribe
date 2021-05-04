@@ -69,10 +69,10 @@ export const setAvailableKeeperData = ( availableKeeperData ) => {
   }
 }
 
-export const updateAvailableKeeperData = ( type, name? ) => {
+export const updateAvailableKeeperData = ( object: {type: string; name?: string; }[] ) => {
   return {
     type: UPDATE_AVAILABLE_KEEPER_DATA, payload: {
-      type, name
+      object
     }
   }
 }

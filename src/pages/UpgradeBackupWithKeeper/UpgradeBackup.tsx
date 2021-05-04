@@ -105,6 +105,7 @@ interface UpgradeBackupStateTypes {
   secondaryMnemonics: string;
   isPdfConfirm: boolean;
   qrScannerText: string;
+  isNextStep: boolean;
 }
 
 interface UpgradeBackupPropsTypes {
@@ -177,6 +178,7 @@ class UpgradeBackup extends Component<
   ErrorBottomSheet = createRef<BottomSheet>()
   storagePermissionBottomSheet = createRef<BottomSheet>()
   QrBottomSheet = createRef<BottomSheet>();
+  ProcessInfoBottomSheet = createRef<BottomSheet>();
 
   constructor( props ) {
     super( props )
@@ -189,6 +191,8 @@ class UpgradeBackup extends Component<
     this.ErrorBottomSheet
     this.storagePermissionBottomSheet
     this.QrBottomSheet
+    this.ProcessInfoBottomSheet
+
     this.state = {
       isCloudBackupProcessing: false,
       selectedIds: [],
@@ -245,7 +249,8 @@ class UpgradeBackup extends Component<
       QrBottomSheetsFlag: false,
       secondaryMnemonics: '',
       isPdfConfirm: false,
-      qrScannerText: ''
+      qrScannerText: '',
+      isNextStep: false,
     }
   }
 
@@ -308,11 +313,15 @@ class UpgradeBackup extends Component<
         this.props.generateSMMetaShares()
       }
     }
-    this.nextToProcess( keepersInfo, levelToSetup, selectedContacts )
+    this.ProcessInfoBottomSheet.current.snapTo( 1 )
+    this.setState( {
+      isNextStep: true
+    } )
     this.updateListData( keepersInfo )
   };
 
   nextToProcess = ( keepersInfo: {shareId: string; type: string; status?: boolean}[], levelToSetup: number, selectedContact: any[] ) => {
+    this.ProcessInfoBottomSheet.current.snapTo( 0 )
     this.setState( {
       showLoader: true
     } )
@@ -485,7 +494,9 @@ class UpgradeBackup extends Component<
       this.setState( {
         showLoader: false
       } )
-      updateAvailableKeeperData( 'cloud' )
+      updateAvailableKeeperData( [ {
+        type:'cloud'
+      } ] )
       this.RestoreFromICloud.current.snapTo( 0 )
     }
 
@@ -508,9 +519,11 @@ class UpgradeBackup extends Component<
       this.setSecondaryDeviceQR()
     }
 
-    if( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( levelHealth ) || JSON.stringify( prevProps.availableKeeperData ) != JSON.stringify( availableKeeperData ) ) {
+    if( this.state.isNextStep === true && ( JSON.stringify( prevProps.levelHealth ) != JSON.stringify( levelHealth ) || JSON.stringify( prevProps.availableKeeperData ) != JSON.stringify( availableKeeperData ) ) ) {
       if( levelHealth[ levelToSetup - 1 ] && levelHealth[ levelToSetup - 1 ].levelInfo[ 2 ] && levelHealth[ levelToSetup - 1 ].levelInfo[ 2 ].status == 'accessible' ) {
-        updateAvailableKeeperData( 'primary' )
+        updateAvailableKeeperData( [ {
+          type:'primary'
+        } ] )
         const availableKeeperDataTmp = [ ...availableKeeperData ]
         if( availableKeeperDataTmp.findIndex( value=>value.type == 'primary' )> -1 ){
           availableKeeperDataTmp[ availableKeeperDataTmp.findIndex( value=>value.type == 'primary' ) ].status = true
@@ -984,6 +997,29 @@ class UpgradeBackup extends Component<
     )
   }
 
+  renderProceedModalContent = () => {
+    return (
+      <ErrorModalContents
+        modalRef={this.ProcessInfoBottomSheet}
+        title={'Proceed to Upgrade'}
+        info={'Your backup will now be upgraded to the new scheme which provides you different levels and more options. This may take some time, please do not close the app.'}
+        proceedButtonText={'Proceed'}
+        onPressProceed={() => {
+          this.nextToProcess( this.props.availableKeeperData, this.props.levelToSetup, this.state.selectedContact )
+        }}
+        isBottomImage={true}
+        bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+      />
+    )
+  }
+
+  renderProceedModalHeader = () => {
+    return (
+      <ModalHeader
+      />
+    )
+  }
+
   checkStoragePermission = async () =>  {
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
@@ -1427,6 +1463,23 @@ class UpgradeBackup extends Component<
           ]}
           renderContent={this.renderStoragePermissionModalContent}
           renderHeader={this.renderStoragePermissionModalHeader}
+        />
+        <BottomSheet
+          onOpenStart={()=>{
+            this.RestoreFromICloud.current.snapTo( 0 )
+            this.secondaryDeviceBottomSheet.current.snapTo( 0 )
+            this.UpgradingKeeperContact.current.snapTo( 0 )
+            this.PersonalCopyShareBottomSheet.current.snapTo( 0 )
+          }}
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={this.ProcessInfoBottomSheet}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
+          ]}
+          renderContent={this.renderProceedModalContent}
+          renderHeader={this.renderProceedModalHeader}
         />
       </View>
     )
