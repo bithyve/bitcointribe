@@ -9,7 +9,7 @@ import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAcc
 import SwanAccountCreationStatus from '../../../../common/data/enums/SwanAccountCreationStatus'
 import useSwanIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import BottomInfoBox from '../../../../components/BottomInfoBox'
-import { fetchSwanAuthenticationUrl } from '../../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, clearSwanCache } from '../../../../store/actions/SwanIntegration'
 import openLink from '../../../../utils/OpenLink'
 import { createTempSwanAccountShell, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
 export type Props = {
@@ -28,6 +28,9 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from  Swan' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+  useEffect( ()=>{
+    dispatch( clearSwanCache() )
+  }, [] )
   const canProceed = useMemo( () => {
     return (
       accountName.length > 0 &&

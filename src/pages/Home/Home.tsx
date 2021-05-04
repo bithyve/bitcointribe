@@ -1167,7 +1167,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     const splits = url.split( '/' )
     if ( splits.includes( 'swan' ) ) {
-      this.props.clearSwanCache()
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
