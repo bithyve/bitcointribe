@@ -1,6 +1,7 @@
 import { call, put, select } from 'redux-saga/effects'
 
 import {
+  updateSwanStatus,
   FETCH_SWAN_AUTHENTICATION_URL,
   fetchSwanAuthenticationUrlInitiated,
   fetchSwanAuthenticationUrlSucceeded,
@@ -37,6 +38,7 @@ import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
 const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
@@ -80,30 +82,29 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
   const { code_verifier, state } = yield select(
     ( state ) => state.swanIntegration
   )
+
   const swanResponse = yield call( redeemAuthCodeForToken, {
     code,
     state,
     code_verifier
   } )
 
-
-
-
-
   // Temp code for testing. to be removed
   console.log( {
     swanResponse
   } )
-  yield put( redeemSwanCodeForTokenSucceeded( {
-    swanAuthenticatedToken: 'access_tokenXYZ'
-  } ) )
-  // uncomment the code below this line after testing
 
-  // console.log( 'swanResponse.data ', swanResponse.data )
-  // const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
-  // yield put( redeemSwanCodeForTokenSucceeded( {
-  //   swanAuthenticatedToken: access_token
-  // } ) )
+  const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
+  yield put( redeemSwanCodeForTokenSucceeded( {
+    swanAuthenticatedToken: access_token
+  } ) )
+  yield call( createWithdrawalWalletOnSwanWorker, {
+    payload: {
+      data: {
+        minBtcThreshold: 0.01
+      }
+    }
+  } )
 }
 
 
@@ -112,6 +113,7 @@ export const createWithdrawalWalletOnSwanWatcher = createWatcher(
   CREATE_WITHDRAWAL_WALLET_ON_SWAN
 )
 export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
+
   yield put( createWithdrawalWalletOnSwanInitiated( payload.data.minBtcThreshold ) )
 
   const { swanAuthenticatedToken, swanAccountShell, minBtcThreshold } = yield select(
@@ -119,17 +121,20 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   )
 
   const swanXpub = swanAccountShell.primarySubAccount.xPub
-
-  const swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
-    access_token: swanAuthenticatedToken,
-    extendedPublicKey: swanXpub,
-    displayName: 'BTC purchased from Swan',
-    metadata: {
-      foo: 'bar'
-    }
-  } )
-
-  console.log( 'swanCreateResponse.data ', swanCreateResponse.data, swanCreateResponse.data.item.id )
+  let swanCreateResponse
+  try {
+    swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
+      access_token: swanAuthenticatedToken,
+      extendedPublicKey: swanXpub,
+      displayName: 'BTC purchased from Swan'
+    } )
+  }
+  catch( e )  {
+    console.log( {
+      e
+    } )
+  }
+  yield put( updateSwanStatus( SwanAccountCreationStatus.WITHDRAWAL_WALLET_CREATED ) )
 
   const swanWithdrawalResponse = yield call( setupAutomaticWithdrawals, {
     walletId: swanCreateResponse.data.item.id,
@@ -137,11 +142,10 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     minBtcThreshold
   } )
 
-  console.log( 'swanWithdrawalResponse.data ', swanWithdrawalResponse.data, swanWithdrawalResponse.data.item.id )
-
   yield put( createWithdrawalWalletOnSwanSucceeded( {
     swanWalletId: swanWithdrawalResponse.data.item.id
   } ) )
+  yield put( updateSwanStatus( SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY ) )
 }
 
 function* addTempSwanAccountShell( { payload: subAccountInfo, }: {

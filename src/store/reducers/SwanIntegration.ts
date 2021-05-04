@@ -143,7 +143,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
 
       case FETCH_SWAN_AUTHENTICATION_URL_STARTED:
         return {
-          ...state,
+          ...INITIAL_STATE,
           hasFetchSwanAuthenticationUrlInitiated: true
         }
 
