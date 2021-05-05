@@ -46,6 +46,7 @@ const AccountCardColumn: React.FC<Props> = ( {
             style={styles.cardContainer}
             onPress={() => onAccountCardSelected( accountShell )}
             onLongPress={() => onCardLongPressed( accountShell )}
+            delayPressIn={0}
           >
             <HomeAccountsListCard
               accountShell={accountShell}

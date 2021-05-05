@@ -41,7 +41,7 @@ import {
   downloadMShare as downloadMShareSSS,
   uploadEncMShare
 } from '../actions/sss'
-import { downloadMShare as downloadMShareHealth, uploadEncMShareKeeper } from '../actions/health'
+import { downloadMShare as downloadMShareHealth, updateMSharesHealth, uploadEncMShareKeeper } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
@@ -67,6 +67,8 @@ import AccountShell from '../../common/data/models/AccountShell'
 import config from '../../bitcoin/HexaConfig'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import moment from 'moment'
+import semver from 'semver'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -1284,7 +1286,19 @@ function* walletCheckInWorker( { payload } ) {
     const preSyncHCStatus = JSON.stringify( {
       healthCheckStatus
     } )
-
+    const shareArray = [] // healths to update(shares under custody)
+    for ( const share of metaSharesUnderCustody ) {
+      if( semver.gte( share.meta.version, '1.5.0' ) ) {
+        shareArray.push( {
+          walletId: share.meta.walletId,
+          shareId: share.shareId,
+          reshareVersion: share.meta.reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          status: 'accessible',
+        } )
+      }
+    }
+    yield put( updateMSharesHealth( shareArray, true )  )
     const res = yield call(
       trustedContacts.walletCheckIn,
       metaShares.length ? metaShares.slice( 0, 3 ) : null, // metaShares is null during wallet-setup
