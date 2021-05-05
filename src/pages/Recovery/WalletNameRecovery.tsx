@@ -120,7 +120,10 @@ export default function WalletNameRecovery( props ) {
                   //   scannedData: (scannedData) =>
                   //     this.handleScannedData(scannedData),
                   // })
-                  props.navigation.navigate( 'RecoveryQuestion', {
+                  // props.navigation.navigate( 'RecoveryQuestion', {
+                  //   walletName
+                  // } )
+                  props.navigation.navigate( 'RestoreWithICloud', {
                     walletName
                   } )
                 }
