@@ -132,10 +132,12 @@ const INITIAL_STATE: SwanIntegrationState = {
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
       case UPDATE_SWAN_STATUS:
+        console.log( 'action.payload.data ', action.payload.data )
         return {
           ...state,
           swanAccountCreationStatus: action.payload.data
         }
+
       case CLEAR_SWAN_CACHE:
         return {
           ...INITIAL_STATE
@@ -150,7 +152,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
       case FETCH_SWAN_AUTHENTICATION_URL_SUCCEEDED:
         return {
           ...state,
-          swanAccountCreationStatus: SwanAccountCreationStatus.INITIAL_USER_AUTHENTICATION_IN_PROGRESS,
+          // swanAccountCreationStatus: SwanAccountCreationStatus.INITIAL_USER_AUTHENTICATION_IN_PROGRESS,
           isSwanAuthenticationInProgress: true,
           hasFetchSwanAuthenticationUrlInitiated: true,
           hasFetchSwanAuthenticationUrlSucceeded: true,

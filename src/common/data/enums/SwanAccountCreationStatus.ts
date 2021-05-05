@@ -18,17 +18,7 @@ enum SwanAccountCreationStatus {
   /**
    * User needs to login to Swan to authenticate.
    */
-  INITIAL_USER_AUTHENTICATION_IN_PROGRESS = 'INITIAL_USER_AUTHENTICATION_IN_PROGRESS',
-
-  /**
-   * User has authenticated on Swan site and redirected back to Hexa
-  */
-  ROUTED_BACK_FROM_SWAN = 'ROUTED_BACK_FROM_SWAN',
-
-  /**
-   * Hexa has created a Swan account and a withdrawal wallet on Swan
-  */
-  WITHDRAWAL_WALLET_CREATED = 'WITHDRAWAL_WALLET_CREATED',
+   AUTHENTICATION_IN_PROGRESS = 'AUTHENTICATION_IN_PROGRESS',
 
   /**
    * Hexa account Swan wallet have been linked
