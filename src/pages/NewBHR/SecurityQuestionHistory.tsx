@@ -230,7 +230,7 @@ const SecurityQuestionHistory = ( props ) => {
           shareType: 'securityQuestion',
         },
       ]
-      dispatch( updateMSharesHealth( shareArray ) )
+      dispatch( updateMSharesHealth( shareArray, true ) )
     }
   }
 

@@ -150,7 +150,8 @@ class ConfirmKeys extends Component<
         }}>
           {listData.map( ( item, index ) => {
             return (
-              <TouchableOpacity
+              <View
+                key={index}
                 style={{
                   ...styles.cardsView,
                   borderBottomWidth: index == 2 ? 0 : 4,
@@ -258,7 +259,7 @@ class ConfirmKeys extends Component<
                     <Text style={styles.statusText}>Waiting for Key</Text>
                   </View>
                 )}
-              </TouchableOpacity>
+              </View>
             )
           } )}
         </ScrollView>

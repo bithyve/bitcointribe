@@ -57,7 +57,8 @@ import {
   downloadSmShareForApproval,
   updateLevelData,
   keeperProcessStatus,
-  setLevelToNotSetupStatus
+  setLevelToNotSetupStatus,
+  setHealthStatus,
 } from '../../store/actions/health'
 import { modifyLevelStatus } from './ManageBackupFunction'
 import {
@@ -85,6 +86,7 @@ import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
+import MBKeeperButton from './MBKeeperButton'
 import debounce from 'lodash.debounce'
 import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/newBHR'
 import LevelStatus from '../../common/data/enums/LevelStatus'
@@ -167,6 +169,7 @@ interface ManageBackupNewBHRPropsTypes {
   setLevelToNotSetupStatus: any;
   isLevelToNotSetupStatus: boolean;
   initLoading: boolean;
+  setHealthStatus: any;
   onPressKeeper: any;
   navigationObj: any;
   status: any;
@@ -273,7 +276,7 @@ class ManageBackupNewBHR extends Component<
 
   componentDidMount = async () => {
     this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
-    await AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
+    await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
 
       if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
         this.setState( {
@@ -302,7 +305,6 @@ class ManageBackupNewBHR extends Component<
       keeperInfo,
       this.updateLevelDataToReducer
     )
-    console.log( 'LEVELDATA', levelData )
     this.setState( {
       levelData: levelData.levelData,
       isError: levelData.isError,
@@ -371,9 +373,7 @@ class ManageBackupNewBHR extends Component<
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      console.log( 'healthLoading', healthLoading )
       console.log( 'cloudBackupStatus', cloudBackupStatus )
-
       if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true,
@@ -680,59 +680,7 @@ class ManageBackupNewBHR extends Component<
 
   onRefresh = async () => {
     this.props.checkMSharesHealth()
-  };
-
-  getImageIcon = ( chosenContact ) => {
-    if ( chosenContact && chosenContact.name ) {
-      if ( chosenContact.imageAvailable ) {
-        return (
-          <View style={styles.imageBackground}>
-            <Image
-              source={{
-                uri: chosenContact.image.uri
-              }}
-              style={styles.contactImage}
-            />
-          </View>
-        )
-      } else {
-        return (
-          <View style={styles.imageBackground}>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: RFValue( 9 ),
-              }}
-            >
-              {chosenContact &&
-              chosenContact.firstName === 'F&F request' &&
-              chosenContact.contactsWalletName !== undefined &&
-              chosenContact.contactsWalletName !== ''
-                ? nameToInitials( `${chosenContact.contactsWalletName}'s wallet` )
-                : chosenContact && chosenContact.name
-                  ? nameToInitials(
-                    chosenContact &&
-                      chosenContact.firstName &&
-                      chosenContact.lastName
-                      ? chosenContact.firstName + ' ' + chosenContact.lastName
-                      : chosenContact.firstName && !chosenContact.lastName
-                        ? chosenContact.firstName
-                        : !chosenContact.firstName && chosenContact.lastName
-                          ? chosenContact.lastName
-                          : ''
-                  )
-                  : ''}
-            </Text>
-          </View>
-        )
-      }
-    }
-    return (
-      <Image
-        style={styles.contactImageAvatar}
-        source={require( '../../assets/images/icons/icon_user.png' )}
-      />
-    )
+    this.props.setHealthStatus()
   };
 
   closeErrorModal = () => {
@@ -990,7 +938,7 @@ class ManageBackupNewBHR extends Component<
                       borderRadius: 10,
                       marginTop: wp( '7%' ),
                       backgroundColor:
-                        value.status == 'good'
+                        value.status == 'good' || value.status == 'bad'
                           ? Colors.blue
                           : Colors.backgroundColor,
                       shadowRadius:
@@ -1011,7 +959,7 @@ class ManageBackupNewBHR extends Component<
                       <View style={{
                         flexDirection: 'row'
                       }}>
-                        {value.status == 'good' ? (
+                        {value.status == 'good' || value.status == 'bad' ? (
                           <View
                             style={{
                               ...styles.cardHealthImageView,
@@ -1020,9 +968,9 @@ class ManageBackupNewBHR extends Component<
                                   ? 10
                                   : 0,
                               backgroundColor:
-                                value.status == 'good'
-                                  ? Colors.green
-                                  : Colors.red,
+                              value.status == 'good'
+                                ? Colors.green
+                                : Colors.red,
                             }}
                           >
                             {value.status == 'good' ? (
@@ -1060,7 +1008,7 @@ class ManageBackupNewBHR extends Component<
                           style={{
                             ...styles.cardButtonView,
                             backgroundColor:
-                              value.status == 'notSetup' || value.status == 'bad'
+                              value.status == 'notSetup'
                                 ? Colors.white
                                 : Colors.deepBlue,
                           }}
@@ -1069,7 +1017,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.cardButtonText,
                               color:
-                                value.status == 'notSetup'|| value.status == 'bad'
+                                value.status == 'notSetup'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                               width:'auto'
@@ -1090,7 +1038,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.levelText,
                               color:
-                                value.status == 'notSetup'|| value.status == 'bad'
+                                value.status == 'notSetup'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                             }}
@@ -1101,7 +1049,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.levelInfoText,
                               color:
-                                value.status == 'notSetup'|| value.status == 'bad'
+                                value.status == 'notSetup'
                                   ? Colors.textColorGrey
                                   : Colors.white,
                               width: wp( '55%' )
@@ -1119,7 +1067,7 @@ class ManageBackupNewBHR extends Component<
                             style={{
                               ...styles.manageButtonText,
                               color:
-                                value.status == 'notSetup'|| value.status == 'bad'
+                                value.status == 'notSetup'
                                   ? Colors.black
                                   : Colors.white,
                             }}
@@ -1134,7 +1082,7 @@ class ManageBackupNewBHR extends Component<
                                 : 'arrowright'
                             }
                             color={
-                              value.status == 'notSetup'|| value.status == 'bad'
+                              value.status == 'notSetup'
                                 ? Colors.black
                                 : Colors.white
                             }
@@ -1158,7 +1106,7 @@ class ManageBackupNewBHR extends Component<
                               numberOfLines={2}
                               style={{
                                 color:
-                                  value.status == 'notSetup'|| value.status == 'bad'
+                                  value.status == 'notSetup'
                                     ? Colors.textColorGrey
                                     : Colors.white,
                                 fontFamily: Fonts.FiraSansRegular,
@@ -1168,302 +1116,63 @@ class ManageBackupNewBHR extends Component<
                               {value.note}
                             </Text>
                           </View>
-                          {value.id == 1 ? (
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                marginTop: 'auto',
-                              }}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  borderColor:
-                                    value.keeper1.status == 'accessible'
-                                      ? Colors.deepBlue
-                                      : Colors.red,
-                                  borderWidth:
-                                    value.keeper1.status == 'accessible'
-                                      ? 0
-                                      : 1,
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  overflow:'hidden'
-                                }}
-                                disabled={this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS}
-                                onPress={() => {
-                                  if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-                                    navigation.navigate(
-                                      'CloudBackupHistory',
-                                      {
-                                        selectedTime: this.getTime( new Date() ),
-                                        selectedStatus: 'Ugly',
-                                      }
-                                    )
-                                    // this.updateCloudData()
-                                  }
-                                }}
-                              >
-                                <Image
-                                  source={require( '../../assets/images/icons/ico_cloud_backup.png' )}
-                                  style={styles.resetImage}
-                                />
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    fontSize: RFValue( 8 ),
-                                    marginLeft: wp( '2%' ),
-                                  }}
-                                  numberOfLines={1}
-                                >
-                                  {value.keeper1ButtonText}
-                                </Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  borderColor:
-                                  value.keeper2.status == 'accessible'
-                                    ? value.status == 'notSetup'|| value.status == 'bad'
-                                      ? Colors.white
-                                      : Colors.deepBlue
-                                    : Colors.red,
-                                  borderWidth:
-                                    value.keeper2.status == 'accessible'
-                                      ? 0
-                                      : 0.5,
-                                  marginLeft: 'auto',
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  overflow: 'hidden'
-                                }}
-                                onPress={() =>
+                          <View
+                            style={{
+                              flexDirection: 'row',
+                              marginTop: 'auto',
+                              justifyContent: 'space-between'
+                            }}
+                          >
+                            <MBKeeperButton
+                              value={value}
+                              keeper={value.keeper1}
+                              onPressKeeper={ value.id == 1 ? () => {
+                                if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
                                   navigation.navigate(
-                                    'SecurityQuestionHistoryNewBHR',
+                                    'CloudBackupHistory',
                                     {
                                       selectedTime: this.getTime( new Date() ),
                                       selectedStatus: 'Ugly',
                                     }
                                   )
                                 }
-                              >
-                                <ImageBackground
-                                  source={require( '../../assets/images/icons/questionMark.png' )}
-                                  style={{
-                                    ...styles.resetImage,
-                                    position: 'relative',
-                                  }}
-                                >
-                                  {value.keeper2.status == 'notAccessible' ? (
-                                    <View
-                                      style={{
-                                        backgroundColor: Colors.red,
-                                        width: wp( '1%' ),
-                                        height: wp( '1%' ),
-                                        position: 'absolute',
-                                        top: 0,
-                                        right: 0,
-                                        borderRadius: wp( '1%' ) / 2,
-                                      }}
-                                    />
-                                  ) : null}
-                                </ImageBackground>
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    fontSize: RFValue( 8 ),
-                                    marginLeft: wp( '2%' ),
-                                  }}
-                                  numberOfLines={1}
-                                >
-                                  Security Question
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          ) : (
-                            <View
-                              style={{
-                                flexDirection: 'row',
-                                marginTop: 'auto',
-                                justifyContent: 'space-between'
+                              } : () => {
+                                this.setState( {
+                                  showLoader: true
+                                } )
+                                requestAnimationFrame( () => {
+                                  this.onPressKeeperButton( value, 1 )
+                                  //this.props.onPressKeeper( value, 1 )
+                                  // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
+                                } )
                               }}
-                            >
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  backgroundColor:
-                                    value.status == 'notSetup'|| value.status == 'bad'
-                                      ? Colors.white
-                                      : Colors.deepBlue,
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  borderColor:
-                                    value.keeper1.status == 'accessible'
-                                      ? value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.white
-                                        : Colors.deepBlue
-                                      : Colors.red,
-                                  borderWidth:
-                                    value.keeper1.status == 'accessible'
-                                      ? 0
-                                      : 1,
-                                  overflow:'hidden'
-                                }}
-                                delayPressIn={0}
-                                onPress={() =>{
-                                  this.setState( {
-                                    showLoader: true
-                                  } )
-                                  requestAnimationFrame( () => {
-                                    this.onPressKeeperButton( value, 1 )
-                                    //this.props.onPressKeeper( value, 1 )
-                                    // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
-                                  } )
-                                }}
-                              >
-                                {value.keeper1.status == 'accessible' &&
-                                ( value.keeper1.shareType == 'device' ) ? (
-                                    <Image
-                                      source={
-                                        value.keeper1.shareType == 'device'
-                                          ? require( '../../assets/images/icons/icon_ipad_blue.png' )
-                                          : require( '../../assets/images/icons/pexels-photo.png' )
-                                      }
-                                      style={{
-                                        width: wp( '6%' ),
-                                        height: wp( '6%' ),
-                                        resizeMode: 'contain',
-                                        borderRadius: wp( '6%' ) / 2,
-                                      }}
-                                    />
-                                  ) : value.keeper1.shareType == 'contact' &&
-                                  value.keeper1.updatedAt != 0 ? (
-                                      this.getImageIcon( value.keeper1.data )
-                                    ) : value.keeper1.shareType == 'pdf' &&
-                                  value.keeper1.status == 'accessible' ? (
-                                        <Image
-                                          source={require( '../../assets/images/icons/doc.png' )}
-                                          style={{
-                                            width: wp( '5%' ),
-                                            height: wp( '6%' ),
-                                            resizeMode: 'contain',
-                                          }}
-                                        />
-                                      ) : (
-                                        <View
-                                          style={{
-                                            backgroundColor: Colors.red,
-                                            width: wp( '2%' ),
-                                            height: wp( '2%' ),
-                                            borderRadius: wp( '2%' ) / 2,
-                                          }}
-                                        />
-                                      )}
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    color:
-                                      value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.textColorGrey
-                                        : Colors.white,
-                                    fontSize: RFValue( 8 ),
-                                    marginLeft: wp( '2%' ),
-                                  } }
-                                  numberOfLines={1}
-                                >
-                                  {this.keeperButtonText( value.keeper1ButtonText, '1' )}
-                                </Text>
-                              </TouchableOpacity>
-                              <TouchableOpacity
-                                style={{
-                                  ...styles.appBackupButton,
-                                  backgroundColor:
-                                    value.status == 'notSetup'|| value.status == 'bad'
-                                      ? Colors.white
-                                      : Colors.deepBlue,
-                                  paddingLeft: wp( '3%' ),
-                                  paddingRight: wp( '3%' ),
-                                  borderColor:
-                                    value.keeper2.status == 'accessible'
-                                      ? value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.white
-                                        : Colors.deepBlue
-                                      : Colors.red,
-                                  borderWidth:
-                                    value.keeper2.status == 'accessible'
-                                      ? 0
-                                      : 0.5,
-                                  marginLeft: wp( '4%' ),
-                                  overflow:'hidden'
-                                }}
-                                delayPressIn={0}
-                                onPress={() => {
-                                  this.setState( {
-                                    showLoader: true
-                                  } )
-
-                                  requestAnimationFrame( () => {
-                                    this.onPressKeeperButton( value, 2 )
-                                    //this.props.onPressKeeper( value, 2 )
-                                    //debounce( this.props.onPressKeeper( value, 2 ), 1000 )
-                                  } )
-                                }}
-                              >
-                                {value.keeper2.status == 'accessible' &&
-                                ( value.keeper2.shareType == 'device' ) ? (
-                                    <Image
-                                      source={
-                                        value.keeper2.shareType == 'device'
-                                          ? require( '../../assets/images/icons/icon_ipad_blue.png' )
-                                          : require( '../../assets/images/icons/pexels-photo.png' )
-                                      }
-                                      style={{
-                                        width: wp( '6%' ),
-                                        height: wp( '6%' ),
-                                        resizeMode: 'contain',
-                                        borderRadius: wp( '6%' ) / 2,
-                                      }}
-                                    />
-                                  ) : value.keeper2.shareType == 'contact' &&
-                                  value.keeper2.updatedAt != 0 ? (
-                                      this.getImageIcon( value.keeper2.data )
-                                    ) : value.keeper2.shareType == 'pdf' &&
-                                  value.keeper2.status == 'accessible' ? (
-                                        <Image
-                                          source={require( '../../assets/images/icons/doc.png' )}
-                                          style={{
-                                            width: wp( '5%' ),
-                                            height: wp( '6%' ),
-                                            resizeMode: 'contain',
-                                          }}
-                                        />
-                                      ) : (
-                                        <View
-                                          style={{
-                                            backgroundColor: Colors.red,
-                                            width: wp( '2%' ),
-                                            height: wp( '2%' ),
-                                            borderRadius: wp( '2%' ) / 2,
-                                          }}
-                                        />
-                                      )}
-                                <Text
-                                  style={{
-                                    ...styles.cardButtonText,
-                                    fontSize: RFValue( 8 ),
-                                    color:
-                                      value.status == 'notSetup'|| value.status == 'bad'
-                                        ? Colors.textColorGrey
-                                        : Colors.white,
-                                    marginLeft: wp( '2%' ),
-                                  }}
-                                  numberOfLines={1}
-                                >
-                                  {this.keeperButtonText( value.keeper2ButtonText, '2' )}
-                                </Text>
-                              </TouchableOpacity>
-                            </View>
-                          )}
+                              keeperButtonText={value.id == 1 ? value.keeper1ButtonText : this.keeperButtonText( value.keeper1ButtonText, '1' )}
+                              disabled={false}
+                            />
+                            <MBKeeperButton
+                              value={value}
+                              keeper={value.keeper2}
+                              onPressKeeper={value.id == 1 ? () =>
+                                navigation.navigate(
+                                  'SecurityQuestionHistoryNewBHR',
+                                  {
+                                    selectedTime: this.getTime( new Date() ),
+                                    selectedStatus: 'Ugly',
+                                  }
+                                ) : () => {
+                                this.setState( {
+                                  showLoader: true
+                                } )
+                                requestAnimationFrame( () => {
+                                  this.onPressKeeperButton( value, 2 )
+                                  //this.props.onPressKeeper( value, 1 )
+                                  // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
+                                } )
+                              }}
+                              keeperButtonText={value.id == 1 ? 'Security Question' : this.keeperButtonText( value.keeper2ButtonText, '2' )}
+                              disabled={false}
+                            />
+                          </View>
                         </View>
                       </View>
                     ) : null}
@@ -1724,6 +1433,7 @@ export default withNavigationFocus(
     updateLevelData,
     keeperProcessStatus,
     setLevelToNotSetupStatus,
+    setHealthStatus,
     onPressKeeper,
     setLevelCompletionError,
     setIsKeeperTypeBottomSheetOpen,
@@ -1843,50 +1553,5 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
     marginRight: 5,
-  },
-  appBackupButton: {
-    flexDirection: 'row',
-    backgroundColor: Colors.deepBlue,
-    alignItems: 'center',
-    borderRadius: 8,
-    width: wp( '37%' ),
-    height: wp( '11%' ),
-  },
-  resetImage: {
-    width: wp( '4%' ),
-    height: wp( '4%' ),
-    resizeMode: 'contain',
-  },
-  contactImageAvatar: {
-    width: wp( '6%' ),
-    height: wp( '6%' ),
-    alignSelf: 'center',
-    shadowColor: Colors.textColorGrey,
-    shadowOpacity: 0.5,
-    shadowOffset: {
-      width: 0, height: 3
-    },
-    shadowRadius: 5,
-  },
-  contactImage: {
-    height: wp( '6%' ),
-    width: wp( '6%' ),
-    borderRadius: wp( '6%' ) / 2,
-  },
-  imageBackground: {
-    backgroundColor: Colors.shadowBlue,
-    height: wp( '6%' ),
-    width: wp( '6%' ),
-    borderRadius: wp( '6%' ) / 2,
-    borderColor: Colors.white,
-    borderWidth: 1,
-    shadowColor: Colors.textColorGrey,
-    shadowOpacity: 0.5,
-    shadowOffset: {
-      width: 0, height: 3
-    },
-    shadowRadius: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 } )
