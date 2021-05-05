@@ -3830,7 +3830,6 @@ function* setLevelToNotSetupStatusWorker( ) {
         yield put( updateLevelTwoMetaShareStatus( true ) )
         yield put( isLevel2InitializedStatus() )
       }
-      yield put( checkMSharesHealth() )
     }
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadSmShare' ) )
