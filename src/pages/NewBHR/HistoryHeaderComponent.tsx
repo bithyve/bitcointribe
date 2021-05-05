@@ -31,7 +31,10 @@ const HistoryHeaderComponent = ( props ) => {
           props.imageIcon()
         ) : (
           <View style={styles.headerImageView}>
-            <Image style={styles.headerImage} source={props.headerImage} />
+            <Image style={props.tintColor ? {
+              ...styles.headerImage,
+              tintColor: Colors.deepBlue
+            } : styles.headerImage} source={props.headerImage} />
           </View>
         )}
         <View style={styles.headerInfoView}>
