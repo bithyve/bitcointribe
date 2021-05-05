@@ -260,18 +260,22 @@ class ManageBackupNewBHR extends Component<
   }
 
   componentDidMount = async () => {
-    await AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
+    await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
       if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
+        this.setState( {
+          showLoader: true
+        } )
         this.props.setLevelToNotSetupStatus()
+        this.modifyLevelData()
+      } else {
+        await this.onRefresh()
+        this.modifyLevelData()
       }
       // updates the new FCM token to channels post recovery
       if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
         this.props.updateNewFcm()
       }
     } )
-
-    await this.onRefresh()
-    this.modifyLevelData()
   };
 
   modifyLevelData = () => {
@@ -369,15 +373,26 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
+    if( prevProps.isLevelToNotSetupStatus != this.props.isLevelToNotSetupStatus && this.props.isLevelToNotSetupStatus ){
+      this.setState( {
+        showLoader: false
+      } )
+    }
+
+    if( prevProps.levelHealth != this.props.levelHealth ){
+      this.modifyLevelData( )
+    }
+
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
+
+
       if(
         ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
         levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
       ) {
         this.loaderBottomSheet.snapTo( 1 )
       }
-      this.modifyLevelData( )
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
