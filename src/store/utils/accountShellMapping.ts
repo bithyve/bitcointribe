@@ -41,6 +41,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
 import { call } from 'react-native-reanimated'
 import useNewAccountChoices from '../../utils/hooks/account-utils/UseNewAccountChoices'
+import { AccountsState } from '../reducers/accounts'
 
 const initAccountShells = ( services ) => {
   const testAcc: TestAccount = services[ TEST_ACCOUNT ]
@@ -517,14 +518,16 @@ export const updateAccountShells = (
   return updatedAccountShells
 }
 
-const restorePrimarySubAccounts = (
-  services,
-  accountShells: AccountShell[],
-) => {
+export const recreatePrimarySubAccounts = (
+  accountsState: AccountsState,
+): AccountShell[] => {
   // helps restore front-end data model for ejected-derivative accounts(w/ txsFound) post blind-sync
   let derivativeAccounts, network
-  const regularAcc: RegularAccount = services[ REGULAR_ACCOUNT ]
-  const secureAcc: SecureAccount = services[ SECURE_ACCOUNT ]
+  const regularAcc: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const secureAcc: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+  const accountShells: AccountShell[] = accountsState.accountShells
+
+  const newAccountShells: AccountShell[] = []
 
   for ( const accountKind of [ SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ) {
     switch ( accountKind ) {
@@ -654,14 +657,13 @@ const restorePrimarySubAccounts = (
               dervBalances,
               dervTransactions,
             )
-            // yield put( newAccountShellAdded( {
-            //   accountShell: newAccountShell
-            // } ) )
-            // yield put( accountShellOrderedToFront( newAccountShell ) )
 
+            newAccountShells.push( newAccountShell )
           }
         }
       }
     }
   }
+
+  return newAccountShells
 }
