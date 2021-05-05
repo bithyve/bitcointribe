@@ -1,16 +1,16 @@
 import crypto from 'crypto'
 import base64url from 'base64url'
 
-export const generatePKCEParameters = () => {
-  console.log( ' made it to generator' )
-  const code_verifier = generateRandomString( 64 )
+import { asyncPkceChallenge } from 'react-native-pkce-challenge'
 
-  const base64Digest = crypto
-    .createHash( 'sha256' )
-    .update( code_verifier )
-    .digest( 'base64' )
 
-  const code_challenge = base64url.fromBase64( base64Digest )
+export const generatePKCEParameters = async () => {
+  const challenge = await asyncPkceChallenge()
+  console.log( {
+    challenge
+  } )
+  const code_challenge = challenge.codeChallenge
+  const code_verifier = challenge.codeVerifier
 
   const nonce = `${generateRandomNumber ( 11 )}-${generateRandomString( 3 )}`
 
