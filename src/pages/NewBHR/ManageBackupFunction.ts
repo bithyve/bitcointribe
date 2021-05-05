@@ -65,6 +65,9 @@ const checkLevelHealth = (
       levelHealthVar[ index ].levelInfo[ index2 ].updatedAt === 0 &&
     levelHealthVar[ index ].levelInfo[ index2 + 1 ].updatedAt === 0
     ) {
+      levelData[ index ].keeper1 = levelHealthVar[ currentLevel ] && levelHealthVar[ currentLevel ].levelInfo[ index2 ] ? levelHealthVar[ currentLevel ].levelInfo[ index2 ] : levelData[ 1 ].keeper1
+      levelData[ index ].keeper2 = levelHealthVar[ currentLevel ] && levelHealthVar[ currentLevel ].levelInfo[ index2 + 1 ] ? levelHealthVar[ currentLevel ].levelInfo[ index2 + 1 ] : levelData[ 1 ].keeper2
+      levelData[ index ].status = checkStatus( levelHealthVar, currentLevel, 0, currentLevel )
       levelData[ index ].status = 'notSetup'
       if( index == 2 && currentLevel > 0 && levelHealthVar[ index ] ){
         // console.log( 'modifyLevelStatus index == 2 && currentLevel > 0 && levelHealthVar[ index ]' )
@@ -123,7 +126,6 @@ const checkLevelHealth = (
         levelData[ 2 ].status = checkStatus( levelHealthVar, 2, 4, currentLevel )
       }
     }
-    // console.log( 'modifyLevelStatus levelData', levelData )
     return levelData
   } catch ( error ) {
     console.log( 'error', error )
@@ -237,14 +239,15 @@ const noteText = ( i, currentLevel ) => {
   return 'Share the Recovery Keys to upgrade your backup'
 }
 
-const changeNameForSeconday = ( name ) =>{
+const changeNameForSecondary = ( name ) =>{
   if( name === 'Secondary Device1' || name === 'Secondary Device2' ){
     return name.replace( 'Secondary', 'Personal' )
   }
   return name
 }
 
-const getLevelInfoStatus = ( levelData, currentLevel ) => {
+const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
+  const levelData = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
     if( i == 0 ){
@@ -266,27 +269,29 @@ const getLevelInfoStatus = ( levelData, currentLevel ) => {
       }
       // BOTH ACCESSIBLE
       if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
-        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
-        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
-
+        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
+        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
         levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Multi Key Backup is accessible'
       }
       // ONLY ONE ACCESSIBLE
       if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ){
         let name = ''
-        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name
-        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name
-
+        if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
+        if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
         if( element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ) name = element.keeper1.name
+        else name = 'Recovery Key 1'
         if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name = element.keeper2.name
-        levelData[ i ].note = 'Your backup stored with '  + changeNameForSeconday( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
+        else name = 'Recovery Key 2'
+        levelData[ i ].note = 'Your backup stored with '  + changeNameForSecondary( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
       }
       // BOTH NOT ACCESSIBLE
       if( ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
         let name = ''
-        if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name; levelData[ i ].keeper2ButtonText = element.keeper2.name
-        if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name; levelData[ i ].keeper1ButtonText = element.keeper1.name
-        levelData[ i ].note = 'Your backup stored with '  + changeNameForSeconday( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
+        if( element.keeper2.updatedAt > 0 ) name = element.keeper2.name
+        if( element.keeper1.updatedAt > 0 ) name = element.keeper1.name
+        levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
+        levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
+        levelData[ i ].note = 'Your backup stored with '  + changeNameForSecondary( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
       }
     }
   }
