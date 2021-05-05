@@ -134,7 +134,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
       e
     } )
   }
-  yield put( updateSwanStatus( SwanAccountCreationStatus.WITHDRAWAL_WALLET_CREATED ) )
+  yield put( updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) )
 
   const swanWithdrawalResponse = yield call( setupAutomaticWithdrawals, {
     walletId: swanCreateResponse.data.item.id,
