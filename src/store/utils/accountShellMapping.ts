@@ -17,9 +17,13 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
+  RAMP,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
+  SWAN,
   TEST_ACCOUNT,
+  WYRE,
 } from '../../common/constants/wallet-service-types'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
@@ -35,6 +39,9 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
+import { call } from 'react-native-reanimated'
+import useNewAccountChoices from '../../utils/hooks/account-utils/UseNewAccountChoices'
+import { AccountsState } from '../reducers/accounts'
 
 const initAccountShells = ( services ) => {
   const testAcc: TestAccount = services[ TEST_ACCOUNT ]
@@ -509,4 +516,160 @@ export const updateAccountShells = (
   )
 
   return updatedAccountShells
+}
+
+export const recreatePrimarySubAccounts = (
+  accountsState: AccountsState,
+): AccountShell[] => {
+  // helps restore front-end data model for ejected-derivative accounts(w/ txsFound) post blind-sync
+  let derivativeAccounts, network
+  const regularAcc: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const secureAcc: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+  const accountShells: AccountShell[] = accountsState.accountShells
+
+  const newAccountShells: AccountShell[] = []
+
+  for ( const accountKind of [ SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ) {
+    let isTFAEnabled = false
+    switch ( accountKind ) {
+        case SourceAccountKind.REGULAR_ACCOUNT:
+          derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
+          network = regularAcc.hdWallet.network
+          break
+
+        case SourceAccountKind.SECURE_ACCOUNT:
+          derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
+          network = secureAcc.secureHDWallet.network
+          isTFAEnabled = true
+          break
+    }
+
+    if ( !derivativeAccounts ) continue
+
+    for ( const dAccountType of config.EJECTED_ACCOUNTS ) {
+      const derivativeAccount: DerivativeAccount =
+        derivativeAccounts[ dAccountType ]
+
+      if ( derivativeAccount && derivativeAccount.instance.using ) {
+        for (
+          let accountNumber = 1;
+          accountNumber <= derivativeAccount.instance.using;
+          accountNumber++
+        ) {
+          const derivativeId = derivativeAccount[ accountNumber ].xpubId
+
+          let exists = false // front-end data model(SubAccountDescribing) already exists?
+          for( const shell of accountShells ){
+            if( shell.primarySubAccount.id === derivativeId ) exists = true
+          }
+          if( exists ) continue
+          else {
+            // generate preliminary SubAccountDescribing (in sync w/ useNewAccountChoices())
+            let subAccountInfo
+            switch( dAccountType ){
+                case SUB_PRIMARY_ACCOUNT:
+                  switch( accountKind ){
+                      case SourceAccountKind.REGULAR_ACCOUNT:
+                        subAccountInfo = new CheckingSubAccountInfo( {
+                          defaultTitle: `Checking Account ${accountNumber}`,
+                          defaultDescription: 'User Checking Account',
+                        } )
+                        break
+
+                      case SourceAccountKind.SECURE_ACCOUNT:
+                        subAccountInfo = new SavingsSubAccountInfo( {
+                          defaultTitle: `Savings Account ${accountNumber}`,
+                          defaultDescription: 'User Savings Account',
+                        } )
+                        break
+                  }
+                  break
+
+                case  DONATION_ACCOUNT:
+                  subAccountInfo = new DonationSubAccountInfo( {
+                    defaultTitle: `Donation Account ${accountNumber}`,
+                    defaultDescription: 'Accept donations',
+                    doneeName: '',
+                    causeName: '',
+                    isTFAEnabled,
+                  } )
+                  break
+
+                case  WYRE:
+                  subAccountInfo = new ExternalServiceSubAccountInfo( {
+                    instanceNumber: accountNumber,
+                    defaultTitle: 'Wyre Account',
+                    defaultDescription: 'Buy with ApplePay or Debit card',
+                    serviceAccountKind: ServiceAccountKind.WYRE,
+                    isTFAEnabled
+                  } )
+                  break
+
+                case  RAMP:
+                  subAccountInfo = new ExternalServiceSubAccountInfo( {
+                    instanceNumber: accountNumber,
+                    defaultTitle: 'Ramp Account',
+                    defaultDescription: 'Buy with Apple Pay, Bank or Card',
+                    serviceAccountKind: ServiceAccountKind.RAMP,
+                    isTFAEnabled
+                  } )
+                  break
+
+                case SWAN:
+                  subAccountInfo = new ExternalServiceSubAccountInfo( {
+                    instanceNumber: accountNumber,
+                    defaultTitle: 'Swan Bitcoin',
+                    defaultDescription: 'Stack sats with Swan',
+                    serviceAccountKind: ServiceAccountKind.SWAN,
+                    isTFAEnabled
+                  } )
+                  break
+            }
+
+            if( !subAccountInfo ) continue
+
+            subAccountInfo.id = derivativeId
+            subAccountInfo.xPub = Bitcoin.generateYpub( derivativeAccount[ accountNumber ].xpub, network )
+            subAccountInfo.instanceNumber = accountNumber
+
+
+            const newAccountShell = new AccountShell( {
+              unit: BitcoinUnit.SATS,
+              primarySubAccount: subAccountInfo,
+              displayOrder: 1,
+            } )
+
+            // saturate w/ balance and transactions
+            let dervBalances: Balances = {
+              confirmed: 0,
+              unconfirmed: 0,
+            }
+            let dervTransactions: TransactionDescribing[] = []
+
+            if ( derivativeAccount[ accountNumber ].balances )
+              dervBalances = {
+                confirmed: derivativeAccount[ accountNumber ].balances.balance,
+                unconfirmed:
+                  derivativeAccount[ accountNumber ].balances.unconfirmedBalance,
+              }
+
+            if ( derivativeAccount[ accountNumber ].transactions )
+              dervTransactions =
+                derivativeAccount[ accountNumber ].transactions.transactionDetails
+
+
+            AccountShell.updatePrimarySubAccountDetails(
+              newAccountShell,
+              dervBalances,
+              dervTransactions,
+            )
+
+            newAccountShells.push( newAccountShell )
+          }
+        }
+      }
+    }
+  }
+
+  return newAccountShells
 }

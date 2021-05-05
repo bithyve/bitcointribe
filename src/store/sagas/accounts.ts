@@ -84,6 +84,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
+import { recreatePrimarySubAccounts } from '../utils/accountShellMapping'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -820,6 +821,20 @@ function* blindRefreshWorker() {
       details: deltaTx,
     } )
   } )
+
+  if( netDeltaTxs.length ){
+    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+    const newAccountShells: AccountShell[]
+    = yield call( recreatePrimarySubAccounts, accountsState,  )
+
+    for( const newShell of newAccountShells ){
+      yield put( newAccountShellAdded( {
+        accountShell: newShell
+      } ) )
+      yield put( accountShellOrderedToFront( newShell ) )
+    }
+  }
+
   yield put( rescanSucceeded( rescanTxs ) )
   yield put( blindRefreshStarted( false ) )
 }
