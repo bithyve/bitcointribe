@@ -127,6 +127,9 @@ import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, s
 
 import {
   fetchSwanAuthenticationUrlWatcher,
+  redeemSwanCodeForTokenWatcher,
+  createWithdrawalWalletOnSwanWatcher,
+  addTempSwanAccountShellWatcher
 } from './sagas/SwanIntegration'
 
 import {
@@ -206,6 +209,8 @@ import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
+import newBHR from './reducers/newBHR'
+import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -342,6 +347,9 @@ const rootSaga = function* () {
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
+    redeemSwanCodeForTokenWatcher,
+    createWithdrawalWalletOnSwanWatcher,
+    addTempSwanAccountShellWatcher,
 
     // Wyre Integration
     fetchWyreReservationWatcher,
@@ -381,6 +389,9 @@ const rootSaga = function* () {
     autoShareSecondaryWatcher,
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
+
+    //newBHR
+    onPressKeeperChannelWatcher,
     confirmPDFSharedFromUpgradeWatcher,
   ]
 
@@ -420,6 +431,7 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
+  newBHR: newBHR
 } )
 
 export default function makeStore() {

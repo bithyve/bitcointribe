@@ -224,6 +224,7 @@ export default function SendShareModal( props ) {
             onPress={() => props.onPressViaLink( index )}
             disabled={loading.uploadMetaShare}
             style={styles.buttonInnerView}
+            delayPressIn={0}
           >
             {loading.uploadMetaShare ? (
               <ActivityIndicator size="small" />
@@ -244,6 +245,7 @@ export default function SendShareModal( props ) {
             style={styles.buttonInnerView}
             disabled={loading.uploadMetaShare}
             onPress={() => props.onPressViaQr( index )}
+            delayPressIn={0}
           >
             {loading.uploadMetaShare ? (
               <ActivityIndicator size="small" />
