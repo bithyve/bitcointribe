@@ -1112,7 +1112,13 @@ class ManageBackupNewBHR extends Component<
                               keeper={value.keeper1}
                               onPressKeeper={ value.id == 1 ? () => {
                                 if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-                                  this.updateCloudData()
+                                  navigation.navigate(
+                                    'CloudBackupHistory',
+                                    {
+                                      selectedTime: this.getTime( new Date() ),
+                                      selectedStatus: 'Ugly',
+                                    }
+                                  )
                                 }
                               } : () => {
                                 this.setState( {
