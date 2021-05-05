@@ -499,7 +499,7 @@ const PersonalCopyHistory = ( props ) => {
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
-          'Please confirm this share by scanning the 1st Qr from pdf.'
+          'Open your PDF copy and scan the first QR for approval.'
         }
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}

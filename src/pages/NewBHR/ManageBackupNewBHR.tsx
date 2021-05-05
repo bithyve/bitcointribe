@@ -493,7 +493,7 @@ class ManageBackupNewBHR extends Component<
 
   updateCloudData = () => {
     if( this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    if( this.props.cloudPermissionGranted === false ) return
+    // if( this.props.cloudPermissionGranted === false ) return
     const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
     let secretShare = {
     }
@@ -1240,7 +1240,14 @@ class ManageBackupNewBHR extends Component<
                                 disabled={this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS}
                                 onPress={() => {
                                   if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-                                    this.updateCloudData()
+                                    navigation.navigate(
+                                      'CloudBackupHistory',
+                                      {
+                                        selectedTime: this.getTime( new Date() ),
+                                        selectedStatus: 'Ugly',
+                                      }
+                                    )
+                                    // this.updateCloudData()
                                   }
                                 }}
                               >

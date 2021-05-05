@@ -1,11 +1,5 @@
 // types and action creators: dispatched by components and sagas
 
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import {
-  EphemeralDataElements,
-  WalletImage,
-} from '../../bitcoin/utilities/Interface'
-
 export const UPGRADE_LOADING = 'UPGRADE_LOADING'
 export const INIT_LEVELS = 'INIT_LEVELS'
 export const SET_CLOUD_FOR_LEVEL = 'SET_CLOUD_FOR_LEVEL'
@@ -16,6 +10,7 @@ export const SET_AVAILABLE_KEEPER_DATA = 'SET_AVAILABLE_KEEPER_DATA'
 export const UPDATE_AVAILABLE_KEEPER_DATA = 'UPDATE_AVAILABLE_KEEPER_DATA'
 export const UPDATE_LEVEL_TO_SETUP = 'UPDATE_LEVEL_TO_SETUP'
 export const UPGRADE_LEVEL_INIT_STATUS = 'UPGRADE_LEVEL_INIT_STATUS'
+export const CONFIRM_PDF_SHARED_UPGRADE = 'CONFIRM_PDF_SHARED_UPGRADE'
 
 export const switchUpgradeLoader = ( beingLoaded ) => {
   // console.log("Called s3 Loading", new Date())
@@ -74,10 +69,10 @@ export const setAvailableKeeperData = ( availableKeeperData ) => {
   }
 }
 
-export const updateAvailableKeeperData = ( type, name? ) => {
+export const updateAvailableKeeperData = ( object: {type: string; name?: string; }[] ) => {
   return {
     type: UPDATE_AVAILABLE_KEEPER_DATA, payload: {
-      type, name
+      object
     }
   }
 }
@@ -93,5 +88,18 @@ export const updateLevelToSetup = ( level ) => {
 export const isUpgradeLevelInitializedStatus = ( ) => {
   return {
     type: UPGRADE_LEVEL_INIT_STATUS
+  }
+}
+
+export const confirmPDFSharedFromUpgrade = (
+  shareId: string,
+  scannedData: string
+) => {
+  return {
+    type: CONFIRM_PDF_SHARED_UPGRADE,
+    payload: {
+      shareId,
+      scannedData
+    },
   }
 }

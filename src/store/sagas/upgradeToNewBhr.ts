@@ -12,8 +12,9 @@ import {
   setAvailableKeeperData,
   updateAvailableKeeperData,
   isUpgradeLevelInitializedStatus,
+  CONFIRM_PDF_SHARED_UPGRADE,
 } from '../actions/upgradeToNewBhr'
-import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
+import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, onApprovalStatusChange, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -23,6 +24,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import RelayServices from '../../bitcoin/services/RelayService'
 import { setCloudData } from '../actions/cloud'
 import semver from 'semver'
+import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 
 function* initLevelsWorker( { payload } ) {
   try {
@@ -184,7 +186,9 @@ function* autoShareSecondaryWorker( { payload } ) {
         } ],
         notification
       )
-      yield put( updateAvailableKeeperData( 'primary' ) )
+      yield put( updateAvailableKeeperData( [ {
+        type: 'primary'
+      } ] ) )
     }
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
   } catch ( error ) {
@@ -202,7 +206,7 @@ function* autoShareContactKeeperWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
-    const contactListToMarkDone = []
+    const contactListToMarkDone:{type: string; name: string;}[] = []
     for ( let i = 0; i < shareIds.length; i++ ) {
       const element = shareIds[ i ]
       const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
@@ -241,7 +245,9 @@ function* autoShareContactKeeperWorker( { payload } ) {
           : contactList[ i ] && !contactList[ i ].firstName && contactList[ i ].lastName
             ? contactList[ i ].lastName
             : ''
-      contactListToMarkDone.push( name )
+      contactListToMarkDone.push( {
+        name, type: contactList[ i ].type
+      } )
       const shareId = shareIds[ i ]
       const share: MetaShare = metaShares.find( value => value.shareId == shareId )
       const oldKeeperInfo = trustedContactsInfo[ name.toLowerCase() ]
@@ -296,8 +302,8 @@ function* autoShareContactKeeperWorker( { payload } ) {
           notification
         )
       }
-      yield put( updateAvailableKeeperData( contactList[ i ] && contactList[ i ].type, name ) )
     }
+    yield put( updateAvailableKeeperData( contactListToMarkDone ) )
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
   } catch ( error ) {
     console.log( 'error', error )
@@ -313,11 +319,13 @@ export const autoShareContactKeeperWatcher = createWatcher(
 function* updateAvailableKeeperDataWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'updateAvailKeeperDataStatus' ) )
-    const { type, name }: {type: string; name:string} = payload
+    const object: {type: string; name?:string}[] = payload.object
     const availableKeeperData: {shareId: string; type: string; count: number; status?: boolean; contactDetails: any;}[] = yield select( ( state ) => state.upgradeToNewBhr.availableKeeperData )
+
     for ( let i = 0; i < availableKeeperData.length; i++ ) {
       const element = availableKeeperData[ i ]
-      if( element.type == type && ( type == 'contact1' || type == 'contact2' ) ) {
+      const objIndex = object.findIndex( value => value.type == element.type )
+      if( objIndex > -1 && object[ objIndex ].name ) {
         const contactDetails = element.contactDetails
         const Name = contactDetails && contactDetails.firstName && contactDetails.lastName
           ? contactDetails.firstName + ' ' + contactDetails.lastName
@@ -326,9 +334,9 @@ function* updateAvailableKeeperDataWorker( { payload } ) {
             : contactDetails && !contactDetails.firstName && contactDetails.lastName
               ? contactDetails.lastName
               : ''
-        if( Name == name ) availableKeeperData[ i ].status = true
+        if( Name == object[ objIndex ].name ) availableKeeperData[ i ].status = true
       }
-      else if( element.type == type && ( type != 'contact1' && type != 'contact2' ) ) {
+      else if( objIndex > -1 && !object[ objIndex ].name ) {
         availableKeeperData[ i ].status = true
       }
     }
@@ -343,4 +351,56 @@ function* updateAvailableKeeperDataWorker( { payload } ) {
 export const updateAvailableKeeperDataWatcher = createWatcher(
   updateAvailableKeeperDataWorker,
   UPDATE_AVAILABLE_KEEPER_DATA,
+)
+
+function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
+  try {
+    yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
+    const { shareId, scannedData } = payload
+    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
+    const walletId = s3Service.levelhealth.walletId
+    const answer = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.answer )
+    let shareIndex = 3
+    if (
+      shareId &&
+      s3Service.levelhealth.metaSharesKeeper.length &&
+      metaShare.findIndex( ( value ) => value.shareId == shareId ) > -1
+    ) {
+      shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
+    }
+    const scannedObj: {type: string, encryptedKey: string; encryptedData: string} = JSON.parse( scannedData )
+    const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
+    if( decryptedData == shareId ){
+      const shareArray = [
+        {
+          walletId: walletId,
+          shareId: shareId,
+          reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          name: 'Keeper PDF',
+          shareType: 'pdf',
+          status: 'accessible',
+        },
+      ]
+      yield put( updateMSharesHealth( shareArray ) )
+      yield put( onApprovalStatusChange( {
+        status: false,
+        initiatedAt: 0,
+        shareId: '',
+      } ) )
+      yield put( updateAvailableKeeperData( [ {
+        type:'pdf'
+      } ] ) )
+    }
+    yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
+  } catch ( error ) {
+    yield put( switchUpgradeLoader( 'pdfDataConfirm' ) )
+    console.log( 'Error EF channel', error )
+  }
+}
+
+export const confirmPDFSharedFromUpgradeWatcher = createWatcher(
+  confirmPDFSharedFromUpgradeWorker,
+  CONFIRM_PDF_SHARED_UPGRADE
 )

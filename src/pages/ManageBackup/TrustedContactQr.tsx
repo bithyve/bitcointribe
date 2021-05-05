@@ -46,10 +46,6 @@ export default function TrustedContactQr( props ) {
           .trim()
         const publicKey =
           trustedContacts.tc.trustedContacts[ contactName ].publicKey
-        console.log( {
-          contactName
-        } )
-
         setTrustedContactQR(
           JSON.stringify( {
             isGuardian: true,

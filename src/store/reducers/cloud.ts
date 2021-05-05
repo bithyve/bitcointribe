@@ -1,54 +1,67 @@
-import ip, { chain } from 'icepick'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { CLEAR_CLOUD_CACHE, CLOUD_BACKUP_STATUS, DATA_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
+import { CLEAR_CLOUD_CACHE, CLOUD_BACKUP_HISTORY, CLOUD_BACKUP_STATUS, GOOGLE_LOGIN_FAILURE, GOOGLE_LOGIN_SUCCESS, IS_CLOUD_BACKUP_SUCCESS, IS_CLOUD_BACKUP_UPDATED, IS_FILE_READING, SET_CLOUD_DATA_RECOVERY } from '../actions/cloud'
 
-const initialState = ip.freeze( {
+interface historyObj {
+  title: string,
+  confirmed: number,
+  date: number,
+}
 
+const initialState: {
+
+  isGoogleLoginSuccess: boolean;
+  isFileReading: boolean;
+  cloudData: any;
+  isCloudBackupUpdated: boolean;
+  isCloudBackupSuccess: boolean;
+  cloudBackupStatus: CloudBackupStatus,
+  cloudBackupHistory: historyObj[],
+} = {
   isGoogleLoginSuccess: false,
   isFileReading: false,
   cloudData: null,
   isCloudBackupUpdated: false,
   isCloudBackupSuccess: false,
   cloudBackupStatus: CloudBackupStatus.PENDING,
+  cloudBackupHistory: [],
+}
 
-} )
-
-export default ( state = initialState, { type, payload } ) => {
-  switch ( type ) {
+export default ( state = initialState, action ) => {
+  switch ( action.type ) {
       case GOOGLE_LOGIN_SUCCESS:
         return {
           ...state,
-          isGoogleLoginSuccess: payload.isGoogleLoginSuccess,
+          isGoogleLoginSuccess: action.payload.isGoogleLoginSuccess,
         }
 
       case GOOGLE_LOGIN_FAILURE:
         return {
           ...state,
-          isGoogleLoginFailure: payload.isGoogleLoginFailure,
+          isGoogleLoginFailure: action.payload.isGoogleLoginFailure,
         }
 
       case IS_FILE_READING:
         return {
           ...state,
-          isFileReading: payload.isFileReading,
+          isFileReading: action.payload.isFileReading,
         }
 
       case SET_CLOUD_DATA_RECOVERY:
         return {
           ...state,
-          cloudData: payload.cloudData,
+          cloudData: action.payload.cloudData,
         }
 
       case IS_CLOUD_BACKUP_UPDATED:
         return {
           ...state,
-          isCloudBackupUpdated: payload.isCloudBackupUpdated,
+          isCloudBackupUpdated: action.payload.isCloudBackupUpdated,
         }
 
       case IS_CLOUD_BACKUP_SUCCESS:
         return {
           ...state,
-          isCloudBackupSuccess: payload.isCloudBackupSuccess,
+          isCloudBackupSuccess: action.payload.isCloudBackupSuccess,
         }
 
       case CLEAR_CLOUD_CACHE:
@@ -59,9 +72,14 @@ export default ( state = initialState, { type, payload } ) => {
       case CLOUD_BACKUP_STATUS:
         return {
           ...state,
-          cloudBackupStatus: payload.cloudBackupStatus,
+          cloudBackupStatus: action.payload.cloudBackupStatus,
         }
 
+      case CLOUD_BACKUP_HISTORY:
+        return {
+          ...state,
+          cloudBackupHistory: action.payload.cloudBackupHistory,
+        }
       default:
         return state
   }
