@@ -17,9 +17,13 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
+  RAMP,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
+  SUB_PRIMARY_ACCOUNT,
+  SWAN,
   TEST_ACCOUNT,
+  WYRE,
 } from '../../common/constants/wallet-service-types'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
@@ -35,6 +39,8 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
+import { call } from 'react-native-reanimated'
+import useNewAccountChoices from '../../utils/hooks/account-utils/UseNewAccountChoices'
 
 const initAccountShells = ( services ) => {
   const testAcc: TestAccount = services[ TEST_ACCOUNT ]
@@ -547,14 +553,69 @@ const restorePrimarySubAccounts = (
         ) {
           const derivativeId = derivativeAccount[ accountNumber ].xpubId
 
-          // rotate to find subAccountId
-          let exists = false
+          let exists = false // front-end data model(SubAccountDescribing) already exists?
           for( const shell of accountShells ){
             if( shell.primarySubAccount.id === derivativeId ) exists = true
           }
           if( exists ) continue
           else {
-            // TODO: generate account shell
+            // generate preliminary SubAccountDescribing (in sync w/ useNewAccountChoices())
+            switch( dAccountType ){
+                case SUB_PRIMARY_ACCOUNT:
+                  switch( accountKind ){
+                      case SourceAccountKind.REGULAR_ACCOUNT:
+                        new CheckingSubAccountInfo( {
+                          defaultTitle: `Checking Account ${accountNumber}`,
+                          defaultDescription: 'User Checking Account'
+                        } )
+                        break
+
+                      case SourceAccountKind.SECURE_ACCOUNT:
+                        new SavingsSubAccountInfo( {
+                          defaultTitle: `Savings Account ${accountNumber}`,
+                          defaultDescription: 'User Savings Account'
+                        } )
+                        break
+                  }
+                  break
+
+                case  DONATION_ACCOUNT:
+                  new DonationSubAccountInfo( {
+                    defaultTitle: `Donation Account ${accountNumber}`,
+                    defaultDescription: 'Accept donations',
+                    doneeName: '',
+                    causeName: '',
+                  } )
+                  break
+
+                case  WYRE:
+                  new ExternalServiceSubAccountInfo( {
+                    instanceNumber: accountNumber,
+                    defaultTitle: 'Wyre Account',
+                    defaultDescription: 'Buy with ApplePay or Debit card',
+                    serviceAccountKind: ServiceAccountKind.WYRE,
+                  } )
+                  break
+
+                case  RAMP:
+                  new ExternalServiceSubAccountInfo( {
+                    instanceNumber: accountNumber,
+                    defaultTitle: 'Ramp Account',
+                    defaultDescription: 'Buy with Apple Pay, Bank or Card',
+                    serviceAccountKind: ServiceAccountKind.RAMP,
+                  } )
+                  break
+
+                case SWAN:
+                  new ExternalServiceSubAccountInfo( {
+                    instanceNumber: accountNumber,
+                    defaultTitle: 'Swan Bitcoin',
+                    defaultDescription: 'Stack sats with Swan',
+                    serviceAccountKind: ServiceAccountKind.SWAN,
+                  } )
+                  break
+            }
+
 
             // let dervBalances: Balances = {
             //   confirmed: 0,
