@@ -560,18 +560,19 @@ const restorePrimarySubAccounts = (
           if( exists ) continue
           else {
             // generate preliminary SubAccountDescribing (in sync w/ useNewAccountChoices())
+            let subAccountInfo
             switch( dAccountType ){
                 case SUB_PRIMARY_ACCOUNT:
                   switch( accountKind ){
                       case SourceAccountKind.REGULAR_ACCOUNT:
-                        new CheckingSubAccountInfo( {
+                        subAccountInfo = new CheckingSubAccountInfo( {
                           defaultTitle: `Checking Account ${accountNumber}`,
                           defaultDescription: 'User Checking Account'
                         } )
                         break
 
                       case SourceAccountKind.SECURE_ACCOUNT:
-                        new SavingsSubAccountInfo( {
+                        subAccountInfo = new SavingsSubAccountInfo( {
                           defaultTitle: `Savings Account ${accountNumber}`,
                           defaultDescription: 'User Savings Account'
                         } )
@@ -580,7 +581,7 @@ const restorePrimarySubAccounts = (
                   break
 
                 case  DONATION_ACCOUNT:
-                  new DonationSubAccountInfo( {
+                  subAccountInfo = new DonationSubAccountInfo( {
                     defaultTitle: `Donation Account ${accountNumber}`,
                     defaultDescription: 'Accept donations',
                     doneeName: '',
@@ -589,7 +590,7 @@ const restorePrimarySubAccounts = (
                   break
 
                 case  WYRE:
-                  new ExternalServiceSubAccountInfo( {
+                  subAccountInfo = new ExternalServiceSubAccountInfo( {
                     instanceNumber: accountNumber,
                     defaultTitle: 'Wyre Account',
                     defaultDescription: 'Buy with ApplePay or Debit card',
@@ -598,7 +599,7 @@ const restorePrimarySubAccounts = (
                   break
 
                 case  RAMP:
-                  new ExternalServiceSubAccountInfo( {
+                  subAccountInfo = new ExternalServiceSubAccountInfo( {
                     instanceNumber: accountNumber,
                     defaultTitle: 'Ramp Account',
                     defaultDescription: 'Buy with Apple Pay, Bank or Card',
@@ -607,7 +608,7 @@ const restorePrimarySubAccounts = (
                   break
 
                 case SWAN:
-                  new ExternalServiceSubAccountInfo( {
+                  subAccountInfo = new ExternalServiceSubAccountInfo( {
                     instanceNumber: accountNumber,
                     defaultTitle: 'Swan Bitcoin',
                     defaultDescription: 'Stack sats with Swan',
@@ -616,36 +617,43 @@ const restorePrimarySubAccounts = (
                   break
             }
 
+            if( !subAccountInfo ) continue
 
-            // let dervBalances: Balances = {
-            //   confirmed: 0,
-            //   unconfirmed: 0,
-            // }
-            // let dervTransactions: TransactionDescribing[] = []
-
-            // if ( derivativeAccount[ accountNumber ].balances )
-            //   dervBalances = {
-            //     confirmed: derivativeAccount[ accountNumber ].balances.balance,
-            //     unconfirmed:
-            //       derivativeAccount[ accountNumber ].balances.unconfirmedBalance,
-            //   }
-
-            // if ( derivativeAccount[ accountNumber ].transactions )
-            //   dervTransactions =
-            //     derivativeAccount[ accountNumber ].transactions.transactionDetails
-
-            // const xpub = derivativeAccount[ accountNumber ].xpub
-            // const ypub = Bitcoin.generateYpub( xpub, network )
+            subAccountInfo.id = derivativeId
+            subAccountInfo.xPub = Bitcoin.generateYpub( derivativeAccount[ accountNumber ].xpub, network )
+            subAccountInfo.instanceNumber = accountNumber
 
 
-            // subAccountInfo.id = subAccountId
-            // subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
-            // subAccountInfo.instanceNumber = subAccountInstanceNum
-            // const newAccountShell = new AccountShell( {
-            //   unit: bitcoinUnit,
-            //   primarySubAccount: subAccountInfo,
-            //   displayOrder: 1,
-            // } )
+            const newAccountShell = new AccountShell( {
+              unit: BitcoinUnit.SATS,
+              primarySubAccount: subAccountInfo,
+              displayOrder: 1,
+            } )
+
+            // saturate w/ balance and transactions
+            let dervBalances: Balances = {
+              confirmed: 0,
+              unconfirmed: 0,
+            }
+            let dervTransactions: TransactionDescribing[] = []
+
+            if ( derivativeAccount[ accountNumber ].balances )
+              dervBalances = {
+                confirmed: derivativeAccount[ accountNumber ].balances.balance,
+                unconfirmed:
+                  derivativeAccount[ accountNumber ].balances.unconfirmedBalance,
+              }
+
+            if ( derivativeAccount[ accountNumber ].transactions )
+              dervTransactions =
+                derivativeAccount[ accountNumber ].transactions.transactionDetails
+
+
+            AccountShell.updatePrimarySubAccountDetails(
+              newAccountShell,
+              dervBalances,
+              dervTransactions,
+            )
             // yield put( newAccountShellAdded( {
             //   accountShell: newAccountShell
             // } ) )
