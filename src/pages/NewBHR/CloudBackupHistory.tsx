@@ -97,7 +97,7 @@ const CloudBackupHistory = ( props ) => {
     }
     dispatch( setCloudData(
       keeperInfo,
-      currentLevel == 3 ? 3 : currentLevel + 1,
+      currentLevel === 0 ? currentLevel + 1 : currentLevel,
       secretShare
     ) )
   }
