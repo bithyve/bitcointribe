@@ -530,6 +530,7 @@ export const recreatePrimarySubAccounts = (
   const newAccountShells: AccountShell[] = []
 
   for ( const accountKind of [ SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ] ) {
+    let isTFAEnabled = false
     switch ( accountKind ) {
         case SourceAccountKind.REGULAR_ACCOUNT:
           derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
@@ -539,6 +540,7 @@ export const recreatePrimarySubAccounts = (
         case SourceAccountKind.SECURE_ACCOUNT:
           derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
           network = secureAcc.secureHDWallet.network
+          isTFAEnabled = true
           break
     }
 
@@ -570,14 +572,14 @@ export const recreatePrimarySubAccounts = (
                       case SourceAccountKind.REGULAR_ACCOUNT:
                         subAccountInfo = new CheckingSubAccountInfo( {
                           defaultTitle: `Checking Account ${accountNumber}`,
-                          defaultDescription: 'User Checking Account'
+                          defaultDescription: 'User Checking Account',
                         } )
                         break
 
                       case SourceAccountKind.SECURE_ACCOUNT:
                         subAccountInfo = new SavingsSubAccountInfo( {
                           defaultTitle: `Savings Account ${accountNumber}`,
-                          defaultDescription: 'User Savings Account'
+                          defaultDescription: 'User Savings Account',
                         } )
                         break
                   }
@@ -589,6 +591,7 @@ export const recreatePrimarySubAccounts = (
                     defaultDescription: 'Accept donations',
                     doneeName: '',
                     causeName: '',
+                    isTFAEnabled,
                   } )
                   break
 
@@ -598,6 +601,7 @@ export const recreatePrimarySubAccounts = (
                     defaultTitle: 'Wyre Account',
                     defaultDescription: 'Buy with ApplePay or Debit card',
                     serviceAccountKind: ServiceAccountKind.WYRE,
+                    isTFAEnabled
                   } )
                   break
 
@@ -607,6 +611,7 @@ export const recreatePrimarySubAccounts = (
                     defaultTitle: 'Ramp Account',
                     defaultDescription: 'Buy with Apple Pay, Bank or Card',
                     serviceAccountKind: ServiceAccountKind.RAMP,
+                    isTFAEnabled
                   } )
                   break
 
@@ -616,6 +621,7 @@ export const recreatePrimarySubAccounts = (
                     defaultTitle: 'Swan Bitcoin',
                     defaultDescription: 'Stack sats with Swan',
                     serviceAccountKind: ServiceAccountKind.SWAN,
+                    isTFAEnabled
                   } )
                   break
             }
