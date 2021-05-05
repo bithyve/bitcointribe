@@ -87,6 +87,10 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
 import MBKeeperButton from './MBKeeperButton'
+import debounce from 'lodash.debounce'
+import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/newBHR'
+import LevelStatus from '../../common/data/enums/LevelStatus'
+
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
   selectedId: any;
@@ -166,6 +170,14 @@ interface ManageBackupNewBHRPropsTypes {
   isLevelToNotSetupStatus: boolean;
   initLoading: boolean;
   setHealthStatus: any;
+  onPressKeeper: any;
+  navigationObj: any;
+  status: any;
+  errorTitle: any;
+  errorInfo: any;
+  isTypeBottomSheetOpen: any;
+  setLevelCompletionError: any;
+  setIsKeeperTypeBottomSheetOpen: any;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -263,6 +275,7 @@ class ManageBackupNewBHR extends Component<
   }
 
   componentDidMount = async () => {
+    this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
     await AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
       if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
         this.props.setLevelToNotSetupStatus()
@@ -420,9 +433,9 @@ class ManageBackupNewBHR extends Component<
     }
 
     if (
-      JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 0 && this.props.metaSharesKeeper.length == 3
+      prevProps.initLoading !== this.props.initLoading && this.props.isSmMetaSharesCreatedFlag && this.props.metaSharesKeeper.length == 3
     ) {
+      console.log()
       const obj = {
         id: 2,
         selectedKeeper: {
@@ -441,6 +454,8 @@ class ManageBackupNewBHR extends Component<
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
       } )
+      this.goToHistory( obj )
+      this.loaderBottomSheet.snapTo( 0 )
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
@@ -467,15 +482,6 @@ class ManageBackupNewBHR extends Component<
       this.sendApprovalRequestToPK( )
     }
 
-    if( prevProps.initLoading !== this.props.initLoading && this.state.selectedKeeper.shareId && this.props.metaSharesKeeper.length == 3 && this.props.isSmMetaSharesCreatedFlag ){
-      this.goToHistory( {
-        id: 2,
-        selectedKeeper: this.state.selectedKeeper,
-        isSetup: true
-      } )
-      this.loaderBottomSheet.snapTo( 0 )
-    }
-
     if( prevProps.keeperProcessStatusFlag != this.props.keeperProcessStatusFlag && this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
       this.props.updateKeeperInfoToTrustedChannel()
       this.props.keeperProcessStatus( '' )
@@ -489,11 +495,38 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
       ( this.QrBottomSheet as any ).snapTo( 0 )
     }
+
+    if( prevProps.status !== this.props.status && this.props.status === LevelStatus.FAILED ){
+      this.setState( {
+        errorTitle: this.props.errorTitle,
+        errorInfo: this.props.errorInfo,
+        showLoader: false
+      } )
+      this.props.setLevelCompletionError( null, null, LevelStatus.PENDING );
+      ( this.ErrorBottomSheet as any ).snapTo( 1 )
+    }
+
+    if( prevProps.navigationObj !== this.props.navigationObj ){
+      this.goToHistory( this.props.navigationObj )
+    }
+
+    console.log( 'prevProps.isTypeBottomSheetOpen', prevProps.isTypeBottomSheetOpen )
+    console.log( 'this.props.isTypeBottomSheetOpen', this.props.isTypeBottomSheetOpen )
+
+    if( prevProps.isTypeBottomSheetOpen !== this.props.isTypeBottomSheetOpen && this.props.isTypeBottomSheetOpen === true ){
+      this.setState( {
+        showLoader: false
+      } )
+      this.props.setIsKeeperTypeBottomSheetOpen( false );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+    }
+
+
   };
 
   updateCloudData = () => {
     if( this.props.cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    if( this.props.cloudPermissionGranted === false ) return
+    // if( this.props.cloudPermissionGranted === false ) return
     const { currentLevel, keeperInfo, levelHealth, s3Service } = this.props
     let secretShare = {
     }
@@ -549,6 +582,10 @@ class ManageBackupNewBHR extends Component<
   goToHistory = ( value ) => {
     const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
     console.log( 'VALUE', value )
+
+    this.setState( {
+      showLoader: false
+    } )
     const navigationParams = {
       selectedTime: selectedKeeper.updatedAt
         ? this.getTime( selectedKeeper.updatedAt )
@@ -621,108 +658,8 @@ class ManageBackupNewBHR extends Component<
     }
   };
 
-  onPressKeeper = ( value, number ) => {
-    const {
-      currentLevel,
-      isLevelThreeMetaShareCreated,
-      isLevel3Initialized,
-      isLevelTwoMetaShareCreated,
-      isLevel2Initialized,
-      secureAccount,
-    } = this.props
-    if (
-      currentLevel == 1 &&
-      value.id == 3 &&
-      !isLevelThreeMetaShareCreated &&
-      !isLevel3Initialized
-    ) {
-      this.setState( {
-        errorTitle: 'Please complete Level 2',
-        errorInfo:
-        'It seems you have not completed Level 2. Please complete Level 2 to proceed'
-      } );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
-      return
-    } else if (
-      currentLevel == 1 &&
-      number == 2 &&
-      value.id == 2 &&
-      !isLevelTwoMetaShareCreated &&
-      !isLevel2Initialized
-    ) {
-      this.setState( {
-        errorTitle: 'Please complete Personal Device Setup',
-        errorInfo:
-          'It seems you have not completed Personal Device setup, please complete Personal Device setup to proceed',
-      } );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
-      return
-    } else if (
-      currentLevel == 1 &&
-      number == 2 &&
-      value.id == 2 &&
-      !secureAccount.secureHDWallet.xpubs.secondary &&
-      !secureAccount.secureHDWallet.xpubs.bh
-    ) {
-      this.setState( {
-        errorTitle: 'Please make sure Primary Keeper setup completed.',
-        errorInfo:
-          'Please check if you have completed Primary Keeper Setup and check notifications for xPubs.',
-      } );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
-      return
-    } else {
-      this.setState( {
-        errorTitle: '', errorInfo: ''
-      } )
-    }
-    const keeper = number == 1 ? value.keeper1 : value.keeper2
-    this.setState( {
-      selectedKeeper: keeper,
-      selectedLevelId: value.id,
-    } )
-    console.log( 'this.props.metaSharesKeeper.length', this.props.metaSharesKeeper.length )
-    const obj = {
-      id: value.id,
-      selectedKeeper: {
-        ...keeper,
-        name: value.id === 2 && number == 1 ? 'Secondary Device1' : keeper.name,
-        shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
-        shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-      },
-      isSetup: keeper.updatedAt ? false : true,
-      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false,
-      isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && this.props.metaSharesKeeper.length === 5 ? false : true
-    }
-    if ( keeper.updatedAt > 0 ) {
-      this.goToHistory( obj )
-      return
-    } else {
-      if ( value.id === 2 && number == 1 ) {
-        if ( this.props.currentLevel == 1 ) {
-          if (
-            !this.props.isLevel2Initialized &&
-            !this.props.isLevelTwoMetaShareCreated &&
-            value.id == 2 && this.props.metaSharesKeeper.length != 3
-          ) {
-            this.loaderBottomSheet.snapTo( 1 )
-            this.props.generateMetaShare( value.id )
-          } else {
-            this.goToHistory( obj )
-          }
-          if( !this.props.isSmMetaSharesCreatedFlag ){
-            this.props.generateSMMetaShares()
-          }
-        } else {
-          this.setState( {
-            errorTitle: 'Please complete Level 1',
-            errorInfo:
-              'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed',
-          } );
-          ( this.ErrorBottomSheet as any ).snapTo( 1 )
-        }
-      } else ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
-    }
+  onPressKeeperButton = ( value, number ) => {
+    this.props.onPressKeeper( value, number )
   };
 
   onRefresh = async () => {
@@ -1177,7 +1114,16 @@ class ManageBackupNewBHR extends Component<
                                 if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
                                   this.updateCloudData()
                                 }
-                              } : () => this.onPressKeeper( value, 1 )}
+                              } : () => {
+                                this.setState( {
+                                  showLoader: true
+                                } )
+                                requestAnimationFrame( () => {
+                                  this.onPressKeeperButton( value, 1 )
+                                  //this.props.onPressKeeper( value, 1 )
+                                  // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
+                                } )
+                              }}
                               keeperButtonText={value.id == 1 ? value.keeper1ButtonText : this.keeperButtonText( value.keeper1ButtonText, '1' )}
                               disabled={false}
                             />
@@ -1191,7 +1137,16 @@ class ManageBackupNewBHR extends Component<
                                     selectedTime: this.getTime( new Date() ),
                                     selectedStatus: 'Ugly',
                                   }
-                                ) : () => this.onPressKeeper( value, 2 )}
+                                ) : () => {
+                                this.setState( {
+                                  showLoader: true
+                                } )
+                                requestAnimationFrame( () => {
+                                  this.onPressKeeperButton( value, 2 )
+                                  //this.props.onPressKeeper( value, 1 )
+                                  // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
+                                } )
+                              }}
                               keeperButtonText={value.id == 1 ? 'Security Question' : this.keeperButtonText( value.keeper2ButtonText, '2' )}
                               disabled={false}
                             />
@@ -1205,8 +1160,9 @@ class ManageBackupNewBHR extends Component<
             } )}
           </View>
         </ScrollView>
-        {this.state.showLoader ? <Loader /> : null}
+        {this.state.showLoader ? <Loader isLoading={true}/> : null}
         <BottomSheet
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={( c )=>this.keeperTypeBottomSheet = c}
           snapPoints={[
@@ -1248,21 +1204,25 @@ class ManageBackupNewBHR extends Component<
                     isSetup: true,
                   }
                   console.log( 'obj', obj )
-                  this.goToHistory( obj );
+                  this.goToHistory( obj )
+                  this.props.setIsKeeperTypeBottomSheetOpen( false );
                   /** other than ThirdLevel first position */
                   ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
                 }
               }}
-              onPressBack={() =>
+              onPressBack={() =>{
+                this.props.setIsKeeperTypeBottomSheetOpen( false );
                 ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+              }
               }
               selectedLevelId={selectedLevelId}
             />
           )}
           renderHeader={() => (
             <SmallHeaderModal
-              onPressHeader={() =>
-                ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+              onPressHeader={() =>{
+                this.props.setIsKeeperTypeBottomSheetOpen( false );
+                ( this.keeperTypeBottomSheet as any ).snapTo( 0 )}
               }
             />
           )}
@@ -1419,6 +1379,11 @@ const mapStateToProps = ( state ) => {
     cloudPermissionGranted: state.health.cloudPermissionGranted,
     keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
     isLevelToNotSetupStatus: idx( state, ( _ ) => _.health.isLevelToNotSetupStatus ),
+    status: idx( state, ( _ ) => _.newBHR.status ),
+    errorTitle: idx( state, ( _ ) => _.newBHR.errorTitle ),
+    navigationObj: idx( state, ( _ ) => _.newBHR.navigationObj ),
+    errorInfo: idx( state, ( _ ) => _.newBHR.errorInfo ),
+    isTypeBottomSheetOpen: idx( state, ( _ ) => _.newBHR.isTypeBottomSheetOpen ),
   }
 }
 
@@ -1446,7 +1411,10 @@ export default withNavigationFocus(
     updateLevelData,
     keeperProcessStatus,
     setLevelToNotSetupStatus,
-    setHealthStatus
+    setHealthStatus,
+    onPressKeeper,
+    setLevelCompletionError,
+    setIsKeeperTypeBottomSheetOpen,
   } )( ManageBackupNewBHR )
 )
 

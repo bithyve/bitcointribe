@@ -85,7 +85,8 @@ function MBKeeperButton( props ) {
         borderWidth: keeper.status == 'accessible' ? 0 : 1,
         overflow: 'hidden',
       }}
-      onPress={() => props.onPressKeeper( value, 1 )}
+      delayPressIn={0}
+      onPress={() => props.onPressKeeper( )}
     >
       {keeper.shareType == 'securityQuestion'?
         <ImageBackground

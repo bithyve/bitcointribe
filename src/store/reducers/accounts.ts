@@ -102,6 +102,7 @@ export type AccountsState = {
 
   currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
   currentRampSubAccount: ExternalServiceSubAccountInfo | null;
+  currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
 
   refreshed: boolean;
   accounts: any,
@@ -150,6 +151,7 @@ const initialState: AccountsState = {
 
   currentWyreSubAccount: null,
   currentRampSubAccount: null,
+  currentSwanSubAccount: null,
 
   refreshed: false,
   accounts: null,
@@ -277,11 +279,18 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         // this will need to be modified later elsewhere to add default wyre account to state
         let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
         let currentRampSubAccount: ExternalServiceSubAccountInfo | null
+        let currentSwanSubAccount: ExternalServiceSubAccountInfo | null
         if (
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
         ) {
           currentWyreSubAccount = action.payload.primarySubAccount
+        }
+        if (
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
+          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.SWAN
+        ) {
+          currentSwanSubAccount = action.payload.primarySubAccount
         }
         if (
           ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
@@ -300,6 +309,9 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           },
           ...currentRampSubAccount && {
             currentRampSubAccount
+          },
+          ...currentSwanSubAccount && {
+            currentSwanSubAccount
           }
         }
 
