@@ -23,6 +23,7 @@ import rampIntegrationReducer from './reducers/RampIntegration'
 import VersionHistoryReducer from './reducers/versionHistory'
 import cloudReducer from './reducers/cloud'
 import upgradeToNewBhr from './reducers/upgradeToNewBhr'
+import restore from './reducers/restore' // Need some valid name other than restore <PendingTask>
 
 
 const config = {
@@ -199,6 +200,7 @@ import {
   readFileWatcher,
   uplaodFileWatcher,
 } from './sagas/cloud'
+import { getMetaShareWatcher } from './sagas/restore';
 
 import { initLevelsWatcher, setCloudDataForLevelWatcher, autoShareSecondaryWatcher, autoShareContactKeeperWatcher, updateAvailableKeeperDataWatcher, confirmPDFSharedFromUpgradeWatcher } from './sagas/upgradeToNewBhr'
 
@@ -382,6 +384,9 @@ const rootSaga = function* () {
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
     confirmPDFSharedFromUpgradeWatcher,
+
+    // restore
+    getMetaShareWatcher,
   ]
 
   yield all(
@@ -413,6 +418,7 @@ const rootReducer = combineReducers( {
   trustedContacts: trustedContactsReducer,
   preferences: preferencesReducer,
   keeper,
+  restore,
   swanIntegration: swanIntegrationReducer,
   walletRescanning: walletRescanningReducer,
   wyreIntegration: wyreIntegrationReducer,

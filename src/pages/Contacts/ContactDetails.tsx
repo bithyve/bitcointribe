@@ -61,6 +61,8 @@ import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountIn
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import SendAutoQR from '../../components/SendAutoQR'
+import {requestSplitedMetaData} from '../../store/actions/restore'
 
 const getImageIcon = ( item ) => {
   if ( item ) {
@@ -140,6 +142,8 @@ interface ContactDetailsPropTypes {
   UploadSMSuccessfully: any;
   uploadingSmShare: any;
   newBHRFlowStarted : any;
+  metashareQRCode: any;
+  requestSplitedMetaData: any;
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -157,6 +161,8 @@ interface ContactDetailsStateTypes {
   SMShareQR: string;
   qrModalTitle: string;
   isSmSharePresent: boolean;
+  multiplQRs: any;
+  showAutoQR: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -166,6 +172,7 @@ class ContactDetails extends PureComponent<
   ReshareBottomSheet: any;
   shareBottomSheet: any;
   SendViaLinkBottomSheet: any;
+  sheetRef: any;
   SendViaQRBottomSheet: any;
   ExitKeyQRBottomSheet: any;
   ErrorBottomSheet: any;
@@ -175,16 +182,18 @@ class ContactDetails extends PureComponent<
   index: any;
   setIsSendDisabledListener: any;
   ContactName: any;
-
+  
   constructor( props ) {
     super( props )
     this.ReshareBottomSheet = createRef()
     this.shareBottomSheet = createRef()
     this.SendViaLinkBottomSheet = createRef()
+    this.sheetRef = createRef()
     this.SendViaQRBottomSheet = createRef()
     this.ExitKeyQRBottomSheet = createRef()
     this.ErrorBottomSheet = createRef()
     this.state = {
+      showAutoQR: false,
       Loading: true,
       key: '',
       isSendDisabled: false,
@@ -197,6 +206,7 @@ class ContactDetails extends PureComponent<
       trustedLink: '',
       trustedQR: '',
       SMShareQR: '',
+      multiplQRs: [],
       encryptedExitKey: '',
       trustedContactHistory: [
         {
@@ -246,6 +256,9 @@ class ContactDetails extends PureComponent<
   }
 
   componentDidMount() {
+    const { trustedContacts } = this.props
+    const requester = trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName    
+    this.props.requestSplitedMetaData(requester)
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
       () => {
@@ -952,6 +965,7 @@ class ContactDetails extends PureComponent<
         contact={this.Contact}
         QR={this.state.trustedQR}
         contactEmail={''}
+        autoQRLink={'Click here to share the Recovery Key manually'}
         onPressBack={() => {
           if ( this.SendViaQRBottomSheet.current )
             ( this.SendViaQRBottomSheet as any ).current.snapTo( 0 )
@@ -959,8 +973,42 @@ class ContactDetails extends PureComponent<
         onPressDone={() => {
           ( this.SendViaQRBottomSheet as any ).current.snapTo( 0 )
         }}
+        onPressLink={() => {
+          (this.sheetRef as any ).current.snapTo( 1 )
+          this.setState({ showAutoQR: true })
+        }}
       />
     )
+  };
+
+  renderAutoQRLink = () => {
+    // console.log('>>>>>> this.sheetRe >>>>>f', this.sheetRef );
+    if (this.state.showAutoQR) {
+    return (
+      <SendAutoQR
+        headerText={'Manual Share'}
+        subHeaderText={'Scan the QRs from the app trying to restore'}
+        contactText={''}
+        contact={this.Contact}
+        QR={this.props.metashareQRCode}
+        contactEmail={''}
+        // autoQRLink={'Click here to share the Recovery Key manually'}
+        onPressBack={() => {
+          if ( this.sheetRef.current )
+            ( this.sheetRef as any ).current.snapTo( 0 )
+            ( this.SendViaQRBottomSheet as any ).current.snapTo( 0 )
+        }}
+        onPressDone={() => {
+          this.setState({ showAutoQR: false });
+          ( this.sheetRef as any ).current.snapTo( 0 )
+          if ( this.SendViaQRBottomSheet.current )
+            ( this.SendViaQRBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+    )
+      } else {
+        return null
+      }
   };
 
   renderSendViaQRHeader = () => {
@@ -1421,6 +1469,20 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderSendViaQRContents}
           renderHeader={this.renderSendViaQRHeader}
         />
+        
+          <BottomSheet
+            enabledInnerScrolling={true}
+            enabledGestureInteraction={false}
+            ref={this.sheetRef as any}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp( '83%' )
+                : hp( '85%' ),
+            ]}
+            renderContent={this.renderAutoQRLink}
+            renderHeader={this.renderSendViaQRHeader}
+          />
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1502,6 +1564,7 @@ const mapStateToProps = ( state ) => {
     ),
     hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
+    metashareQRCode: idx( state, ( _ ) => _.restore.multipleQr )
   }
 }
 export default connect( mapStateToProps, {
@@ -1516,7 +1579,8 @@ export default connect( mapStateToProps, {
   ErrorSending,
   removeTrustedContact,
   uploadRequestedSMShare,
-  UploadSMSuccessfully
+  UploadSMSuccessfully,
+  requestSplitedMetaData
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {

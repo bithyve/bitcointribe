@@ -17,6 +17,7 @@ import {
   TEST_ACCOUNT,
   SECURE_ACCOUNT,
 } from '../common/constants/wallet-service-types'
+import TextLink from './TextLink'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 export default function SendViaQR( props ) {
@@ -92,7 +93,7 @@ export default function SendViaQR( props ) {
     number = number.slice( number.length - 10 ) // last 10 digits only
     return number
   }
-
+  
   return (
     <View style={styles.modalContainer}>
       <View
@@ -414,6 +415,9 @@ export default function SendViaQR( props ) {
               <QRCode value={props.QR} size={hp( '27%' )} />
             )}
           </View>
+          {props.autoQRLink &&
+            <TextLink onPress={props.onPressLink} text={props.autoQRLink} />
+          }
           {/* <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressDone()}
             style={{
