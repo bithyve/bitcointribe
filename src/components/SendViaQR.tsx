@@ -150,6 +150,7 @@ export default function SendViaQR( props ) {
               borderRadius: 8,
               alignSelf: 'center',
             }}
+            delayPressIn={0}
           >
             <Text
               style={{
@@ -314,6 +315,7 @@ export default function SendViaQR( props ) {
                     alignItems: 'center',
                   }}
                   activeOpacity={10}
+                  delayPressIn={0}
                   onPress={() => {
                     //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
                   }}

@@ -73,6 +73,11 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
               currentSubAccount: selectedChoice,
             } )
             break
+          case ServiceAccountKind.SWAN:
+            navigation.navigate( 'NewSwanAccountDetails', {
+              currentSubAccount: selectedChoice,
+            } )
+            break
           default:
             break
       }

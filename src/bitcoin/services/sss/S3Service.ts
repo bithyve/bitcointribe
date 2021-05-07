@@ -511,6 +511,7 @@ export default class S3Service {
       status?: string;
       name?: string;
     }],
+    isNeedToUpdateCurrentLevel?: boolean
   ): Promise<
     | {
         status: number;
@@ -554,7 +555,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await LevelHealth.updateHealthKeeper( shares ),
+        data: await LevelHealth.updateHealthKeeper( shares, isNeedToUpdateCurrentLevel ),
       }
     } catch ( err ) {
       return {

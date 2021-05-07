@@ -128,6 +128,9 @@ import { connectToBitHyveNodeWatcher, restorePersonalNodeConfigurationWatcher, s
 
 import {
   fetchSwanAuthenticationUrlWatcher,
+  redeemSwanCodeForTokenWatcher,
+  createWithdrawalWalletOnSwanWatcher,
+  addTempSwanAccountShellWatcher
 } from './sagas/SwanIntegration'
 
 import {
@@ -180,6 +183,7 @@ import {
   autoShareLevel2KeepersWatcher,
   downloadSmShareForApprovalWatcher,
   setLevelToNotSetupStatusWatcher,
+  setHealthStatusWatcher
 } from './sagas/health'
 
 import {
@@ -202,12 +206,21 @@ import {
 } from './sagas/cloud'
 import { getMetaShareWatcher } from './sagas/restore';
 
-import { initLevelsWatcher, setCloudDataForLevelWatcher, autoShareSecondaryWatcher, autoShareContactKeeperWatcher, updateAvailableKeeperDataWatcher, confirmPDFSharedFromUpgradeWatcher } from './sagas/upgradeToNewBhr'
+import {
+  initLevelsWatcher,
+  setCloudDataForLevelWatcher,
+  autoShareSecondaryWatcher,
+  autoShareContactKeeperWatcher,
+  updateAvailableKeeperDataWatcher,
+  confirmPDFSharedFromUpgradeWatcher,
+} from './sagas/upgradeToNewBhr'
 
 import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
 
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
+import newBHR from './reducers/newBHR'
+import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
   const sagas = [
     // database watchers
@@ -338,12 +351,16 @@ const rootSaga = function* () {
     autoShareLevel2KeepersWatcher,
     downloadSmShareForApprovalWatcher,
     setLevelToNotSetupStatusWatcher,
+    setHealthStatusWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
+    redeemSwanCodeForTokenWatcher,
+    createWithdrawalWalletOnSwanWatcher,
+    addTempSwanAccountShellWatcher,
 
     // Wyre Integration
     fetchWyreReservationWatcher,
@@ -383,6 +400,9 @@ const rootSaga = function* () {
     autoShareSecondaryWatcher,
     autoShareContactKeeperWatcher,
     updateAvailableKeeperDataWatcher,
+
+    //newBHR
+    onPressKeeperChannelWatcher,
     confirmPDFSharedFromUpgradeWatcher,
 
     // restore
@@ -426,6 +446,7 @@ const rootReducer = combineReducers( {
   versionHistory: VersionHistoryReducer,
   cloud: cloudReducer,
   upgradeToNewBhr: upgradeToNewBhr,
+  newBHR: newBHR
 } )
 
 export default function makeStore() {

@@ -1,7 +1,5 @@
 import crypto from 'crypto'
-import base64url from 'base64url'
-
-import { asyncPkceChallenge } from 'react-native-pkce-challenge'
+import { base64UrlEncode, generateRandomBytes } from './random'
 
 
 export const generatePKCEParameters = async () => {
@@ -33,3 +31,29 @@ const generateRandomString = ( length: number ): string => {
 }
 
 const generateRandomNumber = ( digits: number ): number => Math.floor( Math.random() * 10**digits )
+
+const generateChallenge = ( verifier ) => {
+  return base64UrlEncode(
+    crypto
+      .createHash( 'sha256' )
+      .update( verifier )
+      .digest( 'hex' )
+  )
+}
+
+const  generateVerifier =()=> {
+  return base64UrlEncode( generateRandomBytes( 96 ) )
+}
+
+const asyncPkceChallenge = () =>{
+  return new Promise( ( resolve ) => {
+    generateVerifier().then( ( verifier ) => {
+      const challenge = generateChallenge( verifier )
+      resolve( {
+        codeChallenge: challenge,
+        codeVerifier: verifier
+      } )
+    } )
+  } )
+}
+
