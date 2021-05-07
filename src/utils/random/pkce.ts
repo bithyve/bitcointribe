@@ -41,8 +41,8 @@ const generateChallenge = ( verifier ) => {
   )
 }
 
-const  generateVerifier =()=> {
-  return base64UrlEncode( generateRandomBytes( 96 ) )
+const  generateVerifier = async ()=> {
+  return base64UrlEncode( await generateRandomBytes( 96 ) )
 }
 
 const asyncPkceChallenge = () =>{

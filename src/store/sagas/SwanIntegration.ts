@@ -27,7 +27,7 @@ import {
 
 import { createWatcher } from '../utils/utilities'
 
-import { generatePKCEParameters } from '../lib/swan'
+import { generatePKCEParameters } from '../../utils/random/pkce'
 import Config from '../../bitcoin/HexaConfig'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { AccountsState } from '../reducers/accounts'

@@ -1,12 +1,10 @@
 import { randomBytes } from 'crypto'
 import crypto from  'crypto'
 
-export const generateRandomBytes= ( size = 96 ) => {
-  randomBytes( size, ( err, buffer ) => {
-    const bytes = buffer.toString( 'base64' )
-
-    return ( bytes )
-  } )
+export const generateRandomBytes = async ( size = 96 ) => {
+  const buffer = await randomBytes( size )
+  const bytes = buffer.toString( 'base64' )
+  return bytes
 }
 
 export const base64UrlEncode = ( s ) => {
