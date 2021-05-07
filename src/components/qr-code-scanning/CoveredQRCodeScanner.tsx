@@ -73,7 +73,7 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
           }}
           onBarCodeRead={( event: BarCodeReadEvent ) => {
             onCodeScanned( event )
-            setIsCameraOpen( false )
+            // setIsCameraOpen( false )
           }}
           captureAudio={false}
         >

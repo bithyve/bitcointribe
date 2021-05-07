@@ -21,6 +21,7 @@ import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFa
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import CopyThisText from '../../components/CopyThisText'
 
 export type Props = {
   navigation: any;
@@ -42,9 +43,11 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
   const [qrData, setQRData] = useState([])
 
   function handleBarcodeRecognized({ data: dataString }: { data: any }) {
+    
     // Added here just for testing will need to chnage <PendingTask>
     const parsedData = JSON.parse(dataString)
-
+    console.log('parsedData', parsedData);
+    
     let newArr = [...qrData]
 
     if (parsedData.AnimatedQR) {
@@ -53,6 +56,7 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
         // newArr[parsedData.index]= JSON.stringify(parsedData.share)
         newArr.splice(parsedData.index, 0, parsedData.share)
         setQRData(newArr);
+        // showQr(true)
       } else {
         // REMOVE THIS <PendingTask>
         Alert.alert("", 'Its done wait while we restoring data')
@@ -176,7 +180,9 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
               }}
               onPress={() => { navigation.navigate('ReceiveQR') }}
             />
+            <CopyThisText text={qrData.toString()} />
           </View>
+          
           <View style={{
             marginTop: 'auto'
           }}>

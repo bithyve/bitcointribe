@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native'
+import { View, Image, Text, StyleSheet, ActivityIndicator, TouchableOpacity, LayoutAnimation } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -14,11 +14,48 @@ import { ScrollView } from 'react-native-gesture-handler'
 import QRCode from 'react-native-qrcode-svg'
 import Indicator from './Indiactor'
 
+
+const animatedQRCodeStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  qrcodeContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 6,
+    borderRadius: 8,
+    borderColor: '#FFFFFF',
+    margin: 6,
+  },
+  controller: {
+    width: '90%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderRadius: 25,
+    height: 45,
+    paddingHorizontal: 18,
+  },
+  button: {
+    alignItems: 'center',
+    height: 45,
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 14,
+    color: Colors.deepBlu,
+    fontWeight: 'bold',
+  },
+});
+
 export default function SendAutoQR(props) {
   const [curentIndex, setIndex] = useState(0);
-
+  const [hideControls, setControl] = useState(true)
+  let timer = null;
   useEffect(() => {
-    const timer = setInterval(() => {
+    timer = setInterval(() => {
       if (curentIndex === (props.QR.length - 1)) {
         setIndex(0);
       } else {
@@ -28,6 +65,34 @@ export default function SendAutoQR(props) {
     // Clear timeout if the component is unmounted
     return () => clearInterval(timer);
   }, [curentIndex]);
+
+  const moveToNextFragment = () => {
+    if (curentIndex === props.QR.length - 1) {
+      setIndex(0);
+    } else {
+      setIndex(curentIndex + 1)
+    }
+  };
+
+  const startAutoMove = () => {
+    // if (!timer)
+      // this.setState(() => ({
+      //   intervalHandler: setInterval(this.moveToNextFragment, 500),
+      // }));
+  };
+
+  const stopAutoMove = () => {
+    clearInterval(timer);
+    timer = null
+  };
+
+  const moveToPreviousFragment = () => {
+    if (curentIndex > 0) {
+      setIndex(curentIndex-1)
+    } else {
+      setIndex(props.QR.length - 1)
+    }
+  };
 
   return (
     <View style={styles.modalContainer}>
@@ -112,12 +177,52 @@ export default function SendAutoQR(props) {
             {props.QR.length === 0 ? (
               <ActivityIndicator size="large" />
             ) : (
+              <TouchableOpacity
+                testID="DynamicCode"
+                style={animatedQRCodeStyle.qrcodeContainer}
+                onPress={() => {
+                  LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+                  setControl(!hideControls)
+                  // this.setState(prevState => ({ hideControls: !prevState.hideControls }));
+                }}
+              >
                 <QRCode value={JSON.stringify(props.QR[curentIndex])} size={hp('27%')} />
+              </TouchableOpacity>
               )}
           </View>
           <Indicator data={props.QR} curentIndex={curentIndex}/>
           
         </View>
+        {!hideControls && (
+          <View style={animatedQRCodeStyle.container}>
+            <View>
+              <Text style={animatedQRCodeStyle.text}>
+                {props.QR.length}
+              </Text>
+            </View>
+            <View style={animatedQRCodeStyle.controller}>
+              <TouchableOpacity
+                style={[animatedQRCodeStyle.button, { width: '25%', alignItems: 'flex-start' }]}
+                onPress={() => moveToPreviousFragment()}
+              >
+                <Text style={animatedQRCodeStyle.text}>prev</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[animatedQRCodeStyle.button, { width: '50%' }]}
+                onPress={() => timer ? stopAutoMove() : startAutoMove()}
+              >
+                <Text style={animatedQRCodeStyle.text}>{timer ? 'stop' : 'start'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[animatedQRCodeStyle.button, { width: '25%', alignItems: 'flex-end' }]}
+                onPress={() => moveToNextFragment()}
+              >
+                <Text style={animatedQRCodeStyle.text}>next</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
       </ScrollView>
 
       {!props.isFromReceive ? (

@@ -145,9 +145,9 @@ class FriendsAndFamilyScreen extends PureComponent<
       prevProps.trustedChannelsSetupSyncing !==
       this.props.trustedChannelsSetupSyncing
     ) {
-      this.setState( {
-        showLoader: this.props.trustedChannelsSetupSyncing,
-      } )
+      // this.setState( {
+      //   showLoader: this.props.trustedChannelsSetupSyncing,
+      // } )
     }
   }
 
@@ -431,7 +431,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         <ScrollView
           refreshControl={
             <RefreshControl
-              refreshing={showLoader}
+              refreshing={false}
               onRefresh={() => {
                 trustedChannelsSetupSync()
               }}

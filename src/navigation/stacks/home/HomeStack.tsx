@@ -13,6 +13,7 @@ import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScr
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 import QRStack from '../home/QRStack';
+import AnimatedQRScanner from '../../../components/AnimatedQRScanner'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -36,6 +37,12 @@ const HomeStack = createStackNavigator(
       navigationOptions: {
         header: null,
       },
+    },
+    AnimatedQRScanner: {
+      screen: AnimatedQRScanner,
+      navigationOptions: {
+        title: 'Buy with Wyre'
+      }
     },
     NewWyreAccountDetails: {
       screen: NewWyreAccountDetailsScreen,
