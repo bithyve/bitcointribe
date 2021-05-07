@@ -96,8 +96,8 @@ function SecurityQuestion( props ) {
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
-                onFocus={() => props.onFocus()}
-                onBlur={() => props.onBlur()}
+                // onFocus={() => props.onFocus()}
+                // onBlur={() => props.onBlur()}
               />
               {errorText ? (
                 <Text

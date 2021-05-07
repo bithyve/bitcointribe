@@ -74,7 +74,7 @@ import ContactListForRestore from './ContactListForRestore'
 import SendViaLink from '../../components/SendViaLink'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
-import { getCloudDataRecovery, clearCloudCache } from '../../store/actions/cloud'
+import { getCloudDataRecovery, clearCloudCache, setCloudBackupStatus } from '../../store/actions/cloud'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { setVersion } from '../../store/actions/versionHistory'
 import QuestionList from '../../common/QuestionList'
@@ -178,6 +178,7 @@ interface RestoreWithICloudPropsTypes {
   walletCheckIn: any;
   setVersion: any;
   initializeRecovery: any;
+  setCloudBackupStatus: any;
 }
 
 class RestoreWithICloud extends Component<
@@ -278,7 +279,8 @@ class RestoreWithICloud extends Component<
     if( prevProps.cloudBackupStatus !== cloudBackupStatus && cloudBackupStatus === CloudBackupStatus.FAILED ){
       this.setState( ( state ) => ( {
         showLoader: false,
-      } ) );
+      } ) )
+      this.props.setCloudBackupStatus( CloudBackupStatus.PENDING );
       ( this.BackupNotFound as any ).current.snapTo( 1 )
     }
 
@@ -457,29 +459,35 @@ class RestoreWithICloud extends Component<
     this.setState( {
       walletName: selectedBackup.walletName
     } )
-    if( selectedBackup.questionId > 0 ) {
-      const question = this.getQuestion( selectedBackup.questionId )
+    this.getSecurityQuestion( selectedBackup.questionId, selectedBackup.question )
+
+  };
+
+  getSecurityQuestion = ( questionId, question1 ) =>{
+    if( questionId > 0 ){
+      const question = this.getQuestion( questionId )
       console.log( 'Question', question )
       this.setState( {
         question : question[ 0 ].question
       } )
-    } else if( selectedBackup.questionId === 0 ){
+    } else if( questionId === 0 ){
       this.setState( {
-        question: selectedBackup.question
+        question: question1
       } )
     }
     ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-  };
+  }
 
-  setSecurityQuestionAndName = () =>{
-    const { answer, question, walletName } = this.state
+  setSecurityQuestionAndName = async () =>{
+    const { answer, question, walletName,  } = this.state
     console.log( 'answer, question, walletName', answer, question, walletName )
+    if( answer && question && walletName ){
+      const security = {
+        question,
+        answer,
+      }
+      this.props.initializeRecovery( walletName, security )}
 
-    const security = {
-      question,
-      answer,
-    }
-    this.props.initializeRecovery( walletName, security )
   }
 
   decryptCloudJson = () =>{
@@ -711,44 +719,39 @@ class RestoreWithICloud extends Component<
     }
   };
 
-  downloadSecret = ( shareIndex?, key? ) => {
+  downloadSecret = ( ) => {
     this.setState( {
       refreshControlLoader: true
     } )
-    if ( shareIndex ) {
-      const { database } = this.props
-      const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
+    const { database } = this.props
+    const { RECOVERY_SHARES } = database.DECENTRALIZED_BACKUP
+    if ( RECOVERY_SHARES ) {
+      for( let shareIndex=0;shareIndex<Object.keys( RECOVERY_SHARES ).length;shareIndex++ ){
+        if (
+          RECOVERY_SHARES[ shareIndex ] &&
+        !RECOVERY_SHARES[ shareIndex ].META_SHARE && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS && RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS.KEY
+        ) {
+          const { KEY } = RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS
+          console.log( {
+            KEY,
+          } )
 
-      if (
-        RECOVERY_SHARES[ shareIndex ] &&
-        !RECOVERY_SHARES[ shareIndex ].META_SHARE
-      ) {
-        const { KEY } = RECOVERY_SHARES[ shareIndex ].REQUEST_DETAILS
-        console.log( {
-          KEY,
-        } )
-
-        this.props.downloadMShare( {
-          encryptedKey: KEY,
-          downloadType: 'recovery',
-          replaceIndex: 1,
-        } )
-      } else {
-        Alert.alert( 'Key Exists', 'Following key already exists for recovery' )
+          this.props.downloadMShare( {
+            encryptedKey: KEY,
+            downloadType: 'recovery',
+            replaceIndex: shareIndex,
+          } )
+        }
       }
-    } else if ( key ) {
-      // key is directly supplied in case of scanning QR from Guardian (reverse-recovery)
-      this.props.downloadMShare( {
-        encryptedKey: key,
-        downloadType: 'recovery',
-        replaceIndex: 1,
+      this.setState( {
+        refreshControlLoader: false
       } )
     }
   };
 
   onRefresh = () => {
     console.log( 'gggg' )
-    this.downloadSecret( 1 )
+    this.downloadSecret( )
   };
 
   setLoaderMessages = () => {
@@ -1152,6 +1155,7 @@ class RestoreWithICloud extends Component<
           </Modal>
         ) : null}
         <BottomSheet
+          enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.RestoreFromICloud}
           snapPoints={[
@@ -1185,6 +1189,8 @@ class RestoreWithICloud extends Component<
                   this.restoreWallet()
                 }}
                 onPressBack={() => {
+                  this.props.clearCloudCache()
+                  navigation.navigate( 'WalletInitialization' )
                   ( this.RestoreFromICloud as any ).current.snapTo( 0 )
                 }}
                 onPressCard={() => {
@@ -1350,20 +1356,20 @@ class RestoreWithICloud extends Component<
         <BottomSheet
           enabledInnerScrolling={true}
           ref={this.SecurityQuestionBottomSheet}
-          snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
+          snapPoints={[ -30, hp( '80%' ) ]}
           renderContent={()=>(
             <SecurityQuestion
               question={this.state.question}
-              onFocus={() => {
-                if ( Platform.OS == 'ios' ){
-                  if( this.SecurityQuestionBottomSheet as any )
-                    ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 2 )}
-              }}
-              onBlur={() => {
-                if ( Platform.OS == 'ios' ){
-                  if( this.SecurityQuestionBottomSheet as any )
-                    ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )}
-              }}
+              // onFocus={() => {
+              //   if ( Platform.OS == 'ios' ){
+              //     if( this.SecurityQuestionBottomSheet as any )
+              //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 2 )}
+              // }}
+              // onBlur={() => {
+              //   if ( Platform.OS == 'ios' ){
+              //     if( this.SecurityQuestionBottomSheet as any )
+              //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )}
+              // }}
               onPressConfirm={( answer ) => {
                 if( this.SecurityQuestionBottomSheet as any )
                   ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
@@ -1539,7 +1545,8 @@ export default withNavigationFocus(
     initNewBHRFlow,
     walletCheckIn,
     setVersion,
-    initializeRecovery
+    initializeRecovery,
+    setCloudBackupStatus
   } )( RestoreWithICloud )
 )
 

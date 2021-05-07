@@ -324,6 +324,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
     }
   } catch ( error ) {
     console.log( 'LOGIN error', error )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    yield put( setGoogleCloudLoginFailure( true ) )
     throw new Error( error )
   }
 }
