@@ -33,6 +33,10 @@ const generateRandomString = ( length: number ): string => {
 const generateRandomNumber = ( digits: number ): number => Math.floor( Math.random() * 10**digits )
 
 const generateChallenge = ( verifier ) => {
+  console.log( 'generateChallenge ', crypto
+    .createHash( 'sha256' )
+    .update( verifier )
+    .digest( 'hex' ) )
   return base64UrlEncode(
     crypto
       .createHash( 'sha256' )

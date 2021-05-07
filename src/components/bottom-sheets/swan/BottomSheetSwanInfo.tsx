@@ -22,6 +22,7 @@ import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
 import useCompatibleReassignmentDestinationsForAccount from '../../../utils/hooks/account-utils/UseCompatibleReassignmentDestinationsForAccount'
 import { ListItem } from 'react-native-elements'
+import { addNewAccountShell } from '../../../store/actions/accounts'
 
 type Props = {
   swanDeepLinkContent: string | null;
@@ -67,9 +68,9 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         instanceNumber: 1,
         defaultTitle: 'Swan Account',
         defaultDescription: 'BTC purchased from Swan',
-        serviceAccountKind: ServiceAccountKind.WYRE,
+        serviceAccountKind: ServiceAccountKind.SWAN,
       } )
-      dispatch( createTempSwanAccountShell( newSubAccount ) )
+      dispatch( addNewAccountShell( newSubAccount ) )
     }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
 
