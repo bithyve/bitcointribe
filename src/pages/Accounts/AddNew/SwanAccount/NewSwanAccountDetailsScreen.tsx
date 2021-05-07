@@ -9,9 +9,8 @@ import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAcc
 import SwanAccountCreationStatus from '../../../../common/data/enums/SwanAccountCreationStatus'
 import useSwanIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import BottomInfoBox from '../../../../components/BottomInfoBox'
-import { fetchSwanAuthenticationUrl, clearSwanCache } from '../../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, clearSwanCache, createTempSwanAccountShell, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
 import openLink from '../../../../utils/OpenLink'
-import { createTempSwanAccountShell, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
 export type Props = {
   navigation: any;
 };
