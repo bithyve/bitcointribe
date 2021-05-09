@@ -1486,9 +1486,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
           }
           this.props.clearSwanCache()
           this.setState( {

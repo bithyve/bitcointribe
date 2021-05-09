@@ -64,13 +64,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     console.log( '@@@=> XXX', swanAccountCreationStatus )
     if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
       openLink( swanAuthenticationUrl )
-      const newSubAccount = new ExternalServiceSubAccountInfo( {
-        instanceNumber: 1,
-        defaultTitle: 'Swan Account',
-        defaultDescription: 'BTC purchased from Swan',
-        serviceAccountKind: ServiceAccountKind.SWAN,
-      } )
-      dispatch( addNewAccountShell( newSubAccount ) )
     }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
 

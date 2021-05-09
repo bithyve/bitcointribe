@@ -61,12 +61,7 @@ client_id=${Config.SWAN_CLIENT_ID}\
 &code_challenge_method=S256\
 &response_mode=query\
 `
-  const { currentSwanSubAccount } = yield select(
-    ( state ) => state.accounts
-  )
-  console.log( {
-    currentSwanSubAccount
-  } )
+
   yield put( fetchSwanAuthenticationUrlSucceeded( {
     swanAuthenticationUrl, code_challenge, code_verifier, nonce, state
   } ) )

@@ -1,5 +1,7 @@
 import crypto from 'crypto'
 import { base64UrlEncode, generateRandomBytes } from './random'
+import { asyncPkceChallenge } from 'pkce-utils'
+
 
 
 export const generatePKCEParameters = async () => {
@@ -32,32 +34,39 @@ const generateRandomString = ( length: number ): string => {
 
 const generateRandomNumber = ( digits: number ): number => Math.floor( Math.random() * 10**digits )
 
-const generateChallenge = ( verifier ) => {
-  console.log( 'generateChallenge ', crypto
-    .createHash( 'sha256' )
-    .update( verifier )
-    .digest( 'hex' ) )
-  return base64UrlEncode(
-    crypto
-      .createHash( 'sha256' )
-      .update( verifier )
-      .digest( 'hex' )
-  )
-}
 
-const  generateVerifier = async ()=> {
-  return base64UrlEncode( await generateRandomBytes( 96 ) )
-}
 
-const asyncPkceChallenge = () =>{
-  return new Promise( ( resolve ) => {
-    generateVerifier().then( ( verifier ) => {
-      const challenge = generateChallenge( verifier )
-      resolve( {
-        codeChallenge: challenge,
-        codeVerifier: verifier
-      } )
-    } )
-  } )
-}
+// Leaving this commented for modifying in future release
+
+
+
+// const generateChallenge = ( verifier ) => {
+//   console.log( 'generateChallenge ', crypto
+//     .createHash( 'sha256' )
+//     .update( verifier )
+//     .digest( 'hex' ) )
+//   return base64UrlEncode(
+//     crypto
+//       .createHash( 'sha256' )
+//       .update( verifier )
+//       .digest( 'hex' )
+//   )
+// }
+
+// const  generateVerifier = async ()=> {
+//   return base64UrlEncode( await generateRandomBytes( 96 ) )
+// }
+
+
+// const asyncPkceChallenge = () =>{
+//   return new Promise( ( resolve ) => {
+//     generateVerifier().then( ( verifier ) => {
+//       const challenge = generateChallenge( verifier )
+//       resolve( {
+//         codeChallenge: challenge,
+//         codeVerifier: verifier
+//       } )
+//     } )
+//   } )
+// }
 
