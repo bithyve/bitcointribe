@@ -126,7 +126,7 @@ const SecurityQuestionHistory = ( props ) => {
           props.navigation.goBack()
         }}
         isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/illustration.png' )}
+        bottomImage={require( '../../assets/images/icons/success.png' )}
       />
     )
   }, [] )
