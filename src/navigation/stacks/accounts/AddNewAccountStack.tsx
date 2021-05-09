@@ -8,9 +8,8 @@ import defaultStackScreenNavigationOptions from '../../options/DefaultStackScree
 import { View, Text } from 'react-native'
 import NavStyles from '../../../common/Styles/NavStyles'
 import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAccount/NewWyreAccountDetailsScreen'
+import NewSwanAccountDetailsScreen from '../../../pages/Accounts/AddNew/SwanAccount/NewSwanAccountDetailsScreen'
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
-import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
-import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
 
 const AddNewAccountStack = createStackNavigator(
   {
@@ -42,6 +41,7 @@ const AddNewAccountStack = createStackNavigator(
         title: 'Setup New Account'
       }
     },
+
     NewWyreAccountDetails: {
       screen: NewWyreAccountDetailsScreen,
       navigationOptions: {
@@ -53,6 +53,14 @@ const AddNewAccountStack = createStackNavigator(
       screen: NewRampAccountDetailsScreen,
       navigationOptions: {
         title: 'Setup Ramp Account'
+      }
+    },
+
+
+    NewSwanAccountDetails: {
+      screen: NewSwanAccountDetailsScreen,
+      navigationOptions: {
+        title: 'Setup Swan Account'
       }
     },
 
