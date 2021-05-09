@@ -10,6 +10,7 @@ import SwanAccountCreationStatus from '../../../../common/data/enums/SwanAccount
 import useSwanIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import BottomInfoBox from '../../../../components/BottomInfoBox'
 import { fetchSwanAuthenticationUrl, clearSwanCache, createTempSwanAccountShell, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
+import { addNewAccountShell }  from '../../../../store/actions/accounts'
 import openLink from '../../../../utils/OpenLink'
 export type Props = {
   navigation: any;
@@ -53,7 +54,7 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
       openLink( swanAuthenticationUrl )
       dispatch( updateSwanStatus( SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED ) )
-      dispatch( createTempSwanAccountShell( currentSubAccount ) )
+      dispatch( addNewAccountShell( currentSubAccount ) )
     }
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
 

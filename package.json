@@ -84,6 +84,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.27.0",
     "path-browserify": "0.0.0",
+    "pkce-utils": "https://github.com/bithyve/pkce-utils.git",
     "process": "^0.11.10",
     "punycode": "^1.4.1",
     "querystring-es3": "^0.2.1",

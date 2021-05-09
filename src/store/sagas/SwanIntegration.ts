@@ -101,7 +101,7 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
       data: {
-        minBtcThreshold: 0.01
+        minBtcThreshold: 0.02
       }
     }
   } )
@@ -119,8 +119,13 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   const { swanAuthenticatedToken, swanAccountShell, minBtcThreshold } = yield select(
     ( state ) => state.swanIntegration
   )
-
-  const swanXpub = swanAccountShell.primarySubAccount.xPub
+  const { currentSwanSubAccount } = yield select(
+    ( state ) => state.accounts
+  )
+  console.log( {
+    currentSwanSubAccount
+  } )
+  const swanXpub = currentSwanSubAccount.xPub
   let swanCreateResponse
   try {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {

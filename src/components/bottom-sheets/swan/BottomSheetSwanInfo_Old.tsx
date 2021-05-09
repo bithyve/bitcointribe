@@ -12,6 +12,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import { createWithdrawalWalletOnSwan, fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountShell } from '../../../store/actions/SwanIntegration'
+import { addNewAccountShell } from '../../../store/actions/accounts'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
@@ -46,13 +47,13 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, swanFromDe
     if ( swanFromBuyMenu && !swanAccountSetupCompleted ) {
       if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
         openLink( swanAuthenticationUrl )
-        const newSubAccount = new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
-          defaultTitle: 'Swan Account',
-          defaultDescription: 'BTC purchased from Swan',
-          serviceAccountKind: ServiceAccountKind.WYRE,
-        } )
-        dispatch( createTempSwanAccountShell( newSubAccount ) )
+        // const newSubAccount = new ExternalServiceSubAccountInfo( {
+        //   instanceNumber: 1,
+        //   defaultTitle: 'Swan Account',
+        //   defaultDescription: 'BTC purchased from Swan',
+        //   serviceAccountKind: ServiceAccountKind.WYRE,
+        // } )
+        // dispatch( addNewAccountShell( newSubAccount ) )
       }
     }
   }, [ hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl ] )

@@ -1482,12 +1482,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               instanceNumber: 1,
               defaultTitle: 'Swan Account',
               defaultDescription: 'BTC purchased from Swan',
-              serviceAccountKind: ServiceAccountKind.WYRE,
+              serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
           }
           this.props.clearSwanCache()
           this.setState( {
