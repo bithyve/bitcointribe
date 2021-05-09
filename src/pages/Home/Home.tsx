@@ -861,7 +861,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    console.log( 'this.props.currentSwanSubAccount ', this.props.currentSwanSubAccount )
     const {
       navigation,
       s3Service,

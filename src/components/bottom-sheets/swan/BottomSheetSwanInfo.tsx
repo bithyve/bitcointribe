@@ -13,14 +13,13 @@ import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { createWithdrawalWalletOnSwan, fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountShell } from '../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountShell } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
-import useCompatibleReassignmentDestinationsForAccount from '../../../utils/hooks/account-utils/UseCompatibleReassignmentDestinationsForAccount'
 import { ListItem } from 'react-native-elements'
 import { addNewAccountShell } from '../../../store/actions/accounts'
 
@@ -29,23 +28,15 @@ type Props = {
   onClickSetting: ()=>any;
 }
 
-const count = 0
-
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSetting }: Props ) => {
-  const countAnother = 0
   const dispatch = useDispatch()
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted, hasCreateWithdrawalWalletOnSwanSucceeded, hasCreateWithdrawalWalletOnSwanCompleted, hasCreateWithdrawalWalletOnSwanInitiated } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-  const { currentSwanSubAccount } = useAccountsState()
-  const [ swanAccountSetupCompleted, setSwanAccountSetupCompleted ] = useState( !( currentSwanSubAccount == null ) )
 
   let swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
   let swanTitle = 'Buy bitcoin with Swan'
 
   function handleProceedButtonPress() {
-    console.log( 'button pressed ', {
-      swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated
-    } )
     if ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) {
       if( !hasFetchSwanAuthenticationUrlInitiated ) {
         setHasButtonBeenPressed( true )
@@ -73,23 +64,26 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const renderFooter = () => {
     switch ( swanAccountCreationStatus ) {
         case SwanAccountCreationStatus.ERROR:
-          console.log( '@@@-> inside error ', swanAccountCreationStatus )
           return (
-            <Text style={styles.modalTitleText}>Error Occured: {swanAccountCreationStatus}</Text>
+            <Image
+              source={require( '../../../assets/images/icons/errorImage.png' )
+              }
+              style={styles.errorImage}
+            />
           )
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
-          console.log( '@@@-> inside Add New Acc ', swanAccountCreationStatus )
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
-          console.log( '@@@-> inside AUTHENTICATION_IN_PROGRESS ', swanAccountCreationStatus )
-          // setSwanTitle( 'Hexa Wallet is communicating with Swan...' )
-          // setSwanMessage( 'Hexa Wallet is creating a Swan account to store your bitcoin purchased from Swan. This account will be linked to your Swan withdrawal wallet' )
-          return null
+          return (
+            <Image
+              source={require( '../../../assets/images/loader.gif' )
+              }
+              style={styles.communicatingImage}
+            />
+          )
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          console.log( '@@@-> inside WALLET_LINKED_SUCCESSFULLY ', swanAccountCreationStatus )
           return renderSuccessButton()
         default:
-          console.log( '@@@-> inside default ', swanAccountCreationStatus )
           return renderProceedButton()
     }
   }
@@ -97,14 +91,11 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const renderMessage = () => {
     switch ( swanAccountCreationStatus ) {
         case SwanAccountCreationStatus.ERROR:
-
           swanMessage = 'We had a problem communicating with Swan.\n\n'
           swanTitle = 'Something went wrong'
           break
         case SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED:
-          console.log( '@@@-> inside Add New Acc ', swanAccountCreationStatus )
         case SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS:
-          console.log( '@@@-> inside AUTHENTICATION_IN_PROGRESS ', swanAccountCreationStatus )
           swanTitle = 'Hexa Wallet is communicating with Swan...'
           swanMessage = 'Hexa Wallet is creating a Swan account to store your bitcoin purchased from Swan. This account will be linked to your Swan withdrawal wallet'
           break
@@ -113,7 +104,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           swanTitle = 'Successfully linked Hexa Wallet to your Swan Account'
           break
         default:
-          console.log( '@@@-> inside default ', swanAccountCreationStatus )
           swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
           swanTitle = 'Buy bitcoin with Swan'
     }
@@ -193,8 +183,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             height: 27,
           }}
         />
+
       </View>
-      {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
     </View> )
   }
   const renderSuccessButton = () => {
@@ -202,7 +192,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
     }} >
       <AppBottomSheetTouchableWrapper
-        //disabled={swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ? hasButtonBeenPressed : false}
         onPress={onClickSetting}
         style={{
           ...styles.successModalButtonView
@@ -210,7 +199,11 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text style={styles.proceedButtonText}>{'Done'}</Text>
       </AppBottomSheetTouchableWrapper>
-      {/* <Image source={require( '../../../assets/images/icons/icon_swan@3x.png' )} style={styles.successModalImage} /> */}
+      <Image
+        source={require( '../../../assets/images/icons/illustration.png' )
+        }
+        style={styles.successImage}
+      />
     </View> )
   }
 
@@ -280,16 +273,30 @@ const styles = StyleSheet.create( {
     alignSelf: 'flex-start',
     marginLeft: wp( '10%' ),
   },
-  successModalImage: {
+  proceedButtonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium
+  },
+  errorImage: {
+    width: wp( '31%' ),
+    height: wp( '38%' ),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginBottom: hp( '-3%' ),
+  },
+  successImage: {
     width: wp( '25%' ),
     height: hp( '18%' ),
     marginLeft: 'auto',
     resizeMode: 'cover'
   },
-  proceedButtonText: {
-    color: Colors.white,
-    fontSize: RFValue( 13 ),
-    fontFamily: Fonts.FiraSansMedium
+  communicatingImage: {
+    width: wp( '31%' ),
+    height: wp( '38%' ),
+    marginLeft: 'auto',
+    resizeMode: 'stretch',
+    marginBottom: hp( '-3%' ),
   },
 } )
 export default BottomSheetSwanInfo
