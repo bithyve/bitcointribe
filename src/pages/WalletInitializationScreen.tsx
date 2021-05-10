@@ -22,14 +22,14 @@ import openLink from '../utils/OpenLink'
 const WalletInitializationScreen = props => {
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <View style={{
-          ...styles.viewSetupWallet, paddingTop: wp( '10%' ) 
+          ...styles.viewSetupWallet, paddingTop: wp( '10%' )
         }}>
           <Text style={styles.headerTitleText}>New Hexa Wallet</Text>
           <Text style={styles.headerInfoText}>
@@ -54,7 +54,7 @@ const WalletInitializationScreen = props => {
                 color={Colors.textColorGrey}
                 size={15}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               />
             </View>
@@ -62,7 +62,7 @@ const WalletInitializationScreen = props => {
         </View>
         <View style={styles.separator} />
         <View style={{
-          ...styles.viewSetupWallet, paddingTop: wp( '10%' ) 
+          ...styles.viewSetupWallet, paddingTop: wp( '10%' )
         }}>
           <Text style={styles.headerTitleText}>Restore Wallet</Text>
           <Text style={styles.headerInfoText}>
@@ -70,13 +70,13 @@ const WalletInitializationScreen = props => {
           </Text>
           <TouchableOpacity
             onPress={async () => {
-              if (await AsyncStorage.getItem('recoveryExists')) {
-                props.navigation.navigate('RestoreWithICloud');
-                //props.navigation.navigate('RestoreSelectedContactsList');
+              // if ( await AsyncStorage.getItem( 'recoveryExists' ) ) {
+              props.navigation.navigate( 'RestoreWithICloud' )
+              //props.navigation.navigate('RestoreSelectedContactsList');
 
-              } else {
-                props.navigation.navigate( 'WalletNameRecovery' )
-              }
+              // } else {
+              //   props.navigation.navigate( 'WalletNameRecovery' )
+              // }
             }}
             style={{
               ...styles.NewWalletTouchableView,
@@ -97,7 +97,7 @@ const WalletInitializationScreen = props => {
                 color={Colors.textColorGrey}
                 size={15}
                 style={{
-                  alignSelf: 'center' 
+                  alignSelf: 'center'
                 }}
               />
             </View>
@@ -105,10 +105,10 @@ const WalletInitializationScreen = props => {
         </View>
         <View style={styles.separator} />
         <View style={{
-          flex: 1 
+          flex: 1
         }}>
           <View style={{
-            marginTop: 'auto' 
+            marginTop: 'auto'
           }}>
             <BottomInfoBox
               title={'Terms of Service'}
