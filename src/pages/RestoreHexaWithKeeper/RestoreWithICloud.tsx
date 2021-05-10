@@ -1372,6 +1372,7 @@ class RestoreWithICloud extends Component<
               //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )}
               // }}
               onPressConfirm={( answer ) => {
+                Keyboard.dismiss()
                 if( this.SecurityQuestionBottomSheet as any )
                   ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
                 this.setState( ( state ) => ( {
