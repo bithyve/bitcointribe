@@ -484,7 +484,7 @@ export default function RestoreSelectedContactsList( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            props.navigation.navigate( 'WalletInitialization' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>
