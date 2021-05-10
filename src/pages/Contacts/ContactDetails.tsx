@@ -1603,6 +1603,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansMedium,
     marginLeft: 10,
+    height: wp( '17%' ),
+    width: wp( '30%' ),
   },
   buttonInfo: {
     color: Colors.textColorGrey,
