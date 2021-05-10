@@ -272,7 +272,7 @@ class RestoreWithICloud extends Component<
       setVersion,
       cloudBackupStatus
     } = this.props
-    if( prevProps.cloudData !== cloudData ){
+    if( prevProps.cloudData !== cloudData && cloudData ){
       this.getData( cloudData )
     }
 
@@ -315,7 +315,7 @@ class RestoreWithICloud extends Component<
       this.setState( {
         showLoader: false
       } );
-      ( this.BackupNotFound as any ).snapTo( 1 )
+      ( this.BackupNotFound as any ).current.snapTo( 1 )
       if ( this.loaderBottomSheet as any )
         ( this.loaderBottomSheet as any ).current.snapTo( 0 )
     }
@@ -442,7 +442,7 @@ class RestoreWithICloud extends Component<
     } else {
       this.setState( ( state ) => ( {
         showLoader: false,
-      } ) );
+      } ) )
       ( this.BackupNotFound as any ).current.snapTo( 1 )
     }
   };
@@ -1189,9 +1189,10 @@ class RestoreWithICloud extends Component<
                   this.restoreWallet()
                 }}
                 onPressBack={() => {
-                  this.props.clearCloudCache()
-                  navigation.navigate( 'WalletInitialization' )
+                  this.props.clearCloudCache();
                   ( this.RestoreFromICloud as any ).current.snapTo( 0 )
+                  navigation.navigate( 'WalletInitialization' )
+
                 }}
                 onPressCard={() => {
                   console.log( 'ajfjkh asd', hideShow )
@@ -1287,7 +1288,7 @@ class RestoreWithICloud extends Component<
               modalRef={this.BackupNotFound}
               onPressProceed={() => {
                 ( this.BackupNotFound as any ).current.snapTo( 0 )
-                //navigation.navigate( 'RestoreSelectedContactsList' )
+                navigation.replace( 'WalletNameRecovery' )
               }}
               onPressBack={() => {
                 ( this.BackupNotFound as any ).current.snapTo( 0 )
