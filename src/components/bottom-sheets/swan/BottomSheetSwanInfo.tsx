@@ -199,11 +199,11 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text style={styles.proceedButtonText}>{'Done'}</Text>
       </AppBottomSheetTouchableWrapper>
-      <Image
+      {/* <Image
         source={require( '../../../assets/images/icons/success.png' )
         }
         style={styles.successImage}
-      />
+      /> */}
     </View> )
   }
 
