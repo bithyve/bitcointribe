@@ -38,10 +38,11 @@ const HomeStack = createStackNavigator(
         header: null,
       },
     },
+    // Added QR code scanner screen on home for testing
     AnimatedQRScanner: {
       screen: AnimatedQRScanner,
       navigationOptions: {
-        title: 'Buy with Wyre'
+        title: 'Recovery Page'
       }
     },
     NewWyreAccountDetails: {

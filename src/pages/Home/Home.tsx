@@ -2523,7 +2523,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           onAddNewSelected={this.navigateToAddNewAccountScreen}
           onCardSelected={this.handleAccountCardSelection}
         />
-
+       {/* Added QR code scanner for testing  */}
+      {/* <Button title='QR Scanner' onPress={() => this.props.navigation.navigate( 'AnimatedQRScanner' )}/> */}
         <View
           style={styles.floatingActionButtonContainer}
           pointerEvents="box-none"

@@ -43,59 +43,38 @@ const HomeQRScannerScreen: React.FC<Props> = ({ navigation, }: Props) => {
   const [qrData, setQRData] = useState([])
 
   function handleBarcodeRecognized({ data: dataString }: { data: any }) {
-    
-    // Added here just for testing will need to chnage <PendingTask>
-    const parsedData = JSON.parse(dataString)
-    console.log('parsedData', parsedData);
-    
-    let newArr = [...qrData]
+    dispatch( clearTransfer( REGULAR_ACCOUNT ) )
+    const network = Bitcoin.networkType( dataString )
+    if ( network ) {
+      const serviceType =
+        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
+      const service = accountsState[ serviceType ].service
+      const { type } = service.addressDiff( dataString )
+      if ( type===ScannedAddressKind.ADDRESS ) {
+        onSend( dataString, 0 )
+      } else if( type===ScannedAddressKind.PAYMENT_URI )  {
+        const res = service.decodePaymentURI( dataString )
+        const address = res.address
+        const options = res.options
+        let donationId = null
+        // checking for donationId to send note
+        if ( options && options.message ) {
+          const rawMessage = options.message
+          donationId = rawMessage.split( ':' ).pop().trim()
+        }
 
-    if (parsedData.AnimatedQR) {
-      if (qrData.length <= parsedData.totalCode) {
-        // qrData.push()
-        // newArr[parsedData.index]= JSON.stringify(parsedData.share)
-        newArr.splice(parsedData.index, 0, parsedData.share)
-        setQRData(newArr);
-        // showQr(true)
-      } else {
-        // REMOVE THIS <PendingTask>
-        Alert.alert("", 'Its done wait while we restoring data')
-        // newArr can get pass for recovery
-        console.log('JSON.parse(newArr.toString())', newArr.toString());
+        onSend( address, options.amount )
       }
+      return
     }
-    // dispatch( clearTransfer( REGULAR_ACCOUNT ) )
-    // const network = Bitcoin.networkType( dataString )
-    // if ( network ) {
-    //   const serviceType =
-    //     network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-    //   const service = accountsState[ serviceType ].service
-    //   const { type } = service.addressDiff( dataString )
-    //   if ( type===ScannedAddressKind.ADDRESS ) {
-    //     onSend( dataString, 0 )
-    //   } else if( type===ScannedAddressKind.PAYMENT_URI )  {
-    //     const res = service.decodePaymentURI( dataString )
-    //     const address = res.address
-    //     const options = res.options
-    //     let donationId = null
-    //     // checking for donationId to send note
-    //     if ( options && options.message ) {
-    //       const rawMessage = options.message
-    //       donationId = rawMessage.split( ':' ).pop().trim()
-    //     }
 
-    //     onSend( address, options.amount )
-    //   }
-    //   return
-    // }
+    const onCodeScanned = navigation.getParam( 'onCodeScanned' )
+    if ( typeof onCodeScanned === 'function' ) {
+      const data = getFormattedStringFromQRString( dataString )
+      onCodeScanned( data )
+    }
 
-    // const onCodeScanned = navigation.getParam( 'onCodeScanned' )
-    // if ( typeof onCodeScanned === 'function' ) {
-    //   const data = getFormattedStringFromQRString( dataString )
-    //   onCodeScanned( data )
-    // }
-
-    // navigation.goBack( null )
+    navigation.goBack( null )
   }
 
   function onSend(address: string, amount: Satoshis) {

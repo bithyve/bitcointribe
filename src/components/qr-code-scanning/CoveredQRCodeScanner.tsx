@@ -8,6 +8,9 @@ export type Props = {
   containerStyle?: Record<string, unknown>;
   coverImageSource?: ImageSourcePropType;
   onCodeScanned: ( event: BarCodeReadEvent ) => void;
+  // isAnimatedQR: boolean
+  // showQR: boolean,
+  // setShowQR: any
 };
 
 // TODO: Make the styling here a bit more readable 🙂.
@@ -32,6 +35,9 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
   },
   coverImageSource = require( '../../assets/images/icons/iPhone-QR.png' ),
   onCodeScanned,
+  // showQR,
+  // isAnimatedQR,
+  // setShowQR,
 }: Props ) => {
   const [ isCameraOpen, setIsCameraOpen ] = useState( false )
 
@@ -39,6 +45,7 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
     return (
       <AppBottomSheetTouchableWrapper onPress={() => {
         setIsCameraOpen(true)
+        // setShowQR(true)
         // let data ={
         //   key: "a9a1a6b7f20c58a55f83c949",
         //   name: 'primaryk'
@@ -73,7 +80,11 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
           }}
           onBarCodeRead={( event: BarCodeReadEvent ) => {
             onCodeScanned( event )
-            // setIsCameraOpen( false )
+            setIsCameraOpen( false )
+            // if (isAnimatedQR) {
+            //   setIsCameraOpen( false )
+            // }
+            
           }}
           captureAudio={false}
         >
@@ -83,11 +94,21 @@ const CoveredQRCodeScanner: React.FC<Props> = ( {
     )
   }
 
+  // if (isAnimatedQR) {
+  //   if (showQR) {
+  //     return <Scanner />
+  //   } else {
+  //     return <CameraCover />
+  //   }
+  // } else {
   if ( isCameraOpen ) {
     return <Scanner />
   } else {
     return <CameraCover />
   }
+  // }
+
+  
 }
 
 const styles = StyleSheet.create( {

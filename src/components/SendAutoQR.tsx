@@ -61,7 +61,7 @@ export default function SendAutoQR(props) {
       } else {
         setIndex(curentIndex + 1)
       }
-    }, 3000);
+    }, 2000);
     // Clear timeout if the component is unmounted
     return () => clearInterval(timer);
   }, [curentIndex]);
@@ -167,7 +167,7 @@ export default function SendAutoQR(props) {
           }}
         >
           <View style={{
-            height: hp('27%'),
+            height: hp('36%'),
             justifyContent: 'center',
             marginLeft: 20,
             marginRight: 20,
@@ -186,7 +186,7 @@ export default function SendAutoQR(props) {
                   // this.setState(prevState => ({ hideControls: !prevState.hideControls }));
                 }}
               >
-                <QRCode value={JSON.stringify(props.QR[curentIndex])} size={hp('27%')} />
+                <QRCode value={JSON.stringify(props.QR[curentIndex])} size={hp('36%')} />
               </TouchableOpacity>
               )}
           </View>

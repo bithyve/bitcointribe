@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react'
-import { View, Image, Text, StyleSheet, Platform } from 'react-native'
+import { View, Image, Text, StyleSheet, Platform, Alert } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 import {
   widthPercentageToDP, heightPercentageToDP,
@@ -21,9 +21,13 @@ import Toast from './Toast'
 import CoveredQRCodeScanner from './qr-code-scanning/CoveredQRCodeScanner'
 import NavStyles from '../common/Styles/NavStyles'
 import getFormattedStringFromQRString from '../utils/qr-codes/GetFormattedStringFromQRData'
+import Indicator from './Indiactor'
 
 export default function RestoreByCloudQRCodeContents( props ) {
-  const [ qrData, setQrData ] = useState( '' )
+  // const [ qrData, setQrData ] = useState( '' )
+  const [QRData, setQRData] = useState([])
+  const [showQr, setShowQR] = useState(false)
+  const [scanCount, setScanCount] = useState(1)
   const [ qrDataArray, setQrDataArray ] = useState( [] )
   let [ counter, setCounter ] = useState( 1 )
   let [ startNumberCounter, setStartNumberCounter ] = useState( 1 )
@@ -35,88 +39,130 @@ export default function RestoreByCloudQRCodeContents( props ) {
   const unableRecoverShareFromQR = useSelector(
     ( state ) => state.sss.unableRecoverShareFromQR,
   )
-  console.log( 'unableRecoverShareFromQR', unableRecoverShareFromQR )
+  // console.log( 'unableRecoverShareFromQR', unableRecoverShareFromQR )
 
-  const handleQRDataScanned = ( qrData ) => {
-    const tempArray = qrDataArray
-    const shareCode = qrData.substring( 0, 2 )
-    if ( shareCode !== 'e0' && shareCode !== 'c0' ) {
-      console.log( 'shareCode', shareCode )
-      setTimeout( () => {
-        setErrorMessageHeader( 'Invalid QR' )
-        setErrorMessage( 'Please try again' )
-        setProcessButtonText( 'Try again' )
-      }, 2 )
-      errorBottomSheetRef.current.snapTo( 1 )
-      console.log( 'shareCode1', shareCode )
-      //Alert.alert('Invalid QR', 'Please try again');
-      return
+  const checkUndefined = (arr) => {
+    let isUndefined = false
+    if (arr.length === 0) {
+      isUndefined = true
     }
-    const startNumber1 = qrData.substring( 2, 3 )
-    console.log( 'startNumber', startNumber1 )
-    setQrData( qrData )
-    const temp1 =
-      startNumberCounter == 1
-        ? startNumberCounter + 'st'
-        : startNumberCounter == 2
-          ? startNumberCounter + 'nd'
-          : startNumberCounter == 3
-            ? startNumberCounter + 'rd'
-            : startNumberCounter == 9
-              ? 8
-              : startNumberCounter + 'th'
-    for ( let i = 0; i < 8; i++ ) {
-      if ( qrDataArray[ i ] == qrData ) {
-        setTimeout( () => {
-          setErrorMessageHeader( 'Scan QR code' )
-          setErrorMessage( 'Please scan ' + temp1 + ' QR code' )
-          setProcessButtonText( 'Okay' )
-        }, 2 )
-        errorBottomSheetRef.current.snapTo( 1 )
-        return
-      }
-      if ( startNumberCounter != startNumber1 ) {
-        console.log( 'in if', startNumber1, startNumberCounter )
-        setTimeout( () => {
-          setErrorMessageHeader( 'Scan QR code' )
-          setErrorMessage( 'Please scan ' + temp1 + ' QR code' )
-          setProcessButtonText( 'Okay' )
-        }, 2 )
-        errorBottomSheetRef.current.snapTo( 1 )
-
-        return
+    for(let i = 0; i< arr.length; i++) {
+      if (typeof arr[i] == 'undefined') {
+        isUndefined =true
+        break;
       }
     }
-    if ( qrDataArray.length <= 8 ) {
-      tempArray.push( qrData )
-      setQrDataArray( tempArray )
-      const temp =
-        counter == 1
-          ? counter + 'st'
-          : counter == 2
-            ? counter + 'nd'
-            : counter == 3
-              ? counter + 'rd'
-              : counter == 9
-                ? 8
-                : counter + 'th'
+    return isUndefined;
+  }
+  const handleQRDataScanned = ( dataString ) => {
+    // Added here just for testing will need to chnage <PendingTask>
+    const parsedData = JSON.parse(dataString)
+    // console.log('parsedData', parsedData);
+    
+    let newArr = [...QRData]
 
-      Toast( temp + ' QR code scanned, please scan the next one' )
+    if (parsedData.AnimatedQR) {
+      
+      const isUndefined = checkUndefined(newArr)
+      console.log('checkUndefined', isUndefined);
+      if (QRData.length < parsedData.totalCode || isUndefined) {
+        console.log('parsedData.index>>>>>>>', parsedData.index);
+        // qrData.push()
+        newArr[parsedData.index]= JSON.stringify(parsedData.share)
+        // newArr.splice(parsedData.index, 0, parsedData.share)
 
-      counter++
-      setCounter( counter )
-      startNumberCounter++
-      setStartNumberCounter( startNumberCounter )
+        // console.log('>>>>>> newArr.length', newArr.length);
+        
+        setScanCount(newArr.length)
+        setQRData(newArr);
+        setShowQR(true)
+      } else {
+        setShowQR(false)
+        // REMOVE THIS <PendingTask>
+        Alert.alert("", 'Done!!! Please wait while we restoring data')
+        // newArr can get pass for recovery
+        console.log('JSON.parse(newArr.toString())', newArr.join(""));
+      }
     }
-    if ( qrDataArray.length === 8 ) {
-    //   dispatch( restoreShareFromQR( qrDataArray ) )
-      setQrDataArray( [] )
-      setCounter( 1 )
-      setQrData( '' )
-      setStartNumberCounter( 1 )
+    // const tempArray = qrDataArray
+    // const shareCode = qrData.substring( 0, 2 )
+    // if ( shareCode !== 'e0' && shareCode !== 'c0' ) {
+    //   console.log( 'shareCode', shareCode )
+    //   setTimeout( () => {
+    //     setErrorMessageHeader( 'Invalid QR' )
+    //     setErrorMessage( 'Please try again' )
+    //     setProcessButtonText( 'Try again' )
+    //   }, 2 )
+    //   errorBottomSheetRef.current.snapTo( 1 )
+    //   console.log( 'shareCode1', shareCode )
+    //   //Alert.alert('Invalid QR', 'Please try again');
+    //   return
+    // }
+    // const startNumber1 = qrData.substring( 2, 3 )
+    // console.log( 'startNumber', startNumber1 )
+    // setQrData( qrData )
+    // const temp1 =
+    //   startNumberCounter == 1
+    //     ? startNumberCounter + 'st'
+    //     : startNumberCounter == 2
+    //       ? startNumberCounter + 'nd'
+    //       : startNumberCounter == 3
+    //         ? startNumberCounter + 'rd'
+    //         : startNumberCounter == 9
+    //           ? 8
+    //           : startNumberCounter + 'th'
+    // for ( let i = 0; i < 8; i++ ) {
+    //   if ( qrDataArray[ i ] == qrData ) {
+    //     setTimeout( () => {
+    //       setErrorMessageHeader( 'Scan QR code' )
+    //       setErrorMessage( 'Please scan ' + temp1 + ' QR code' )
+    //       setProcessButtonText( 'Okay' )
+    //     }, 2 )
+    //     errorBottomSheetRef.current.snapTo( 1 )
+    //     return
+    //   }
+    //   if ( startNumberCounter != startNumber1 ) {
+    //     console.log( 'in if', startNumber1, startNumberCounter )
+    //     setTimeout( () => {
+    //       setErrorMessageHeader( 'Scan QR code' )
+    //       setErrorMessage( 'Please scan ' + temp1 + ' QR code' )
+    //       setProcessButtonText( 'Okay' )
+    //     }, 2 )
+    //     errorBottomSheetRef.current.snapTo( 1 )
 
-    //   props.onScanCompleted( shareCode )
-    }
+    //     return
+    //   }
+    // }
+    // if ( qrDataArray.length <= 8 ) {
+    //   tempArray.push( qrData )
+    //   setQrDataArray( tempArray )
+    //   const temp =
+    //     counter == 1
+    //       ? counter + 'st'
+    //       : counter == 2
+    //         ? counter + 'nd'
+    //         : counter == 3
+    //           ? counter + 'rd'
+    //           : counter == 9
+    //             ? 8
+    //             : counter + 'th'
+
+    //   Toast( temp + ' QR code scanned, please scan the next one' )
+
+    //   counter++
+    //   setCounter( counter )
+    //   startNumberCounter++
+    //   setStartNumberCounter( startNumberCounter )
+    // }
+    // if ( qrDataArray.length === 8 ) {
+    // //   dispatch( restoreShareFromQR( qrDataArray ) )
+    //   setQrDataArray( [] )
+    //   setCounter( 1 )
+    //   setQrData( '' )
+    //   setStartNumberCounter( 1 )
+
+    // //   props.onScanCompleted( shareCode )
+    // }
   }
 
   const renderErrorModalContent = useCallback( () => {
@@ -167,8 +213,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
               </Text>
               <Text numberOfLines={2} style={NavStyles.modalHeaderInfoText}>
                 {/* {props.pageInfo} */}
-                There are 8 QR codes in the {'\n'}PDF you have
-                stored
+                Your keeper have 7 QR codes 
               </Text>
             </View>
             <View style={{
@@ -198,15 +243,15 @@ export default function RestoreByCloudQRCodeContents( props ) {
         <View style={{
           marginLeft: 30 
         }}>
-          <Text
+          {/* <Text
             style={{
               color: Colors.blue,
               fontSize: RFValue( 13, 812 ),
               fontFamily: Fonts.FiraSansMedium,
             }}
           >
-            Step {counter == 9 ? 8 : counter} of 8
-          </Text>
+            Step {scanCount == 8 ? 7 : scanCount} of 7
+          </Text> */}
           <Text
             numberOfLines={2}
             style={{
@@ -217,16 +262,16 @@ export default function RestoreByCloudQRCodeContents( props ) {
           >
             {/* {props.pageInfo} */}
             Please scan the{' '}
-            {counter == 1
-              ? counter + 'st'
-              : counter == 2
-                ? counter + 'nd'
-                : counter == 3
-                  ? counter + 'rd'
-                  : counter == 9
+            {scanCount == 1
+              ? scanCount + 'st'
+              : scanCount == 2
+                ? scanCount + 'nd'
+                : scanCount == 3
+                  ? scanCount + 'rd'
+                  : scanCount == 9
                     ? 8
-                    : counter + 'th'}{' '}
-            QR code on the{'\n'}PDF you have
+                    : scanCount + 'th'}{' '}
+            QR code from your keeper
           </Text>
         </View>
 
@@ -237,7 +282,11 @@ export default function RestoreByCloudQRCodeContents( props ) {
             Scan a Bitcoin address or any Hexa QR
           </Text>
 
-          <CoveredQRCodeScanner onCodeScanned={( { data: dataString }: { data: string } ) => {
+          <CoveredQRCodeScanner
+            // setShowQR={setShowQR}
+            // showQR={showQr}
+            // isAnimatedQR={true}
+            onCodeScanned={( { data: dataString }: { data: string } ) => {
             handleQRDataScanned( getFormattedStringFromQRString( dataString ) )
           }} />
         </View>
@@ -249,48 +298,7 @@ export default function RestoreByCloudQRCodeContents( props ) {
             marginRight: 20,
           }}
         >
-          <View style={styles.statusIndicatorView}>
-            {qrDataArray.length == 0 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 1 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 2 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 3 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 4 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 5 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 6 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-            {qrDataArray.length == 7 || qrDataArray.length == 8 ? (
-              <View style={styles.statusIndicatorActiveView} />
-            ) : (
-              <View style={styles.statusIndicatorInactiveView} />
-            )}
-          </View>
+          <Indicator data={new Array(7).fill(0)} curentIndex={scanCount-1} />
         </View>
       </ScrollView>
       <BottomSheet

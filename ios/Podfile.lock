@@ -324,8 +324,6 @@ PODS:
     - React
   - react-native-netinfo (5.9.9):
     - React-Core
-  - react-native-pkce-challenge (3.0.0):
-    - React-Core
   - react-native-print (0.6.0):
     - React
   - react-native-randombytes (3.6.0):
@@ -502,7 +500,6 @@ DEPENDENCIES:
   - react-native-in-app-utils (from `../node_modules/react-native-in-app-utils`)
   - react-native-mail (from `../node_modules/react-native-mail`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
-  - react-native-pkce-challenge (from `../node_modules/react-native-pkce-challenge`)
   - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
@@ -636,8 +633,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-mail"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
-  react-native-pkce-challenge:
-    :path: "../node_modules/react-native-pkce-challenge"
   react-native-print:
     :path: "../node_modules/react-native-print"
   react-native-randombytes:
@@ -784,7 +779,6 @@ SPEC CHECKSUMS:
   react-native-in-app-utils: 96cdefc90ad74a79a95d19239a183995a6face0b
   react-native-mail: a864fb211feaa5845c6c478a3266de725afdce89
   react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
-  react-native-pkce-challenge: fba2e999d38965fe7fe4b2206db63103020233ec
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
@@ -836,4 +830,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c98886d7e364f1f4a7318f4d6fdc05272f2195e2
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1
