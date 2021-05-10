@@ -15,7 +15,8 @@ import {
   DONATION_ACCOUNT,
   SUB_PRIMARY_ACCOUNT,
   WYRE,
-  RAMP
+  RAMP,
+  SWAN
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
@@ -229,7 +230,7 @@ class HexaConfig {
     DONATION_ACCOUNT: this.DONATION_ACCOUNT,
   };
 
-  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP ];
+  public EJECTED_ACCOUNTS = [ SUB_PRIMARY_ACCOUNT, DONATION_ACCOUNT, WYRE, RAMP, SWAN ];
 
   public DERIVATIVE_ACC_TO_SYNC = Object.keys( this.DERIVATIVE_ACC ).filter(
     ( account ) => !this.EJECTED_ACCOUNTS.includes( account ),
