@@ -93,8 +93,6 @@ const asyncDataToBackup = async () => {
     'FBTCAccount',
     'PersonalNode'
   ] )
-  console.log('>>>> aftee async call');
-  
   const ASYNC_DATA = {
   }
 
