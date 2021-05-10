@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  AsyncStorage,
   ImageBackground,
 } from 'react-native'
 import {

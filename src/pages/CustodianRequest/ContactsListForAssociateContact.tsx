@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import {
   View,
   StyleSheet,
-  AsyncStorage,
   TouchableOpacity,
   Text,
   SafeAreaView,

@@ -10,7 +10,6 @@ import {
   StatusBar,
   Linking,
   BackHandler,
-  AsyncStorage,
 } from 'react-native'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
