@@ -172,9 +172,7 @@ export default function Login( props ) {
       .then( async ( res ) => {
         // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
-        // JSON.parse(
-        //   await AsyncStorage.getItem('releaseCases'),
-        // );
+
         if (
           res.data.releases.length &&
           res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
