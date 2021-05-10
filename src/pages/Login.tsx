@@ -5,10 +5,10 @@ import {
   View,
   TouchableOpacity,
   StatusBar,
-  AsyncStorage,
   Platform,
   BackHandler
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
