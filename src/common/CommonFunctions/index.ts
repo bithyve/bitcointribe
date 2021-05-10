@@ -1,4 +1,4 @@
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import AccountShell from '../data/models/AccountShell'
@@ -93,6 +93,8 @@ const asyncDataToBackup = async () => {
     'FBTCAccount',
     'PersonalNode'
   ] )
+  console.log('>>>> aftee async call');
+  
   const ASYNC_DATA = {
   }
 

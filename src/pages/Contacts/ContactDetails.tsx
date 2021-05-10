@@ -8,11 +8,11 @@ import {
   StatusBar,
   Image,
   ScrollView,
-  AsyncStorage,
   Platform,
   Alert,
   ActivityIndicator,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
   widthPercentageToDP as wp,
