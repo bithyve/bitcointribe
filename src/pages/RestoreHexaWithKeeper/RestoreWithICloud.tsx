@@ -878,7 +878,7 @@ class RestoreWithICloud extends Component<
           {cloudBackup &&
             listData.map( ( item, index ) => {
               return (
-                <TouchableOpacity
+                <View
                   key={index}
                   style={{
                     ...styles.cardsView,
@@ -987,7 +987,7 @@ class RestoreWithICloud extends Component<
                       <Text style={styles.statusText}>Waiting for Key</Text>
                     </View>
                   )}
-                </TouchableOpacity>
+                </View>
               )
             } )}
         </ScrollView>

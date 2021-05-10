@@ -233,7 +233,7 @@ const PairNewWallet = ( props ) => {
         cancelButtonText={'Back'}
         onPressIgnore={() => { }}
         isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/illustration.png' )}
+        bottomImage={require( '../../assets/images/icons/success.png' )}
       />
     )
   }, [ FBTCAccount_Data ] )
