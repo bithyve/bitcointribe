@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { AsyncStorage, NativeModules, Platform } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { call, fork, put, select, spawn } from 'redux-saga/effects'
 import { CloudData } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
