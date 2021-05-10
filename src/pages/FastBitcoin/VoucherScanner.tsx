@@ -9,11 +9,11 @@ import {
   Platform,
   Image,
   ImageBackground,
-  AsyncStorage,
   Linking,
   TextInput,
   KeyboardAvoidingView,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import DeviceInfo from 'react-native-device-info'
 import NavStyles from '../../common/Styles/NavStyles'

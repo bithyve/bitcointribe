@@ -6,7 +6,6 @@ import {
   Image,
   FlatList,
   Platform,
-  AsyncStorage,
   TouchableOpacity,
 } from 'react-native'
 import {
