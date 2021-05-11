@@ -42,6 +42,8 @@ import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/acco
 import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -53,6 +55,9 @@ export default function AddContactSendRequest( props ) {
     React.createRef(),
   )
   const [ SendViaQRBottomSheet ] = useState(
+    React.createRef(),
+  )
+  const [ ContactRequestBottomSheet ] = useState(
     React.createRef(),
   )
   const [ TimerModalBottomSheet ] = useState(
@@ -168,6 +173,8 @@ export default function AddContactSendRequest( props ) {
 
   useEffect( () => {
     if ( updateEphemeralChannelLoader ) {
+      console.log('rettuned from here');
+      
       if ( trustedLink ) setTrustedLink( '' )
       if ( trustedQR ) setTrustedQR( '' )
       return
@@ -293,7 +300,18 @@ export default function AddContactSendRequest( props ) {
             ver: appVersion,
           } ),
         )
+        // setTimeout( () => {
+        //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
+        // }, 2 )
+        
+      } else {
+        // setTimeout( () => {
+        //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
+        // }, 2 )
       }
+      
+    } else {
+      createTrustedContact()
     }
   }, [ Contact, trustedContacts, updateEphemeralChannelLoader ] )
 
@@ -356,6 +374,42 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [] )
+  
+
+  const renderContactRequest = useCallback( () => {
+    return (
+      <RequestKeyFromContact
+        isFromReceive={true}
+        headerText={'Friends and Family Request'}
+        subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
+        contactText={'Adding to Friends and Family:'}
+        contact={Contact}
+        QR={trustedQR}
+        link={trustedLink}
+        contactEmail={''}
+        onPressBack={() => {
+          if ( ContactRequestBottomSheet.current )
+            ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
+            props.navigation.goBack()
+        }}
+        onPressDone={() => {
+          ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
+          openTimer()
+        }}
+        onPressShare={() => {
+          setTimeout( () => {
+            setRenderTimer( true )
+          }, 2 )
+          if ( isOTPType ) {
+            shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+          } else {
+            openTimer()
+          }
+          ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+    )
+  }, [ Contact, trustedQR ] )
 
   const renderSendViaQRContents = useCallback( () => {
     return (
@@ -382,6 +436,8 @@ export default function AddContactSendRequest( props ) {
   const renderTimerModalContents = useCallback( () => {
     return (
       <TimerModalContents
+        contactText={'Trusted Contact'}
+        contact={Contact}
         renderTimer={renderTimer}
         onPressContinue={() => onContinueWithTimer()}
       />
@@ -391,9 +447,20 @@ export default function AddContactSendRequest( props ) {
   const renderTimerModalHeader = useCallback( () => {
     return (
       <ModalHeader
+        // backgroundColor={'transparent'}
       // onPressHeader={() => {
       //   if (TimerModalBottomSheet.current)
       //     (TimerModalBottomSheet as any).current.snapTo(0);
+      // }}
+      />
+    )
+  }, [] )
+  const renderContactRequestHeader = useCallback( () => {
+    return (
+      <ModalHeader
+      // onPressHeader={() => {
+      //   if (SendViaQRBottomSheet.current)
+      //     (SendViaQRBottomSheet as any).current.snapTo(0);
       // }}
       />
     )
@@ -424,7 +491,7 @@ export default function AddContactSendRequest( props ) {
 
   const renderShareOtpWithTrustedContactContent = useCallback( () => {
     return (
-      <ShareOtpWithTrustedContact
+      <ShareOtpWithContact
         renderTimer={renderTimer}
         onPressOk={() => {
           setRenderTimer( false )
@@ -537,136 +604,37 @@ export default function AddContactSendRequest( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.contactProfileView}>
-          <View style={{
-            flexDirection: 'row', alignItems: 'center'
-          }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                flex: 1,
-                backgroundColor: Colors.backgroundColor1,
-                height: 90,
-                position: 'relative',
-                borderRadius: 10,
-              }}
-            >
-              <View style={{
-                marginLeft: 70
-              }}>
-                <Text
-                  style={{
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                    fontSize: RFValue( 11 ),
-                    marginLeft: 25,
-                    paddingTop: 5,
-                    paddingBottom: 3,
-                  }}
-                >
-                  Adding to Friends and Family:
-                </Text>
-                <Text style={styles.contactNameText}>
-                  {Contact.firstName && Contact.lastName
-                    ? Contact.firstName + ' ' + Contact.lastName
-                    : Contact.firstName && !Contact.lastName
-                      ? Contact.firstName
-                      : !Contact.firstName && Contact.lastName
-                        ? Contact.lastName
-                        : ''}
-                </Text>
-                {Contact.phoneNumbers && Contact.phoneNumbers.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue( 10 ),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                    }}
-                  >
-                    {setPhoneNumber()}
-                    {/* {Contact.phoneNumbers[0].digits} */}
-                  </Text>
-                ) : Contact.emails && Contact.emails.length ? (
-                  <Text
-                    style={{
-                      color: Colors.textColorGrey,
-                      fontFamily: Fonts.FiraSansRegular,
-                      fontSize: RFValue( 10 ),
-                      marginLeft: 25,
-                      paddingTop: 3,
-                      paddingBottom: 5,
-                    }}
-                  >
-                    {Contact.emails[ 0 ].email}
-                  </Text>
-                ) : null}
-              </View>
-            </View>
-            {Contact.imageAvailable ? (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 2, height: 2
-                  },
-                }}
-              >
-                <Image
-                  source={Contact.image}
-                  style={{
-                    ...styles.contactProfileImage
-                  }}
-                />
-              </View>
-            ) : (
-              <View
-                style={{
-                  position: 'absolute',
-                  marginLeft: 15,
-                  marginRight: 15,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: Colors.backgroundColor,
-                  width: 70,
-                  height: 70,
-                  borderRadius: 70 / 2,
-                  shadowColor: Colors.shadowBlue,
-                  shadowOpacity: 1,
-                  shadowOffset: {
-                    width: 2, height: 2
-                  },
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue( 20 ),
-                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
-                  }}
-                >
-                  {nameToInitials(
-                    Contact.firstName && Contact.lastName
-                      ? Contact.firstName + ' ' + Contact.lastName
-                      : Contact.firstName && !Contact.lastName
-                        ? Contact.firstName
-                        : !Contact.firstName && Contact.lastName
-                          ? Contact.lastName
-                          : '',
-                  )}
-                </Text>
-              </View>
-            )}
-          </View>
-        </View>
-        <View style={{
+        <RequestKeyFromContact
+        isModal={false}
+        // headerText={'Request Recovery Secret from trusted contact'}
+        // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
+        contactText={'Adding to Friends and Family:'}
+        contact={Contact}
+        QR={trustedQR}
+        link={trustedLink}
+        contactEmail={''}
+        onPressBack={() => {
+          if ( ContactRequestBottomSheet.current )
+            ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
+            props.navigation.goBack()
+        }}
+        onPressDone={() => {
+          ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
+          openTimer()
+        }}
+        onPressShare={() => {
+          setTimeout( () => {
+            setRenderTimer( true )
+          }, 2 )
+          if ( isOTPType ) {
+            shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+          } else {
+            openTimer()
+          }
+          ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+        {/* <View style={{
           marginTop: 'auto'
         }}>
           <View style={{
@@ -678,8 +646,8 @@ export default function AddContactSendRequest( props ) {
                 'Your contact will have to accept your request for you to add them'
               }
             />
-          </View>
-          <View
+          </View> */}
+          {/* <View
             style={{
               flexDirection: 'row',
               backgroundColor: Colors.blue,
@@ -730,8 +698,8 @@ export default function AddContactSendRequest( props ) {
               />
               <Text style={styles.buttonText}>QR</Text>
             </TouchableOpacity>
-          </View>
-        </View>
+          </View> */}
+        {/* </View> */}
         <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
@@ -758,6 +726,19 @@ export default function AddContactSendRequest( props ) {
           renderContent={renderSendViaQRContents}
           renderHeader={renderSendViaQRHeader}
         />
+        {/* <BottomSheet
+          enabledGestureInteraction={false}
+          enabledInnerScrolling={true}
+          ref={ContactRequestBottomSheet as any}
+          snapPoints={[
+            -50,
+            Platform.OS == 'ios' && DeviceInfo.hasNotch()
+              ? hp( '86%' )
+              : hp( '86%' ),
+          ]}
+          renderContent={renderContactRequest}
+          renderHeader={renderContactRequestHeader}
+        /> */}
         <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
@@ -765,8 +746,8 @@ export default function AddContactSendRequest( props ) {
           snapPoints={[
             -50,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '30%' )
-              : hp( '35%' ),
+              ? hp( '50%' )
+              : hp( '55%' ),
           ]}
           renderContent={renderTimerModalContents}
           renderHeader={renderTimerModalHeader}
