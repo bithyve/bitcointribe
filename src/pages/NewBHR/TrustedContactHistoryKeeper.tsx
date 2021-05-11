@@ -68,6 +68,7 @@ import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -753,6 +754,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
 
   const createGuardian = useCallback( async () => {
+    console.log('createGuardian inside 111');
+    
     if ( !Object.keys( chosenContact ).length ) return
     setIsGuardianCreationClicked( true )
 
@@ -771,7 +774,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     } else if ( chosenContact.emails && chosenContact.emails.length ) {
       info = chosenContact.emails[ 0 ].email
     }
-
+    console.log('createGuardian inside 222');
     const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
@@ -797,7 +800,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
       updateTrustedContactsInfo( chosenContact )
       onOTPShare( ) // enables reshare
       setChangeContact( false )
+      console.log('createGuardian inside 333', contactName);
     } else {
+      console.log('createGuardian inside 333', contactName);
       const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
       const hasTrustedChannel = trustedContact.symmetricKey ? true : false
       const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
@@ -809,6 +814,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setTrustedLink( '' )
         setTrustedQR( '' )
       }
+      console.log('createGuardian inside 444');
     }
 
     const contactInfo = {
@@ -830,7 +836,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
-
+    console.log('createGuardian inside 555');
     dispatch(
       addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
     )
@@ -915,8 +921,40 @@ const TrustedContactHistoryKeeper = ( props ) => {
   ] )
 
   const SendShareModalFunction = useCallback( () => {
+    console.log('trustedQR',trustedQR);
+    
     if ( chosenContact && !isEmpty( chosenContact ) ) {
       return (
+        // <RequestKeyFromContact
+        // isModal={true}
+        // headerText={'Friends and Family Request'}
+        // subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
+        // contactText={'Adding to Friends and Family:'}
+        // contact={chosenContact}
+        // QR={trustedQR}
+        // link={trustedLink}
+        // contactEmail={''}
+        // onPressBack={() => {
+        //   if ( shareBottomSheet.current )
+        //     ( shareBottomSheet as any ).current.snapTo( 0 )
+        //     props.navigation.goBack()
+        // }}
+        // onPressDone={() => {
+        //   ( shareBottomSheet as any ).current.snapTo( 0 )
+        //   // openTimer()
+        // }}
+        // onPressShare={() => {
+        //   // setTimeout( () => {
+        //   //   setRenderTimer( true )
+        //   // }, 2 )
+        //   // if ( isOTPType ) {
+        //   //   shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+        //   // } else {
+        //   //   // openTimer()
+        //   // }
+        //   ( shareBottomSheet as any ).current.snapTo( 0 )
+        // }}
+      // />
         <SendShareModal
           contact={chosenContact ? chosenContact : null}
           index={index}
@@ -1274,7 +1312,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ref={shareBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '65%' ),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '85%' ) : hp( '90%' ),
         ]}
         renderContent={SendShareModalFunction}
         renderHeader={SendModalFunction}

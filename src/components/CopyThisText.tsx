@@ -16,8 +16,10 @@ import {
 
 export default function CopyThisText(props) {
   function writeToClipboard() {
-    Clipboard.setString(props.text);
-    Toast('Copied Successfully');
+    if (props.text === 'Creating Link....') {
+      Clipboard.setString(props.text);
+      Toast('Copied Successfully');
+    }
   }
 
   return (
