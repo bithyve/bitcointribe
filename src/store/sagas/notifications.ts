@@ -9,7 +9,8 @@ import {
   notificationsFetched,
 } from '../actions/notifications'
 import { INotification, Contacts } from '../../bitcoin/utilities/Interface'
-import { AsyncStorage, Alert } from 'react-native'
+import { Alert } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 

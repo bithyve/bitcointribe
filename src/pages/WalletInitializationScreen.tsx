@@ -7,7 +7,6 @@ import {
   Image,
   StatusBar,
   Text,
-  AsyncStorage,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,

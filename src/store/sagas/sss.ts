@@ -68,7 +68,8 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import generatePDF from '../utils/generatePDF'
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
-import { AsyncStorage, Platform, NativeModules } from 'react-native'
+import { Platform, NativeModules } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   updateEphemeralChannel,
   updateTrustedChannel,

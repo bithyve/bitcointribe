@@ -1,6 +1,6 @@
 import { call, put, select } from 'redux-saga/effects'
 import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'

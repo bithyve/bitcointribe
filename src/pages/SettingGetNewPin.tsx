@@ -8,8 +8,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
-  AsyncStorage,
-  Alert,
 } from 'react-native'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'

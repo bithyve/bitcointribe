@@ -4,10 +4,10 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
   PermissionsAndroid,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

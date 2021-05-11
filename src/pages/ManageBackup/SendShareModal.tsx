@@ -5,9 +5,6 @@ import {
   Image,
   Text,
   StyleSheet,
-  Platform,
-  AsyncStorage,
-  Alert,
   ActivityIndicator,
 } from 'react-native'
 import Colors from '../../common/Colors'
