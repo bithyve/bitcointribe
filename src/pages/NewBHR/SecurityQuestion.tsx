@@ -85,7 +85,7 @@ function SecurityQuestion( props ) {
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                Select the question and specify the answer{'\n'}as you did at
+                Specify the answer{'\n'}as you did at
                 the time of setting up the wallet
               </Text>
             </View>
