@@ -925,53 +925,53 @@ const TrustedContactHistoryKeeper = ( props ) => {
     
     if ( chosenContact && !isEmpty( chosenContact ) ) {
       return (
-        // <RequestKeyFromContact
-        // isModal={true}
-        // headerText={'Friends and Family Request'}
-        // subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
-        // contactText={'Adding to Friends and Family:'}
-        // contact={chosenContact}
-        // QR={trustedQR}
-        // link={trustedLink}
-        // contactEmail={''}
-        // onPressBack={() => {
-        //   if ( shareBottomSheet.current )
-        //     ( shareBottomSheet as any ).current.snapTo( 0 )
-        //     props.navigation.goBack()
-        // }}
-        // onPressDone={() => {
-        //   ( shareBottomSheet as any ).current.snapTo( 0 )
-        //   // openTimer()
-        // }}
-        // onPressShare={() => {
-        //   // setTimeout( () => {
-        //   //   setRenderTimer( true )
-        //   // }, 2 )
-        //   // if ( isOTPType ) {
-        //   //   shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
-        //   // } else {
-        //   //   // openTimer()
-        //   // }
-        //   ( shareBottomSheet as any ).current.snapTo( 0 )
-        // }}
-      // />
-        <SendShareModal
-          contact={chosenContact ? chosenContact : null}
-          index={index}
-          textHeader={'Sharing Recovery Key with'}
-          onPressViaQr={( index ) => {
-            createGuardian()
-            if ( SendViaQRBottomSheet.current )
-              ( SendViaQRBottomSheet as any ).current.snapTo( 1 );
+        <RequestKeyFromContact
+        isModal={true}
+        headerText={'Friends and Family Request'}
+        subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
+        contactText={'Adding to Friends and Family:'}
+        contact={chosenContact}
+        QR={trustedQR}
+        link={trustedLink}
+        contactEmail={''}
+        onPressBack={() => {
+          if ( shareBottomSheet.current )
             ( shareBottomSheet as any ).current.snapTo( 0 )
-          }}
-          onPressViaLink={( index ) => {
-            createGuardian()
-            if ( SendViaLinkBottomSheet.current )
-              ( SendViaLinkBottomSheet as any ).current.snapTo( 1 );
-            ( shareBottomSheet as any ).current.snapTo( 0 )
-          }}
-        />
+            props.navigation.goBack()
+        }}
+        onPressDone={() => {
+          ( shareBottomSheet as any ).current.snapTo( 0 )
+          // openTimer()
+        }}
+        onPressShare={() => {
+          // setTimeout( () => {
+          //   setRenderTimer( true )
+          // }, 2 )
+          // if ( isOTPType ) {
+          //   shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+          // } else {
+          //   // openTimer()
+          // }
+          ( shareBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+      //   <SendShareModal
+      //     contact={chosenContact ? chosenContact : null}
+      //     index={index}
+      //     textHeader={'Sharing Recovery Key with'}
+      //     onPressViaQr={( index ) => {
+      //       createGuardian()
+      //       if ( SendViaQRBottomSheet.current )
+      //         ( SendViaQRBottomSheet as any ).current.snapTo( 1 );
+      //       ( shareBottomSheet as any ).current.snapTo( 0 )
+      //     }}
+      //     onPressViaLink={( index ) => {
+      //       createGuardian()
+      //       if ( SendViaLinkBottomSheet.current )
+      //         ( SendViaLinkBottomSheet as any ).current.snapTo( 1 );
+      //       ( shareBottomSheet as any ).current.snapTo( 0 )
+      //     }}
+      //   />
       )
     }
   }, [ chosenContact, index ] )

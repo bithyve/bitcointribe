@@ -85,11 +85,6 @@ export default function RequestKeyFromContact(props) {
 		setContactName(contactName)
 	}, [Contact])
 
-	function writeToClipboard() {
-		Clipboard.setString(shareLink)
-		Toast('Copied Successfully')
-	}
-
 	const shareOption = async (link) => {
 		console.log('shareOption');
 
@@ -224,7 +219,6 @@ export default function RequestKeyFromContact(props) {
 						marginBottom: !props.isModal ? hp('2%')  : hp('1.7%'),
 					}}
 				>
-
 					<View style={{
 						height: hp('27%'),
 						justifyContent: 'center',
@@ -240,54 +234,11 @@ export default function RequestKeyFromContact(props) {
 							)}
 					</View>
 					<CopyThisText
+						openLink={shareOption}	
 						backgroundColor={Colors.backgroundColor1}
 						text={shareLink ? shareLink : 'Creating Link....'}
 					/>
 				</View>
-				<View style={{ flexDirection: 'row', marginHorizontal: 31, alignItems: 'center', marginTop: props.isModal ? 0 : hp('6%') }}>
-				<TouchableOpacity
-					onPress={() => {
-						// createTrustedContact()
-						// props.navigation.goBack()
-						shareOption(shareLink)
-					}}
-					style={{
-						height: wp('12%'),
-						width: wp('37%'),
-						flexDirection: 'row',
-						alignItems: 'center',
-						backgroundColor: Colors.blue,
-						justifyContent: 'center',
-						borderRadius: 8,
-						alignSelf: 'center',
-					}}
-				>
-					<Text
-						style={{
-							color: Colors.white,
-							fontSize: RFValue(12),
-							fontFamily: Fonts.FiraSansRegular,
-						}}
-					>
-						Share
-              </Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					style={{ marginLeft: 34 }}
-					onPress={() => props.onPressBack()}
-				>
-					<Text
-						style={{
-							color: Colors.blue,
-							fontSize: RFValue(12),
-							fontFamily: Fonts.FiraSansRegular,
-							fontWeight: 'bold'
-						}}
-					>
-						Back
-              </Text>
-				</TouchableOpacity>
-			</View>
 			</ScrollView>
 			
 		</View>
