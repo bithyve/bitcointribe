@@ -138,7 +138,7 @@ import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheet
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
 import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
 import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
@@ -233,6 +233,7 @@ interface HomePropsTypes {
   clearSwanCache: any;
   updateSwanStatus: any;
   addNewAccountShell: any;
+  createTempSwanAccountInfo: any;
   addTransferDetails: any;
   paymentDetails: any;
   clearPaymentDetails: any;
@@ -1170,7 +1171,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
-        this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.props.currentSwanSubAccount
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
 
@@ -1477,6 +1480,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
+          this.props.clearSwanCache()
           if ( !this.props.currentSwanSubAccount ) {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
@@ -1484,13 +1488,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               defaultDescription: 'BTC purchased from Swan',
               serviceAccountKind: ServiceAccountKind.SWAN,
             } )
-            this.props.addNewAccountShell( newSubAccount )
+            this.props.createTempSwanAccountInfo( newSubAccount )
+            this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
           }
-          this.props.clearSwanCache()
+          else {
+            this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          }
           this.setState( {
             swanDeepLinkContent: null
           }, () => {
-            this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
             this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
           } )
           break
@@ -2649,6 +2655,7 @@ export default withNavigationFocus(
     clearSwanCache,
     updateSwanStatus,
     addNewAccountShell,
+    createTempSwanAccountInfo,
     addTransferDetails,
     clearPaymentDetails,
     notificationsUpdated,

@@ -10,7 +10,7 @@ import {
   Linking,
   ActivityIndicator,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import {
