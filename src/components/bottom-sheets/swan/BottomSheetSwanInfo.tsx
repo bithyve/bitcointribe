@@ -189,7 +189,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }
   const renderSuccessButton = () => {
     return ( <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
+      marginTop: 'auto',
+      flexDirection: 'row'
     }} >
       <AppBottomSheetTouchableWrapper
         onPress={onClickSetting}
@@ -199,11 +200,11 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text style={styles.proceedButtonText}>{'Done'}</Text>
       </AppBottomSheetTouchableWrapper>
-      {/* <Image
+      <Image
         source={require( '../../../assets/images/icons/success.png' )
         }
         style={styles.successImage}
-      /> */}
+      />
     </View> )
   }
 
@@ -269,6 +270,7 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 15, height: 15
     },
+    marginTop: 'auto',
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
     marginLeft: wp( '10%' ),
@@ -289,7 +291,8 @@ const styles = StyleSheet.create( {
     width: wp( '25%' ),
     height: hp( '18%' ),
     marginLeft: 'auto',
-    resizeMode: 'cover'
+    resizeMode: 'stretch',
+    marginBottom: hp( '-4%' ),
   },
   communicatingImage: {
     width: wp( '31%' ),
