@@ -89,31 +89,43 @@ function MBKeeperButton( props ) {
       onPress={() => props.onPressKeeper( )}
     >
       {keeper.shareType == 'securityQuestion'?
-        <ImageBackground
-          source={require( '../../assets/images/icons/questionMark.png' )}
-          style={{
-            ...styles.resetImage,
-            position: 'relative',
-          }}
-        >
-          {keeper.status == 'notAccessible' ? (
-            <View
-              style={{
-                backgroundColor: Colors.red,
-                width: wp( '1%' ),
-                height: wp( '1%' ),
-                position: 'absolute',
-                top: 0,
-                right: 0,
-                borderRadius: wp( '1%' ) / 2,
-              }}
-            />
-          ) : null}
-        </ImageBackground>
+        value.status == 'notSetup'
+          ? <Image
+            source={require( '../../assets/images/icons/questionMark.png' )}
+            style={{
+              ...styles.resetImage,
+              position: 'relative',
+              tintColor: Colors.deepBlue
+            }}
+          /> :
+          <ImageBackground
+            source={require( '../../assets/images/icons/questionMark.png' )}
+            style={{
+              ...styles.resetImage,
+              position: 'relative',
+            }}
+          >
+            {keeper.status == 'notAccessible' ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  width: wp( '1%' ),
+                  height: wp( '1%' ),
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  borderRadius: wp( '1%' ) / 2,
+                }}
+              />
+            ) : null}
+          </ImageBackground>
         :keeper.shareType == 'cloud' ?
           <Image
             source={require( '../../assets/images/icons/ico_cloud_backup.png' )}
-            style={styles.resetImage}
+            style={{
+              ...styles.resetImage,
+              tintColor: value.status == 'notSetup' ? Colors.deepBlue : Colors.secondaryBackgroundColor
+            }}
           />
           :keeper.status == 'accessible' && keeper.shareType == 'device' ? (
             <Image

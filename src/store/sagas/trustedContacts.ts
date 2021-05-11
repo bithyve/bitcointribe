@@ -50,7 +50,7 @@ import {
   TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { fetchNotificationsWorker } from './notifications'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import RelayServices from '../../bitcoin/services/RelayService'

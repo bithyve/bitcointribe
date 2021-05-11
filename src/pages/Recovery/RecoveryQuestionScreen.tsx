@@ -42,8 +42,8 @@ export default function RecoveryQuestionScreen( props ) {
     ( async () => {
       if ( initializeRecoveryCompleted ) {
         await AsyncStorage.setItem( 'recoveryExists', 'true' )
-        props.navigation.navigate( 'RestoreWithICloud' )
-        //props.navigation.navigate('RestoreSelectedContactsList');
+        //props.navigation.navigate( 'RestoreWithICloud' )
+        props.navigation.navigate( 'RestoreSelectedContactsList' )
       }
     } )()
   }, [ initializeRecoveryCompleted ] )

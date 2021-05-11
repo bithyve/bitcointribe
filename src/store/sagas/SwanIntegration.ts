@@ -27,7 +27,7 @@ import {
 
 import { createWatcher } from '../utils/utilities'
 
-import { generatePKCEParameters } from '../lib/swan'
+import { generatePKCEParameters } from '../../utils/random/pkce'
 import Config from '../../bitcoin/HexaConfig'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { AccountsState } from '../reducers/accounts'
@@ -101,7 +101,7 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
       data: {
-        minBtcThreshold: 0.01
+        minBtcThreshold: 0.02
       }
     }
   } )
@@ -119,8 +119,13 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   const { swanAuthenticatedToken, swanAccountShell, minBtcThreshold } = yield select(
     ( state ) => state.swanIntegration
   )
-
-  const swanXpub = swanAccountShell.primarySubAccount.xPub
+  const { currentSwanSubAccount } = yield select(
+    ( state ) => state.accounts
+  )
+  console.log( {
+    currentSwanSubAccount
+  } )
+  const swanXpub = currentSwanSubAccount.xPub
   let swanCreateResponse
   try {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
@@ -134,7 +139,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
       e
     } )
   }
-  yield put( updateSwanStatus( SwanAccountCreationStatus.WITHDRAWAL_WALLET_CREATED ) )
+  yield put( updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) )
 
   const swanWithdrawalResponse = yield call( setupAutomaticWithdrawals, {
     walletId: swanCreateResponse.data.item.id,

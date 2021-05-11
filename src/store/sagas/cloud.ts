@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { AsyncStorage, NativeModules, Platform } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { call, fork, put, select, spawn } from 'redux-saga/effects'
 import { CloudData } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
@@ -201,6 +202,7 @@ function* getCloudBackupRecoveryWorker () {
   try {
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
+      console.log( 'backedJson getCloudBackupRecoveryWorker', backedJson )
       if( backedJson === 'failure' ) {
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
         return false
@@ -323,6 +325,8 @@ function* GoogleDriveLoginWorker ( { payload } ) {
     }
   } catch ( error ) {
     console.log( 'LOGIN error', error )
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+    yield put( setGoogleCloudLoginFailure( true ) )
     throw new Error( error )
   }
 }

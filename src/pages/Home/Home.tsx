@@ -5,13 +5,13 @@ import {
   StatusBar,
   ImageBackground,
   Platform,
-  AsyncStorage,
   Linking,
   Alert,
   Image,
   AppState,
   InteractionManager,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,
@@ -1170,7 +1170,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
-        this.props.updateSwanStatus( SwanAccountCreationStatus.ROUTED_BACK_FROM_SWAN )
+        this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
 
@@ -1482,12 +1482,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               instanceNumber: 1,
               defaultTitle: 'Swan Account',
               defaultDescription: 'BTC purchased from Swan',
-              serviceAccountKind: ServiceAccountKind.WYRE,
+              serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
           }
           this.props.clearSwanCache()
           this.setState( {

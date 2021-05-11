@@ -158,10 +158,10 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: 22,
-    height: 22,
-    marginBottom: 8,
-    marginTop: 8
+    width: 35,
+    height: 35,
+    marginBottom: 5,
+    marginTop: 5
   },
 
   cardContainer: {

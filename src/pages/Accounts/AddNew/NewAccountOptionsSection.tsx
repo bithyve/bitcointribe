@@ -114,7 +114,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         case ServiceAccountKind.FAST_BITCOINS:
           return 'COMING SOON'
         case ServiceAccountKind.SWAN:
-          return 'COMING SOON'
+          return 'NEW'
         case ServiceAccountKind.WYRE:
           return 'NEW'
         case ServiceAccountKind.RAMP:

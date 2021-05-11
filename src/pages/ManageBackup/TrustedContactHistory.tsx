@@ -7,10 +7,10 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
-  AsyncStorage,
   Alert,
   Keyboard,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import {

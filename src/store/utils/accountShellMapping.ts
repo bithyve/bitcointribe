@@ -14,6 +14,8 @@ import {
   WyreDerivativeAccountElements,
   RampDerivativeAccount,
   RampDerivativeAccountElements,
+  SwanDerivativeAccount,
+  SwanDerivativeAccountElements,
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
@@ -289,8 +291,11 @@ const updatePrimarySubAccounts = (
           break
 
         case SubAccountKind.SERVICE:
-          switch ( ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
+          const serviceAccountKind = ( shell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
+          switch ( serviceAccountKind ) {
               case ServiceAccountKind.WYRE:
+              case ServiceAccountKind.RAMP:
+              case ServiceAccountKind.SWAN:
                 const { sourceKind, instanceNumber } = shell.primarySubAccount
                 let derivativeAccounts, network
 
@@ -305,52 +310,18 @@ const updatePrimarySubAccounts = (
                       network = secureAcc.secureHDWallet.network
                       break
                 }
-                const wyreAccounts: WyreDerivativeAccount = derivativeAccounts[ DerivativeAccountTypes.WYRE ]
-                const wyreInstance: WyreDerivativeAccountElements = wyreAccounts[ instanceNumber ]
+                const dervAccounts: WyreDerivativeAccount | RampDerivativeAccount | SwanDerivativeAccount = derivativeAccounts[ serviceAccountKind ]
+                const dervInstance: WyreDerivativeAccountElements | RampDerivativeAccountElements | SwanDerivativeAccountElements = dervAccounts[ instanceNumber ]
 
-                if ( wyreInstance && wyreInstance.balances ) {
-                  accountName = wyreInstance.accountName
-                  accountDescription = wyreInstance.accountDescription
-                  accountXpub = Bitcoin.generateYpub( wyreInstance.xpub, network )
+                if ( dervInstance && dervInstance.balances ) {
+                  accountName = dervInstance.accountName
+                  accountDescription = dervInstance.accountDescription
+                  accountXpub = Bitcoin.generateYpub( dervInstance.xpub, network )
                   balances = {
-                    confirmed: wyreInstance.balances.balance,
-                    unconfirmed: wyreInstance.balances.unconfirmedBalance,
+                    confirmed: dervInstance.balances.balance,
+                    unconfirmed: dervInstance.balances.unconfirmedBalance,
                   }
-                  transactions = wyreInstance.transactions.transactionDetails
-                }
-                break
-
-              case ServiceAccountKind.RAMP:
-                //const { sourceKind, instanceNumber } = shell.primarySubAccount
-                const rampSourceKind = shell.primarySubAccount.sourceKind
-                const rampInstanceNumber = shell.primarySubAccount.instanceNumber
-
-                let rampDerivativeAccounts, rampNetwork
-                switch ( rampSourceKind ) {
-                    case SourceAccountKind.REGULAR_ACCOUNT:
-                      rampDerivativeAccounts = regularAcc.hdWallet.derivativeAccounts
-                      rampNetwork = regularAcc.hdWallet.network
-                      break
-
-                    case SourceAccountKind.SECURE_ACCOUNT:
-                      rampDerivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
-                      rampNetwork = secureAcc.secureHDWallet.network
-                      break
-                }
-                const rampAccounts: RampDerivativeAccount =
-                rampDerivativeAccounts[ DerivativeAccountTypes.RAMP ]
-                const rampInstance: RampDerivativeAccountElements = rampAccounts[ rampInstanceNumber ]
-
-                if ( rampInstance && rampInstance.balances ) {
-                  accountName = rampInstance.accountName
-                  accountDescription = rampInstance.accountDescription
-                  accountXpub = Bitcoin.generateYpub( rampInstance.xpub, rampNetwork )
-
-                  balances = {
-                    confirmed: rampInstance.balances.balance,
-                    unconfirmed: rampInstance.balances.unconfirmedBalance,
-                  }
-                  transactions = rampInstance.transactions.transactionDetails
+                  transactions = dervInstance.transactions.transactionDetails
                 }
                 break
           }
