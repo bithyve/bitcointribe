@@ -8,9 +8,9 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
-  Alert,
-  AsyncStorage,
+  Alert
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,

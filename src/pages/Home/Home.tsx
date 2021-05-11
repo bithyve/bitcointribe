@@ -5,13 +5,13 @@ import {
   StatusBar,
   ImageBackground,
   Platform,
-  AsyncStorage,
   Linking,
   Alert,
   Image,
   AppState,
   InteractionManager,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,

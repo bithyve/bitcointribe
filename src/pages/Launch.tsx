@@ -5,10 +5,10 @@ import {
   StatusBar,
   Linking,
   Alert,
-  AsyncStorage,
   Platform,
   AppState,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Video from 'react-native-video'
 import Colors from '../common/Colors'
 

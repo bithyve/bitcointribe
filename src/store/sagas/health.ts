@@ -84,7 +84,8 @@ import {
   GENERATE_META_SHARE,
 } from '../actions/health'
 import { insertDBWorker } from './storage'
-import { AsyncStorage, NativeModules, Platform } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'

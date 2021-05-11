@@ -12,8 +12,8 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
-  AsyncStorage,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Fonts from '../common/Fonts'
 import Colors from '../common/Colors'

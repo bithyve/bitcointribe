@@ -12,10 +12,9 @@ import {
   Platform,
   TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar,
-  AsyncStorage,
-  Alert,
+  StatusBar
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RFValue } from 'react-native-responsive-fontsize'
 import NavStyles from '../../common/Styles/NavStyles'
 import {

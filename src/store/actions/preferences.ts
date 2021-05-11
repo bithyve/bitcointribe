@@ -1,6 +1,6 @@
 import { createAction } from 'redux-actions'
 import { UPDATE_APP_PREFERENCE } from '../constants'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { updateTrustedContactsInfoLocally } from '../actions/trustedContacts'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Action } from 'redux'

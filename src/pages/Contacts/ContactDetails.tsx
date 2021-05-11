@@ -8,11 +8,11 @@ import {
   StatusBar,
   Image,
   ScrollView,
-  AsyncStorage,
   Platform,
   Alert,
   ActivityIndicator,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
   widthPercentageToDP as wp,
@@ -1603,6 +1603,8 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansMedium,
     marginLeft: 10,
+    height: wp( '17%' ),
+    width: wp( '30%' ),
   },
   buttonInfo: {
     color: Colors.textColorGrey,

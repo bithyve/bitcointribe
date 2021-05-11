@@ -10,9 +10,9 @@ import {
   ScrollView,
   RefreshControl,
   ImageBackground,
-  Platform,
-  AsyncStorage,
+  Platform
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -526,9 +526,6 @@ class ManageBackupNewBHR extends Component<
       this.goToHistory( this.props.navigationObj )
     }
 
-    console.log( 'prevProps.isTypeBottomSheetOpen', prevProps.isTypeBottomSheetOpen )
-    console.log( 'this.props.isTypeBottomSheetOpen', this.props.isTypeBottomSheetOpen )
-
     if( prevProps.isTypeBottomSheetOpen !== this.props.isTypeBottomSheetOpen && this.props.isTypeBottomSheetOpen === true ){
       this.setState( {
         showLoader: false
@@ -596,8 +593,9 @@ class ManageBackupNewBHR extends Component<
   };
 
   goToHistory = ( value ) => {
+    //console.log( 'VALUE', value )
     const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
-    console.log( 'VALUE', value )
+    //console.log( 'selectedKeeper', selectedKeeper )
 
     this.setState( {
       showLoader: false
@@ -1165,8 +1163,6 @@ class ManageBackupNewBHR extends Component<
                                 } )
                                 requestAnimationFrame( () => {
                                   this.onPressKeeperButton( value, 2 )
-                                  //this.props.onPressKeeper( value, 1 )
-                                  // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
                                 } )
                               }}
                               keeperButtonText={value.id == 1 ? 'Security Question' : this.keeperButtonText( value.keeper2ButtonText, '2' )}
