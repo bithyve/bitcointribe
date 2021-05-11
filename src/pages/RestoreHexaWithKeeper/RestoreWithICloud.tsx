@@ -1288,7 +1288,7 @@ class RestoreWithICloud extends Component<
               modalRef={this.BackupNotFound}
               onPressProceed={() => {
                 ( this.BackupNotFound as any ).current.snapTo( 0 )
-                navigation.replace( 'WalletNameRecovery' )
+                // navigation.replace( 'WalletNameRecovery' )
               }}
               onPressBack={() => {
                 ( this.BackupNotFound as any ).current.snapTo( 0 )
