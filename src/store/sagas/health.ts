@@ -85,7 +85,7 @@ import {
 } from '../actions/health'
 import { insertDBWorker } from './storage'
 import { NativeModules, Platform } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
@@ -2736,7 +2736,7 @@ function* sharePDFWorker( { payload } ) {
             yield call(
               Mailer.mail,
               {
-                subject: 'test',
+                subject: 'Personal Copy',
                 body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
                 isHTML: true,
                 attachment: {
@@ -2745,7 +2745,7 @@ function* sharePDFWorker( { payload } ) {
                     ? 'file://' + pdfInfo.filePath
                     : pdfInfo.filePath, // The absolute path of the file from which to read data.
                   type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                  name: 'test', // Optional: Custom filename for attachment
+                  name: 'Personal Copy', // Optional: Custom filename for attachment
                 },
               },
               ( err, event ) => {
@@ -2757,7 +2757,7 @@ function* sharePDFWorker( { payload } ) {
             )
           } else {
             const shareOptions = {
-              title: 'test',
+              title: 'Personal Copy',
               message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
               url:
               Platform.OS == 'android'
@@ -2765,7 +2765,7 @@ function* sharePDFWorker( { payload } ) {
                 : pdfInfo.filePath,
               type: 'application/pdf',
               showAppsToView: true,
-              subject: 'test',
+              subject: 'Personal Copy',
             }
 
             try {
@@ -2819,7 +2819,7 @@ function* sharePDFWorker( { payload } ) {
 
         case 'Other':
           const shareOptions = {
-            title: 'test',
+            title: 'Personal Copy',
             message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
             url:
             Platform.OS == 'android'
@@ -2827,7 +2827,7 @@ function* sharePDFWorker( { payload } ) {
               : pdfInfo.filePath,
             type: 'application/pdf',
             showAppsToView: true,
-            subject: 'test',
+            subject: 'Personal Copy',
           }
 
           try {
