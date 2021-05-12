@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { FlatList } from 'react-native'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import AccountCardColumn from './AccountCardColumn'
 
@@ -87,21 +88,24 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     let currentColumn = []
 
     sortedShells.forEach( ( accountShell, index ) => {
-      currentColumn.push( accountShell )
+      console.log( 'accountShell', accountShell )
+      if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+        currentColumn.push( accountShell )
 
-      // Make a new column after adding two items -- or after adding the
-      // very first item. This is because the first column
-      // will only contain one item, since the "Add new" button will be placed
-      // in front of everything.
-      if ( currentColumn.length == 2 || index == 0 ) {
-        columns.push( currentColumn )
-        currentColumn = []
-      }
+        // Make a new column after adding two items -- or after adding the
+        // very first item. This is because the first column
+        // will only contain one item, since the "Add new" button will be placed
+        // in front of everything.
+        if ( currentColumn.length == 2 || index == 0 ) {
+          columns.push( currentColumn )
+          currentColumn = []
+        }
 
-      // If we're at the end and a partially filled column still exists,
-      // push it.
-      if ( index == shellCount - 1 && currentColumn.length > 0 ) {
-        columns.push( currentColumn )
+        // If we're at the end and a partially filled column still exists,
+        // push it.
+        if ( index == shellCount - 1 && currentColumn.length > 0 ) {
+          columns.push( currentColumn )
+        }
       }
     } )
 

@@ -89,27 +89,27 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       //   screenName: 'ReassignTransactionsMainOptions',
       //   imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
       // },
-      // {
-      //   title: 'Account Visibility',
-      //   subtitle: 'Configure for different privacy-sensitive contexts',
-      //   screenName: 'EditVisibility',
-      //   screenParams: {
-      //     accountShellID: accountShell.id,
-      //   },
-      //   imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
-      // },
+      {
+        title: 'Account Visibility',
+        subtitle: 'Configure for different privacy-sensitive contexts',
+        screenName: 'EditVisibility',
+        screenParams: {
+          accountShellID: accountShell.id,
+        },
+        imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
+      },
       // {
       //   title: 'Merge Account',
       //   subtitle: `Move all transactions to another Hexa account`,
       //   screenName: 'MergeAccounts',
       //   imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
       // },
-      // {
-      //   title: 'Archive Account',
-      //   subtitle: 'Move this account out of sight and out of mind',
-      //   screenName: '',
-      //   imageSource: require('../../../assets/images/icons/icon_archive.png'),
-      // },
+      {
+        title: 'Archive Account',
+        subtitle: 'Move this account out of sight and out of mind',
+        screenName: '',
+        imageSource: require( '../../../assets/images/icons/icon_archive.png' ),
+      },
     ]
   }, [ accountShell ] )
 

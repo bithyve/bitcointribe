@@ -6,6 +6,7 @@ import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/Accoun
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import EnterPasscodeScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/EnterPasscodeScreen'
 
 
 const PanAccountSettingsStack = createStackNavigator(
@@ -21,6 +22,28 @@ const PanAccountSettingsStack = createStackNavigator(
         }
       },
     },
+    EnterPasscode: {
+      screen: EnterPasscodeScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          title: 'Enter Passcode',
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      },
+    },
+    // SecurityQuestion: {
+    //   screen: SecurityQuestionScreen,
+    //   navigationOptions: ( { navigation } ) => {
+    //     return {
+    //       title: 'Enter Passcode',
+    //       headerLeft: () => {
+    //         return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+    //       },
+    //     }
+    //   },
+    // },
   },
   {
     defaultNavigationOptions: () => {
@@ -48,11 +71,11 @@ const AccountManagementStack = createStackNavigator(
             // (See: https://github.com/bithyve/hexa/issues/2454)
             //
 
-            // return (
-            //   <NavHeaderSettingsButton
-            //     onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-            //   />
-            // )
+            return (
+              <NavHeaderSettingsButton
+                onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+              />
+            )
           },
         }
       },
