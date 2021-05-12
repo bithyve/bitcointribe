@@ -60,6 +60,82 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
+    mainContainer:{
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    contactView: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        flex: 1,
+        backgroundColor: Colors.backgroundColor1,
+        height: 90,
+        position: 'relative',
+        borderRadius: 10,
+    },
+    contactText: {
+        color: Colors.textColorGrey,
+        fontFamily: Fonts.FiraSansRegular,
+        fontSize: RFValue(11),
+        marginLeft: 25,
+        paddingTop: 5,
+        paddingBottom: 3,
+    },
+    phoneNumber: {
+        color: Colors.textColorGrey,
+        fontFamily: Fonts.FiraSansRegular,
+        fontSize: RFValue(10),
+        marginLeft: 25,
+        paddingTop: 3,
+    },
+    emailView: {
+        color: Colors.textColorGrey,
+        fontFamily: Fonts.FiraSansRegular,
+        fontSize: RFValue(10),
+        marginLeft: 25,
+        paddingTop: 3,
+        paddingBottom: 5,
+    },
+    contactName: {
+        color: Colors.textColorGrey,
+        fontFamily: Fonts.FiraSansRegular,
+        fontSize: RFValue(10),
+        marginLeft: 25,
+        paddingTop: 3,
+    },
+    imageView: {
+        position: 'absolute',
+        marginLeft: 15,
+        marginRight: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        shadowOpacity: 1,
+        shadowOffset: {
+            width: 2, height: 2
+        },
+    },
+    initialsContainer: {
+        position: 'absolute',
+        marginLeft: 15,
+        marginRight: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: Colors.backgroundColor,
+        width: 70,
+        height: 70,
+        borderRadius: 70 / 2,
+        shadowColor: Colors.shadowBlue,
+        shadowOpacity: 1,
+        shadowOffset: {
+            width: 2, height: 2
+        },
+        padding: 10
+    },
+    initialsText: {
+        textAlign: 'center',
+        fontSize: RFValue(20),
+        lineHeight: RFValue(20), //... One for top and one for bottom alignment
+    }
 })
 
 export default function CopyThisText(props) {
@@ -72,33 +148,16 @@ export default function CopyThisText(props) {
     }
     return (
         <View style={styles.contactProfileView}>
-            <View style={{
-                flexDirection: 'row', alignItems: 'center'
-            }}>
+            <View style={styles.mainContainer}>
                 <View
-                    style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        flex: 1,
-                        backgroundColor: Colors.backgroundColor1,
-                        height: 90,
-                        position: 'relative',
-                        borderRadius: 10,
-                    }}
+                    style={styles.contactView}
                 >
                     <View style={{
                         marginLeft: 70
                     }}>
                         {props.contactText ? (
                             <Text
-                                style={{
-                                    color: Colors.textColorGrey,
-                                    fontFamily: Fonts.FiraSansRegular,
-                                    fontSize: RFValue(11),
-                                    marginLeft: 25,
-                                    paddingTop: 5,
-                                    paddingBottom: 3,
-                                }}
+                                style={styles.contactText}
                             >
                                 {props.contactText}
                             </Text>
@@ -114,13 +173,7 @@ export default function CopyThisText(props) {
                                 <Text
                                     style={props.fromScreen == 'TimerModalContents' ? props.titleStyle
                                     :
-                                    {
-                                        color: Colors.textColorGrey,
-                                        fontFamily: Fonts.FiraSansRegular,
-                                        fontSize: RFValue(10),
-                                        marginLeft: 25,
-                                        paddingTop: 3,
-                                    }}
+                                    styles.phoneNumber}
                                 >
                                     {setPhoneNumber()}
                                     {/* {Contact && Contact.phoneNumbers[0].digits} */}
@@ -131,26 +184,13 @@ export default function CopyThisText(props) {
                                     <Text
                                         style={props.fromScreen == 'TimerModalContents' ? props.titleStyle
                                         :
-                                        {
-                                            color: Colors.textColorGrey,
-                                            fontFamily: Fonts.FiraSansRegular,
-                                            fontSize: RFValue(10),
-                                            marginLeft: 25,
-                                            paddingTop: 3,
-                                            paddingBottom: 5,
-                                        }}
+                                        styles.emailView}
                                     >
                                         {props.Contact && props.Contact.emails[0].email}
                                     </Text>
                                 ) : null}
                         {props.contactName && props.fromScreen == 'TimerModalContents' ? (
-                            <Text style={{
-                                color: Colors.textColorGrey,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue(10),
-                                marginLeft: 25,
-                                paddingTop: 3,
-                            }}>
+                            <Text style={styles.contactName}>
                                 {props.contactName}
                             </Text>
                         ) : null}
@@ -158,17 +198,7 @@ export default function CopyThisText(props) {
                 </View>
                 {props.Contact && props.Contact.imageAvailable ? (
                     <View
-                        style={{
-                            position: 'absolute',
-                            marginLeft: 15,
-                            marginRight: 15,
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            shadowOpacity: 1,
-                            shadowOffset: {
-                                width: 2, height: 2
-                            },
-                        }}
+                        style={styles.imageView}
                     >
                         <Image
                             source={props.Contact && props.Contact.image}
@@ -181,30 +211,10 @@ export default function CopyThisText(props) {
                     // <View style={styles.headerImageView}>
                     //     <View style={styles.headerImageInitials}>
                         <View
-                            style={{
-                                position: 'absolute',
-                                marginLeft: 15,
-                                marginRight: 15,
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                backgroundColor: Colors.backgroundColor,
-                                width: 70,
-                                height: 70,
-                                borderRadius: 70 / 2,
-                                shadowColor: Colors.shadowBlue,
-                                shadowOpacity: 1,
-                                shadowOffset: {
-                                    width: 2, height: 2
-                                },
-                                padding: 10
-                            }}
+                            style={styles.initialsContainer}
                         >
                             <Text
-                                style={{
-                                    textAlign: 'center',
-                                    fontSize: RFValue(20),
-                                    lineHeight: RFValue(20), //... One for top and one for bottom alignment
-                                }}
+                                style={styles.initialsText}
                             >
                                 {nameToInitials(props.contactName)}
                             </Text>

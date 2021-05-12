@@ -95,7 +95,6 @@ export default function AddContactSendRequest( props ) {
   )
 
   const updateTrustedContactsInfo = async ( contact ) => {
-    console.log( 'trustedContactsInfo', trustedContactsInfo )
     const tcInfo = trustedContactsInfo ? trustedContactsInfo : []
     if ( tcInfo && tcInfo.length ) {
       if (
@@ -173,8 +172,6 @@ export default function AddContactSendRequest( props ) {
 
   useEffect( () => {
     if ( updateEphemeralChannelLoader ) {
-      console.log('rettuned from here');
-      
       if ( trustedLink ) setTrustedLink( '' )
       if ( trustedQR ) setTrustedQR( '' )
       return
@@ -212,9 +209,6 @@ export default function AddContactSendRequest( props ) {
       if ( !trustedLink ) {
         if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
           const phoneNumber = Contact.phoneNumbers[ 0 ].number
-          console.log( {
-            phoneNumber
-          } )
           let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
           number = number.slice( number.length - 10 ) // last 10 digits only
           const numHintType = 'num'
@@ -273,7 +267,6 @@ export default function AddContactSendRequest( props ) {
           Alert.alert( 'Invalid Contact', 'Something went wrong.' )
           return
         }
-        console.log( 'Contact', Contact )
         updateTrustedContactsInfo( Contact ) // Contact initialized to become TC
       }
 

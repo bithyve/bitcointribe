@@ -755,8 +755,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
 
   const createGuardian = useCallback( async () => {
-    console.log('createGuardian inside 111');
-    
     if ( !Object.keys( chosenContact ).length ) return
     setIsGuardianCreationClicked( true )
 
@@ -775,7 +773,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     } else if ( chosenContact.emails && chosenContact.emails.length ) {
       info = chosenContact.emails[ 0 ].email
     }
-    console.log('createGuardian inside 222');
     const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
@@ -801,9 +798,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       updateTrustedContactsInfo( chosenContact )
       onOTPShare( ) // enables reshare
       setChangeContact( false )
-      console.log('createGuardian inside 333', contactName);
     } else {
-      console.log('createGuardian inside 333', contactName);
       const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
       const hasTrustedChannel = trustedContact.symmetricKey ? true : false
       const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
@@ -815,7 +810,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setTrustedLink( '' )
         setTrustedQR( '' )
       }
-      console.log('createGuardian inside 444');
     }
 
     const contactInfo = {
@@ -837,7 +831,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
-    console.log('createGuardian inside 555');
     dispatch(
       addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
     )
@@ -1082,7 +1075,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
     }
-    console.log( 'changeIndex', changeIndex, type )
     if ( type == 'contact' ) {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }

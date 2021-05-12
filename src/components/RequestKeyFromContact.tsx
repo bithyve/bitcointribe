@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Image, Text, StyleSheet, ActivityIndicator, Share } from 'react-native'
-import Clipboard from '@react-native-clipboard/clipboard'
+import { View, Text, StyleSheet, ActivityIndicator, Share } from 'react-native'
 import {
 	widthPercentageToDP as wp,
 	heightPercentageToDP as hp,
@@ -8,47 +7,24 @@ import {
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import BottomInfoBox from './BottomInfoBox'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import { nameToInitials } from '../common/CommonFunctions'
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
+import { ScrollView } from 'react-native-gesture-handler'
 import QRCode from 'react-native-qrcode-svg'
 import {
 	REGULAR_ACCOUNT,
 	TEST_ACCOUNT,
 	SECURE_ACCOUNT,
 } from '../common/constants/wallet-service-types'
-import Ionicons from 'react-native-vector-icons/Ionicons'
-import Toast from '../components/Toast'
 import CopyThisText from '../components/CopyThisText'
 import UserDetails from './UserDetails'
 
 export default function RequestKeyFromContact(props) {
 	const [contactName, setContactName] = useState('')
 	const [shareLink, setShareLink] = useState('')
-	console.log('props.QR RequestKeyFromContact > ', props.QR);
+	// console.log('props.QR RequestKeyFromContact > ', props.QR);
 	
-	const amount = props.amount
 	const contact = props.contact
-	const [dropdownBoxOpenClose, setDropdownBoxOpenClose] = useState(false)
-	const [dropdownBoxList, setDropdownBoxList] = useState([
-		{
-			id: '1',
-			account_name: 'Test Account',
-			type: TEST_ACCOUNT,
-		},
-		{
-			id: '2',
-			account_name: 'Checking Account',
-			type: REGULAR_ACCOUNT,
-		},
-		{
-			id: '3',
-			account_name: 'Saving Account',
-			type: SECURE_ACCOUNT,
-		},
-	])
 	const [serviceType, setServiceType] = useState(
 		props.serviceType ? props.serviceType : '',
 	)
@@ -108,51 +84,18 @@ export default function RequestKeyFromContact(props) {
 		}
 	}
 
-	const renderVerticalDivider = () => {
-		return (
-			<View
-				style={{
-					width: 1,
-					height: '60%',
-					backgroundColor: Colors.borderColor,
-					marginRight: 5,
-					marginLeft: 5,
-					alignSelf: 'center',
-				}}
-			/>
-		)
-	}
-
-	const setPhoneNumber = () => {
-		const phoneNumber = Contact.phoneNumbers[0].number
-		let number = phoneNumber.replace(/[^0-9]/g, '') // removing non-numeric characters
-		number = number.slice(number.length - 10) // last 10 digits only
-		return number
-	}
-
 	return (
 		<View style={styles.modalContainer}>
 			<View
-				style={{
-					alignItems: 'center',
-					flexDirection: 'row',
-					paddingRight: 10,
-					paddingBottom: hp('1.5%'),
-					paddingTop: hp('1%'),
-					marginLeft: 10,
-					marginRight: 10,
-					marginBottom: hp('1.5%'),
-				}}
+				style={styles.mainView}
 			>
 				{props.isModal &&
-					<View style={{
-						flex: 1, flexDirection: 'row', alignItems: 'flex-start'
-					}}>
+					<View style={styles.topSubView}>
 						<AppBottomSheetTouchableWrapper
 							onPress={() => {
 								props.onPressBack();
 							}}
-							style={{ height: 30, width: 30, justifyContent: 'center' }}
+							style={styles.backButton}
 						>
 							<FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
 						</AppBottomSheetTouchableWrapper>
@@ -166,12 +109,7 @@ export default function RequestKeyFromContact(props) {
 							}
 							{props.subHeaderText &&
 								<Text
-									style={{
-										color: Colors.textColorGrey,
-										fontSize: RFValue(12),
-										fontFamily: Fonts.FiraSansRegular,
-										paddingTop: 5,
-									}}
+									style={styles.subHeaderText}
 								>
 									{props.subHeaderText}
 								</Text>
@@ -180,13 +118,10 @@ export default function RequestKeyFromContact(props) {
 					</View>
 				}
 			</View>
-			<View style={{
-				marginHorizontal: 20,
-				justifyContent: 'center',
-				alignItems: 'center',
+			<View style={[styles.topContainer, {
 				marginTop: !props.isModal ? 0 : hp('1.7%'),
 				marginBottom: !props.isModal ? 0 : hp('1.7%'),
-			}}>
+			}]}>
 				<UserDetails
 					titleStyle={styles.titleStyle}
 					contactName={contactName}
@@ -197,23 +132,13 @@ export default function RequestKeyFromContact(props) {
 				flex: 1
 			}}>
 				<View
-					style={{
-						marginLeft: 20,
-						marginRight: 20,
-						justifyContent: 'center',
-						alignItems: 'center',
+					style={[styles.mainContainer, 
+					{
 						marginTop: !props.isModal ? hp('2%') : hp('1.7%'),
 						marginBottom: !props.isModal ? hp('2%') : hp('1.7%'),
-					}}
+					}]}
 				>
-					<View style={{
-						height: hp('27%'),
-						justifyContent: 'center',
-						marginLeft: 20,
-						marginRight: 20,
-						alignItems: 'center',
-						marginTop: !props.isModal ? 0 : hp('4%')
-					}}>
+					<View style={[styles.qrContainer, { marginTop: !props.isModal ? 0 : hp('4%') }]}>
 						{!props.QR ? (
 							<ActivityIndicator size="large" />
 						) : (
@@ -238,18 +163,6 @@ const styles = StyleSheet.create({
 		fontFamily: Fonts.FiraSansRegular,
 		marginLeft: 25,
 	},
-	addModalView: {
-		padding: 7,
-		flexDirection: 'row',
-		display: 'flex',
-		marginTop: 10,
-		justifyContent: 'space-between',
-	},
-	modalElementInfoView: {
-		padding: 10,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
 	modalHeaderTitleText: {
 		color: Colors.blue,
 		fontSize: RFValue(18),
@@ -261,110 +174,48 @@ const styles = StyleSheet.create({
 		alignSelf: 'center',
 		width: '100%',
 	},
-	modalContentContainer: {
-		height: '100%',
-		backgroundColor: Colors.white,
-	},
-	separatorView: {
-		marginLeft: 15,
-		marginRight: 15,
-		height: 2,
-		backgroundColor: Colors.backgroundColor,
-	},
-	contactProfileView: {
-		flexDirection: 'row',
+	qrContainer: {
+		height: hp('27%'),
+		justifyContent: 'center',
+		marginLeft: 20,
+		marginRight: 20,
 		alignItems: 'center',
 	},
-	contactProfileImage: {
-		borderRadius: 60 / 2,
-		width: 60,
-		height: 60,
-		resizeMode: 'cover',
-		shadowColor: Colors.shadowBlue,
-		shadowOpacity: 1,
-		shadowOffset: {
-			width: 15, height: 15
-		},
-	},
-	contactNameText: {
-		color: Colors.textColorGrey,
-		fontSize: RFValue(20),
-		fontFamily: Fonts.FiraSansRegular,
-		marginLeft: 25,
-	},
-	contactIconImage: {
-		width: 20,
-		height: 20,
-		resizeMode: 'cover',
-	},
-	buttonInnerView: {
-		flexDirection: 'row',
-		height: 40,
+	mainContainer: {
+		marginLeft: 20,
+		marginRight: 20,
 		justifyContent: 'center',
 		alignItems: 'center',
-		width: wp('30%'),
 	},
-	buttonImage: {
-		width: 20,
-		height: 20,
-		resizeMode: 'contain',
-		tintColor: Colors.white,
+	topContainer: {
+		marginHorizontal: 20,
+		justifyContent: 'center',
+		alignItems: 'center',
 	},
-	buttonText: {
-		color: Colors.white,
+	subHeaderText: {
+		color: Colors.textColorGrey,
 		fontSize: RFValue(12),
 		fontFamily: Fonts.FiraSansRegular,
-		marginLeft: 10,
+		paddingTop: 5,
 	},
-	amountContainer: {
-		flexDirection: 'row',
+	mainView: {
 		alignItems: 'center',
-		marginTop: hp('1%'),
-		borderBottomWidth: 1,
-		borderColor: Colors.borderColor,
+		flexDirection: 'row',
+		paddingRight: 10,
 		paddingBottom: hp('1.5%'),
-		paddingTop: hp('1.5%'),
+		paddingTop: hp('1%'),
+		marginLeft: 10,
+		marginRight: 10,
+		marginBottom: hp('1.5%'),
 	},
-	amountInputImage: {
-		width: 40,
-		height: 50,
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderTopLeftRadius: 10,
-		borderBottomLeftRadius: 10,
+	backButton: {
+		height: 30,
+		width: 30,
+		justifyContent: 'center'
 	},
-	textBoxImage: {
-		width: wp('6%'),
-		height: wp('6%'),
-		resizeMode: 'contain',
-	},
-	dropdownBoxModal: {
-		borderRadius: 10,
-		borderWidth: 1,
-		borderColor: Colors.borderColor,
-		marginTop: hp('1%'),
-		width: wp('90%'),
-		height: hp('18%'),
-		elevation: 10,
-		shadowColor: Colors.shadowBlue,
-		shadowOpacity: 10,
-		shadowOffset: {
-			width: 0, height: 10
-		},
-		backgroundColor: Colors.white,
-		position: 'absolute',
-		zIndex: 9999,
-		overflow: 'hidden',
-	},
-	dropdownBoxModalElementView: {
-		height: 50,
-		alignItems: 'center',
+	topSubView: {
+		flex: 1,
 		flexDirection: 'row',
-		paddingLeft: 15,
-	},
-	boldItalicText: {
-		fontFamily: Fonts.FiraSansMediumItalic,
-		fontStyle: 'italic',
-		color: Colors.blue,
-	},
+		alignItems: 'flex-start'
+	}
 })

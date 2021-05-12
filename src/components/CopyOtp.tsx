@@ -3,12 +3,10 @@ import {
     View,
     Image,
     Text,
-    Clipboard,
     TouchableOpacity
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard'
 import Colors from '../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import Toast from '../components/Toast';
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper';
 import {
     widthPercentageToDP as wp,
@@ -18,15 +16,11 @@ import Styles from '../pages/NewBHR/Styles';
 
 export default function CopyOTP(props) {
     function writeToClipboard() {
-        console.log('writeToClipboard');
-
         Clipboard.setString(props.OTP);
         props.setIsCopied(true)
         // Toast('Copied Successfully');
     }
     const OTP = props.OTP
-    console.log('props.OTP', props.OTP);
-
 
     return (
         <View
@@ -65,7 +59,6 @@ export default function CopyOTP(props) {
                 </AppBottomSheetTouchableWrapper>
                 <TouchableOpacity
                     onPress={() => {
-                        console.log('presssed');
                         writeToClipboard()
                     }}
                     style={{
