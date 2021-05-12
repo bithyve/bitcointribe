@@ -1256,8 +1256,6 @@ export default class SecureHDWallet extends Bitcoin {
     description: string,
     configuration: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
     },
     disableAccount = false,
   ): Promise<{
@@ -1416,8 +1414,6 @@ export default class SecureHDWallet extends Bitcoin {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
-        displayTransactions: boolean;
-        displayTxDetails: boolean;
       };
       accountDetails?: {
         donee: string;

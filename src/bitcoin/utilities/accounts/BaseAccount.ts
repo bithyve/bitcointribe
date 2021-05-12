@@ -392,8 +392,6 @@ export default class BaseAccount {
     description: string,
     configuration: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
     },
     disableAccount?: boolean,
   ): Promise<
@@ -441,8 +439,6 @@ export default class BaseAccount {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
-        displayTransactions: boolean;
-        displayTxDetails: boolean;
       };
       accountDetails?: {
         donee: string;
