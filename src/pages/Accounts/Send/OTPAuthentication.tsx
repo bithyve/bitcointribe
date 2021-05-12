@@ -20,7 +20,7 @@ import {
 import { useDispatch } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SendConfirmationContent from '../SendConfirmationContent'
-import { executeSendStage3, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
+import { executeSendStage3, sendTxNotification } from '../../../store/actions/sending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useAccountSendST3CompletionEffect from '../../../utils/sending/useAccountSendST3CompletionEffect'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
@@ -29,7 +29,6 @@ import { resetStackToAccountDetails } from '../../../navigation/actions/Navigati
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 
 export default function OTPAuthenticationScreen( { navigation } ) {
@@ -40,7 +39,6 @@ export default function OTPAuthenticationScreen( { navigation } ) {
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const dispatch = useDispatch()
   const sendingState = useSendingState()
-  const donationId = useDonationIdFromSelectedRecipients()
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -133,17 +131,6 @@ export default function OTPAuthenticationScreen( { navigation } ) {
     onSuccess: ( txid: string | null ) => {
       if ( txid ) {
         dispatch( sendTxNotification() )
-
-        //dispatch donation note action during donation tx
-        const { donationNote } = sendingState.donationDetails
-        if( donationId && donationNote ){
-          dispatch( sendDonationNote( {
-            txid,
-            donationId: donationId,
-            donationNote: donationNote,
-          } ) )
-        }
-
         showSendSuccessBottomSheet()
       }
     },

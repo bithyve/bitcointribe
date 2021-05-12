@@ -29,7 +29,7 @@ export default class Relay {
     }
     const { compatible, alternatives } = res.data
     return {
-      compatible, alternatives 
+      compatible, alternatives
     }
   };
 
@@ -51,7 +51,7 @@ export default class Relay {
     const { releases = [] } = idx( res, ( _ ) => _.data ) || {
     }
     return {
-      releases 
+      releases
     }
   };
 
@@ -75,7 +75,7 @@ export default class Relay {
       }
       const { updated } = res.data
       return {
-        updated 
+        updated
       }
     } catch ( err ) {
       throw new Error( 'Failed to fetch GetBittr Details' )
@@ -96,7 +96,7 @@ export default class Relay {
       } )
     } catch ( err ) {
       console.log( {
-        err 
+        err
       } )
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
@@ -104,7 +104,7 @@ export default class Relay {
 
     const { notifications, DHInfos } = res.data
     return {
-      notifications, DHInfos 
+      notifications, DHInfos
     }
   };
 
@@ -136,45 +136,10 @@ export default class Relay {
       if ( !sent ) throw new Error()
 
       return {
-        sent 
+        sent
       }
     } catch ( err ) {
       throw new Error( 'Failed to deliver notification' )
-    }
-  };
-
-  public static sendDonationNote = async (
-    donationId: string,
-    txNote: { txId: string; note: string }
-  ): Promise<{
-    added: boolean;
-  }> => {
-    try {
-      let res: AxiosResponse
-
-      if ( !txNote || !txNote.txId || !txNote.note )
-        throw new Error( 'Failed to send donation note: txid|note missing' )
-
-      try {
-        res = await BH_AXIOS.post( 'addDonationTxNote', {
-          HEXA_ID,
-          donationId,
-          txNote,
-        } )
-        // console.log({ res });
-      } catch ( err ) {
-        // console.log({ err });
-        if ( err.response ) throw new Error( err.response.data.err )
-        if ( err.code ) throw new Error( err.code )
-      }
-      const { added } = res.data
-      if ( !added ) throw new Error()
-
-      return {
-        added 
-      }
-    } catch ( err ) {
-      throw new Error( 'Failed to deliver donation note' )
     }
   };
 
@@ -197,7 +162,7 @@ export default class Relay {
       const { exchangeRates, averageTxFees } = res.data
 
       return {
-        exchangeRates, averageTxFees 
+        exchangeRates, averageTxFees
       }
     } catch ( err ) {
       throw new Error( 'Failed fetch fee and exchange rates' )
@@ -209,27 +174,29 @@ export default class Relay {
     notification: INotification,
   ) => {
     try {
-      let res: AxiosResponse;
-      let obj = {
+      let res: AxiosResponse
+      const obj = {
         HEXA_ID,
         receivers,
         notification,
-      };
+      }
       try {
-        res = await BH_AXIOS.post('sendKeeperNotifications', {
+        res = await BH_AXIOS.post( 'sendKeeperNotifications', {
           HEXA_ID,
           receivers,
           notification,
-        });
-        const { sent } = res.data;
-        if (!sent) throw new Error();
-        return { sent };
-      } catch (err) {
-        if (err.response) throw new Error(err.response.data.err);
-        if (err.code) throw new Error(err.code);
+        } )
+        const { sent } = res.data
+        if ( !sent ) throw new Error()
+        return {
+          sent
+        }
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
       }
-    } catch (err) {
-      throw new Error('Failed to deliver notification');
+    } catch ( err ) {
+      throw new Error( 'Failed to deliver notification' )
     }
   };
 }

@@ -80,7 +80,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   function handlePaymentURIEntry( uri: string ) {
     let address: string
-    let donationID: string | null = null
     let amount: number | null = 0
 
     try {
@@ -88,10 +87,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
       address = decodingResult.address
       const options = decodingResult.options
-
-      // checking for donationId to send note
-      if ( options?.message )
-        donationID = options.message.split( ':' ).pop().trim()
 
       if ( options?.amount )
         amount = options.amount
@@ -103,7 +98,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
     const newRecipient = makeAddressRecipientDescription( {
       address,
-      donationID,
     } )
 
     if ( isRecipientSelectedForSending( newRecipient ) == false ) {

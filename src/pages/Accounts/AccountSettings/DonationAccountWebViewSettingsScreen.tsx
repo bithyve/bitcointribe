@@ -59,15 +59,6 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     donationAccount.configuration.displayBalance
   )
 
-  const [
-    isDonationTransactionEnable,
-    setIsDonationTransactionEnable,
-  ] = useState( donationAccount.configuration.displayTransactions )
-
-  const [ hideTxDetails, setHideTxDetails ] = useState(
-    !donationAccount.configuration.displayTxDetails,
-  )
-
   const [ disableSave, setDisableSave ] = useState( true )
   const [ doneeName, setDoneeName ] = useState( donationAccount.donee )
   const [ description, setDescription ] = useState( donationAccount.description )
@@ -93,15 +84,10 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     }
 
     if (
-      isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        donationAccount.configuration.displayTransactions ||
-      !hideTxDetails !== donationAccount.configuration.displayTxDetails
+      isDonationTotalEnable !== donationAccount.configuration.displayBalance
     ) {
       const configuration = {
         displayBalance: isDonationTotalEnable,
-        displayTransactions: isDonationTransactionEnable,
-        displayTxDetails: !hideTxDetails,
       }
 
       preferences = preferences
@@ -147,9 +133,6 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
       ( description && description !== donationAccount.description ) ||
       ( cause && cause !== donationAccount.subject ) ||
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        donationAccount.configuration.displayTransactions ||
-      !hideTxDetails !== donationAccount.configuration.displayTxDetails ||
       isDonationPause !== donationAccount.disableAccount
     ) {
       setDisableSave( false )
@@ -161,9 +144,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     description,
     cause,
     isDonationPause,
-    hideTxDetails,
     isDonationTotalEnable,
-    isDonationTransactionEnable,
   ] )
 
   return (
@@ -327,81 +308,6 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                   setIsDonationTotalEnable( ( prevState ) => !prevState )
                 }
                 isOn={isDonationTotalEnable}
-              />
-            </View>
-            <View style={styles.rowContainer}>
-              <Image
-                style={styles.imageStyle}
-                source={require( '../../../assets/images/icons/icon_donation_transactions.png' )}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Show Transactions</Text>
-                <Text
-                  style={{
-                    ...styles.modalInfoText,
-                    marginTop: wp( '1.2%' ),
-                    color: Colors.lightTextColor,
-                  }}
-                >
-                  Show / hide transactions on web view
-                </Text>
-              </View>
-              <CurrencyKindToggleSwitch
-                changeSettingToggle={true}
-                thumbSize={wp( '6%' )}
-                isNotImage={true}
-                trackColor={Colors.lightBlue}
-                thumbColor={
-                  isDonationTransactionEnable ? Colors.blue : Colors.white
-                }
-                onpress={() =>
-                  setIsDonationTransactionEnable( ( prevState ) => !prevState )
-                }
-                isOn={isDonationTransactionEnable}
-              />
-            </View>
-
-            <View style={styles.rowContainer}>
-              <View
-                style={{
-                  ...styles.circleShapeView,
-                  backgroundColor: Colors.lightBlue,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue( 20 ),
-                    color: Colors.white,
-                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
-                  }}
-                >
-                  @
-                </Text>
-              </View>
-
-              <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Hide Transaction ID</Text>
-                <Text
-                  style={{
-                    ...styles.modalInfoText,
-                    marginTop: wp( '1.2%' ),
-                    color: Colors.lightTextColor,
-                  }}
-                >
-                  Show / hide transaction ID on the web view
-                </Text>
-              </View>
-              <CurrencyKindToggleSwitch
-                changeSettingToggle={true}
-                thumbSize={wp( '6%' )}
-                isNotImage={true}
-                trackColor={Colors.lightBlue}
-                thumbColor={hideTxDetails ? Colors.blue : Colors.white}
-                onpress={() => setHideTxDetails( ( prevState ) => !prevState )}
-                isOn={hideTxDetails}
               />
             </View>
 
