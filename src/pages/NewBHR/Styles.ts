@@ -8,6 +8,27 @@ import {
 } from "react-native-responsive-screen";
 
 export default StyleSheet.create({
+  otpText: {
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue(23),
+    // margin: 9,
+    alignSelf: 'center'
+  },
+  otpTextView: {
+    height: wp('9%'),
+    width: wp('9%'),
+    backgroundColor: Colors.white,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin:5
+  },
+  otpView: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: hp('5%'),
+  },
   cardIconImage: {
     width: 14,
     height: 16,
