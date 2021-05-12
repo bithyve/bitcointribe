@@ -9,8 +9,7 @@ import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAcc
 import SwanAccountCreationStatus from '../../../../common/data/enums/SwanAccountCreationStatus'
 import useSwanIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import BottomInfoBox from '../../../../components/BottomInfoBox'
-import { fetchSwanAuthenticationUrl, clearSwanCache, createTempSwanAccountShell, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
-import { addNewAccountShell }  from '../../../../store/actions/accounts'
+import { fetchSwanAuthenticationUrl, clearSwanCache, createTempSwanAccountInfo, updateSwanStatus } from '../../../../store/actions/SwanIntegration'
 import openLink from '../../../../utils/OpenLink'
 export type Props = {
   navigation: any;
@@ -23,7 +22,7 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     return navigation.getParam( 'currentSubAccount' )
   }, [ navigation.state.params ] )
 
-  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl } = useSwanIntegrationState()
+  const { hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated } = useSwanIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
   const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from  Swan' )
@@ -51,12 +50,12 @@ const NewSwanAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   }
 
   useEffect( ()=>{
-    if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
+    if( !hasRedeemSwanCodeForTokenInitiated && hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
       openLink( swanAuthenticationUrl )
       dispatch( updateSwanStatus( SwanAccountCreationStatus.ADD_NEW_ACCOUNT_INITIATED ) )
-      dispatch( addNewAccountShell( currentSubAccount ) )
+      dispatch( createTempSwanAccountInfo( currentSubAccount ) )
     }
-  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
+  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
 
   return (
     <View style={styles.rootContainer}>

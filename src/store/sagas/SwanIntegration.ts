@@ -15,8 +15,8 @@ import {
   LINK_SWAN_WALLET,
   linkSwanWalletSucceeded,
   linkSwanWalletFailed,
-  tempSwanAccountShellCreated,
-  CREATE_TEMP_SWAN_ACCOUNT_SHELL
+  tempSwanAccountInfoSaved,
+  CREATE_TEMP_SWAN_ACCOUNT_INFO
 } from '../actions/SwanIntegration'
 
 import {
@@ -98,6 +98,13 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield put( redeemSwanCodeForTokenSucceeded( {
     swanAuthenticatedToken: access_token
   } ) )
+  const ST = yield select(
+    ( state ) => state.swanIntegration
+  )
+  console.log( 'SUX-S ', ST.swanAccountDetails, {
+    ST
+  } )
+
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
       data: {
@@ -116,22 +123,22 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
 
   yield put( createWithdrawalWalletOnSwanInitiated( payload.data.minBtcThreshold ) )
 
-  const { swanAuthenticatedToken, swanAccountShell, minBtcThreshold } = yield select(
+  const { swanAuthenticatedToken, minBtcThreshold } = yield select(
     ( state ) => state.swanIntegration
   )
-  const { currentSwanSubAccount } = yield select(
-    ( state ) => state.accounts
+  const { swanAccountDetails } = yield select(
+    ( state ) => state.swanIntegration
   )
   console.log( {
-    currentSwanSubAccount
+    swanAccountDetails
   } )
-  const swanXpub = currentSwanSubAccount.xPub
+  const swanXpub = swanAccountDetails.xPub
   let swanCreateResponse
   try {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
       access_token: swanAuthenticatedToken,
       extendedPublicKey: swanXpub,
-      displayName: 'BTC purchased from Swan'
+      displayName: swanAccountDetails.accountName || 'BTC purchased from Swan'
     } )
   }
   catch( e )  {
@@ -150,22 +157,19 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   yield put( createWithdrawalWalletOnSwanSucceeded( {
     swanWalletId: swanWithdrawalResponse.data.item.id
   } ) )
-  yield put( updateSwanStatus( SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY ) )
 }
 
-function* addTempSwanAccountShell( { payload: subAccountInfo, }: {
+function* createTempSwanAccountInfo( { payload: subAccountInfo, }: {
   payload: SubAccountDescribing;
 } ) {
-  console.log( 'addTempSwanAcc called!' )
   const accountsState: AccountsState = yield select( state => state.accounts )
   const network = accountsState[ REGULAR_ACCOUNT ].service.hdWallet.network
 
-  const bitcoinUnit = BitcoinUnit.SATS
-
   try {
     const swanAccountDetails = {
-      accountName: subAccountInfo.customDisplayName,
-      accountDescription: subAccountInfo.customDescription,
+      accountName: subAccountInfo.customDisplayName || subAccountInfo.defaultTitle,
+      accountDescription: subAccountInfo.customDescription || subAccountInfo.defaultDescription,
+      xPub: ''
     }
     const service = yield select(
       ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
@@ -176,28 +180,17 @@ function* addTempSwanAccountShell( { payload: subAccountInfo, }: {
       swanAccountDetails
     )
 
-    const subAccountId = res.data.accountId
     const subAccountXpub = res.data.accountXpub
-    const subAccountInstanceNum = res.data.accountNumber
-
-    subAccountInfo.id = subAccountId
     subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
-    subAccountInfo.instanceNumber = subAccountInstanceNum
+    swanAccountDetails.xPub = Bitcoin.generateYpub( subAccountXpub, network )
 
-    const swanAccountShell = new AccountShell( {
-      unit: bitcoinUnit,
-      primarySubAccount: subAccountInfo,
-      displayOrder: 1,
-    } )
-
-    yield put( tempSwanAccountShellCreated( swanAccountShell ) )
-
+    yield put( tempSwanAccountInfoSaved( swanAccountDetails ) )
   } catch ( error ) {
-    console.log( 'addNewAccountShell saga::error: ' + error )
+    console.log( 'createTempSwanAccountInfo saga::error: ' + error )
   }
 }
 
-export const addTempSwanAccountShellWatcher = createWatcher( addTempSwanAccountShell, CREATE_TEMP_SWAN_ACCOUNT_SHELL )
+export const addTempSwanAccountInfoWatcher = createWatcher( createTempSwanAccountInfo, CREATE_TEMP_SWAN_ACCOUNT_INFO )
 
 function* linkSwanWalletWorker( { payload } ) {
   /*

@@ -180,7 +180,8 @@ export default function Login( props ) {
           if (
             releaseCases &&
             releaseCases.build == res.data.releases[ 0 ].build &&
-            releaseCases.ignoreClick
+            releaseCases.ignoreClick &&
+            releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {

@@ -12,7 +12,7 @@ import {
   LINK_SWAN_WALLET_SUCCEEDED,
   LINK_SWAN_WALLET_COMPLETED,
   LINK_SWAN_WALLET,
-  TEMP_SWAN_ACCOUNT_SHELL_CREATED
+  TEMP_SWAN_ACCOUNT_INFO_SAVED
 } from '../actions/SwanIntegration'
 
 
@@ -44,7 +44,7 @@ export type SwanIntegrationState = {
   hasSwanAccountCreationInitiated: boolean | null,
   hasSwanAccountCreationCompleted: boolean | null,
   hasSwanAccountCreationSucceeded: boolean | null,
-  swanAccountShell: Object | null, // temperory swan account shell object
+  swanAccountDetails: Object | null, // temperory swan account shell object
 
   // TODO:: Reducers for linking Hexa Wallet with Swan Withdrawal Wallet
 
@@ -94,12 +94,12 @@ const INITIAL_STATE: SwanIntegrationState = {
   hasRedeemSwanCodeForTokenCompleted: false,
   hasRedeemSwanCodeForTokenInitiated: false,
 
-  minBtcThreshold: 0.0005,
+  minBtcThreshold: 0.02,
   hasSwanAccountCreationSucceeded: false,
   hasSwanAccountCreationCompleted: false,
   hasSwanAccountCreationInitiated: false,
 
-  swanAccountShell: null,
+  swanAccountDetails: null,
 
   hasCreateWithdrawalWalletOnSwanSucceeded: false,
   hasCreateWithdrawalWalletOnSwanCompleted: false,
@@ -132,7 +132,6 @@ const INITIAL_STATE: SwanIntegrationState = {
 const reducer = ( state = INITIAL_STATE, action ) => {
   switch ( action.type ) {
       case UPDATE_SWAN_STATUS:
-        console.log( 'action.payload.data ', action.payload.data )
         return {
           ...state,
           swanAccountCreationStatus: action.payload.data
@@ -145,7 +144,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
 
       case FETCH_SWAN_AUTHENTICATION_URL_STARTED:
         return {
-          ...INITIAL_STATE,
+          ...state,
           hasFetchSwanAuthenticationUrlInitiated: true
         }
 
@@ -186,9 +185,10 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
+        console.log( 'action.payload.data CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED', action.payload.data )
         return {
           ...state,
-          minBtcThreshold: action.payload.data.minBtcThreshold || 0.0005,
+          minBtcThreshold: action.payload.data || 0.02,
           hasCreateWithdrawalWalletOnSwanInitiated: true,
         }
 
@@ -201,10 +201,13 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           swanWalletId: action.payload.data.swanWalletId
         }
 
-      case TEMP_SWAN_ACCOUNT_SHELL_CREATED:
+      case TEMP_SWAN_ACCOUNT_INFO_SAVED:
+        console.log( '@@@=> TEMP_SWAN_ACCOUNT_INFO_SAVED ', {
+          swanAccountDetails: action.payload.data
+        } )
         return {
           ...state,
-          swanAccountShell: action.payload.swanAccountShell
+          swanAccountDetails: action.payload.data
         }
 
       case LINK_SWAN_WALLET:
