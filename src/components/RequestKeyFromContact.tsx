@@ -85,19 +85,15 @@ export default function RequestKeyFromContact(props) {
 		setContactName(contactName)
 	}, [Contact])
 
-	const shareOption = async (link) => {
-		console.log('shareOption');
-
+	const shareOption = async () => {
 		try {
 			const result = await Share.share({
 				message:
-					`${link}`,
+					`${shareLink}`,
 			});
 
 			if (result.action === Share.sharedAction) {
 				props.onPressShare()
-				console.log('result.activityType', result.activityType);
-
 				if (result.activityType) {
 					// shared with activity type of result.activityType
 				} else {
@@ -105,11 +101,9 @@ export default function RequestKeyFromContact(props) {
 				}
 			} else if (result.action === Share.dismissedAction) {
 				// dismissed
-				console.log('dismissed');
-
 			}
 		} catch (error) {
-			console.log(error);
+			// console.log(error);
 
 		}
 	}
@@ -151,47 +145,40 @@ export default function RequestKeyFromContact(props) {
 				}}
 			>
 				{props.isModal &&
-				<View style={{
-					flex: 1, flexDirection: 'row', alignItems: 'flex-start'
-				}}>
-					<TouchableOpacity
-						onPress={() => props.onPressBack()}
-						// hitSlop={{
-						//   left: 20, bottom: 20, right: 20
-						// }}
-						style={{
-							height: 30, width: 30, justifyContent: 'center'
-						}}
-					>
-						<FontAwesome
-							name="long-arrow-left"
-							color={Colors.blue}
-							size={17}
-						/>
-					</TouchableOpacity>
 					<View style={{
-						flex: 1, marginLeft: 5
+						flex: 1, flexDirection: 'row', alignItems: 'flex-start'
 					}}>
-						{props.headerText &&
-						<Text style={styles.modalHeaderTitleText}>
-							{props.headerText}
-            </Text>
-						}
-						{props.subHeaderText && 
-						<Text
-							style={{
-								color: Colors.textColorGrey,
-								fontSize: RFValue(12),
-								fontFamily: Fonts.FiraSansRegular,
-								paddingTop: 5,
+						<AppBottomSheetTouchableWrapper
+							onPress={() => {
+								props.onPressBack();
 							}}
+							style={{ height: 30, width: 30, justifyContent: 'center' }}
 						>
-							{props.subHeaderText}
-            </Text>
-					}
+							<FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+						</AppBottomSheetTouchableWrapper>
+						<View style={{
+							flex: 1, marginLeft: 5
+						}}>
+							{props.headerText &&
+								<Text style={styles.modalHeaderTitleText}>
+									{props.headerText}
+								</Text>
+							}
+							{props.subHeaderText &&
+								<Text
+									style={{
+										color: Colors.textColorGrey,
+										fontSize: RFValue(12),
+										fontFamily: Fonts.FiraSansRegular,
+										paddingTop: 5,
+									}}
+								>
+									{props.subHeaderText}
+								</Text>
+							}
+						</View>
 					</View>
-				</View>
-			}
+				}
 			</View>
 			<View style={{
 				marginHorizontal: 20,
@@ -207,7 +194,7 @@ export default function RequestKeyFromContact(props) {
 					Contact={Contact} />
 			</View>
 			<ScrollView contentContainerStyle={{
-				flex: 1 
+				flex: 1
 			}}>
 				<View
 					style={{
@@ -216,7 +203,7 @@ export default function RequestKeyFromContact(props) {
 						justifyContent: 'center',
 						alignItems: 'center',
 						marginTop: !props.isModal ? hp('2%') : hp('1.7%'),
-						marginBottom: !props.isModal ? hp('2%')  : hp('1.7%'),
+						marginBottom: !props.isModal ? hp('2%') : hp('1.7%'),
 					}}
 				>
 					<View style={{
@@ -234,13 +221,13 @@ export default function RequestKeyFromContact(props) {
 							)}
 					</View>
 					<CopyThisText
-						openLink={shareOption}	
+						openLink={shareOption}
 						backgroundColor={Colors.backgroundColor1}
 						text={shareLink ? shareLink : 'Creating Link....'}
 					/>
 				</View>
 			</ScrollView>
-			
+
 		</View>
 	)
 }
