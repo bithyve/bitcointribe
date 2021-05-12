@@ -3,8 +3,8 @@ import {
   View,
   Image,
   Text,
-  Clipboard,
 } from 'react-native';
+import Clipboard from '@react-native-clipboard/clipboard'
 import Colors from '../common/Colors';
 import { RFValue } from 'react-native-responsive-fontsize';
 import Toast from '../components/Toast';
@@ -16,8 +16,8 @@ import {
 
 export default function CopyThisText(props) {
   function writeToClipboard() {
-    Clipboard.setString(props.text);
-    Toast('Copied Successfully');
+      Clipboard.setString(props.text);
+      Toast('Copied Successfully');
   }
 
   return (

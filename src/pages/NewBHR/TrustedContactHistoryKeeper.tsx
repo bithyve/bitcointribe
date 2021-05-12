@@ -68,6 +68,7 @@ import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -315,10 +316,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
         onPressContinue={async ( selectedContacts ) => {
           Keyboard.dismiss()
           getContacts( selectedContacts )
+          createGuardian()
         }}
       />
     )
-  }, [ LoadContacts, getContacts ] )
+  }, [ LoadContacts, getContacts, createGuardian ] )
 
   const renderTrustedContactsHeader = useCallback( () => {
     return (
@@ -771,7 +773,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     } else if ( chosenContact.emails && chosenContact.emails.length ) {
       info = chosenContact.emails[ 0 ].email
     }
-
     const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
@@ -830,7 +831,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
-
     dispatch(
       addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
     )
@@ -917,23 +917,39 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const SendShareModalFunction = useCallback( () => {
     if ( chosenContact && !isEmpty( chosenContact ) ) {
       return (
-        <SendShareModal
-          contact={chosenContact ? chosenContact : null}
-          index={index}
-          textHeader={'Sharing Recovery Key with'}
-          onPressViaQr={( index ) => {
-            createGuardian()
-            if ( SendViaQRBottomSheet.current )
-              ( SendViaQRBottomSheet as any ).current.snapTo( 1 );
+        <RequestKeyFromContact
+        isModal={true}
+        headerText={`Send Recovery Key${'\n'}to contact`}
+        subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}
+        contactText={'Sharing Recovery Key with'}
+        contact={chosenContact}
+        QR={trustedQR}
+        link={trustedLink}
+        contactEmail={''}
+        onPressBack={() => {
             ( shareBottomSheet as any ).current.snapTo( 0 )
-          }}
-          onPressViaLink={( index ) => {
-            createGuardian()
-            if ( SendViaLinkBottomSheet.current )
-              ( SendViaLinkBottomSheet as any ).current.snapTo( 1 );
+            props.navigation.goBack()
+        }}
+        onPressDone={() => {
+          ( shareBottomSheet as any ).current.snapTo( 0 )
+        }}
+        onPressShare={() => {
+          if ( isOTPType ) {
+            setTimeout( () => {
+              setRenderTimer( true )
+            }, 2 );
             ( shareBottomSheet as any ).current.snapTo( 0 )
-          }}
-        />
+            ( shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
+          }
+          else {
+            ( shareBottomSheet as any ).current.snapTo( 0 )
+            const popAction = StackActions.pop( {
+              n: isChange ? 2 : 1
+            } )
+            props.navigation.dispatch( popAction )
+          }
+        }}
+      />
       )
     }
   }, [ chosenContact, index ] )
@@ -1059,7 +1075,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
     }
-    console.log( 'changeIndex', changeIndex, type )
     if ( type == 'contact' ) {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
@@ -1274,7 +1289,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ref={shareBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '65%' ),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '85%' ) : hp( '90%' ),
         ]}
         renderContent={SendShareModalFunction}
         renderHeader={SendModalFunction}
