@@ -12,7 +12,6 @@ import {
   FETCH_EPHEMERAL_CHANNEL,
   updateEphemeralChannel,
   TRUSTED_CHANNELS_SETUP_SYNC,
-  paymentDetailsFetched,
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
   updateTrustedContactsInfoLocally,
@@ -65,7 +64,6 @@ import { AccountsState } from '../reducers/accounts'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import AccountShell from '../../common/data/models/AccountShell'
 import config from '../../bitcoin/HexaConfig'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import moment from 'moment'
 import semver from 'semver'
@@ -209,76 +207,76 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   } else{
 
     // update ephemeral data (if payment details are available)
-    const { paymentDetails } = contactInfo
-    let paymentURI, trustedPaymentURI
-    if( paymentDetails ){
-      const { amount, address }  = paymentDetails
-      paymentURI = regularAccount.getPaymentURI( address, {
-        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-      } ).paymentURI
-      trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
-        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-      } ).paymentURI
+    // const { paymentDetails } = contactInfo
+    // let paymentURI, trustedPaymentURI
+    // if( paymentDetails ){
+    //   const { amount, address }  = paymentDetails
+    //   paymentURI = regularAccount.getPaymentURI( address, {
+    //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+    //   } ).paymentURI
+    //   trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
+    //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+    //   } ).paymentURI
 
-      data.paymentDetails =  {
-        trusted: {
-          address: trustedReceivingAddress,
-          paymentURI: trustedPaymentURI,
-        },
-        alternate: {
-          address: address,
-          paymentURI,
-        },
-      }
-    }
+    //   data.paymentDetails =  {
+    //     trusted: {
+    //       address: trustedReceivingAddress,
+    //       paymentURI: trustedPaymentURI,
+    //     },
+    //     alternate: {
+    //       address: address,
+    //       paymentURI,
+    //     },
+    //   }
+  }
 
-    if ( !trustedContact ) {
-      // create emphemeral channel(initiating TC)
-      yield put( updateEphemeralChannel( contactInfo, data ) )
-    } else {
-      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+  if ( !trustedContact ) {
+    // create emphemeral channel(initiating TC)
+    yield put( updateEphemeralChannel( contactInfo, data ) )
+  } else {
+    const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+    const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
       trustedContact.ephemeralChannel.initiatedAt &&
       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
       config.TC_REQUEST_EXPIRY? true: false
 
-      if ( !hasTrustedChannel ){
-        if( isEphemeralChannelExpired ){
-          // re-initiating expired Ephemeral Channel
-          yield put(
-            updateEphemeralChannel(
-              contactInfo,
-              trustedContact.ephemeralChannel.data[ 0 ],
-            ),
-          )
-        }
-        else{
-          // if payment details are changed(on receive); re-upload the data
-          if( paymentDetails && trustedContact.ephemeralChannel ) {
-            const { address }  = paymentDetails
-            const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
-            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
-            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-              .address === address &&
-            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-              .paymentURI === paymentURI ? true: false
+    if ( !hasTrustedChannel ){
+      if( isEphemeralChannelExpired ){
+        // re-initiating expired Ephemeral Channel
+        yield put(
+          updateEphemeralChannel(
+            contactInfo,
+            trustedContact.ephemeralChannel.data[ 0 ],
+          ),
+        )
+      }
+      else{
+        // if payment details are changed(on receive); re-upload the data
+        //   if( paymentDetails && trustedContact.ephemeralChannel ) {
+        //     const { address }  = paymentDetails
+        //     const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
+        //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
+        //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+        //       .address === address &&
+        //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+        //       .paymentURI === paymentURI ? true: false
 
-            if ( !isPaymentDetailsSame ){
-              const updatedPaymentDetails = {
-                trusted: {
-                  address: trustedReceivingAddress,
-                  paymentURI: trustedPaymentURI,
-                },
-                alternate: {
-                  address: paymentDetails.address,
-                  paymentURI,
-                },
-              }
-              trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
-              yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
-            }
-          }
-        }
+        //     if ( !isPaymentDetailsSame ){
+        //       const updatedPaymentDetails = {
+        //         trusted: {
+        //           address: trustedReceivingAddress,
+        //           paymentURI: trustedPaymentURI,
+        //         },
+        //         alternate: {
+        //           address: paymentDetails.address,
+        //           paymentURI,
+        //         },
+        //       }
+        //       trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
+        //       yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
+        //     }
+        //   }
+        // }
       }
     }
   }
@@ -579,14 +577,14 @@ function* updateEphemeralChannelWorker( { payload } ) {
       res
     } )
     if ( res.status === 200 ) {
-      const ephData: EphemeralDataElements = res.data.data
-      if ( ephData && ephData.paymentDetails ) {
-      // using trusted details on TC approval
-        const { trusted } = ephData.paymentDetails
-        yield put( paymentDetailsFetched( {
-          ...trusted
-        } ) )
-      }
+      // const ephData: EphemeralDataElements = res.data.data
+      // if ( ephData && ephData.paymentDetails ) {
+      // // using trusted details on TC approval
+      //   const { trusted } = ephData.paymentDetails
+      //   yield put( paymentDetailsFetched( {
+      //     ...trusted
+      //   } ) )
+      // }
 
       yield put(
         ephemeralChannelUpdated(
@@ -791,13 +789,13 @@ function* fetchEphemeralChannelWorker( { payload } ) {
   if ( res.status === 200 ) {
     const data: EphemeralDataElements = res.data.data
     if ( publicKey ) {
-      if ( data && data.paymentDetails ) {
-        // using alternate details on TC rejection
-        const { alternate } = data.paymentDetails
-        yield put( paymentDetailsFetched( {
-          ...alternate
-        } ) )
-      }
+      // if ( data && data.paymentDetails ) {
+      //   // using alternate details on TC rejection
+      //   const { alternate } = data.paymentDetails
+      //   yield put( paymentDetailsFetched( {
+      //     ...alternate
+      //   } ) )
+      // }
 
       return
     }

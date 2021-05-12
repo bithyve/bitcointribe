@@ -60,10 +60,10 @@ export type TrustedContactsState = {
 
   trustedChannel: { [contactName: string]: { updated: boolean; data?: unknown } };
 
-  paymentDetails: {
-    address?: string;
-    paymentURI?: string;
-  };
+  // paymentDetails: {
+  //   address?: string;
+  //   paymentURI?: string;
+  // };
 
   loading: {
     updateEphemeralChannel: boolean;
@@ -85,7 +85,7 @@ const initialState: TrustedContactsState = {
   approvedTrustedContacts: null,
   ephemeralChannel: null,
   trustedChannel: null,
-  paymentDetails: null,
+  // paymentDetails: null,
   loading: {
     updateEphemeralChannel: false,
     updateTrustedChannel: false,
@@ -189,17 +189,17 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
           },
         }
 
-      case PAYMENT_DETAILS_FETCHED:
-        return {
-          ...state,
-          paymentDetails: action.payload.paymentDetails,
-        }
+        // case PAYMENT_DETAILS_FETCHED:
+        //   return {
+        //     ...state,
+        //     paymentDetails: action.payload.paymentDetails,
+        //   }
 
-      case CLEAR_PAYMENT_DETAILS:
-        return {
-          ...state,
-          paymentDetails: null,
-        }
+        // case CLEAR_PAYMENT_DETAILS:
+        //   return {
+        //     ...state,
+        //     paymentDetails: null,
+        //   }
 
       case SWITCH_TC_LOADING:
         return {

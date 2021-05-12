@@ -358,16 +358,16 @@ export interface EphemeralDataElements {
     otp: string;
     encryptedKey: string;
   };
-  paymentDetails?: {
-    trusted?: {
-      address?: string;
-      paymentURI?: string;
-    };
-    alternate?: {
-      address?: string;
-      paymentURI?: string;
-    };
-  };
+  // paymentDetails?: {
+  //   trusted?: {
+  //     address?: string;
+  //     paymentURI?: string;
+  //   };
+  //   alternate?: {
+  //     address?: string;
+  //     paymentURI?: string;
+  //   };
+  // };
   trustedAddress?: string;
   trustedTestAddress?: string;
   restoreOf?: string;

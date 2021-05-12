@@ -257,20 +257,20 @@ export const trustedChannelFetched = ( contactName: string, data: any ) => {
   }
 }
 
-export const paymentDetailsFetched = ( paymentDetails ) => {
-  return {
-    type: PAYMENT_DETAILS_FETCHED,
-    payload: {
-      paymentDetails
-    },
-  }
-}
+// export const paymentDetailsFetched = ( paymentDetails ) => {
+//   return {
+//     type: PAYMENT_DETAILS_FETCHED,
+//     payload: {
+//       paymentDetails
+//     },
+//   }
+// }
 
-export const clearPaymentDetails = () => {
-  return {
-    type: CLEAR_PAYMENT_DETAILS,
-  }
-}
+// export const clearPaymentDetails = () => {
+//   return {
+//     type: CLEAR_PAYMENT_DETAILS,
+//   }
+// }
 
 export const switchTCLoading = ( beingLoaded ) => {
   return {
