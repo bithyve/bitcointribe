@@ -121,6 +121,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
+    scheme?: string,
   };
   encryptedStaticNonPMDD?: string;
 }

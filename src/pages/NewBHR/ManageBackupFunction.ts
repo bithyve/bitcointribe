@@ -250,6 +250,15 @@ const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
   const levelData = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
+    if( element.status != 'notSetup' ){
+      if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ) {
+        levelData[ i ].status = 'good'
+      } else if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ) {
+        levelData[ i ].status = 'bad'
+      } else if( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) {
+        levelData[ i ].status = 'bad'
+      }
+    }
     if( i == 0 ){
       // Not SETUP
       if( levelData[ i ].status == 'notSetup' ) {
