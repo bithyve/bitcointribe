@@ -23,7 +23,7 @@ export default function RequestKeyFromContact(props) {
 	const [contactName, setContactName] = useState('')
 	const [shareLink, setShareLink] = useState('')
 	// console.log('props.QR RequestKeyFromContact > ', props.QR);
-	
+
 	const contact = props.contact
 	const [serviceType, setServiceType] = useState(
 		props.serviceType ? props.serviceType : '',
@@ -132,7 +132,7 @@ export default function RequestKeyFromContact(props) {
 				flex: 1
 			}}>
 				<View
-					style={[styles.mainContainer, 
+					style={[styles.mainContainer,
 					{
 						marginTop: !props.isModal ? hp('2%') : hp('1.7%'),
 						marginBottom: !props.isModal ? hp('2%') : hp('1.7%'),
