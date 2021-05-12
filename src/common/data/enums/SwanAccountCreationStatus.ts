@@ -16,14 +16,20 @@ enum SwanAccountCreationStatus {
   BUY_MENU_CLICKED = 'BUY_MENU_CLICKED',
 
   /**
-   * User needs to login to Swan to authenticate.
+   * Hexa is communicating with Swan to authenticate and create a withdrawal wallet.
    */
    AUTHENTICATION_IN_PROGRESS = 'AUTHENTICATION_IN_PROGRESS',
 
   /**
-   * Hexa account Swan wallet have been linked
+   * Hexa account has been linked to Swan wallet
   */
   WALLET_LINKED_SUCCESSFULLY = 'WALLET_LINKED_SUCCESSFULLY',
+
+  /**
+   * Swan account already exists
+   */
+
+   ACCOUNT_CREATED = 'ACCOUNT_CREATED',
 
   /**
    * Error encountered

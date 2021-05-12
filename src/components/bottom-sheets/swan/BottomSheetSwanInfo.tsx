@@ -13,7 +13,7 @@ import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountShell } from '../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountInfo, updateSwanStatus } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
@@ -22,6 +22,7 @@ import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
 import { ListItem } from 'react-native-elements'
 import { addNewAccountShell } from '../../../store/actions/accounts'
+let swanAccountCount = 0
 
 type Props = {
   swanDeepLinkContent: string | null;
@@ -30,12 +31,13 @@ type Props = {
 
 const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSetting }: Props ) => {
   const dispatch = useDispatch()
-  const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, hasFetchSwanAuthenticationUrlCompleted, swanAuthenticationUrl, swanAuthenticatedToken, hasRedeemSwanCodeForTokenInitiated, hasRedeemSwanCodeForTokenSucceeded, hasRedeemSwanCodeForTokenCompleted, hasCreateWithdrawalWalletOnSwanSucceeded, hasCreateWithdrawalWalletOnSwanCompleted, hasCreateWithdrawalWalletOnSwanInitiated } = useSwanIntegrationState()
+  const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-
+  const { currentSwanSubAccount } = useAccountsState()
   let swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
   let swanTitle = 'Buy bitcoin with Swan'
-
+  let accountName = ''
+  let accountDescription = ''
   function handleProceedButtonPress() {
     if ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) {
       if( !hasFetchSwanAuthenticationUrlInitiated ) {
@@ -51,14 +53,15 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }
 
   useEffect( ()=>{
-
-    console.log( '@@@=> XXX', swanAccountCreationStatus )
-    if( hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
+    if( ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) && hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
       openLink( swanAuthenticationUrl )
     }
-  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl ] )
+  }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
 
   if( !hasRedeemSwanCodeForTokenInitiated && swanAccountCreationStatus == SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) {
+    console.log( 'redeem', {
+      hasRedeemSwanCodeForTokenInitiated
+    } )
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
   const renderFooter = () => {
@@ -82,6 +85,19 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           )
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
+          console.log( 'inside WALLET_LINKED_SUCCESSFULLY' )
+          if( swanAccountCount<1 ) {
+            const newSubAccount = new ExternalServiceSubAccountInfo( {
+              instanceNumber: 1,
+              defaultTitle: swanAccountDetails.accountName,
+              defaultDescription: swanAccountDetails.accountDescription,
+              serviceAccountKind: ServiceAccountKind.SWAN,
+            } )
+            dispatch( addNewAccountShell( newSubAccount ) )
+            swanAccountCount++
+          }
+          return renderSuccessButton()
+        case SwanAccountCreationStatus.ACCOUNT_CREATED:
           return renderSuccessButton()
         default:
           return renderProceedButton()
@@ -100,8 +116,16 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           swanMessage = 'Hexa Wallet is creating a Swan account to store your bitcoin purchased from Swan. This account will be linked to your Swan withdrawal wallet'
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          swanMessage = 'Sats in your Swan withdrawal wallet will be transfered to Hexa Wallet.\nSwan will transfer the sats once 0.02 BTC accumulate in your withdrawal wallet\n'
+          swanMessage = 'Sats in your Swan withdrawal wallet will be transfered to Hexa Wallet.\nSwan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
           swanTitle = 'Successfully linked Hexa Wallet to your Swan Account'
+          accountName = swanAccountDetails.accountName
+          accountDescription = swanAccountDetails.accountDescription
+          break
+        case SwanAccountCreationStatus.ACCOUNT_CREATED:
+          swanMessage = 'Swan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
+          swanTitle = 'Hexa Wallet and your Swan Account are linked'
+          accountName = currentSwanSubAccount.defaultTitle
+          accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
           swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
@@ -110,12 +134,15 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     return (
       <View style={styles.successModalHeaderView}>
         <Text style={styles.modalTitleText}>{swanTitle}</Text>
-        {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY ) ? renderAccount() : null}
         <Text style={{
           ...styles.modalInfoText,
           marginTop: wp( 1.5 ),
           marginBottom: wp( 5 ),
         }}>{swanMessage}</Text>
+        {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
+          ||
+          swanAccountCreationStatus == SwanAccountCreationStatus.ACCOUNT_CREATED ) ? renderAccount() : null}
+
       </View>
     )
   }
@@ -139,14 +166,14 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
             style={ListStyles.infoHeaderSubtitleText}
             numberOfLines={1}
           >
-            bitcoin will be transferred to
+            {accountDescription}
           </ListItem.Subtitle>
 
           <ListItem.Title
             style={styles.destinationTitleText}
             numberOfLines={1}
           >
-            Swan Account
+            {accountName}
           </ListItem.Title>
         </ListItem.Content>
       </View>

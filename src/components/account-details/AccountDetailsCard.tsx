@@ -47,6 +47,8 @@ function backgroundImageForAccountKind(
               return require( '../../assets/images/carouselImages/wyre_account_background.png' )
             case( ServiceAccountKind.RAMP ):
               return require( '../../assets/images/carouselImages/ramp_account_background.png' )
+            case( ServiceAccountKind.SWAN ):
+              return require( '../../assets/images/carouselImages/swan_account_background.png' )
         }
       default:
         return require( '../../assets/images/carouselImages/savings_account_background.png' )
@@ -69,6 +71,8 @@ function shadowColorForAccountKind( primarySubAccount: SubAccountDescribing ): s
               return Colors.danube
             case ( ServiceAccountKind.RAMP ):
               return Colors.riptide
+            case ( ServiceAccountKind.SWAN ):
+              return Colors.kashmirBlue
         }
       default:
         return Colors.borderColor

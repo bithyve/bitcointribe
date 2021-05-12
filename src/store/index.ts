@@ -129,7 +129,7 @@ import {
   fetchSwanAuthenticationUrlWatcher,
   redeemSwanCodeForTokenWatcher,
   createWithdrawalWalletOnSwanWatcher,
-  addTempSwanAccountShellWatcher
+  addTempSwanAccountInfoWatcher
 } from './sagas/SwanIntegration'
 
 import {
@@ -358,7 +358,7 @@ const rootSaga = function* () {
     fetchSwanAuthenticationUrlWatcher,
     redeemSwanCodeForTokenWatcher,
     createWithdrawalWalletOnSwanWatcher,
-    addTempSwanAccountShellWatcher,
+    addTempSwanAccountInfoWatcher,
 
     // Wyre Integration
     fetchWyreReservationWatcher,
