@@ -1,5 +1,5 @@
 import { put, call, select } from 'redux-saga/effects'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_DONATION_NOTE, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'

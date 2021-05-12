@@ -5,10 +5,10 @@ import {
   View,
   TouchableOpacity,
   StatusBar,
-  AsyncStorage,
   Platform,
   BackHandler
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
@@ -172,9 +172,7 @@ export default function Login( props ) {
       .then( async ( res ) => {
         // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
-        // JSON.parse(
-        //   await AsyncStorage.getItem('releaseCases'),
-        // );
+
         if (
           res.data.releases.length &&
           res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
@@ -182,7 +180,8 @@ export default function Login( props ) {
           if (
             releaseCases &&
             releaseCases.build == res.data.releases[ 0 ].build &&
-            releaseCases.ignoreClick
+            releaseCases.ignoreClick &&
+            releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {

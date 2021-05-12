@@ -132,6 +132,8 @@ PODS:
   - nanopb/decode (2.30906.0)
   - nanopb/encode (2.30906.0)
   - PDFGenerator (3.1.0)
+  - pkce-utils (0.1.0):
+    - React-Core
   - PromisesObjC (1.2.12)
   - QRCoder (1.1.0)
   - RCTRequired (0.63.3)
@@ -399,6 +401,10 @@ PODS:
     - React-Core (= 0.63.3)
     - React-cxxreact (= 0.63.3)
     - React-jsi (= 0.63.3)
+  - RNCAsyncStorage (1.15.4):
+    - React-Core
+  - RNCClipboard (1.7.0):
+    - React-Core
   - RNCMaskedView (0.1.10):
     - React
   - RNCPushNotificationIOS (1.8.0):
@@ -479,6 +485,7 @@ DEPENDENCIES:
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - jail-monkey (from `../node_modules/jail-monkey`)
   - PDFGenerator
+  - pkce-utils (from `../node_modules/pkce-utils`)
   - QRCoder
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
@@ -516,6 +523,8 @@ DEPENDENCIES:
   - React-RCTText (from `../node_modules/react-native/Libraries/Text`)
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNCClipboard (from `../node_modules/@react-native-clipboard/clipboard`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
   - "RNCPushNotificationIOS (from `../node_modules/@react-native-community/push-notification-ios`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
@@ -597,6 +606,8 @@ EXTERNAL SOURCES:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   jail-monkey:
     :path: "../node_modules/jail-monkey"
+  pkce-utils:
+    :path: "../node_modules/pkce-utils"
   RCTRequired:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
@@ -665,6 +676,10 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNCAsyncStorage:
+    :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNCClipboard:
+    :path: "../node_modules/@react-native-clipboard/clipboard"
   RNCMaskedView:
     :path: "../node_modules/@react-native-community/masked-view"
   RNCPushNotificationIOS:
@@ -759,6 +774,7 @@ SPEC CHECKSUMS:
   jail-monkey: 80c9e34da2cd54023e5ad08bf7051ec75bd43d5b
   nanopb: 1bf24dd71191072e120b83dd02d08f3da0d65e53
   PDFGenerator: 17d6bc525db0a3fcd156fbf00f9d1b8d5cc75d1e
+  pkce-utils: 436648edb29e323ce0ad0d9043499fb90c3574ce
   PromisesObjC: 3113f7f76903778cf4a0586bd1ab89329a0b7b97
   QRCoder: cbd2bee531cc86d286df7942334cfed94c803ae4
   RCTRequired: 48884c74035a0b5b76dbb7a998bd93bcfc5f2047
@@ -795,6 +811,8 @@ SPEC CHECKSUMS:
   React-RCTText: 65a6de06a7389098ce24340d1d3556015c38f746
   React-RCTVibration: 8e9fb25724a0805107fc1acc9075e26f814df454
   ReactCommon: 4167844018c9ed375cc01a843e9ee564399e53c3
+  RNCAsyncStorage: f47a7e8f927f7c9da947491fc55752eb9ce17f2d
+  RNCClipboard: 245417a78ab585e0d4d83926c28907e7b2bc24bd
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
   RNCPushNotificationIOS: 61a7c72bd1ebad3568025957d001e0f0e7b32191
   RNDeviceInfo: c5f8f3a456adcbba405ace475254b08febc4c095
@@ -830,4 +848,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: c98886d7e364f1f4a7318f4d6fdc05272f2195e2
 
-COCOAPODS: 1.9.3
+COCOAPODS: 1.10.1

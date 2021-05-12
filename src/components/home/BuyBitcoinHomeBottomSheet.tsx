@@ -48,16 +48,15 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false
   },
   {
-    title: 'Set up automatic buys  (COMING SOON)',
+    title: 'Set up automatic buys',
     subtitle: 'Stack sats with Swan Bitcoin',
     kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/swan_disabled.png' ),
-    disabled: true
+    imageSource: require( '../../assets/images/icons/swan.png' ),
+    disabled: false
   }
 ]
 
 const listItemKeyExtractor = ( item: BuyBitcoinBottomSheetMenuItem ) => item.title
-
 
 const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Props ) => {
 

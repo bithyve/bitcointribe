@@ -3,9 +3,9 @@ import {
   View,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -599,8 +599,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( blockReshare ) {
             ( QrBottomSheet.current as any ).snapTo( 1 )
           } else {
-            createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+            createGuardian()
           }
         }}
         onPressIgnore={() => {
@@ -639,9 +639,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( blockReshare ) {
             ( QrBottomSheet.current as any ).snapTo( 1 )
           } else {
-            const changeKeeper = true
-            createGuardian( changeKeeper );
+            const changeKeeper = true;
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+            createGuardian( changeKeeper )
           }
         }}
         onPressIgnore={() => {
@@ -869,8 +869,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           data={sortedHistory( secondaryDeviceHistory )}
           confirmButtonText={'Share Now'}
           onPressConfirm={() => {
-            createGuardian();
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+            createGuardian()
           }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {

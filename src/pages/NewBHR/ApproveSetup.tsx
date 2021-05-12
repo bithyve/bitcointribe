@@ -37,9 +37,9 @@ export default function ApproveSetup( props ) {
       }}>
         <View style={styles.successModalHeaderView}>
           <Text style={styles.headerText}>
-          Approve New Setup
+          Share Recovery Key
           </Text>
-          <Text
+          {/* <Text
             numberOfLines={2}
             style={{
               ...styles.modalInfoText,
@@ -48,7 +48,7 @@ export default function ApproveSetup( props ) {
             }}
           >
             Using the other device running Hexa, accept the link you just shared to backup Recovery Key
-          </Text>
+          </Text> */}
         </View>
         <View style={{
           flex: 1

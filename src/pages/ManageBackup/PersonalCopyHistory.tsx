@@ -6,12 +6,11 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  AsyncStorage,
   Platform,
   Alert,
   PermissionsAndroid
 } from 'react-native'
-import * as Permissions from 'expo-permissions'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,

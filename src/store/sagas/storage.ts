@@ -16,7 +16,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
 import { sendVersionUpdateNotification, walletCheckIn } from '../actions/trustedContacts'
@@ -26,6 +26,7 @@ import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
 import { updateWalletImage } from '../actions/sss'
 import { clearAccountSyncCache } from '../actions/accounts'
+import { clearSwanCache } from '../actions/SwanIntegration'
 // import { timer } from '../../utils'
 
 function* initDBWorker() {
@@ -72,6 +73,9 @@ function* fetchDBWorker() {
 
         // reset the sync status for all account shells
         yield put( clearAccountSyncCache() )
+
+        // clear Swan reducers
+        yield put( clearSwanCache() )
 
         // update wallet image on Relay
         if( newBHRFlowStarted === true ){
