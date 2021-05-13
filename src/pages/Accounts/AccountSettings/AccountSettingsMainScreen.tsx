@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
@@ -10,6 +10,14 @@ import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import AccountCheckingModal from './AccountCheckingModal'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+
+
+const SELECTABLE_VISIBILITY_OPTIONS = [
+  AccountVisibility.ARCHIVED,
+  // AccountVisibility.DURESS,   // Disabled until duress mode is implemented later
+]
 
 export type Props = {
   navigation: any;
@@ -22,6 +30,7 @@ export type SettingsListItem = {
   screenName?: string;
   screenParams?: Record<string, unknown>;
   onOptionPressed?: () => void;
+  onArchivePressed?: () => void;
 };
 
 const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
@@ -31,13 +40,18 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
-
+  
   const accountShell = useAccountShellForID( accountShellID )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-
+  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
+  const {
+    present: openArchiveModal,
+    dismiss: closeArchiveModal,
   } = useBottomSheetModal()
 
   const listItems = useMemo<SettingsListItem[]>( () => {
@@ -107,13 +121,16 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       {
         title: 'Archive Account',
         subtitle: 'Move this account out of sight and out of mind',
-        screenName: '',
+        onArchivePressed: showArchiveModal,
         imageSource: require( '../../../assets/images/icons/icon_archive.png' ),
       },
     ]
   }, [ accountShell ] )
 
   function handleListItemPress( listItem: SettingsListItem ) {
+    if (listItem.onArchivePressed) {
+      listItem.onArchivePressed()
+    }
     if ( typeof listItem.onOptionPressed === 'function' ) {
       listItem.onOptionPressed()
     } else if ( listItem.screenName !== undefined ) {
@@ -124,8 +141,57 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     }
   }
 
+  function showAccount( ) {
+    closeArchiveModal()
+  }
+
+  const checkAccountBalance = useCallback( () => {
+      openArchiveModal(
+        <AccountCheckingModal
+          isError={true}
+          onProceed={() => {
+            closeArchiveModal()
+            setTimeout( () => {
+              checkAccountBalance()
+            }, 500 )
+          }}
+          onBack={closeArchiveModal}
+          onViewAccount={showAccount}
+        />,
+        {
+          ...defaultBottomSheetConfigs,
+          snapPoints: [ 0, '40%' ],
+        },
+      )
+  }, [ openArchiveModal, closeArchiveModal ] )
+
   function handleRescanListItemSelection() {
     showRescanningPromptBottomSheet()
+  }
+
+  const showAccountArchiveBottomSheet = useCallback( () => {
+    openArchiveModal(
+      <AccountCheckingModal
+        isError={false}
+        onProceed={() => {
+          closeArchiveModal()
+        }}
+        onBack={closeArchiveModal}
+        onViewAccount={showAccount}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  }, [ openArchiveModal, closeArchiveModal ] )
+
+  function showArchiveModal() {
+    if (accountBalance.confirmed === 0) {
+    showAccountArchiveBottomSheet()
+    } else {
+      checkAccountBalance()
+    }
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
