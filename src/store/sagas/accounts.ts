@@ -863,8 +863,6 @@ function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
             description: subAccountInfo.customDescription,
             configuration: {
               displayBalance: true,
-              displayTransactions: true,
-              displayTxDetails: true,
             },
           },
         } )

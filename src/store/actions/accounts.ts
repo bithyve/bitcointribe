@@ -223,8 +223,6 @@ export const setupDonationAccount = (
   description: string,
   configuration: {
     displayBalance: boolean;
-    displayTransactions: boolean;
-    displayTxDetails: boolean;
   },
   disableAccount?: boolean
 ) => {
@@ -248,8 +246,6 @@ export const updateDonationPreferences = (
     disableAccount?: boolean;
     configuration?: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
     };
     accountDetails?: {
       donee: string;

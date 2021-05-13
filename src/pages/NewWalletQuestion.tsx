@@ -168,26 +168,28 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = () =>{
     showLoader()
-    const security = {
-      questionId: dropdownBoxValue.id,
-      question: dropdownBoxValue.question,
-      answer,
-    }
-    dispatch( setupWallet( walletName, security ) )
-    dispatch( initNewBHRFlow( true ) )
-    dispatch( setVersion( 'Current' ) )
-    const current = Date.now()
-    AsyncStorage.setItem(
-      'SecurityAnsTimestamp',
-      JSON.stringify( current ),
-    )
-    const securityQuestionHistory = {
-      created: current,
-    }
-    AsyncStorage.setItem(
-      'securityQuestionHistory',
-      JSON.stringify( securityQuestionHistory ),
-    )
+    requestAnimationFrame(() => {
+      const security = {
+        questionId: dropdownBoxValue.id,
+        question: dropdownBoxValue.question,
+        answer,
+      }
+      dispatch( setupWallet( walletName, security ) )
+      dispatch( initNewBHRFlow( true ) )
+      dispatch( setVersion( 'Current' ) )
+      const current = Date.now()
+      AsyncStorage.setItem(
+        'SecurityAnsTimestamp',
+        JSON.stringify( current ),
+      )
+      const securityQuestionHistory = {
+        created: current,
+      }
+      AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify( securityQuestionHistory ),
+      )
+    })
   }
 
   const showLoader = () => {
