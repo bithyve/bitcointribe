@@ -35,8 +35,8 @@ const LOADER_MESSAGE_TIME = 2
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
-    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
-    subText: '(*select locations)',
+    text: 'Get sats directly in your wallet with compatible exchanges vouchers',
+    subText: '',
   },
   {
     heading: 'Friends & Family',

@@ -14,9 +14,7 @@ export interface RecipientDescribing {
   avatarImageSource: ImageSourcePropType | null;
 }
 
-export interface AddressRecipientDescribing extends RecipientDescribing {
-  donationID: string | null;
-}
+export type AddressRecipientDescribing = RecipientDescribing
 
 export interface ContactRecipientDescribing extends RecipientDescribing {
   lastSeenActive: number | null;

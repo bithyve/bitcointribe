@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, AsyncStorage } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -13,24 +13,96 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import CountDown from 'react-native-countdown-component';
 import { config } from 'process';
 import Config from '../../bitcoin/HexaConfig';
+import UserDetails from '../../components/UserDetails'
 
 export default function TimerModalContents(props) {
+  const [contactName, setContactName] = useState('')
+  const contact = props.contact
+  const [Contact, setContact] = useState(props.contact ? props.contact : {
+  })
+  
+  useEffect(() => {
+		if (contact) {
+			setContact(props.contact)
+		}
+  }, [contact])
+  
+  useEffect(() => {
+		const contactName =
+			Contact && Contact.firstName && Contact.lastName
+				? Contact.firstName + ' ' + Contact.lastName
+				: Contact && Contact.firstName && !Contact.lastName
+					? Contact.firstName
+					: Contact && !Contact.firstName && Contact.lastName
+						? Contact.lastName
+						: ''
+		setContactName(contactName)
+  }, [Contact])
+  
   const TC_REQUEST_EXPIRY = Config.TC_REQUEST_EXPIRY/1000;
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View>
-          <Text style={styles.modalHeaderTitleText}>Added Successfully</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={styles.modalHeaderTitleText}>Message shared{'\n'}
+          with trusted contact</Text>
+          <TouchableOpacity
+              onPress={() => {
+                props.onPressContinue()
+              }}
+              style={{
+                height: wp( '8%' ),
+                width: wp( '18%' ),
+                flexDirection: 'row',
+                alignItems: 'center',
+                backgroundColor: Colors.lightBlue,
+                justifyContent: 'center',
+                borderRadius: 8,
+                alignSelf: 'center',
+              }}
+            >
+              <Text
+                style={{
+                  color: Colors.white,
+                  fontSize: RFValue( 14 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Close
+              </Text>
+              <Ionicons color={Colors.white} size={18} name={'close-outline'} />
+            </TouchableOpacity>
+            </View>
           <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-            Your request has been sent successfully, once it is accepted by ,
-            they will appear in your F&F list.
+          Your friend will be prompted to enter the same while
+          accepting the Recovery Share
           </Text>
         </View>
       </View>
-      <View style={{ flex: 1, marginLeft: 20, marginRight: 20 }}>
+      <View style={{
+        marginHorizontal: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: props.isFromReceive ? 0 : hp('1.7%'),
+        marginBottom: props.isFromReceive ? 0 : hp('1.7%'),
+      }}>
+        <UserDetails
+          fromScreen={'TimerModalContents'}
+          titleStyle={styles.titleStyle}
+          contactName={contactName}
+          contactText={props.contactText}
+          Contact={Contact} />
+      </View>
+      <Text numberOfLines={2} style={[styles.modalHeaderInfoText, { marginHorizontal: 20 }]}>
+      This message will expire in 24 hours Amet,
+      consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet
+      </Text>
+      <View style={styles.seperator} />
+      <View style={{ flex: 1, marginHorizontal: 20 }}>
         <View style={styles.bottomView}>
           <View style={styles.bottomInnerView}>
-            <Ionicons color={Colors.blue} size={18} name={'md-time'} />
+            <Ionicons color={Colors.blue} size={18} name={'time-outline'} />
             {props.renderTimer ? (
               <CountDown
                 size={15}
@@ -40,7 +112,6 @@ export default function TimerModalContents(props) {
                   backgroundColor: '#FFF',
                   borderWidth: 0,
                   borderColor: '#FFF',
-                  margin: -10,
                 }}
                 digitTxtStyle={{
                   color: Colors.blue,
@@ -48,13 +119,14 @@ export default function TimerModalContents(props) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
                 separatorStyle={{ color: Colors.blue }}
-                timeToShow={['H', 'M', 'S']}
+                timeToShow={['H', 'M']}
                 timeLabels={{ h: null, m: null, s: null }}
                 showSeparator
               />
             ) : null}
           </View>
-
+          {/* <UserD */}
+          {/* 
           <AppBottomSheetTouchableWrapper
             onPress={() => props.onPressContinue()}
             style={{
@@ -77,13 +149,28 @@ export default function TimerModalContents(props) {
             >
               Continue
             </Text>
-          </AppBottomSheetTouchableWrapper>
+          </AppBottomSheetTouchableWrapper> */}
         </View>
       </View>
     </View>
   );
 }
 const styles = StyleSheet.create({
+  seperator: {
+    width: 306,
+    height: 1,
+    backgroundColor: Colors.borderColor,
+    borderRadius: 10,
+    alignSelf: 'center',
+    marginTop: 18,
+    marginBottom: 12
+  },
+  titleStyle: {
+    color: Colors.blue,
+		fontSize: RFValue(20),
+		fontFamily: Fonts.FiraSansRegular,
+		marginLeft: 25,
+  },
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.white,

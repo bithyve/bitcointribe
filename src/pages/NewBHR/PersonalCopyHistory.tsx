@@ -221,6 +221,12 @@ const PersonalCopyHistory = ( props ) => {
   }, [ pdfCreatedSuccessfully ] )
 
   useEffect( () => {
+    if( pdfInfo.filePath ){
+      setConfirmDisable( false )
+    }
+  }, [ pdfInfo ] )
+
+  useEffect( () => {
     if( !pdfDataConfirm ){
       dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
     }
