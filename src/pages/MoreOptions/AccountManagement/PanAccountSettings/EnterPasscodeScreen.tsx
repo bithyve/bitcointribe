@@ -35,20 +35,24 @@ export default function EnterPasscodeScreen( props ) {
   const [ checkAuth, setCheckAuth ] = useState( false )
 
   const dispatch = useDispatch()
-  const { isAuthenticated, authenticationFailed } = useSelector(
+  const { reLogin, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
   )
-  console.log( 'isAuthenticated', isAuthenticated )
+
   useEffect( () => {
-    if ( isAuthenticated ) {
+    if ( reLogin ) {
+      setCheckAuth( false )
       dispatch( credsAuthenticated( false ) )
       props.navigation.navigate( 'SecurityQuestion' )
+      dispatch( switchReLogin( false, true ) )
     }
-  }, [ isAuthenticated ] )
+  }, [ reLogin ] )
 
 
   useEffect( () => {
-    authenticationFailed && pin ? setCheckAuth( true ) : setCheckAuth( false )
+    if( authenticationFailed === true && pin ){
+      setCheckAuth( true )
+    }
   }, [ authenticationFailed ] )
 
   const [] = useState( false )
@@ -208,7 +212,7 @@ export default function EnterPasscodeScreen( props ) {
           <TouchableOpacity
             disabled={pin.length == 4 ? false : true}
             onPress={() => {
-              dispatch( credsAuth( pin ) )
+              dispatch( credsAuth( pin, true ) )
               //props.navigation.navigate('SettingGetNewPin')
               //PinChangeSuccessBottomSheet.current.snapTo(1);
             }}

@@ -7,6 +7,7 @@ import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSet
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
 import EnterPasscodeScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/EnterPasscodeScreen'
+import SecurityQuestionScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
 
 
 const PanAccountSettingsStack = createStackNavigator(
@@ -24,6 +25,17 @@ const PanAccountSettingsStack = createStackNavigator(
     },
     EnterPasscode: {
       screen: EnterPasscodeScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          title: 'Show all accounts',
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      },
+    },
+    SecurityQuestion: {
+      screen: SecurityQuestionScreen,
       navigationOptions: ( { navigation } ) => {
         return {
           title: 'Show all accounts',

@@ -86,7 +86,6 @@ import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKe
 // import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../pages/NewBHR/CloudBackupHistory'
-import SecurityQuestion from '../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -229,7 +228,6 @@ const HomeNavigator = createStackNavigator(
         title: 'Wyre Home'
       }
     },
-    SecurityQuestion,
   },
   {
     headerLayoutPreset: 'center',

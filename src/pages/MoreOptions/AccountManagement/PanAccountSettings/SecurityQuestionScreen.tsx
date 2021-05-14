@@ -77,31 +77,7 @@ export default function SecurityQuestionScreen( props ) {
       <View style={{
         flex: 1
       }}>
-        <View style={styles.modalHeaderTitleView}>
-          <View style={{
-            flexDirection: 'row', alignItems: 'center'
-          }}>
-            <TouchableOpacity
-              onPress={() => props.navigation.goBack()}
-              hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20
-              }}
-              style={{
-                height: 30, width: 30, justifyContent: 'center'
-              }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <Text style={styles.modalHeaderTitleText}>
-              {'Show all accounts'}
-            </Text>
-          </View>
 
-        </View>
         <Text style={{
           ...styles.modalInfoText,
           marginTop: wp( '1.5%' ),
@@ -199,7 +175,7 @@ export default function SecurityQuestionScreen( props ) {
               setConfirm()
               if ( answer.trim() == securityAnswer.trim() ) {
                 dispatch( setShowAllAccount( true ) )
-                props.navigation.popToTop( )
+                props.navigation.popToTop( 2 )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }
