@@ -57,7 +57,7 @@ export default function CopyOTP(props) {
                         <Text style={Styles.otpText}>{OTP[5]}</Text>
                     </View>
                 </AppBottomSheetTouchableWrapper>
-                <TouchableOpacity
+                <AppBottomSheetTouchableWrapper
                     onPress={() => {
                         writeToClipboard()
                     }}
@@ -79,7 +79,7 @@ export default function CopyOTP(props) {
                                 : require('../assets/images/icons/icon-copy.png')
                         }
                     />
-                </TouchableOpacity>
+                </AppBottomSheetTouchableWrapper>
             </View>
         </View>
     );

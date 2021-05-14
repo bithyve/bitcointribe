@@ -17,13 +17,15 @@ import UserDetails from '../../components/UserDetails'
 
 export default function TimerModalContents(props) {
   const [contactName, setContactName] = useState('')
+  const [type, setType] = useState('their phone number')
   const contact = props.contact
   const [Contact, setContact] = useState(props.contact ? props.contact : {
   })
   
   useEffect(() => {
 		if (contact) {
-			setContact(props.contact)
+      setContact(props.contact)
+      getNumberOrEmail()
 		}
   }, [contact])
   
@@ -36,23 +38,37 @@ export default function TimerModalContents(props) {
 					: Contact && !Contact.firstName && Contact.lastName
 						? Contact.lastName
 						: ''
-		setContactName(contactName)
+    setContactName(contactName)
   }, [Contact])
   
   const TC_REQUEST_EXPIRY = Config.TC_REQUEST_EXPIRY/1000;
+
+  const getNumberOrEmail = () => {
+    if (Contact &&
+      Contact.phoneNumbers &&
+      Contact.phoneNumbers.length) {
+          setType('their phone number')
+      } else if (Contact &&
+        Contact.emails &&
+        Contact.emails.length) {
+          setType('their email')
+        }
+  }
   return (
     <View style={styles.modalContainer}>
       <View style={styles.modalHeaderTitleView}>
         <View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-          <Text style={styles.modalHeaderTitleText}>Message shared{'\n'}
-          with trusted contact</Text>
-          <TouchableOpacity
+          <Text style={styles.modalHeaderTitleText}>
+            Contact to confirm{'\n'}
+            {type}
+          </Text>
+          <AppBottomSheetTouchableWrapper
               onPress={() => {
                 props.onPressContinue()
               }}
               style={{
-                height: wp( '8%' ),
+                height: wp( '9%' ),
                 width: wp( '18%' ),
                 flexDirection: 'row',
                 alignItems: 'center',
@@ -71,12 +87,11 @@ export default function TimerModalContents(props) {
               >
                 Close
               </Text>
-              <Ionicons color={Colors.white} size={18} name={'close-outline'} />
-            </TouchableOpacity>
+              <Ionicons color={Colors.white} size={20} name={'close-outline'} />
+            </AppBottomSheetTouchableWrapper>
             </View>
           <Text numberOfLines={2} style={styles.modalHeaderInfoText}>
-          Your friend will be prompted to enter the same while
-          accepting the Recovery Share
+          Your contact will be prompted to enter {type} to accept the request
           </Text>
         </View>
       </View>
@@ -95,8 +110,7 @@ export default function TimerModalContents(props) {
           Contact={Contact} />
       </View>
       <Text numberOfLines={2} style={[styles.modalHeaderInfoText, { marginHorizontal: 20 }]}>
-      This message will expire in 24 hours Amet,
-      consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet
+      This request will expire in 24 hours. Make sure that your contact accepts the request before that time
       </Text>
       <View style={styles.seperator} />
       <View style={{ flex: 1, marginHorizontal: 20 }}>
