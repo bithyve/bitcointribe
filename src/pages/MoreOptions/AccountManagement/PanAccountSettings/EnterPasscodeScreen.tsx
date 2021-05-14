@@ -13,7 +13,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { credsAuth, switchReLogin } from '../../../../store/actions/setupAndAuth'
+import { credsAuth, credsAuthenticated, switchReLogin } from '../../../../store/actions/setupAndAuth'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 
 export default function EnterPasscodeScreen( props ) {
@@ -35,19 +35,20 @@ export default function EnterPasscodeScreen( props ) {
   const [ checkAuth, setCheckAuth ] = useState( false )
 
   const dispatch = useDispatch()
-  const { reLogin, authenticationFailed } = useSelector(
+  const { isAuthenticated, authenticationFailed } = useSelector(
     state => state.setupAndAuth,
   )
+  console.log( 'isAuthenticated', isAuthenticated )
+  useEffect( () => {
+    if ( isAuthenticated ) {
+      dispatch( credsAuthenticated( false ) )
+      props.navigation.navigate( 'SecurityQuestion' )
+    }
+  }, [ isAuthenticated ] )
 
-  if ( reLogin ) {
-    props.navigation.navigate( 'SettingGetNewPin', {
-      oldPasscode: pin
-    } )
-    dispatch( switchReLogin( false, true ) )
-  }
 
   useEffect( () => {
-    authenticationFailed ? setCheckAuth( true ) : setCheckAuth( false )
+    authenticationFailed && pin ? setCheckAuth( true ) : setCheckAuth( false )
   }, [ authenticationFailed ] )
 
   const [] = useState( false )
@@ -61,8 +62,8 @@ export default function EnterPasscodeScreen( props ) {
       }}>
         <View>
           <Text style={styles.headerInfoText}>
-            Please enter your{' '}
-            <Text style={styles.boldItalicText}>existing passcode</Text>
+            To view all accounts,{' '}
+            <Text style={styles.boldItalicText}>confirm pin</Text>
           </Text>
           <View style={styles.passcodeTextInputView}>
             <View
@@ -207,7 +208,7 @@ export default function EnterPasscodeScreen( props ) {
           <TouchableOpacity
             disabled={pin.length == 4 ? false : true}
             onPress={() => {
-              dispatch( credsAuth( pin, true ) )
+              dispatch( credsAuth( pin ) )
               //props.navigation.navigate('SettingGetNewPin')
               //PinChangeSuccessBottomSheet.current.snapTo(1);
             }}

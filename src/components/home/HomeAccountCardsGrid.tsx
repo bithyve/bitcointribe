@@ -11,6 +11,7 @@ export type Props = {
   onAddNewSelected: () => void;
   currentLevel: number;
   contentContainerStyle?: Record<string, unknown>;
+  showAllAccount: boolean;
 };
 
 type RenderItemProps = {
@@ -31,8 +32,9 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
   currentLevel,
   contentContainerStyle = {
   },
+  showAllAccount,
 }: Props ) => {
-
+  console.log( 'SHOWALL', showAllAccount )
   const columnData: Array<AccountShell[]> = useMemo( () => {
     if ( accountShells.length == 0 ) {
       return []
@@ -50,7 +52,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     ///////////////////
 
     const evenIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
-      if ( index % 2 == 0 ) {
+      if ( index % 2 == 0 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
         accumulated.push( current )
       }
 
@@ -58,7 +60,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     }, [] )
 
     const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
-      if ( index % 2 == 1 ) {
+      if ( index % 2 == 1 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
         accumulated.push( current )
       }
 
@@ -89,28 +91,28 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
 
     sortedShells.forEach( ( accountShell, index ) => {
       console.log( 'accountShell', accountShell )
-      if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
-        currentColumn.push( accountShell )
+      // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
+      currentColumn.push( accountShell )
 
-        // Make a new column after adding two items -- or after adding the
-        // very first item. This is because the first column
-        // will only contain one item, since the "Add new" button will be placed
-        // in front of everything.
-        if ( currentColumn.length == 2 || index == 0 ) {
-          columns.push( currentColumn )
-          currentColumn = []
-        }
-
-        // If we're at the end and a partially filled column still exists,
-        // push it.
-        if ( index == shellCount - 1 && currentColumn.length > 0 ) {
-          columns.push( currentColumn )
-        }
+      // Make a new column after adding two items -- or after adding the
+      // very first item. This is because the first column
+      // will only contain one item, since the "Add new" button will be placed
+      // in front of everything.
+      if ( currentColumn.length == 2 || index == 0 ) {
+        columns.push( currentColumn )
+        currentColumn = []
       }
+
+      // If we're at the end and a partially filled column still exists,
+      // push it.
+      if ( index == shellCount - 1 && currentColumn.length > 0 ) {
+        columns.push( currentColumn )
+      }
+    //  }
     } )
 
     return columns
-  }, [ accountShells ] )
+  }, [ accountShells, showAllAccount ] )
 
   return (
     <FlatList

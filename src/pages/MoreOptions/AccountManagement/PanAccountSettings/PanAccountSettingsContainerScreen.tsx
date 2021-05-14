@@ -16,25 +16,25 @@ interface MenuOption {
   onOptionPressed?: () => void;
 }
 
-const menuOptions: MenuOption[] = [
-  {
-    title: 'Show All Accounts',
-    subtitle: 'Include Hidden, Duress, and Archived accounts in your display',
-    imageSource: require( '../../../../assets/images/icons/account-visibility/icon_visible.png' ),
-    onOptionPressed: () => {
-      // TODO: Implement when implementing "Show All" functionality.
-    },
-  },
-]
-
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
 
-const PanAccountSettingsContainerScreen: React.FC<Props> = () => {
+const PanAccountSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+
+  const menuOptions: MenuOption[] = [
+    {
+      title: 'Show All Accounts',
+      subtitle: 'Include Hidden, Duress, and Archived accounts in your display',
+      imageSource: require( '../../../../assets/images/icons/account-visibility/icon_visible.png' ),
+      screenName: 'EnterPasscode',
+    },
+  ]
 
   function handleListItemPress( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
-      menuOption?.onOptionPressed()
+      menuOption.onOptionPressed()
+    } else if ( menuOption.screenName !== undefined ) {
+      navigation.navigate( menuOption.screenName )
     }
   }
 

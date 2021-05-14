@@ -26,24 +26,13 @@ const PanAccountSettingsStack = createStackNavigator(
       screen: EnterPasscodeScreen,
       navigationOptions: ( { navigation } ) => {
         return {
-          title: 'Enter Passcode',
+          title: 'Show all accounts',
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
         }
       },
     },
-    // SecurityQuestion: {
-    //   screen: SecurityQuestionScreen,
-    //   navigationOptions: ( { navigation } ) => {
-    //     return {
-    //       title: 'Enter Passcode',
-    //       headerLeft: () => {
-    //         return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-    //       },
-    //     }
-    //   },
-    // },
   },
   {
     defaultNavigationOptions: () => {

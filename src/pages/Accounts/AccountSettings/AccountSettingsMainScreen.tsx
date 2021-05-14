@@ -10,8 +10,10 @@ import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
-import AccountCheckingModal from './AccountCheckingModal'
+import AccountArchiveModal from './AccountArchiveModal'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateSubAccountSettings } from '../../../store/actions/accounts'
 
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
@@ -30,7 +32,6 @@ export type SettingsListItem = {
   screenName?: string;
   screenParams?: Record<string, unknown>;
   onOptionPressed?: () => void;
-  onArchivePressed?: () => void;
 };
 
 const listItemKeyExtractor = ( item: SettingsListItem ) => item.title
@@ -40,10 +41,11 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
-  
+  const dispatch = useDispatch()
+
   const accountShell = useAccountShellForID( accountShellID )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
+  //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -121,74 +123,95 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       {
         title: 'Archive Account',
         subtitle: 'Move this account out of sight and out of mind',
-        onArchivePressed: showArchiveModal,
+        onOptionPressed: showArchiveModal,
         imageSource: require( '../../../assets/images/icons/icon_archive.png' ),
       },
     ]
   }, [ accountShell ] )
 
   function handleListItemPress( listItem: SettingsListItem ) {
-    if (listItem.onArchivePressed) {
-      listItem.onArchivePressed()
-    }
     if ( typeof listItem.onOptionPressed === 'function' ) {
       listItem.onOptionPressed()
     } else if ( listItem.screenName !== undefined ) {
       const screenParams = listItem.screenParams || {
       }
-
       navigation.navigate( listItem.screenName, screenParams )
     }
   }
 
-  function showAccount( ) {
-    closeArchiveModal()
+  const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
+    return (
+      <ListItem
+        bottomDivider
+        onPress={() => { handleListItemPress( listItem ) }}
+      >
+        <Image
+          source={listItem.imageSource}
+          style={ListStyles.thumbnailImageSmall}
+          resizeMode="contain"
+        />
+
+        <ListItem.Content style={ListStyles.listItemContentContainer}>
+          <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
+          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
+        </ListItem.Content>
+
+        <ListItem.Chevron />
+      </ListItem>
+    )
   }
 
   const checkAccountBalance = useCallback( () => {
-      openArchiveModal(
-        <AccountCheckingModal
-          isError={true}
-          onProceed={() => {
-            closeArchiveModal()
-            setTimeout( () => {
-              checkAccountBalance()
-            }, 500 )
-          }}
-          onBack={closeArchiveModal}
-          onViewAccount={showAccount}
-        />,
-        {
-          ...defaultBottomSheetConfigs,
-          snapPoints: [ 0, '40%' ],
-        },
-      )
-  }, [ openArchiveModal, closeArchiveModal ] )
-
-  function handleRescanListItemSelection() {
-    showRescanningPromptBottomSheet()
-  }
-
-  const showAccountArchiveBottomSheet = useCallback( () => {
     openArchiveModal(
-      <AccountCheckingModal
-        isError={false}
+      <AccountArchiveModal
+        isError={true}
         onProceed={() => {
           closeArchiveModal()
         }}
         onBack={closeArchiveModal}
-        onViewAccount={showAccount}
+        onViewAccount={closeArchiveModal}
+        account={primarySubAccount}
       />,
       {
         ...defaultBottomSheetConfigs,
         snapPoints: [ 0, '40%' ],
       },
     )
-  }, [ openArchiveModal, closeArchiveModal ] )
+  }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
+
+  function handleRescanListItemSelection() {
+    showRescanningPromptBottomSheet()
+  }
+
+  function handleAccountArchive() {
+    primarySubAccount.visibility = AccountVisibility.ARCHIVED
+    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    navigation.goBack()
+  }
+
+
+  const showAccountArchiveBottomSheet = useCallback( () => {
+    openArchiveModal(
+      <AccountArchiveModal
+        isError={false}
+        onProceed={() => {
+          handleAccountArchive()
+          closeArchiveModal()
+        }}
+        onBack={closeArchiveModal}
+        onViewAccount={closeArchiveModal}
+        account={primarySubAccount}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
 
   function showArchiveModal() {
-    if (accountBalance.confirmed === 0) {
-    showAccountArchiveBottomSheet()
+    if ( primarySubAccount.balances.confirmed === 0 ) {
+      showAccountArchiveBottomSheet()
     } else {
       checkAccountBalance()
     }
@@ -237,34 +260,13 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
 
-  const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
-    return (
-      <ListItem
-        bottomDivider
-        onPress={() => { handleListItemPress( listItem ) }}
-      >
-        <Image
-          source={listItem.imageSource}
-          style={ListStyles.thumbnailImageSmall}
-          resizeMode="contain"
-        />
-
-        <ListItem.Content style={ListStyles.listItemContentContainer}>
-          <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
-          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
-        </ListItem.Content>
-
-        <ListItem.Chevron />
-      </ListItem>
-    )
-  }
-
   return (
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{
         paddingHorizontal: 14
       }}
+      extraData={accountShell}
       data={listItems}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
