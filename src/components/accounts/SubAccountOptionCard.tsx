@@ -177,7 +177,7 @@ const styles = StyleSheet.create( {
     backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     elevation: 2,
-    marginVertical: -4
+    marginVertical: -6
   },
 
   descriptionTextContainer: {

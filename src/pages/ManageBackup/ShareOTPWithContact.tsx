@@ -12,6 +12,7 @@ import Toast from '../../components/Toast';
 import CountDown from 'react-native-countdown-component';
 import Config from '../../bitcoin/HexaConfig';
 import CopyOTP from '../../components/CopyOtp';
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
 
 export default function ShareOtpWithContact(props) {
 	const [isCopied, setIsCopied] = useState(false)
@@ -26,11 +27,11 @@ export default function ShareOtpWithContact(props) {
             <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
           </AppBottomSheetTouchableWrapper> */}
 					<View>
-						<View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+						<View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
 							<Text style={styles.modalHeaderTitleText}>
 								Share OTP with{'\n'}trusted contact
             </Text>
-							<TouchableOpacity
+							<AppBottomSheetTouchableWrapper
 								onPress={() => props.onPressOk(index)}
 								style={{
 									height: wp('8%'),
@@ -53,7 +54,7 @@ export default function ShareOtpWithContact(props) {
 									Close
               </Text>
 								<Ionicons color={Colors.white} size={18} name={'close-outline'} />
-							</TouchableOpacity>
+							</AppBottomSheetTouchableWrapper>
 						</View>
 						<Text numberOfLines={2} style={styles.modalHeaderInfoText}>
 							Please provide this OTP to your trusted contact in order for them to send you the recovery secret
@@ -67,8 +68,8 @@ export default function ShareOtpWithContact(props) {
 			<View style={{ flex: 1, marginLeft: 30, marginRight: 30 }}>
 				<CopyOTP OTP={OTP} setIsCopied={setIsCopied} />
 				<Text numberOfLines={2} style={[styles.modalHeaderInfoText, { marginTop: hp('7%'), }]}>
-					This OTP is only valid for 24 hours, if the OTP{'\n'}expires you
-          will be asked to create a new one..
+					This OTP is only valid for 24 hours, if the OTP expires you
+          will be asked to create a new one
         </Text>
 				<View style={styles.separator} />
 				{isCopied ?
