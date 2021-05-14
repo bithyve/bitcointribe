@@ -68,6 +68,7 @@ import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -282,7 +283,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ index, keeperInfo ] )
 
   const getContacts = useCallback(
-    async ( selectedContacts ) => {
+    ( selectedContacts ) => {
       setTimeout( () => {
         if ( selectedContacts[ 0 ] ) {
           setSelectedTitle(
@@ -301,6 +302,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       }, 2 );
       ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
       ( shareBottomSheet as any ).current.snapTo( 1 )
+      return selectedContacts[ 0 ]
     },
     [ SelectedContacts, chosenContact ],
   )
@@ -314,7 +316,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }}
         onPressContinue={async ( selectedContacts ) => {
           Keyboard.dismiss()
-          getContacts( selectedContacts )
+          createGuardian( getContacts( selectedContacts ) )
         }}
       />
     )
@@ -752,26 +754,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
     [ index, trustedContactsInfo ],
   )
 
-  const createGuardian = useCallback( async () => {
-    if ( !Object.keys( chosenContact ).length ) return
+  const createGuardian = useCallback( async ( chosenContactTmp? ) => {
+    let chosenContactState = chosenContact
+    if ( chosenContact && !Object.keys( chosenContact ).length ) chosenContactState = chosenContactTmp
     setIsGuardianCreationClicked( true )
 
-    const contactName = `${chosenContact.firstName} ${
-      chosenContact.lastName ? chosenContact.lastName : ''
+    const contactName = `${chosenContactState.firstName} ${
+      chosenContactState.lastName ? chosenContactState.lastName : ''
     }`
       .toLowerCase()
       .trim()
 
     let info = ''
-    if ( chosenContact.phoneNumbers && chosenContact.phoneNumbers.length ) {
-      const phoneNumber = chosenContact.phoneNumbers[ 0 ].number
+    if ( chosenContactState.phoneNumbers && chosenContactState.phoneNumbers.length ) {
+      const phoneNumber = chosenContactState.phoneNumbers[ 0 ].number
       let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
       number = number.slice( number.length - 10 ) // last 10 digits only
       info = number
-    } else if ( chosenContact.emails && chosenContact.emails.length ) {
-      info = chosenContact.emails[ 0 ].email
+    } else if ( chosenContactState.emails && chosenContactState.emails.length ) {
+      info = chosenContactState.emails[ 0 ].email
     }
-
     const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
       Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
       config.TC_REQUEST_EXPIRY
@@ -780,13 +782,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
     dispatch( updatedKeeperInfo( {
       shareId: selectedShareId,
-      name: chosenContact.name,
-      uuid: chosenContact.id,
+      name: chosenContactState.name,
+      uuid: chosenContactState.id,
       publicKey: '',
       ephemeralAddress: '',
       type: 'contact',
       data: {
-        ...chosenContact, index
+        ...chosenContactState, index
       }
     } ) )
 
@@ -794,7 +796,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     if ( changeContact || shareExpired || isChange ) {
       setTrustedLink( '' )
       setTrustedQR( '' )
-      updateTrustedContactsInfo( chosenContact )
+      updateTrustedContactsInfo( chosenContactState )
       onOTPShare( ) // enables reshare
       setChangeContact( false )
     } else {
@@ -830,7 +832,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       accountShellID: parentShell.id,
       isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
     } )
-
     dispatch(
       addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
     )
@@ -917,26 +918,42 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const SendShareModalFunction = useCallback( () => {
     if ( chosenContact && !isEmpty( chosenContact ) ) {
       return (
-        <SendShareModal
-          contact={chosenContact ? chosenContact : null}
-          index={index}
-          textHeader={'Sharing Recovery Key with'}
-          onPressViaQr={( index ) => {
-            createGuardian()
-            if ( SendViaQRBottomSheet.current )
-              ( SendViaQRBottomSheet as any ).current.snapTo( 1 );
+        <RequestKeyFromContact
+          isModal={true}
+          headerText={`Send Recovery Key${'\n'}to contact`}
+          subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}
+          contactText={'Sharing Recovery Key with'}
+          contact={chosenContact}
+          QR={trustedQR}
+          link={trustedLink}
+          contactEmail={''}
+          onPressBack={() => {
+            ( shareBottomSheet as any ).current.snapTo( 0 )
+            props.navigation.goBack()
+          }}
+          onPressDone={() => {
             ( shareBottomSheet as any ).current.snapTo( 0 )
           }}
-          onPressViaLink={( index ) => {
-            createGuardian()
-            if ( SendViaLinkBottomSheet.current )
-              ( SendViaLinkBottomSheet as any ).current.snapTo( 1 );
-            ( shareBottomSheet as any ).current.snapTo( 0 )
+          onPressShare={() => {
+            if ( isOTPType ) {
+              setTimeout( () => {
+                setRenderTimer( true )
+              }, 2 );
+              ( shareBottomSheet as any ).current.snapTo( 0 );
+              ( shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
+            }
+            else {
+              ( shareBottomSheet as any ).current.snapTo( 0 )
+              const popAction = StackActions.pop( {
+                n: isChange ? 2 : 1
+              } )
+              props.navigation.dispatch( popAction )
+            }
           }}
         />
       )
     }
-  }, [ chosenContact, index ] )
+  }, [ chosenContact, index, trustedQR, trustedLink ] )
 
   const SendModalFunction = useCallback( () => {
     return (
@@ -1059,7 +1076,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }
     }
-    console.log( 'changeIndex', changeIndex, type )
     if ( type == 'contact' ) {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
@@ -1274,7 +1290,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ref={shareBottomSheet as any}
         snapPoints={[
           Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '50%' ) : hp( '65%' ),
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '85%' ) : hp( '90%' ),
         ]}
         renderContent={SendShareModalFunction}
         renderHeader={SendModalFunction}

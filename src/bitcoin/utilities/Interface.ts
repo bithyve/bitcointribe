@@ -121,6 +121,7 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
+    scheme?: string,
   };
   encryptedStaticNonPMDD?: string;
 }
@@ -236,8 +237,6 @@ export interface DonationDerivativeAccountElements
   description: string;
   configuration: {
     displayBalance: boolean;
-    displayTransactions: boolean;
-    displayTxDetails: boolean;
   };
   disableAccount: boolean;
 }

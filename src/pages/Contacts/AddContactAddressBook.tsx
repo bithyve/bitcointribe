@@ -371,7 +371,7 @@ export default function AddContactAddressBook( props ) {
               {props.modalTitle ? props.modalTitle : 'Associate a contact'}
             </Text>
             <Text style={styles.modalHeaderInfoText}>
-              {'Select a contact from your phones address book'}
+              {'Select a contact from your phone\'s address book'}
             </Text>
           </View>
           <AppBottomSheetTouchableWrapper
@@ -427,9 +427,9 @@ export default function AddContactAddressBook( props ) {
         }}>
           <View style={styles.selectedContactContainer}>
             {selectedContacts.length > 0
-              ? selectedContacts.map( ( value ) => {
+              ? selectedContacts.map( ( value, index ) => {
                 return (
-                  <View style={styles.selectedContactView}>
+                  <View key={index} style={styles.selectedContactView}>
                     <Text style={styles.selectedContactNameText}>
                       {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
                       <Text style={{

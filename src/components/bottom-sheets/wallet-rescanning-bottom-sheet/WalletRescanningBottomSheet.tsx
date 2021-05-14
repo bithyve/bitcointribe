@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo,  } from 'react'
 import { View, Text, StyleSheet, ImageBackground, Image, ActivityIndicator } from 'react-native'
-import { useDispatch,useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../../common/Colors'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import AccountShell from '../../../common/data/models/AccountShell'
@@ -35,7 +35,7 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
 
   const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
-  
+
 
   return (
     <View style={{
@@ -63,11 +63,10 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
   onDismiss,
   onTransactionDataSelected,
 }: Props ) => {
-  const dispatch = useDispatch();
-  const { refreshed } = useSelector(state => state.accounts)
-
+  const dispatch = useDispatch()
+  const { refreshed } = useSelector( state => state.accounts )
   useEffect( () => {
-    dispatch(blindRefresh())
+    dispatch( blindRefresh() )
   }, [] )
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
   //const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails

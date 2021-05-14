@@ -73,13 +73,14 @@ export default function SendConfirmationContent( props ) {
       )}
       <View
         style={{
+          flex: 1,
           flexDirection: 'row',
           marginTop: 'auto',
           alignItems: 'center',
           marginBottom:
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? wp( '2%' )
-              : wp( '2%' ),
+              ? hp( '2%' )
+              : hp( '2%' ),
         }}
       >
         <AppBottomSheetTouchableWrapper
@@ -111,10 +112,13 @@ export default function SendConfirmationContent( props ) {
         {( props.isSuccess || props.isUnSuccess ) && (
           <Image
             style={{
+              flex: 1,
               width: wp( '25%' ),
-              height: hp( '18%' ),
+              height: hp( '25%' ),
               marginLeft: 'auto',
-              resizeMode: 'cover',
+              marginRight: 'auto',
+              resizeMode: 'contain',
+              marginBottom: 'auto'
             }}
             source={
               props.isSuccess

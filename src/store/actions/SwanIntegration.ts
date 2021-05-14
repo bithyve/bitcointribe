@@ -30,12 +30,8 @@ export const ADD_SWAN_METADATA_FAILED = 'ADD_SWAN_METADATA_FAILED'
 export const ADD_SWAN_METADATA_SUCCEEDED = 'ADD_SWAN_METADATA_SUCCEEDED'
 export const ADD_SWAN_METADATA_COMPLETED = 'ADD_SWAN_METADATA_COMPLETED'
 
-export const CREATE_TEMP_SWAN_ACCOUNT_SHELL = 'CREATE_TEMP_SWAN_ACCOUNT_SHELL'
-export const TEMP_SWAN_ACCOUNT_SHELL_CREATED = 'TEMP_SWAN_ACCOUNT_SHELL_CREATED'
-
-export const CREATE_SWAN_ACCOUNT_SHELL = 'CREATE_SWAN_ACCOUNT_SHELL'
-export const SWAN_ACCOUNT_SHELL_CREATED = 'SWAN_ACCOUNT_SHELL_CREATED'
-
+export const CREATE_TEMP_SWAN_ACCOUNT_INFO = 'CREATE_TEMP_SWAN_ACCOUNT_INFO'
+export const TEMP_SWAN_ACCOUNT_INFO_SAVED = 'TEMP_SWAN_ACCOUNT_INFO_SAVED'
 
 export enum SwanActionKind {
   UPDATE_SWAN_STATUS,
@@ -47,8 +43,7 @@ export enum SwanActionKind {
   CREATE_WITHDRAWAL_WALLET_ON_SWAN,
   CREATE_WITHDRAWAL_WALLET_ON_SWAN_SUCCEEDED,
   AUTHENTICATE,
-  CREATE_TEMP_SWAN_ACCOUNT_SHELL,
-  CREATE_SWAN_ACCOUNT_SHELL,
+  CREATE_TEMP_SWAN_ACCOUNT_INFO,
   LINK_HEXA_AND_SWAN_SUB_ACCOUNTS,
   SYNC_SWAN_ACCOUNT_DATA
 }
@@ -144,34 +139,19 @@ export const createWithdrawalWalletOnSwanSucceeded = ( data ) => {
   }
 }
 
-export const createTempSwanAccountShell = ( payload: SubAccountDescribing ) => {
+export const createTempSwanAccountInfo = ( payload: SubAccountDescribing ) => {
   return {
-    type: CREATE_TEMP_SWAN_ACCOUNT_SHELL,
+    type: CREATE_TEMP_SWAN_ACCOUNT_INFO,
     payload,
   }
 }
 
-export const tempSwanAccountShellCreated = ( swanAccountShell: AccountShell ) => {
+export const tempSwanAccountInfoSaved = ( data ) => {
+  console.log( 'tempSwanAccountInfoSaved called ', data )
   return {
-    type: TEMP_SWAN_ACCOUNT_SHELL_CREATED,
+    type: TEMP_SWAN_ACCOUNT_INFO_SAVED,
     payload: {
-      swanAccountShell
-    }
-  }
-}
-
-export const createSwanAccountShell = ( payload: SubAccountDescribing ) => {
-  return {
-    type: CREATE_SWAN_ACCOUNT_SHELL,
-    payload
-  }
-}
-
-export const swanAccountShellCreated = ( swanAccountShell: AccountShell ) => {
-  return {
-    type: SWAN_ACCOUNT_SHELL_CREATED,
-    payload : {
-      swanAccountShell
+      data
     }
   }
 }

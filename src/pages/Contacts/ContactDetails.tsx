@@ -1302,7 +1302,7 @@ class ContactDetails extends PureComponent<
                   {uploading ? (
                     <ActivityIndicator size="small" />
                   ) : (
-                    <Text style={styles.buttonText}>Help Restore</Text>
+                    <Text style={styles.buttonText} numberOfLines={1}>Help Restore</Text>
                   )}
                 </View>
               </TouchableOpacity>
@@ -1321,7 +1321,7 @@ class ContactDetails extends PureComponent<
                     {uploadingSmShare ? (
                       <ActivityIndicator size="small" />
                     ) : (
-                      <Text style={styles.buttonText}>Show Secondary Key</Text>
+                      <Text style={styles.buttonText} numberOfLines={1}>Show Secondary Key</Text>
                     )}
                   </View>
                 </TouchableOpacity>
@@ -1344,7 +1344,7 @@ class ContactDetails extends PureComponent<
                     style={styles.buttonImage}
                   />
                   <View>
-                    <Text style={styles.buttonText}>
+                    <Text style={styles.buttonText} numberOfLines={1}>
                       {encryptedExitKey ? 'Show Secondary Key' : 'Request Key'}
                     </Text>
                     {encryptedExitKey ? (
@@ -1390,7 +1390,7 @@ class ContactDetails extends PureComponent<
               }}
             >
               <View>
-                <Text style={styles.buttonText}>Remove</Text>
+                <Text style={styles.buttonText} numberOfLines={1}>Remove</Text>
               </View>
             </TouchableOpacity>
           ) : null}
@@ -1603,8 +1603,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansMedium,
     marginLeft: 10,
-    height: wp( '17%' ),
-    width: wp( '30%' ),
+    marginRight: 10,
   },
   buttonInfo: {
     color: Colors.textColorGrey,

@@ -129,7 +129,7 @@ import {
   fetchSwanAuthenticationUrlWatcher,
   redeemSwanCodeForTokenWatcher,
   createWithdrawalWalletOnSwanWatcher,
-  addTempSwanAccountShellWatcher
+  addTempSwanAccountInfoWatcher
 } from './sagas/SwanIntegration'
 
 import {
@@ -216,7 +216,7 @@ import {
 import { fromPrivateKey } from 'bip32'
 import reducer from './reducers/fbtc'
 
-import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendDonationNoteWatcher, sendTxNotificationWatcher } from './sagas/sending'
+import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import newBHR from './reducers/newBHR'
 import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
@@ -358,7 +358,7 @@ const rootSaga = function* () {
     fetchSwanAuthenticationUrlWatcher,
     redeemSwanCodeForTokenWatcher,
     createWithdrawalWalletOnSwanWatcher,
-    addTempSwanAccountShellWatcher,
+    addTempSwanAccountInfoWatcher,
 
     // Wyre Integration
     fetchWyreReservationWatcher,
@@ -391,7 +391,7 @@ const rootSaga = function* () {
     calculateSendMaxFeeWatcher,
     calculateCustomFeeWatcher,
     sendTxNotificationWatcher,
-    sendDonationNoteWatcher,
+
     // upgrade
     initLevelsWatcher,
     setCloudDataForLevelWatcher,

@@ -1389,7 +1389,8 @@ export default class LevelHealth {
             timestamp,
             reshareVersion: 0,
             questionId,
-            question
+            question,
+            scheme: level == 2 ? '2of3' : level == 3 ? '3of5' : '',
           },
           encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
         }
@@ -1406,7 +1407,8 @@ export default class LevelHealth {
             timestamp,
             reshareVersion: 0,
             questionId,
-            question
+            question,
+            scheme: level == 2 ? '2of3' : level == 3 ? '3of5' : '',
           },
           encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
         }

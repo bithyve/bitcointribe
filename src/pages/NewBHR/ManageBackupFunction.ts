@@ -250,6 +250,15 @@ const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
   const levelData = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
     const element = levelData[ i ]
+    if( element.status != 'notSetup' ){
+      if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ) {
+        levelData[ i ].status = 'good'
+      } else if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ) {
+        levelData[ i ].status = 'bad'
+      } else if( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) {
+        levelData[ i ].status = 'bad'
+      }
+    }
     if( i == 0 ){
       // Not SETUP
       if( levelData[ i ].status == 'notSetup' ) {
@@ -263,10 +272,6 @@ const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
       }
     }
     if( i == 1 || i == 2 ) {
-      // NOT SETUP
-      if( levelData[ i ].status == 'notSetup' && i == 1 || i == 2 ) {
-        levelData[ i ].note = noteText( i, currentLevel )
-      }
       // BOTH ACCESSIBLE
       if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
         if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
@@ -292,6 +297,10 @@ const getLevelInfoStatus = ( levelDataTemp, currentLevel ) => {
         levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
         levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
         levelData[ i ].note = 'Your backup stored with '  + changeNameForSecondary( name ) + ' is inaccessible, please confirm/ manage the Recovery Key'
+      }
+      // NOT SETUP
+      if( levelData[ i ].status == 'notSetup' && i == 1 || i == 2 ) {
+        levelData[ i ].note = noteText( i, currentLevel )
       }
     }
   }

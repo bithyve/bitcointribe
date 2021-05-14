@@ -352,7 +352,12 @@ export default function TwoFAValidation( props ) {
           onCloseStart={() => {
             SendUnSuccessBottomSheet.current.snapTo( 0 )
           }}
-          onCloseEnd={() => setElevation( 10 )}
+          onCloseEnd={() => {
+            setElevation( 10 )
+          }}
+          onOpenEnd={() => {
+            setElevation( 0 )
+          }}
           enabledInnerScrolling={true}
           ref={SendUnSuccessBottomSheet}
           snapPoints={[

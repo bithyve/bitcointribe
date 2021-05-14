@@ -35,6 +35,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
       ...styles.selectionIndicatorContainer,
       borderColor: isSelected ? Colors.blue : Colors.borderColor,
       backgroundColor: isSelected ? Colors.blue : 'transparent',
+      margin: 1
     }
   }, [ isSelected ] )
 
@@ -176,6 +177,7 @@ const styles = StyleSheet.create( {
     backgroundColor: 'transparent',
     justifyContent: 'flex-start',
     elevation: 2,
+    marginVertical: -6
   },
 
   descriptionTextContainer: {
