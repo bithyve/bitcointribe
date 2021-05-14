@@ -38,6 +38,7 @@ import {
 import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import _ from 'lodash'
+import SSS from '../sss/SSS'
 const { HEXA_ID } = config
 
 export default class HDSegwitWallet extends Bitcoin {
@@ -935,26 +936,19 @@ export default class HDSegwitWallet extends Bitcoin {
           break
 
         case TRUSTED_CONTACTS:
-          if ( !contactName )
-            throw new Error( `Required param: contactName for ${accountType}` )
-
-          contactName = contactName.toLowerCase().trim()
+          const channelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
           const trustedAccounts: TrustedContactDerivativeAccount = this
             .derivativeAccounts[ accountType ]
 
-          accountNumber = this.trustedContactToDA[ contactName ]
-          if ( accountNumber ) {
-            console.log( `Derivative account already exist against contact: ${contactName}` )
-          } else {
-            accountNumber = trustedAccounts.instance.using + 1
-            this.generateDerivativeXpub( accountType, accountNumber )
-            const derivativeInstance: TrustedContactDerivativeAccountElements = this
-              .derivativeAccounts[ accountType ][ accountNumber ]
-            derivativeInstance.contactName = contactName
-            this.trustedContactToDA[ contactName ] = accountNumber
-            accountId = derivativeInstance.xpubId
-            accountXpub = derivativeInstance.xpub
-          }
+          accountNumber = trustedAccounts.instance.using + 1
+          this.generateDerivativeXpub( accountType, accountNumber )
+          const trustedDerivativeInstance: TrustedContactDerivativeAccountElements = this
+            .derivativeAccounts[ accountType ][ accountNumber ]
+          trustedDerivativeInstance.contactName = contactName
+          trustedDerivativeInstance.channelKey = channelKey
+          this.trustedContactToDA[ channelKey ] = accountNumber
+          accountId = trustedDerivativeInstance.xpubId
+          accountXpub = trustedDerivativeInstance.xpub
           break
     }
 

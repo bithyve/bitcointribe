@@ -210,6 +210,7 @@ export interface DerivativeAccount {
 export interface TrustedContactDerivativeAccountElements
   extends DerivativeAccountElements {
   contactName: string;
+  channelKey: string;
   contactDetails?: {
     xpub: string;
     tpub?: string;

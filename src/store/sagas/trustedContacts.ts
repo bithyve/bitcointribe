@@ -80,6 +80,208 @@ const sendNotification = ( recipient, notification ) => {
     RelayServices.sendNotifications( receivers, notification ).then( console.log )
 }
 
+// export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
+//   const accountsState: AccountsState = yield select( state => state.accounts )
+//   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+//   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
+//   const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
+//   const trustedContactsInfo = yield select(
+//     ( state ) => state.trustedContacts.trustedContactsInfo,
+//   )
+//   const FCM = yield select ( state => state.preferences.fcmTokenValue )
+//   const { contactName } = contactInfo
+
+//   const { walletId } = regularAccount.hdWallet.getWalletId()
+
+//   // check whether a derivative account already exist for this contact
+//   let accountNumber =
+//     regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+//   if ( !accountNumber ) {
+//     // initialize a trusted derivative account against the following contact
+//     const res = regularAccount.setupDerivativeAccount(
+//       TRUSTED_CONTACTS,
+//       null,
+//       contactName,
+//     )
+//     if ( res.status !== 200 ) {
+//       throw new Error( `${res.err}` )
+//     } else {
+//       // refresh the account number
+//       accountNumber =
+//         regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+//       const secondarySubAccountId = res.data.accountId
+//       secondarySubAccount.id = secondarySubAccountId
+//       secondarySubAccount.instanceNumber = accountNumber
+//       secondarySubAccount.balances = {
+//         confirmed: 0,
+//         unconfirmed: 0,
+//       }
+//       secondarySubAccount.transactions = []
+
+//       AccountShell.addSecondarySubAccount(
+//         parentShell,
+//         secondarySubAccountId,
+//         secondarySubAccount,
+//       )
+//     }
+//   }
+//   const trustedReceivingAddress = ( regularAccount.hdWallet
+//     .derivativeAccounts[ TRUSTED_CONTACTS ][
+//       accountNumber
+//     ] as TrustedContactDerivativeAccountElements ).receivingAddress
+
+//   const data: EphemeralDataElements = {
+//     walletID: walletId,
+//     FCM,
+//     trustedAddress: trustedReceivingAddress,
+//     trustedTestAddress: testAccount.hdWallet.receivingAddress,
+//   }
+
+//   const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+
+//   if( contactInfo.isGuardian ){
+//     // Trusted Contact: Guardian
+//     const { changeContact, shareIndex, shareId, legacy } = contactInfo
+//     const { SHARES_TRANSFER_DETAILS } = yield select(
+//       ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
+//     )
+//     const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
+//     Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
+//     config.TC_REQUEST_EXPIRY
+
+//     if ( changeContact ) {
+//       let previousGuardianName: string
+//       // find previous TC (except keeper: shareIndex 0)
+//       if ( trustedContactsInfo && shareIndex ) {
+//         const previousGuardian = trustedContactsInfo[ shareIndex ]
+//         if ( previousGuardian ) {
+//           previousGuardianName = `${previousGuardian.firstName} ${
+//             previousGuardian.lastName ? previousGuardian.lastName : ''
+//           }`
+//             .toLowerCase()
+//             .trim()
+//         } else console.log( 'Previous guardian details missing' )
+//       }
+
+//       // upload share for the new contact(guardian)
+//       if( legacy )
+//         yield put(
+//           uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
+//         )
+//       else
+//         yield put(
+//           uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
+//         )
+//     } else if( shareExpired ) {
+//       // share expired, re-upload (creates ephermeal channel as well)
+//       if( legacy )
+//         yield put(
+//           uploadEncMShare( shareIndex, contactInfo, data ),
+//         )
+//       else
+//         yield put(
+//           uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
+//         )
+//     } else {
+//       // re-initiating expired Ephemeral Channel
+//       const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+//       const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+//       trustedContact.ephemeralChannel.initiatedAt &&
+//       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+//       config.TC_REQUEST_EXPIRY? true: false
+
+//       if (
+//         !hasTrustedChannel &&
+//         isEphemeralChannelExpired
+//       ){
+//         yield put(
+//           updateEphemeralChannel(
+//             contactInfo,
+//             trustedContact.ephemeralChannel.data[ 0 ],
+//           ),
+//         )
+//       }
+//     }
+//   } else{
+
+//     // update ephemeral data (if payment details are available)
+//     // const { paymentDetails } = contactInfo
+//     // let paymentURI, trustedPaymentURI
+//     // if( paymentDetails ){
+//     //   const { amount, address }  = paymentDetails
+//     //   paymentURI = regularAccount.getPaymentURI( address, {
+//     //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+//     //   } ).paymentURI
+//     //   trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
+//     //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+//     //   } ).paymentURI
+
+//     //   data.paymentDetails =  {
+//     //     trusted: {
+//     //       address: trustedReceivingAddress,
+//     //       paymentURI: trustedPaymentURI,
+//     //     },
+//     //     alternate: {
+//     //       address: address,
+//     //       paymentURI,
+//     //     },
+//     //   }
+//   }
+
+//   if ( !trustedContact ) {
+//     // create emphemeral channel(initiating TC)
+//     yield put( updateEphemeralChannel( contactInfo, data ) )
+//   } else {
+//     const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+//     const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+//       trustedContact.ephemeralChannel.initiatedAt &&
+//       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+//       config.TC_REQUEST_EXPIRY? true: false
+
+//     if ( !hasTrustedChannel ){
+//       if( isEphemeralChannelExpired ){
+//         // re-initiating expired Ephemeral Channel
+//         yield put(
+//           updateEphemeralChannel(
+//             contactInfo,
+//             trustedContact.ephemeralChannel.data[ 0 ],
+//           ),
+//         )
+//       }
+//       else{
+//         // if payment details are changed(on receive); re-upload the data
+//         //   if( paymentDetails && trustedContact.ephemeralChannel ) {
+//         //     const { address }  = paymentDetails
+//         //     const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
+//         //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
+//         //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+//         //       .address === address &&
+//         //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+//         //       .paymentURI === paymentURI ? true: false
+
+//         //     if ( !isPaymentDetailsSame ){
+//         //       const updatedPaymentDetails = {
+//         //         trusted: {
+//         //           address: trustedReceivingAddress,
+//         //           paymentURI: trustedPaymentURI,
+//         //         },
+//         //         alternate: {
+//         //           address: paymentDetails.address,
+//         //           paymentURI,
+//         //         },
+//         //       }
+//         //       trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
+//         //       yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
+//         //     }
+//         //   }
+//         // }
+//       }
+//     }
+//   }
+// }
+
 export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
@@ -93,44 +295,37 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
 
   const { walletId } = regularAccount.hdWallet.getWalletId()
 
-  // check whether a derivative account already exist for this contact
-  let accountNumber =
-    regularAccount.hdWallet.trustedContactToDA[ contactName ]
+  // initialize a trusted derivative account against the following contact
+  const res = regularAccount.setupDerivativeAccount(
+    TRUSTED_CONTACTS,
+    null,
+    contactName,
+  )
+  if ( res.status !== 200 ) throw new Error( `${res.err}` )
 
-  if ( !accountNumber ) {
-    // initialize a trusted derivative account against the following contact
-    const res = regularAccount.setupDerivativeAccount(
-      TRUSTED_CONTACTS,
-      null,
-      contactName,
-    )
-    if ( res.status !== 200 ) {
-      throw new Error( `${res.err}` )
-    } else {
-      // refresh the account number
-      accountNumber =
-        regularAccount.hdWallet.trustedContactToDA[ contactName ]
-
-      const secondarySubAccountId = res.data.accountId
-      secondarySubAccount.id = secondarySubAccountId
-      secondarySubAccount.instanceNumber = accountNumber
-      secondarySubAccount.balances = {
-        confirmed: 0,
-        unconfirmed: 0,
-      }
-      secondarySubAccount.transactions = []
-
-      AccountShell.addSecondarySubAccount(
-        parentShell,
-        secondarySubAccountId,
-        secondarySubAccount,
-      )
-    }
+  // refresh the account number
+  const accountNumber = res.data.accountNumber
+  const secondarySubAccountId = res.data.accountId
+  secondarySubAccount.id = secondarySubAccountId
+  secondarySubAccount.instanceNumber = accountNumber
+  secondarySubAccount.balances = {
+    confirmed: 0,
+    unconfirmed: 0,
   }
-  const trustedReceivingAddress = ( regularAccount.hdWallet
+  secondarySubAccount.transactions = []
+
+  AccountShell.addSecondarySubAccount(
+    parentShell,
+    secondarySubAccountId,
+    secondarySubAccount,
+  )
+
+  const trustedDerivativeAccount = ( regularAccount.hdWallet
     .derivativeAccounts[ TRUSTED_CONTACTS ][
       accountNumber
-    ] as TrustedContactDerivativeAccountElements ).receivingAddress
+    ] as TrustedContactDerivativeAccountElements )
+  const trustedReceivingAddress = trustedDerivativeAccount.receivingAddress
+  const channelKey = trustedDerivativeAccount.channelKey
 
   const data: EphemeralDataElements = {
     walletID: walletId,
@@ -139,20 +334,12 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     trustedTestAddress: testAccount.hdWallet.receivingAddress,
   }
 
-  const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-
   if( contactInfo.isGuardian ){
     // Trusted Contact: Guardian
     const { changeContact, shareIndex, shareId, legacy } = contactInfo
-    const { SHARES_TRANSFER_DETAILS } = yield select(
-      ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
-    )
-    const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
-    Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
-    config.TC_REQUEST_EXPIRY
 
+    let previousGuardianName: string
     if ( changeContact ) {
-      let previousGuardianName: string
       // find previous TC (except keeper: shareIndex 0)
       if ( trustedContactsInfo && shareIndex ) {
         const previousGuardian = trustedContactsInfo[ shareIndex ]
@@ -164,121 +351,20 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
             .trim()
         } else console.log( 'Previous guardian details missing' )
       }
-
-      // upload share for the new contact(guardian)
-      if( legacy )
-        yield put(
-          uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
-        )
-      else
-        yield put(
-          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
-        )
-    } else if( shareExpired ) {
-      // share expired, re-upload (creates ephermeal channel as well)
-      if( legacy )
-        yield put(
-          uploadEncMShare( shareIndex, contactInfo, data ),
-        )
-      else
-        yield put(
-          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
-        )
-    } else {
-      // re-initiating expired Ephemeral Channel
-      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-      trustedContact.ephemeralChannel.initiatedAt &&
-      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-      config.TC_REQUEST_EXPIRY? true: false
-
-      if (
-        !hasTrustedChannel &&
-        isEphemeralChannelExpired
-      ){
-        yield put(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
-      }
     }
-  } else{
 
-    // update ephemeral data (if payment details are available)
-    // const { paymentDetails } = contactInfo
-    // let paymentURI, trustedPaymentURI
-    // if( paymentDetails ){
-    //   const { amount, address }  = paymentDetails
-    //   paymentURI = regularAccount.getPaymentURI( address, {
-    //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-    //   } ).paymentURI
-    //   trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
-    //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-    //   } ).paymentURI
-
-    //   data.paymentDetails =  {
-    //     trusted: {
-    //       address: trustedReceivingAddress,
-    //       paymentURI: trustedPaymentURI,
-    //     },
-    //     alternate: {
-    //       address: address,
-    //       paymentURI,
-    //     },
-    //   }
-  }
-
-  if ( !trustedContact ) {
+    // upload share for the new contact(guardian)
+    if( legacy )
+      yield put(
+        uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
+      )
+    else
+      yield put(
+        uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
+      )
+  } else {
     // create emphemeral channel(initiating TC)
     yield put( updateEphemeralChannel( contactInfo, data ) )
-  } else {
-    const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-    const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-      trustedContact.ephemeralChannel.initiatedAt &&
-      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-      config.TC_REQUEST_EXPIRY? true: false
-
-    if ( !hasTrustedChannel ){
-      if( isEphemeralChannelExpired ){
-        // re-initiating expired Ephemeral Channel
-        yield put(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
-      }
-      else{
-        // if payment details are changed(on receive); re-upload the data
-        //   if( paymentDetails && trustedContact.ephemeralChannel ) {
-        //     const { address }  = paymentDetails
-        //     const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
-        //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
-        //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-        //       .address === address &&
-        //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-        //       .paymentURI === paymentURI ? true: false
-
-        //     if ( !isPaymentDetailsSame ){
-        //       const updatedPaymentDetails = {
-        //         trusted: {
-        //           address: trustedReceivingAddress,
-        //           paymentURI: trustedPaymentURI,
-        //         },
-        //         alternate: {
-        //           address: paymentDetails.address,
-        //           paymentURI,
-        //         },
-        //       }
-        //       trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
-        //       yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
-        //     }
-        //   }
-        // }
-      }
-    }
   }
 }
 
