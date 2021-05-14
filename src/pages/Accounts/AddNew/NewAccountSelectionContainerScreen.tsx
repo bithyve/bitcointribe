@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import { View, Text, StyleSheet, SectionList, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, SectionList, SafeAreaView, TouchableOpacity, StatusBar } from 'react-native'
 import NewAccountOptionsSection from './NewAccountOptionsSection'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
@@ -8,7 +8,14 @@ import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccoun
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useNewAccountChoices from '../../../utils/hooks/account-utils/UseNewAccountChoices'
 import { RFValue } from 'react-native-responsive-fontsize'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import NavStyles from '../../../common/Styles/NavStyles'
 import ButtonBlue from '../../../components/ButtonBlue'
 
 export enum SectionKind {
@@ -123,6 +130,64 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 
   return (
     <SafeAreaView style={styles.rootContainer}>
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+      <View style={NavStyles.modalContainer}>
+      <View
+          style={{
+            alignItems: 'center',
+            flexDirection: 'row',
+            paddingRight: 10,
+            paddingBottom: hp( '1.5%' ),
+            paddingTop: hp( '1%' ),
+            marginLeft: 10,
+            marginRight: 10,
+            // marginBottom: hp( '1.5%' ),
+          }}
+        >
+          <View style={{
+            flex: 1, flexDirection: 'row', alignItems: 'center'
+          }}>
+            <TouchableOpacity
+              onPress={() => {
+                navigation.pop()
+              }}
+              hitSlop={{
+                top: 20, left: 20, bottom: 20, right: 20
+              }}
+              style={{
+                height: 30, width: 30, justifyContent: 'center'
+              }}
+            >
+              <FontAwesome
+                name="long-arrow-left"
+                color={Colors.blue}
+                size={17}
+              />
+            </TouchableOpacity>
+            <View style={{
+              flex: 1
+            }}>
+              <Text
+                style={{
+                  ...NavStyles.modalHeaderTitleText,
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                Add new Account
+              </Text>
+              <Text
+                style={{
+                  color: Colors.textColorGrey,
+                  fontSize: RFValue( 12 ),
+                  fontFamily: Fonts.FiraSansRegular,
+                  paddingTop: 5,
+                }}
+              >
+                Add an account, add a service, or import a wallet
+              </Text>
+            </View>
+          </View>
+        </View>
       <SectionList
         contentContainerStyle={{
           paddingVertical: 25
@@ -180,6 +245,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
         renderSectionHeader={renderSectionHeader}
         stickySectionHeadersEnabled={false}
       ></SectionList>
+      </View>
     </SafeAreaView>
   )
 }
