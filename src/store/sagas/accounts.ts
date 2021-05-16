@@ -1138,11 +1138,12 @@ export const addNewAccountShellWatcher = createWatcher(
 function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
+  console.log( 'payload', account )
+
   try {
     const service = yield select(
       ( state ) => state.accounts[ account.sourceKind ].service
     )
-
     const result = yield call(
       service.updateAccountDetails,
       {
@@ -1151,10 +1152,11 @@ function* updateAccountSettings( { payload: account, }: {
         kind: account.kind === SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
         instanceNumber: account.instanceNumber,
         customDisplayName: account.customDisplayName,
-        customDescription: account.customDescription
+        customDescription: account.customDescription,
+        visibility: account.visibility,
       }
     )
-
+    console.log( 'result', result )
     if ( result.status === 200 ) {
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
