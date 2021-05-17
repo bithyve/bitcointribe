@@ -455,7 +455,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const onPressReshare = useCallback( async () => {
     ( shareBottomSheet as any ).current.snapTo( 1 );
     ( ReshareBottomSheet as any ).current.snapTo( 0 )
-  }, [ selectedTitle, chosenContact ] )
+    createGuardian( getContacts( chosenContact ) )
+  }, [ selectedTitle, chosenContact, getContacts ] )
 
   const renderReshareContent = useCallback( () => {
     return (
@@ -756,7 +757,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const createGuardian = useCallback( async ( chosenContactTmp? ) => {
     let chosenContactState = chosenContact
-    if ( chosenContact && !Object.keys( chosenContact ).length ) chosenContactState = chosenContactTmp
+    if ( (chosenContact && !Object.keys( chosenContact ).length) || chosenContact == null ) chosenContactState = chosenContactTmp
     setIsGuardianCreationClicked( true )
 
     const contactName = `${chosenContactState.firstName} ${
