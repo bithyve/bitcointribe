@@ -11,6 +11,8 @@ import {
 import { nameToInitials } from '../../common/CommonFunctions'
 
 function MBKeeperButton( props ) {
+  const value = props.value
+  const keeper = props.keeper
 
   const getImageIcon = ( chosenContact ) => {
     if ( chosenContact && chosenContact.name ) {
@@ -65,8 +67,7 @@ function MBKeeperButton( props ) {
     )
   }
 
-  const value = props.value
-  const keeper = props.keeper
+
   return (
     <TouchableOpacity
       disabled={props.disabled}

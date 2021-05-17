@@ -32,7 +32,6 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   const dispatch = useDispatch()
   const accountShell = useAccountShellFromNavigation( navigation )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-
   const [ selectedVisibility, setSelectedVisibility ] = useState( primarySubAccount.visibility )
 
   function handleSelection( visibilityOption: AccountVisibility ) {
@@ -40,11 +39,8 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   }
 
   function handleSaveButtonPress() {
-    dispatch( updateSubAccountSettings( {
-      ...primarySubAccount,
-      visibility: selectedVisibility,
-    } ) )
-
+    primarySubAccount.visibility = selectedVisibility
+    dispatch( updateSubAccountSettings( primarySubAccount ) )
     navigation.goBack()
   }
 

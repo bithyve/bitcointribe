@@ -35,8 +35,8 @@ const LOADER_MESSAGE_TIME = 2
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
-    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
-    subText: '(*select locations)',
+    text: 'Get sats directly in your wallet with compatible exchanges vouchers',
+    subText: '',
   },
   {
     heading: 'Friends & Family',
@@ -180,7 +180,8 @@ export default function Login( props ) {
           if (
             releaseCases &&
             releaseCases.build == res.data.releases[ 0 ].build &&
-            releaseCases.ignoreClick
+            releaseCases.ignoreClick &&
+            releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {

@@ -451,7 +451,6 @@ class ManageBackupNewBHR extends Component<
     if (
       prevProps.initLoading !== this.props.initLoading && this.props.isSmMetaSharesCreatedFlag && this.props.metaSharesKeeper.length == 3
     ) {
-      console.log()
       const obj = {
         id: 2,
         selectedKeeper: {
@@ -673,6 +672,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   onPressKeeperButton = ( value, number ) => {
+    console.log( 'ONPress Keeper Button', value, number )
     this.props.onPressKeeper( value, number )
   };
 
@@ -1129,14 +1129,17 @@ class ManageBackupNewBHR extends Component<
                                   navigation.navigate(
                                     'CloudBackupHistory',
                                     {
-                                      selectedTime: this.getTime( new Date() ),
+                                      selectedTime: selectedKeeper.updatedAt
+                                        ? this.getTime( selectedKeeper.updatedAt )
+                                        : 'never',
                                       selectedStatus: 'Ugly',
                                     }
                                   )
                                 }
                               } : () => {
                                 this.setState( {
-                                  showLoader: true
+                                  showLoader: true,
+                                  selectedKeeper: value.keeper1
                                 } )
                                 requestAnimationFrame( () => {
                                   this.onPressKeeperButton( value, 1 )
@@ -1154,12 +1157,15 @@ class ManageBackupNewBHR extends Component<
                                 navigation.navigate(
                                   'SecurityQuestionHistoryNewBHR',
                                   {
-                                    selectedTime: this.getTime( new Date() ),
+                                    selectedTime: selectedKeeper.updatedAt
+                                      ? this.getTime( selectedKeeper.updatedAt )
+                                      : 'never',
                                     selectedStatus: 'Ugly',
                                   }
                                 ) : () => {
                                 this.setState( {
-                                  showLoader: true
+                                  showLoader: true,
+                                  selectedKeeper: value.keeper2
                                 } )
                                 requestAnimationFrame( () => {
                                   this.onPressKeeperButton( value, 2 )

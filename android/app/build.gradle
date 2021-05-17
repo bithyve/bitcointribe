@@ -60,7 +60,7 @@ android {
         applicationId "io.hexawallet.hexa"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 284
+        versionCode 288
         versionName "1.7.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         multiDexEnabled true
@@ -200,6 +200,7 @@ dependencies {
     implementation 'com.facebook.fresco:webpsupport:1.10.0'
     implementation 'com.google.firebase:firebase-crashlytics:17.3.0'
     implementation 'com.google.firebase:firebase-analytics:18.0.0'
+    implementation 'com.google.firebase:firebase-messaging:21.1.0'
     
     implementation 'com.google.android.gms:play-services-auth:16.0.1'
     implementation 'com.google.http-client:google-http-client-gson:1.26.0'

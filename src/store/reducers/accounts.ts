@@ -34,7 +34,9 @@ import {
   CLEAR_RECEIVE_ADDRESS,
   GENERATE_SECONDARY_XPRIV,
   RESET_TWO_FA,
-  VALIDATE_TWO_FA
+  VALIDATE_TWO_FA,
+  SET_SHOW_ALL_ACCOUNT,
+  RESET_ACCOUNT_UPDATE_FLAG
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -109,6 +111,7 @@ export type AccountsState = {
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
+  showAllAccount: boolean | null;
 };
 
 const initialState: AccountsState = {
@@ -158,6 +161,7 @@ const initialState: AccountsState = {
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
+  showAllAccount: false
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -510,6 +514,19 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           hasReceiveAddressSucceeded: null
         }
 
+      case SET_SHOW_ALL_ACCOUNT:
+        return {
+          ...state,
+          showAllAccount: action.payload.showAllAccount,
+        }
+
+      case RESET_ACCOUNT_UPDATE_FLAG:
+        return {
+          ...state,
+          isUpdatingAccountSettings: false,
+          hasAccountSettingsUpdateSucceeded: false,
+          hasAccountSettingsUpdateFailed: false,
+        }
       default:
         return state
   }
