@@ -1493,7 +1493,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Swan Account',
-              defaultDescription: 'BTC purchased from Swan',
+              defaultDescription: 'Sats purchased from Swan',
               serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.createTempSwanAccountInfo( newSubAccount )
