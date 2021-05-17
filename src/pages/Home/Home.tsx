@@ -1077,10 +1077,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   handleDeepLinkModal = () => {
     const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
     const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.getParam(
-      'trustedContactRequest'
-    )
+    const trustedContactRequest = this.props.navigation.getParam( 'trustedContactRequest' )
     const userKey = this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.getParam( 'swanRequest' )
+    if ( swanRequest ) {
+      this.setState( {
+        swanDeepLinkContent:swanRequest.url,
+      }, () => {
+        this.props.currentSwanSubAccount
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+    }
 
     if ( custodyRequest ) {
       this.setState(
@@ -1484,7 +1493,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Swan Account',
-              defaultDescription: 'BTC purchased from Swan',
+              defaultDescription: 'Sats purchased from Swan',
               serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.createTempSwanAccountInfo( newSubAccount )
