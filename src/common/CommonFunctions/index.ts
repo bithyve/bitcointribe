@@ -1,4 +1,4 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import AccountShell from '../data/models/AccountShell'
@@ -278,4 +278,16 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
     else return levelHealthVar[ 0 ].levelInfo
   }
   return levelHealthVar[ currentLevel - 1 ].levelInfo
+}
+
+
+export const deviceText = ( text ) =>{
+  switch ( text ) {
+      case 'Secondary Device1': return 'Personal Device1'
+      case 'Secondary Device2': return 'Personal Device2'
+      case 'Secondary Device3': return 'Personal Device3'
+
+      default:
+        return text
+  }
 }

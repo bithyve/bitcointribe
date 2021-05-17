@@ -50,6 +50,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
+import { deviceText } from '../../common/CommonFunctions'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -831,17 +832,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     ]
     console.log( 'shareArray', shareArray )
     dispatch( updateMSharesHealth( shareArray ) )
-  }
-
-  const deviceText = ( text ) =>{
-    switch ( text ) {
-        case 'Secondary Device1': return 'Personal Device1'
-        case 'Secondary Device2': return 'Personal Device2'
-        case 'Secondary Device3': return 'Personal Device3'
-
-        default:
-          return text
-    }
   }
 
   return (
