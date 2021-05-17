@@ -61,6 +61,7 @@ import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountIn
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 
 const getImageIcon = ( item ) => {
   if ( item ) {
@@ -382,6 +383,7 @@ class ContactDetails extends PureComponent<
 
   onPressResendRequest = () => {
     if ( this.index < 3 ) {
+      this.createGuardian()
       setTimeout( () => {
         ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
       }, 2 )
@@ -885,20 +887,26 @@ class ContactDetails extends PureComponent<
   SendShareModalFunction = () => {
     if ( !isEmpty( this.Contact ) ) {
       return (
-        <SendShareModal
+        <RequestKeyFromContact
+          isModal={true}
+          headerText={`Send Recovery Key${'\n'}to contact`}
+          subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}
+          contactText={'Sharing Recovery Key with'}
           contact={this.Contact ? this.Contact : null}
-          textHeader={'Sharing Key with'}
-          onPressViaQr={() => {
-            this.createGuardian()
-            if ( this.SendViaQRBottomSheet.current )
-              ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 );
+          QR={this.state.trustedQR}
+          link={this.state.trustedLink}
+          contactEmail={''}
+          onPressBack={() => {
             ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            this.props.navigation.goBack()
           }}
-          onPressViaLink={() => {
-            this.createGuardian()
-            if ( this.SendViaLinkBottomSheet.current )
-              ( this.SendViaLinkBottomSheet as any ).current.snapTo( 1 );
+          onPressDone={() => {
             ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            this.props.navigation.goBack()
+          }}
+          onPressShare={() => {
+              ( this.shareBottomSheet as any ).current.snapTo( 0 )
+              this.props.navigation.goBack()
           }}
         />
       )
@@ -1468,8 +1476,8 @@ class ContactDetails extends PureComponent<
           snapPoints={[
             Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '50%' )
-              : hp( '65%' ),
+              ? hp( '90%' )
+              : hp( '85%' ),
           ]}
           renderContent={this.SendShareModalFunction}
           renderHeader={this.SendModalFunction}

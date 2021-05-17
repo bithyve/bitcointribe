@@ -145,13 +145,13 @@ export default function RequestKeyFromContact(props) {
 				>
 					<View style={[styles.qrContainer, { marginTop: !props.isModal ? 0 : hp('4%') }]}>
 						{!props.QR ? (
-							<ActivityIndicator size="large" />
+							<ActivityIndicator size="large" color={Colors.babyGray} />
 						) : (
 								<QRCode value={props.QR} size={hp('27%')} />
 							)}
 					</View>
 					<CopyThisText
-						openLink={shareOption}
+						openLink={shareLink ? shareOption : ()=> {}}
 						backgroundColor={Colors.backgroundColor1}
 						text={shareLink ? shareLink : 'Creating Link....'}
 					/>
