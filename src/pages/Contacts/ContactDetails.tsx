@@ -1310,6 +1310,7 @@ class ContactDetails extends PureComponent<
                 <TouchableOpacity
                   style={{
                     ...styles.bottomButton,
+                    justifyContent: 'space-around',
                   }}
                   onPress={() => this.onHelpRestore( true )}
                 >
@@ -1321,7 +1322,7 @@ class ContactDetails extends PureComponent<
                     {uploadingSmShare ? (
                       <ActivityIndicator size="small" />
                     ) : (
-                      <Text style={styles.buttonText} numberOfLines={1}>Show Secondary Key</Text>
+                      <Text style={[styles.buttonText, { marginLeft: 0, marginRight: 0, width: wp('30%'), textAlign: 'center' }]}>Show Secondary Key</Text>
                     )}
                   </View>
                 </TouchableOpacity>

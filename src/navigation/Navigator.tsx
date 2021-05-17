@@ -86,6 +86,7 @@ import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKe
 // import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../pages/NewBHR/CloudBackupHistory'
+
 const SetupNavigator = createStackNavigator(
   {
     Launch,
@@ -226,7 +227,7 @@ const HomeNavigator = createStackNavigator(
       navigationOptions: {
         title: 'Wyre Home'
       }
-    }
+    },
   },
   {
     headerLayoutPreset: 'center',

@@ -6,6 +6,8 @@ import PanAccountSettingsContainerScreen from '../../../pages/MoreOptions/Accoun
 import NavHeaderSettingsButton from '../../../components/navigation/NavHeaderSettingsButton'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from '../../options/DefaultStackScreenNavigationOptions'
+import EnterPasscodeScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/EnterPasscodeScreen'
+import SecurityQuestionScreen from '../../../pages/MoreOptions/AccountManagement/PanAccountSettings/SecurityQuestionScreen'
 
 
 const PanAccountSettingsStack = createStackNavigator(
@@ -15,6 +17,28 @@ const PanAccountSettingsStack = createStackNavigator(
       navigationOptions: ( { navigation } ) => {
         return {
           title: 'Account Settings',
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      },
+    },
+    EnterPasscode: {
+      screen: EnterPasscodeScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          title: 'Show all accounts',
+          headerLeft: () => {
+            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+          },
+        }
+      },
+    },
+    SecurityQuestion: {
+      screen: SecurityQuestionScreen,
+      navigationOptions: ( { navigation } ) => {
+        return {
+          title: 'Show all accounts',
           headerLeft: () => {
             return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
           },
@@ -48,11 +72,11 @@ const AccountManagementStack = createStackNavigator(
             // (See: https://github.com/bithyve/hexa/issues/2454)
             //
 
-            // return (
-            //   <NavHeaderSettingsButton
-            //     onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
-            //   />
-            // )
+            return (
+              <NavHeaderSettingsButton
+                onPress={() => { navigation.navigate( 'PanAccountSettings' ) }}
+              />
+            )
           },
         }
       },

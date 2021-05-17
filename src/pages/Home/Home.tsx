@@ -142,6 +142,8 @@ import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { setShowAllAccount } from '../../store/actions/accounts'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -274,6 +276,8 @@ interface HomePropsTypes {
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
   updateCloudPermission: any;
+  credsAuthenticated: any;
+  setShowAllAccount: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -291,7 +295,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-
+    this.props.setShowAllAccount( false )
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
@@ -399,18 +403,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
 
             case ScannedAddressKind.PAYMENT_URI:
-              let address, options, donationId
+              let address, options
 
               try {
                 const res = service.decodePaymentURI( qrData )
                 address = res.address
                 options = res.options
 
-                // checking for donationId to send note
-                if ( options && options.message ) {
-                  const rawMessage = options.message
-                  donationId = rawMessage.split( ':' ).pop().trim()
-                }
               } catch ( err ) {
                 Alert.alert( 'Unable to decode payment URI' )
                 return
@@ -430,7 +429,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 bitcoinAmount: options.amount
                   ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
                   : '',
-                donationId,
               } )
               break
         }
@@ -866,8 +864,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation,
       s3Service,
       initializeHealthSetup,
-      newBHRFlowStarted
+      newBHRFlowStarted,
+      credsAuthenticated
     } = this.props
+    credsAuthenticated( false )
     const versionData = []
     this.closeBottomSheet()
     if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
@@ -1121,7 +1121,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()
@@ -2673,6 +2672,8 @@ export default withNavigationFocus(
     setCloudData,
     updateKeeperInfoToUnderCustody,
     updateCloudPermission,
+    credsAuthenticated,
+    setShowAllAccount
   } )( Home )
 )
 

@@ -7,7 +7,6 @@ import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import FormStyles from '../../../common/Styles/FormStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch } from 'react-redux'
-import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import AccountShell from '../../../common/data/models/AccountShell'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
@@ -21,7 +20,7 @@ import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
 import { TouchableOpacity, useBottomSheetModal } from '@gorhom/bottom-sheet'
-import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending, updateDonationNote } from '../../../store/actions/sending'
+import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
@@ -32,7 +31,6 @@ import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-uti
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import idx from 'idx'
-import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 export type NavigationParams = {
 };
@@ -62,7 +60,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   const [ selectedAmount, setSelectedAmount ] = useState<Satoshis | null>( currentAmount ? currentAmount : 0 )
   const [ noteText, setNoteText ] = useState( '' )
   const sendingState = useSendingState()
-  const donationId = useDonationIdFromSelectedRecipients()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
   } )
@@ -98,12 +95,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     dispatch( executeSendStage1( {
       accountShellID: sourceAccountShell.id
     } ) )
-
-    // update donation note
-    if( donationId && noteText )
-      dispatch( updateDonationNote( {
-        donationNote: noteText
-      } ) )
   }
 
   function handleAddRecipientButtonPress() {
@@ -213,29 +204,6 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
           }}
           onSendMaxPressed={handleSendMaxPress}
         />
-
-        { donationId ? (
-          <View style={styles.textInputFieldWrapper}>
-            <Input
-              containerStyle={styles.textInputContainer}
-              inputContainerStyle={{
-                height: '100%',
-                padding: 0,
-                borderBottomColor: 'transparent',
-              }}
-              inputStyle={styles.textInputContent}
-              placeholder={'Send a short note to the donee'}
-              placeholderTextColor={FormStyles.placeholderText.color}
-              value={noteText}
-              returnKeyLabel="Done"
-              returnKeyType="done"
-              onSubmitEditing={Keyboard.dismiss}
-              onChangeText={setNoteText}
-              autoCorrect={false}
-              autoCompleteType="off"
-            />
-          </View>
-        ): null}
       </View>
 
       <View style={styles.footerSection}>

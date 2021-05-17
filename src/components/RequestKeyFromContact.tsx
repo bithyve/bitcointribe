@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ActivityIndicator, Share } from 'react-native'
+import { View, Text, StyleSheet, ActivityIndicator, Platform } from 'react-native'
 import {
 	widthPercentageToDP as wp,
 	heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Share from 'react-native-share';
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -63,21 +64,25 @@ export default function RequestKeyFromContact(props) {
 
 	const shareOption = async () => {
 		try {
-			const result = await Share.share({
-				message:
-					`${shareLink}`,
+			// const url = 'https://awesome.contents.com/';
+			const title = 'Request';
+
+			const options = Platform.select({
+				default: {
+					title,
+					message: `${shareLink}`,
+				},
 			});
 
-			if (result.action === Share.sharedAction) {
-				props.onPressShare()
-				if (result.activityType) {
-					// shared with activity type of result.activityType
-				} else {
-					// shared
-				}
-			} else if (result.action === Share.dismissedAction) {
-				// dismissed
-			}
+
+			Share.open(options)
+				.then((res) => {
+					// if (res.success) {
+					props.onPressShare()
+					// }
+				})
+				.catch((err) => {
+				});
 		} catch (error) {
 			// console.log(error);
 
