@@ -2,6 +2,7 @@ import { StyleSheet } from 'react-native'
 import Colors from '../Colors'
 import Fonts from '../Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import { heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 
 const ListStyles = StyleSheet.create( {
@@ -44,7 +45,8 @@ const ListStyles = StyleSheet.create( {
     paddingVertical: 10,
   },
   container : {
-    paddingHorizontal: 9,
+    // paddingHorizontal: 3,
+    height: hp( '11%' ),
     marginHorizontal: 14
   },
   disabledContainer: {

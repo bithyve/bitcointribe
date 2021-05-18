@@ -41,13 +41,13 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false
   },
   
-  // {
-  //   title: 'Scan a Voucher',
-  //   subtitle: 'From select retail stores with FastBitcoins',
-  //   kind: BuyMenuItemKind.FAST_BITCOINS,
-  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-  //   disabled: false
-  // },
+  {
+    title: 'Scan a Voucher',
+    subtitle: 'From select retail stores with FastBitcoins',
+    kind: BuyMenuItemKind.FAST_BITCOINS,
+    imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+    disabled: false
+  },
   {
     title: 'Set up automatic buys',
     subtitle: 'Stack sats with Swan Bitcoin',
