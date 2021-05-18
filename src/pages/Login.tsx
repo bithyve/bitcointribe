@@ -198,10 +198,10 @@ export default function Login( props ) {
 
   const custodyRequest = props.navigation.getParam( 'custodyRequest' )
   const recoveryRequest = props.navigation.getParam( 'recoveryRequest' )
-  const trustedContactRequest = props.navigation.getParam(
-    'trustedContactRequest',
-  )
+  const trustedContactRequest = props.navigation.getParam( 'trustedContactRequest' )
   const userKey = props.navigation.getParam( 'userKey' )
+  const swanRequest = props.navigation.getParam( 'swanRequest' )
+
   const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
 
   useEffect( () => {
@@ -221,6 +221,7 @@ export default function Login( props ) {
               recoveryRequest,
               trustedContactRequest,
               userKey,
+              swanRequest
             } )
           }, LOADER_MESSAGE_TIME )
         } else {
