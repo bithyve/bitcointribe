@@ -27,13 +27,6 @@ export type BuyBitcoinBottomSheetMenuItem = {
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
-    title: 'Buy with Wyre',
-    subtitle: 'Buy any amount',
-    kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-    disabled: false
-  },
-  {
     title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
     subtitle: 'Low fee for those big buys',
     kind: BuyMenuItemKind.RAMP,
@@ -41,12 +34,20 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false
   },
   {
-    title: 'Scan a Voucher',
-    subtitle: 'From select retail stores with FastBitcoins',
-    kind: BuyMenuItemKind.FAST_BITCOINS,
-    imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+    title: 'Buy with Wyre',
+    subtitle: 'Buy any amount',
+    kind: BuyMenuItemKind.WYRE,
+    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
     disabled: false
   },
+  
+  // {
+  //   title: 'Scan a Voucher',
+  //   subtitle: 'From select retail stores with FastBitcoins',
+  //   kind: BuyMenuItemKind.FAST_BITCOINS,
+  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+  //   disabled: false
+  // },
   {
     title: 'Set up automatic buys',
     subtitle: 'Stack sats with Swan Bitcoin',

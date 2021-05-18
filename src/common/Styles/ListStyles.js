@@ -44,7 +44,8 @@ const ListStyles = StyleSheet.create( {
     paddingVertical: 10,
   },
   container : {
-    paddingHorizontal: 16,
+    paddingHorizontal: 9,
+    marginHorizontal: 14
   },
   disabledContainer: {
     paddingHorizontal: 16,
