@@ -4,10 +4,10 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
   Keyboard,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,

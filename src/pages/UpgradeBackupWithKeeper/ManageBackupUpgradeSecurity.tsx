@@ -11,8 +11,8 @@ import {
   RefreshControl,
   ImageBackground,
   Platform,
-  AsyncStorage,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,

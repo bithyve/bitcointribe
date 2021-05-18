@@ -6,8 +6,8 @@ import {
   StatusBar,
   KeyboardAvoidingView,
   Platform,
-  AsyncStorage,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../../common/Colors'
