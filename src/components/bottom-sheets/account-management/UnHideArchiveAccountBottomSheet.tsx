@@ -83,19 +83,19 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
 
       <View style={styles.mainContentContainer}>
         <Text style={BottomSheetStyles.confirmationMessageHeading}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Un-hide Account' : 'Restore Archived Account'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide Account' : 'Restore Archived Account'}
         </Text>
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Un-hide the account to Home screen' : 'Restore the account to Home screen'}
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'Start showing the account in My Portfolio' : 'Restore the account to Home screen'}
         </Text>
         {renderAccount( accountInfo )}
 
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          {accountInfo.visibility === AccountVisibility.HIDDEN ? 'You can hide the account again from my Portfolio from account settings' : 'Once confirmed you can use this account like a normal account from My Portfolio'}
         </Text>
         <View style={styles.footerSectionContainer}>
           <View style={styles.actionButtonContainer}>
