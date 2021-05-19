@@ -33,7 +33,7 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {isError ? 'An account should be empty before it can be archived' : 'You can acrchive an unused account from the home screen'}
+          {isError ? 'An account should be empty before it can be archived' : 'You can archive an unused account from the home screen'}
         </Text>
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18

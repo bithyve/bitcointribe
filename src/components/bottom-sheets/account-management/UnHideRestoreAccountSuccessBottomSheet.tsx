@@ -83,19 +83,19 @@ const UnHideRestoreAccountSuccessBottomSheet: React.FC<Props> = ( {
 
       <View style={styles.mainContentContainer}>
         <Text style={BottomSheetStyles.confirmationMessageHeading}>
-          {accountVisibility === AccountVisibility.HIDDEN ? 'Account Successfully Un-hidden' : 'Account Successfully Restored'}
+          {accountVisibility === AccountVisibility.HIDDEN ? 'Account Successfully Unhidden' : 'Account Successfully Restored'}
         </Text>
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-          {'You can now find this account on your Home screen'}
+          {'You can now find this account in My Portfolio'}
         </Text>
         {renderAccount( accountInfo, accountVisibility )}
 
         <Text style={{
           ...ListStyles.infoHeaderSubtitleText, marginBottom: 18
         }}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          {accountVisibility === AccountVisibility.HIDDEN ? 'The account can be seen under My Portfolio and the balance of this account will be added to the overall portfolio value' : 'You can now use this account to send and receive sats like a normal account'}
         </Text>
       </View>
       <View style={styles.footerSectionContainer}>

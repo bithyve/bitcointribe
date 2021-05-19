@@ -64,7 +64,6 @@ const HomeAccountCardsList: React.FC<Props> = ( {
   const { present, dismiss } = useBottomSheetModal()
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   function handleAccountReordering( orderedAccounts: AccountShell[] ) {}
-  console.log( 'showAllAccount', showAllAccount )
   function handleGridCardLongPress() {
     // 📝 For now, long-pressing to re-order is on the backburner
     // until we can make it WYSIWYG.
