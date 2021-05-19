@@ -62,9 +62,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
 
   if( !hasRedeemSwanCodeForTokenInitiated && swanAccountCreationStatus == SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) {
-    console.log( 'redeem', {
-      hasRedeemSwanCodeForTokenInitiated
-    } )
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
   const renderFooter = () => {
@@ -88,7 +85,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           )
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          console.log( 'inside WALLET_LINKED_SUCCESSFULLY' )
           if( swanAccountCount<1 ) {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
@@ -139,12 +135,16 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         <TouchableOpacity
           activeOpacity={1}
           onPress={onPress}
-          style={{ flexDirection: 'row' }}
+          style={{
+            flexDirection: 'row'
+          }}
         >
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} style={{ marginTop: hp(0.5) }} />
+          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} style={{
+            marginTop: hp( 0.5 )
+          }} />
           <Text style={styles.modalTitleText}>{swanTitle}</Text>
         </TouchableOpacity>
-        
+
         <Text style={{
           ...styles.modalInfoText,
           marginTop: wp( 1.5 ),
@@ -250,7 +250,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     ...styles.modalContentContainer
   }}>
     <View style={{
-      height: '92%'
+      height: '95%'
     }}>
       {renderMessage()}
       {renderFooter()}
