@@ -89,21 +89,10 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     code_verifier
   } )
 
-  // Temp code for testing. to be removed
-  console.log( {
-    swanResponse
-  } )
-
   const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
   yield put( redeemSwanCodeForTokenSucceeded( {
     swanAuthenticatedToken: access_token
   } ) )
-  const ST = yield select(
-    ( state ) => state.swanIntegration
-  )
-  console.log( 'SUX-S ', ST.swanAccountDetails, {
-    ST
-  } )
 
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
@@ -129,9 +118,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   const { swanAccountDetails } = yield select(
     ( state ) => state.swanIntegration
   )
-  console.log( {
-    swanAccountDetails
-  } )
+
   const swanXpub = swanAccountDetails.xPub
   let swanCreateResponse
   try {

@@ -1138,8 +1138,6 @@ export const addNewAccountShellWatcher = createWatcher(
 function* updateAccountSettings( { payload: account, }: {
   payload: SubAccountDescribing;
 } ) {
-  console.log( 'payload', account )
-
   try {
     const service = yield select(
       ( state ) => state.accounts[ account.sourceKind ].service

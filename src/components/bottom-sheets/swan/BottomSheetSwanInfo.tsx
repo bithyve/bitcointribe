@@ -62,9 +62,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
 
   if( !hasRedeemSwanCodeForTokenInitiated && swanAccountCreationStatus == SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) {
-    console.log( 'redeem', {
-      hasRedeemSwanCodeForTokenInitiated
-    } )
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
   const renderFooter = () => {
@@ -88,7 +85,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           )
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          console.log( 'inside WALLET_LINKED_SUCCESSFULLY' )
           if( swanAccountCount<1 ) {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
