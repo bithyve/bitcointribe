@@ -147,7 +147,6 @@ export const createTempSwanAccountInfo = ( payload: SubAccountDescribing ) => {
 }
 
 export const tempSwanAccountInfoSaved = ( data ) => {
-  console.log( 'tempSwanAccountInfoSaved called ', data )
   return {
     type: TEMP_SWAN_ACCOUNT_INFO_SAVED,
     payload: {
