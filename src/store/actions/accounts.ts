@@ -50,6 +50,8 @@ export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
 export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
+export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
+export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
 
 export const getAllAccountsData = () => {
   return {
@@ -655,5 +657,19 @@ export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, service
       QRModalHeader,
       serviceType
     },
+  }
+}
+
+export const setShowAllAccount = ( showAllAccount ) => {
+  return {
+    type: SET_SHOW_ALL_ACCOUNT, payload: {
+      showAllAccount
+    }
+  }
+}
+
+export const resetAccountUpdateFlag = () => {
+  return {
+    type: RESET_ACCOUNT_UPDATE_FLAG,
   }
 }

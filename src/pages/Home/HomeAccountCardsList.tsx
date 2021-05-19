@@ -9,6 +9,7 @@ import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBac
 import HomeAccountCardsDraggableList from '../../components/home/HomeAccountCardsDraggableList'
 import HomeAccountCardsGrid from '../../components/home/HomeAccountCardsGrid'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import { useDispatch, useSelector } from 'react-redux'
 
 
 export type Props = {
@@ -32,7 +33,7 @@ const EditModeBottomSheetHeader: React.FC = () => {
     <View style={styles.editModeBottomSheetHeaderSection}>
 
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <Text style={styles.editModeBottomSheetHeadingText}>Rearrange Accounts</Text>
         <Text style={styles.editModeBottomSheetSubHeadingText}>Move the accounts to reorder them</Text>
@@ -40,7 +41,7 @@ const EditModeBottomSheetHeader: React.FC = () => {
 
       <Button
         containerStyle={{
-          flex: 0 
+          flex: 0
         }}
         buttonStyle={ButtonStyles.actionButton}
         title="All Accounts"
@@ -61,9 +62,8 @@ const HomeAccountCardsList: React.FC<Props> = ( {
 }: Props ) => {
   const accountShells = useActiveAccountShells()
   const { present, dismiss } = useBottomSheetModal()
-
+  const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   function handleAccountReordering( orderedAccounts: AccountShell[] ) {}
-
   function handleGridCardLongPress() {
     // 📝 For now, long-pressing to re-order is on the backburner
     // until we can make it WYSIWYG.
@@ -116,6 +116,7 @@ const HomeAccountCardsList: React.FC<Props> = ( {
         onAccountSelected={onCardSelected}
         onAddNewSelected={onAddNewSelected}
         contentContainerStyle={contentContainerStyle}
+        showAllAccount={showAllAccount}
       />
     </View>
   )

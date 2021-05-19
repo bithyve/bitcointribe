@@ -141,6 +141,8 @@ import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { setShowAllAccount } from '../../store/actions/accounts'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -271,6 +273,8 @@ interface HomePropsTypes {
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
   updateCloudPermission: any;
+  credsAuthenticated: any;
+  setShowAllAccount: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -288,7 +292,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-
+    this.props.setShowAllAccount( false )
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
@@ -857,8 +861,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation,
       s3Service,
       initializeHealthSetup,
-      newBHRFlowStarted
+      newBHRFlowStarted,
+      credsAuthenticated
     } = this.props
+    credsAuthenticated( false )
     const versionData = []
     this.closeBottomSheet()
     if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
@@ -1065,10 +1071,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   handleDeepLinkModal = () => {
     const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
     const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.getParam(
-      'trustedContactRequest'
-    )
+    const trustedContactRequest = this.props.navigation.getParam( 'trustedContactRequest' )
     const userKey = this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.getParam( 'swanRequest' )
+    if ( swanRequest ) {
+      this.setState( {
+        swanDeepLinkContent:swanRequest.url,
+      }, () => {
+        this.props.currentSwanSubAccount
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+    }
 
     if ( custodyRequest ) {
       this.setState(
@@ -1109,7 +1124,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()
@@ -1473,7 +1487,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Swan Account',
-              defaultDescription: 'BTC purchased from Swan',
+              defaultDescription: 'Sats purchased from Swan',
               serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.createTempSwanAccountInfo( newSubAccount )
@@ -1776,6 +1790,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   closeBottomSheet = () => {
     this.bottomSheetRef.current?.close()
     this.onBottomSheetClosed()
+  };
+
+  onBackPress = () => {
+    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
   };
 
   onNotificationClicked = async ( value ) => {
@@ -2174,6 +2192,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+                // onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -2187,6 +2206,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2201,6 +2221,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                 onPress={this.onBackPress}
               />
             </>
           )
@@ -2216,6 +2237,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2276,6 +2298,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2292,6 +2315,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2659,6 +2683,8 @@ export default withNavigationFocus(
     setCloudData,
     updateKeeperInfoToUnderCustody,
     updateCloudPermission,
+    credsAuthenticated,
+    setShowAllAccount
   } )( Home )
 )
 

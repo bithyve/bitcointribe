@@ -1,4 +1,4 @@
-import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP } from '../../../common/constants/wallet-service-types'
+import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP, SWAN } from '../../../common/constants/wallet-service-types'
 
 export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
   // determines account icon
@@ -13,6 +13,9 @@ export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
           break
         case WYRE:
           accountImageSource = require( '../../../assets/images/icons/icon_wyre.png' )
+          break
+        case SWAN:
+          accountImageSource = require( '../../../assets/images/icons/icon_swan.png' )
           break
     }
   }
@@ -49,6 +52,9 @@ export const getAccountTitle = ( accountKind, derivativeAccountDetails ) => {
           break
         case WYRE:
           accountTitle = 'Wyre'
+          break
+        case SWAN:
+          accountTitle = 'Swan'
           break
     }
   }

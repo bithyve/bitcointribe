@@ -92,6 +92,15 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   processDL = async ( url ) => {
     const splits = url.split( '/' )
 
+    if ( splits.includes( 'swan' ) ) {
+      const swanRequest = {
+        url
+      }
+      this.props.navigation.replace( 'Login', {
+        swanRequest
+      } )
+    }
+
     if ( splits[ 5 ] === 'sss' ) {
       const requester = splits[ 4 ]
 

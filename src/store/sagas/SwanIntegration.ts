@@ -138,7 +138,7 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
       access_token: swanAuthenticatedToken,
       extendedPublicKey: swanXpub,
-      displayName: swanAccountDetails.accountName || 'BTC purchased from Swan'
+      displayName: swanAccountDetails.accountName || 'Sats purchased from Swan'
     } )
   }
   catch( e )  {

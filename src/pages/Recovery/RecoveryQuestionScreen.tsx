@@ -8,9 +8,9 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Colors from '../../common/Colors'
 import QuestionList from '../../common/QuestionList'
 import Fonts from '../../common/Fonts'

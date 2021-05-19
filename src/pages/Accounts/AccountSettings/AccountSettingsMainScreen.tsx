@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
@@ -10,6 +10,16 @@ import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import AccountArchiveModal from './AccountArchiveModal'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateSubAccountSettings } from '../../../store/actions/accounts'
+
+
+const SELECTABLE_VISIBILITY_OPTIONS = [
+  AccountVisibility.ARCHIVED,
+  // AccountVisibility.DURESS,   // Disabled until duress mode is implemented later
+]
 
 export type Props = {
   navigation: any;
@@ -31,13 +41,19 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
+  const dispatch = useDispatch()
 
   const accountShell = useAccountShellForID( accountShellID )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
-
+  //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
+  const {
+    present: openArchiveModal,
+    dismiss: closeArchiveModal,
   } = useBottomSheetModal()
 
   const listItems = useMemo<SettingsListItem[]>( () => {
@@ -89,27 +105,27 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
       //   screenName: 'ReassignTransactionsMainOptions',
       //   imageSource: require('../../../assets/images/icons/icon_transactions_circle.png'),
       // },
-      // {
-      //   title: 'Account Visibility',
-      //   subtitle: 'Configure for different privacy-sensitive contexts',
-      //   screenName: 'EditVisibility',
-      //   screenParams: {
-      //     accountShellID: accountShell.id,
-      //   },
-      //   imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
-      // },
+      {
+        title: 'Account Visibility',
+        subtitle: 'Configure for different privacy-sensitive contexts',
+        screenName: 'EditVisibility',
+        screenParams: {
+          accountShellID: accountShell.id,
+        },
+        imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
+      },
       // {
       //   title: 'Merge Account',
       //   subtitle: `Move all transactions to another Hexa account`,
       //   screenName: 'MergeAccounts',
       //   imageSource: require('../../../assets/images/icons/icon_merge_blue.png'),
       // },
-      // {
-      //   title: 'Archive Account',
-      //   subtitle: 'Move this account out of sight and out of mind',
-      //   screenName: '',
-      //   imageSource: require('../../../assets/images/icons/icon_archive.png'),
-      // },
+      {
+        title: 'Archive Account',
+        subtitle: 'Move this account out of sight and out of mind',
+        onOptionPressed: showArchiveModal,
+        imageSource: require( '../../../assets/images/icons/icon_archive.png' ),
+      },
     ]
   }, [ accountShell ] )
 
@@ -119,13 +135,86 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     } else if ( listItem.screenName !== undefined ) {
       const screenParams = listItem.screenParams || {
       }
-
       navigation.navigate( listItem.screenName, screenParams )
     }
   }
 
+  const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
+    return (
+      <ListItem
+        bottomDivider
+        onPress={() => { handleListItemPress( listItem ) }}
+      >
+        <Image
+          source={listItem.imageSource}
+          style={ListStyles.thumbnailImageSmall}
+          resizeMode="contain"
+        />
+
+        <ListItem.Content style={ListStyles.listItemContentContainer}>
+          <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
+          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
+        </ListItem.Content>
+
+        <ListItem.Chevron />
+      </ListItem>
+    )
+  }
+
+  const checkAccountBalance = useCallback( () => {
+    openArchiveModal(
+      <AccountArchiveModal
+        isError={true}
+        onProceed={() => {
+          closeArchiveModal()
+        }}
+        onBack={closeArchiveModal}
+        onViewAccount={closeArchiveModal}
+        account={primarySubAccount}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
+
   function handleRescanListItemSelection() {
     showRescanningPromptBottomSheet()
+  }
+
+  function handleAccountArchive() {
+    primarySubAccount.visibility = AccountVisibility.ARCHIVED
+    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    navigation.goBack()
+  }
+
+
+  const showAccountArchiveBottomSheet = useCallback( () => {
+    openArchiveModal(
+      <AccountArchiveModal
+        isError={false}
+        onProceed={() => {
+          handleAccountArchive()
+          closeArchiveModal()
+        }}
+        onBack={closeArchiveModal}
+        onViewAccount={closeArchiveModal}
+        account={primarySubAccount}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '40%' ],
+      },
+    )
+  }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
+
+  function showArchiveModal() {
+    if ( primarySubAccount.balances.confirmed === 0 ) {
+      showAccountArchiveBottomSheet()
+    } else {
+      checkAccountBalance()
+    }
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
@@ -171,34 +260,13 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ presentBottomSheet, dismissBottomSheet ] )
 
 
-  const renderItem = ( { item: listItem }: { item: SettingsListItem } ) => {
-    return (
-      <ListItem
-        bottomDivider
-        onPress={() => { handleListItemPress( listItem ) }}
-      >
-        <Image
-          source={listItem.imageSource}
-          style={ListStyles.thumbnailImageSmall}
-          resizeMode="contain"
-        />
-
-        <ListItem.Content style={ListStyles.listItemContentContainer}>
-          <ListItem.Title style={ListStyles.listItemTitle}>{listItem.title}</ListItem.Title>
-          <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{listItem.subtitle}</ListItem.Subtitle>
-        </ListItem.Content>
-
-        <ListItem.Chevron />
-      </ListItem>
-    )
-  }
-
   return (
     <FlatList
       style={styles.rootContainer}
       contentContainerStyle={{
         paddingHorizontal: 14
       }}
+      extraData={accountShell}
       data={listItems}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
