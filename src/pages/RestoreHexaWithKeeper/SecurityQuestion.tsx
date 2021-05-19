@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
-  AsyncStorage,
   StyleSheet,
   TextInput,
   Platform,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
