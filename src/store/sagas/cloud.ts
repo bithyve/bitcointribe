@@ -2,9 +2,9 @@ import moment from 'moment'
 import { NativeModules, Platform } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { call, fork, put, select, spawn } from 'redux-saga/effects'
-import { CloudData } from '../../common/CommonFunctions'
+import { CloudData, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
-import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory } from '../actions/cloud'
+import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
 import { updateMSharesHealth } from '../actions/health'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
@@ -651,3 +651,53 @@ export const uplaodFileWatcher = createWatcher(
   UPLOAD_FILE,
 )
 
+function* updateCloudBackupWorker( ) {
+  try{
+    const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
+    if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+      const levelHealth = yield select( ( state ) => state.health.levelHealth )
+      const currentLevel = yield select( ( state ) => state.health.currentLevel )
+      const s3Service = yield select( ( state ) => state.health.service )
+      const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
+
+      let secretShare = {
+      }
+      if ( levelHealth.length > 0 ) {
+        const levelInfo = getLevelInfo( levelHealth, currentLevel )
+        if ( levelInfo ) {
+          if (
+            levelInfo[ 2 ] &&
+            levelInfo[ 3 ] &&
+            levelInfo[ 2 ].status == 'accessible' &&
+            levelInfo[ 3 ].status == 'accessible'
+          ) {
+            for (
+              let i = 0;
+              i < s3Service.levelhealth.metaSharesKeeper.length;
+              i++
+            ) {
+              const element = s3Service.levelhealth.metaSharesKeeper[ i ]
+              if ( levelInfo[ 0 ].shareId == element.shareId ) {
+                secretShare = element
+                break
+              }
+            }
+          }
+        }
+      }
+      yield call( cloudWorker, {
+        payload: {
+          kpInfo: keeperInfo, level: currentLevel == 3 ? 3 : currentLevel + 1, share: secretShare
+        }
+      } )
+    }
+  }
+  catch ( error ) {
+    yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+  }
+}
+
+export const updateCloudBackupWatcher = createWatcher(
+  updateCloudBackupWorker,
+  UPDATE_CLOUD_BACKUP,
+)

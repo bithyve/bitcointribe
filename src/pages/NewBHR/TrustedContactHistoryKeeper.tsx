@@ -756,7 +756,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const createGuardian = useCallback( async ( chosenContactTmp? ) => {
     let chosenContactState = chosenContact
-    if ( chosenContact && !Object.keys( chosenContact ).length ) chosenContactState = chosenContactTmp
+    if ( ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContactState == null ) chosenContactState = chosenContactTmp
     setIsGuardianCreationClicked( true )
 
     const contactName = `${chosenContactState.firstName} ${

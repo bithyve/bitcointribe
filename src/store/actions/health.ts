@@ -564,14 +564,9 @@ export const autoShareContact = (
   }
 }
 
-export const autoShareToLevel2Keepers = (
-  levelHealth
-) => {
+export const autoShareToLevel2Keepers = ( ) => {
   return {
     type: AUTO_SHARE_LEVEL2_KEEPER,
-    payload: {
-      levelHealth
-    },
   }
 }
 

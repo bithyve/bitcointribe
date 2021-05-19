@@ -93,7 +93,6 @@ const checkLevelHealth = (
       return levelData
     } else {
       // console.log( 'modifyLevelStatus ELSE' )
-      const status = checkStatus( levelHealthVar, index, index2, currentLevel )
       if( levelHealthVar[ 0 ] && currentLevel > 0 ){
         levelData[ 0 ].keeper1 = levelHealthVar[ currentLevel - 1 ] && levelHealthVar[ currentLevel - 1 ].levelInfo ? levelHealthVar[ currentLevel - 1 ].levelInfo[ 0 ] : levelData[ 0 ].keeper1
         levelData[ 0 ].keeper1.name = 'Cloud'
@@ -134,19 +133,15 @@ const checkLevelHealth = (
 
 const checkStatus = ( levelHealthVar: any[], index: number, index2: number, currentLevel: number ) => {
   let status = 'notSetup'
-  let goodCount = 0; let badCount = 0
+  let goodCount = 0
   if( levelHealthVar[ index ] && levelHealthVar[ index ].levelInfo ) {
     for ( let i = 0; i < levelHealthVar[ index ].levelInfo.length; i++ ) {
       const element = levelHealthVar[ index ].levelInfo[ i ]
       if( element.status == 'accessible' ) goodCount++
-      if( element.status == 'notAccessible' ) badCount++
     }
     if( index + 1 > currentLevel ) status = 'notSetup'
     else if( goodCount == levelHealthVar[ index ].levelInfo.length ) status = 'good'
     else if( goodCount < levelHealthVar[ index ].levelInfo.length ) status = 'bad'
-    // console.log( 'modifyLevelStatus badCount', badCount )
-    // console.log( 'modifyLevelStatus goodCount', goodCount )
-    // console.log( 'modifyLevelStatus status', status )
     return status
   }
   return status

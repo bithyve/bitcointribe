@@ -202,6 +202,7 @@ import {
   checkFileIsAvailableWatcher,
   readFileWatcher,
   uplaodFileWatcher,
+  updateCloudBackupWatcher,
 } from './sagas/cloud'
 
 import {
@@ -383,6 +384,7 @@ const rootSaga = function* () {
     checkFileIsAvailableWatcher,
     readFileWatcher,
     uplaodFileWatcher,
+    updateCloudBackupWatcher,
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,
