@@ -6,10 +6,15 @@ import {
   TrustedDataElements,
   EphemeralData,
   EncryptedEphemeralData,
-  trustedChannelActions,
   ShareUploadables,
   MetaShare,
   EncDynamicNonPMDD,
+  Streams,
+  UnecryptedStreams,
+  UnecryptedStreamData,
+  StreamData,
+  TrustedContact,
+  Trusted_Contacts
 } from './Interface'
 import crypto from 'crypto'
 import config from '../HexaConfig'
@@ -52,6 +57,12 @@ export default class TrustedContacts {
     }
     return key.slice( key.length - TrustedContacts.cipherSpec.keyLength )
   };
+
+  public static getStreamId = ( walletId: string ): string =>
+    crypto
+      .createHash( 'sha256' )
+      .update( walletId )
+      .digest( 'hex' ).slice( 0, 9 )
 
   public static encryptPub = (
     publicKey: string,
@@ -102,6 +113,7 @@ export default class TrustedContacts {
 
   public trustedContacts: Contacts = {
   };
+  public trustedContactsV2: Trusted_Contacts;
   public skippedContactsCount = 0;
   constructor( stateVars ) {
     this.initializeStateVars( stateVars )
@@ -784,6 +796,126 @@ export default class TrustedContacts {
 
       return {
         data,
+      }
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+      throw new Error( err.message )
+    }
+  };
+
+  public updatePermanentChannelData = (
+    contact: TrustedContact,
+    channelKey: string,
+    streamId: string,
+    updates: {
+      data?: any,
+      backupData?: any
+      isActive?: any
+    }
+  ) => {
+    const { data, backupData, isActive } = updates
+    if( !contact.permanentChannel ){
+      // setup permanent channel
+      const unencryptedStream: UnecryptedStreamData = {
+        streamId,
+        data,
+        backupData
+      }
+      contact.unencryptedPermanentChannel = {
+        [ streamId ]: unencryptedStream
+      }
+
+      const stream: StreamData = {
+        streamId,
+        encryptedData : unencryptedStream.data? this.encryptData( channelKey, unencryptedStream.data ).encryptedData: null,
+        encryptedBackupData : unencryptedStream.backupData? this.encryptData( channelKey, unencryptedStream.backupData ).encryptedData: null,
+        flags: {
+          active: true,
+          lastSeen: Date.now(),
+          newData: true,
+        }
+      }
+      contact.permanentChannel = {
+        [ streamId ]: stream
+      }
+    } else {
+      // update permanent channel
+      const unencryptedStream = ( contact.unencryptedPermanentChannel as UnecryptedStreams )[ streamId ]
+      const stream = ( contact.permanentChannel as Streams )[ streamId ]
+
+      if( data ){
+        unencryptedStream.data = {
+          ...unencryptedStream.data,
+          data
+        }
+        stream.encryptedData = this.encryptData( channelKey, unencryptedStream.data ).encryptedData
+      }
+
+      if( backupData ){
+        unencryptedStream.backupData = {
+          ...unencryptedStream.backupData,
+          backupData
+        }
+        stream.encryptedBackupData = this.encryptData( channelKey, unencryptedStream.backupData ).encryptedData
+      }
+
+      stream.flags = {
+        ...stream.flags,
+        active: isActive,
+        lastSeen: Date.now(),
+        newData: true,
+      }
+    }
+  };
+
+  public updatePermanentChannel = async (
+    channelKey: string,
+    walletId: string,
+    updates: {
+      data?: any,
+      backupData?: any
+      isActive?: any
+    }
+  ): Promise<{
+    updated: boolean;
+  }> => {
+    try {
+
+      let contact: TrustedContact = this.trustedContactsV2[ channelKey ]
+      if ( !contact ) {
+        // initialize contact
+        const newContact: TrustedContact = {
+          permanentChannelAddress: crypto
+            .createHash( 'sha256' )
+            .update( channelKey )
+            .digest( 'hex' ),
+        }
+        this.trustedContactsV2[ channelKey ] = newContact
+        contact = newContact
+      }
+
+      const streamId = TrustedContacts.getStreamId( walletId )
+      // update permanent channel(local)
+      this.updatePermanentChannelData( contact, channelKey, streamId, updates )
+
+      const { permanentChannelAddress, permanentChannel } = ( this.trustedContactsV2[
+        channelKey
+      ] as TrustedContact )
+
+      const res: AxiosResponse = await BH_AXIOS.post( 'updatePermanentChannel', {
+        HEXA_ID,
+        channelAddress: permanentChannelAddress,
+        updateStream: permanentChannel[ streamId ],
+      } )
+      console.log( {
+        res
+      } )
+
+      const { updated, data } = res.data
+      if ( !updated ) throw new Error( 'Failed to update permanent channel' )
+      return {
+        updated
       }
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )

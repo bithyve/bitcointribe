@@ -464,6 +464,44 @@ export interface Contacts {
   [contactName: string]: ContactElements
 }
 
+export interface UnecryptedStreamData {
+  streamId: string,
+  data: any,
+  backupData?: any | null,
+}
+
+export type UnecryptedStreams = {
+  [streamId: string]: UnecryptedStreamData
+}
+export interface StreamData {
+  streamId: string,
+  encryptedData: string,
+  encryptedBackupData?: string | null,
+  flags: {
+    active: boolean,
+    lastSeen: number,
+    newData: boolean,
+  }
+}
+
+export type Streams = {
+  [streamId: string]: StreamData
+}
+
+export interface TrustedContact {
+  permanentChannelAddress: string,
+  permanentChannel?: Streams, // encrypted and uploaded to Relay
+  unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
+  relationship?: {
+    isWard?: boolean;
+    isGuardian?: boolean;
+  }
+  walletID?: string;
+}
+export interface Trusted_Contacts {
+  [channelKey: string]: TrustedContact
+}
+
 export interface WalletImage {
   DECENTRALIZED_BACKUP?: DecentralizedBackup;
   SERVICES?: ServicesJSON;

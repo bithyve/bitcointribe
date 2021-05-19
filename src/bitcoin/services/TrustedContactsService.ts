@@ -213,7 +213,7 @@ export default class TrustedContactsService {
   };
 
   public updateTrustedChannel = async (
-    contactName: string,
+    channelKey: string,
     dataElements: TrustedDataElements,
     fetch?: boolean,
     shareUploadables?: ShareUploadables,
@@ -243,7 +243,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateTrustedChannel(
-          contactName.toLowerCase().trim(),
+          channelKey,
           dataElements,
           fetch,
           shareUploadables,
@@ -291,6 +291,51 @@ export default class TrustedContactsService {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
+      }
+    }
+  };
+
+  public updatePermanentChannel = async (
+    channelKey: string,
+    walletId: string,
+    updates: {
+      data?: any,
+      backupData?: any
+      isActive?: any
+    }
+  ): Promise<
+    | {
+        status: number;
+        data:
+          | {
+              updated: any;
+            }
+          | {
+              updated: any;
+            };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.updatePermanentChannel(
+          channelKey,
+          walletId,
+          updates )
+      }
+    } catch ( err ) {
+      console.log( 'err', err )
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update contact',
       }
     }
   };
