@@ -100,6 +100,7 @@ import KeeperService from '../../bitcoin/services/KeeperService'
 import {
   EphemeralDataElements,
   INotification,
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
   LevelInfo,
@@ -189,17 +190,21 @@ function* generateMetaSharesWorker( { payload } ) {
   const { walletName } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP
   )
+  const secureAccount: SecureAccount = yield select(
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+  )
   const appVersion = DeviceInfo.getVersion()
-  const { level, isUpgrade } = payload
+  const { level, SM, isUpgrade } = payload
   const { answer, questionId, question } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP.security
   )
+  const secondaryMnemonic = SM && SM ? SM : secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
 
   const secureAssets = {
-    secondaryMnemonic: '',
+    secondaryMnemonic: secondaryMnemonic,
     twoFASecret: '',
     secondaryXpub: '',
-    bhXpub: '',
+    bhXpub: secureAccount.secureHDWallet.xpubs.bh,
   }
 
   let serviceCall = null
@@ -334,6 +339,7 @@ function* createAndUploadOnEFChannelWorker( { payload } ) {
       isChange,
     } = payload
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
     const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const keeperApproveStatus = yield select( ( state ) => state.health.keeperApproveStatus )
     console.log( 'metaShare createAndUploadOnEFChannelWorker', metaShare )
@@ -502,13 +508,14 @@ function* createAndUploadOnEFChannelWorker( { payload } ) {
             },
           ]
           yield put( updateMSharesHealth( shareArray, false ) )
-          const obj = {
+          const obj: KeeperInfoInterface = {
             shareId: share.shareId,
             name: ScannedData.walletName,
-            uuid: ScannedData.uuid,
-            publicKey: ScannedData.publicKey,
-            ephemeralAddress: ScannedData.ephemeralAddress,
             type: type,
+            scheme: share.meta.scheme,
+            currentLevel: currentLevel,
+            createdAt: moment( new Date() ).valueOf(),
+            sharePosition: shareIndex,
             data: {
             }
           }
@@ -1614,27 +1621,27 @@ function* uploadEncMetaShareKeeperWorker( { payload } ) {
       console.log( 'updateKeeperInfoToMetaShare contact', contact )
       if ( contact && contact.symmetricKey ) {
       // Upload secondary share
-        if( s3Service.levelhealth.SMMetaSharesKeeper.length ){
-          yield call( uploadSecondaryShareWorker, {
-            payload: {
-              encryptedKey, metaShare: s3Service.levelhealth.SMMetaSharesKeeper[ 1 ], otp
-            }
-          } )
-        } else {
-          if( secondaryShareDownloaded ) {
-            yield call( uploadSecondaryShareWorker, {
-              payload: {
-                encryptedKey, metaShare: secondaryShareDownloaded, otp
-              }
-            } )
-          } else {
-            const response = yield call( uploadSMShareWorker, {
-              payload: {
-                otp, encryptedKey
-              }
-            } )
-          }
-        }
+        // if( s3Service.levelhealth.SMMetaSharesKeeper.length ){
+        //   yield call( uploadSecondaryShareWorker, {
+        //     payload: {
+        //       encryptedKey, metaShare: s3Service.levelhealth.SMMetaSharesKeeper[ 1 ], otp
+        //     }
+        //   } )
+        // } else {
+        //   if( secondaryShareDownloaded ) {
+        //     yield call( uploadSecondaryShareWorker, {
+        //       payload: {
+        //         encryptedKey, metaShare: secondaryShareDownloaded, otp
+        //       }
+        //     } )
+        //   } else {
+        //     const response = yield call( uploadSMShareWorker, {
+        //       payload: {
+        //         otp, encryptedKey
+        //       }
+        //     } )
+        //   }
+        // }
 
         // has trusted channel
         const data: TrustedDataElements = {
@@ -1656,27 +1663,27 @@ function* uploadEncMetaShareKeeperWorker( { payload } ) {
         )
       } else {
       // Upload secondary share
-        if( s3Service.levelhealth.SMMetaSharesKeeper.length ){
-          yield call( uploadSecondaryShareWorker, {
-            payload: {
-              encryptedKey, metaShare: s3Service.levelhealth.SMMetaSharesKeeper[ 1 ], otp
-            }
-          } )
-        } else {
-          if( secondaryShareDownloaded ) {
-            yield call( uploadSecondaryShareWorker, {
-              payload: {
-                encryptedKey, metaShare: secondaryShareDownloaded, otp
-              }
-            } )
-          } else {
-            const response = yield call( uploadSMShareWorker, {
-              payload: {
-                otp, encryptedKey
-              }
-            } )
-          }
-        }
+        // if( s3Service.levelhealth.SMMetaSharesKeeper.length ){
+        //   yield call( uploadSecondaryShareWorker, {
+        //     payload: {
+        //       encryptedKey, metaShare: s3Service.levelhealth.SMMetaSharesKeeper[ 1 ], otp
+        //     }
+        //   } )
+        // } else {
+        //   if( secondaryShareDownloaded ) {
+        //     yield call( uploadSecondaryShareWorker, {
+        //       payload: {
+        //         encryptedKey, metaShare: secondaryShareDownloaded, otp
+        //       }
+        //     } )
+        //   } else {
+        //     const response = yield call( uploadSMShareWorker, {
+        //       payload: {
+        //         otp, encryptedKey
+        //       }
+        //     } )
+        //   }
+        // }
         // adding transfer details to he ephemeral data
         const data: EphemeralDataElements = {
           ...payload.data,
@@ -2163,6 +2170,7 @@ function* reShareWithSameKeeperWorker( { payload } ) {
     const levelHealth: LevelHealthInterface[] = yield select(
       ( state ) => state.health.levelHealth
     )
+    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
 
     for ( let i = 0; i < deviceLevelInfo.length; i++ ) {
       const element = deviceLevelInfo[ i ]
@@ -2233,13 +2241,14 @@ function* reShareWithSameKeeperWorker( { payload } ) {
                 object.shareId = selectedShareId
               }
               if ( object ) {
-                const obj = {
+                const obj: KeeperInfoInterface = {
                   shareId: selectedShareId,
                   name: object.name,
-                  uuid: object.uuid,
-                  publicKey: object.publicKey,
-                  ephemeralAddress: object.ephemeralAddress,
-                  type: object.type,
+                  type: type,
+                  scheme: share.meta.scheme,
+                  currentLevel: currentLevel,
+                  createdAt: moment( new Date() ).valueOf(),
+                  sharePosition: shareIndex,
                   data: {
                   }
                 }
@@ -2541,6 +2550,7 @@ function* getPDFDataWorker( { payload } ) {
     let shareIndex = 3
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
     if (
       shareId &&
         s3Service.levelhealth.metaSharesKeeper.length &&
@@ -2549,13 +2559,14 @@ function* getPDFDataWorker( { payload } ) {
       shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == shareId )
     }
     const primaryShare: MetaShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
-    const obj = {
+    const obj: KeeperInfoInterface = {
       shareId: primaryShare.shareId,
       name: 'Keeper PDF',
-      uuid: '',
-      publicKey: '',
-      ephemeralAddress: '',
       type: 'pdf',
+      scheme: primaryShare.meta.scheme,
+      currentLevel: currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: shareIndex,
       data: {
       }
     }
@@ -2564,7 +2575,6 @@ function* getPDFDataWorker( { payload } ) {
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeper: KeeperService = yield select( ( state ) => state.keeper.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
     const secondaryShareDownloaded = yield select( ( state ) => state.health.secondaryShareDownloaded )
     const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
@@ -2908,7 +2918,7 @@ export const confirmPDFSharedWatcher = createWatcher(
 function* updatedKeeperInfoWorker( { payload } ) {
   try {
     const { keeperData } = payload
-    const keeperInfo = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
+    const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
     let flag = false
     if ( keeperInfo.length > 0 ) {
       for ( let i = 0; i < keeperInfo.length; i++ ) {
@@ -2916,11 +2926,12 @@ function* updatedKeeperInfoWorker( { payload } ) {
         if ( element.shareId == keeperData.shareId ) {
           flag = false
           keeperInfo[ i ].name = keeperData.name
-          keeperInfo[ i ].uuid = keeperData.uuid
-          keeperInfo[ i ].publicKey = keeperData.publicKey
-          keeperInfo[ i ].ephemeralAddress = keeperData.ephemeralAddress
+          keeperInfo[ i ].scheme = keeperData.scheme
+          keeperInfo[ i ].currentLevel = keeperData.currentLevel
+          keeperInfo[ i ].createdAt = keeperData.createdAt
           keeperInfo[ i ].type = keeperData.type
           keeperInfo[ i ].data = keeperData.data
+          keeperInfo[ i ].sharePosition = keeperData.sharePosition
           break
         } else flag = true
       }

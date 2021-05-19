@@ -107,7 +107,12 @@ export interface Transactions {
 }
 
 export interface MetaShare {
-  encryptedSecret: string;
+  encryptedSecret?: string;
+  encryptedShare?: {
+    pmShare: string;
+    smShare: string;
+    bhXpub: string;
+  };
   shareId: string;
   meta: {
     version: string;
@@ -123,7 +128,6 @@ export interface MetaShare {
     encryptedKeeperInfo?: string;
     scheme?: string,
   };
-  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {
@@ -548,6 +552,17 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
+}
+
+export interface KeeperInfoInterface {
+  shareId: string;
+  name: string;
+  type: string;
+  scheme: string;
+  currentLevel: number;
+  createdAt: number;
+  sharePosition: number;
+  data?: any;
 }
 //VersionHistory
 export interface VersionHistory {

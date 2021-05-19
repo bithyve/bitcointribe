@@ -113,7 +113,6 @@ interface ManageBackupNewBHRPropsTypes {
   updateNewFcm: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
-  isSmMetaSharesCreatedFlag: boolean;
   deletePrivateData: any;
   updateKeeperInfoToTrustedChannel: any;
   secondaryShareDownloaded: any
@@ -362,7 +361,7 @@ class ManageBackupNewBHR extends Component<
     }
 
     if (
-      prevProps.initLoading !== this.props.initLoading && this.props.isSmMetaSharesCreatedFlag && this.props.metaSharesKeeper.length == 3
+      prevProps.initLoading !== this.props.initLoading && this.props.metaSharesKeeper.length == 3
     ) {
       const obj = {
         id: 2,
@@ -387,7 +386,7 @@ class ManageBackupNewBHR extends Component<
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
-      JSON.stringify( this.props.metaSharesKeeper ) && this.props.isSmMetaSharesCreatedFlag && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
+      JSON.stringify( this.props.metaSharesKeeper ) && prevProps.metaSharesKeeper.length == 3 && this.props.metaSharesKeeper.length == 5
     ) {
       const obj = {
         id: 2,
@@ -1190,7 +1189,6 @@ const mapStateToProps = ( state ) => {
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
     isNewFCMUpdated: idx( state, ( _ ) => _.keeper.isNewFCMUpdated ),
-    isSmMetaSharesCreatedFlag: idx( state, ( _ ) => _.health.isSmMetaSharesCreatedFlag ),
     downloadSmShare: idx( state, ( _ ) => _.health.loading.downloadSmShare ),
     secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
     cloudPermissionGranted: state.health.cloudPermissionGranted,

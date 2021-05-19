@@ -58,7 +58,7 @@ import {
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
@@ -615,7 +615,7 @@ class UpgradeBackup extends Component<
         this.setState( {
           isGuardianCreationClicked: true
         } )
-        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
+        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount, metaSharesKeeper } = this.props
         const firstName = 'Secondary'
         const lastName = 'Device1'
 
@@ -632,17 +632,19 @@ class UpgradeBackup extends Component<
         config.TC_REQUEST_EXPIRY
         // Keeper setup started
         keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
-        updatedKeeperInfo( {
+        const obj: KeeperInfoInterface = {
           shareId: shareId,
           name: contactName,
-          uuid: '',
-          publicKey: '',
-          ephemeralAddress: '',
           type: 'device',
+          scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+          currentLevel: this.props.levelToSetup,
+          createdAt: moment( new Date() ).valueOf(),
+          sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
           data: {
             name: contactName, index: 0
           }
-        } )
+        }
+        updatedKeeperInfo( obj )
 
         if ( shareExpired ) {
           this.setState( {

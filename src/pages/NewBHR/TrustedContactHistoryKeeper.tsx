@@ -42,8 +42,10 @@ import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
+  MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import {
@@ -119,6 +121,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP
   const uploadMetaShare = useSelector(
     ( state ) => state.health.loading.uploadMetaShare,
+  )
+  const MetaShares: MetaShare[] = useSelector(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
   )
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
@@ -779,18 +784,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
       config.TC_REQUEST_EXPIRY
     // Keeper setup started
     dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-
-    dispatch( updatedKeeperInfo( {
+    const obj: KeeperInfoInterface = {
       shareId: selectedShareId,
-      name: chosenContactState.name,
-      uuid: chosenContactState.id,
-      publicKey: '',
-      ephemeralAddress: '',
+      name: contactName,
       type: 'contact',
+      scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
+      currentLevel: currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
       data: {
         ...chosenContactState, index
       }
-    } ) )
+    }
+    dispatch( updatedKeeperInfo( obj ) )
 
     // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
     if ( changeContact || shareExpired || isChange ) {

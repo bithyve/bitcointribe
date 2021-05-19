@@ -1,5 +1,5 @@
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
@@ -82,24 +82,9 @@ const initialState: {
   isLevel3Initialized: Boolean;
   levelHealth: {
     level: number;
-    levelInfo: {
-      shareType: string;
-      updatedAt: string;
-      status: string;
-      shareId: string;
-      reshareVersion?: number;
-      name?: string;
-    }[];
+    levelInfo: LevelInfo[];
   }[];
-  keeperInfo: {
-    shareId: string;
-    name: string;
-    uuid: string;
-    publicKey: string;
-    ephemeralAddress: string;
-    type: string;
-    data?: any;
-  }[];
+  keeperInfo: KeeperInfoInterface[];
   shares: any;
   metaShare: MetaShare;
   downloadedMShare: {

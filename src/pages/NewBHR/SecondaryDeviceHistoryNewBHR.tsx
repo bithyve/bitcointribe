@@ -23,8 +23,10 @@ import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
 import {
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
+  MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
@@ -186,6 +188,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const uploadMetaShare = useSelector(
     ( state ) => state.health.loading.uploadMetaShare,
   )
+  const MetaShares: MetaShare[] = useSelector(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+  )
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
   )
@@ -247,17 +252,19 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       config.TC_REQUEST_EXPIRY
       // Keeper setup started
       dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-      dispatch( updatedKeeperInfo( {
+      const obj: KeeperInfoInterface = {
         shareId: selectedShareId,
         name: contactName,
-        uuid: '',
-        publicKey: '',
-        ephemeralAddress: '',
         type: 'device',
+        scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
         data: {
           name: contactName, index
         }
-      } ) )
+      }
+      dispatch( updatedKeeperInfo( obj ) )
 
       if ( changeKeeper || shareExpired || isChange ) {
         setSecondaryQR( '' )
