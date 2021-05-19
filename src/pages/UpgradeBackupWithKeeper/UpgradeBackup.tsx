@@ -11,10 +11,10 @@ import {
   Platform,
   ImageBackground,
   Keyboard,
-  AsyncStorage,
   PermissionsAndroid,
   RefreshControl,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
