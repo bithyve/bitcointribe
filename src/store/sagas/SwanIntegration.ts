@@ -41,7 +41,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
-const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
+const redirect_uri = Config.SWAN_REDIRECT_URL
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
   FETCH_SWAN_AUTHENTICATION_URL
