@@ -73,7 +73,7 @@ export default function SendConfirmationContent( props ) {
       )}
       <View
         style={{
-          flex: 1,
+          flex: props.recipients.length === 0 ? 1 : 0,
           flexDirection: 'row',
           marginTop: 'auto',
           alignItems: 'center',
@@ -112,13 +112,11 @@ export default function SendConfirmationContent( props ) {
         {( props.isSuccess || props.isUnSuccess ) && (
           <Image
             style={{
-              flex: 1,
               width: wp( '25%' ),
-              height: hp( '25%' ),
-              marginLeft: 'auto',
-              marginRight: 'auto',
-              resizeMode: 'contain',
-              marginBottom: 'auto'
+              height: hp( '18%' ),
+              resizeMode: 'cover',
+               marginLeft: 'auto',
+              marginBottom: props.recipients.length === 0 ? 'auto' : 0,
             }}
             source={
               props.isSuccess

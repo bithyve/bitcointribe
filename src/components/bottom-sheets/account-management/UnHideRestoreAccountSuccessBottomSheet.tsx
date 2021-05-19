@@ -142,6 +142,7 @@ const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
   },
   destinationTitleText: {
     fontFamily: Fonts.FiraSansRegular,

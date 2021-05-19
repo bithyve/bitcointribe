@@ -11,6 +11,9 @@ import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/Use
 import { RFValue } from 'react-native-responsive-fontsize'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import ButtonBlue from '../../ButtonBlue'
+import {
+  widthPercentageToDP as wp,
+} from 'react-native-responsive-screen'
 
 
 export type Props = {
@@ -153,7 +156,7 @@ const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.thumbnailImageLarge,
     marginRight: 4,
-    borderRadius: 9999,
+    borderRadius: wp ( 14 )/2,
   },
 
   titleSection: {
