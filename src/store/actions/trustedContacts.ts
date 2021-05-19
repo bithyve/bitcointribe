@@ -15,6 +15,7 @@ export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
+export const UPDATE_PERMANENT_CHANNEL = 'UPDATE_PERMANENT_CHANNEL'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
 export const UPDATE_TRUSTED_CONTACTS_INFO = 'UPDATE_TRUSTED_CONTACTS_INFO'
@@ -112,6 +113,19 @@ export const updateTrustedChannel = (
     type: UPDATE_TRUSTED_CHANNEL,
     payload: {
       contactInfo, data, fetch, shareUploadables, updatedDB
+    },
+  }
+}
+
+export const updatePermanentChannel = (
+  contactInfo: { contactName: string; info: string },
+  updates: { data?: any, backupData?: any, isActive?: any },
+  updatedDB?: any
+) => {
+  return {
+    type: UPDATE_PERMANENT_CHANNEL,
+    payload: {
+      contactInfo, updates, updatedDB
     },
   }
 }

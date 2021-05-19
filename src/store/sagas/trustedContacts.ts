@@ -22,6 +22,8 @@ import {
   MULTI_UPDATE_TRUSTED_CHANNELS,
   SEND_VERSION_UPDATE_NOTIFICATION,
   multiUpdateTrustedChannels,
+  UPDATE_PERMANENT_CHANNEL,
+  updatePermanentChannel,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -286,10 +288,10 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
-  const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
-  const trustedContactsInfo = yield select(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
+  // const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
+  // const trustedContactsInfo = yield select(
+  //   ( state ) => state.trustedContacts.trustedContactsInfo,
+  // )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
   const { contactName } = contactInfo
 
@@ -324,48 +326,44 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     .derivativeAccounts[ TRUSTED_CONTACTS ][
       accountNumber
     ] as TrustedContactDerivativeAccountElements )
-  const trustedReceivingAddress = trustedDerivativeAccount.receivingAddress
-  const channelKey = trustedDerivativeAccount.channelKey
+  const paymentAddress = trustedDerivativeAccount.receivingAddress
+  contactInfo.channelKey = trustedDerivativeAccount.channelKey
 
-  const data: EphemeralDataElements = {
+  const data: any = {
     walletID: walletId,
     FCM,
-    trustedAddress: trustedReceivingAddress,
-    trustedTestAddress: testAccount.hdWallet.receivingAddress,
+    paymentAddress,
+    testPaymentAddress: testAccount.hdWallet.receivingAddress,
   }
 
-  if( contactInfo.isGuardian ){
-    // Trusted Contact: Guardian
-    const { changeContact, shareIndex, shareId, legacy } = contactInfo
-
-    let previousGuardianName: string
-    if ( changeContact ) {
-      // find previous TC (except keeper: shareIndex 0)
-      if ( trustedContactsInfo && shareIndex ) {
-        const previousGuardian = trustedContactsInfo[ shareIndex ]
-        if ( previousGuardian ) {
-          previousGuardianName = `${previousGuardian.firstName} ${
-            previousGuardian.lastName ? previousGuardian.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-        } else console.log( 'Previous guardian details missing' )
-      }
-    }
-
-    // upload share for the new contact(guardian)
-    if( legacy )
-      yield put(
-        uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
-      )
-    else
-      yield put(
-        uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
-      )
-  } else {
-    // create emphemeral channel(initiating TC)
-    yield put( updateEphemeralChannel( contactInfo, data ) )
+  const updates = {
+    data,
+    backupData: null,
+    isActive: true
   }
+
+  // if( contactInfo.isGuardian ){
+  //   // Trusted Contact: Guardian
+  //   const { changeContact, shareIndex, shareId, legacy } = contactInfo
+
+  //   let previousGuardianName: string
+  //   if ( changeContact ) {
+  //     // find previous TC (except keeper: shareIndex 0)
+  //     if ( trustedContactsInfo && shareIndex ) {
+  //       const previousGuardian = trustedContactsInfo[ shareIndex ]
+  //       if ( previousGuardian ) {
+  //         previousGuardianName = `${previousGuardian.firstName} ${
+  //           previousGuardian.lastName ? previousGuardian.lastName : ''
+  //         }`
+  //           .toLowerCase()
+  //           .trim()
+  //       } else console.log( 'Previous guardian details missing' )
+  //     }
+  //   }
+  // }
+
+  // initiate permanent channel
+  yield put( updatePermanentChannel( contactInfo, updates ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {
@@ -967,6 +965,7 @@ export const updateTrustedChannelWatcher = createWatcher(
   UPDATE_TRUSTED_CHANNEL,
 )
 
+
 function* fetchTrustedChannelWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
@@ -1019,6 +1018,54 @@ function* fetchTrustedChannelWorker( { payload } ) {
 export const fetchTrustedChannelWatcher = createWatcher(
   fetchTrustedChannelWorker,
   FETCH_TRUSTED_CHANNEL,
+)
+
+function* updatePermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: { data?: any, backupData?: any, isActive?: any }, updatedDB?: any }} ) {
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const regularService: RegularAccount = yield select(
+    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+  )
+  const { walletId } = regularService.hdWallet.getWalletId()
+  const { contactInfo, updates } = payload
+  const res = yield call(
+    trustedContacts.updatePermanentChannel,
+    contactInfo.channelKey,
+    walletId,
+    updates,
+  )
+  if ( res.status === 200 ) {
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+    }
+
+    if ( payload.updatedDB ) {
+      yield call( insertDBWorker, {
+        payload: {
+          ...payload.updatedDB,
+          SERVICES: {
+            ...payload.updatedDB.SERVICES, ...updatedSERVICES
+          },
+        },
+      } )
+    } else {
+      yield call( insertDBWorker, {
+        payload: {
+          SERVICES: updatedSERVICES
+        }
+      } )
+    }
+  } else {
+    console.log( res.err )
+  }
+}
+
+export const updatePermanentChannelWatcher = createWatcher(
+  updatePermanentChannelWorker,
+  UPDATE_PERMANENT_CHANNEL,
 )
 
 export function* trustedChannelsSetupSyncWorker() {
