@@ -1,32 +1,32 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import Navigator from './src/navigation/Navigator';
-import { Provider } from 'react-redux';
-import makeStore from './src/store';
-import NoInternetModalContents from './src/components/NoInternetModalContents';
-import { useDispatch } from 'react-redux';
-import NetInfo from '@react-native-community/netinfo';
-import { getVersion, getBuildId } from 'react-native-device-info';
-import { setApiHeaders } from './src/services/api';
-import firebase from '@react-native-firebase/app';
-import analytics from '@react-native-firebase/analytics';
-import crashlytics from '@react-native-firebase/crashlytics';
-import { updatePreference } from './src/store/actions/preferences';
-import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState';
-import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet';
-import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs';
-import getActiveRouteName from './src/utils/navigation/GetActiveRouteName';
-import { LogBox } from 'react-native';
+import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import Navigator from './src/navigation/Navigator'
+import { Provider } from 'react-redux'
+import makeStore from './src/store'
+import NoInternetModalContents from './src/components/NoInternetModalContents'
+import { useDispatch } from 'react-redux'
+import NetInfo from '@react-native-community/netinfo'
+import { getVersion, getBuildId } from 'react-native-device-info'
+import { setApiHeaders } from './src/services/api'
+import firebase from '@react-native-firebase/app'
+import analytics from '@react-native-firebase/analytics'
+import crashlytics from '@react-native-firebase/crashlytics'
+import { updatePreference } from './src/store/actions/preferences'
+import usePreferencesState from './src/utils/hooks/state-selectors/preferences/UsePreferencesState'
+import { BottomSheetModalProvider, useBottomSheetModal } from '@gorhom/bottom-sheet'
+import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs'
+import getActiveRouteName from './src/utils/navigation/GetActiveRouteName'
+import { LogBox } from 'react-native'
 
-LogBox.ignoreAllLogs(true);
+LogBox.ignoreAllLogs( true )
 
-export const URI_PREFIX = 'hexa://';
+export const URI_PREFIX = 'hexa://'
 
 async function configureAPIHeaders() {
   const version = await getVersion()
   const buildNumber = await getBuildId()
 
   setApiHeaders( {
-    appVersion: version, appBuildNumber: buildNumber 
+    appVersion: version, appBuildNumber: buildNumber
   } )
 }
 
@@ -37,13 +37,13 @@ export default function AppWrapper() {
   // context can have access to it. (see: https://stackoverflow.com/a/60329482/8859365)
   const store = makeStore()
 
-  useEffect(() => {
+  useEffect( () => {
     ( async () => {
-      configureAPIHeaders();
-      await firebase.analytics().setAnalyticsCollectionEnabled(true);
-      await crashlytics().setCrashlyticsCollectionEnabled(true);
-    })();
-  }, []);
+      configureAPIHeaders()
+      await firebase.analytics().setAnalyticsCollectionEnabled( true )
+      await crashlytics().setCrashlyticsCollectionEnabled( true )
+    } )()
+  }, [] )
 
   return (
     <Provider store={store} uriPrefix={URI_PREFIX}>
@@ -131,8 +131,8 @@ function AppContent() {
         setPreviousScreenName( getActiveRouteName( prevState ) )
         setCurrentScreenName( getActiveRouteName( currentState ) )
 
-        if (previousScreenName !== currentScreenName) {
-          analytics().logEvent(currentScreenName);
+        if ( previousScreenName !== currentScreenName ) {
+          analytics().logEvent( currentScreenName )
         }
       }}
     />
