@@ -231,23 +231,8 @@ export default function Login( props ) {
             if ( loaderBottomSheet.current ) {
               loaderBottomSheet.current.snapTo( 0 )
             }
-            // props.navigation.navigate( 'Home', {
-            //   custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-            //   recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-            //   trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            //   userKey: requestName && requestName.userKey ? requestName.userKey : null,
-            //   swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-            // } )
-            // props.navigation.dispatch(
-            //   resetToHomeAction( {
-            //     custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-            //     recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
-            //     trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            //     userKey: requestName && requestName.userKey ? requestName.userKey : null,
-            //     swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
-            //   } ) )
-            console.log( 'requestName**', requestName )
-            console.log( 'creationFlag**', creationFlag )
+            //console.log( 'requestName**', requestName )
+            //console.log( 'creationFlag**', creationFlag )
 
             if( !creationFlag ) {
               props.navigation.navigate( 'HomeRoot', {
