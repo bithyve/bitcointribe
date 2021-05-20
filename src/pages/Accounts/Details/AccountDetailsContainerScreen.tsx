@@ -144,6 +144,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const showKnowMoreSheet = useCallback( () => {
     presentBottomSheet(
       <KnowMoreBottomSheet
+        primarySubAccount={primarySubAccount}
         accountKind={primarySubAccount.kind}
         onClose={dismissBottomSheet}
       />,

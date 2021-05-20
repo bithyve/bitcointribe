@@ -1806,6 +1806,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.onBottomSheetClosed()
   };
 
+  onBackPress = () => {
+    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+  };
+
   onNotificationClicked = async ( value ) => {
     const asyncNotifications = JSON.parse(
       await AsyncStorage.getItem( 'notificationList' )
@@ -2141,7 +2145,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.SWAN_STATUS_INFO:
-          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+          return [
+            0,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+            ),
+            heightPercentageToDP( 65 ),
+          ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '67%' ]
@@ -2202,6 +2212,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+                // onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -2215,6 +2226,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2229,6 +2241,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2244,6 +2257,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2304,6 +2318,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2320,6 +2335,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )

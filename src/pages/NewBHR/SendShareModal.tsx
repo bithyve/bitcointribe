@@ -6,7 +6,6 @@ import {
   Text,
   StyleSheet,
   Platform,
-  AsyncStorage,
   Alert,
   ActivityIndicator,
 } from 'react-native'

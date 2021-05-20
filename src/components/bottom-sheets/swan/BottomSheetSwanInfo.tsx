@@ -4,6 +4,7 @@ import {
   Image,
   Text,
   StyleSheet,
+  TouchableOpacity
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
@@ -11,6 +12,7 @@ import Fonts from '../../../common/Fonts'
 import ListStyles from '../../../common/Styles/ListStyles'
 import ImageStyles from '../../../common/Styles/ImageStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountInfo, updateSwanStatus } from '../../../store/actions/SwanIntegration'
@@ -27,15 +29,16 @@ let swanAccountCount = 0
 type Props = {
   swanDeepLinkContent: string | null;
   onClickSetting: ()=>any;
+  onPress: () => any;
 }
 
-const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSetting }: Props ) => {
+const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const { currentSwanSubAccount } = useAccountsState()
   let swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
-  let swanTitle = 'Buy bitcoin with Swan'
+  let swanTitle = 'Buy bitcoin\n with Swan..'
   let accountName = ''
   let accountDescription = ''
   function handleProceedButtonPress() {
@@ -59,9 +62,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }, [ hasFetchSwanAuthenticationUrlSucceeded, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated ] )
 
   if( !hasRedeemSwanCodeForTokenInitiated && swanAccountCreationStatus == SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) {
-    console.log( 'redeem', {
-      hasRedeemSwanCodeForTokenInitiated
-    } )
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
   const renderFooter = () => {
@@ -85,7 +85,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           )
           break
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          console.log( 'inside WALLET_LINKED_SUCCESSFULLY' )
           if( swanAccountCount<1 ) {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
@@ -129,11 +128,23 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           break
         default:
           swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
-          swanTitle = 'Buy bitcoin with Swan'
+          swanTitle = 'Buy bitcoin\nwith Swan'
     }
     return (
       <View style={styles.successModalHeaderView}>
-        <Text style={styles.modalTitleText}>{swanTitle}</Text>
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={onPress}
+          style={{
+            flexDirection: 'row'
+          }}
+        >
+          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} style={{
+            marginTop: hp( 0.5 )
+          }} />
+          <Text style={styles.modalTitleText}>{swanTitle}</Text>
+        </TouchableOpacity>
+
         <Text style={{
           ...styles.modalInfoText,
           marginTop: wp( 1.5 ),
@@ -192,7 +203,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text style={styles.proceedButtonText}>{'Proceed to Swan'}</Text>
       </AppBottomSheetTouchableWrapper>
-      <View style={{
+      {/* <View style={{
         flexDirection: 'row',
         alignItems: 'center',
         alignContent: 'center'
@@ -211,7 +222,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}
         />
 
-      </View>
+      </View> */}
     </View> )
   }
   const renderSuccessButton = () => {
@@ -239,7 +250,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     ...styles.modalContentContainer
   }}>
     <View style={{
-      height: '92%'
+      height: '95%'
     }}>
       {renderMessage()}
       {renderFooter()}
@@ -265,8 +276,8 @@ const styles = StyleSheet.create( {
   },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
-    marginLeft: wp( '10%' ),
-    marginTop: wp( '0%' ),
+    marginLeft: wp( '3%' ),
+    marginTop: wp( '5%' ),
     flex: 1.7
   },
   modalTitleText: {
@@ -274,8 +285,10 @@ const styles = StyleSheet.create( {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansMedium,
+    marginLeft: 10
   },
   modalInfoText: {
+    marginLeft: wp( '7%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
