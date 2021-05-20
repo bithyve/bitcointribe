@@ -2138,11 +2138,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.SWAN_STATUS_INFO:
           return [
-            0,
+            -50,
             heightPercentageToDP(
               Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
             ),
-            heightPercentageToDP( 65 ),
+            heightPercentageToDP( 71 ),
           ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
