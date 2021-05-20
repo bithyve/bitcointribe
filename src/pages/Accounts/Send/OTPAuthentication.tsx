@@ -65,7 +65,7 @@ export default function OTPAuthenticationScreen( { navigation } ) {
       <SendConfirmationContent
         title={'Sent Successfully'}
         info={'Transaction(s) successfully submitted'}
-        infoText={'Bitcoin successfully sent to Contact'}
+        infoText={'bitcoin successfully sent to Contact'}
         isFromContact={false}
         recipients={sendingState.selectedRecipients}
         okButtonText={'View Account'}
