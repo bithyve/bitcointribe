@@ -2137,13 +2137,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.SWAN_STATUS_INFO:
-          return [
-            0,
-            heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
-            ),
-            heightPercentageToDP( 65 ),
-          ]
+          return Platform.OS == 'ios' && DeviceInfo.hasNotch ? [ 0, '70%' ] : [ 0, '65%' ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '67%' ]
