@@ -1020,7 +1020,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: { data?: any, backupData?: any, isActive?: any }, updatedDB?: any }} ) {
+function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates?: { data?: any, backupData?: any, isActive?: any }, updatedDB?: any }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )

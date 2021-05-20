@@ -298,7 +298,7 @@ export default class TrustedContactsService {
   public syncPermanentChannel = async (
     channelKey: string,
     walletId: string,
-    updates: {
+    updates?: {
       data?: any,
       backupData?: any
       isActive?: any

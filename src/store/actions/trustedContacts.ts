@@ -119,7 +119,7 @@ export const updateTrustedChannel = (
 
 export const syncPermanentChannel = (
   contactInfo: { contactName: string; info: string },
-  updates: { data?: any, backupData?: any, isActive?: any },
+  updates?: { data?: any, backupData?: any, isActive?: any },
   updatedDB?: any
 ) => {
   return {

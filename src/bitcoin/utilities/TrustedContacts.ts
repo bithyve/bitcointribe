@@ -885,7 +885,7 @@ export default class TrustedContacts {
   public syncPermanentChannel = async (
     channelKey: string,
     walletId: string,
-    updates: {
+    updates?: {
       data?: any,
       backupData?: any
       isActive?: any
@@ -909,7 +909,8 @@ export default class TrustedContacts {
       }
 
       const streamId = TrustedContacts.getStreamId( walletId )
-      this.cacheOutstream( contact, channelKey, streamId, updates )
+      if( updates )
+        this.cacheOutstream( contact, channelKey, streamId, updates )
 
       const { permanentChannelAddress, permanentChannel } = ( this.trustedContactsV2[
         channelKey
@@ -918,7 +919,7 @@ export default class TrustedContacts {
       const res: AxiosResponse = await BH_AXIOS.post( 'syncPermanentChannel', {
         HEXA_ID,
         channelAddress: permanentChannelAddress,
-        outStream: permanentChannel[ streamId ],
+        outStream: updates? permanentChannel[ streamId ]: null,
       } )
       console.log( {
         res
