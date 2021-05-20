@@ -10,6 +10,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import openLink from '../../utils/OpenLink'
 
 export default function ServiceAccountKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
@@ -84,6 +85,7 @@ export default function ServiceAccountKnowMoreSheetContents( props ) {
         decelerationRate="fast"
       >
         <View style={styles.ElementView}>
+
           <Text
             style={{
               ...styles.infoText,
@@ -91,8 +93,19 @@ export default function ServiceAccountKnowMoreSheetContents( props ) {
               marginBottom: wp( '3%' ),
             }}
           >
-            {firstPara()} <Text style={ styles.boldItalicText }>{firstParaUrl()}</Text>
+            {firstPara()}
+            <AppBottomSheetTouchableWrapper
+              style={{
+                marginLeft: 5,
+              }}
+              onPress={() =>
+                openLink( firstParaUrl() )
+              }
+            >
+              <Text style={ styles.boldItalicText }>{firstParaUrl()}</Text>
+            </AppBottomSheetTouchableWrapper>
           </Text>
+
           <View style={{
             justifyContent: 'center', alignItems: 'center'
           }}>
@@ -131,7 +144,9 @@ const styles = StyleSheet.create( {
   boldItalicText: {
     fontFamily: Fonts.FiraSansMediumItalic,
     fontWeight: 'bold',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,
