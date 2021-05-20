@@ -14,19 +14,17 @@ export type Props = {
 
 const RecipientAvatar: React.FC<Props> = ( {
   recipient,
-  containerStyle = {
-    width: 44,
-    height: 44,
-    borderRadius: 22
-  },
-  contentContainerStyle = {
-    ...ImageStyles.circledAvatarContainer,
-    ...ImageStyles.thumbnailImageMedium,
-  },
+  contentContainerStyle
 }: Props ) => {
   if ( recipient.avatarImageSource ) {
     return (
-      <View style={containerStyle}>
+      <View
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center',
+          ...contentContainerStyle,
+        }}
+      >
         <Image
           source={recipient.avatarImageSource}
           style={contentContainerStyle}
