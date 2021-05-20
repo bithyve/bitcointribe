@@ -203,7 +203,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
       >
         <Text style={styles.proceedButtonText}>{'Proceed to Swan'}</Text>
       </AppBottomSheetTouchableWrapper>
-      {/* <View style={{
+      <View style={{
         flexDirection: 'row',
         alignItems: 'center',
         alignContent: 'center'
@@ -222,7 +222,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}
         />
 
-      </View> */}
+      </View>
     </View> )
   }
   const renderSuccessButton = () => {
@@ -267,6 +267,7 @@ const styles = StyleSheet.create( {
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
     marginRight: 14,
   },
   destinationTitleText: {

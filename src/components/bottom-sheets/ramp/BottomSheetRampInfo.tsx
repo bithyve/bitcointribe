@@ -240,9 +240,9 @@ const styles = StyleSheet.create( {
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
-    width: 45,
-    height: 45,
-    marginRight: 14,
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
+    // marginRight: wp( 16 ),
   },
   destinationTitleText: {
     fontFamily: Fonts.FiraSansRegular,

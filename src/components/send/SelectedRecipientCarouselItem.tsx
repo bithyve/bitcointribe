@@ -15,7 +15,10 @@ import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
 import useAmountBeingSentToRecipient from '../../utils/hooks/state-selectors/sending/UseAmountBeingSentToRecipient'
 import useFormattedAmountText from '../../utils/hooks/formatting/UseFormattedAmountText'
-
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
 
 export type Props = {
   recipient: RecipientDescribing;
@@ -45,7 +48,10 @@ const SelectedRecipientCarouselItem: React.FC<Props> = ( {
 
         <View style={styles.circledAvatarContainer}>
 
-          <RecipientAvatar recipient={recipient} />
+          <RecipientAvatar
+            recipient={recipient}
+            contentContainerStyle={styles.avatarImage}
+          />
 
           {recipient.kind == RecipientKind.CONTACT && (
             <LastSeenActiveIndicator
@@ -117,7 +123,14 @@ const styles = StyleSheet.create( {
   circledAvatarContainer: {
     ...ImageStyles.thumbnailImageMedium,
     ...ImageStyles.circledAvatarContainer,
+    borderRadius: wp( 12 )/2,
     marginRight: 8,
+  },
+
+  avatarImage: {
+    // ...ImageStyles.circledAvatarContainer,
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp ( 12 )/2,
   },
 
   textContentContainer: {
