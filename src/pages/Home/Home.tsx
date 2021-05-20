@@ -97,7 +97,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
+import { NavigationActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
 import semver from 'semver'
 import {
@@ -332,6 +332,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       wyreFromBuyMenu: null,
       wyreFromDeepLink: null
     }
+    console.log( 'this.props.navigation.getParam', this.props.navigation.state.params )
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange
+    )
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -842,7 +847,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         {
           appState: nextAppState,
         },
+
         async () => {
+          if ( Platform.OS == 'android' ? ( nextAppState == 'active' ) : ( nextAppState == 'background' ) ) {
+            this.props.navigation.dispatch( NavigationActions.navigate( {
+              routeName: 'Login',
+            } ) )
+          }
           if ( nextAppState === 'active' ) {
             this.scheduleNotification()
           }
@@ -868,16 +879,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       credsAuthenticated
     } = this.props
     credsAuthenticated( false )
+
     const versionData = []
     this.closeBottomSheet()
     if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
       this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
     }
     this.calculateNetBalance()
-    this.appStateListener = AppState.addEventListener(
-      'change',
-      this.onAppStateChange
-    )
+
     if( newBHRFlowStarted === true )
     {
       const { healthCheckInitializedKeeper } = s3Service.levelhealth
@@ -898,10 +907,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( this.handleDeepLinking )
-
     // call this once deeplink is detected aswell
     this.handleDeepLinkModal()
-
     const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
     if ( unhandledDeepLinkURL ) {
@@ -1075,11 +1082,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
-    const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.getParam( 'trustedContactRequest' )
-    const userKey = this.props.navigation.getParam( 'userKey' )
-    const swanRequest = this.props.navigation.getParam( 'swanRequest' )
+    const custodyRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.custodyRequest : null//this.props.navigation.getParam( 'custodyRequest' )
+    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
+    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    console.log( 'trustedContactRequest', trustedContactRequest )
     if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
@@ -1172,7 +1180,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
 
-    console.log( 'Home::handleDeepLinking::URL: ' + url )
+    console.log( 'handleDeepLinking: ' + url )
 
     const splits = url.split( '/' )
     if ( splits.includes( 'swan' ) ) {
