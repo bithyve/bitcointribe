@@ -22,8 +22,8 @@ import {
   MULTI_UPDATE_TRUSTED_CHANNELS,
   SEND_VERSION_UPDATE_NOTIFICATION,
   multiUpdateTrustedChannels,
-  UPDATE_PERMANENT_CHANNEL,
-  updatePermanentChannel,
+  SYNC_PERMANENT_CHANNEL,
+  syncPermanentChannel,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -363,7 +363,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   // }
 
   // initiate permanent channel
-  yield put( updatePermanentChannel( contactInfo, updates ) )
+  yield put( syncPermanentChannel( contactInfo, updates ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {
@@ -1020,7 +1020,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* updatePermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: { data?: any, backupData?: any, isActive?: any }, updatedDB?: any }} ) {
+function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: { data?: any, backupData?: any, isActive?: any }, updatedDB?: any }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
@@ -1030,7 +1030,7 @@ function* updatePermanentChannelWorker( { payload }: {payload: { contactInfo: Co
   const { walletId } = regularService.hdWallet.getWalletId()
   const { contactInfo, updates } = payload
   const res = yield call(
-    trustedContacts.updatePermanentChannel,
+    trustedContacts.syncPermanentChannel,
     contactInfo.channelKey,
     walletId,
     updates,
@@ -1063,9 +1063,9 @@ function* updatePermanentChannelWorker( { payload }: {payload: { contactInfo: Co
   }
 }
 
-export const updatePermanentChannelWatcher = createWatcher(
-  updatePermanentChannelWorker,
-  UPDATE_PERMANENT_CHANNEL,
+export const syncPermanentChannelWatcher = createWatcher(
+  syncPermanentChannelWorker,
+  SYNC_PERMANENT_CHANNEL,
 )
 
 export function* trustedChannelsSetupSyncWorker() {

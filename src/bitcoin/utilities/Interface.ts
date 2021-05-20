@@ -467,7 +467,7 @@ export interface Contacts {
 export interface UnecryptedStreamData {
   streamId: string,
   data: any,
-  backupData?: any | null,
+  backupData?: any | null, // instream backupData = null
 }
 
 export type UnecryptedStreams = {

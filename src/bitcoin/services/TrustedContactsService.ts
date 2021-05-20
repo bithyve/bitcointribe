@@ -295,7 +295,7 @@ export default class TrustedContactsService {
     }
   };
 
-  public updatePermanentChannel = async (
+  public syncPermanentChannel = async (
     channelKey: string,
     walletId: string,
     updates: {
@@ -325,7 +325,7 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.updatePermanentChannel(
+        data: await this.tc.syncPermanentChannel(
           channelKey,
           walletId,
           updates )
