@@ -80,7 +80,7 @@ export default function SendConfirmationContent( props ) {
           marginBottom:
             Platform.OS == 'ios' && DeviceInfo.hasNotch()
               ? hp( '2%' )
-              : hp( '2%' ),
+              : hp( '1%' ),
         }}
       >
         <AppBottomSheetTouchableWrapper
