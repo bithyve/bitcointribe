@@ -1171,16 +1171,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
       .toLowerCase()
       .trim()
     console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
-    dispatch( updateMSharesHealth( [
+    dispatch( updateMSharesHealth(
       {
         walletId: s3Service.getWalletId().data.walletId,
         shareId: selectedShareId,
         reshareVersion: 0,
-        updatedAt: moment( new Date() ).valueOf(),
+        updatedAt: 'notAccessible',
         name: contactName,
         shareType: 'contact',
-      },
-    ] ) )
+      } ) )
   }
 
   return (

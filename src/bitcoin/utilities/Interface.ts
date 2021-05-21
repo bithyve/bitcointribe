@@ -542,6 +542,7 @@ export interface EphemeralDataForKeeper {
 }
 
 export interface LevelHealthInterface {
+  level?: number;
   levelInfo: LevelInfo[];
 }
 

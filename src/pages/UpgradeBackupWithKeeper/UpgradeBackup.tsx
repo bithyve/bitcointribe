@@ -781,7 +781,7 @@ class UpgradeBackup extends Component<
     if( index === 0 ) contactName = 'Secondary Device1'
     else if( index === 3 ) contactName = 'Secondary Device2'
     else contactName = 'Secondary Device3'
-    const shareArray = [
+    const shareObj =
       {
         walletId: this.props.s3Service.getWalletId().data.walletId,
         shareId: this.state.selectedShareId[ 0 ],
@@ -789,9 +789,8 @@ class UpgradeBackup extends Component<
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-      },
-    ]
-    this.props.updateMSharesHealth( shareArray )
+      }
+    this.props.updateMSharesHealth( shareObj )
   }
 
   saveInTransitHistory = async () => {

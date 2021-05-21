@@ -826,18 +826,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( index === 0 ) contactName = 'Secondary Device1'
     else if( index === 3 ) contactName = 'Secondary Device2'
     else contactName = 'Secondary Device3'
-    const shareArray = [
+    const shareObj =
       {
         walletId: s3Service.getWalletId().data.walletId,
         shareId: selectedShareId,
         reshareVersion: 0,
-        updatedAt: moment( new Date() ).valueOf(),
+        status: 'notAccessible',
         name: contactName,
         shareType: 'device',
-      },
-    ]
-    console.log( 'shareArray', shareArray )
-    dispatch( updateMSharesHealth( shareArray ) )
+      }
+
+    console.log( 'shareArray', shareObj )
+    dispatch( updateMSharesHealth( shareObj ) )
   }
 
   const deviceText = ( text ) =>{

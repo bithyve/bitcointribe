@@ -1,13 +1,13 @@
 import moment from 'moment'
 import { NativeModules, Platform } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { call, fork, put, select, spawn } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { CloudData, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
-import { updateMSharesHealth } from '../actions/health'
+import { updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { KeeperInfoInterface, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
@@ -31,8 +31,21 @@ function* cloudWorker( { payload } ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+      const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share } = payload
+      const obj: KeeperInfoInterface = {
+        shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+        name: 'Cloud',
+        type: share ? share.type : levelHealth[ 0 ].levelInfo[ 0 ].shareType,
+        scheme: '1of1',
+        currentLevel: 1,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: 0,
+        data: {
+        }
+      }
+      yield put( updatedKeeperInfo( obj ) )
       const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
       const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
       const question = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.question )
@@ -96,7 +109,7 @@ function* cloudWorker( { payload } ) {
         console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
-      } else{
+      } else {
         const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
@@ -173,17 +186,16 @@ function* updateHealthForCloudWorker( { payload } ) {
         levelHealthVar.reshareVersion = 0
         levelHealthVar.name = 'Cloud'
       }
-      const shareArray = [
-        {
-          walletId: s3Service.getWalletId().data.walletId,
-          shareId: levelHealthVar.shareId,
-          reshareVersion: levelHealthVar.reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-          shareType: 'cloud',
-        },
-      ]
-      yield put( updateMSharesHealth( shareArray ) )
+      const shareObj = {
+        walletId: s3Service.getWalletId().data.walletId,
+        shareId: levelHealthVar.shareId,
+        reshareVersion: levelHealthVar.reshareVersion,
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareType: 'cloud',
+      }
+
+      yield put( updateMSharesHealth( shareObj ) )
     }
   }
   catch ( error ) {

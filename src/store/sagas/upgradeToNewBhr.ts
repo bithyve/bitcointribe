@@ -278,17 +278,15 @@ function* autoShareContactKeeperWorker( { payload } ) {
             SERVICES: updatedSERVICES
           },
         } )
-        yield put( updateMSharesHealth( [
-          {
-            walletId: walletId,
-            shareId: shareId,
-            reshareVersion: share.meta.reshareVersion,
-            updatedAt: moment( new Date() ).valueOf(),
-            shareType: 'contact',
-            name: name,
-            status: status,
-          },
-        ] ) )
+        yield put( updateMSharesHealth( {
+          walletId: walletId,
+          shareId: shareId,
+          reshareVersion: share.meta.reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          shareType: 'contact',
+          name: name,
+          status: status,
+        } ) )
         const notification: INotification = {
           notificationType: notificationType.reShare,
           title: 'New share uploaded',
@@ -377,18 +375,16 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
     const scannedObj: {type: string, encryptedKey: string; encryptedData: string} = JSON.parse( scannedData )
     const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
     if( decryptedData == shareId ){
-      const shareArray = [
-        {
-          walletId: walletId,
-          shareId: shareId,
-          reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          name: 'Keeper PDF',
-          shareType: 'pdf',
-          status: 'accessible',
-        },
-      ]
-      yield put( updateMSharesHealth( shareArray ) )
+      const shareObj = {
+        walletId: walletId,
+        shareId: shareId,
+        reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
+        updatedAt: moment( new Date() ).valueOf(),
+        name: 'Keeper PDF',
+        shareType: 'pdf',
+        status: 'accessible',
+      }
+      yield put( updateMSharesHealth( shareObj ) )
       yield put( onApprovalStatusChange( {
         status: false,
         initiatedAt: 0,

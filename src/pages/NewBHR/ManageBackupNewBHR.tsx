@@ -532,7 +532,7 @@ class ManageBackupNewBHR extends Component<
   };
 
   onRefresh = async () => {
-    this.props.checkMSharesHealth()
+    // this.props.checkMSharesHealth()
     this.props.setHealthStatus()
   };
 
