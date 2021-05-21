@@ -466,8 +466,17 @@ export interface Contacts {
 
 export interface UnecryptedStreamData {
   streamId: string,
-  data: any,
+  primaryData?: any,
+  secondaryData?: any,      // instream secondaryData = null
   backupData?: any | null, // instream backupData = null
+  metaData?: {
+    flags?: {
+      active: boolean,
+      lastSeen: number,
+      newData: boolean,
+    },
+    version?: string
+  }
 }
 
 export type UnecryptedStreams = {
@@ -475,12 +484,16 @@ export type UnecryptedStreams = {
 }
 export interface StreamData {
   streamId: string,
-  encryptedData: string,
-  encryptedBackupData?: string | null,
-  flags: {
-    active: boolean,
-    lastSeen: number,
-    newData: boolean,
+  primaryEncryptedData?: string // CH encrypted: encrypted via primary channel key
+  secondaryEncryptedData?: string // CH2 encrypted: encrypted via secondary channel key
+  encryptedBackupData?: string, // not stored in the app
+  metaData?: {
+    flags?: {
+      active: boolean,
+      lastSeen: number,
+      newData: boolean,
+    },
+    version?: string
   }
 }
 

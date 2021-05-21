@@ -807,20 +807,19 @@ export default class TrustedContacts {
   public cacheOutstream = (
     contact: TrustedContact,
     channelKey: string,
-    streamId: string,
-    updates: {
-      data?: any,
-      backupData?: any
-      isActive?: any
-    }
-  ) => {
-    const { data, backupData, isActive } = updates
+    unencryptedOutstreamUpdates: UnecryptedStreamData
+  ): StreamData => {
+
+    const { streamId, primaryData, secondaryData, backupData, metaData } = unencryptedOutstreamUpdates
+    let outstreamUpdates: StreamData
     if( !contact.permanentChannel ){
       // setup permanent channel and output stream
       const unencryptedOutStream: UnecryptedStreamData = {
         streamId,
-        data,
-        backupData
+        primaryData,
+        secondaryData,
+        backupData,
+        metaData
       }
       contact.unencryptedPermanentChannel = {
         [ streamId ]: unencryptedOutStream
@@ -828,45 +827,57 @@ export default class TrustedContacts {
 
       const outstream: StreamData = {
         streamId,
-        encryptedData : unencryptedOutStream.data? this.encryptData( channelKey, unencryptedOutStream.data ).encryptedData: null,
+        primaryEncryptedData : unencryptedOutStream.primaryData? this.encryptData( channelKey, unencryptedOutStream.primaryData ).encryptedData: null,
+        secondaryEncryptedData: unencryptedOutStream.secondaryData? this.encryptData( channelKey, unencryptedOutStream.secondaryData ).encryptedData: null,
         encryptedBackupData : unencryptedOutStream.backupData? this.encryptData( channelKey, unencryptedOutStream.backupData ).encryptedData: null,
-        flags: {
-          active: true,
-          lastSeen: Date.now(),
-          newData: true,
-        }
+        metaData: unencryptedOutStream.metaData
       }
       contact.permanentChannel = {
         [ streamId ]: outstream
       }
+
+      outstreamUpdates =  outstream
     } else {
       // update output stream
       const unencryptedOutstream = ( contact.unencryptedPermanentChannel as UnecryptedStreams )[ streamId ]
       const outstream = ( contact.permanentChannel as Streams )[ streamId ]
 
-      if( data ){
-        unencryptedOutstream.data = {
-          ...unencryptedOutstream.data,
-          data
+      if( primaryData ){
+        unencryptedOutstream.primaryData = {
+          ...unencryptedOutstream.primaryData,
+          ...primaryData
         }
-        outstream.encryptedData = this.encryptData( channelKey, unencryptedOutstream.data ).encryptedData
+        outstream.primaryEncryptedData = this.encryptData( channelKey, unencryptedOutstream.primaryData ).encryptedData
+        outstreamUpdates.primaryEncryptedData = outstream.primaryEncryptedData
+      }
+
+      if( secondaryData ){
+        unencryptedOutstream.secondaryData = {
+          ...unencryptedOutstream.secondaryData,
+          ...secondaryData
+        }
+        outstream.secondaryEncryptedData = this.encryptData( channelKey, unencryptedOutstream.secondaryData ).encryptedData
+        outstreamUpdates.secondaryEncryptedData = outstream.secondaryEncryptedData
       }
 
       if( backupData ){
         unencryptedOutstream.backupData = {
           ...unencryptedOutstream.backupData,
-          backupData
+          ...backupData
         }
         outstream.encryptedBackupData = this.encryptData( channelKey, unencryptedOutstream.backupData ).encryptedData
+        outstreamUpdates.encryptedBackupData = outstream.encryptedBackupData
       }
 
-      outstream.flags = {
-        ...outstream.flags,
-        active: isActive,
-        lastSeen: Date.now(),
-        newData: true,
+      if( metaData ){
+        outstream.metaData = {
+          ...outstream.metaData,
+          ...metaData
+        }
+        outstreamUpdates.metaData = outstream.metaData
       }
     }
+    return outstreamUpdates
   };
 
   public cacheInstream = (
@@ -884,12 +895,7 @@ export default class TrustedContacts {
 
   public syncPermanentChannel = async (
     channelKey: string,
-    walletId: string,
-    updates?: {
-      data?: any,
-      backupData?: any
-      isActive?: any
-    }
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData
   ): Promise<{
     updated: boolean;
   }> => {
@@ -908,18 +914,18 @@ export default class TrustedContacts {
         contact = newContact
       }
 
-      const streamId = TrustedContacts.getStreamId( walletId )
-      if( updates )
-        this.cacheOutstream( contact, channelKey, streamId, updates )
+      let outstreamUpdates: StreamData
+      if( unEncryptedOutstreamUpdates )
+        outstreamUpdates = this.cacheOutstream( contact, channelKey, unEncryptedOutstreamUpdates )
 
-      const { permanentChannelAddress, permanentChannel } = ( this.trustedContactsV2[
+      const { permanentChannelAddress } = ( this.trustedContactsV2[
         channelKey
       ] as TrustedContact )
 
       const res: AxiosResponse = await BH_AXIOS.post( 'syncPermanentChannel', {
         HEXA_ID,
         channelAddress: permanentChannelAddress,
-        outStream: updates? permanentChannel[ streamId ]: null,
+        outstreamUpdates,
       } )
       console.log( {
         res
