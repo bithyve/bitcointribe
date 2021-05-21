@@ -88,7 +88,8 @@ import CustomBottomTabs, {
 import {
   addTransferDetails,
   autoSyncShells,
-  addNewAccountShell
+  addNewAccountShell,
+  fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
   trustedChannelActions,
@@ -235,6 +236,7 @@ interface HomePropsTypes {
   clearSwanCache: any;
   updateSwanStatus: any;
   addNewAccountShell: any;
+  fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -924,6 +926,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // Keeping autoSync disabled
 
       this.props.setVersion()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
@@ -1369,6 +1372,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
       this.props.fetchNotifications()
       this.setState( {
         lastActiveTime: moment().toISOString(),
@@ -2615,6 +2619,7 @@ export default withNavigationFocus(
     clearSwanCache,
     updateSwanStatus,
     addNewAccountShell,
+    fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
     clearPaymentDetails,
