@@ -475,12 +475,12 @@ export interface PrimaryStreamData {
 }
 
 export interface SecondaryStreamData {
-  secondaryMnemonicShard: string,
+  secondaryMnemonicShard: any,
   bhXpub: string,
 }
 
 export interface BackupStreamData {
-  primaryMnemonicShard: string,
+  primaryMnemonicShard: any,
   keeperInfo: any,
 }
 

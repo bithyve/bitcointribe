@@ -38,12 +38,13 @@ import {
   trustedChannelActions,
   UnecryptedStreamData,
   PrimaryStreamData,
-  TrustedContactRelationTypes
+  TrustedContactRelationTypes,
+  SecondaryStreamData,
+  BackupStreamData
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
   downloadMShare as downloadMShareSSS,
-  uploadEncMShare
 } from '../actions/sss'
 import { downloadMShare as downloadMShareHealth, updateMSharesHealth, uploadEncMShareKeeper } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -74,6 +75,7 @@ import moment from 'moment'
 import semver from 'semver'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import idx from 'idx'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -339,11 +341,30 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     FCM,
     paymentAddresses
   }
+
+  let secondaryData: SecondaryStreamData = null
+  let backupData: BackupStreamData = null
+  const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
+  if( contactInfo.isGuardian && channelAssets ){
+    const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard, bhXpub } = channelAssets
+    backupData = {
+      primaryMnemonicShard,
+      keeperInfo,
+    }
+    secondaryData = {
+      secondaryMnemonicShard,
+      bhXpub,
+    }
+    const secondaryChannelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    contactInfo.secondaryChannelKey = secondaryChannelKey
+  }
+  contactInfo.channelKey = trustedDerivativeAccount.channelKey
+
   const updates: UnecryptedStreamData = {
     streamId: TrustedContacts.getStreamId( walletId ),
     primaryData,
-    secondaryData: null,
-    backupData: null,
+    secondaryData,
+    backupData,
     metaData: {
       flags:{
         active: true,
@@ -352,9 +373,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
     }
   }
-  const secondaryChannelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
-  contactInfo.channelKey = trustedDerivativeAccount.channelKey
-  contactInfo.secondaryChannelKey = secondaryChannelKey
 
   // initiate permanent channel
   yield put( syncPermanentChannel( contactInfo, updates ) )

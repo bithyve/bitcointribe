@@ -830,7 +830,7 @@ export default class TrustedContacts {
       const outstream: StreamData = {
         streamId,
         primaryEncryptedData : unencryptedOutStream.primaryData? this.encryptData( channelKey, unencryptedOutStream.primaryData ).encryptedData: null,
-        secondaryEncryptedData: unencryptedOutStream.secondaryData? this.encryptData( secondaryChannelKey, unencryptedOutStream.secondaryData ).encryptedData: null,
+        secondaryEncryptedData: unencryptedOutStream.secondaryData && secondaryChannelKey? this.encryptData( secondaryChannelKey, unencryptedOutStream.secondaryData ).encryptedData: null,
         encryptedBackupData : unencryptedOutStream.backupData? this.encryptData( channelKey, unencryptedOutStream.backupData ).encryptedData: null,
         metaData: unencryptedOutStream.metaData
       }
@@ -853,7 +853,7 @@ export default class TrustedContacts {
         outstreamUpdates.primaryEncryptedData = outstream.primaryEncryptedData
       }
 
-      if( secondaryData ){
+      if( secondaryData && secondaryChannelKey ){
         unencryptedOutstream.secondaryData = {
           ...unencryptedOutstream.secondaryData,
           ...secondaryData
