@@ -143,7 +143,7 @@ export default class Relay {
     }
   };
 
-  public static fetchFeeAndExchangeRates = async (): Promise<{
+  public static fetchFeeAndExchangeRates = async ( currencyCode ): Promise<{
     exchangeRates: any;
     averageTxFees: any;
   }> => {
@@ -152,8 +152,11 @@ export default class Relay {
       try {
         res = await BH_AXIOS.post( 'fetchFeeAndExchangeRates', {
           HEXA_ID,
+          currencyCode
         } )
-        // console.log({ res });
+        console.log( '@@@-> ', {
+          res
+        } )
       } catch ( err ) {
         // console.log({ err });
         if ( err.response ) throw new Error( err.response.data.err )
