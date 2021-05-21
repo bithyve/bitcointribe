@@ -154,9 +154,6 @@ export default class Relay {
           HEXA_ID,
           currencyCode
         } )
-        console.log( '@@@-> ', {
-          res
-        } )
       } catch ( err ) {
         // console.log({ err });
         if ( err.response ) throw new Error( err.response.data.err )
