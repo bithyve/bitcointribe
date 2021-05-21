@@ -22,6 +22,7 @@ import { ec as EC } from 'elliptic'
 import { BH_AXIOS } from '../../services/api'
 import { AxiosResponse } from 'axios'
 import SSS from './sss/SSS'
+import idx from 'idx'
 const ec = new EC( 'curve25519' )
 
 const { HEXA_ID } = config
@@ -807,7 +808,8 @@ export default class TrustedContacts {
   public cacheOutstream = (
     contact: TrustedContact,
     channelKey: string,
-    unencryptedOutstreamUpdates: UnecryptedStreamData
+    unencryptedOutstreamUpdates: UnecryptedStreamData,
+    secondaryChannelKey?: string,
   ): StreamData => {
 
     const { streamId, primaryData, secondaryData, backupData, metaData } = unencryptedOutstreamUpdates
@@ -828,7 +830,7 @@ export default class TrustedContacts {
       const outstream: StreamData = {
         streamId,
         primaryEncryptedData : unencryptedOutStream.primaryData? this.encryptData( channelKey, unencryptedOutStream.primaryData ).encryptedData: null,
-        secondaryEncryptedData: unencryptedOutStream.secondaryData? this.encryptData( channelKey, unencryptedOutStream.secondaryData ).encryptedData: null,
+        secondaryEncryptedData: unencryptedOutStream.secondaryData? this.encryptData( secondaryChannelKey, unencryptedOutStream.secondaryData ).encryptedData: null,
         encryptedBackupData : unencryptedOutStream.backupData? this.encryptData( channelKey, unencryptedOutStream.backupData ).encryptedData: null,
         metaData: unencryptedOutStream.metaData
       }
@@ -856,7 +858,7 @@ export default class TrustedContacts {
           ...unencryptedOutstream.secondaryData,
           ...secondaryData
         }
-        outstream.secondaryEncryptedData = this.encryptData( channelKey, unencryptedOutstream.secondaryData ).encryptedData
+        outstream.secondaryEncryptedData = this.encryptData( secondaryChannelKey, unencryptedOutstream.secondaryData ).encryptedData
         outstreamUpdates.secondaryEncryptedData = outstream.secondaryEncryptedData
       }
 
@@ -895,7 +897,8 @@ export default class TrustedContacts {
 
   public syncPermanentChannel = async (
     channelKey: string,
-    unEncryptedOutstreamUpdates?: UnecryptedStreamData
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    secondaryChannelKey?: string,
   ): Promise<{
     updated: boolean;
   }> => {
@@ -909,6 +912,7 @@ export default class TrustedContacts {
             .createHash( 'sha256' )
             .update( channelKey )
             .digest( 'hex' ),
+          relationType: idx( unEncryptedOutstreamUpdates, ( _ ) => _.primaryData.relationType ),
         }
         this.trustedContactsV2[ channelKey ] = newContact
         contact = newContact
@@ -916,7 +920,7 @@ export default class TrustedContacts {
 
       let outstreamUpdates: StreamData
       if( unEncryptedOutstreamUpdates )
-        outstreamUpdates = this.cacheOutstream( contact, channelKey, unEncryptedOutstreamUpdates )
+        outstreamUpdates = this.cacheOutstream( contact, channelKey, unEncryptedOutstreamUpdates, secondaryChannelKey )
 
       const { permanentChannelAddress } = ( this.trustedContactsV2[
         channelKey

@@ -298,7 +298,8 @@ export default class TrustedContactsService {
 
   public syncPermanentChannel = async (
     channelKey: string,
-    unEncryptedOutstreamUpdates?: UnecryptedStreamData
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    secondaryChannelKey?: string,
   ): Promise<
     | {
         status: number;
@@ -323,7 +324,9 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.syncPermanentChannel(
           channelKey,
-          unEncryptedOutstreamUpdates )
+          unEncryptedOutstreamUpdates,
+          secondaryChannelKey,
+        )
       }
     } catch ( err ) {
       console.log( 'err', err )

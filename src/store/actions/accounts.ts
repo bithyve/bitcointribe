@@ -318,7 +318,7 @@ export const addNewAccountShell = (
   }
 }
 
-export interface ContactInfo  { contactName: string; info: string; channelKey?: string, isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, legacy?: boolean}
+export interface ContactInfo  { contactName: string; info: string; channelKey?: string, secondaryChannelKey?: string, isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, legacy?: boolean}
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,

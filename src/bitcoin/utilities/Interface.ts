@@ -531,7 +531,7 @@ export interface TrustedContact {
   permanentChannelAddress: string,
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
-  relationType: TrustedContactRelationTypes,
+  relationType?: TrustedContactRelationTypes,
   walletID?: string;
 }
 export interface Trusted_Contacts {

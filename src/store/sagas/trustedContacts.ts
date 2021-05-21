@@ -328,8 +328,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       accountNumber
     ] as TrustedContactDerivativeAccountElements )
   const paymentAddress = trustedDerivativeAccount.receivingAddress
-  contactInfo.channelKey = trustedDerivativeAccount.channelKey
-
   const paymentAddresses = {
     [ SubAccountKind.TRUSTED_CONTACTS ]: paymentAddress,
     [ SubAccountKind.TEST_ACCOUNT ]: testAccount.hdWallet.receivingAddress
@@ -341,7 +339,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     FCM,
     paymentAddresses
   }
-
   const updates: UnecryptedStreamData = {
     streamId: TrustedContacts.getStreamId( walletId ),
     primaryData,
@@ -355,26 +352,9 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
       }
     }
   }
-
-  // if( contactInfo.isGuardian ){
-  //   // Trusted Contact: Guardian
-  //   const { changeContact, shareIndex, shareId, legacy } = contactInfo
-
-  //   let previousGuardianName: string
-  //   if ( changeContact ) {
-  //     // find previous TC (except keeper: shareIndex 0)
-  //     if ( trustedContactsInfo && shareIndex ) {
-  //       const previousGuardian = trustedContactsInfo[ shareIndex ]
-  //       if ( previousGuardian ) {
-  //         previousGuardianName = `${previousGuardian.firstName} ${
-  //           previousGuardian.lastName ? previousGuardian.lastName : ''
-  //         }`
-  //           .toLowerCase()
-  //           .trim()
-  //       } else console.log( 'Previous guardian details missing' )
-  //     }
-  //   }
-  // }
+  const secondaryChannelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
+  contactInfo.channelKey = trustedDerivativeAccount.channelKey
+  contactInfo.secondaryChannelKey = secondaryChannelKey
 
   // initiate permanent channel
   yield put( syncPermanentChannel( contactInfo, updates ) )
@@ -1044,6 +1024,7 @@ function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: Cont
     trustedContacts.syncPermanentChannel,
     contactInfo.channelKey,
     updates,
+    contactInfo.secondaryChannelKey
   )
   if ( res.status === 200 ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )
