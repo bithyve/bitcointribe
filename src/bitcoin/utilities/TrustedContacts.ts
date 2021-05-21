@@ -887,7 +887,7 @@ export default class TrustedContacts {
   ) => {
     const unencryptedInstream: UnecryptedStreamData = {
       streamId: inStream.streamId,
-      data: this.decryptData( channelKey, inStream.encryptedData ).data,
+      primaryData: this.decryptData( channelKey, inStream.primaryEncryptedData ).data,
     }
     contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
     contact.permanentChannel[ inStream.streamId ] = inStream

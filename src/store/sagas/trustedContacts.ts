@@ -36,6 +36,7 @@ import {
   notificationType,
   notificationTag,
   trustedChannelActions,
+  UnecryptedStreamData,
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
@@ -69,6 +70,7 @@ import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import moment from 'moment'
 import semver from 'semver'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -336,10 +338,18 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     testPaymentAddress: testAccount.hdWallet.receivingAddress,
   }
 
-  const updates = {
-    data,
+  const updates: UnecryptedStreamData = {
+    streamId:   TrustedContacts.getStreamId( walletId ),
+    primaryData: data,
+    secondaryData: null,
     backupData: null,
-    isActive: true
+    metaData: {
+      flags:{
+        active: true,
+        newData: true,
+        lastSeen: Date.now(),
+      }
+    }
   }
 
   // if( contactInfo.isGuardian ){

@@ -6,6 +6,7 @@ import {
   trustedChannelActions,
   ShareUploadables,
   Contacts,
+  UnecryptedStreamData,
 } from '../../bitcoin/utilities/Interface'
 import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -119,7 +120,7 @@ export const updateTrustedChannel = (
 
 export const syncPermanentChannel = (
   contactInfo: { contactName: string; info: string },
-  updates?: { data?: any, backupData?: any, isActive?: any },
+  updates?: UnecryptedStreamData,
   updatedDB?: any
 ) => {
   return {

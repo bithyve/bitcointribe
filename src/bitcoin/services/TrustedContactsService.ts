@@ -8,6 +8,7 @@ import {
   ShareUploadables,
   MetaShare,
   EncDynamicNonPMDD,
+  UnecryptedStreamData,
 } from '../utilities/Interface'
 
 export default class TrustedContactsService {
@@ -297,12 +298,7 @@ export default class TrustedContactsService {
 
   public syncPermanentChannel = async (
     channelKey: string,
-    walletId: string,
-    updates?: {
-      data?: any,
-      backupData?: any
-      isActive?: any
-    }
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData
   ): Promise<
     | {
         status: number;
@@ -327,8 +323,7 @@ export default class TrustedContactsService {
         status: config.STATUS.SUCCESS,
         data: await this.tc.syncPermanentChannel(
           channelKey,
-          walletId,
-          updates )
+          unEncryptedOutstreamUpdates )
       }
     } catch ( err ) {
       console.log( 'err', err )
