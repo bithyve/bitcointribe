@@ -329,7 +329,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
           )}
           isOn={currencyKindForEntry == CurrencyKind.BITCOIN}
           isVertical={true}
-          disabled={exchangeRates ? false : true}
+          disabled={exchangeRates && exchangeRates[ currencyCode ] ? false : true}
         />
       </View>
     </View >
