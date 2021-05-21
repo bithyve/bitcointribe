@@ -37,6 +37,8 @@ import {
   notificationTag,
   trustedChannelActions,
   UnecryptedStreamData,
+  PrimaryStreamData,
+  TrustedContactRelationTypes
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
@@ -71,6 +73,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import moment from 'moment'
 import semver from 'semver'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -290,13 +293,9 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
-  // const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
-  // const trustedContactsInfo = yield select(
-  //   ( state ) => state.trustedContacts.trustedContactsInfo,
-  // )
+  const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
   const { contactName } = contactInfo
-
   const { walletId } = regularAccount.hdWallet.getWalletId()
 
   // initialize a trusted derivative account against the following contact
@@ -331,16 +330,21 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const paymentAddress = trustedDerivativeAccount.receivingAddress
   contactInfo.channelKey = trustedDerivativeAccount.channelKey
 
-  const data: any = {
+  const paymentAddresses = {
+    [ SubAccountKind.TRUSTED_CONTACTS ]: paymentAddress,
+    [ SubAccountKind.TEST_ACCOUNT ]: testAccount.hdWallet.receivingAddress
+  }
+  const primaryData: PrimaryStreamData = {
     walletID: walletId,
+    walletName,
+    relationType: TrustedContactRelationTypes.CONTACT,
     FCM,
-    paymentAddress,
-    testPaymentAddress: testAccount.hdWallet.receivingAddress,
+    paymentAddresses
   }
 
   const updates: UnecryptedStreamData = {
-    streamId:   TrustedContacts.getStreamId( walletId ),
-    primaryData: data,
+    streamId: TrustedContacts.getStreamId( walletId ),
+    primaryData,
     secondaryData: null,
     backupData: null,
     metaData: {
@@ -1030,19 +1034,15 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates?: { data?: any, backupData?: any, isActive?: any }, updatedDB?: any }} ) {
+function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: UnecryptedStreamData, updatedDB?: any }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
-  const regularService: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-  const { walletId } = regularService.hdWallet.getWalletId()
+
   const { contactInfo, updates } = payload
   const res = yield call(
     trustedContacts.syncPermanentChannel,
     contactInfo.channelKey,
-    walletId,
     updates,
   )
   if ( res.status === 200 ) {

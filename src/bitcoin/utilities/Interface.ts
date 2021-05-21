@@ -464,11 +464,31 @@ export interface Contacts {
   [contactName: string]: ContactElements
 }
 
+export interface PrimaryStreamData {
+  walletID?: string,
+  walletName?: string,
+  relationType?: TrustedContactRelationTypes,
+  FCM?: string,
+  paymentAddresses?: {
+    [accountType: string]: string
+  },
+}
+
+export interface SecondaryStreamData {
+  secondaryMnemonicShard: string,
+  bhXpub: string,
+}
+
+export interface BackupStreamData {
+  primaryMnemonicShard: string,
+  keeperInfo: any,
+}
+
 export interface UnecryptedStreamData {
   streamId: string,
-  primaryData?: any,
-  secondaryData?: any,      // instream secondaryData = null
-  backupData?: any | null, // instream backupData = null
+  primaryData?: PrimaryStreamData,
+  secondaryData?: SecondaryStreamData,     // in/out-stream secondaryData = null
+  backupData?: BackupStreamData | null, // in/out-stream backupData = null
   metaData?: {
     flags?: {
       active: boolean,
@@ -485,7 +505,7 @@ export type UnecryptedStreams = {
 export interface StreamData {
   streamId: string,
   primaryEncryptedData?: string // CH encrypted: encrypted via primary channel key
-  secondaryEncryptedData?: string // CH2 encrypted: encrypted via secondary channel key
+  secondaryEncryptedData?: string // CH2 encrypted: encrypted via secondary channel key & is not stored in the app
   encryptedBackupData?: string, // not stored in the app
   metaData?: {
     flags?: {
@@ -501,14 +521,17 @@ export type Streams = {
   [streamId: string]: StreamData
 }
 
+export enum TrustedContactRelationTypes {
+  CONTACT = 'CONTACT',
+  KEEPER  = 'KEEPER',
+  WARD = 'WARD'
+}
+
 export interface TrustedContact {
   permanentChannelAddress: string,
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
-  relationship?: {
-    isWard?: boolean;
-    isGuardian?: boolean;
-  }
+  relationType: TrustedContactRelationTypes,
   walletID?: string;
 }
 export interface Trusted_Contacts {
