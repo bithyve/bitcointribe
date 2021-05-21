@@ -172,12 +172,13 @@ const styles = StyleSheet.create( {
   avatarContainer: {
     ...ImageStyles.circledAvatarContainer,
     ...ImageStyles.thumbnailImageLarge,
+    borderRadius: widthPercentageToDP( 14 )/2,
     marginRight: 16,
   },
 
   avatarImage: {
     ...ImageStyles.thumbnailImageLarge,
-    borderRadius: 9999,
+    borderRadius: widthPercentageToDP( 14 )/2,
   },
 
   listItemTitle: {

@@ -132,4 +132,22 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 #endif
 }
 
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+
+        UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.window.bounds];
+
+        imageView.tag = 101;    // Give some decent tagvalue or keep a reference of imageView in self
+        imageView.backgroundColor = [UIColor whiteColor];
+        //[imageView setImage:[UIImage imageNamed:@"AppIcon.png"]];   // assuming Default.png is your splash image's name
+
+        [UIApplication.sharedApplication.keyWindow.subviews.lastObject addSubview:imageView];
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application
+{
+    UIImageView *imageView = (UIImageView *)[UIApplication.sharedApplication.keyWindow.subviews.lastObject viewWithTag:101];   // search by the same tag value
+    [imageView removeFromSuperview];
+
+}
 @end

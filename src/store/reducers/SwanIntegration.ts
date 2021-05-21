@@ -185,7 +185,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
-        console.log( 'action.payload.data CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED', action.payload.data )
         return {
           ...state,
           minBtcThreshold: action.payload.data || 0.02,
@@ -202,9 +201,6 @@ const reducer = ( state = INITIAL_STATE, action ) => {
         }
 
       case TEMP_SWAN_ACCOUNT_INFO_SAVED:
-        console.log( '@@@=> TEMP_SWAN_ACCOUNT_INFO_SAVED ', {
-          swanAccountDetails: action.payload.data
-        } )
         return {
           ...state,
           swanAccountDetails: action.payload.data

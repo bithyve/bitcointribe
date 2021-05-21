@@ -20,13 +20,15 @@ import {
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
+
 class HexaConfig {
   //RAMP details
   public RAMP_BASE_URL: string = Config.RAMP_BASE_URL ? Config.RAMP_BASE_URL.trim() : 'https://buy.ramp.network/'
   public RAMP_REFERRAL_CODE: string = Config.RAMP_REFERRAL_CODE ? Config.RAMP_REFERRAL_CODE.trim() : 'ku67r7oh5juc27bmb3h5pek8y5heyb5bdtfa66pr'
   //SWAN details
   public SWAN_CLIENT_ID:string = Config.SWAN_CLIENT_ID || 'hexa-dev'
-  public SWAN_BASE_URL:string = Config.SWAN_AUTH_URL || 'http://dev-api.swanbitcoin.com/'
+  public SWAN_BASE_URL:string = Config.SWAN_BASE_URL || 'http://dev-api.swanbitcoin.com/'
+  public SWAN_REDIRECT_URL: string = Config.SWAN_REDIRECT_URL || 'https%3A%2F%2Fhexa.bithyve.com%2FdeepLink%2Fdev%2Fswan%2F'
   public WALLET_SLUG: string = Config.WALLET_SLUG ? Config.WALLET_SLUG.trim() : 'WALLET_SLUG'
   public FBTC_REGISTRATION_URL: string = Config.FBTC_REGISTRATION_URL ? Config.FBTC_REGISTRATION_URL.trim() : 'https://fastbitcoins.com/create-account/hexa'
   public FBTC_URL: string = Config.FBTC_URL ? Config.FBTC_URL.trim() : 'https://wallet-api.fastbitcoins.com/v2/'

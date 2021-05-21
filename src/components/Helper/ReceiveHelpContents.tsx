@@ -9,8 +9,9 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import openLink from '../../utils/OpenLink'
 
-export default function ReceiveHelpContents(props) {
+export default function ReceiveHelpContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
 
   return (
@@ -31,14 +32,14 @@ export default function ReceiveHelpContents(props) {
           flex: 1,
           backgroundColor: Colors.blue,
         }}
-        snapToInterval={hp('80%')}
+        snapToInterval={hp( '80%' )}
         decelerationRate="fast"
       >
         <View style={styles.ElementView}>
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('5%'),
+              marginTop: wp( '5%' ),
             }}
           >
             To receive sats or bitcoin, you share the QR code with the person trying to send you money. Scanning the QR code with their phone camera gives them your bitcoin address.
@@ -47,14 +48,14 @@ export default function ReceiveHelpContents(props) {
             justifyContent: 'center', alignItems: 'center'
           }}>
             <Image
-              source={require( '../../assets/images/icons/bitcoin_receive_info_1.png')}
+              source={require( '../../assets/images/icons/bitcoin_receive_info_1.png' )}
               style={styles.helperImage}
             />
           </View>
           <Text
             style={{
               ...styles.infoText,
-              marginBottom: wp('15%'),
+              marginBottom: wp( '15%' ),
             }}
           >
             For your privacy, a new address is generated each time you want to receive sats or bitcoin. The app does this on its own - you don't have to do a thing!
@@ -64,11 +65,11 @@ export default function ReceiveHelpContents(props) {
               alignItems: 'center'
             }}
             onPress={() => {
-              scrollViewRef.current?.scrollTo({
+              scrollViewRef.current?.scrollTo( {
                 x: 0,
-                y: hp('80%'),
+                y: hp( '80%' ),
                 animated: true,
-              })
+              } )
             }}
           >
             <FontAwesome
@@ -83,7 +84,7 @@ export default function ReceiveHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('10%'),
+              marginTop: wp( '10%' ),
             }}
           >
             Depending on the sender's wallet, you may receive a few less sats than you requested - this may be due to the mining fee.
@@ -92,25 +93,25 @@ export default function ReceiveHelpContents(props) {
             justifyContent: 'center', alignItems: 'center'
           }}>
             <Image
-              source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+              source={require( '../../assets/images/icons/bitcoin_send_info_2.png' )}
               style={styles.helperImage}
             />
           </View>
           <Text style={{
-            ...styles.infoText, marginBottom: wp('15%'),
+            ...styles.infoText, marginBottom: wp( '15%' ),
           }}>
            If your sender sends the transaction with higher mining fees, it gets to you faster. Make sure they know!
-            </Text>
+          </Text>
           <AppBottomSheetTouchableWrapper
             style={{
               alignItems: 'center'
             }}
             onPress={() => {
-              scrollViewRef.current?.scrollTo({
+              scrollViewRef.current?.scrollTo( {
                 x: 0,
-                y: hp('160%'),
+                y: hp( '160%' ),
                 animated: true,
-              })
+              } )
             }}
           >
             <FontAwesome
@@ -126,16 +127,16 @@ export default function ReceiveHelpContents(props) {
           <Text
             style={{
               ...styles.infoText,
-              marginTop: wp('10%'),
+              marginTop: wp( '10%' ),
             }}
           >
-            When you send sats, our app calculates the fees to get your money to your recipient within a certain window of time - or you can use a custom fee, if you know what you're doing. 
+            When you send sats, our app calculates the fees to get your money to your recipient within a certain window of time - or you can use a custom fee, if you know what you're doing.
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
           }}>
             <Image
-              source={require('../../assets/images/icons/bitcoin_send_info_2.png')}
+              source={require( '../../assets/images/icons/bitcoin_send_info_2.png' )}
               style={styles.helperImage}
             />
           </View>
@@ -146,55 +147,55 @@ export default function ReceiveHelpContents(props) {
              Fees provide additional incentives for the miner to process your transaction, resulting in you (or your recipient) receiving your sats faster.
             </Text>
             <View
-            style={{
-              flexDirection: 'row',
-              marginLeft: wp( '10%' ),
-              marginRight: wp( '10%' ),
-              justifyContent: 'center',
-              flexWrap: 'wrap',
-              marginTop: wp('7%')
-            }}
-          >
-            <Text
               style={{
-                color: Colors.white,
-                // textAlign: 'center',
-                fontSize: RFValue( 13 ),
-                fontFamily: Fonts.FiraSansRegular,
+                flexDirection: 'row',
+                marginLeft: wp( '10%' ),
+                marginRight: wp( '10%' ),
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginTop: wp( '7%' )
               }}
-            >
-              To know more,
-            </Text>
-            <AppBottomSheetTouchableWrapper
-              style={{
-                marginLeft: 5
-              }}
-              onPress={() =>
-                openLink(
-                  'https://github.com/6102bitcoin/bitcoin-intro#step-12-buying-privately',
-                )
-              }
             >
               <Text
                 style={{
                   color: Colors.white,
+                  // textAlign: 'center',
                   fontSize: RFValue( 13 ),
                   fontFamily: Fonts.FiraSansRegular,
-                  textDecorationLine: 'underline',
-                  textAlign: 'center',
                 }}
               >
-                click here
+              To know more,
               </Text>
-            </AppBottomSheetTouchableWrapper>
-          </View>
+              <AppBottomSheetTouchableWrapper
+                style={{
+                  marginLeft: 5
+                }}
+                onPress={() =>
+                  openLink(
+                    'https://github.com/6102bitcoin/bitcoin-intro#step-12-buying-privately',
+                  )
+                }
+              >
+                <Text
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue( 13 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    textDecorationLine: 'underline',
+                    textAlign: 'center',
+                  }}
+                >
+                click here
+                </Text>
+              </AppBottomSheetTouchableWrapper>
+            </View>
           </View>
         </View>
       </ScrollView>
     </View>
   )
 }
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   modalContainer: {
     height: '100%',
     backgroundColor: Colors.blue,
@@ -210,69 +211,69 @@ const styles = StyleSheet.create({
   headerText: {
     color: Colors.white,
     fontFamily: Fonts.FiraSansMedium,
-    fontSize: RFValue(20),
-    marginTop: hp('1%'),
-    marginBottom: hp('1%'),
+    fontSize: RFValue( 20 ),
+    marginTop: hp( '1%' ),
+    marginBottom: hp( '1%' ),
   },
   headerSeparator: {
     backgroundColor: Colors.homepageButtonColor,
     height: 1,
-    marginLeft: wp('5%'),
-    marginRight: wp('5%'),
-    marginBottom: hp('1%'),
+    marginLeft: wp( '5%' ),
+    marginRight: wp( '5%' ),
+    marginBottom: hp( '1%' ),
   },
   infoText: {
     textAlign: 'center',
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
-    marginLeft: wp('10%'),
-    marginRight: wp('10%'),
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
   },
   clickHereText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     textDecorationLine: 'underline',
     textAlign: 'center',
   },
   toKnowMoreText: {
     color: Colors.white,
-    fontSize: RFValue(13),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
   linkView: {
     flexDirection: 'row',
-    marginLeft: wp('10%'),
-    marginRight: wp('10%'),
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
     justifyContent: 'center',
     flexWrap: 'wrap',
   },
   ElementView: {
-    height: hp('80%'),
+    height: hp( '80%' ),
     justifyContent: 'space-between',
   },
   separatorView: {
-    width: wp('70%'),
+    width: wp( '70%' ),
     height: 0,
     alignSelf: 'center',
-    marginBottom: wp('1%'),
+    marginBottom: wp( '1%' ),
     borderStyle: 'dotted',
     borderWidth: 1,
     borderRadius: 1,
     borderColor: Colors.white,
   },
   helperImage: {
-    width: wp('80%'),
-    height: wp('65%'),
+    width: wp( '80%' ),
+    height: wp( '65%' ),
     resizeMode: 'contain',
   },
   bottomLinkView: {
-    marginLeft: wp('10%'),
-    marginRight: wp('10%'),
-    marginBottom: wp('15%'),
+    marginLeft: wp( '10%' ),
+    marginRight: wp( '10%' ),
+    marginBottom: wp( '15%' ),
   },
-})
+} )
 
 //     <View style={styles.modalContainer}>
 //       <AppBottomSheetTouchableWrapper
