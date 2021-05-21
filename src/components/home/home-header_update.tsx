@@ -269,6 +269,7 @@ const HomeHeader = ( {
             )
           }}
           isOn={prefersBitcoin}
+          disabled={exchangeRates && exchangeRates[ CurrencyCode ] ? false : true}
         />
         <TouchableOpacity
           onPress={onPressNotifications}
