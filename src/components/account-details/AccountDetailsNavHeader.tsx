@@ -131,7 +131,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                   : showNoExchangeRateBottomSheet()
               }}
               isOn={prefersBitcoin}
-              disabled={exchangeRates ? false : true}
+              disabled={exchangeRates && exchangeRates[ currencyCode ] ? false : true}
             />
           </View>
         </View>
