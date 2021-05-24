@@ -179,7 +179,7 @@ const initialState: {
     {
       levelName: 'Level 1',
       status: 'notSetup',
-      keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on GoogleDrive',
+      keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive',
       keeper2ButtonText: 'Security Question',
       keeper1: obj,
       keeper2: obj,
