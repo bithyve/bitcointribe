@@ -171,11 +171,11 @@ export default class RelayServices {
     }
   };
 
-  public static fetchFeeAndExchangeRates = async () => {
+  public static fetchFeeAndExchangeRates = async ( currencyCode ) => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.fetchFeeAndExchangeRates(),
+        data: await Relay.fetchFeeAndExchangeRates( currencyCode ),
       }
     } catch ( err ) {
       return {

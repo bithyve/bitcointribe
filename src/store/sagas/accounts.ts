@@ -480,9 +480,11 @@ function* feeAndExchangeRatesWorker() {
   const storedAverageTxFees = yield select(
     ( state ) => state.accounts.averageTxFees
   )
-
+  const currencyCode = yield select(
+    ( state ) => state.preferences.currencyCode
+  )
   try {
-    const res = yield call( RelayServices.fetchFeeAndExchangeRates )
+    const res = yield call( RelayServices.fetchFeeAndExchangeRates, currencyCode )
     console.log( {
       res
     } )
