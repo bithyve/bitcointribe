@@ -30,7 +30,6 @@ const checkLevelHealth = (
 ) => {
   try {
     if( levelHealthVar.length == 1 ){
-      console.log( 'IF' )
       const levelInfo = levelHealthVar[ 0 ].levelInfo
       const elements =  arrayChunks( levelInfo, 2 )
       for ( let j = 0; j < elements.length; j++ ) {

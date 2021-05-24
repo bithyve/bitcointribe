@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
@@ -41,7 +42,17 @@ import {
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
-
+const obj = {
+  shareType: '',
+  updatedAt: 0,
+  status: 'notAccessible',
+  shareId: '',
+  reshareVersion: 0,
+  name: '',
+  data: {
+  },
+  uuid: '',
+}
 const initialState: {
   mnemonic: string;
   service: S3Service;
@@ -164,7 +175,41 @@ const initialState: {
   hasSMUploadedSuccessfully: false,
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
-  levelData: null,
+  levelData: [
+    {
+      levelName: 'Level 1',
+      status: 'notSetup',
+      keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on GoogleDrive',
+      keeper2ButtonText: 'Security Question',
+      keeper1: obj,
+      keeper2: obj,
+      note:'',
+      info:'Automated Cloud Backup',
+      id: 1,
+    },
+    {
+      levelName: 'Level 2',
+      status: 'notSetup',
+      keeper1ButtonText: 'Share Recovery Key 1',
+      keeper2ButtonText: 'Share Recovery Key 2',
+      keeper1: obj,
+      keeper2: obj,
+      note:'',
+      info:'Double Backup',
+      id: 2,
+    },
+    {
+      levelName: 'Level 3',
+      status: 'notSetup',
+      keeper1ButtonText: 'Share Recovery Key 1',
+      keeper2ButtonText: 'Share Recovery Key 2',
+      keeper1: obj,
+      keeper2: obj,
+      note:'',
+      info:'Multi Key Backup',
+      id: 3,
+    },
+  ],
   keeperProcessStatus: '',
   pdfCreatedSuccessfully: false,
   isLevelToNotSetupStatus: false
