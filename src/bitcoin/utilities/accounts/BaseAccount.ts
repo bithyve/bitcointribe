@@ -11,6 +11,7 @@ import {
   ScannedAddressKind,
   AverageTxFees,
   TransactionPrerequisiteElements,
+  ContactDetails,
 } from '../Interface'
 
 export default class BaseAccount {
@@ -316,7 +317,7 @@ export default class BaseAccount {
   public setupDerivativeAccount = (
     accountType: string,
     accountDetails?: { accountName?: string; accountDescription?: string },
-    contactName?: string
+    contactDetails?: ContactDetails
   ):
     | {
         status: number;
@@ -337,7 +338,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactName ),
+        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactDetails ),
       }
     } catch ( err ) {
       return {

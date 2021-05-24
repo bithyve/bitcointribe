@@ -7,6 +7,7 @@ import {
   ShareUploadables,
   Contacts,
   UnecryptedStreamData,
+  ContactDetails,
 } from '../../bitcoin/utilities/Interface'
 import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -19,7 +20,6 @@ export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
 export const SYNC_PERMANENT_CHANNEL = 'SYNC_PERMANENT_CHANNEL'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
-export const UPDATE_TRUSTED_CONTACTS_INFO = 'UPDATE_TRUSTED_CONTACTS_INFO'
 export const UPDATE_ADDRESS_BOOK_LOCALLY = 'UPDATE_ADDRESS_BOOK_LOCALLY'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
@@ -119,14 +119,14 @@ export const updateTrustedChannel = (
 }
 
 export const syncPermanentChannel = (
-  contactInfo: { contactName: string; info: string },
+  contactDetails: ContactDetails,
   updates?: UnecryptedStreamData,
   updatedDB?: any
 ) => {
   return {
     type: SYNC_PERMANENT_CHANNEL,
     payload: {
-      contactInfo, updates, updatedDB
+      contactDetails, updates, updatedDB
     },
   }
 }
@@ -174,15 +174,6 @@ export const syncTrustedChannels = ( contacts? ) => {
 export const postRecoveryChannelSync = () => {
   return {
     type: POST_RECOVERY_CHANNEL_SYNC,
-  }
-}
-
-export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
-  return {
-    type: UPDATE_TRUSTED_CONTACTS_INFO,
-    payload: {
-      trustedContactsInfo
-    },
   }
 }
 

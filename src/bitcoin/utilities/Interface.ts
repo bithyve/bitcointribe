@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from 'react-native'
 import {
   DecentralizedBackup,
   ServicesJSON,
@@ -468,7 +469,7 @@ export interface ContactDetails {
   contactName: string,
   info: string, // phone-number/email-address
   id: string,
-  image?: any | null,
+  image?: ImageSourcePropType | null,
 }
 
 export interface ContactInfo  {
