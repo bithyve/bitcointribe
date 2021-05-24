@@ -38,7 +38,7 @@ import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountIn
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
-import { ContactDetails, ContactInfo } from '../../bitcoin/utilities/Interface'
+import { ContactDetails, ContactInfo, QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -84,11 +84,6 @@ export default function AddContactSendRequest( props ) {
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
   )
-
-  const updateEphemeralChannelLoader = useSelector(
-    ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
-  )
-
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
@@ -131,141 +126,40 @@ export default function AddContactSendRequest( props ) {
   }, [ Contact ] )
 
   useEffect( () => {
-    if ( updateEphemeralChannelLoader ) {
-      if ( trustedLink ) setTrustedLink( '' )
-      if ( trustedQR ) setTrustedQR( '' )
-      return
-    }
+    if( !Contact ) return
 
-    if ( !Contact ) {
-      console.log( 'Err: Contact missing' )
-      return
-    }
-    console.log( {
-      Contact
-    } )
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
+    let channelKey: string
 
-    const contactName = `${Contact.firstName} ${
-      Contact.lastName ? Contact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
-    const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
 
-    if ( trustedContact ) {
-      if ( !trustedContact.ephemeralChannel ) {
-        console.log(
-          'Err: Ephemeral Channel does not exists for contact: ',
-          contactName,
-        )
-        return
-      }
-
-      const { publicKey, otp } = trustedContacts.tc.trustedContacts[
-        contactName
-      ]
-      const requester = WALLET_SETUP.walletName
-      const appVersion = DeviceInfo.getVersion()
-      if ( !trustedLink ) {
-        if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-          const phoneNumber = Contact.phoneNumbers[ 0 ].number
-          let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-          number = number.slice( number.length - 10 ) // last 10 digits only
-          const numHintType = 'num'
-          const numHint = number[ 0 ] + number.slice( number.length - 2 )
-          const numberEncPubKey = TrustedContactsService.encryptPub(
-            publicKey,
-            number,
-          ).encryptedPub
-          const numberDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
-            `/${requester}` +
-            `/${numberEncPubKey}` +
-            `/${numHintType}` +
-            `/${numHint}` +
-            `/${trustedContact.ephemeralChannel.initiatedAt}` +
-            `/v${appVersion}`
-          setIsOTPType( false )
-          setTrustedLink( numberDL )
-        } else if ( Contact.emails && Contact.emails.length ) {
-          const email = Contact.emails[ 0 ].email
-          const emailHintType = 'eml'
-          const trucatedEmail = email.replace( '.com', '' )
-          const emailHint =
-            email[ 0 ] + trucatedEmail.slice( trucatedEmail.length - 2 )
-          const emailEncPubKey = TrustedContactsService.encryptPub(
-            publicKey,
-            email,
-          ).encryptedPub
-          const emailDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
-            `/${requester}` +
-            `/${emailEncPubKey}` +
-            `/${emailHintType}` +
-            `/${emailHint}` +
-            `/${trustedContact.ephemeralChannel.initiatedAt}` +
-            `/v${appVersion}`
-          setIsOTPType( false )
-          setTrustedLink( emailDL )
-        } else if ( otp ) {
-          const otpHintType = 'otp'
-          const otpHint = 'xxx'
-          const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otp )
-            .encryptedPub
-          const otpDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
-            `/${requester}` +
-            `/${otpEncPubKey}` +
-            `/${otpHintType}` +
-            `/${otpHint}` +
-            `/${trustedContact.ephemeralChannel.initiatedAt}` +
-            `/v${appVersion}`
-          setIsOTPType( true )
-          setOTP( otp )
-          setTrustedLink( otpDL )
-        } else {
-          Alert.alert( 'Invalid Contact', 'Something went wrong.' )
-          return
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          currentContact = contacts[ ck ]
+          channelKey = ck
+          break
         }
       }
+
+    if ( currentContact ) {
+      const { secondaryChannelKey } = currentContact
+      const appVersion = DeviceInfo.getVersion()
 
       if ( !trustedQR ) {
-        let info = ''
-        if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-          const phoneNumber = Contact.phoneNumbers[ 0 ].number
-          let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-          number = number.slice( number.length - 10 ) // last 10 digits only
-          info = number
-        } else if ( Contact.emails && Contact.emails.length ) {
-          info = Contact.emails[ 0 ].email
-        } else if ( otp ) {
-          info = otp
-        }
-
         setTrustedQR(
           JSON.stringify( {
-            requester: WALLET_SETUP.walletName,
-            publicKey,
-            info: info.trim(),
-            uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
-            type: 'trustedContactQR',
-            ver: appVersion,
+            type: QRCodeTypes.CONTACT_REQUEST,
+            channelKey,
+            secondaryChannelKey,
+            version: appVersion,
           } ),
         )
-        // setTimeout( () => {
-        //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
-        // }, 2 )
-
-      } else {
-        // setTimeout( () => {
-        //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
-        // }, 2 )
       }
-
     } else {
       createTrustedContact()
     }
-  }, [ Contact, trustedContacts, updateEphemeralChannelLoader ] )
+  }, [ Contact, trustedContacts ] )
 
   const openTimer = async () => {
     setTimeout( () => {

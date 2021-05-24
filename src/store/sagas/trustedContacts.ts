@@ -375,7 +375,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
 
   // initiate permanent channel
-  yield put( syncPermanentChannel( contactInfo.contactDetails, updates ) )
+  yield put( syncPermanentChannel( contactInfo, updates ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {
@@ -1040,9 +1040,10 @@ function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: Cont
   const { contactInfo, updates } = payload
   const res = yield call(
     trustedContacts.syncPermanentChannel,
+    contactInfo.contactDetails,
     contactInfo.channelKey,
+    contactInfo.secondaryChannelKey,
     updates,
-    contactInfo.secondaryChannelKey
   )
   if ( res.status === 200 ) {
     const { SERVICES } = yield select( ( state ) => state.storage.database )

@@ -9,6 +9,8 @@ import {
   MetaShare,
   EncDynamicNonPMDD,
   UnecryptedStreamData,
+  ContactDetails,
+  Trusted_Contacts,
 } from '../utilities/Interface'
 
 export default class TrustedContactsService {
@@ -16,14 +18,17 @@ export default class TrustedContactsService {
     const { tc } = JSON.parse( json )
     const {
       trustedContacts,
+      trustedContactsV2,
       skippedContactsCount,
     }: {
       trustedContacts: Contacts;
+      trustedContactsV2: Trusted_Contacts;
       skippedContactsCount: number;
     } = tc
 
     return new TrustedContactsService( {
       trustedContacts,
+      trustedContactsV2,
       skippedContactsCount,
     } )
   };
@@ -297,9 +302,10 @@ export default class TrustedContactsService {
   };
 
   public syncPermanentChannel = async (
+    contactDetails: ContactDetails,
     channelKey: string,
-    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     secondaryChannelKey?: string,
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
   ): Promise<
     | {
         status: number;
@@ -323,9 +329,10 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.syncPermanentChannel(
+          contactDetails,
           channelKey,
-          unEncryptedOutstreamUpdates,
           secondaryChannelKey,
+          unEncryptedOutstreamUpdates,
         )
       }
     } catch ( err ) {

@@ -14,7 +14,8 @@ import {
   UnecryptedStreamData,
   StreamData,
   TrustedContact,
-  Trusted_Contacts
+  Trusted_Contacts,
+  ContactDetails
 } from './Interface'
 import crypto from 'crypto'
 import config from '../HexaConfig'
@@ -159,6 +160,9 @@ export default class TrustedContacts {
   public initializeStateVars = ( stateVars ) => {
     this.trustedContacts =
       stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {
+      }
+    this.trustedContactsV2 =
+      stateVars && stateVars.trustedContactsV2 ? stateVars.trustedContactsV2 : {
       }
     this.skippedContactsCount =
       stateVars && stateVars.skippedContactsCount
@@ -896,23 +900,25 @@ export default class TrustedContacts {
   };
 
   public syncPermanentChannel = async (
+    contactDetails: ContactDetails,
     channelKey: string,
-    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     secondaryChannelKey?: string,
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
   ): Promise<{
     updated: boolean;
   }> => {
     try {
-
       let contact: TrustedContact = this.trustedContactsV2[ channelKey ]
       if ( !contact ) {
         // initialize contact
         const newContact: TrustedContact = {
+          contactDetails,
           permanentChannelAddress: crypto
             .createHash( 'sha256' )
             .update( channelKey )
             .digest( 'hex' ),
           relationType: idx( unEncryptedOutstreamUpdates, ( _ ) => _.primaryData.relationType ),
+          secondaryChannelKey,
         }
         this.trustedContactsV2[ channelKey ] = newContact
         contact = newContact
