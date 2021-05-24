@@ -64,6 +64,7 @@ import {
 import {
   setCurrencyCode,
   setCardData,
+  setIsPermissionGiven,
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
@@ -280,6 +281,8 @@ interface HomePropsTypes {
   updateCloudPermission: any;
   credsAuthenticated: any;
   setShowAllAccount: any;
+  setIsPermissionGiven: any;
+  isPermissionSet: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -334,11 +337,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       wyreFromBuyMenu: null,
       wyreFromDeepLink: null
     }
-    console.log( 'this.props.navigation.getParam', this.props.navigation.state.params )
-    this.appStateListener = AppState.addEventListener(
-      'change',
-      this.onAppStateChange
-    )
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -613,46 +611,46 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  scheduleNotification = async () => {
-    PushNotification.cancelAllLocalNotifications()
-    const channelIdRandom = moment().valueOf()
+  // scheduleNotification = async () => {
+  //   PushNotification.cancelAllLocalNotifications()
+  //   const channelIdRandom = moment().valueOf()
 
-    PushNotification.createChannel(
-      {
-        channelId: `${channelIdRandom}`,
-        channelName: 'reminder',
-        channelDescription: 'A channel to categorise your notifications',
-        playSound: false,
-        soundName: 'default',
-        importance: 4, // (optional) default: 4. Int value of the Android notification importance
-        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
-      },
-      ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
-    )
-    const date = new Date()
-    date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
+  //   PushNotification.createChannel(
+  //     {
+  //       channelId: `${channelIdRandom}`,
+  //       channelName: 'reminder',
+  //       channelDescription: 'A channel to categorise your notifications',
+  //       playSound: false,
+  //       soundName: 'default',
+  //       importance: 4, // (optional) default: 4. Int value of the Android notification importance
+  //       vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+  //     },
+  //     ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+  //   )
+  //   const date = new Date()
+  //   date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
 
-    //let date =  new Date(Date.now() + (3 * 60 * 1000));
-    PushNotification.localNotificationSchedule( {
-      channelId: channelIdRandom,
-      vibrate: true,
-      vibration: 300,
-      priority: 'high',
-      showWhen: true,
-      autoCancel: true,
-      soundName: 'default',
-      title: 'We have not seen you in a while!',
-      message:
-        'Opening your app regularly ensures you get all the notifications and security updates', // (required)
-      date: date,
-      repeatType: 'day',
-      allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
-    } )
+  //   //let date =  new Date(Date.now() + (3 * 60 * 1000));
+  //   PushNotification.localNotificationSchedule( {
+  //     channelId: channelIdRandom,
+  //     vibrate: true,
+  //     vibration: 300,
+  //     priority: 'high',
+  //     showWhen: true,
+  //     autoCancel: true,
+  //     soundName: 'default',
+  //     title: 'We have not seen you in a while!',
+  //     message:
+  //       'Opening your app regularly ensures you get all the notifications and security updates', // (required)
+  //     date: date,
+  //     repeatType: 'day',
+  //     allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
+  //   } )
 
-    PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
-      console.log( 'SCHEDULE notiifcations', notiifcations )
-    } )
-  };
+  //   PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
+  //     console.log( 'SCHEDULE notiifcations', notiifcations )
+  //   } )
+  // };
 
   localNotification = async ( notificationDetails ) => {
     const channelIdRandom = moment().valueOf()
@@ -688,6 +686,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   bootStrapNotifications = async () => {
+    this.props.setIsPermissionGiven( true )
+    const t0 = performance.now()
     if ( Platform.OS === 'ios' ) {
       firebase
         .messaging()
@@ -695,7 +695,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         .then( ( enabled ) => {
           if ( enabled ) {
             this.storeFCMToken()
-            this.scheduleNotification()
             this.createNotificationListeners()
           } else {
             firebase
@@ -705,7 +704,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               } )
               .then( () => {
                 this.storeFCMToken()
-                this.scheduleNotification()
                 this.createNotificationListeners()
               } )
               .catch( () => {
@@ -716,9 +714,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         .catch()
     } else {
       this.storeFCMToken()
-      this.scheduleNotification()
       this.createNotificationListeners()
     }
+    const t1 = performance.now()
+    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   storeFCMToken = async () => {
@@ -743,6 +742,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   createNotificationListeners = async () => {
+    this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       onNotification: ( notification ) => {
         console.log( 'NOTIFICATION:', notification )
@@ -841,29 +841,34 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onAppStateChange = async ( nextAppState ) => {
     const { appState } = this.state
+    const { isPermissionSet, setIsPermissionGiven } = this.props
     try {
       // TODO: Will this function ever be called if the state wasn't different? If not,
       // I don't think we need to be holding on to `appState` in this component's state.
       if ( appState === nextAppState ) return
+      console.log( 'isPermissionSet', isPermissionSet )
+      console.log( 'nextAppState', nextAppState )
+      if ( isPermissionSet ) {
+        setIsPermissionGiven( false )
+        return
+      }
       this.setState(
         {
           appState: nextAppState,
         },
-
         async () => {
-          if ( Platform.OS == 'android' ? ( nextAppState == 'active' ) : ( nextAppState == 'background' ) ) {
-            this.props.navigation.dispatch( NavigationActions.navigate( {
-              routeName: 'Login',
-            } ) )
-          }
           if ( nextAppState === 'active' ) {
-            this.scheduleNotification()
+          //this.scheduleNotification()
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
+            console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
+            this.props.navigation.dispatch( NavigationActions.navigate( {
+              routeName: 'Login',
+            } ) )
           }
         }
       )
@@ -880,50 +885,53 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       newBHRFlowStarted,
       credsAuthenticated
     } = this.props
-    credsAuthenticated( false )
-
-    const versionData = []
-    this.closeBottomSheet()
-    if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
-      this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
-    }
-    this.calculateNetBalance()
-
-    if( newBHRFlowStarted === true )
-    {
-      const { healthCheckInitializedKeeper } = s3Service.levelhealth
-      if ( healthCheckInitializedKeeper === false ) {
-        initializeHealthSetup()
-      }
-    }
-
-    //const { healthCheckInitialized } = s3Service.sss;
-    //   console.log("healthCheckInitialized", healthCheckInitialized);
-    //   if (!healthCheckInitialized) {
-    //     initHealthCheck();
-    //   }
-    // }
-    this.bootStrapNotifications()
-    this.setUpFocusListener()
-    this.getNewTransactionNotifications()
-
-    Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-    Linking.getInitialURL().then( this.handleDeepLinking )
-    // call this once deeplink is detected aswell
-    this.handleDeepLinkModal()
-    const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
-
-    if ( unhandledDeepLinkURL ) {
-      navigation.setParams( {
-        unhandledDeepLinkURL: null,
-      } )
-      this.handleDeepLinking( unhandledDeepLinkURL )
-    }
-
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange
+    )
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSync disabled
+      // Keeping autoSynn disabled
+      credsAuthenticated( false )
+      this.closeBottomSheet()
+      if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
+        this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
+      }
+      this.calculateNetBalance()
+
+      if( newBHRFlowStarted === true )
+      {
+        const { healthCheckInitializedKeeper } = s3Service.levelhealth
+        if ( healthCheckInitializedKeeper === false ) {
+          initializeHealthSetup()
+        }
+      }
+
+      //const { healthCheckInitialized } = s3Service.sss;
+      //   console.log("healthCheckInitialized", healthCheckInitialized);
+      //   if (!healthCheckInitialized) {
+      //     initHealthCheck();
+      //   }
+      // }
+      this.bootStrapNotifications()
+      this.setUpFocusListener()
+      //this.getNewTransactionNotifications()
+
+      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      Linking.getInitialURL().then( this.handleDeepLinking )
+
+      // call this once deeplink is detected aswell
+      this.handleDeepLinkModal()
+
+      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+
+      if ( unhandledDeepLinkURL ) {
+        navigation.setParams( {
+          unhandledDeepLinkURL: null,
+        } )
+        this.handleDeepLinking( unhandledDeepLinkURL )
+      }
 
       this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
@@ -931,6 +939,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   getNewTransactionNotifications = async () => {
+    const t0 = performance.now()
     const newTransactions = []
     const { accountsState } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
@@ -1009,6 +1018,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         } )
       }, 2 )
     }
+    const t1 = performance.now()
+    console.log( 'getNewTransactionNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   componentDidUpdate = ( prevProps, prevState ) => {
@@ -1176,6 +1187,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else {
       this.handleDeepLinking( url )
     }
+
   };
 
   handleDeepLinking = async ( url: string | null ) => {
@@ -1368,6 +1380,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setUpFocusListener = () => {
+    const t0 = performance.now()
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
@@ -1380,6 +1393,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
     this.setCurrencyCodeFromAsync()
+    const t1 = performance.now()
+    console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   setSecondaryDeviceAddresses = async () => {
@@ -1432,37 +1447,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.setState( {
       netBalance: totalBalance,
     } )
-  };
-
-  onNotificationListOpen = async () => {
-    // let asyncNotificationList = notificationListNew;
-    const asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    if ( asyncNotificationList ) {
-      for ( let i = 0; i < asyncNotificationList.length; i++ ) {
-        if ( asyncNotificationList[ i ] ) {
-          asyncNotificationList[ i ].time = timeFormatter(
-            moment( new Date() ),
-            moment( asyncNotificationList[ i ].date ).valueOf()
-          )
-        }
-      }
-      // this.props.notificationsUpdated(asyncNotificationList);
-
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify( asyncNotificationList )
-      )
-      asyncNotificationList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-      } )
-
-      this.setState( {
-        notificationData: asyncNotificationList,
-        notificationDataChange: !this.state.notificationDataChange,
-      } )
-    }
   };
 
   onTrustedContactRequestAccepted = ( key ) => {
@@ -2597,6 +2581,7 @@ const mapStateToProps = ( state ) => {
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
+    isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
   }
 }
 
@@ -2639,7 +2624,8 @@ export default withNavigationFocus(
     updateKeeperInfoToUnderCustody,
     updateCloudPermission,
     credsAuthenticated,
-    setShowAllAccount
+    setShowAllAccount,
+    setIsPermissionGiven
   } )( Home )
 )
 

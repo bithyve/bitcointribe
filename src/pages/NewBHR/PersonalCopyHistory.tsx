@@ -40,6 +40,7 @@ import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
 import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -356,6 +357,7 @@ const PersonalCopyHistory = ( props ) => {
 
   const requestStoragePermission = async () => {
     try {
+      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -377,6 +379,7 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   const checkStoragePermission = async () =>  {
+    dispatch( setIsPermissionGiven( true ) )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),

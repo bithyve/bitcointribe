@@ -143,6 +143,7 @@ import { getVersions } from '../../common/utilities'
 import { initLevels } from '../actions/upgradeToNewBhr'
 
 function* initHealthWorker() {
+  const t0 = performance.now()
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const initialized = s3Service.levelhealth.healthCheckInitializedKeeper
 
@@ -177,6 +178,8 @@ function* initHealthWorker() {
     if ( res.err === 'ECONNABORTED' ) requestTimedout()
     yield put( initLoader( false ) )
   }
+  const t1 = performance.now()
+  console.log( 'Call initHealthWorker took ' + ( t1 - t0 ) + ' milliseconds.' )
 }
 
 export const initHealthWatcher = createWatcher(

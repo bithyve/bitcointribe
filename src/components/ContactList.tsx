@@ -32,6 +32,7 @@ import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import Toast from '../components/Toast'
 import { useDispatch, useSelector } from 'react-redux'
+import { setIsPermissionGiven } from '../store/actions/preferences'
 
 export default function ContactList( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -88,16 +89,7 @@ export default function ContactList( props ) {
 
   const requestContactsPermission = async () => {
     try {
-      let isContactOpen = false
-      AsyncStorage.getItem( 'isContactOpen', ( err, value ) => {
-        if ( err ) console.log( err )
-        else {
-          isContactOpen = JSON.parse( value )
-        }
-      } )
-      if ( !isContactOpen ) {
-        await AsyncStorage.setItem( 'isContactOpen', JSON.stringify( true ) )
-      }
+      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
@@ -137,6 +129,7 @@ export default function ContactList( props ) {
   }
 
   const getContactPermission = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
@@ -165,6 +158,7 @@ export default function ContactList( props ) {
   }
 
   const getContactsAsync = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
       //console.log("chckContactPermission",chckContactPermission)
@@ -202,17 +196,6 @@ export default function ContactList( props ) {
           }
         }
       } )
-
-      let isContactOpen = false
-      AsyncStorage.getItem( 'isContactOpen', ( err, value ) => {
-        if ( err ) console.log( err )
-        else {
-          isContactOpen = JSON.parse( value )
-        }
-      } )
-      if ( !isContactOpen ) {
-        await AsyncStorage.setItem( 'isContactOpen', JSON.stringify( true ) )
-      }
     } )()
     getContactsAsync()
   }, [] )

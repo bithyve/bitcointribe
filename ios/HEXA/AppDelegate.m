@@ -132,7 +132,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 #endif
 }
 
-- (void)applicationWillResignActive:(UIApplication *)application
+- (void)applicationDidEnterBackground:(UIApplication *)application
 {
     // Your application can present a full screen modal view controller to
     // cover its contents when it moves into the background. If your
