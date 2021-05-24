@@ -88,7 +88,8 @@ import CustomBottomTabs, {
 import {
   addTransferDetails,
   autoSyncShells,
-  addNewAccountShell
+  addNewAccountShell,
+  fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
   trustedChannelActions,
@@ -97,7 +98,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
+import { NavigationActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
 import semver from 'semver'
 import {
@@ -142,6 +143,8 @@ import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { setShowAllAccount } from '../../store/actions/accounts'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -233,6 +236,7 @@ interface HomePropsTypes {
   clearSwanCache: any;
   updateSwanStatus: any;
   addNewAccountShell: any;
+  fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -274,6 +278,8 @@ interface HomePropsTypes {
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
   updateCloudPermission: any;
+  credsAuthenticated: any;
+  setShowAllAccount: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -291,7 +297,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-
+    this.props.setShowAllAccount( false )
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
@@ -328,6 +334,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       wyreFromBuyMenu: null,
       wyreFromDeepLink: null
     }
+    console.log( 'this.props.navigation.getParam', this.props.navigation.state.params )
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange
+    )
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -838,7 +849,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         {
           appState: nextAppState,
         },
+
         async () => {
+          if ( Platform.OS == 'android' ? ( nextAppState == 'active' ) : ( nextAppState == 'background' ) ) {
+            this.props.navigation.dispatch( NavigationActions.navigate( {
+              routeName: 'Login',
+            } ) )
+          }
           if ( nextAppState === 'active' ) {
             this.scheduleNotification()
           }
@@ -860,18 +877,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       navigation,
       s3Service,
       initializeHealthSetup,
-      newBHRFlowStarted
+      newBHRFlowStarted,
+      credsAuthenticated
     } = this.props
+    credsAuthenticated( false )
+
     const versionData = []
     this.closeBottomSheet()
     if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
       this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
     }
     this.calculateNetBalance()
-    this.appStateListener = AppState.addEventListener(
-      'change',
-      this.onAppStateChange
-    )
+
     if( newBHRFlowStarted === true )
     {
       const { healthCheckInitializedKeeper } = s3Service.levelhealth
@@ -892,10 +909,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( this.handleDeepLinking )
-
     // call this once deeplink is detected aswell
     this.handleDeepLinkModal()
-
     const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
     if ( unhandledDeepLinkURL ) {
@@ -908,9 +923,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSynn disabled
+      // Keeping autoSync disabled
 
       this.props.setVersion()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
@@ -1069,12 +1085,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
-    const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.getParam(
-      'trustedContactRequest'
-    )
-    const userKey = this.props.navigation.getParam( 'userKey' )
+    const custodyRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.custodyRequest : null//this.props.navigation.getParam( 'custodyRequest' )
+    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
+    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    console.log( 'trustedContactRequest', trustedContactRequest )
+    if ( swanRequest ) {
+      this.setState( {
+        swanDeepLinkContent:swanRequest.url,
+      }, () => {
+        this.props.currentSwanSubAccount
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+    }
 
     if ( custodyRequest ) {
       this.setState(
@@ -1115,7 +1141,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()
@@ -1158,7 +1183,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
 
-    console.log( 'Home::handleDeepLinking::URL: ' + url )
+    console.log( 'handleDeepLinking: ' + url )
 
     const splits = url.split( '/' )
     if ( splits.includes( 'swan' ) ) {
@@ -1347,6 +1372,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
       this.props.fetchNotifications()
       this.setState( {
         lastActiveTime: moment().toISOString(),
@@ -1479,7 +1505,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Swan Account',
-              defaultDescription: 'BTC purchased from Swan',
+              defaultDescription: 'Sats purchased from Swan',
               serviceAccountKind: ServiceAccountKind.SWAN,
             } )
             this.props.createTempSwanAccountInfo( newSubAccount )
@@ -1782,6 +1808,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   closeBottomSheet = () => {
     this.bottomSheetRef.current?.close()
     this.onBottomSheetClosed()
+  };
+
+  onBackPress = () => {
+    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
   };
 
   onNotificationClicked = async ( value ) => {
@@ -2119,7 +2149,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.SWAN_STATUS_INFO:
-          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+            ),
+            heightPercentageToDP( 71 ),
+          ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '67%' ]
@@ -2180,6 +2216,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
               <BuyBitcoinHomeBottomSheet
                 onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+                // onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -2193,6 +2230,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2207,6 +2245,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2222,6 +2261,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2267,76 +2307,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
             </>
           )
-
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader
-                title="Buy bitcoin with Wyre"
-                onPress={this.closeBottomSheet}
-              />
-              <BottomSheetWyreInfo
-                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-              />
-            </>
-          )
-
-        case BottomSheetKind.RAMP_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader
-                title="Buy bitcoin with Ramp"
-                onPress={this.closeBottomSheet}
-              />
-              <BottomSheetRampInfo
-                rampDeepLinkContent={this.state.rampDeepLinkContent}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-              />
-            </>
-          )
-
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-          return (
-            <CustodianRequestModalContents
-              userName={custodyRequest.requester}
-              onPressAcceptSecret={() => {
-                this.closeBottomSheet()
-                if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
-                  Alert.alert(
-                    'Request expired!',
-                    'Please ask the sender to initiate a new request'
-                  )
-                } else {
-                  if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
-                    Alert.alert(
-                      'Failed to store',
-                      'You cannot custody multiple shares of the same user.'
-                    )
-                  } else {
-                    if ( custodyRequest.isQR ) {
-                      downloadMShare( custodyRequest.ek, custodyRequest.otp )
-                    } else {
-                      navigation.navigate( 'CustodianRequestOTP', {
-                        custodyRequest,
-                      } )
-                    }
-                  }
-                }
-              }}
-              onPressRejectSecret={() => {
-                this.closeBottomSheet()
-                this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
-              }}
-            />
-          )
-
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return (
             <CustodianRequestRejectedModalContents
@@ -2649,6 +2619,7 @@ export default withNavigationFocus(
     clearSwanCache,
     updateSwanStatus,
     addNewAccountShell,
+    fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
     clearPaymentDetails,
@@ -2667,6 +2638,8 @@ export default withNavigationFocus(
     setCloudData,
     updateKeeperInfoToUnderCustody,
     updateCloudPermission,
+    credsAuthenticated,
+    setShowAllAccount
   } )( Home )
 )
 

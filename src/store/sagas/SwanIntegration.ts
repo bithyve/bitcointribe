@@ -41,7 +41,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 
 const swan_auth_url = `${Config.SWAN_BASE_URL}oidc/auth`
-const redirect_uri = 'https%3A%2F%2Fhexawallet.io%2Fdev%2Fswan%2F'
+const redirect_uri = Config.SWAN_REDIRECT_URL
 export const fetchSwanAuthenticationUrlWatcher = createWatcher(
   fetchSwanAuthenticationUrlWorker,
   FETCH_SWAN_AUTHENTICATION_URL
@@ -89,21 +89,10 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
     code_verifier
   } )
 
-  // Temp code for testing. to be removed
-  console.log( {
-    swanResponse
-  } )
-
   const { access_token, expires_in, id_token, scope, token_type } = swanResponse.data
   yield put( redeemSwanCodeForTokenSucceeded( {
     swanAuthenticatedToken: access_token
   } ) )
-  const ST = yield select(
-    ( state ) => state.swanIntegration
-  )
-  console.log( 'SUX-S ', ST.swanAccountDetails, {
-    ST
-  } )
 
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
@@ -129,16 +118,14 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   const { swanAccountDetails } = yield select(
     ( state ) => state.swanIntegration
   )
-  console.log( {
-    swanAccountDetails
-  } )
+
   const swanXpub = swanAccountDetails.xPub
   let swanCreateResponse
   try {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
       access_token: swanAuthenticatedToken,
       extendedPublicKey: swanXpub,
-      displayName: swanAccountDetails.accountName || 'BTC purchased from Swan'
+      displayName: swanAccountDetails.accountName || 'Sats purchased from Swan'
     } )
   }
   catch( e )  {

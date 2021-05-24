@@ -4,10 +4,10 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
   Keyboard,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
@@ -41,7 +41,7 @@ const SecurityQuestionHistory = ( props ) => {
     },
     {
       id: 2,
-      title: 'Security Questions confirmed',
+      title: 'Security Answer confirmed',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
@@ -116,7 +116,7 @@ const SecurityQuestionHistory = ( props ) => {
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
-        info={'Question Successfully Backed Up'}
+        info={'Answer backed up successfully'}
         note={''}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}

@@ -35,5 +35,9 @@ public class MainActivity extends ReactActivity {
         super.onCreate(savedInstanceState);
         View v = findViewById(android.R.id.content);
         v.setFilterTouchesWhenObscured(true);
+        getWindow().setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE
+        );
     }
 }

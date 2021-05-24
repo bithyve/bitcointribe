@@ -6,7 +6,9 @@ import {
   TouchableOpacity,
   StatusBar,
   Platform,
-  BackHandler
+  BackHandler,
+  Alert,
+  Linking
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
@@ -30,6 +32,7 @@ import RelayServices from '../bitcoin/services/RelayService'
 import { initMigration } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
+import { processDL } from '../common/CommonFunctions'
 
 const LOADER_MESSAGE_TIME = 2
 const loaderMessages = [
@@ -73,7 +76,7 @@ const getRandomMessage = () => {
 }
 
 export default function Login( props ) {
-
+  const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -93,8 +96,9 @@ export default function Login( props ) {
   const releaseCasesValue = useSelector(
     ( state ) => state.preferences.releaseCasesValue,
   )
-
+  const [ requestName, setRequestName ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
+  const [ creationFlag, setCreationFlag ] = useState( false )
 
   const onPressNumber = useCallback(
     ( text ) => {
@@ -118,11 +122,29 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
+    Linking.addEventListener( 'url', handleDeepLinkEvent )
+    //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
       BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      Linking.removeEventListener( 'url', handleDeepLinkEvent )
     }
+
   }, [] )
+
+  const handleDeepLinkEvent = async ( { url } ) => {
+    handleDeepLinking( url )
+  }
+
+  const handleDeepLinking = async ( url: string | null ) => {
+    // console.log( 'Login::handleDeepLinkEvent::URL: ', url )
+    if ( url == null ) {
+      return
+    }
+    setCreationFlag( true )
+    const requestName = await processDL( url )
+    setRequestName( requestName )
+  }
 
   useEffect( () => {
     if ( passcode.length == 4 ) {
@@ -196,39 +218,46 @@ export default function Login( props ) {
   }, [] )
 
 
-  const custodyRequest = props.navigation.getParam( 'custodyRequest' )
-  const recoveryRequest = props.navigation.getParam( 'recoveryRequest' )
-  const trustedContactRequest = props.navigation.getParam(
-    'trustedContactRequest',
-  )
-  const userKey = props.navigation.getParam( 'userKey' )
-  const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
-
   useEffect( () => {
     if ( isAuthenticated ) {
       // migrate async keys
       if ( !isMigrated ) {
         dispatch( initMigration() )
       }
+
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
           setTimeout( () => {
             if ( loaderBottomSheet.current ) {
               loaderBottomSheet.current.snapTo( 0 )
             }
-            props.navigation.navigate( 'Home', {
-              custodyRequest,
-              recoveryRequest,
-              trustedContactRequest,
-              userKey,
-            } )
+            //console.log( 'requestName**', requestName )
+            //console.log( 'creationFlag**', creationFlag )
+
+            if( !creationFlag ) {
+              props.navigation.navigate( 'HomeRoot', {
+                screen: 'Home',
+              }
+              )
+            } else if( requestName ){
+              props.navigation.navigate( 'HomeRoot', {
+                screen: 'Home',
+                params: {
+                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+                  trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
+                  swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+                }
+              } )
+            }
           }, LOADER_MESSAGE_TIME )
         } else {
           props.navigation.replace( 'WalletInitialization' )
         }
       } )
     }
-  }, [ isAuthenticated ] )
+  }, [ isAuthenticated, requestName ] )
 
   const handleLoaderMessages = ( passcode ) => {
     setTimeout( () => {
@@ -280,7 +309,7 @@ export default function Login( props ) {
   }
 
   useEffect( () => {
-    if ( authenticationFailed ) {
+    if ( authenticationFailed && passcode ) {
       setCheckAuth( true )
       checkPasscode()
       setPasscode( '' )

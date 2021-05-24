@@ -480,9 +480,11 @@ function* feeAndExchangeRatesWorker() {
   const storedAverageTxFees = yield select(
     ( state ) => state.accounts.averageTxFees
   )
-
+  const currencyCode = yield select(
+    ( state ) => state.preferences.currencyCode
+  )
   try {
-    const res = yield call( RelayServices.fetchFeeAndExchangeRates )
+    const res = yield call( RelayServices.fetchFeeAndExchangeRates, currencyCode )
     console.log( {
       res
     } )
@@ -1142,7 +1144,6 @@ function* updateAccountSettings( { payload: account, }: {
     const service = yield select(
       ( state ) => state.accounts[ account.sourceKind ].service
     )
-
     const result = yield call(
       service.updateAccountDetails,
       {
@@ -1151,10 +1152,11 @@ function* updateAccountSettings( { payload: account, }: {
         kind: account.kind === SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
         instanceNumber: account.instanceNumber,
         customDisplayName: account.customDisplayName,
-        customDescription: account.customDescription
+        customDescription: account.customDescription,
+        visibility: account.visibility,
       }
     )
-
+    console.log( 'result', result )
     if ( result.status === 200 ) {
       const { SERVICES } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {

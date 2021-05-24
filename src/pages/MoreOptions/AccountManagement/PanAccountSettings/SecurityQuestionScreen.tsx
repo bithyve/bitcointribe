@@ -2,24 +2,28 @@ import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
+  AsyncStorage,
   StyleSheet,
   TextInput,
   Platform,
+  TouchableOpacity,
+  StatusBar,
+  SafeAreaView,
+  ScrollView,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import Colors from '../../common/Colors'
-import Fonts from '../../common/Fonts'
+import Colors from '../../../../common/Colors'
+import Fonts from '../../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { useSelector } from 'react-redux'
-import { ScrollView } from 'react-native-gesture-handler'
-import { withNavigation } from 'react-navigation'
+import { AppBottomSheetTouchableWrapper } from '../../../../components/AppBottomSheetTouchableWrapper'
+import { useDispatch, useSelector } from 'react-redux'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+import { setShowAllAccount } from '../../../../store/actions/accounts'
 
-function SecurityQuestion( props ) {
+export default function SecurityQuestionScreen( props ) {
   const { security } = useSelector(
     ( state ) => state.storage.database.WALLET_SETUP,
   )
@@ -30,6 +34,7 @@ function SecurityQuestion( props ) {
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
+  const dispatch = useDispatch()
 
   const setConfirm = () => {
     if ( answer.length > 0 && answer != securityAnswer ) {
@@ -37,9 +42,6 @@ function SecurityQuestion( props ) {
         AnswerCounter++
         setAnswerCounter( AnswerCounter )
       } else {
-        props.navigation.navigate( 'ReLogin', {
-          isPasscodeCheck: true
-        } )
         setShowAnswer( true )
         setErrorText( '' )
         return
@@ -68,102 +70,97 @@ function SecurityQuestion( props ) {
   }, [ answer, errorText ] )
 
   return (
-    <View style={{
-      ...styles.modalContentContainer, height: '100%'
+    <SafeAreaView style={{
+      flex: 1
     }}>
-      <View style={styles.modalContentContainer}>
-        <View>
-          <View style={{
-            flexDirection: 'row', padding: wp( '7%' )
-          }}>
-            <View style={{
-              flex: 1, justifyContent: 'center'
-            }}>
-              <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Security Question
-              </Text>
-              <Text style={{
-                ...styles.modalInfoText, marginTop: wp( '1.5%' )
-              }}>
-                Specify the answer{'\n'}as you did at
-                the time of setting up the wallet
-              </Text>
-            </View>
+      <StatusBar />
+      <View style={{
+        flex: 1
+      }}>
+
+        <Text style={{
+          ...styles.modalInfoText,
+          marginTop: wp( '1.5%' ),
+          marginBottom: wp( '5%' ),
+          paddingLeft: 30,
+          paddingRight: 30
+        }}>
+            To view all accounts,{' '}
+          <Text style={styles.boldItalicText}>Specify the answer as you did at
+                the time of setting up the wallet</Text>
+        </Text>
+
+        <ScrollView style={{
+          paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
+        }}>
+          <View style={styles.dropdownBox}>
+            <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
           </View>
-          <ScrollView style={{
-            paddingLeft: wp( '6%' ), paddingRight: wp( '6%' )
+          <View style={{
           }}>
-            <View style={styles.dropdownBox}>
-              <Text style={styles.dropdownBoxText}>{securityQuestion}</Text>
-            </View>
-            <View style={{
-            }}>
-              <TextInput
-                style={{
-                  ...styles.inputBox,
-                  width: '100%',
-                  marginBottom: hp( '1%' ),
-                  borderColor:
+            <TextInput
+              style={{
+                ...styles.inputBox,
+                width: '100%',
+                marginBottom: hp( '1%' ),
+                borderColor:
                     errorText == 'Answer is incorrect'
                       ? Colors.red
                       : Colors.borderColor,
-                }}
-                placeholder={'Enter answer'}
-                placeholderTextColor={Colors.borderColor}
-                value={answer}
-                textContentType="none"
-                autoCompleteType="off"
-                autoCorrect={false}
-                autoCapitalize="none"
-                onKeyPress={( event ) => {
-                  setBackspace( event )
-                }}
-                onChangeText={( text ) => {
-                  setAnswer( text )
-                }}
-                keyboardType={
-                  Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
-                }
-                onSubmitEditing={( event ) => setConfirm()}
-                onFocus={() => props.onFocus()}
-                onBlur={() => props.onBlur()}
-              />
-              {errorText ? (
-                <Text
-                  style={{
-                    marginLeft: 'auto',
-                    color: Colors.red,
-                    fontSize: RFValue( 10 ),
-                    fontFamily: Fonts.FiraSansMediumItalic,
-                  }}
-                >
-                  {errorText}
-                </Text>
-              ) : null}
-            </View>
-            {showAnswer && (
-              <View
+              }}
+              placeholder={'Enter answer'}
+              placeholderTextColor={Colors.borderColor}
+              value={answer}
+              textContentType="none"
+              autoCompleteType="off"
+              autoCorrect={false}
+              autoCapitalize="none"
+              onKeyPress={( event ) => {
+                setBackspace( event )
+              }}
+              onChangeText={( text ) => {
+                setAnswer( text )
+              }}
+              keyboardType={
+                Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
+              }
+              onSubmitEditing={( event ) => setConfirm()}
+            />
+            {errorText ? (
+              <Text
                 style={{
-                  ...styles.inputBox,
-                  width: '100%',
-                  marginBottom: hp( '1%' ),
-                  borderColor: Colors.borderColor,
-                  justifyContent: 'center'
+                  marginLeft: 'auto',
+                  color: Colors.red,
+                  fontSize: RFValue( 10 ),
+                  fontFamily: Fonts.FiraSansMediumItalic,
                 }}
               >
-                <Text
-                  style={{
-                    fontSize: RFValue( 13 ),
-                    color: Colors.textColorGrey,
-                    fontFamily: Fonts.FiraSansRegular,
-                  }}
-                >
-                  {securityAnswer}
-                </Text>
-              </View>
-            )}
-          </ScrollView>
-        </View>
+                {errorText}
+              </Text>
+            ) : null}
+          </View>
+          {showAnswer && (
+            <View
+              style={{
+                ...styles.inputBox,
+                width: '100%',
+                marginBottom: hp( '1%' ),
+                borderColor: Colors.borderColor,
+                justifyContent: 'center'
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: RFValue( 13 ),
+                  color: Colors.textColorGrey,
+                  fontFamily: Fonts.FiraSansRegular,
+                }}
+              >
+                {securityAnswer}
+              </Text>
+            </View>
+          )}
+        </ScrollView>
         <View
           style={{
             paddingLeft: wp( '6%' ),
@@ -177,12 +174,8 @@ function SecurityQuestion( props ) {
             onPress={() => {
               setConfirm()
               if ( answer.trim() == securityAnswer.trim() ) {
-                AsyncStorage.setItem(
-                  'SecurityAnsTimestamp',
-                  JSON.stringify( Date.now() ),
-                ).then( () => {
-                  props.onPressConfirm()
-                } )
+                dispatch( setShowAllAccount( true ) )
+                props.navigation.popToTop( 2 )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }
@@ -199,16 +192,26 @@ function SecurityQuestion( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 
-export default withNavigation( SecurityQuestion )
-
 const styles = StyleSheet.create( {
-  modalContentContainer: {
-    height: '100%',
-    backgroundColor: Colors.white,
+  modalHeaderTitleView: {
+    borderBottomWidth: 1,
+    borderColor: Colors.borderColor,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingRight: 10,
+    paddingBottom: 15,
+    paddingTop: 10,
+    marginLeft: 20,
+    marginBottom: 15,
+  },
+  modalHeaderTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansMedium,
   },
   modalTitleText: {
     color: Colors.blue,
@@ -260,5 +263,10 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansMedium,
+  },
+  boldItalicText: {
+    fontFamily: Fonts.FiraSansMediumItalic,
+    fontWeight: 'bold',
+    fontStyle: 'italic',
   },
 } )

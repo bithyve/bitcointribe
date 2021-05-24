@@ -8,14 +8,12 @@ export const redeemAuthCodeForToken = ( { code, state, code_verifier } ) => {
     const body = {
       code_verifier, code, state
     }
-    console.log( 'about to call for redeem ', body )
     return BH_AXIOS.post( 'swanAuth', {
       HEXA_ID,
       ...body
     } )
 
   } catch ( error ) {
-    console.log( 'error calling swan ', error )
     return {
       error
     }
@@ -33,7 +31,6 @@ export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey,
       'Authorization': `Bearer ${access_token}`,
       'Content-Type': 'application/json'
     }
-    console.log( 'about to create wallet with ', data, headers )
 
     return axios( {
       method: 'POST',
@@ -43,7 +40,6 @@ export const createWithdrawalWalletOnSwan = ( { access_token, extendedPublicKey,
     } )
 
   } catch ( error ) {
-    console.log( 'error calling swan ', error )
     return {
       error
     }
@@ -60,13 +56,6 @@ export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThres
       'Authorization': `Bearer ${access_token}`,
       'Content-Type': 'application/json'
     }
-    console.log( 'about to create wallet with ', data, headers )
-    const config = {
-      method: 'POST',
-      url: `${SWAN_BASE_URL}v1/automatic-withdrawal`,
-      headers,
-      data
-    }
 
     return axios( {
       method: 'POST',
@@ -75,7 +64,6 @@ export const setupAutomaticWithdrawals = ( { access_token, walletId, minBtcThres
       data
     } )
   } catch ( error ) {
-    console.log( 'error calling swan ', error )
     return {
       error
     }

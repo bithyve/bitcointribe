@@ -429,6 +429,7 @@ export default function AddContactSendRequest( props ) {
   const renderTimerModalContents = useCallback( () => {
     return (
       <TimerModalContents
+        isOTPType={isOTPType}
         contactText={'Trusted Contact'}
         contact={Contact}
         renderTimer={renderTimer}
@@ -598,35 +599,31 @@ export default function AddContactSendRequest( props ) {
           </View>
         </View>
         <RequestKeyFromContact
-        isModal={false}
-        // headerText={'Request Recovery Secret from trusted contact'}
-        // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
-        contactText={'Adding to Friends and Family:'}
-        contact={Contact}
-        QR={trustedQR}
-        link={trustedLink}
-        contactEmail={''}
-        onPressBack={() => {
-          if ( ContactRequestBottomSheet.current )
-            ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
-        }}
-        onPressDone={() => {
-          ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-          openTimer()
-        }}
-        onPressShare={() => {
-          setTimeout( () => {
-            setRenderTimer( true )
-          }, 2 )
-          if ( isOTPType ) {
-            shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
-          } else {
+          isModal={false}
+          // headerText={'Request Recovery Secret from trusted contact'}
+          // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
+          contactText={'Adding to Friends and Family:'}
+          contact={Contact}
+          QR={trustedQR}
+          link={trustedLink}
+          contactEmail={''}
+          onPressBack={() => {
+              props.navigation.goBack()
+          }}
+          onPressDone={() => {
             openTimer()
-          }
-          ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
+          }}
+          onPressShare={() => {
+            setTimeout( () => {
+              setRenderTimer( true )
+            }, 2 )
+            if ( isOTPType ) {
+              shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+            } else {
+              openTimer()
+            }
+          }}
+        />
         {/* <View style={{
           marginTop: 'auto'
         }}>
