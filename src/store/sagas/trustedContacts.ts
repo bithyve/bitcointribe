@@ -14,7 +14,6 @@ import {
   TRUSTED_CHANNELS_SETUP_SYNC,
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
-  updateTrustedContactsInfoLocally,
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
   WALLET_CHECK_IN,
@@ -566,7 +565,7 @@ function* removeTrustedContactWorker( { payload } ) {
           //   'TrustedContactsInfo',
           //   JSON.stringify(tcInfo),
           // );
-          yield put( updateTrustedContactsInfoLocally( tcInfo ) )
+          // yield put( updateTrustedContactsInfoLocally( tcInfo ) )
           break
         }
       }
@@ -1643,7 +1642,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
             }
           }
         }
-        yield put( updateTrustedContactsInfoLocally( tcInfo ) )
+        // yield put( updateTrustedContactsInfoLocally( tcInfo ) )
       }
 
       const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )

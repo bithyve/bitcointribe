@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
-  Image,
   Text,
   StyleSheet,
   SafeAreaView,
@@ -21,23 +20,18 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import NavStyles from '../../common/Styles/NavStyles'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import SendViaLink from '../../components/SendViaLink'
-import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
+import { isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
 import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
@@ -94,40 +88,6 @@ export default function AddContactSendRequest( props ) {
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
   )
-
-  const updateTrustedContactsInfo = async ( contact ) => {
-    const tcInfo = trustedContactsInfo ? trustedContactsInfo : []
-    if ( tcInfo && tcInfo.length ) {
-      if (
-        tcInfo.findIndex( ( trustedContact ) => {
-          if ( !trustedContact ) return false
-
-          const presentContactName = `${trustedContact.firstName} ${
-            trustedContact.lastName ? trustedContact.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-
-          const selectedContactName = `${contact.firstName} ${
-            contact.lastName ? contact.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-
-          return presentContactName == selectedContactName
-        } ) == -1
-      ) {
-        tcInfo.push( contact )
-      }
-    } else {
-      tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
-      tcInfo[ 1 ] = null
-      tcInfo[ 2 ] = null
-      tcInfo[ 3 ] = contact
-    }
-
-    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-  }
 
   const dispatch = useDispatch()
 
@@ -267,7 +227,6 @@ export default function AddContactSendRequest( props ) {
           Alert.alert( 'Invalid Contact', 'Something went wrong.' )
           return
         }
-        updateTrustedContactsInfo( Contact ) // Contact initialized to become TC
       }
 
       if ( !trustedQR ) {
