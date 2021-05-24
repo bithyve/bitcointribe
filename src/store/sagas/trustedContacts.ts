@@ -76,6 +76,7 @@ import semver from 'semver'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import idx from 'idx'
+import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -308,6 +309,12 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   )
   if ( res.status !== 200 ) throw new Error( `${res.err}` )
 
+  const { SERVICES } = yield select( ( state ) => state.storage.database )
+  const updatedSERVICES = {
+    ...SERVICES,
+    REGULAR_ACCOUNT: JSON.stringify( regularAccount ),
+  }
+
   // refresh the account number
   const accountNumber = res.data.accountNumber
   const secondarySubAccountId = res.data.accountId
@@ -375,7 +382,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
 
   // initiate permanent channel
-  yield put( syncPermanentChannel( contactInfo.contactDetails, updates ) )
+  yield put( syncPermanentChannel( contactInfo, updates, updatedSERVICES ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {
@@ -1032,7 +1039,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: UnecryptedStreamData, updatedDB?: any }} ) {
+function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: UnecryptedStreamData, updatedSERVICES?: ServicesJSON }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
@@ -1040,33 +1047,23 @@ function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: Cont
   const { contactInfo, updates } = payload
   const res = yield call(
     trustedContacts.syncPermanentChannel,
+    contactInfo.contactDetails,
     contactInfo.channelKey,
+    contactInfo.secondaryChannelKey,
     updates,
-    contactInfo.secondaryChannelKey
   )
   if ( res.status === 200 ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
+    const SERVICES  = payload.updatedSERVICES? payload.updatedSERVICES: yield select( ( state ) => state.storage.database.SERVICES )
+    const updatedSERVICES: ServicesJSON = {
       ...SERVICES,
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
     }
 
-    if ( payload.updatedDB ) {
-      yield call( insertDBWorker, {
-        payload: {
-          ...payload.updatedDB,
-          SERVICES: {
-            ...payload.updatedDB.SERVICES, ...updatedSERVICES
-          },
-        },
-      } )
-    } else {
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
-    }
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
   } else {
     console.log( res.err )
   }

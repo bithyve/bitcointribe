@@ -8,9 +8,11 @@ import {
   Contacts,
   UnecryptedStreamData,
   ContactDetails,
+  ContactInfo,
 } from '../../bitcoin/utilities/Interface'
 import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
@@ -119,14 +121,14 @@ export const updateTrustedChannel = (
 }
 
 export const syncPermanentChannel = (
-  contactDetails: ContactDetails,
+  contactInfo: ContactInfo,
   updates?: UnecryptedStreamData,
-  updatedDB?: any
+  updatedSERVICES?: ServicesJSON
 ) => {
   return {
     type: SYNC_PERMANENT_CHANNEL,
     payload: {
-      contactDetails, updates, updatedDB
+      contactInfo, updates, updatedSERVICES
     },
   }
 }

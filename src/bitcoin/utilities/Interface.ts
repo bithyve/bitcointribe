@@ -553,6 +553,7 @@ export interface TrustedContact {
   permanentChannelAddress: string,
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
+  secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
   walletID?: string, // contact's walletId
 }
 export interface Trusted_Contacts {
@@ -666,4 +667,9 @@ export interface AverageTxFees {
     feePerByte: number,
     estimatedBlocks: number,
   },
+}
+
+export enum QRCodeTypes {
+  CONTACT_REQUEST = 'CONTACT_REQUEST',
+  KEEPER_REQUEST = 'KEEPER_REQUEST'
 }
