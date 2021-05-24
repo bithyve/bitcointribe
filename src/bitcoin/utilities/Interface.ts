@@ -587,3 +587,26 @@ export interface AverageTxFees {
     estimatedBlocks: number,
   },
 }
+
+export interface LevelDataObj {
+  shareType: string
+  updatedAt: number
+  status: string
+  shareId: string
+  reshareVersion: number
+  name: string
+  data: any;
+  uuid: string
+}
+
+export interface LevelData {
+  levelName: string
+  status: string
+  keeper1ButtonText: string
+  keeper2ButtonText: string
+  keeper1: LevelDataObj,
+  keeper2: LevelDataObj,
+  note:string
+  info:string
+  id: number
+}

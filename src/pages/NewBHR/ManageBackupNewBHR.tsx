@@ -46,7 +46,7 @@ import {
   setLevelToNotSetupStatus,
   setHealthStatus,
 } from '../../store/actions/health'
-import { modifyLevelStatus } from './ManageBackupFunction'
+import { modifyLevelStatus } from './ManageBackupPageData'
 import {
   LevelHealthInterface,
   MetaShare,

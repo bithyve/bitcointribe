@@ -1,5 +1,5 @@
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { KeeperInfoInterface, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
@@ -41,16 +41,6 @@ import {
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
-interface obj {
-  shareType: string
-  updatedAt: number
-  status: string
-  shareId: string
-  reshareVersion: number
-  name: string
-  data: any;
-  uuid: string
-}
 
 const initialState: {
   mnemonic: string;
@@ -115,17 +105,7 @@ const initialState: {
   hasSMUploadedSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
   newBHRFlowStarted: boolean;
-  levelData: {
-    levelName: string
-    status: string
-    keeper1ButtonText: string
-    keeper2ButtonText: string
-    keeper1: obj,
-    keeper2: obj,
-    note:string
-    info:string
-    id: number
-  }[];
+  levelData: LevelData[];
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
   isLevelToNotSetupStatus: boolean;
