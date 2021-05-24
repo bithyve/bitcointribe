@@ -29,9 +29,6 @@ import {
   MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -214,22 +211,22 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  const updateTrustedContactsInfo = useCallback(
-    async ( contact ) => {
-      const tcInfo = trustedContactsInfo
+  // const updateTrustedContactsInfo = useCallback(
+  //   async ( contact ) => {
+  //     const tcInfo = trustedContactsInfo
 
-      if ( tcInfo.length ) {
-        tcInfo[ 0 ] = contact
-      } else {
-        tcInfo[ 0 ] = contact
-        tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-        tcInfo[ 2 ] = undefined
-      }
-      console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
-      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-    },
-    [ trustedContactsInfo ],
-  )
+  //     if ( tcInfo.length ) {
+  //       tcInfo[ 0 ] = contact
+  //     } else {
+  //       tcInfo[ 0 ] = contact
+  //       tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+  //       tcInfo[ 2 ] = undefined
+  //     }
+  //     console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
+  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+  //   },
+  //   [ trustedContactsInfo ],
+  // )
 
   const createGuardian = useCallback(
     async ( changeKeeper?: boolean ) => {
@@ -269,9 +266,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
       if ( changeKeeper || shareExpired || isChange ) {
         setSecondaryQR( '' )
-        updateTrustedContactsInfo( {
-          firstName, lastName
-        } )
+        // updateTrustedContactsInfo( {
+        //   firstName, lastName
+        // } )
         // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
       } else {
         const hasTrustedChannel = trustedContact.symmetricKey ? true : false

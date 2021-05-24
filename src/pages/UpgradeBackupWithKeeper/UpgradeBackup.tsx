@@ -28,7 +28,6 @@ import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
   trustedChannelsSetupSync,
-  updateTrustedContactsInfoLocally
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -160,7 +159,6 @@ interface UpgradeBackupPropsTypes {
   getPDFData: any;
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
-  updateTrustedContactsInfoLocally: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
   secureAccount: SecureAccount;
 }
@@ -650,9 +648,9 @@ class UpgradeBackup extends Component<
           this.setState( {
             secondaryQR: ''
           } )
-          this.updateTrustedContactsInfo( {
-            firstName, lastName
-          } )
+          // this.updateTrustedContactsInfo( {
+          //   firstName, lastName
+          // } )
           // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
         } else {
           const hasTrustedChannel = trustedContact.symmetricKey ? true : false
@@ -695,17 +693,17 @@ class UpgradeBackup extends Component<
     }
   }
 
-  updateTrustedContactsInfo = async ( contact ) => {
-    const tcInfo = this.props.trustedContactsInfo
-    if ( tcInfo.length ) {
-      tcInfo[ 0 ] = contact
-    } else {
-      tcInfo[ 0 ] = contact
-      tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-      tcInfo[ 2 ] = undefined
-    }
-    this.props.updateTrustedContactsInfoLocally( tcInfo )
-  }
+  // updateTrustedContactsInfo = async ( contact ) => {
+  //   const tcInfo = this.props.trustedContactsInfo
+  //   if ( tcInfo.length ) {
+  //     tcInfo[ 0 ] = contact
+  //   } else {
+  //     tcInfo[ 0 ] = contact
+  //     tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+  //     tcInfo[ 2 ] = undefined
+  //   }
+  //   this.props.updateTrustedContactsInfoLocally( tcInfo )
+  // }
 
   setSecondaryDeviceQR = () => {
     try {
@@ -1551,7 +1549,6 @@ export default withNavigationFocus(
     confirmPDFSharedFromUpgrade,
     getPDFData,
     checkMSharesHealth,
-    updateTrustedContactsInfoLocally
   } )( UpgradeBackup )
 )
 

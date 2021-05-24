@@ -12,10 +12,8 @@ import {
   FETCH_EPHEMERAL_CHANNEL,
   updateEphemeralChannel,
   TRUSTED_CHANNELS_SETUP_SYNC,
-  paymentDetailsFetched,
   switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
-  updateTrustedContactsInfoLocally,
   SYNC_TRUSTED_CHANNELS,
   syncTrustedChannels,
   WALLET_CHECK_IN,
@@ -23,6 +21,8 @@ import {
   MULTI_UPDATE_TRUSTED_CHANNELS,
   SEND_VERSION_UPDATE_NOTIFICATION,
   multiUpdateTrustedChannels,
+  SYNC_PERMANENT_CHANNEL,
+  syncPermanentChannel,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -35,11 +35,16 @@ import {
   notificationType,
   notificationTag,
   trustedChannelActions,
+  UnecryptedStreamData,
+  PrimaryStreamData,
+  TrustedContactRelationTypes,
+  SecondaryStreamData,
+  BackupStreamData,
+  ContactInfo
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
   downloadMShare as downloadMShareSSS,
-  uploadEncMShare
 } from '../actions/sss'
 import { downloadMShare as downloadMShareHealth, updateMSharesHealth, uploadEncMShareKeeper } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -60,15 +65,18 @@ import { downloadMetaShareWorker } from './sss'
 import { downloadMetaShareWorker as downloadMetaShareWorkerKeeper } from './health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
-import { ContactInfo, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import AccountShell from '../../common/data/models/AccountShell'
 import config from '../../bitcoin/HexaConfig'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import moment from 'moment'
 import semver from 'semver'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import idx from 'idx'
+import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -82,206 +90,299 @@ const sendNotification = ( recipient, notification ) => {
     RelayServices.sendNotifications( receivers, notification ).then( console.log )
 }
 
+// export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
+//   const accountsState: AccountsState = yield select( state => state.accounts )
+//   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+//   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
+//   const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
+//   const trustedContactsInfo = yield select(
+//     ( state ) => state.trustedContacts.trustedContactsInfo,
+//   )
+//   const FCM = yield select ( state => state.preferences.fcmTokenValue )
+//   const { contactName } = contactInfo
+
+//   const { walletId } = regularAccount.hdWallet.getWalletId()
+
+//   // check whether a derivative account already exist for this contact
+//   let accountNumber =
+//     regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+//   if ( !accountNumber ) {
+//     // initialize a trusted derivative account against the following contact
+//     const res = regularAccount.setupDerivativeAccount(
+//       TRUSTED_CONTACTS,
+//       null,
+//       contactName,
+//     )
+//     if ( res.status !== 200 ) {
+//       throw new Error( `${res.err}` )
+//     } else {
+//       // refresh the account number
+//       accountNumber =
+//         regularAccount.hdWallet.trustedContactToDA[ contactName ]
+
+//       const secondarySubAccountId = res.data.accountId
+//       secondarySubAccount.id = secondarySubAccountId
+//       secondarySubAccount.instanceNumber = accountNumber
+//       secondarySubAccount.balances = {
+//         confirmed: 0,
+//         unconfirmed: 0,
+//       }
+//       secondarySubAccount.transactions = []
+
+//       AccountShell.addSecondarySubAccount(
+//         parentShell,
+//         secondarySubAccountId,
+//         secondarySubAccount,
+//       )
+//     }
+//   }
+//   const trustedReceivingAddress = ( regularAccount.hdWallet
+//     .derivativeAccounts[ TRUSTED_CONTACTS ][
+//       accountNumber
+//     ] as TrustedContactDerivativeAccountElements ).receivingAddress
+
+//   const data: EphemeralDataElements = {
+//     walletID: walletId,
+//     FCM,
+//     trustedAddress: trustedReceivingAddress,
+//     trustedTestAddress: testAccount.hdWallet.receivingAddress,
+//   }
+
+//   const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
+
+//   if( contactInfo.isGuardian ){
+//     // Trusted Contact: Guardian
+//     const { changeContact, shareIndex, shareId, legacy } = contactInfo
+//     const { SHARES_TRANSFER_DETAILS } = yield select(
+//       ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
+//     )
+//     const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
+//     Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
+//     config.TC_REQUEST_EXPIRY
+
+//     if ( changeContact ) {
+//       let previousGuardianName: string
+//       // find previous TC (except keeper: shareIndex 0)
+//       if ( trustedContactsInfo && shareIndex ) {
+//         const previousGuardian = trustedContactsInfo[ shareIndex ]
+//         if ( previousGuardian ) {
+//           previousGuardianName = `${previousGuardian.firstName} ${
+//             previousGuardian.lastName ? previousGuardian.lastName : ''
+//           }`
+//             .toLowerCase()
+//             .trim()
+//         } else console.log( 'Previous guardian details missing' )
+//       }
+
+//       // upload share for the new contact(guardian)
+//       if( legacy )
+//         yield put(
+//           uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
+//         )
+//       else
+//         yield put(
+//           uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
+//         )
+//     } else if( shareExpired ) {
+//       // share expired, re-upload (creates ephermeal channel as well)
+//       if( legacy )
+//         yield put(
+//           uploadEncMShare( shareIndex, contactInfo, data ),
+//         )
+//       else
+//         yield put(
+//           uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
+//         )
+//     } else {
+//       // re-initiating expired Ephemeral Channel
+//       const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+//       const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+//       trustedContact.ephemeralChannel.initiatedAt &&
+//       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+//       config.TC_REQUEST_EXPIRY? true: false
+
+//       if (
+//         !hasTrustedChannel &&
+//         isEphemeralChannelExpired
+//       ){
+//         yield put(
+//           updateEphemeralChannel(
+//             contactInfo,
+//             trustedContact.ephemeralChannel.data[ 0 ],
+//           ),
+//         )
+//       }
+//     }
+//   } else{
+
+//     // update ephemeral data (if payment details are available)
+//     // const { paymentDetails } = contactInfo
+//     // let paymentURI, trustedPaymentURI
+//     // if( paymentDetails ){
+//     //   const { amount, address }  = paymentDetails
+//     //   paymentURI = regularAccount.getPaymentURI( address, {
+//     //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+//     //   } ).paymentURI
+//     //   trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
+//     //     amount: parseInt( amount ) / SATOSHIS_IN_BTC,
+//     //   } ).paymentURI
+
+//     //   data.paymentDetails =  {
+//     //     trusted: {
+//     //       address: trustedReceivingAddress,
+//     //       paymentURI: trustedPaymentURI,
+//     //     },
+//     //     alternate: {
+//     //       address: address,
+//     //       paymentURI,
+//     //     },
+//     //   }
+//   }
+
+//   if ( !trustedContact ) {
+//     // create emphemeral channel(initiating TC)
+//     yield put( updateEphemeralChannel( contactInfo, data ) )
+//   } else {
+//     const hasTrustedChannel = trustedContact.symmetricKey ? true : false
+//     const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
+//       trustedContact.ephemeralChannel.initiatedAt &&
+//       Date.now() - trustedContact.ephemeralChannel.initiatedAt >
+//       config.TC_REQUEST_EXPIRY? true: false
+
+//     if ( !hasTrustedChannel ){
+//       if( isEphemeralChannelExpired ){
+//         // re-initiating expired Ephemeral Channel
+//         yield put(
+//           updateEphemeralChannel(
+//             contactInfo,
+//             trustedContact.ephemeralChannel.data[ 0 ],
+//           ),
+//         )
+//       }
+//       else{
+//         // if payment details are changed(on receive); re-upload the data
+//         //   if( paymentDetails && trustedContact.ephemeralChannel ) {
+//         //     const { address }  = paymentDetails
+//         //     const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
+//         //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
+//         //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+//         //       .address === address &&
+//         //     trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
+//         //       .paymentURI === paymentURI ? true: false
+
+//         //     if ( !isPaymentDetailsSame ){
+//         //       const updatedPaymentDetails = {
+//         //         trusted: {
+//         //           address: trustedReceivingAddress,
+//         //           paymentURI: trustedPaymentURI,
+//         //         },
+//         //         alternate: {
+//         //           address: paymentDetails.address,
+//         //           paymentURI,
+//         //         },
+//         //       }
+//         //       trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
+//         //       yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
+//         //     }
+//         //   }
+//         // }
+//       }
+//     }
+//   }
+// }
+
 export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
-  const trustedContacts: TrustedContactsService = yield select( state => state.trustedContacts.service )
-  const trustedContactsInfo = yield select(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
+  const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
-  const { contactName } = contactInfo
-
+  const { contactDetails } = contactInfo
   const { walletId } = regularAccount.hdWallet.getWalletId()
 
-  // check whether a derivative account already exist for this contact
-  let accountNumber =
-    regularAccount.hdWallet.trustedContactToDA[ contactName ]
+  // initialize a trusted derivative account against the following contact
+  const res = regularAccount.setupDerivativeAccount(
+    TRUSTED_CONTACTS,
+    null,
+    contactDetails,
+  )
+  if ( res.status !== 200 ) throw new Error( `${res.err}` )
 
-  if ( !accountNumber ) {
-    // initialize a trusted derivative account against the following contact
-    const res = regularAccount.setupDerivativeAccount(
-      TRUSTED_CONTACTS,
-      null,
-      contactName,
-    )
-    if ( res.status !== 200 ) {
-      throw new Error( `${res.err}` )
-    } else {
-      // refresh the account number
-      accountNumber =
-        regularAccount.hdWallet.trustedContactToDA[ contactName ]
-
-      const secondarySubAccountId = res.data.accountId
-      secondarySubAccount.id = secondarySubAccountId
-      secondarySubAccount.instanceNumber = accountNumber
-      secondarySubAccount.balances = {
-        confirmed: 0,
-        unconfirmed: 0,
-      }
-      secondarySubAccount.transactions = []
-
-      AccountShell.addSecondarySubAccount(
-        parentShell,
-        secondarySubAccountId,
-        secondarySubAccount,
-      )
-    }
+  const { SERVICES } = yield select( ( state ) => state.storage.database )
+  const updatedSERVICES = {
+    ...SERVICES,
+    REGULAR_ACCOUNT: JSON.stringify( regularAccount ),
   }
-  const trustedReceivingAddress = ( regularAccount.hdWallet
+
+  // refresh the account number
+  const accountNumber = res.data.accountNumber
+  const secondarySubAccountId = res.data.accountId
+  secondarySubAccount.id = secondarySubAccountId
+  secondarySubAccount.instanceNumber = accountNumber
+  secondarySubAccount.balances = {
+    confirmed: 0,
+    unconfirmed: 0,
+  }
+  secondarySubAccount.transactions = []
+
+  AccountShell.addSecondarySubAccount(
+    parentShell,
+    secondarySubAccountId,
+    secondarySubAccount,
+  )
+
+  const trustedDerivativeAccount = ( regularAccount.hdWallet
     .derivativeAccounts[ TRUSTED_CONTACTS ][
       accountNumber
-    ] as TrustedContactDerivativeAccountElements ).receivingAddress
-
-  const data: EphemeralDataElements = {
+    ] as TrustedContactDerivativeAccountElements )
+  const paymentAddress = trustedDerivativeAccount.receivingAddress
+  const paymentAddresses = {
+    [ SubAccountKind.TRUSTED_CONTACTS ]: paymentAddress,
+    [ SubAccountKind.TEST_ACCOUNT ]: testAccount.hdWallet.receivingAddress
+  }
+  const primaryData: PrimaryStreamData = {
     walletID: walletId,
+    walletName,
+    relationType: TrustedContactRelationTypes.CONTACT,
     FCM,
-    trustedAddress: trustedReceivingAddress,
-    trustedTestAddress: testAccount.hdWallet.receivingAddress,
+    paymentAddresses
   }
 
-  const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-
-  if( contactInfo.isGuardian ){
-    // Trusted Contact: Guardian
-    const { changeContact, shareIndex, shareId, legacy } = contactInfo
-    const { SHARES_TRANSFER_DETAILS } = yield select(
-      ( state ) => state.storage.database[ 'DECENTRALIZED_BACKUP' ],
-    )
-    const shareExpired = !SHARES_TRANSFER_DETAILS[ shareIndex ] ||
-    Date.now() - SHARES_TRANSFER_DETAILS[ shareIndex ].UPLOADED_AT >
-    config.TC_REQUEST_EXPIRY
-
-    if ( changeContact ) {
-      let previousGuardianName: string
-      // find previous TC (except keeper: shareIndex 0)
-      if ( trustedContactsInfo && shareIndex ) {
-        const previousGuardian = trustedContactsInfo[ shareIndex ]
-        if ( previousGuardian ) {
-          previousGuardianName = `${previousGuardian.firstName} ${
-            previousGuardian.lastName ? previousGuardian.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-        } else console.log( 'Previous guardian details missing' )
-      }
-
-      // upload share for the new contact(guardian)
-      if( legacy )
-        yield put(
-          uploadEncMShare( shareIndex, contactInfo, data, true, previousGuardianName ),
-        )
-      else
-        yield put(
-          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data, true, previousGuardianName )
-        )
-    } else if( shareExpired ) {
-      // share expired, re-upload (creates ephermeal channel as well)
-      if( legacy )
-        yield put(
-          uploadEncMShare( shareIndex, contactInfo, data ),
-        )
-      else
-        yield put(
-          uploadEncMShareKeeper( shareIndex, shareId, contactInfo, data )
-        )
-    } else {
-      // re-initiating expired Ephemeral Channel
-      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-      trustedContact.ephemeralChannel.initiatedAt &&
-      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-      config.TC_REQUEST_EXPIRY? true: false
-
-      if (
-        !hasTrustedChannel &&
-        isEphemeralChannelExpired
-      ){
-        yield put(
-          updateEphemeralChannel(
-            contactInfo,
-            trustedContact.ephemeralChannel.data[ 0 ],
-          ),
-        )
-      }
+  let secondaryData: SecondaryStreamData = null
+  let backupData: BackupStreamData = null
+  const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
+  if( contactInfo.isGuardian && channelAssets ){
+    const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard, bhXpub } = channelAssets
+    backupData = {
+      primaryMnemonicShard,
+      keeperInfo,
     }
-  } else{
-
-    // update ephemeral data (if payment details are available)
-    const { paymentDetails } = contactInfo
-    let paymentURI, trustedPaymentURI
-    if( paymentDetails ){
-      const { amount, address }  = paymentDetails
-      paymentURI = regularAccount.getPaymentURI( address, {
-        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-      } ).paymentURI
-      trustedPaymentURI = regularAccount.getPaymentURI( trustedReceivingAddress, {
-        amount: parseInt( amount ) / SATOSHIS_IN_BTC,
-      } ).paymentURI
-
-      data.paymentDetails =  {
-        trusted: {
-          address: trustedReceivingAddress,
-          paymentURI: trustedPaymentURI,
-        },
-        alternate: {
-          address: address,
-          paymentURI,
-        },
-      }
+    secondaryData = {
+      secondaryMnemonicShard,
+      bhXpub,
     }
+    const secondaryChannelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    contactInfo.secondaryChannelKey = secondaryChannelKey
+  }
+  contactInfo.channelKey = trustedDerivativeAccount.channelKey
 
-    if ( !trustedContact ) {
-      // create emphemeral channel(initiating TC)
-      yield put( updateEphemeralChannel( contactInfo, data ) )
-    } else {
-      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-      trustedContact.ephemeralChannel.initiatedAt &&
-      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-      config.TC_REQUEST_EXPIRY? true: false
-
-      if ( !hasTrustedChannel ){
-        if( isEphemeralChannelExpired ){
-          // re-initiating expired Ephemeral Channel
-          yield put(
-            updateEphemeralChannel(
-              contactInfo,
-              trustedContact.ephemeralChannel.data[ 0 ],
-            ),
-          )
-        }
-        else{
-          // if payment details are changed(on receive); re-upload the data
-          if( paymentDetails && trustedContact.ephemeralChannel ) {
-            const { address }  = paymentDetails
-            const isPaymentDetailsSame =  trustedContact.ephemeralChannel.data &&
-            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails &&
-            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-              .address === address &&
-            trustedContact.ephemeralChannel.data[ 0 ].paymentDetails.alternate
-              .paymentURI === paymentURI ? true: false
-
-            if ( !isPaymentDetailsSame ){
-              const updatedPaymentDetails = {
-                trusted: {
-                  address: trustedReceivingAddress,
-                  paymentURI: trustedPaymentURI,
-                },
-                alternate: {
-                  address: paymentDetails.address,
-                  paymentURI,
-                },
-              }
-              trustedContact.ephemeralChannel.data[ 0 ].paymentDetails = updatedPaymentDetails
-              yield put( updateEphemeralChannel( contactInfo, trustedContact.ephemeralChannel.data[ 0 ] ) )
-            }
-          }
-        }
+  const updates: UnecryptedStreamData = {
+    streamId: TrustedContacts.getStreamId( walletId ),
+    primaryData,
+    secondaryData,
+    backupData,
+    metaData: {
+      flags:{
+        active: true,
+        newData: true,
+        lastSeen: Date.now(),
       }
     }
   }
+
+  // initiate permanent channel
+  yield put( syncPermanentChannel( contactInfo, updates, updatedSERVICES ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {
@@ -471,7 +572,7 @@ function* removeTrustedContactWorker( { payload } ) {
           //   'TrustedContactsInfo',
           //   JSON.stringify(tcInfo),
           // );
-          yield put( updateTrustedContactsInfoLocally( tcInfo ) )
+          // yield put( updateTrustedContactsInfoLocally( tcInfo ) )
           break
         }
       }
@@ -579,14 +680,14 @@ function* updateEphemeralChannelWorker( { payload } ) {
       res
     } )
     if ( res.status === 200 ) {
-      const ephData: EphemeralDataElements = res.data.data
-      if ( ephData && ephData.paymentDetails ) {
-      // using trusted details on TC approval
-        const { trusted } = ephData.paymentDetails
-        yield put( paymentDetailsFetched( {
-          ...trusted
-        } ) )
-      }
+      // const ephData: EphemeralDataElements = res.data.data
+      // if ( ephData && ephData.paymentDetails ) {
+      // // using trusted details on TC approval
+      //   const { trusted } = ephData.paymentDetails
+      //   yield put( paymentDetailsFetched( {
+      //     ...trusted
+      //   } ) )
+      // }
 
       yield put(
         ephemeralChannelUpdated(
@@ -791,13 +892,13 @@ function* fetchEphemeralChannelWorker( { payload } ) {
   if ( res.status === 200 ) {
     const data: EphemeralDataElements = res.data.data
     if ( publicKey ) {
-      if ( data && data.paymentDetails ) {
-        // using alternate details on TC rejection
-        const { alternate } = data.paymentDetails
-        yield put( paymentDetailsFetched( {
-          ...alternate
-        } ) )
-      }
+      // if ( data && data.paymentDetails ) {
+      //   // using alternate details on TC rejection
+      //   const { alternate } = data.paymentDetails
+      //   yield put( paymentDetailsFetched( {
+      //     ...alternate
+      //   } ) )
+      // }
 
       return
     }
@@ -883,6 +984,7 @@ export const updateTrustedChannelWatcher = createWatcher(
   UPDATE_TRUSTED_CHANNEL,
 )
 
+
 function* fetchTrustedChannelWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
@@ -937,301 +1039,336 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-export function* trustedChannelsSetupSyncWorker() {
-  // TODO: simplify and optimise the saga
-  yield put( switchTCLoading( 'trustedChannelsSetupSync' ) )
-
+function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: UnecryptedStreamData, updatedSERVICES?: ServicesJSON }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
-  const regularService: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+
+  const { contactInfo, updates } = payload
+  const res = yield call(
+    trustedContacts.syncPermanentChannel,
+    contactInfo.contactDetails,
+    contactInfo.channelKey,
+    contactInfo.secondaryChannelKey,
+    updates,
   )
-  const preSyncReg = JSON.stringify( regularService )
-  const testService: TestAccount = yield select(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service,
-  )
-
-  const contacts: Contacts = trustedContacts.tc.trustedContacts
-  let DHInfos
-  for ( const contactName of Object.keys( contacts ) ) {
-    let { trustedChannel, ephemeralChannel, encKey } = contacts[ contactName ]
-
-    if ( !trustedChannel ) {
-      // trusted channel not setup; probably need to still get the counter party's pubKey
-
-      // update DHInfos(once) only if there's a contact w/ trusted channel pending
-      if ( !DHInfos ) {
-        yield call( fetchNotificationsWorker ) // refreshes DHInfos
-        DHInfos = yield call( AsyncStorage.getItem, 'DHInfos' )
-        if ( DHInfos ) {
-          DHInfos = JSON.parse( DHInfos )
-        } else {
-          DHInfos = []
-        }
-      }
-
-      let contactsPublicKey
-      DHInfos.forEach( ( dhInfo: { address: string; publicKey: string } ) => {
-        if ( dhInfo.address === ephemeralChannel.address ) {
-          contactsPublicKey = dhInfo.publicKey
-        }
-      } )
-
-      if ( contactsPublicKey ) {
-        const res = yield call(
-          trustedContacts.finalizeContact,
-          contactName,
-          contactsPublicKey,
-          encKey,
-        )
-
-        if ( res.status !== 200 ) {
-          console.log(
-            `Failed to setup trusted channel with contact ${contactName}`,
-          )
-          continue
-        } else {
-          // refresh the trustedChannel object
-          trustedChannel =
-            trustedContacts.tc.trustedContacts[ contactName.trim() ]
-              .trustedChannel
-        }
-      } else {
-        // ECDH pub not available for this contact
-        continue
-      }
-    }
-
-    if ( trustedChannel.data && trustedChannel.data.length ) {
-      if ( trustedChannel.data.length !== 2 ) {
-        // implies missing trusted data from the counter party
-        const res = yield call(
-          trustedContacts.fetchTrustedChannel,
-          contactName,
-        )
-        console.log( {
-          res
-        } )
-        if ( res.status === 200 ) {
-          console.log( 'Attempted a fetch from TC with: ', contactName )
-          const { data } = res.data
-          if ( data )
-            console.log( 'Received data from TC with: ', contactName, data )
-
-          // update the xpub to the trusted contact derivative acc if contact's xpub is received
-          trustedChannel =
-            trustedContacts.tc.trustedContacts[ contactName.trim() ]
-              .trustedChannel // refresh trusted channel
-          if ( trustedChannel.data.length === 2 ) {
-            const contactsData = trustedChannel.data[ 1 ].data
-            if ( contactsData && contactsData.xpub ) {
-              const accountNumber =
-                regularService.hdWallet.trustedContactToDA[ contactName ]
-              if ( accountNumber ) {
-                ( regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
-                  accountNumber
-                ] as TrustedContactDerivativeAccountElements ).contactDetails = {
-                  xpub: contactsData.xpub,
-                  tpub: contactsData.tpub,
-                }
-
-                console.log(
-                  `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
-                )
-              } else {
-                console.log(
-                  'Failed to find account number corersponding to contact: ',
-                  contactName,
-                )
-              }
-            } else {
-              console.log(
-                'Missing xpub corresponding to contact: ',
-                contactName,
-              )
-            }
-          }
-        }
-      } else {
-        // updating trusted derivative acc(from trusted-channel) in case of non-updation(handles recovery failures)
-        const accountNumber =
-          regularService.hdWallet.trustedContactToDA[ contactName ]
-        if ( accountNumber ) {
-          const { contactDetails } = regularService.hdWallet.derivativeAccounts[
-            TRUSTED_CONTACTS
-          ][ accountNumber ] as TrustedContactDerivativeAccountElements
-          if ( !contactDetails || !contactDetails.xpub ) {
-            const contactsData = trustedChannel.data[ 1 ].data
-            if ( contactsData && contactsData.xpub ) {
-              ( regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
-                accountNumber
-              ] as TrustedContactDerivativeAccountElements ).contactDetails = {
-                xpub: contactsData.xpub,
-                tpub: contactsData.tpub,
-              }
-
-              console.log(
-                `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
-              )
-            } else {
-              console.log(
-                'Missing xpub corresponding to contact: ',
-                contactName,
-              )
-            }
-          }
-        }
-      }
-    } else {
-      // generate a corresponding derivative acc and assign xpub(uploading info to trusted channel)
-      let accountNumber =
-      regularService.hdWallet.trustedContactToDA[ contactName ]
-      if ( !accountNumber ) {
-        // initialize a trusted derivative account against the following contact
-        const res = regularService.setupDerivativeAccount(
-          TRUSTED_CONTACTS,
-          null,
-          contactName,
-        )
-        if ( res.status !== 200 ) {
-          throw new Error( `${res.err}` )
-        } else {
-          // refresh the account number and add trusted contact sub acc to acc-shell
-          accountNumber =
-          regularService.hdWallet.trustedContactToDA[ contactName ]
-          const secondarySubAccountId = res.data.accountId
-
-          const accountShells: AccountShell[] = yield select(
-            ( state ) => state.accounts.accountShells,
-          )
-          let parentShell: AccountShell
-          accountShells.forEach( ( shell: AccountShell ) => {
-            if( !shell.primarySubAccount.instanceNumber ){
-              if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-            }
-          } )
-          const secondarySubAccount = new TrustedContactsSubAccountInfo( {
-            accountShellID: parentShell.id,
-            isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-          } )
-
-          secondarySubAccount.id = secondarySubAccountId
-          secondarySubAccount.instanceNumber = accountNumber
-          secondarySubAccount.balances = {
-            confirmed: 0,
-            unconfirmed: 0,
-          }
-          secondarySubAccount.transactions = []
-          AccountShell.addSecondarySubAccount(
-            parentShell,
-            secondarySubAccountId,
-            secondarySubAccount,
-          )
-        }
-      }
-
-      const xpub = ( regularService.hdWallet
-        .derivativeAccounts[ TRUSTED_CONTACTS ][
-          accountNumber
-        ] as TrustedContactDerivativeAccountElements ).xpub
-
-      if ( xpub ) {
-        const tpub = testService.getTestXpub()
-        const data: TrustedDataElements = {
-          xpub,
-          tpub,
-        }
-        const updateRes = yield call(
-          trustedContacts.updateTrustedChannel,
-          contactName,
-          data,
-          true,
-        )
-
-        if ( updateRes.status === 200 ) {
-          console.log( 'Xpub updated to TC for: ', contactName )
-          if ( updateRes.data.data ) {
-            // received some data back from the channel; probably contact's xpub
-            console.log( 'Received data from TC with: ', contactName )
-
-            // update the xpub to the trusted contact derivative acc if contact's xpub is received
-            const trustedChannel =
-              trustedContacts.tc.trustedContacts[ contactName.trim() ]
-                .trustedChannel // refresh trusted channel
-            if ( trustedChannel.data.length === 2 ) {
-              const contactsData = trustedChannel.data[ 1 ].data
-              if ( contactsData && contactsData.xpub ) {
-                const accountNumber =
-                  regularService.hdWallet.trustedContactToDA[ contactName ]
-                if ( accountNumber ) {
-                  ( regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
-                    accountNumber
-                  ] as TrustedContactDerivativeAccountElements ).contactDetails = {
-                    xpub: contactsData.xpub,
-                    tpub: contactsData.tpub,
-                  }
-
-                  console.log(
-                    `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
-                  )
-                } else {
-                  console.log(
-                    'Failed to find account number corersponding to contact: ',
-                    contactName,
-                  )
-                }
-              } else {
-                console.log(
-                  'Missing xpub corresponding to contact: ',
-                  contactName,
-                )
-              }
-            }
-          }
-        }
-      } else {
-        console.log( `Failed to generate xpub for ${contactName}` )
-      }
-    }
-  }
-
-  const preSyncTC = yield call( AsyncStorage.getItem, 'preSyncTC' )
-  const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
-  const postSyncReg = JSON.stringify( regularService )
-
-  if (
-    Object.keys( trustedContacts.tc.trustedContacts ).length &&
-    ( !preSyncTC || preSyncTC !== postSyncTC || preSyncReg !== postSyncReg )
-  ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
+  if ( res.status === 200 ) {
+    const SERVICES  = payload.updatedSERVICES? payload.updatedSERVICES: yield select( ( state ) => state.storage.database.SERVICES )
+    const updatedSERVICES: ServicesJSON = {
       ...SERVICES,
-      REGULAR_ACCOUNT: JSON.stringify( regularService ),
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
     }
+
     yield call( insertDBWorker, {
       payload: {
         SERVICES: updatedSERVICES
-      },
+      }
     } )
-
-    // console.log('Updating WI...');
-    // yield put(updateWalletImage()); // TODO: re-enable once the WI updation is refactored and optimised
-
-    yield call( AsyncStorage.setItem, 'preSyncTC', postSyncTC )
+  } else {
+    console.log( res.err )
   }
-
-  yield put( switchTCLoading( 'trustedChannelsSetupSync' ) )
-
-  // synching trusted channel data
-  yield put( syncTrustedChannels() )
 }
 
-export const trustedChannelsSetupSyncWatcher = createWatcher(
-  trustedChannelsSetupSyncWorker,
-  TRUSTED_CHANNELS_SETUP_SYNC,
+export const syncPermanentChannelWatcher = createWatcher(
+  syncPermanentChannelWorker,
+  SYNC_PERMANENT_CHANNEL,
 )
+
+// export function* trustedChannelsSetupSyncWorker() {
+//   // TODO: simplify and optimise the saga
+//   yield put( switchTCLoading( 'trustedChannelsSetupSync' ) )
+
+//   const trustedContacts: TrustedContactsService = yield select(
+//     ( state ) => state.trustedContacts.service,
+//   )
+//   const regularService: RegularAccount = yield select(
+//     ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+//   )
+//   const preSyncReg = JSON.stringify( regularService )
+//   const testService: TestAccount = yield select(
+//     ( state ) => state.accounts[ TEST_ACCOUNT ].service,
+//   )
+
+//   const contacts: Contacts = trustedContacts.tc.trustedContacts
+//   let DHInfos
+//   for ( const contactName of Object.keys( contacts ) ) {
+//     let { trustedChannel, ephemeralChannel, encKey } = contacts[ contactName ]
+
+//     if ( !trustedChannel ) {
+//       // trusted channel not setup; probably need to still get the counter party's pubKey
+
+//       // update DHInfos(once) only if there's a contact w/ trusted channel pending
+//       if ( !DHInfos ) {
+//         yield call( fetchNotificationsWorker ) // refreshes DHInfos
+//         DHInfos = yield call( AsyncStorage.getItem, 'DHInfos' )
+//         if ( DHInfos ) {
+//           DHInfos = JSON.parse( DHInfos )
+//         } else {
+//           DHInfos = []
+//         }
+//       }
+
+//       let contactsPublicKey
+//       DHInfos.forEach( ( dhInfo: { address: string; publicKey: string } ) => {
+//         if ( dhInfo.address === ephemeralChannel.address ) {
+//           contactsPublicKey = dhInfo.publicKey
+//         }
+//       } )
+
+//       if ( contactsPublicKey ) {
+//         const res = yield call(
+//           trustedContacts.finalizeContact,
+//           contactName,
+//           contactsPublicKey,
+//           encKey,
+//         )
+
+//         if ( res.status !== 200 ) {
+//           console.log(
+//             `Failed to setup trusted channel with contact ${contactName}`,
+//           )
+//           continue
+//         } else {
+//           // refresh the trustedChannel object
+//           trustedChannel =
+//             trustedContacts.tc.trustedContacts[ contactName.trim() ]
+//               .trustedChannel
+//         }
+//       } else {
+//         // ECDH pub not available for this contact
+//         continue
+//       }
+//     }
+
+//     if ( trustedChannel.data && trustedChannel.data.length ) {
+//       if ( trustedChannel.data.length !== 2 ) {
+//         // implies missing trusted data from the counter party
+//         const res = yield call(
+//           trustedContacts.fetchTrustedChannel,
+//           contactName,
+//         )
+//         console.log( {
+//           res
+//         } )
+//         if ( res.status === 200 ) {
+//           console.log( 'Attempted a fetch from TC with: ', contactName )
+//           const { data } = res.data
+//           if ( data )
+//             console.log( 'Received data from TC with: ', contactName, data )
+
+//           // update the xpub to the trusted contact derivative acc if contact's xpub is received
+//           trustedChannel =
+//             trustedContacts.tc.trustedContacts[ contactName.trim() ]
+//               .trustedChannel // refresh trusted channel
+//           if ( trustedChannel.data.length === 2 ) {
+//             const contactsData = trustedChannel.data[ 1 ].data
+//             if ( contactsData && contactsData.xpub ) {
+//               const accountNumber =
+//                 regularService.hdWallet.trustedContactToDA[ contactName ]
+//               if ( accountNumber ) {
+//                 ( regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
+//                   accountNumber
+//                 ] as TrustedContactDerivativeAccountElements ).xpubDetails = {
+//                   xpub: contactsData.xpub,
+//                   tpub: contactsData.tpub,
+//                 }
+
+//                 console.log(
+//                   `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
+//                 )
+//               } else {
+//                 console.log(
+//                   'Failed to find account number corersponding to contact: ',
+//                   contactName,
+//                 )
+//               }
+//             } else {
+//               console.log(
+//                 'Missing xpub corresponding to contact: ',
+//                 contactName,
+//               )
+//             }
+//           }
+//         }
+//       } else {
+//         // updating trusted derivative acc(from trusted-channel) in case of non-updation(handles recovery failures)
+//         const accountNumber =
+//           regularService.hdWallet.trustedContactToDA[ contactName ]
+//         if ( accountNumber ) {
+//           const { xpubDetails } = regularService.hdWallet.derivativeAccounts[
+//             TRUSTED_CONTACTS
+//           ][ accountNumber ] as TrustedContactDerivativeAccountElements
+//           if ( !xpubDetails || !xpubDetails.xpub ) {
+//             const contactsData = trustedChannel.data[ 1 ].data
+//             if ( contactsData && contactsData.xpub ) {
+//               ( regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
+//                 accountNumber
+//               ] as TrustedContactDerivativeAccountElements ).xpubDetails = {
+//                 xpub: xpubDetails.xpub,
+//                 tpub: xpubDetails.tpub,
+//               }
+
+//               console.log(
+//                 `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
+//               )
+//             } else {
+//               console.log(
+//                 'Missing xpub corresponding to contact: ',
+//                 contactName,
+//               )
+//             }
+//           }
+//         }
+//       }
+//     } else {
+//       // generate a corresponding derivative acc and assign xpub(uploading info to trusted channel)
+//       let accountNumber =
+//       regularService.hdWallet.trustedContactToDA[ contactName ]
+//       if ( !accountNumber ) {
+//         // initialize a trusted derivative account against the following contact
+//         const res = regularService.setupDerivativeAccount(
+//           TRUSTED_CONTACTS,
+//           null,
+//           contactName,
+//         )
+//         if ( res.status !== 200 ) {
+//           throw new Error( `${res.err}` )
+//         } else {
+//           // refresh the account number and add trusted contact sub acc to acc-shell
+//           accountNumber =
+//           regularService.hdWallet.trustedContactToDA[ contactName ]
+//           const secondarySubAccountId = res.data.accountId
+
+//           const accountShells: AccountShell[] = yield select(
+//             ( state ) => state.accounts.accountShells,
+//           )
+//           let parentShell: AccountShell
+//           accountShells.forEach( ( shell: AccountShell ) => {
+//             if( !shell.primarySubAccount.instanceNumber ){
+//               if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+//             }
+//           } )
+//           const secondarySubAccount = new TrustedContactsSubAccountInfo( {
+//             accountShellID: parentShell.id,
+//             isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+//           } )
+
+//           secondarySubAccount.id = secondarySubAccountId
+//           secondarySubAccount.instanceNumber = accountNumber
+//           secondarySubAccount.balances = {
+//             confirmed: 0,
+//             unconfirmed: 0,
+//           }
+//           secondarySubAccount.transactions = []
+//           AccountShell.addSecondarySubAccount(
+//             parentShell,
+//             secondarySubAccountId,
+//             secondarySubAccount,
+//           )
+//         }
+//       }
+
+//       const xpub = ( regularService.hdWallet
+//         .derivativeAccounts[ TRUSTED_CONTACTS ][
+//           accountNumber
+//         ] as TrustedContactDerivativeAccountElements ).xpub
+
+//       if ( xpub ) {
+//         const tpub = testService.getTestXpub()
+//         const data: TrustedDataElements = {
+//           xpub,
+//           tpub,
+//         }
+//         const updateRes = yield call(
+//           trustedContacts.updateTrustedChannel,
+//           contactName,
+//           data,
+//           true,
+//         )
+
+//         if ( updateRes.status === 200 ) {
+//           console.log( 'Xpub updated to TC for: ', contactName )
+//           if ( updateRes.data.data ) {
+//             // received some data back from the channel; probably contact's xpub
+//             console.log( 'Received data from TC with: ', contactName )
+
+//             // update the xpub to the trusted contact derivative acc if contact's xpub is received
+//             const trustedChannel =
+//               trustedContacts.tc.trustedContacts[ contactName.trim() ]
+//                 .trustedChannel // refresh trusted channel
+//             if ( trustedChannel.data.length === 2 ) {
+//               const contactsData = trustedChannel.data[ 1 ].data
+//               if ( contactsData && contactsData.xpub ) {
+//                 const accountNumber =
+//                   regularService.hdWallet.trustedContactToDA[ contactName ]
+//                 if ( accountNumber ) {
+//                   ( regularService.hdWallet.derivativeAccounts[ TRUSTED_CONTACTS ][
+//                     accountNumber
+//                   ] as TrustedContactDerivativeAccountElements ).contactDetails = {
+//                     xpub: contactsData.xpub,
+//                     tpub: contactsData.tpub,
+//                   }
+
+//                   console.log(
+//                     `Updated ${contactName}'s xpub to TrustedContact Derivative Account`,
+//                   )
+//                 } else {
+//                   console.log(
+//                     'Failed to find account number corersponding to contact: ',
+//                     contactName,
+//                   )
+//                 }
+//               } else {
+//                 console.log(
+//                   'Missing xpub corresponding to contact: ',
+//                   contactName,
+//                 )
+//               }
+//             }
+//           }
+//         }
+//       } else {
+//         console.log( `Failed to generate xpub for ${contactName}` )
+//       }
+//     }
+//   }
+
+//   const preSyncTC = yield call( AsyncStorage.getItem, 'preSyncTC' )
+//   const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
+//   const postSyncReg = JSON.stringify( regularService )
+
+//   if (
+//     Object.keys( trustedContacts.tc.trustedContacts ).length &&
+//     ( !preSyncTC || preSyncTC !== postSyncTC || preSyncReg !== postSyncReg )
+//   ) {
+//     const { SERVICES } = yield select( ( state ) => state.storage.database )
+//     const updatedSERVICES = {
+//       ...SERVICES,
+//       REGULAR_ACCOUNT: JSON.stringify( regularService ),
+//       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+//     }
+//     yield call( insertDBWorker, {
+//       payload: {
+//         SERVICES: updatedSERVICES
+//       },
+//     } )
+
+//     // console.log('Updating WI...');
+//     // yield put(updateWalletImage()); // TODO: re-enable once the WI updation is refactored and optimised
+
+//     yield call( AsyncStorage.setItem, 'preSyncTC', postSyncTC )
+//   }
+
+//   yield put( switchTCLoading( 'trustedChannelsSetupSync' ) )
+
+//   // synching trusted channel data
+//   yield put( syncTrustedChannels() )
+// }
+
+// export const trustedChannelsSetupSyncWatcher = createWatcher(
+//   trustedChannelsSetupSyncWorker,
+//   TRUSTED_CHANNELS_SETUP_SYNC,
+// )
 
 function* walletCheckInWorker( { payload } ) {
   // syncs last seen, health & exchange rates
@@ -1502,7 +1639,7 @@ function* syncTrustedChannelsWorker( { payload } ) {
             }
           }
         }
-        yield put( updateTrustedContactsInfoLocally( tcInfo ) )
+        // yield put( updateTrustedContactsInfoLocally( tcInfo ) )
       }
 
       const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )

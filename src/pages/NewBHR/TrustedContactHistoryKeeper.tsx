@@ -48,9 +48,6 @@ import {
   MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import {
@@ -723,42 +720,42 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
 
-  const updateTrustedContactsInfo = useCallback(
-    async ( contact ) => {
-      const tcInfo = trustedContactsInfo
+  // const updateTrustedContactsInfo = useCallback(
+  //   async ( contact ) => {
+  //     const tcInfo = trustedContactsInfo
 
-      if ( tcInfo.length ) {
-        if ( tcInfo[ index ] ) {
-          let found = false
-          for ( let i = 3; i < tcInfo.length; i++ ) {
-            // push if not present in TC list
-            if ( tcInfo[ i ] && tcInfo[ i ].name == tcInfo[ index ].name ) {
-              found = true
-              break
-            }
-          }
+  //     if ( tcInfo.length ) {
+  //       if ( tcInfo[ index ] ) {
+  //         let found = false
+  //         for ( let i = 3; i < tcInfo.length; i++ ) {
+  //           // push if not present in TC list
+  //           if ( tcInfo[ i ] && tcInfo[ i ].name == tcInfo[ index ].name ) {
+  //             found = true
+  //             break
+  //           }
+  //         }
 
-          if ( !found ) tcInfo.push( tcInfo[ index ] )
-        }
+  //         if ( !found ) tcInfo.push( tcInfo[ index ] )
+  //       }
 
-        for ( let i = 0; i < tcInfo.length; i++ ) {
-          if ( tcInfo[ i ] && tcInfo[ i ].name == contact.name ) {
-            tcInfo.splice( i, 1 )
-            break
-          }
-        }
+  //       for ( let i = 0; i < tcInfo.length; i++ ) {
+  //         if ( tcInfo[ i ] && tcInfo[ i ].name == contact.name ) {
+  //           tcInfo.splice( i, 1 )
+  //           break
+  //         }
+  //       }
 
-        tcInfo[ index ] = contact
-      } else {
-        tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
-        tcInfo[ 1 ] = null
-        tcInfo[ 2 ] = null
-        tcInfo[ index ] = contact
-      }
-      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-    },
-    [ index, trustedContactsInfo ],
-  )
+  //       tcInfo[ index ] = contact
+  //     } else {
+  //       tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
+  //       tcInfo[ 1 ] = null
+  //       tcInfo[ 2 ] = null
+  //       tcInfo[ index ] = contact
+  //     }
+  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+  //   },
+  //   [ index, trustedContactsInfo ],
+  // )
 
   const createGuardian = useCallback( async ( chosenContactTmp? ) => {
     let chosenContactState = chosenContact
@@ -803,7 +800,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     if ( changeContact || shareExpired || isChange ) {
       setTrustedLink( '' )
       setTrustedQR( '' )
-      updateTrustedContactsInfo( chosenContactState )
+      // updateTrustedContactsInfo( chosenContactState )
       onOTPShare( ) // enables reshare
       setChangeContact( false )
     } else {

@@ -28,7 +28,6 @@ import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
-  clearPaymentDetails,
   walletCheckIn,
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
