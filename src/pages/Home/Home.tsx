@@ -53,7 +53,6 @@ import {
   approveTrustedContact,
   fetchEphemeralChannel,
   fetchTrustedChannel,
-  clearPaymentDetails,
   postRecoveryChannelSync,
 } from '../../store/actions/trustedContacts'
 import {
@@ -239,8 +238,6 @@ interface HomePropsTypes {
   fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
-  paymentDetails: any;
-  clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
   notificationListNew: any;
@@ -1039,49 +1036,46 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setSecondaryDeviceAddresses()
     }
 
-    if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
-      const serviceType = REGULAR_ACCOUNT
-      const {
-        paymentDetails,
-        accountsState,
-        navigation,
-        addTransferDetails,
-        clearPaymentDetails,
-      } = this.props
-      let { address, paymentURI } = paymentDetails
-      let options: any = {
-      }
-      if ( paymentURI ) {
-        try {
-          const details = accountsState[ serviceType ].service.decodePaymentURI(
-            paymentURI
-          )
-          address = details.address
-          options = details.options
-        } catch ( err ) {
-          Alert.alert( 'Unable to decode payment URI' )
-          return
-        }
-      }
+    // if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
+    //   const serviceType = REGULAR_ACCOUNT
+    //   const {
+    //     paymentDetails,
+    //     accountsState,
+    //     navigation,
+    //     addTransferDetails,
+    //   } = this.props
+    //   let { address, paymentURI } = paymentDetails
+    //   let options: any = {
+    //   }
+    //   if ( paymentURI ) {
+    //     try {
+    //       const details = accountsState[ serviceType ].service.decodePaymentURI(
+    //         paymentURI
+    //       )
+    //       address = details.address
+    //       options = details.options
+    //     } catch ( err ) {
+    //       Alert.alert( 'Unable to decode payment URI' )
+    //       return
+    //     }
+    //   }
 
-      const item = {
-        id: address,
-      }
+    //   const item = {
+    //     id: address,
+    //   }
 
-      addTransferDetails( serviceType, {
-        selectedContact: item,
-      } )
+    //   addTransferDetails( serviceType, {
+    //     selectedContact: item,
+    //   } )
 
-      clearPaymentDetails()
-
-      navigation.navigate( 'SendToContact', {
-        selectedContact: item,
-        serviceType,
-        bitcoinAmount: options.amount
-          ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-          : '',
-      } )
-    }
+    //   navigation.navigate( 'SendToContact', {
+    //     selectedContact: item,
+    //     serviceType,
+    //     bitcoinAmount: options.amount
+    //       ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
+    //       : '',
+    //   } )
+    // }
   };
 
   handleDeepLinkModal = () => {
@@ -2578,7 +2572,6 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.health.service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    paymentDetails: idx( state, ( _ ) => _.trustedContacts.paymentDetails ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
@@ -2622,7 +2615,6 @@ export default withNavigationFocus(
     fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
-    clearPaymentDetails,
     notificationsUpdated,
     setCurrencyCode,
     updatePreference,

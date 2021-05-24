@@ -113,13 +113,13 @@ import {
   fetchEphemeralChannelWatcher,
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
-  trustedChannelsSetupSyncWatcher,
   removeTrustedContactWatcher,
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
   multiUpdateTrustedChannelsWatcher,
-  sendVersionUpdateNotificationWatcher
+  sendVersionUpdateNotificationWatcher,
+  syncPermanentChannelWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -303,12 +303,12 @@ const rootSaga = function* () {
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
-    trustedChannelsSetupSyncWatcher,
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
     sendVersionUpdateNotificationWatcher,
     multiUpdateTrustedChannelsWatcher,
+    syncPermanentChannelWatcher,
 
     // Health
     initHealthWatcher,

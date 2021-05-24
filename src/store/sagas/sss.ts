@@ -69,11 +69,10 @@ import {
 import generatePDF from '../utils/generatePDF'
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
 import { Platform, NativeModules } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   updateEphemeralChannel,
   updateTrustedChannel,
-  updateTrustedContactsInfoLocally,
 } from '../actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -1838,7 +1837,7 @@ const asyncDataToBackup = async () => {
 function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
-  const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
+  // const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
 
   const versionHistory = yield select(
@@ -1855,8 +1854,8 @@ function* stateDataToBackup() {
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if ( trustedContactsInfo && trustedContactsInfo.length )
-    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+  // if ( trustedContactsInfo && trustedContactsInfo.length )
+  //   STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
 
   if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
@@ -2029,11 +2028,11 @@ function* fetchWalletImageWorker( { payload } ) {
         console.log( 'restoring to async: ', key )
         yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
 
-        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
-          // supports legacy trustedContactsInfo; backed up as a part of async data(for versions < 1.5.0)
-          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
-        }
+        // if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
+        //   // supports legacy trustedContactsInfo; backed up as a part of async data(for versions < 1.5.0)
+        //   const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
+        //   yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
+        // }
       }
     }
 
@@ -2049,10 +2048,10 @@ function* fetchWalletImageWorker( { payload } ) {
               } ) )
               break
 
-            case 'trustedContactsInfo':
-              const trustedContactsInfo = JSON.parse( STATE_DATA[ key ] )
-              yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
-              break
+              // case 'trustedContactsInfo':
+              //   const trustedContactsInfo = JSON.parse( STATE_DATA[ key ] )
+              //   yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
+              //   break
 
             case 'activePersonalNode':
               const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )

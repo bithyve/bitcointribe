@@ -1,7 +1,6 @@
 import { createAction } from 'redux-actions'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { updateTrustedContactsInfoLocally } from '../actions/trustedContacts'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Action } from 'redux'
 
@@ -131,7 +130,7 @@ export const initMigration = () => {
     ] )
     if ( data && data[ 0 ] && data[ 0 ][ 1 ] ) {
       const trustedContacts = data[ 0 ][ 1 ]
-      dispatch( updateTrustedContactsInfoLocally( JSON.parse( trustedContacts ) ) )
+      // dispatch( updateTrustedContactsInfoLocally( JSON.parse( trustedContacts ) ) )
     }
     if ( data && data[ 1 ] ) {
       const currencyCode = JSON.parse( data[ 1 ][ 1 ] ) || 'USD'
