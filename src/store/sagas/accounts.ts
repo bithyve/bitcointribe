@@ -39,7 +39,6 @@ import {
   VALIDATE_TWO_FA,
   twoFAValid,
   ADD_NEW_SECONDARY_SUBACCOUNT,
-  ContactInfo,
   clearAccountSyncCache,
   BLIND_REFRESH,
   blindRefreshStarted,
@@ -58,6 +57,7 @@ import {
   DONATION_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
+  ContactInfo,
   DerivativeAccountTypes,
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'

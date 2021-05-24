@@ -22,6 +22,7 @@ import {
   InputUTXOs,
   AverageTxFees,
   TransactionPrerequisiteElements,
+  ContactDetails,
 } from '../Interface'
 import { AxiosResponse } from 'axios'
 import {
@@ -343,38 +344,38 @@ export default class HDSegwitWallet extends Bitcoin {
       let availableAddress = ''
       let itr
 
-      const { nextFreeAddressIndex } = account.contactDetails
+      const { nextFreeAddressIndex } = account.xpubDetails
       if ( nextFreeAddressIndex !== 0 && !nextFreeAddressIndex )
-        account.contactDetails.nextFreeAddressIndex = 0
+        account.xpubDetails.nextFreeAddressIndex = 0
 
       for ( itr = 0; itr < this.derivativeGapLimit + 1; itr++ ) {
         const address = this.getAddress(
           false,
-          account.contactDetails.nextFreeAddressIndex + itr,
-          account.contactDetails.xpub,
+          account.xpubDetails.nextFreeAddressIndex + itr,
+          account.xpubDetails.xpub,
         )
 
         const txCounts = await this.getTxCounts( [ address ] )
         if ( txCounts[ address ] === 0 ) {
           availableAddress = address
-          account.contactDetails.nextFreeAddressIndex += itr
+          account.xpubDetails.nextFreeAddressIndex += itr
           break
         }
       }
 
       if ( !availableAddress )
-        account.contactDetails.nextFreeAddressIndex += itr + 1
+        account.xpubDetails.nextFreeAddressIndex += itr + 1
 
-      account.contactDetails.receivingAddress = availableAddress
+      account.xpubDetails.receivingAddress = availableAddress
         ? availableAddress
         : this.getAddress(
           false,
-          account.contactDetails.nextFreeAddressIndex + itr,
-          account.contactDetails.xpub,
+          account.xpubDetails.nextFreeAddressIndex + itr,
+          account.xpubDetails.xpub,
         )
 
       return {
-        address: account.contactDetails.receivingAddress
+        address: account.xpubDetails.receivingAddress
       }
     } catch ( err ) {
       throw new Error( `Unable to generate receiving address: ${err.message}` )
@@ -437,7 +438,7 @@ export default class HDSegwitWallet extends Bitcoin {
           // remove if no txs exist on such an account
           if( !transactionDetails.length ){
             if( accountType === TRUSTED_CONTACTS ){
-              const { contactName } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as TrustedContactDerivativeAccountElements )
+              const { contactName } = ( this.derivativeAccounts[ accountType ][ accountNumber ] as TrustedContactDerivativeAccountElements ).contactDetails
               delete this.trustedContactToDA[ contactName ]
             }
             delete this.derivativeAccounts[ accountType ][ accountNumber ];
@@ -483,7 +484,7 @@ export default class HDSegwitWallet extends Bitcoin {
           // blind derv-account generation
           this.generateDerivativeXpub( accountType, accountNumber )
           if( accountType === TRUSTED_CONTACTS ){
-            ( this.derivativeAccounts[ accountType ][ accountNumber ] as TrustedContactDerivativeAccountElements ).contactName = contactName
+            ( this.derivativeAccounts[ accountType ][ accountNumber ] as TrustedContactDerivativeAccountElements ).contactDetails.contactName = contactName
             this.trustedContactToDA[ contactName ] = accountNumber
           }
 
@@ -901,7 +902,7 @@ export default class HDSegwitWallet extends Bitcoin {
   public setupDerivativeAccount = (
     accountType: string,
     accountDetails?: { accountName?: string; accountDescription?: string },
-    contactName?: string,
+    contactDetails?: ContactDetails,
   ): {
     accountId: string;
     accountNumber: number;
@@ -944,7 +945,7 @@ export default class HDSegwitWallet extends Bitcoin {
           this.generateDerivativeXpub( accountType, accountNumber )
           const trustedDerivativeInstance: TrustedContactDerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
-          trustedDerivativeInstance.contactName = contactName
+          trustedDerivativeInstance.contactDetails = contactDetails
           trustedDerivativeInstance.channelKey = channelKey
           this.trustedContactToDA[ channelKey ] = accountNumber
           accountId = trustedDerivativeInstance.xpubId

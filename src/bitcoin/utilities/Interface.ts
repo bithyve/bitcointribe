@@ -209,10 +209,10 @@ export interface DerivativeAccount {
 
 export interface TrustedContactDerivativeAccountElements
   extends DerivativeAccountElements {
-  contactName: string;
   channelKey: string;
-  contactDetails?: {
-    xpub: string;
+  contactDetails: ContactDetails,
+  xpubDetails: {
+    xpub?: string;
     tpub?: string;
     receivingAddress?: string;
     usedAddresses?: string[];
@@ -464,6 +464,25 @@ export interface Contacts {
   [contactName: string]: ContactElements
 }
 
+export interface ContactDetails {
+  contactName: string,
+  info: string, // phone-number/email-address
+  id: string,
+  image?: any | null,
+}
+
+export interface ContactInfo  {
+  contactDetails: ContactDetails,
+  isGuardian?: boolean,
+  channelKey?: string,
+  secondaryChannelKey?: string
+  channelAssets?: {
+    primaryMnemonicShard?: any,
+    keeperInfo?: any,
+    secondaryMnemonicShard?: any,
+    bhXpub?: string
+  },
+}
 export interface PrimaryStreamData {
   walletID?: string,
   walletName?: string,
@@ -528,11 +547,12 @@ export enum TrustedContactRelationTypes {
 }
 
 export interface TrustedContact {
+  contactDetails: ContactDetails,
+  relationType: TrustedContactRelationTypes,
   permanentChannelAddress: string,
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
-  relationType?: TrustedContactRelationTypes,
-  walletID?: string;
+  walletID?: string, // contact's walletId
 }
 export interface Trusted_Contacts {
   [channelKey: string]: TrustedContact

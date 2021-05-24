@@ -1,4 +1,5 @@
 import { Action } from 'redux'
+import { ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -318,19 +319,6 @@ export const addNewAccountShell = (
   }
 }
 
-export interface ContactInfo  {
-  contactName: string,
-  info: string,
-  isGuardian?: boolean,
-  channelKey?: string,
-  secondaryChannelKey?: string
-  channelAssets?: {
-    primaryMnemonicShard?: any,
-    keeperInfo?: any,
-    secondaryMnemonicShard?: any,
-    bhXpub?: string
-  },
-}
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,

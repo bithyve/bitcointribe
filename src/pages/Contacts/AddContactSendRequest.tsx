@@ -38,12 +38,13 @@ import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
-import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/accounts'
+import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
+import { ContactDetails, ContactInfo } from '../../bitcoin/utilities/Interface'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -131,43 +132,42 @@ export default function AddContactSendRequest( props ) {
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
-    if ( Contact && Contact.firstName ) {
-      const contactName = `${Contact.firstName} ${
-        Contact.lastName ? Contact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
-
-      let info = ''
-      if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-        const phoneNumber = Contact.phoneNumbers[ 0 ].number
-        let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-        number = number.slice( number.length - 10 ) // last 10 digits only
-        info = number
-      } else if ( Contact.emails && Contact.emails.length ) {
-        info = Contact.emails[ 0 ].email
-      }
-
-      const contactInfo: ContactInfo = {
-        contactName,
-        info: info? info.trim(): info,
-      }
-
-      let parentShell: AccountShell
-      accountShells.forEach( ( shell: AccountShell ) => {
-        if( !shell.primarySubAccount.instanceNumber ){
-          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-        }
-      } )
-      const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
-        accountShellID: parentShell.id,
-        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-      } )
-
-      dispatch(
-        addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
-      )
+    if ( !Contact ) return
+    const contactName = Contact.name
+    let info = ''
+    if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
+      const phoneNumber = Contact.phoneNumbers[ 0 ].number
+      let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+      number = number.slice( number.length - 10 ) // last 10 digits only
+      info = number
+    } else if ( Contact.emails && Contact.emails.length ) {
+      info = Contact.emails[ 0 ].email
     }
+
+    const contactDetails: ContactDetails = {
+      id: Contact.id,
+      contactName,
+      info: info? info.trim(): info,
+      image: Contact.imageAvailable? Contact.image: null
+    }
+    const contactInfo: ContactInfo = {
+      contactDetails,
+    }
+
+    let parentShell: AccountShell
+    accountShells.forEach( ( shell: AccountShell ) => {
+      if( !shell.primarySubAccount.instanceNumber ){
+        if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+      }
+    } )
+    const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+      accountShellID: parentShell.id,
+      isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+    } )
+
+    dispatch(
+      addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
+    )
   }, [ Contact ] )
 
   useEffect( () => {
@@ -296,13 +296,13 @@ export default function AddContactSendRequest( props ) {
         // setTimeout( () => {
         //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
         // }, 2 )
-        
+
       } else {
         // setTimeout( () => {
         //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
         // }, 2 )
       }
-      
+
     } else {
       createTrustedContact()
     }
@@ -367,7 +367,7 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [] )
-  
+
 
   const renderContactRequest = useCallback( () => {
     return (
@@ -383,7 +383,7 @@ export default function AddContactSendRequest( props ) {
         onPressBack={() => {
           if ( ContactRequestBottomSheet.current )
             ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
+          props.navigation.goBack()
         }}
         onPressDone={() => {
           ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
@@ -608,7 +608,7 @@ export default function AddContactSendRequest( props ) {
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
-              props.navigation.goBack()
+            props.navigation.goBack()
           }}
           onPressDone={() => {
             openTimer()
@@ -637,7 +637,7 @@ export default function AddContactSendRequest( props ) {
               }
             />
           </View> */}
-          {/* <View
+        {/* <View
             style={{
               flexDirection: 'row',
               backgroundColor: Colors.blue,

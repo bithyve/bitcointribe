@@ -40,7 +40,8 @@ import {
   PrimaryStreamData,
   TrustedContactRelationTypes,
   SecondaryStreamData,
-  BackupStreamData
+  BackupStreamData,
+  ContactInfo
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
@@ -65,7 +66,7 @@ import { downloadMetaShareWorker } from './sss'
 import { downloadMetaShareWorker as downloadMetaShareWorkerKeeper } from './health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
-import { ContactInfo, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -297,14 +298,14 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
   const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
-  const { contactName } = contactInfo
+  const { contactDetails } = contactInfo
   const { walletId } = regularAccount.hdWallet.getWalletId()
 
   // initialize a trusted derivative account against the following contact
   const res = regularAccount.setupDerivativeAccount(
     TRUSTED_CONTACTS,
     null,
-    contactName,
+    contactDetails,
   )
   if ( res.status !== 200 ) throw new Error( `${res.err}` )
 
@@ -375,7 +376,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
 
   // initiate permanent channel
-  yield put( syncPermanentChannel( contactInfo, updates ) )
+  yield put( syncPermanentChannel( contactInfo.contactDetails, updates ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {
