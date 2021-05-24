@@ -745,7 +745,6 @@ export default class S3Service {
     version: string,
     question :string,
     level: number,
-    smShare?: string
   ):
     | {
         status: number;
@@ -764,7 +763,7 @@ export default class S3Service {
     try {
       const { shares } = this.levelhealth.generateLevel2Shares( answer )
       const { encryptedSecrets } = this.levelhealth.encryptShares( shares, answer )
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level, smShare )
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level )
       return {
         status: config.STATUS.SUCCESS, data: {
           encryptedSecrets

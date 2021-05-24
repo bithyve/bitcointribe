@@ -1353,7 +1353,6 @@ export default class LevelHealth {
     version: string,
     question: string,
     level: number,
-    smShare?: string
   ): {
     metaShares: MetaShare[];
   } => {
@@ -1379,7 +1378,7 @@ export default class LevelHealth {
         shareId: LevelHealth.getShareId( element ),
         encryptedShare: {
           pmShare: element,
-          smShare: this.encryptedSMSecretsKeeper.length ? this.encryptedSMSecretsKeeper[ 1 ] : smShare,
+          smShare: this.encryptedSMSecretsKeeper.length ? this.encryptedSMSecretsKeeper[ 1 ] : '',
           bhXpub: encryptedXpub.encryptedString
         },
         meta: {
@@ -1954,6 +1953,9 @@ export default class LevelHealth {
   public deletePrivateData = async (): Promise<{ success: boolean }> => {
     this.SMMetaSharesKeeper = []
     this.encryptedSMSecretsKeeper = []
+    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
+      this.metaSharesKeeper[ i ].encryptedShare.smShare = ''
+    }
     this.mnemonic = ''
     return {
       success: true
