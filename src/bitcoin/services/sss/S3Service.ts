@@ -717,7 +717,7 @@ export default class S3Service {
       } => {
     try {
       const { shares, smShares } = this.levelhealth.generateLevel1Shares( secureAssets.secondaryMnemonic )
-      const { encryptedSecrets, encryptedSMSecrets } = this.levelhealth.encryptShares( shares, smShares, answer )
+      const { encryptedSecrets, encryptedSMSecrets } = this.levelhealth.encryptShares( shares, answer, smShares )
       const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level )
       console.log( 'metaShares', metaShares )
       return {
@@ -743,14 +743,14 @@ export default class S3Service {
     tag: string,
     questionId: string,
     version: string,
-    question? :string,
-    level?: number
+    question :string,
+    level: number,
+    smShare?: string
   ):
     | {
         status: number;
         data: {
           encryptedSecrets: string[];
-          encryptedSMSecrets: string[];
         };
         err?: undefined;
         message?: undefined;
@@ -762,12 +762,12 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-      const { shares, smShares } = this.levelhealth.generateLevel2Shares( secureAssets.secondaryMnemonic, answer )
-      const { encryptedSecrets, encryptedSMSecrets } = this.levelhealth.encryptShares( shares, smShares, answer )
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level )
+      const { shares } = this.levelhealth.generateLevel2Shares( answer )
+      const { encryptedSecrets } = this.levelhealth.encryptShares( shares, answer )
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level, smShare )
       return {
         status: config.STATUS.SUCCESS, data: {
-          encryptedSecrets, encryptedSMSecrets
+          encryptedSecrets
         }
       }
     } catch ( err ) {

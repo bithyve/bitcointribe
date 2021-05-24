@@ -206,6 +206,7 @@ function* generateMetaSharesWorker( { payload } ) {
   const { answer, questionId, question } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP.security
   )
+  const secondaryShareDownloaded = yield select( ( state ) => state.health.secondaryShareDownloaded )
   const secondaryMnemonic = SM && SM ? SM : secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
 
   const secureAssets = {
@@ -214,16 +215,9 @@ function* generateMetaSharesWorker( { payload } ) {
     secondaryXpub: '',
     bhXpub: secureAccount.secureHDWallet.xpubs.bh,
   }
-
-  let serviceCall = null
+  let res
   if ( level == 2 ) {
-    serviceCall = s3Service.generateLevel1Shares
-  } else if ( level == 3 ) {
-    serviceCall = s3Service.generateLevel2Shares
-  }
-  if ( serviceCall != null ) {
-    const res = yield call(
-      serviceCall,
+    res = yield call( s3Service.generateLevel1Shares,
       secureAssets,
       answer,
       walletName,
@@ -232,42 +226,53 @@ function* generateMetaSharesWorker( { payload } ) {
       questionId === '0' ? question: '',
       level
     )
-    if ( res.status === 200 ) {
-      if ( level == 2 ) {
-        const isLevel2Initialized = yield select(
-          ( state ) => state.health.isLevel2Initialized
-        )
-        if ( !isLevel2Initialized ) {
-          yield put( updateLevelTwoMetaShareStatus( true ) )
-          if( isUpgrade ) yield put( initLevels( level ) )
-          else yield put( initLevelTwo( level ) )
-        }
+  } else if ( level == 3 ) {
+    res = yield call( s3Service.generateLevel2Shares,
+      secureAssets,
+      answer,
+      walletName,
+      questionId,
+      appVersion,
+      questionId === '0' ? question: '',
+      level,
+      secondaryShareDownloaded
+    )
+  }
+  if ( res.status === 200 ) {
+    if ( level == 2 ) {
+      const isLevel2Initialized = yield select(
+        ( state ) => state.health.isLevel2Initialized
+      )
+      if ( !isLevel2Initialized ) {
+        yield put( updateLevelTwoMetaShareStatus( true ) )
+        if( isUpgrade ) yield put( initLevels( level ) )
+        else yield put( initLevelTwo( level ) )
       }
-      if ( level == 3 ) {
-        const isLevel3Initialized = yield select(
-          ( state ) => state.health.isLevel3Initialized
-        )
-        if ( !isLevel3Initialized ) {
-          yield put( updateLevelThreeMetaShareStatus( true ) )
-          if( isUpgrade ) yield put( initLevels( level ) )
-          else yield put( initLevelTwo( level ) )
-        }
-      }
-
-      const { SERVICES } = yield select( ( state ) => state.storage.database )
-      const updatedSERVICES = {
-        ...SERVICES,
-        S3_SERVICE: JSON.stringify( s3Service ),
-      }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
-    } else {
-      if ( res.err === 'ECONNABORTED' ) requestTimedout()
-      throw new Error( res.err )
     }
+    if ( level == 3 ) {
+      const isLevel3Initialized = yield select(
+        ( state ) => state.health.isLevel3Initialized
+      )
+      if ( !isLevel3Initialized ) {
+        yield put( updateLevelThreeMetaShareStatus( true ) )
+        if( isUpgrade ) yield put( initLevels( level ) )
+        else yield put( initLevelTwo( level ) )
+      }
+    }
+
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const updatedSERVICES = {
+      ...SERVICES,
+      S3_SERVICE: JSON.stringify( s3Service ),
+    }
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+  } else {
+    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    throw new Error( res.err )
   }
 }
 

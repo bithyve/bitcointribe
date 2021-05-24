@@ -744,12 +744,11 @@ export default class LevelHealth {
     }
   };
 
-  public generateLevel2Shares = ( secondaryMnemonics:string, answer: string ): {
-    shares: string[]; smShares: string[]
+  public generateLevel2Shares = ( answer: string ): {
+    shares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     let PrimaryMnemonics = this.mnemonic
-    let SecondaryMnemonics = secondaryMnemonics
     if( !PrimaryMnemonics ){
       const decryptedShareArr = []
       for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
@@ -767,32 +766,8 @@ export default class LevelHealth {
       PrimaryMnemonics = LevelHealth.hexToString( recoveredMnemonicHex )
     }
 
-    if( !secondaryMnemonics ){
-      const decryptedShareArr = []
-      const secondaryShares = this.metaSharesKeeper.find( value => value.encryptedShare && value.encryptedShare.smShare ) ? this.metaSharesKeeper : this.SMMetaSharesKeeper
-      for ( let i = 0; i < secondaryShares.length; i++ ) {
-        const element = secondaryShares[ i ]
-        decryptedShareArr.push( element.encryptedShare.smShare )
-      }
-      const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
-
-      const secretsArr = [] // secrets w/o checksum
-      for ( const secret of decryptedSecrets ) {
-        secretsArr.push( secret.slice( 0, secret.length - 8 ) )
-      }
-
-      const recoveredMnemonicHex = secrets.combine( secretsArr )
-      SecondaryMnemonics = LevelHealth.hexToString( recoveredMnemonicHex )
-    }
-
     const shares = secrets.share(
       this.stringToHex( PrimaryMnemonics ),
-      config.SSS_LEVEL2_TOTAL,
-      config.SSS_LEVEL2_THRESHOLD,
-    )
-
-    const smShares = secrets.share(
-      this.stringToHex( SecondaryMnemonics ),
       config.SSS_LEVEL2_TOTAL,
       config.SSS_LEVEL2_THRESHOLD,
     )
@@ -803,7 +778,7 @@ export default class LevelHealth {
     }
 
     return {
-      shares, smShares
+      shares
     }
   };
 
@@ -1375,9 +1350,10 @@ export default class LevelHealth {
     bhXpub: string,
     tag: string,
     questionId: string,
-    version?: string,
-    question?: string,
-    level?: number,
+    version: string,
+    question: string,
+    level: number,
+    smShare?: string
   ): {
     metaShares: MetaShare[];
   } => {
@@ -1403,7 +1379,7 @@ export default class LevelHealth {
         shareId: LevelHealth.getShareId( element ),
         encryptedShare: {
           pmShare: element,
-          smShare: this.encryptedSMSecretsKeeper[ index ],
+          smShare: this.encryptedSMSecretsKeeper.length ? this.encryptedSMSecretsKeeper[ 1 ] : smShare,
           bhXpub: encryptedXpub.encryptedString
         },
         meta: {
@@ -1559,8 +1535,8 @@ export default class LevelHealth {
 
   public encryptShares = (
     secretsToEncrypt: string[],
-    smShares: string[],
     answer: string,
+    smShares?: string[],
   ): {
     encryptedSecrets: string[];
     encryptedSMSecrets: string[];
@@ -1580,22 +1556,25 @@ export default class LevelHealth {
       encryptedSecretsTmp.push( encrypted )
       shareIDs.push( LevelHealth.getShareId( encrypted ) )
     }
-    for ( const secret of smShares ) {
-      const cipher = crypto.createCipheriv(
-        LevelHealth.cipherSpec.algorithm,
-        key,
-        LevelHealth.cipherSpec.iv,
-      )
-      let encrypted = cipher.update( secret, 'utf8', 'hex' )
-      encrypted += cipher.final( 'hex' )
-      encryptedSMSecretsTmp.push( encrypted )
+    if( smShares ){
+      for ( const secret of smShares ) {
+        const cipher = crypto.createCipheriv(
+          LevelHealth.cipherSpec.algorithm,
+          key,
+          LevelHealth.cipherSpec.iv,
+        )
+        let encrypted = cipher.update( secret, 'utf8', 'hex' )
+        encrypted += cipher.final( 'hex' )
+        encryptedSMSecretsTmp.push( encrypted )
+      }
+      this.encryptedSMSecretsKeeper = encryptedSMSecretsTmp // Secondary Mnemonics share
     }
-    this.encryptedSMSecretsKeeper = encryptedSMSecretsTmp // Secondary Mnemonics share
+
     this.encryptedSecretsKeeper = encryptedSecretsTmp
     this.shareIDsKeeper = shareIDs // preserving just the online(relay-transmitted) shareIDs
     return {
-      encryptedSecrets: encryptedSecretsTmp,
-      encryptedSMSecrets: encryptedSMSecretsTmp
+      encryptedSecrets: this.encryptedSecretsKeeper,
+      encryptedSMSecrets: this.encryptedSMSecretsKeeper
     }
   };
 

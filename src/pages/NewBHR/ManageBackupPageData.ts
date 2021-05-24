@@ -59,7 +59,6 @@ const checkLevelHealth = (
           levelData[ j ].keeper2 = element1[ 1 ]
           levelData[ j ].status = checkStatus2( levelInfo1 )
         }
-
       }
     }
     return levelData
