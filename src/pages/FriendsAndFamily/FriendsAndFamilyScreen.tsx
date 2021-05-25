@@ -65,7 +65,9 @@ interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   selectedContact: any[];
   loading: boolean;
-  friendsAndFamilyList: any[];
+  myKeepers: any[];
+  ImKeeping: any[];
+  otherContacts: any[];
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
   showLoader: boolean;
@@ -93,7 +95,9 @@ class FriendsAndFamilyScreen extends PureComponent<
       isLoadContacts: false,
       selectedContact: [],
       loading: true,
-      friendsAndFamilyList: [],
+      myKeepers: [],
+      ImKeeping: [],
+      otherContacts: [],
       isShowingKnowMoreSheet: false,
       showLoader: false
     }
@@ -144,12 +148,18 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   updateAddressBook = async () => {
-    const { trustedContactsService } = this.props
+    const { trustedContactsService, regularAccount } = this.props
     const contacts = trustedContactsService.tc.trustedContactsV2
-    const friendsAndFamily: any[] = []
-    Object.values( contacts ).forEach( ( contact ) => {
+    const { walletId } = regularAccount.hdWallet.getWalletId()
+
+    const myKeepers = []
+    const ImKeeping = []
+    const otherContacts = []
+
+    for( const contact of Object.values( contacts ) ){
       const { contactDetails, relationType, unencryptedPermanentChannel } = contact
-      const stream: UnecryptedStreamData = useStreamFromPermanentChannel( unencryptedPermanentChannel, true )
+      const stream: UnecryptedStreamData = useStreamFromPermanentChannel( walletId, unencryptedPermanentChannel, true )
+
       const fnf = {
         id: contactDetails.id,
         contactName: contactDetails.contactName,
@@ -164,14 +174,19 @@ class FriendsAndFamilyScreen extends PureComponent<
         contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
         lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
       }
-      friendsAndFamily.push( fnf )
-    } )
 
-    if( friendsAndFamily.length )
-      this.setState( {
-        friendsAndFamilyList: friendsAndFamily,
-      }
-      )
+      if( fnf.isGuardian || fnf.isWard ){
+        if( fnf.isGuardian ) myKeepers.push( fnf )
+        if( fnf.isWard ) ImKeeping.push( fnf )
+      } else otherContacts.push( fnf )
+    }
+
+    this.setState( {
+      myKeepers,
+      ImKeeping,
+      otherContacts
+    }
+    )
 
     // if ( trustedContactsInfo ) {
     //   if ( trustedContactsInfo.length ) {
@@ -416,7 +431,9 @@ class FriendsAndFamilyScreen extends PureComponent<
     const { trustedChannelsSetupSync } = this.props
 
     const {
-      friendsAndFamilyList,
+      myKeepers,
+      ImKeeping,
+      otherContacts,
       onRefresh,
       showLoader
     } = this.state
@@ -449,17 +466,16 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( friendsAndFamilyList.filter( ( item, index ) => {
-                  if( item.isGuardian )
-                    return this.renderContactListItem( {
-                      backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(
-                        item,
-                        ContactTrustKind.KEEPER_OF_USER,
-                      ),
-                      index,
-                      contactsType: 'My Keepers',
-                    } )
+                {( myKeepers.length && myKeepers.map( ( item, index ) => {
+                  return this.renderContactListItem( {
+                    backendContactInfo: item,
+                    contactDescription: makeContactRecipientDescription(
+                      item,
+                      ContactTrustKind.KEEPER_OF_USER,
+                    ),
+                    index,
+                    contactsType: 'My Keepers',
+                  } )
                 } ) ) || <View style={{
                   height: wp( '22%' ) + 30
                 }} />}
@@ -481,17 +497,16 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( friendsAndFamilyList.filter( ( item, index ) => {
-                  if( item.isWard )
-                    return this.renderContactListItem( {
-                      backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(
-                        item,
-                        ContactTrustKind.USER_IS_KEEPING,
-                      ),
-                      index,
-                      contactsType: 'I\'m Keeper of',
-                    } )
+                {( ImKeeping.length && ImKeeping.filter( ( item, index ) => {
+                  return this.renderContactListItem( {
+                    backendContactInfo: item,
+                    contactDescription: makeContactRecipientDescription(
+                      item,
+                      ContactTrustKind.USER_IS_KEEPING,
+                    ),
+                    index,
+                    contactsType: 'I\'m Keeper of',
+                  } )
                 } ) ) || <View style={{
                   height: wp( '22%' ) + 30
                 }} />}
@@ -513,17 +528,16 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( friendsAndFamilyList.filter( ( item, index ) => {
-                  if( !item.isGuardian || !item.isWard )
-                    return this.renderContactListItem( {
-                      backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(
-                        item,
-                        ContactTrustKind.OTHER,
-                      ),
-                      index,
-                      contactsType: 'Other Contacts',
-                    } )
+                {( otherContacts.length && otherContacts.map( ( item, index ) => {
+                  return this.renderContactListItem( {
+                    backendContactInfo: item,
+                    contactDescription: makeContactRecipientDescription(
+                      item,
+                      ContactTrustKind.OTHER,
+                    ),
+                    index,
+                    contactsType: 'Other Contacts',
+                  } )
                 } ) ) || <View style={{
                   height: wp( '22%' ) + 30
                 }} />}
@@ -554,7 +568,9 @@ class FriendsAndFamilyScreen extends PureComponent<
             </View>
           </View>
           {
-            friendsAndFamilyList.length == 0 && (
+            myKeepers.length == 0 &&
+            ImKeeping.length == 0 &&
+            otherContacts.length == 0 && (
               <BottomInfoBox
                 title={'Note'}
                 infoText={
