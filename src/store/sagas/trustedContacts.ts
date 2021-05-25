@@ -300,7 +300,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
   const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
-  const { contactDetails } = contactInfo
+  const { contactDetails, channelKey, secondaryChannelKey } = contactInfo
   const { walletId } = regularAccount.hdWallet.getWalletId()
 
   // initialize a trusted derivative account against the following contact
@@ -308,6 +308,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     TRUSTED_CONTACTS,
     null,
     contactDetails,
+    channelKey,
   )
   if ( res.status !== 200 ) throw new Error( `${res.err}` )
 
@@ -460,11 +461,11 @@ export const approveTrustedContactWatcher = createWatcher(
 )
 
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, isGuardian?: boolean, channelKey?: string, secondaryChannelKey?: string}} ) {
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, isGuardian?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string}} ) {
   const accountShells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells,
   )
-  const { contact, channelKey, secondaryChannelKey } = payload
+  const { contact, isGuardian, channelKey, contactsSecondaryChannelKey } = payload
   let info = ''
   if ( contact.phoneNumbers && contact.phoneNumbers.length ) {
     const phoneNumber = contact.phoneNumbers[ 0 ].number
@@ -481,10 +482,15 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     info: info? info.trim(): null,
     image: contact.imageAvailable? contact.image: null
   }
+
   const contactInfo: ContactInfo = {
     contactDetails,
     channelKey,
-    secondaryChannelKey
+    contactsSecondaryChannelKey
+  }
+
+  if( isGuardian ) {
+    // TODO: prepare channel assets and plug into contactInfo obj
   }
 
   let parentShell: AccountShell
@@ -1103,6 +1109,7 @@ function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: Cont
     contactInfo.channelKey,
     contactInfo.secondaryChannelKey,
     updates,
+    contactInfo.contactsSecondaryChannelKey
   )
   if ( res.status === 200 ) {
     const SERVICES  = payload.updatedSERVICES? payload.updatedSERVICES: yield select( ( state ) => state.storage.database.SERVICES )

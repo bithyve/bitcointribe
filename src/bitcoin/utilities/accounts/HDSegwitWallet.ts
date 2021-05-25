@@ -903,6 +903,7 @@ export default class HDSegwitWallet extends Bitcoin {
     accountType: string,
     accountDetails?: { accountName?: string; accountDescription?: string },
     contactDetails?: ContactDetails,
+    channelKey?: string
   ): {
     accountId: string;
     accountNumber: number;
@@ -937,7 +938,7 @@ export default class HDSegwitWallet extends Bitcoin {
           break
 
         case TRUSTED_CONTACTS:
-          const channelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
+          const key = channelKey? channelKey: SSS.generateKey( config.CIPHER_SPEC.keyLength )
           const trustedAccounts: TrustedContactDerivativeAccount = this
             .derivativeAccounts[ accountType ]
 
@@ -946,8 +947,8 @@ export default class HDSegwitWallet extends Bitcoin {
           const trustedDerivativeInstance: TrustedContactDerivativeAccountElements = this
             .derivativeAccounts[ accountType ][ accountNumber ]
           trustedDerivativeInstance.contactDetails = contactDetails
-          trustedDerivativeInstance.channelKey = channelKey
-          this.trustedContactToDA[ channelKey ] = accountNumber
+          trustedDerivativeInstance.channelKey = key
+          this.trustedContactToDA[ key ] = accountNumber
           accountId = trustedDerivativeInstance.xpubId
           accountXpub = trustedDerivativeInstance.xpub
           break

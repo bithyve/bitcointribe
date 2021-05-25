@@ -51,6 +51,7 @@ import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   approveTrustedContact,
+  initializeTrustedContact,
   fetchEphemeralChannel,
   fetchTrustedChannel,
   postRecoveryChannelSync,
@@ -94,6 +95,7 @@ import {
   trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
+  QRCodeTypes,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -218,6 +220,7 @@ interface HomePropsTypes {
   postRecoveryChannelSync: any;
   downloadMShare: any;
   approveTrustedContact: any;
+  initializeTrustedContact: any;
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
@@ -444,7 +447,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       const scannedData = JSON.parse( qrData )
 
-      if ( scannedData.ver ) {
+      // check version compatibility
+      if ( scannedData.version ) {
         const isAppVersionCompatible = await checkAppVersionCompatibility( {
           relayCheckMethod: scannedData.type,
           version: scannedData.ver,
@@ -456,6 +460,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       switch ( scannedData.type ) {
+          case QRCodeTypes.CONTACT_REQUEST:
+            const channelKey = scannedData.channelKey
+            const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
+            navigation.navigate( 'ContactsListForAssociateContact', {
+              postAssociation: ( contact ) => {
+                this.props.initializeTrustedContact( contact, channelKey, contactsSecondaryChannelKey )
+              }
+            } )
+            break
+
           case 'trustedGuardian':
             const trustedGuardianRequest = {
               isGuardian: scannedData.isGuardian,
@@ -2601,6 +2615,7 @@ export default withNavigationFocus(
     postRecoveryChannelSync,
     downloadMShare,
     approveTrustedContact,
+    initializeTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
     uploadSecondaryShareForPK,
