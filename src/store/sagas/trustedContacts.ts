@@ -23,6 +23,7 @@ import {
   multiUpdateTrustedChannels,
   SYNC_PERMANENT_CHANNEL,
   syncPermanentChannel,
+  INITIALIZE_TRUSTED_CONTACT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -40,7 +41,8 @@ import {
   TrustedContactRelationTypes,
   SecondaryStreamData,
   BackupStreamData,
-  ContactInfo
+  ContactInfo,
+  ContactDetails
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
@@ -65,7 +67,7 @@ import { downloadMetaShareWorker } from './sss'
 import { downloadMetaShareWorker as downloadMetaShareWorkerKeeper } from './health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
+import { addNewSecondarySubAccount, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -455,6 +457,55 @@ function* approveTrustedContactWorker( { payload } ) {
 export const approveTrustedContactWatcher = createWatcher(
   approveTrustedContactWorker,
   APPROVE_TRUSTED_CONTACT,
+)
+
+
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, isGuardian?: boolean, channelKey?: string, secondaryChannelKey?: string}} ) {
+  const accountShells: AccountShell[] = yield select(
+    ( state ) => state.accounts.accountShells,
+  )
+  const { contact, channelKey, secondaryChannelKey } = payload
+  let info = ''
+  if ( contact.phoneNumbers && contact.phoneNumbers.length ) {
+    const phoneNumber = contact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    info = number
+  } else if ( contact.emails && contact.emails.length ) {
+    info = contact.emails[ 0 ].email
+  }
+
+  const contactDetails: ContactDetails = {
+    id: contact.id,
+    contactName: contact.name,
+    info: info? info.trim(): null,
+    image: contact.imageAvailable? contact.image: null
+  }
+  const contactInfo: ContactInfo = {
+    contactDetails,
+    channelKey,
+    secondaryChannelKey
+  }
+
+  let parentShell: AccountShell
+  accountShells.forEach( ( shell: AccountShell ) => {
+    if( !shell.primarySubAccount.instanceNumber ){
+      if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
+    }
+  } )
+  const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
+    accountShellID: parentShell.id,
+    isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
+  } )
+
+  yield put(
+    addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
+  )
+}
+
+export const initializeTrustedContactWatcher = createWatcher(
+  initializeTrustedContactWorker,
+  INITIALIZE_TRUSTED_CONTACT,
 )
 
 function* removeTrustedContactWorker( { payload } ) {
