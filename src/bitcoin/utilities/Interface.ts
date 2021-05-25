@@ -548,7 +548,8 @@ export type Streams = {
 export enum TrustedContactRelationTypes {
   CONTACT = 'CONTACT',
   KEEPER  = 'KEEPER',
-  WARD = 'WARD'
+  WARD = 'WARD',
+  KEEPER_WARD = 'KEEPER_WARD'
 }
 
 export interface TrustedContact {

@@ -377,7 +377,8 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
         active: true,
         newData: true,
         lastSeen: Date.now(),
-      }
+      },
+      version: DeviceInfo.getVersion()
     }
   }
 
