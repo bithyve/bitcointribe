@@ -29,16 +29,11 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
-import { ContactDetails, ContactInfo, QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { initializeTrustedContact } from '../../store/actions/trustedContacts'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -91,42 +86,7 @@ export default function AddContactSendRequest( props ) {
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
-
-    const contactName = Contact.name
-    let info = ''
-    if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-      const phoneNumber = Contact.phoneNumbers[ 0 ].number
-      let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-      number = number.slice( number.length - 10 ) // last 10 digits only
-      info = number
-    } else if ( Contact.emails && Contact.emails.length ) {
-      info = Contact.emails[ 0 ].email
-    }
-
-    const contactDetails: ContactDetails = {
-      id: Contact.id,
-      contactName,
-      info: info? info.trim(): info,
-      image: Contact.imageAvailable? Contact.image: null
-    }
-    const contactInfo: ContactInfo = {
-      contactDetails,
-    }
-
-    let parentShell: AccountShell
-    accountShells.forEach( ( shell: AccountShell ) => {
-      if( !shell.primarySubAccount.instanceNumber ){
-        if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-      }
-    } )
-    const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
-      accountShellID: parentShell.id,
-      isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-    } )
-
-    dispatch(
-      addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
-    )
+    dispatch( initializeTrustedContact( Contact ) )
   }, [ Contact ] )
 
   useEffect( ()=> {
@@ -158,19 +118,20 @@ export default function AddContactSendRequest( props ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
 
-      const numberDL =
-        `https://hexawallet.io/${config.APP_STAGE}/${
-          'tcg'
-        }` +
-        `/${channelKey}` +
-        `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
-        `/v${appVersion}`
-      setTrustedLink( numberDL )
+      // const numberDL =
+      //   `https://hexawallet.io/${config.APP_STAGE}/${
+      //     'tcg'
+      //   }` +
+      //   `/${channelKey}` +
+      //   `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
+      //   `/v${appVersion}`
+      // setTrustedLink( numberDL )
 
       setTrustedQR(
         JSON.stringify( {
           type: QRCodeTypes.CONTACT_REQUEST,
           channelKey,
+          walletName: WALLET_SETUP.walletName,
           secondaryChannelKey,
           version: appVersion,
         } ),

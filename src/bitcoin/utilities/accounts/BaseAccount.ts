@@ -317,7 +317,8 @@ export default class BaseAccount {
   public setupDerivativeAccount = (
     accountType: string,
     accountDetails?: { accountName?: string; accountDescription?: string },
-    contactDetails?: ContactDetails
+    contactDetails?: ContactDetails,
+    channelKey?: string
   ):
     | {
         status: number;
@@ -338,7 +339,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactDetails ),
+        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactDetails, channelKey ),
       }
     } catch ( err ) {
       return {
