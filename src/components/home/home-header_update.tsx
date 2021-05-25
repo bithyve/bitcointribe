@@ -59,6 +59,7 @@ function setCurrencyCodeToImage( currencyName, currencyColor ) {
 
 const HomeHeader = ( {
   onPressNotifications,
+  navigateToQRScreen,
   notificationData,
   walletName,
   netBalance,
@@ -259,7 +260,8 @@ const HomeHeader = ( {
       <View style={{
         flexDirection: 'row'
       }}>
-        <CurrencyKindToggleSwitch
+{/* <<<<<<< Updated upstream */}
+        {/* <CurrencyKindToggleSwitch
           fiatCurrencyCode={CurrencyCode}
           onpress={() => {
             dispatch(
@@ -300,15 +302,19 @@ const HomeHeader = ( {
             ) : null}
           </ImageBackground>
         </TouchableOpacity>
-      </View>
+      </View> */}
       <View style={{
         flex: 1, justifyContent: 'center', alignItems: 'center'
+// =======
+        // <View style={{
+        // flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start'
+// >>>>>>> Stashed changes
       }}>
         <View
           style={{
             marginBottom: wp( '2%' ),
             justifyContent: 'center',
-            alignItems: 'center',
+            alignItems: 'flex-start',
           }}
         >
           <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
@@ -357,7 +363,78 @@ const HomeHeader = ( {
           </View>
         </View>
       </View>
-      <View
+        {/* <CurrencyKindToggleSwitch
+          fiatCurrencyCode={CurrencyCode}
+          onpress={() => {
+            dispatch(
+              currencyKindSet(
+                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+              )
+            )
+          }}
+          isOn={prefersBitcoin}
+        /> */}
+        <TouchableOpacity
+          onPress={navigateToQRScreen}
+          style={{
+            height: wp( '10%' ),
+            width: wp( '10%' ),
+            justifyContent: 'center',
+            marginLeft: 'auto',
+          }}
+        >
+          <ImageBackground
+            source={require( '../../assets/images/HomePageIcons/icon_qr_active.png' )}
+            style={{
+              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+            }}
+            resizeMode={'contain'}
+          >
+            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
+          </ImageBackground>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onPressNotifications}
+          style={{
+            height: wp( '10%' ),
+            width: wp( '10%' ),
+            justifyContent: 'center',
+            marginLeft: 'auto',
+          }}
+        >
+          <ImageBackground
+            source={require( '../../assets/images/icons/icon_notification.png' )}
+            style={{
+              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+            }}
+            resizeMode={'contain'}
+          >
+            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
+          </ImageBackground>
+        </TouchableOpacity>
+      </View>
+      
+      {/* <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -408,8 +485,8 @@ const HomeHeader = ( {
             size={17}
           />
         </TouchableOpacity>
-      </View>
-    </View>
+      </View> */}
+     </View>
   )
 }
 
@@ -417,7 +494,7 @@ export default HomeHeader
 
 const styles = StyleSheet.create( {
   headerViewContainer: {
-    marginTop: hp( '1%' ),
+    marginTop: hp( '2%' ),
     marginLeft: 20,
     marginRight: 20,
   },

@@ -12,7 +12,7 @@ import NewWyreAccountDetailsScreen from '../../../pages/Accounts/AddNew/WyreAcco
 import WyreOrderFormScreen from '../../../pages/WyreIntegration/WyreOrderFormScreen'
 import NewRampAccountDetailsScreen from '../../../pages/Accounts/AddNew/RampAccount/NewRampAccountDetailsScreen'
 import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScreen'
-import QRStack from '../home/QRStack';
+import QRStack from '../home/QRStack'
 
 const MODAL_ROUTES = [
   'AllTransactions',

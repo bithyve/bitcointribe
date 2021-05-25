@@ -9,6 +9,7 @@ import openLink from '../../utils/OpenLink'
 
 export type Props = {
   navigation: any;
+  containerStyle: {}
 };
 
 interface MenuOption {
@@ -76,7 +77,7 @@ const menuOptions: MenuOption[] = [
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerStyle }: Props ) => {
 
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
@@ -87,10 +88,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) =
   }
 
   return (
-    <SafeAreaView style={styles.modalContentContainer}>
-      <View style={{
+    <View style={containerStyle}>
+    {/* <SafeAreaView style={styles.modalContentContainer}> */}
+      {/* <View style={{
         flex: 1
-      }}>
+      }}> */}
         <FlatList
           data={menuOptions}
           keyExtractor={listItemKeyExtractor}
@@ -127,7 +129,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) =
             </AppBottomSheetTouchableWrapper>
           }}
         />
-      </View>
+      {/* </View> */}
 
       <View
         style={styles.webLinkBarContainer}
@@ -162,7 +164,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) =
           <Text style={styles.addModalTitleText}>Privacy Policy</Text>
         </AppBottomSheetTouchableWrapper>
       </View>
-    </SafeAreaView>
+    </View>
   )
 }
 

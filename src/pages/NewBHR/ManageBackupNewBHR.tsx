@@ -119,6 +119,7 @@ interface ManageBackupNewBHRStateTypes {
 
 interface ManageBackupNewBHRPropsTypes {
   navigation: any;
+  containerStyle: {};
   updateHealthForCloud: any;
   cloudBackupStatus: CloudBackupStatus;
   walletName: string;
@@ -818,17 +819,18 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader,
       selectedKeeper,
     } = this.state
-    const { navigation, currentLevel } = this.props
+    const { navigation, currentLevel, containerStyle } = this.props
     return (
-      <View style={{
+      <View style={containerStyle}>
+      {/* <View style={{
         flex: 1, backgroundColor: 'white'
-      }}>
+      }}> */}
         <SafeAreaView style={{
           flex: 0
         }} />
         <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
         <View style={styles.modalHeaderTitleView}>
-          <View style={{
+          {/* <View style={{
             flex: 1, flexDirection: 'row', alignItems: 'center'
           }}>
             <TouchableOpacity
@@ -841,7 +843,7 @@ class ManageBackupNewBHR extends Component<
                 size={17}
               />
             </TouchableOpacity>
-          </View>
+          </View> */}
           {/* <TouchableOpacity
             onPress={() => navigation.replace( 'Home' )}
             style={styles.headerSettingImageView}

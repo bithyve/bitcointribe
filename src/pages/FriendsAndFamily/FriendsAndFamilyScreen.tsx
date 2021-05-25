@@ -51,6 +51,8 @@ import {
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
+import ImageStyles from '../../common/Styles/ImageStyles'
+import RecipientAvatar from '../../components/RecipientAvatar'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -64,6 +66,7 @@ interface FriendsAndFamilyPropTypes {
   trustedContactsInfo: any;
   removeTrustedContact: any;
   clearTrustedContactsCache: any;
+  containerStyle: {}
 }
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
@@ -337,6 +340,25 @@ class FriendsAndFamilyScreen extends PureComponent<
     } )
   }
 
+
+  renderContactItem = ( {
+    backendContactInfo,
+    contactDescription,
+    index,
+    contactsType,
+  }: {
+    backendContactInfo: unknown;
+    contactDescription: ContactRecipientDescribing;
+    index: number;
+    contactsType: string;
+  } ) => {
+    return (
+      <View style={{ alignItems: 'center' }}>
+      <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+      <Text style={{ textAlign: 'center', marginTop: hp (0.5) }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
+      </View>
+    )
+  };
   renderContactListItem = ( {
     backendContactInfo,
     contactDescription,
@@ -355,6 +377,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         onPress={() =>
           this.handleContactSelection( backendContactInfo, index, contactsType )
         }
+        containerStyle={{ backgroundColor: 'transparent' }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
       </ListItem>
@@ -417,7 +440,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { trustedChannelsSetupSync } = this.props
+    const { trustedChannelsSetupSync, containerStyle } = this.props
 
     const {
       myKeepers: contactsKeepingUser,
@@ -427,7 +450,8 @@ class FriendsAndFamilyScreen extends PureComponent<
       showLoader
     } = this.state
     return (
-      <>
+      <View style={containerStyle}>
+        
         <ScrollView
           refreshControl={
             <RefreshControl
@@ -442,9 +466,37 @@ class FriendsAndFamilyScreen extends PureComponent<
           }}
         >
           <View style={{
-            marginTop: wp( '2%' )
+            marginTop: wp( '4%' ),
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginHorizontal: wp ( 6 ),
           }}>
-            <Text style={styles.pageTitle}>My Keepers</Text>
+            <Text
+            style={styles.pageTitle}
+            >
+              Friends & Family
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                this.setState( {
+                  isLoadContacts: true,
+                } )
+                this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
+              }}
+              style={{
+                ...styles.selectedContactsView,
+              }}
+            >
+              <Image
+                style={styles.addGrayImage}
+                source={require( '../../assets/images/icons/icon_add_grey.png' )}
+              />
+              <View>
+                <Text style={styles.contactText}>Add New</Text>
+              </View>
+            </TouchableOpacity>
+            {/* <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
             </Text>
@@ -470,10 +522,38 @@ class FriendsAndFamilyScreen extends PureComponent<
                   height: wp( '22%' ) + 30
                 }} />}
               </View>
+            </View> */}
+          </View>
+          <View style={{ width: wp ( '95%' ), height: hp ( '15%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center' }}>
+          <Text
+            style={styles.cardTitle}
+            >
+              Recently Sent
+            </Text>
+            <View style={{ flexDirection: 'row',  alignSelf: 'flex-start', marginHorizontal: wp( 3 ), marginTop: hp ( '1%' )  }}>
+            {( otherTrustedContacts.length > 0 &&
+                    otherTrustedContacts.map( ( item, index ) => {
+                      return this.renderContactItem( {
+                        backendContactInfo: item,
+                        contactDescription: makeContactRecipientDescription(
+                          item,
+                          ContactTrustKind.OTHER,
+                        ),
+                        index,
+                        contactsType: 'Other Contacts',
+                      } )
+                    } ) ) || <View style={{
+                    height: wp( '22%' ) + 30
+                  }} />}
             </View>
           </View>
+          
+          
+          <View >
 
-          <View style={{
+          </View>
+
+          {/* <View style={{
             marginTop: wp( '5%' )
           }}>
             <Text style={styles.pageTitle}>I am the Keeper of</Text>
@@ -503,16 +583,11 @@ class FriendsAndFamilyScreen extends PureComponent<
                 }} />}
               </View>
             </View>
-          </View>
+          </View> */}
 
           <View style={{
             marginTop: wp( '5%' )
           }}>
-            <Text style={styles.pageTitle}>Other Contacts</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts who I can pay directly
-            </Text>
-
             <View style={{
               marginBottom: 15
             }}>
@@ -533,29 +608,6 @@ class FriendsAndFamilyScreen extends PureComponent<
                   } ) ) || <View style={{
                   height: wp( '22%' ) + 30
                 }} />}
-
-                <TouchableOpacity
-                  onPress={() => {
-                    this.setState( {
-                      isLoadContacts: true,
-                    } )
-                    this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
-                  }}
-                  style={{
-                    ...styles.selectedContactsView,
-                    paddingBottom: 7,
-                    paddingTop: 7,
-                    marginTop: 0,
-                  }}
-                >
-                  <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  />
-                  <View>
-                    <Text style={styles.contactText}>Add a Contact</Text>
-                  </View>
-                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -603,7 +655,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             } )
           }}
         />
-      </>
+      </View>
     )
   }
 }
@@ -635,11 +687,31 @@ export default connect( mapStateToProps, {
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageLarge,
+    borderRadius: wp( 14 )/2,
+    marginHorizontal: wp ( 1 )
+  },
+  accountCardsSectionContainer: {
+    flex: 13,
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   contactText: {
-    marginLeft: 10,
+    // marginLeft: 10,
+    marginHorizontal: wp ( 1 ),
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
-    color: Colors.textColorGrey,
+    color: Colors.white,
   },
   phoneText: {
     marginTop: 3,
@@ -649,21 +721,32 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
   },
   selectedContactsView: {
-    marginLeft: 20,
+    // marginLeft: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 20,
-    marginTop: 5,
-    paddingBottom: 15,
-    paddingTop: 15,
-    borderBottomWidth: 1,
-    borderColor: Colors.borderColor,
+    justifyContent: 'space-around',
+    // marginRight: 20,
+    // marginTop: 5,
+    // paddingBottom: 15,
+    // paddingTop: 15,
+    // borderBottomWidth: 1,
+    // borderColor: Colors.borderColor,
+    backgroundColor: Colors.blue,
+    borderRadius: wp ( 2 )
   },
   pageTitle: {
-    marginLeft: 30,
     color: Colors.blue,
-    fontSize: RFValue( 14 ),
-    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 16 ),
+    // fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  cardTitle: {
+    color: Colors.blue,
+    fontSize: RFValue( 12 ),
+    // fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
+    marginVertical: wp( 2 ),
+    marginHorizontal: wp( 4 )
   },
   pageInfoText: {
     marginLeft: 30,

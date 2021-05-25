@@ -13,6 +13,8 @@ import {
   Keyboard,
   PermissionsAndroid,
   RefreshControl,
+  ViewStyle,
+  StyleProp,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
@@ -163,6 +165,7 @@ interface UpgradeBackupPropsTypes {
   updateTrustedContactsInfoLocally: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
   secureAccount: SecureAccount;
+  containerStyle: StyleProp<ViewStyle>;
 }
 
 class UpgradeBackup extends Component<
@@ -1070,11 +1073,12 @@ class UpgradeBackup extends Component<
 
   render() {
     const { listData, contactToShow, isCloudBackupProcessing, showLoader } = this.state
-    const { navigation } = this.props
+    const { navigation, containerStyle } = this.props
     return (
-      <View style={{
+      <View style={containerStyle}>
+      {/* <View style={{
         flex: 1, backgroundColor: Colors.backgroundColor1
-      }}>
+      }}> */}
         <SafeAreaView style={{
           flex: 0
         }} />

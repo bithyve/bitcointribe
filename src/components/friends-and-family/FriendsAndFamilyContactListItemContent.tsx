@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientAvatar from '../RecipientAvatar'
@@ -163,7 +163,10 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
         </ListItem.Content>
       )}
 
-      <ListItem.Chevron />
+      <Image
+        style={{width: 15, height: 15}}
+        source={require('../../assets/images/icons/own-node.png')}
+        />
     </>
   )
 }
