@@ -1,5 +1,5 @@
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
@@ -55,6 +55,12 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     present: openArchiveModal,
     dismiss: closeArchiveModal,
   } = useBottomSheetModal()
+
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
   const listItems = useMemo<SettingsListItem[]>( () => {
     return [

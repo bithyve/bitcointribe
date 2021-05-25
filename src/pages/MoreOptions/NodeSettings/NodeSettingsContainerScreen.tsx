@@ -20,7 +20,7 @@ export type Props = {
   navigation: any;
 };
 
-const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
+const NodeSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const nodeSettingsState = useNodeSettingsState()
   const activePersonalNode = useActivePersonalNode()
@@ -39,6 +39,12 @@ const NodeSettingsContainerScreen: React.FC<Props> = ( ) => {
     if( nodeSettingsState.prefersPersonalNodeConnection && !activePersonalNode )
       dispatch( personalNodePreferenceToggled( false ) )
   }, [] )
+
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
   const [ isEditingPersonalNodeConnection, setIsEditingPersonalNodeConnection ] = useState( false )
   const [ isKeyboardVisible, setKeyboardVisible ] = useState( false )

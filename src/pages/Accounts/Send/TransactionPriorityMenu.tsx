@@ -51,6 +51,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
       ? NetworkKind.TESTNET : NetworkKind.MAINNET
   }, [ sourceSubAccount.sourceKind, config ] )
 
+
   const showCustomPriorityBottomSheet = useCallback( () => {
     presentBottomSheet(
       <CustomPriorityContent
