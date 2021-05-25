@@ -87,7 +87,11 @@ export default function AddContactSendRequest( props ) {
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
-    if ( !Contact ) return
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    for( const contact of Object.values( contacts ) ){
+      if ( contact.contactDetails.id === Contact.id ) return
+    }
+
     const contactName = Contact.name
     let info = ''
     if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
@@ -125,13 +129,21 @@ export default function AddContactSendRequest( props ) {
     )
   }, [ Contact ] )
 
+  useEffect( ()=> {
+    if ( !Contact ) return
+    createTrustedContact()
+    if( trustedLink || trustedQR ){
+      setTrustedLink( '' )
+      setTrustedQR( '' )
+    }
+  }, [ Contact ] )
+
   useEffect( () => {
     if( !Contact ) return
 
     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
     let currentContact: TrustedContact
     let channelKey: string
-
 
     if( contacts )
       for( const ck of Object.keys( contacts ) ){
@@ -146,33 +158,39 @@ export default function AddContactSendRequest( props ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
 
-      if ( !trustedQR ) {
-        setTrustedQR(
-          JSON.stringify( {
-            type: QRCodeTypes.CONTACT_REQUEST,
-            channelKey,
-            secondaryChannelKey,
-            version: appVersion,
-          } ),
-        )
-      }
-    } else {
-      createTrustedContact()
+      const numberDL =
+        `https://hexawallet.io/${config.APP_STAGE}/${
+          'tcg'
+        }` +
+        `/${channelKey}` +
+        `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
+        `/v${appVersion}`
+      setTrustedLink( numberDL )
+
+      setTrustedQR(
+        JSON.stringify( {
+          type: QRCodeTypes.CONTACT_REQUEST,
+          channelKey,
+          secondaryChannelKey,
+          version: appVersion,
+        } ),
+      )
     }
   }, [ Contact, trustedContacts ] )
 
-  const openTimer = async () => {
-    setTimeout( () => {
-      setRenderTimer( true )
-    }, 2 )
-    const TCRequestTimer = JSON.parse(
-      await AsyncStorage.getItem( 'TCRequestTimer' ),
-    );
-    ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-    if ( !TCRequestTimer ) {
-      ( TimerModalBottomSheet as any ).current.snapTo( 1 )
-    }
-  }
+
+  // const openTimer = async () => {
+  //   setTimeout( () => {
+  //     setRenderTimer( true )
+  //   }, 2 )
+  //   const TCRequestTimer = JSON.parse(
+  //     await AsyncStorage.getItem( 'TCRequestTimer' ),
+  //   );
+  //   ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
+  //   if ( !TCRequestTimer ) {
+  //     ( TimerModalBottomSheet as any ).current.snapTo( 1 )
+  //   }
+  // }
 
   const renderSendViaLinkContents = useCallback( () => {
     if ( !isEmpty( Contact ) ) {
@@ -201,7 +219,7 @@ export default function AddContactSendRequest( props ) {
             if ( isOTPType ) {
               shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
             } else {
-              openTimer()
+              // openTimer()
             }
             ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
           }}
@@ -240,7 +258,7 @@ export default function AddContactSendRequest( props ) {
         }}
         onPressDone={() => {
           ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-          openTimer()
+          // openTimer()
         }}
         onPressShare={() => {
           setTimeout( () => {
@@ -249,7 +267,7 @@ export default function AddContactSendRequest( props ) {
           if ( isOTPType ) {
             shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
           } else {
-            openTimer()
+            // openTimer()
           }
           ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
         }}
@@ -273,7 +291,7 @@ export default function AddContactSendRequest( props ) {
         }}
         onPressDone={() => {
           ( SendViaQRBottomSheet as any ).current.snapTo( 0 )
-          openTimer()
+          // openTimer()
         }}
       />
     )
@@ -425,7 +443,7 @@ export default function AddContactSendRequest( props ) {
             </View>
             <TouchableOpacity
               onPress={() => {
-                createTrustedContact()
+                // createTrustedContact()
                 props.navigation.goBack()
               }}
               style={{
@@ -464,7 +482,7 @@ export default function AddContactSendRequest( props ) {
             props.navigation.goBack()
           }}
           onPressDone={() => {
-            openTimer()
+            // openTimer()
           }}
           onPressShare={() => {
             setTimeout( () => {
@@ -473,7 +491,7 @@ export default function AddContactSendRequest( props ) {
             if ( isOTPType ) {
               shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
             } else {
-              openTimer()
+              // openTimer()
             }
           }}
         />
