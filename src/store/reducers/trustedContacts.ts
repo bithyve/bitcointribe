@@ -10,7 +10,6 @@ import {
   SWITCH_TC_LOADING,
   APPROVE_TRUSTED_CONTACT,
   CLEAR_TRUSTED_CONTACTS_CACHE,
-  UPDATE_ADDRESS_BOOK_LOCALLY,
   UPGRADE_REDUCER,
 } from '../actions/trustedContacts'
 import {
@@ -23,14 +22,6 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import idx from 'idx'
-
-export type AddressBook = {
-  myKeepers: ContactRecipientDescribing[];
-  contactsKeptByUser: ContactRecipientDescribing[];
-  otherTrustedContacts: ContactRecipientDescribing[];
-  trustedContacts: ContactRecipientDescribing[];
-};
-
 
 export type TrustedContactsState = {
   service: TrustedContactsService;
@@ -59,8 +50,6 @@ export type TrustedContactsState = {
     approvingTrustedContact: boolean;
     walletCheckIn: boolean;
   };
-
-  addressBook: AddressBook;
   trustedContactRecipients: ContactRecipientDescribing[];
 };
 
@@ -78,7 +67,6 @@ const initialState: TrustedContactsState = {
     approvingTrustedContact: false,
     walletCheckIn: false,
   },
-  addressBook: null,
   trustedContactRecipients: [],
 }
 
@@ -193,12 +181,6 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
               action.payload.beingLoaded
             ],
           },
-        }
-
-      case UPDATE_ADDRESS_BOOK_LOCALLY:
-        return {
-          ...state,
-          addressBook: action.payload,
         }
 
       case UPGRADE_REDUCER:

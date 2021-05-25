@@ -22,7 +22,6 @@ export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
 export const SYNC_PERMANENT_CHANNEL = 'SYNC_PERMANENT_CHANNEL'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
-export const UPDATE_ADDRESS_BOOK_LOCALLY = 'UPDATE_ADDRESS_BOOK_LOCALLY'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
@@ -288,14 +287,6 @@ export const switchTCLoading = ( beingLoaded ) => {
     },
   }
 }
-
-const updateAddressBookLocallyRequest = createAction(
-  UPDATE_ADDRESS_BOOK_LOCALLY,
-)
-
-export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
-  dispatch( updateAddressBookLocallyRequest( payload ) )
-
 export const upgradeReducer = (  ) => {
   return {
     type: UPGRADE_REDUCER,
