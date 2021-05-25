@@ -306,6 +306,7 @@ export default class TrustedContactsService {
     channelKey: string,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    contactsSecondaryChannelKey?: string,
   ): Promise<
     | {
         status: number;
@@ -333,6 +334,7 @@ export default class TrustedContactsService {
           channelKey,
           secondaryChannelKey,
           unEncryptedOutstreamUpdates,
+          contactsSecondaryChannelKey,
         )
       }
     } catch ( err ) {

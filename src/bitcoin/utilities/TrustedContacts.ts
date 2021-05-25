@@ -904,6 +904,7 @@ export default class TrustedContacts {
     channelKey: string,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    contactsSecondaryChannelKey?: string
   ): Promise<{
     updated: boolean;
   }> => {
@@ -919,6 +920,7 @@ export default class TrustedContacts {
             .digest( 'hex' ),
           relationType: idx( unEncryptedOutstreamUpdates, ( _ ) => _.primaryData.relationType ),
           secondaryChannelKey,
+          contactsSecondaryChannelKey
         }
         this.trustedContactsV2[ channelKey ] = newContact
         contact = newContact

@@ -481,6 +481,7 @@ export interface ContactInfo  {
   isGuardian?: boolean,
   channelKey?: string,
   secondaryChannelKey?: string
+  contactsSecondaryChannelKey?: string,
   channelAssets?: {
     primaryMnemonicShard?: any,
     keeperInfo?: any,
@@ -560,6 +561,7 @@ export interface TrustedContact {
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
   secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
   walletID?: string, // contact's walletId
+  contactsSecondaryChannelKey?: string, // contacts secondaryKey(stored locally)
 }
 export interface Trusted_Contacts {
   [channelKey: string]: TrustedContact

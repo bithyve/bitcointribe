@@ -119,7 +119,8 @@ import {
   postRecoveryChannelSyncWatcher,
   multiUpdateTrustedChannelsWatcher,
   sendVersionUpdateNotificationWatcher,
-  syncPermanentChannelWatcher
+  syncPermanentChannelWatcher,
+  initializeTrustedContactWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -299,6 +300,7 @@ const rootSaga = function* () {
 
     // Trusted Contacts
     approveTrustedContactWatcher,
+    initializeTrustedContactWatcher,
     removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
     fetchEphemeralChannelWatcher,

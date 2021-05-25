@@ -15,6 +15,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
+export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
@@ -52,6 +53,23 @@ export const approveTrustedContact = (
       contactsWalletName,
       isGuardian,
       isFromKeeper,
+    },
+  }
+}
+
+export const initializeTrustedContact = (
+  contact: any,
+  isGuardian?: boolean,
+  channelKey?: string,
+  contactsSecondaryChannelKey?: string,
+) => {
+  return {
+    type: INITIALIZE_TRUSTED_CONTACT,
+    payload: {
+      contact,
+      isGuardian,
+      channelKey,
+      contactsSecondaryChannelKey,
     },
   }
 }
