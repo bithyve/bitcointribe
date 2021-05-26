@@ -56,14 +56,14 @@ const AddNewAccountStack = createStackNavigator(
   },
   {
     initialRouteName: 'AccountSelectionList',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
-      }
-    },
+    // defaultNavigationOptions: ( { navigation } ) => {
+    //   return {
+    //     ...defaultStackScreenNavigationOptions,
+    //     headerLeft: () => {
+    //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+    //     },
+    //   }
+    // },
   },
 )
 

@@ -1,11 +1,12 @@
 import React from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView, ImageSourcePropType } from 'react-native'
+import { View, Text, StyleSheet, Linking, FlatList, Image, ImageBackground, StatusBar, ImageSourcePropType } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import openLink from '../../utils/OpenLink'
+import Header from '../../navigation/stacks/Header'
 
 export type Props = {
   navigation: any;
@@ -88,9 +89,22 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
   }
 
   return (
-    <View style={containerStyle}>
-    {/* <SafeAreaView style={styles.modalContentContainer}> */}
-      {/* <View style={{
+    <ImageBackground
+      source={require( '../../assets/images/home-bg.png' )}
+      style={{
+        width: '100%',
+        height: '100%',
+        flex: 1,
+      }}
+      imageStyle={{
+        resizeMode: 'stretch',
+      }}
+    >
+      <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+      <Header />
+      <View style={styles.accountCardsSectionContainer}>
+        {/* <SafeAreaView style={styles.modalContentContainer}> */}
+        {/* <View style={{
         flex: 1
       }}> */}
         <FlatList
@@ -129,46 +143,61 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
             </AppBottomSheetTouchableWrapper>
           }}
         />
-      {/* </View> */}
-
-      <View
-        style={styles.webLinkBarContainer}
-      >
-        <AppBottomSheetTouchableWrapper
-          onPress={() => openLink( 'http://hexawallet.io/faq' )}
-        >
-          <Text style={styles.addModalTitleText}>FAQs</Text>
-        </AppBottomSheetTouchableWrapper>
+        {/* </View> */}
 
         <View
-          style={{
-            height: 20, width: 1, backgroundColor: Colors.borderColor
-          }}
-        />
-
-        <AppBottomSheetTouchableWrapper
-          onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+          style={styles.webLinkBarContainer}
         >
-          <Text style={styles.addModalTitleText}>Terms of Service</Text>
-        </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper
+            onPress={() => openLink( 'http://hexawallet.io/faq' )}
+          >
+            <Text style={styles.addModalTitleText}>FAQs</Text>
+          </AppBottomSheetTouchableWrapper>
 
-        <View
-          style={{
-            height: 20, width: 1, backgroundColor: Colors.borderColor
-          }}
-        />
+          <View
+            style={{
+              height: 20, width: 1, backgroundColor: Colors.borderColor
+            }}
+          />
 
-        <AppBottomSheetTouchableWrapper
-          onPress={() => openLink( 'http://hexawallet.io/privacy-policy' )}
-        >
-          <Text style={styles.addModalTitleText}>Privacy Policy</Text>
-        </AppBottomSheetTouchableWrapper>
+          <AppBottomSheetTouchableWrapper
+            onPress={() => openLink( 'https://hexawallet.io/terms-of-service/' )}
+          >
+            <Text style={styles.addModalTitleText}>Terms of Service</Text>
+          </AppBottomSheetTouchableWrapper>
+
+          <View
+            style={{
+              height: 20, width: 1, backgroundColor: Colors.borderColor
+            }}
+          />
+
+          <AppBottomSheetTouchableWrapper
+            onPress={() => openLink( 'http://hexawallet.io/privacy-policy' )}
+          >
+            <Text style={styles.addModalTitleText}>Privacy Policy</Text>
+          </AppBottomSheetTouchableWrapper>
+        </View>
       </View>
-    </View>
+    </ImageBackground>
   )
 }
 
 const styles = StyleSheet.create( {
+  accountCardsSectionContainer: {
+    flex: 13,
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   modalContentContainer: {
     flex: 1,
     justifyContent: 'space-between',

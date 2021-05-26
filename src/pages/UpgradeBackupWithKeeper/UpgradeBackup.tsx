@@ -1075,8 +1075,8 @@ class UpgradeBackup extends Component<
     const { listData, contactToShow, isCloudBackupProcessing, showLoader } = this.state
     const { navigation, containerStyle } = this.props
     return (
-      <View style={containerStyle}>
-      {/* <View style={{
+      <View style={styles.accountCardsSectionContainer}>
+        {/* <View style={{
         flex: 1, backgroundColor: Colors.backgroundColor1
       }}> */}
         <SafeAreaView style={{
@@ -1559,6 +1559,20 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  accountCardsSectionContainer: {
+    flex: 13,
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   modalHeaderTitleView: {
     alignItems: 'center',
     flexDirection: 'row',

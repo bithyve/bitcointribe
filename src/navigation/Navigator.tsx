@@ -59,7 +59,9 @@ import Intermediate from '../pages/Intermediate'
 import NewOwnQuestions from '../pages/NewOwnQuestions'
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
+import FriendsAndFamily from './stacks/F&F/F&FStack'
 import SendStack from './stacks/send/SendStack'
+import Colors from '../common/Colors'
 import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../pages/WyreIntegration/WyreIntegrationScreen'
 
@@ -86,6 +88,17 @@ import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKe
 // import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
 import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../pages/NewBHR/CloudBackupHistory'
+import { createBottomTabNavigator } from 'react-navigation-tabs'
+// import Bottomtab from './Bottomtab'
+// import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs'
+// import TabNavigator from './TabNavigator'
+// import { BottomTab } from '../components/home/custom-bottom-tabs'
+import Boottomtab from './Bottomtab'
+import { Text, View } from 'react-native'
+
+import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
+import SecurityStack from './stacks/security/Security&Privacy'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -138,96 +151,96 @@ const HomeNavigator = createStackNavigator(
       screen: HomeStack,
       path: 'home',
     },
-    ReLogin: {
-      screen: ReLogin,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    Intermediate,
-    AccountDetails: {
-      screen: AccountDetailsStack,
-    },
-    ManageBackup,
-    SecondaryDevice,
-    TrustedContacts,
-    CustodianRequestOTP,
-    CustodianRequestAccepted,
-    HealthCheck,
-    SecondaryDeviceHealthCheck,
-    TrustedContactHealthCheck,
-    NoteHealthCheck,
-    CloudHealthCheck,
-    SweepFundsFromExistingAccount,
-    NewWalletNameRegenerateShare,
-    NewWalletQuestionRegenerateShare,
-    NewWalletGenerationOTP,
-    WalletCreationSuccess,
-    SecureScan,
-    GoogleAuthenticatorOTP,
-    SecondaryDeviceHistory,
-    SecondaryDeviceHistoryNewBHR,
-    TrustedContactHistory,
-    PersonalCopyHistory,
-    SecurityQuestionHistory,
-    SettingGetNewPin,
-    ContactsListForAssociateContact,
-    NewTwoFASecret,
-    TwoFASweepFunds,
-    SendRequest,
-    VoucherScanner,
-    AddContactSendRequest,
-    ContactDetails,
-    Receive,
-    PairNewWallet,
-    // ManageBackupKeeper,
-    ManageBackupNewBHR,
-    // SecurityQuestionHistoryKeeper,
-    SecurityQuestionHistoryNewBHR,
-    // KeeperFeatures,
-    // TrustedContactHistoryKeeper,
-    TrustedContactHistoryNewBHR,
-    // KeeperDeviceHistory,
-    // PersonalCopyHistoryKeeper,
-    PersonalCopyHistoryNewBHR,
-    CloudBackupHistory,
-    NewOwnQuestions,
-    RestoreWithICloud,
-    RestoreWithoutICloud,
-    SettingsContents,
-    SweepFunds,
-    SweepFundsEnterAmount,
-    SweepFundUseExitKey,
-    SweepConfirmation,
-    ScanRecoveryKey,
-    UpgradeBackup,
-    ConfirmKeys,
-    ManageBackupUpgradeSecurity,
-    TwoFAValidation,
-    TwoFASetup: {
-      screen: TwoFASetup,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    UpdateApp: {
-      screen: UpdateApp,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    PasscodeChangeSuccessPage: {
-      screen: PasscodeChangeSuccessPage,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    WyreIntegrationScreen: {
-      screen: WyreIntegrationScreen,
-      navigationOptions: {
-        title: 'Wyre Home'
-      }
-    },
+    // ReLogin: {
+    //   screen: ReLogin,
+    //   navigationOptions: {
+    //     gesturesEnabled: false,
+    //   },
+    // },
+    // Intermediate,
+    // AccountDetails: {
+    //   screen: AccountDetailsStack,
+    // },
+    // ManageBackup,
+    // SecondaryDevice,
+    // TrustedContacts,
+    // CustodianRequestOTP,
+    // CustodianRequestAccepted,
+    // HealthCheck,
+    // SecondaryDeviceHealthCheck,
+    // TrustedContactHealthCheck,
+    // NoteHealthCheck,
+    // CloudHealthCheck,
+    // SweepFundsFromExistingAccount,
+    // NewWalletNameRegenerateShare,
+    // NewWalletQuestionRegenerateShare,
+    // NewWalletGenerationOTP,
+    // WalletCreationSuccess,
+    // SecureScan,
+    // GoogleAuthenticatorOTP,
+    // SecondaryDeviceHistory,
+    // SecondaryDeviceHistoryNewBHR,
+    // TrustedContactHistory,
+    // PersonalCopyHistory,
+    // SecurityQuestionHistory,
+    // SettingGetNewPin,
+    // ContactsListForAssociateContact,
+    // NewTwoFASecret,
+    // TwoFASweepFunds,
+    // SendRequest,
+    // VoucherScanner,
+    // AddContactSendRequest,
+    // ContactDetails,
+    // Receive,
+    // PairNewWallet,
+    // // ManageBackupKeeper,
+    // ManageBackupNewBHR,
+    // // SecurityQuestionHistoryKeeper,
+    // SecurityQuestionHistoryNewBHR,
+    // // KeeperFeatures,
+    // // TrustedContactHistoryKeeper,
+    // TrustedContactHistoryNewBHR,
+    // // KeeperDeviceHistory,
+    // // PersonalCopyHistoryKeeper,
+    // PersonalCopyHistoryNewBHR,
+    // CloudBackupHistory,
+    // NewOwnQuestions,
+    // RestoreWithICloud,
+    // RestoreWithoutICloud,
+    // SettingsContents,
+    // SweepFunds,
+    // SweepFundsEnterAmount,
+    // SweepFundUseExitKey,
+    // SweepConfirmation,
+    // ScanRecoveryKey,
+    // UpgradeBackup,
+    // ConfirmKeys,
+    // ManageBackupUpgradeSecurity,
+    // TwoFAValidation,
+    // TwoFASetup: {
+    //   screen: TwoFASetup,
+    //   navigationOptions: {
+    //     gesturesEnabled: false,
+    //   },
+    // },
+    // UpdateApp: {
+    //   screen: UpdateApp,
+    //   navigationOptions: {
+    //     gesturesEnabled: false,
+    //   },
+    // },
+    // PasscodeChangeSuccessPage: {
+    //   screen: PasscodeChangeSuccessPage,
+    //   navigationOptions: {
+    //     gesturesEnabled: false,
+    //   },
+    // },
+    // WyreIntegrationScreen: {
+    //   screen: WyreIntegrationScreen,
+    //   navigationOptions: {
+    //     title: 'Wyre Home'
+    //   }
+    // },
   },
   {
     headerLayoutPreset: 'center',
@@ -259,10 +272,40 @@ const HomeNavigator = createStackNavigator(
     },
   },
 )
+// const TabNavigator = createBottomTabNavigator( {
+//   Home: HomeNavigator,
+//   Settings: AccountDetailsStack,
+// } )
+
+const Bottomtab = createMaterialBottomTabNavigator(
+  {
+    Home: {
+      screen: HomeStack,
+
+    },
+    Freiend: FriendsAndFamily,
+    // },
+    Securiy: {
+      screen: SecurityStack
+    },
+    Setting: {
+      screen: MoreOptionsStack,
+    },
+  },
+
+  {
+    barStyle: {
+      overflow:'hidden',
+      backgroundColor: Colors.blue,
+      borderRadius: 45,
+      margin: 15
+    },
+  }
+)
 
 const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
-  HomeNav: HomeNavigator,
+  HomeNav: Bottomtab,
 } )
 
 

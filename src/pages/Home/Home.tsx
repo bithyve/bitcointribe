@@ -153,6 +153,7 @@ import FriendsAndFamilyScreen from '../FriendsAndFamily/FriendsAndFamilyScreen'
 import ManageBackupNewBHR from '../NewBHR/ManageBackupNewBHR'
 import UpgradeBackup from '../UpgradeBackupWithKeeper/UpgradeBackup'
 import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScreen'
+import Header from '../../navigation/stacks/Header'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -358,7 +359,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       onCodeScanned: this.processQRData,
     } )
   };
-  
+
 
   onPressNotifications = async () => {
     const notificationList = JSON.parse(
@@ -682,7 +683,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
       ( created ) => {}
-        // console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+      // console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
     )
 
     PushNotification.localNotification( {
@@ -1493,7 +1494,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   handleBottomTabSelection = ( tab: BottomTab ) => {
     // console.log('handleBottomTabSelection', tab);
-    
+
     this.setState( {
       selectedBottomTab: tab,
     } )
@@ -2221,233 +2222,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
-  renderBottomSheetContent() {
-    const { UNDER_CUSTODY, navigation } = this.props
-    const { custodyRequest } = this.state
-
-    switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return (
-            <>
-              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-                // onPress={this.closeBottomSheet}
-              />
-            </>
-          )
-
-        case BottomSheetKind.SWAN_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetSwanInfo
-                swanDeepLinkContent={this.state.swanDeepLinkContent}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetWyreInfo
-                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-
-        case BottomSheetKind.RAMP_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
-              <BottomSheetRampInfo
-                rampDeepLinkContent={this.state.rampDeepLinkContent}
-                rampFromBuyMenu={this.state.rampFromBuyMenu}
-                rampFromDeepLink={this.state.rampFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-          return (
-            <>
-              <CustodianRequestModalContents
-                userName={custodyRequest.requester}
-                onPressAcceptSecret={() => {
-                  this.closeBottomSheet()
-
-                  if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
-                    Alert.alert(
-                      'Request expired!',
-                      'Please ask the sender to initiate a new request',
-                    )
-                  } else {
-                    if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
-                      Alert.alert(
-                        'Failed to store',
-                        'You cannot custody multiple shares of the same user.',
-                      )
-                    } else {
-                      if ( custodyRequest.isQR ) {
-                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
-                      } else {
-                        navigation.navigate( 'CustodianRequestOTP', {
-                          custodyRequest,
-                        } )
-                      }
-                    }
-                  }
-                }}
-                onPressRejectSecret={() => {
-                  this.closeBottomSheet()
-                  this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
-                }}
-              />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-              />
-            </>
-          )
-        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
-          return (
-            <CustodianRequestRejectedModalContents
-              onPressViewTrustedContacts={this.closeBottomSheet}
-              userName={custodyRequest.requester}
-            />
-          )
-
-        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest, recoveryRequest } = this.state
-
-          return (
-            <TrustedContactRequestContent
-              trustedContactRequest={trustedContactRequest}
-              recoveryRequest={recoveryRequest}
-              onPressAccept={this.onTrustedContactRequestAccepted}
-              onPressReject={this.onTrustedContactRejected}
-              onPhoneNumberChange={this.onPhoneNumberChange}
-              bottomSheetRef={this.bottomSheetRef}
-            />
-          )
-
-        case BottomSheetKind.NOTIFICATIONS_LIST:
-          const { notificationLoading, notificationData } = this.state
-
-          return (
-            <NotificationListContent
-              notificationLoading={notificationLoading}
-              NotificationData={notificationData}
-              onNotificationClicked={this.onNotificationClicked}
-              onPressBack={this.closeBottomSheet}
-            />
-          )
-
-        case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
-          const { isLoadContacts, selectedContact } = this.state
-
-          return (
-            <AddContactAddressBook
-              isLoadContacts={isLoadContacts}
-              proceedButtonText={'Confirm & Proceed'}
-              onPressContinue={() => {
-                if ( selectedContact && selectedContact.length ) {
-                  this.closeBottomSheet()
-
-                  navigation.navigate( 'AddContactSendRequest', {
-                    SelectedContact: selectedContact,
-                  } )
-                }
-              }}
-              onSelectContact={( selectedContact ) => {
-                this.setState( {
-                  selectedContact,
-                } )
-              }}
-              onPressBack={this.closeBottomSheet}
-              onSkipContinue={() => {
-                let { skippedContactsCount } = this.props.trustedContacts.tc
-                let data
-                if ( !skippedContactsCount ) {
-                  skippedContactsCount = 1
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount}`,
-                    name: `F&F request awaiting ${skippedContactsCount}`,
-                  }
-                } else {
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount + 1}`,
-                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                  }
-                }
-
-                this.closeBottomSheet()
-
-                navigation.navigate( 'AddContactSendRequest', {
-                  SelectedContact: [ data ],
-                } )
-              }}
-            />
-          )
-
-        case BottomSheetKind.ERROR:
-          const { errorMessageHeader, errorMessage } = this.state
-
-          return (
-            <ErrorModalContents
-              title={errorMessageHeader}
-              info={errorMessage}
-              onPressProceed={this.closeBottomSheet}
-              isBottomImage={true}
-              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
-            />
-          )
-
-        case BottomSheetKind.CLOUD_ERROR:
-          return (
-            <ErrorModalContents
-              title={'Automated Cloud Backup Error'}
-              info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
-              note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
-              onPressProceed={()=>{
-                this.props.setCloudData()
-                this.closeBottomSheet()
-              }}
-              onPressIgnore={()=> {
-                this.props.updateCloudPermission( false )
-                this.closeBottomSheet()
-              }}
-              proceedButtonText={'Try Again'}
-              cancelButtonText={'Skip'}
-              isIgnoreButton={true}
-              isBottomImage={true}
-              isBottomImageStyle={styles.cloudErrorModalImage}
-              bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
-            />
-          )
-
-        default:
-          break
-    }
-  }
-
   render() {
     const { netBalance, notificationData, currencyCode, selectedBottomTab } = this.state
 
@@ -2458,7 +2232,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentLevel,
       newBHRFlowStarted
     } = this.props
-console.log('newBHRFlowStarted >>>>>>>.', newBHRFlowStarted);
+    // console.log( 'newBHRFlowStarted >>>>>>>.', newBHRFlowStarted )
 
     return (
       <ImageBackground
@@ -2473,13 +2247,14 @@ console.log('newBHRFlowStarted >>>>>>>.', newBHRFlowStarted);
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <View
+        <Header />
+        {/* <View
           style={{
             flex: 3.8,
             paddingTop:
-              Platform.OS == 'ios' && DeviceInfo.hasNotch
-                ? heightPercentageToDP( '5%' )
-                : 0,
+                Platform.OS == 'ios' && DeviceInfo.hasNotch
+                  ? heightPercentageToDP( '5%' )
+                  : 0,
           }}
         >
           <HomeHeader
@@ -2498,22 +2273,22 @@ console.log('newBHRFlowStarted >>>>>>>.', newBHRFlowStarted);
             // navigation={this.props.navigation}
             // overallHealth={overallHealth}
           />
-        </View>
-        {selectedBottomTab === BottomTab.Home && <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />}
+        </View> */}
+        {/* {selectedBottomTab === BottomTab.Home && <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />}
         {selectedBottomTab === BottomTab.FriendsAndFamily && <FriendsAndFamilyScreen navigation={navigation} containerStyle={styles.accountCardsSectionContainer} />}
         {selectedBottomTab === BottomTab.SecurityAndPrivacy && !newBHRFlowStarted && <ManageBackupNewBHR containerStyle={styles.accountCardsSectionContainer}/>}
         {selectedBottomTab === BottomTab.SecurityAndPrivacy && newBHRFlowStarted && <UpgradeBackup containerStyle={styles.accountCardsSectionContainer} />}
-        {selectedBottomTab === BottomTab.Settings && <MoreOptionsContainerScreen containerStyle={styles.accountCardsSectionContainer} navigation={navigation} />}
-        {/* <HomeContainer /> */}
-        <HomeBuyCard
-              cardContainer={styles.cardContainer}
-              amount={'5664.80'}
-              incramount={'55.09'}
-              percentIncr={'2.1'}
-              asset={ require( '../../assets/images/currencySymbols/icon_dollar_light.png' )}
-              openBottomSheet={(value) => this.openBottomSheet(value)}
-            />
-        <CustomBottomTabs
+        {selectedBottomTab === BottomTab.Settings && <MoreOptionsContainerScreen containerStyle={styles.accountCardsSectionContainer} navigation={navigation} />} */}
+        <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />
+        {/* <HomeBuyCard
+          cardContainer={styles.cardContainer}
+          amount={'5664.80'}
+          incramount={'55.09'}
+          percentIncr={'2.1'}
+          asset={ require( '../../assets/images/currencySymbols/icon_dollar_light.png' )}
+          openBottomSheet={( value ) => this.openBottomSheet( value )}
+        /> */}
+        {/* <CustomBottomTabs
           onSelect={this.handleBottomTabSelection}
           tabBarZIndex={
             this.state.currentBottomSheetKind ==
@@ -2521,8 +2296,8 @@ console.log('newBHRFlowStarted >>>>>>>.', newBHRFlowStarted);
               ? 0
               : 0
           }
-        />
-        <BottomSheetBackground
+        /> */}
+        {/* <BottomSheetBackground
           isVisible={this.state.bottomSheetState === BottomSheetState.Open}
           onPress={this.closeBottomSheet}
         />
@@ -2539,7 +2314,7 @@ console.log('newBHRFlowStarted >>>>>>>.', newBHRFlowStarted);
           >
             <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
           </BottomSheet>
-        )}
+        )} */}
       </ImageBackground>
     )
   }

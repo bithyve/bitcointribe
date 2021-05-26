@@ -3,16 +3,16 @@ import {
   Text,
   View,
   StyleSheet,
-  ViewStyle,
-  StyleProp,
+  StatusBar,
+  ImageBackground,
   Platform,
   Linking,
   Alert,
-  TouchableOpacity,
+  Image,
   AppState,
   InteractionManager,
-  Modal,
 } from 'react-native'
+import { createBottomTabNavigator } from 'react-navigation-tabs'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
 import {
@@ -20,10 +20,10 @@ import {
   widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
-import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
+import CustodianRequestRejectedModalContents from '../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
 import { BottomSheetView } from '@gorhom/bottom-sheet'
-import Colors from '../../common/Colors'
+import Colors from '../common/Colors'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -33,12 +33,12 @@ import {
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
   FAST_BITCOINS,
-} from '../../common/constants/wallet-service-types'
+} from '../common/constants/wallet-service-types'
 import {
   downloadMShare,
   uploadRequestedShare,
   initHealthCheck,
-} from '../../store/actions/sss'
+} from '../store/actions/sss'
 import {
   initializeHealthSetup,
   onApprovalStatusChange,
@@ -47,8 +47,8 @@ import {
   downloadSMShard,
   updateKeeperInfoToUnderCustody,
   updateCloudPermission,
-} from '../../store/actions/health'
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
+} from '../store/actions/health'
+import { createRandomString } from '../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   approveTrustedContact,
@@ -56,96 +56,171 @@ import {
   fetchTrustedChannel,
   clearPaymentDetails,
   postRecoveryChannelSync,
-} from '../../store/actions/trustedContacts'
+} from '../store/actions/trustedContacts'
 import {
   updateFCMTokens,
   fetchNotifications,
   notificationsUpdated,
-} from '../../store/actions/notifications'
+} from '../store/actions/notifications'
 import {
   setCurrencyCode,
   setCardData,
-} from '../../store/actions/preferences'
+} from '../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
   getKeeperInfoFromShareId,
-} from '../../common/CommonFunctions/index'
-import ErrorModalContents from '../../components/ErrorModalContents'
-import Toast from '../../components/Toast'
+} from '../common/CommonFunctions/index'
+import ErrorModalContents from '../components/ErrorModalContents'
+import Toast from '../components/Toast'
 import PushNotification from 'react-native-push-notification'
-import NotificationListContent from '../../components/NotificationListContent'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import RelayServices from '../../bitcoin/services/RelayService'
-import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import config from '../../bitcoin/HexaConfig'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import HomeHeader from '../../components/home/home-header_update'
+import NotificationListContent from '../components/NotificationListContent'
+import { timeFormatter } from '../common/CommonFunctions/timeFormatter'
+import RelayServices from '../bitcoin/services/RelayService'
+// import AddContactAddressBook from '../Contacts/AddContactAddressBook'
+import config from '../bitcoin/HexaConfig'
+import TrustedContactsService from '../bitcoin/services/TrustedContactsService'
+import HomeHeader from '../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
 import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
-} from '../../components/home/custom-bottom-tabs'
+} from '../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
   autoSyncShells,
-  addNewAccountShell
-} from '../../store/actions/accounts'
+  addNewAccountShell,
+  fetchFeeAndExchangeRates
+} from '../store/actions/accounts'
 import {
   trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
-} from '../../bitcoin/utilities/Interface'
-import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+} from '../bitcoin/utilities/Interface'
+import { ScannedAddressKind } from '../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
-import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
+import { NavigationActions, withNavigationFocus } from 'react-navigation'
+import CustodianRequestModalContents from '../components/CustodianRequestModalContents'
 import semver from 'semver'
 import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
-} from '../../store/actions/preferences'
-import { fetchKeeperTrustedChannel, updateNewFcm } from '../../store/actions/keeper'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import PersonalNode from '../../common/data/models/PersonalNode'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
-import TrustedContactRequestContent from './TrustedContactRequestContent'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
-import BottomSheetHeader from '../Accounts/BottomSheetHeader'
+} from '../store/actions/preferences'
+import { fetchKeeperTrustedChannel, updateNewFcm } from '../store/actions/keeper'
+import S3Service from '../bitcoin/services/sss/S3Service'
+import RegularAccount from '../bitcoin/services/accounts/RegularAccount'
+import PersonalNode from '../common/data/models/PersonalNode'
+import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin'
+// import TrustedContactRequestContent from './TrustedContactRequestContent'
+import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
+// import BottomSheetHeader from '../Accounts/BottomSheetHeader'
 import { Button } from 'react-native-elements'
-import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
+import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility'
+import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
 import BottomSheet from '@gorhom/bottom-sheet'
-import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
-import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { getEnvReleaseTopic } from '../../utils/geEnvSpecificParams'
-import { AccountsState } from '../../store/reducers/accounts'
-import HomeAccountCardsList from './HomeAccountCardsList'
-import AccountShell from '../../common/data/models/AccountShell'
+import { resetToHomeAction } from '../navigation/actions/NavigationActions'
+import { Milliseconds } from '../common/data/typealiases/UnitAliases'
+import { SATOSHIS_IN_BTC } from '../common/constants/Bitcoin'
+import { getEnvReleaseTopic } from '../utils/geEnvSpecificParams'
+import { AccountsState } from '../store/reducers/accounts'
+// import HomeAccountCardsList from './HomeAccountCardsList'
+import AccountShell from '../common/data/models/AccountShell'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import SourceAccountKind from '../common/data/enums/SourceAccountKind'
+import ServiceAccountKind from '../common/data/enums/ServiceAccountKind'
+import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import SwanAccountCreationStatus from '../common/data/enums/SwanAccountCreationStatus'
+import TransactionDescribing from '../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
-import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData } from '../../store/actions/cloud'
-import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { setShowAllAccount } from '../../store/actions/accounts'
-import HomeBuyCard from './HomeBuyCard'
+import ExternalServiceSubAccountInfo from '../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../components/home/BuyBitcoinHomeBottomSheet'
+import BottomSheetWyreInfo from '../components/bottom-sheets/wyre/BottomSheetWyreInfo'
+import BottomSheetRampInfo from '../components/bottom-sheets/ramp/BottomSheetRampInfo'
+import BottomSheetSwanInfo from '../components/bottom-sheets/swan/BottomSheetSwanInfo'
+import { setVersion } from '../store/actions/versionHistory'
+import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../store/actions/SwanIntegration'
+import { clearRampCache } from '../store/actions/RampIntegration'
+import { clearWyreCache } from '../store/actions/WyreIntegration'
+import { setCloudData } from '../store/actions/cloud'
+import { credsAuthenticated } from '../store/actions/setupAndAuth'
+import { setShowAllAccount } from '../store/actions/accounts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../common/Fonts'
+// import HomeBuyCard from './HomeBuyCard'
+// import HomeContainer from './HomeContainer'
+// import FriendsAndFamilyScreen from '../FriendsAndFamily/FriendsAndFamilyScreen'
+// import ManageBackupNewBHR from '../NewBHR/ManageBackupNewBHR'
+// import UpgradeBackup from '../UpgradeBackupWithKeeper/UpgradeBackup'
+// import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScreen'
+import AddContactAddressBook from '../pages/Contacts/AddContactAddressBook'
+import TrustedContactRequestContent from '../pages/Home/TrustedContactRequestContent'
+import BottomSheetHeader from '../pages/Accounts/BottomSheetHeader'
+import HomeStack from './stacks/home/HomeStack'
+import {
+  createStackNavigator,
+  StackViewTransitionConfigs,
+} from 'react-navigation-stack'
+import HomeContainer from '../pages/Home/HomeContainer'
+import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
+import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR'
+import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup'
+import MoreOptionsContainerScreen from '../pages/MoreOptions/MoreOptionsContainerScreen'
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs'
+import HomeBuyCard from '../pages/Home/HomeBuyCard'
+import Bottomtab from './Bottomtab'
+
+const HomeNavigator = createStackNavigator(
+  {
+    Home: {
+      screen: HomeContainer,
+      path: 'home',
+    },
+  },
+  {
+    headerLayoutPreset: 'center',
+    defaultNavigationOptions: ( { navigation } ) => {
+      return {
+        header: null,
+        headerTitleContainerStyle: {
+          justifyContent: 'flex-start',
+          alignItems: 'flex-start',
+        },
+      }
+    },
+    //   transitionConfig: ( transitionProps, prevTransitionProps ) => {
+
+    // 📝 Override the default presentation mode for screens that we
+    // want to present modally
+    // const isModal = MODAL_ROUTES.some(
+    //   ( screenName ) =>
+    //     screenName === transitionProps.scene.route.routeName ||
+    //     ( prevTransitionProps &&
+    //       screenName === prevTransitionProps.scene.route.routeName ),
+    // )
+
+    // return StackViewTransitionConfigs.defaultTransitionConfig(
+    //   transitionProps,
+    //   prevTransitionProps,
+    //   isModal,
+    // )
+    //   },
+  },
+)
+//   class HomeScreen extends React.Component {
+//     render() {
+//       return (
+//         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+//           <Text>Home!</Text>
+//         </View>
+//       );
+//     }
+//   }
+// const BottomTabs = createMaterialBottomTabNavigator({
+//     Home: HomeScreen,
+//     Settings: HomeScreen,
+//   });
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -173,6 +248,8 @@ interface HomeStateTypes {
   notificationData?: any[];
   CurrencyCode: string;
   netBalance: number;
+  selectedBottomTab: BottomTab | null;
+
   bottomSheetState: BottomSheetState;
   currentBottomSheetKind: BottomSheetKind | null;
 
@@ -204,7 +281,7 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any[];
   exchangeRates?: any[];
-  containerView: StyleProp<ViewStyle>;
+
   accountsState: AccountsState;
   cloudPermissionGranted: any;
 
@@ -235,6 +312,7 @@ interface HomePropsTypes {
   clearSwanCache: any;
   updateSwanStatus: any;
   addNewAccountShell: any;
+  fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
   paymentDetails: any;
@@ -282,11 +360,12 @@ interface HomePropsTypes {
 
 const releaseNotificationTopic = getEnvReleaseTopic()
 
-class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
+class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
+
   bottomSheetRef = createRef<BottomSheet>();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
 
@@ -303,6 +382,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationData: [],
       CurrencyCode: 'USD',
       netBalance: 0,
+      selectedBottomTab: 0,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
       secondaryDeviceOtp: {
@@ -330,6 +410,11 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
       wyreFromBuyMenu: null,
       wyreFromDeepLink: null
     }
+    console.log( 'this.props.navigation.getParam', this.props.navigation.state.params )
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange
+    )
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -492,7 +577,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
             break
 
           case 'secondaryDeviceGuardian':
-            console.log( 'scannedData', scannedData )
+            // console.log( 'scannedData', scannedData )
             const secondaryDeviceGuardianRequest = {
               isGuardian: scannedData.isGuardian,
               requester: scannedData.requester,
@@ -648,7 +733,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
     PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
-      console.log( 'SCHEDULE notiifcations', notiifcations )
+      // console.log( 'SCHEDULE notiifcations', notiifcations )
     } )
   };
 
@@ -664,8 +749,8 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
-      ( created ) =>
-        console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+      ( created ) => {}
+      // console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
     )
 
     PushNotification.localNotification( {
@@ -707,7 +792,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.createNotificationListeners()
               } )
               .catch( () => {
-                console.log( 'Permission rejected.' )
+                // console.log( 'Permission rejected.' )
               } )
           }
         } )
@@ -721,7 +806,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   storeFCMToken = async () => {
     const fcmToken = await messaging().getToken()
-    console.log( 'TOKEN', fcmToken )
+    // console.log( 'TOKEN', fcmToken )
     const fcmArray = [ fcmToken ]
     const fcmTokenFromAsync = this.props.fcmTokenValue
     if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
@@ -743,7 +828,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   createNotificationListeners = async () => {
     PushNotification.configure( {
       onNotification: ( notification ) => {
-        console.log( 'NOTIFICATION:', notification )
+        // console.log( 'NOTIFICATION:', notification )
         // process the notification
         if ( notification.data ) {
           this.props.fetchNotifications()
@@ -755,8 +840,8 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
       onAction: ( notification ) => {
-        console.log( 'ACTION:', notification.action )
-        console.log( 'NOTIFICATION:', notification )
+        // console.log( 'ACTION:', notification.action )
+        // console.log( 'NOTIFICATION:', notification )
 
         // process the action
       },
@@ -789,7 +874,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationOpen = async ( item ) => {
-    console.log( 'item', item )
+    // console.log( 'item', item )
     const content = JSON.parse( item.data.content )
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
@@ -847,7 +932,13 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
         {
           appState: nextAppState,
         },
+
         async () => {
+          if ( Platform.OS == 'android' ? ( nextAppState == 'active' ) : ( nextAppState == 'background' ) ) {
+            this.props.navigation.dispatch( NavigationActions.navigate( {
+              routeName: 'Login',
+            } ) )
+          }
           if ( nextAppState === 'active' ) {
             this.scheduleNotification()
           }
@@ -865,7 +956,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   componentDidMount = () => {
-    console.log( '>>>>>>>>>. componentDidMount HOME >>>>>>>>' )
+    console.log( 'componentDidMount of tab navigatir' )
 
     const {
       navigation,
@@ -875,16 +966,14 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
       credsAuthenticated
     } = this.props
     credsAuthenticated( false )
+
     const versionData = []
     this.closeBottomSheet()
     if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
       this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
     }
     this.calculateNetBalance()
-    this.appStateListener = AppState.addEventListener(
-      'change',
-      this.onAppStateChange
-    )
+
     if( newBHRFlowStarted === true )
     {
       const { healthCheckInitializedKeeper } = s3Service.levelhealth
@@ -905,10 +994,8 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( this.handleDeepLinking )
-
     // call this once deeplink is detected aswell
     this.handleDeepLinkModal()
-
     const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
     if ( unhandledDeepLinkURL ) {
@@ -921,9 +1008,10 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSynn disabled
+      // Keeping autoSync disabled
 
       this.props.setVersion()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
@@ -987,7 +1075,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           title: obj.title,
           body: obj.info,
         }
-        console.log( ':asyncNotificationList', asyncNotificationList )
+        // console.log( ':asyncNotificationList', asyncNotificationList )
 
         this.localNotification( notificationDetails )
       }
@@ -1082,11 +1170,12 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleDeepLinkModal = () => {
-    const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
-    const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.getParam( 'trustedContactRequest' )
-    const userKey = this.props.navigation.getParam( 'userKey' )
-    const swanRequest = this.props.navigation.getParam( 'swanRequest' )
+    const custodyRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.custodyRequest : null//this.props.navigation.getParam( 'custodyRequest' )
+    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
+    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    console.log( 'trustedContactRequest', trustedContactRequest )
     if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
@@ -1157,7 +1246,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    console.log( 'Home::handleDeepLinkEvent::URL: ', url )
+    // console.log( 'Home::handleDeepLinkEvent::URL: ', url )
 
     const { navigation, isFocused } = this.props
 
@@ -1179,7 +1268,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
 
-    console.log( 'Home::handleDeepLinking::URL: ' + url )
+    console.log( 'handleDeepLinking: ' + url )
 
     const splits = url.split( '/' )
     if ( splits.includes( 'swan' ) ) {
@@ -1368,6 +1457,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
       this.props.fetchNotifications()
       this.setState( {
         lastActiveTime: moment().toISOString(),
@@ -1471,6 +1561,25 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onPhoneNumberChange = () => {};
 
+  handleBottomTabSelection = ( tab: BottomTab ) => {
+    // console.log('handleBottomTabSelection', tab);
+
+    this.setState( {
+      selectedBottomTab: tab,
+    } )
+
+    // if ( tab === BottomTab.Home ) {
+    //   this.props.navigation.navigate( 'AllTransactions' )
+    // } else if ( tab === BottomTab.More ) {
+    //   this.props.navigation.navigate( 'MoreOptions' )
+    // } else if ( tab === BottomTab.QR ) {
+    //   this.props.navigation.navigate( 'QRScanner', {
+    //     onCodeScanned: this.processQRData,
+    //   } )
+    // } else if ( tab === BottomTab.FriendsAndFamily ) {
+    //   this.props.navigation.navigate( 'FriendsAndFamily' )
+    // }
+  };
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
     switch ( menuItem.kind ) {
@@ -1741,13 +1850,11 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
     } catch ( error ) {
-      console.log( 'PKRECOVERY error', error )
+      // console.log( 'PKRECOVERY error', error )
     }
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    console.log( 'handleAccountCardSelection >>>>>>>>>>' )
-
     this.props.navigation.navigate( 'AccountDetails', {
       accountShellID: selectedAccount.id,
     } )
@@ -1798,9 +1905,9 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const asyncNotifications = JSON.parse(
       await AsyncStorage.getItem( 'notificationList' )
     )
-    console.log( 'Notification clicked Home>onNotificationClicked' )
-    console.log( 'asyncNotifications ', asyncNotifications )
-    console.log( 'notification passed ', value )
+    // console.log( 'Notification clicked Home>onNotificationClicked' )
+    // console.log( 'asyncNotifications ', asyncNotifications )
+    // console.log( 'notification passed ', value )
 
     const { notificationData } = this.state
     const { navigation, } = this.props
@@ -1986,15 +2093,15 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if ( Object.keys( UNDER_CUSTODY ).length ) {
             existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
               console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
+              // return UNDER_CUSTODY[ tag ].META_SHARE
             } )
           }
           if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
+            // console.log(
+            //   'existingShares.length',
+            //   existingShares.length,
+            //   existingShares
+            // )
             if (
               existingShares.findIndex(
                 ( value ) =>
@@ -2034,27 +2141,27 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           let existingShares: MetaShare[]
           if ( Object.keys( UNDER_CUSTODY ).length ) {
             existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
+              // console.log( tag )
               return UNDER_CUSTODY[ tag ].META_SHARE
             } )
           }
 
           if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
+            // console.log(
+            //   'existingShares.length',
+            //   existingShares.length,
+            //   existingShares
+            // )
             if (
               existingShares.findIndex(
                 ( value ) =>
                   value.shareId === JSON.parse( element.data ).selectedShareId
               ) == -1
             ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
+              // console.log(
+              //   'element.notificationType 1',
+              //   element.notificationType
+              // )
               this.props.autoDownloadShareContact(
                 JSON.parse( element.data ).selectedShareId,
                 JSON.parse( element.data ).walletId
@@ -2129,7 +2236,13 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.SWAN_STATUS_INFO:
-          return Platform.OS == 'ios' ? [ 0, '50%' ] : [ 0, '65%' ]
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+            ),
+            heightPercentageToDP( 71 ),
+          ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '67%' ]
@@ -2281,78 +2394,6 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
             </>
           )
-
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader
-                title="Buy bitcoin with Wyre"
-                onPress={this.closeBottomSheet}
-              />
-              <BottomSheetWyreInfo
-                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-
-        case BottomSheetKind.RAMP_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader
-                title="Buy bitcoin with Ramp"
-                onPress={this.closeBottomSheet}
-              />
-              <BottomSheetRampInfo
-                rampDeepLinkContent={this.state.rampDeepLinkContent}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-                onPress={this.onBackPress}
-              />
-            </>
-          )
-
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-          return (
-            <CustodianRequestModalContents
-              userName={custodyRequest.requester}
-              onPressAcceptSecret={() => {
-                this.closeBottomSheet()
-                if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
-                  Alert.alert(
-                    'Request expired!',
-                    'Please ask the sender to initiate a new request'
-                  )
-                } else {
-                  if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
-                    Alert.alert(
-                      'Failed to store',
-                      'You cannot custody multiple shares of the same user.'
-                    )
-                  } else {
-                    if ( custodyRequest.isQR ) {
-                      downloadMShare( custodyRequest.ek, custodyRequest.otp )
-                    } else {
-                      navigation.navigate( 'CustodianRequestOTP', {
-                        custodyRequest,
-                      } )
-                    }
-                  }
-                }
-              }}
-              onPressRejectSecret={() => {
-                this.closeBottomSheet()
-                this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
-              }}
-            />
-          )
-
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return (
             <CustodianRequestRejectedModalContents
@@ -2445,7 +2486,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
               info={errorMessage}
               onPressProceed={this.closeBottomSheet}
               isBottomImage={true}
-              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+              bottomImage={require( '../assets/images/icons/errorImage.png' )}
             />
           )
 
@@ -2468,7 +2509,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isIgnoreButton={true}
               isBottomImage={true}
               isBottomImageStyle={styles.cloudErrorModalImage}
-              bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+              bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
             />
           )
 
@@ -2478,71 +2519,96 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   render() {
+    const { netBalance, notificationData, currencyCode, selectedBottomTab } = this.state
 
     const {
+      navigation,
+      exchangeRates,
+      walletName,
       currentLevel,
-      containerView,
+      newBHRFlowStarted
     } = this.props
+    console.log( 'newBHRFlowStarted >>>>>>>.', newBHRFlowStarted )
 
     return (
-      <>
-        <View style={containerView}>
-          <HomeAccountCardsList
-            containerStyle={containerView}
-            contentContainerStyle={{
-              paddingTop: 36,
-              paddingLeft: 14,
-            }}
+      <ImageBackground
+        source={require( '../assets/images/home-bg.png' )}
+        style={{
+          width: '100%',
+          height: '100%',
+          flex: 1,
+        }}
+        imageStyle={{
+          resizeMode: 'stretch',
+        }}
+      >
+        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <View
+          style={{
+            flex: 3.8,
+            paddingTop:
+              Platform.OS == 'ios' && DeviceInfo.hasNotch
+                ? heightPercentageToDP( '5%' )
+                : 0,
+          }}
+        >
+          <HomeHeader
+            onPressNotifications={this.onPressNotifications}
+            navigateToQRScreen={this.navigateToQRScreen}
+            notificationData={notificationData}
+            walletName={walletName}
+            getCurrencyImageByRegion={getCurrencyImageByRegion}
+            netBalance={netBalance}
+            exchangeRates={exchangeRates}
+            CurrencyCode={currencyCode}
+            navigation={navigation}
             currentLevel={currentLevel}
-            onAddNewSelected={this.navigateToAddNewAccountScreen}
-            onCardSelected={this.handleAccountCardSelection}
+            //  onSwitchToggle={this.onSwitchToggle}
+            // setCurrencyToggleValue={this.setCurrencyToggleValue}
+            // navigation={this.props.navigation}
+            // overallHealth={overallHealth}
           />
-          {/* <View > */}
-          <HomeBuyCard
-            cardContainer={styles.cardContainer}
-            amount={'5664.80'}
-            incramount={'55.09'}
-            percentIncr={'2.1'}
-            asset={ require( '../../assets/images/currencySymbols/icon_dollar_light.png' )}
-            openBottomSheet={( value ) => this.openBottomSheet( value )}
-          />
-
-          {/* </View> */}
         </View>
+        {/* <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} /> */}
+        {/* {selectedBottomTab === BottomTab.Home && <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />} */}
+        {/* {selectedBottomTab === BottomTab.FriendsAndFamily && <FriendsAndFamilyScreen navigation={navigation} containerStyle={styles.accountCardsSectionContainer} />}
+        {selectedBottomTab === BottomTab.SecurityAndPrivacy && !newBHRFlowStarted && <ManageBackupNewBHR containerStyle={styles.accountCardsSectionContainer}/>}
+        {selectedBottomTab === BottomTab.SecurityAndPrivacy && newBHRFlowStarted && <UpgradeBackup containerStyle={styles.accountCardsSectionContainer} />}
+        {selectedBottomTab === BottomTab.Settings && <MoreOptionsContainerScreen containerStyle={styles.accountCardsSectionContainer} navigation={navigation} />} */}
+
+        {/* <HomeBuyCard
+          cardContainer={styles.cardContainer}
+          amount={'5664.80'}
+          incramount={'55.09'}
+          percentIncr={'2.1'}
+          asset={ require( '../assets/images/currencySymbols/icon_dollar_light.png' )}
+          openBottomSheet={( value ) => this.openBottomSheet( value )}
+        /> */}
+        <View style={styles.accountCardsSectionContainer}>
+          {/* <HomeContainer /> */}
+          <Bottomtab
+          />
+        </View>
+
         <BottomSheetBackground
           isVisible={this.state.bottomSheetState === BottomSheetState.Open}
           onPress={this.closeBottomSheet}
         />
-        <Modal
-          visible={this.state.currentBottomSheetKind != null}
-          onRequestClose={() => { this.closeBottomSheet() }}
-          transparent={true}
-        >
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              // margin: 10
-            }}
-            activeOpacity={1}
-            onPressOut={() => { this.closeBottomSheet() }}
-          >
-            <BottomSheet
-              ref={this.bottomSheetRef}
-              snapPoints={this.getBottomSheetSnapPoints()}
-              initialSnapIndex={-1}
-              animationDuration={defaultBottomSheetConfigs.animationDuration}
-              animationEasing={Easing.out( Easing.back( 1 ) )}
-              handleComponent={defaultBottomSheetConfigs.handleComponent}
-              onChange={this.handleBottomSheetPositionChange}
-            >
-              <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
-            </BottomSheet>
-          </TouchableOpacity>
-        </Modal>
-        {/* {this.state.currentBottomSheetKind != null && ( */}
 
-        {/* )} */}
-      </>
+        {this.state.currentBottomSheetKind != null && (
+          <BottomSheet
+            ref={this.bottomSheetRef}
+            snapPoints={this.getBottomSheetSnapPoints()}
+            initialSnapIndex={-1}
+            animationDuration={defaultBottomSheetConfigs.animationDuration}
+            animationEasing={Easing.out( Easing.back( 1 ) )}
+            handleComponent={defaultBottomSheetConfigs.handleComponent}
+            onChange={this.handleBottomSheetPositionChange}
+          >
+            <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
+          </BottomSheet>
+        )}
+      </ImageBackground>
     )
   }
 }
@@ -2608,6 +2674,7 @@ export default withNavigationFocus(
     clearSwanCache,
     updateSwanStatus,
     addNewAccountShell,
+    fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
     clearPaymentDetails,
@@ -2628,13 +2695,16 @@ export default withNavigationFocus(
     updateCloudPermission,
     credsAuthenticated,
     setShowAllAccount
-  } )( HomeContainer )
+  } )( Home )
 )
 
 const styles = StyleSheet.create( {
   cardContainer: {
     backgroundColor: Colors.white,
     width: widthPercentageToDP( '95%' ),
+    // height: heightPercentageToDP( '7%' ),
+    // borderColor: Colors.borderColor,
+    // borderWidth: 1,
     borderRadius: widthPercentageToDP( 3 ),
     marginBottom: 10,
     alignItems: 'center',
@@ -2645,7 +2715,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: widthPercentageToDP ( 2 )
   },
   accountCardsSectionContainer: {
-    flex: 13,
+    flex: 15,
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
@@ -2660,6 +2730,11 @@ const styles = StyleSheet.create( {
   },
 
   floatingActionButtonContainer: {
+    // position: 'absolute',
+    // zIndex: 0,
+    // bottom: TAB_BAR_HEIGHT,
+    // right: 0,
+    // flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
     padding: heightPercentageToDP( 1.5 ),

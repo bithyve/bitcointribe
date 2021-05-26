@@ -6,8 +6,12 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Platform,
+  SafeAreaView,
   RefreshControl,
+  Platform,
+  ImageBackground,
+  StatusBar,
+  Modal
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -53,6 +57,9 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import RecipientAvatar from '../../components/RecipientAvatar'
+import HomeHeader from '../../components/home/home-header_update'
+import Header from '../../navigation/stacks/Header'
+// import { SafeAreaView } from 'react-native-safe-area-context'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -70,6 +77,7 @@ interface FriendsAndFamilyPropTypes {
 }
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
+  showModal: boolean;
   selectedContact: any[];
   loading: boolean;
   myKeepers: ContactRecipientDescribing[];
@@ -85,7 +93,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   FriendsAndFamilyPropTypes,
   FriendsAndFamilyStateTypes
 > {
-  static navigationOptions = makeNavigationOptions;
+  // static navigationOptions = makeNavigationOptions;
 
   addContactAddressBookBottomSheetRef: React.RefObject<BottomSheet>;
   helpBottomSheetRef: React.RefObject<BottomSheet>;
@@ -101,6 +109,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     this.state = {
       onRefresh: false,
       isLoadContacts: false,
+      showModal: false,
       selectedContact: [],
       loading: true,
       trustedContacts: idx( props, ( _ ) => _.addressBookData.trustedContacts ) || [],
@@ -114,7 +123,10 @@ class FriendsAndFamilyScreen extends PureComponent<
   }
 
   componentDidMount() {
+    // console.log( '>>>>>>>>>. componentDidMount F&F >>>>>>>>' )
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+      // console.log( 'F&F >>>' )
+
       this.props.trustedChannelsSetupSync()
       this.updateAddressBook()
     } )
@@ -165,7 +177,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       isShowingKnowMoreSheet: shouldShow
     }, () => {
       if ( shouldShow ) {
-        this.helpBottomSheetRef.current?.snapTo( 1 )
+        // this.helpBottomSheetRef.current?.snapTo( 1 )
       } else {
         this.helpBottomSheetRef.current?.snapTo( 0 )
       }
@@ -179,7 +191,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     const myKeepers = []
     const contactsKeptByUser = []
     const otherTrustedContacts = []
-
+    // console.log( 'trustedContactsInfo', trustedContactsInfo )
     if ( trustedContactsInfo ) {
       if ( trustedContactsInfo.length ) {
         const trustedContacts = []
@@ -353,9 +365,13 @@ class FriendsAndFamilyScreen extends PureComponent<
     contactsType: string;
   } ) => {
     return (
-      <View style={{ alignItems: 'center' }}>
-      <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
-      <Text style={{ textAlign: 'center', marginTop: hp (0.5) }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
+      <View style={{
+        alignItems: 'center'
+      }}>
+        <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        <Text style={{
+          textAlign: 'center', marginTop: hp ( 0.5 )
+        }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
       </View>
     )
   };
@@ -377,7 +393,9 @@ class FriendsAndFamilyScreen extends PureComponent<
         onPress={() =>
           this.handleContactSelection( backendContactInfo, index, contactsType )
         }
-        containerStyle={{ backgroundColor: 'transparent' }}
+        containerStyle={{
+          backgroundColor: 'transparent'
+        }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
       </ListItem>
@@ -398,6 +416,9 @@ class FriendsAndFamilyScreen extends PureComponent<
               SelectedContact: selectedContact,
             } )
             this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+            this.setState( {
+              showModal: false,
+            } )
           }
         }}
         onSelectContact={( selectedData ) => {
@@ -407,6 +428,9 @@ class FriendsAndFamilyScreen extends PureComponent<
         }}
         onPressBack={() => {
           this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+          this.setState( {
+            showModal: false,
+          } )
         }}
         onSkipContinue={() => {
           let { skippedContactsCount } = this.props.trustedContactsService.tc
@@ -430,6 +454,9 @@ class FriendsAndFamilyScreen extends PureComponent<
             SelectedContact: [ data ],
           } )
           this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+          this.setState( {
+            showModal: false,
+          } )
         }}
       />
     )
@@ -440,7 +467,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { trustedChannelsSetupSync, containerStyle } = this.props
+    const { trustedChannelsSetupSync } = this.props
 
     const {
       myKeepers: contactsKeepingUser,
@@ -450,53 +477,94 @@ class FriendsAndFamilyScreen extends PureComponent<
       showLoader
     } = this.state
     return (
-      <View style={containerStyle}>
-        
-        <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={showLoader}
-              onRefresh={() => {
-                trustedChannelsSetupSync()
-              }}
-            />
-          }
+      <ImageBackground
+        source={require( '../../assets/images/home-bg.png' )}
+        style={{
+          width: '100%',
+          height: '100%',
+          flex: 1,
+        }}
+        imageStyle={{
+          resizeMode: 'stretch',
+        }}
+      >
+        <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <Header />
+        {/* <View
           style={{
-            flex: 1, marginBottom: hp( '6%' )
+            flex: 3.8,
+            paddingTop:
+                Platform.OS == 'ios' && DeviceInfo.hasNotch
+                  ? hp( '5%' )
+                  : 0,
           }}
         >
-          <View style={{
-            marginTop: wp( '4%' ),
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginHorizontal: wp ( 6 ),
-          }}>
-            <Text
-            style={styles.pageTitle}
-            >
-              Friends & Family
-            </Text>
-            <TouchableOpacity
-              onPress={() => {
-                this.setState( {
-                  isLoadContacts: true,
-                } )
-                this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
-              }}
-              style={{
-                ...styles.selectedContactsView,
-              }}
-            >
-              <Image
-                style={styles.addGrayImage}
-                source={require( '../../assets/images/icons/icon_add_grey.png' )}
+          <HomeHeader
+            onPressNotifications={this.onPressNotifications}
+            navigateToQRScreen={this.navigateToQRScreen}
+            notificationData={notificationData}
+            walletName={walletName}
+            getCurrencyImageByRegion={getCurrencyImageByRegion}
+            netBalance={netBalance}
+            exchangeRates={exchangeRates}
+            CurrencyCode={currencyCode}
+            navigation={navigation}
+            currentLevel={currentLevel}
+            //  onSwitchToggle={this.onSwitchToggle}
+            // setCurrencyToggleValue={this.setCurrencyToggleValue}
+            // navigation={this.props.navigation}
+            // overallHealth={overallHealth}
+          />
+        </View> */}
+        <View style={styles.accountCardsSectionContainer}>
+
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={showLoader}
+                onRefresh={() => {
+                  trustedChannelsSetupSync()
+                }}
               />
-              <View>
-                <Text style={styles.contactText}>Add New</Text>
-              </View>
-            </TouchableOpacity>
-            {/* <Text style={styles.pageTitle}>My Keepers</Text>
+            }
+            style={{
+              flex: 1, marginBottom: hp( '6%' )
+            }}
+          >
+            <View style={{
+              marginTop: wp( '4%' ),
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginHorizontal: wp ( 6 ),
+            }}>
+              <Text
+                style={styles.pageTitle}
+              >
+              Friends & Family
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  this.setState( {
+                    isLoadContacts: true,
+                    showModal: true
+                  }, () => {
+                    this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
+                  } )
+                }}
+                style={{
+                  ...styles.selectedContactsView,
+                }}
+              >
+                <Image
+                  style={styles.addGrayImage}
+                  source={require( '../../assets/images/icons/icon_add_grey.png' )}
+                />
+                <View>
+                  <Text style={styles.contactText}>Add New</Text>
+                </View>
+              </TouchableOpacity>
+              {/* <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
             </Text>
@@ -523,15 +591,19 @@ class FriendsAndFamilyScreen extends PureComponent<
                 }} />}
               </View>
             </View> */}
-          </View>
-          <View style={{ width: wp ( '95%' ), height: hp ( '15%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center' }}>
-          <Text
-            style={styles.cardTitle}
-            >
+            </View>
+            <View style={{
+              width: wp ( '95%' ), height: hp ( '15%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
+            }}>
+              <Text
+                style={styles.cardTitle}
+              >
               Recently Sent
-            </Text>
-            <View style={{ flexDirection: 'row',  alignSelf: 'flex-start', marginHorizontal: wp( 3 ), marginTop: hp ( '1%' )  }}>
-            {( otherTrustedContacts.length > 0 &&
+              </Text>
+              <View style={{
+                flexDirection: 'row',  alignSelf: 'flex-start', marginHorizontal: wp( 3 ), marginTop: hp ( '1%' )
+              }}>
+                {( otherTrustedContacts.length > 0 &&
                     otherTrustedContacts.map( ( item, index ) => {
                       return this.renderContactItem( {
                         backendContactInfo: item,
@@ -543,17 +615,17 @@ class FriendsAndFamilyScreen extends PureComponent<
                         contactsType: 'Other Contacts',
                       } )
                     } ) ) || <View style={{
-                    height: wp( '22%' ) + 30
-                  }} />}
+                  height: wp( '22%' ) + 30
+                }} />}
+              </View>
             </View>
-          </View>
-          
-          
-          <View >
 
-          </View>
 
-          {/* <View style={{
+            <View >
+
+            </View>
+
+            {/* <View style={{
             marginTop: wp( '5%' )
           }}>
             <Text style={styles.pageTitle}>I am the Keeper of</Text>
@@ -585,16 +657,16 @@ class FriendsAndFamilyScreen extends PureComponent<
             </View>
           </View> */}
 
-          <View style={{
-            marginTop: wp( '5%' )
-          }}>
             <View style={{
-              marginBottom: 15
+              marginTop: wp( '5%' )
             }}>
               <View style={{
-                height: 'auto'
+                marginBottom: 15
               }}>
-                {( otherTrustedContacts.length > 0 &&
+                <View style={{
+                  height: 'auto'
+                }}>
+                  {( otherTrustedContacts.length > 0 &&
                   otherTrustedContacts.map( ( item, index ) => {
                     return this.renderContactListItem( {
                       backendContactInfo: item,
@@ -606,56 +678,75 @@ class FriendsAndFamilyScreen extends PureComponent<
                       contactsType: 'Other Contacts',
                     } )
                   } ) ) || <View style={{
-                  height: wp( '22%' ) + 30
-                }} />}
+                    height: wp( '22%' ) + 30
+                  }} />}
+                </View>
               </View>
             </View>
-          </View>
-          {otherTrustedContacts.length == 0 &&
+            {otherTrustedContacts.length == 0 &&
             contactsKeepingUser.length == 0 &&
             contactsKeptByUser.length == 0 && (
-            <BottomInfoBox
-              title={'Note'}
-              infoText={
-                'All your contacts appear here when added to Hexa wallet'
-              }
-            />
-          )}
-        </ScrollView>
-        {showLoader ? <Loader /> : null}
-
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.addContactAddressBookBottomSheetRef}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '82%' )
-              : hp( '82%' ),
-          ]}
-          renderContent={this.renderAddContactFriendsAndFamily}
-          renderHeader={this.renderAddContactAddressBookHeader}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.helpBottomSheetRef}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '87%' )
-              : hp( '89%' ),
-          ]}
-          renderContent={this.renderHelpContent}
-          renderHeader={this.renderHelpHeader}
-          onCloseEnd={() => {
-            this.setState( {
-              isShowingKnowMoreSheet: false
-            } )
-          }}
-        />
-      </View>
+              <BottomInfoBox
+                title={'Note'}
+                infoText={
+                  'All your contacts appear here when added to Hexa wallet'
+                }
+              />
+            )}
+          </ScrollView>
+          {showLoader ? <Loader /> : null}
+          <Modal
+            visible={this.state.showModal}
+            onRequestClose={() => { this.setState( {
+              showModal: false
+            } ) }}
+            transparent={true}
+          >
+            <TouchableOpacity
+              style={{
+                flex: 1,
+                // margin: 10
+              }}
+              activeOpacity={1}
+              onPressOut={() => { this.setState( {
+                showModal: false
+              } ) }}
+            >
+              <BottomSheet
+                enabledGestureInteraction={false}
+                enabledInnerScrolling={true}
+                ref={this.addContactAddressBookBottomSheetRef}
+                snapPoints={[
+                  -50,
+                  Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                    ? hp( '82%' )
+                    : hp( '82%' ),
+                ]}
+                renderContent={this.renderAddContactFriendsAndFamily}
+                renderHeader={this.renderAddContactAddressBookHeader}
+              />
+            </TouchableOpacity>
+          </Modal>
+          <BottomSheet
+            enabledInnerScrolling={true}
+            enabledGestureInteraction={false}
+            ref={this.helpBottomSheetRef}
+            snapPoints={[
+              -50,
+              Platform.OS == 'ios' && DeviceInfo.hasNotch()
+                ? hp( '87%' )
+                : hp( '89%' ),
+            ]}
+            renderContent={this.renderHelpContent}
+            renderHeader={this.renderHelpHeader}
+            onCloseEnd={() => {
+              this.setState( {
+                isShowingKnowMoreSheet: false
+              } )
+            }}
+          />
+        </View>
+      </ImageBackground>
     )
   }
 }

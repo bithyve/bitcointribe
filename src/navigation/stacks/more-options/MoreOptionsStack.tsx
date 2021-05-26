@@ -10,19 +10,17 @@ import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHea
 import WalletSettingsStack from './WalletSettingsStack'
 import AccountManagementStack from './AccountManagementStack'
 import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings/NodeSettingsContainerScreen'
+import Header from '../Header'
+import QRStack from '../home/QRStack'
 
 
 const MoreOptionsStack = createStackNavigator(
   {
     MoreOptionsRoot: {
       screen: MoreOptionsContainerScreen,
-      navigationOptions: ( { navigation } ) => {
-        return {
-          title: 'More',
-          headerLeft: () => {
-            return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
-          },
-        }
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
       },
     },
     AccountManagement: {
@@ -58,17 +56,35 @@ const MoreOptionsStack = createStackNavigator(
         header: null,
       },
     },
+    QRScanner: {
+      screen: QRStack,
+      navigationOptions: {
+        header: null,
+      },
+    },
   },
   {
     initialRouteName: 'MoreOptionsRoot',
-    defaultNavigationOptions: ( { navigation } ) => {
+    navigationOptions: ( { navigation } ) => {
+      let tabBarVisible = false
+      console.log( 'navigation.state.index>>>>>>>>', navigation.state.index )
+
+      if ( navigation.state.index === 0 ) {
+        tabBarVisible = true
+      }
+
       return {
-        ...defaultStackScreenNavigationOptions,
-        headerLeft: () => {
-          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-        },
+        tabBarVisible,
       }
     },
+    // defaultNavigationOptions: ( { navigation } ) => {
+    //   return {
+    //     ...defaultStackScreenNavigationOptions,
+    //     headerLeft: () => {
+    //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+    //     },
+    //   }
+    // },
   },
 )
 

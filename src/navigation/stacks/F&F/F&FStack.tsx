@@ -15,8 +15,9 @@ import RampOrderFormScreen from '../../../pages/RampIntegration/RampOrderFormScr
 import QRStack from '../home/QRStack'
 import Home from '../../../pages/Home/Home'
 import TabNavigator from '../../TabNavigator'
-import AccountDetailsStack from '../accounts/AccountDetailsStack'
+import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Header from '../Header'
+import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -27,69 +28,29 @@ const MODAL_ROUTES = [
   'PlaceRampOrder'
 ]
 
-
-const HomeStack = createStackNavigator(
+const FriendsAndFamily = createStackNavigator(
   {
-    HomeRoot: {
-      screen: Home,
+    Home: {
+      screen: FriendsAndFamilyScreen,
       navigationOptions: {
         header: null,
         // tabBarVisibl
       },
     },
-    AddNewAccount: {
-      screen: AddNewAccountStack,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    AccountDetails: {
-      screen: AccountDetailsStack,
-      navigationOptions: {
-        header: null,
-        // tabBarVisibl
-      },
-    },
-    NewWyreAccountDetails: {
-      screen: NewWyreAccountDetailsScreen,
-      navigationOptions: {
-        title: 'Setup Wyre Account'
-      }
-    },
-    NewRampAccountDetails: {
-      screen: NewRampAccountDetailsScreen,
-      navigationOptions: {
-        title: 'Setup Ramp Account'
-      }
-    },
-    PlaceWyreOrder: {
-      screen: WyreOrderFormScreen,
-      navigationOptions: {
-        title: 'Buy with Wyre'
-      }
-    },
-    PlaceRampOrder: {
-      screen: RampOrderFormScreen,
-      navigationOptions: {
-        title: 'Buy with Ramp'
-      }
-    },
-    AllTransactions: {
-      screen: AllTransactionsStack,
+    ContactDetails: {
+      screen: ContactDetails,
       navigationOptions: {
         header: null,
       },
     },
-    // FriendsAndFamily: FriendsAndFamilyScreen,
+    AddContactSendRequest: {
+      screen: AddContactSendRequest,
+      navigationOptions: {
+        header: null,
+      },
+    },
     QRScanner: {
       screen: QRStack,
-      navigationOptions: {
-        header: null,
-      },
-    },
-    MoreOptions: {
-      screen: MoreOptionsStack,
       navigationOptions: {
         header: null,
       },
@@ -97,12 +58,9 @@ const HomeStack = createStackNavigator(
   },
   {
     mode: 'modal',
-    initialRouteName: 'HomeRoot',
-
+    initialRouteName: 'Home',
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
-      console.log( 'navigation.state.index>>>>>>>>', navigation.state.index )
-
       if ( navigation.state.index === 0 ) {
         tabBarVisible = true
       }
@@ -110,43 +68,32 @@ const HomeStack = createStackNavigator(
       return {
         tabBarVisible,
       }
+    },
+    // defaultNavigationOptions: ( { navigation } ) => {
     //   return {
     //     ...defaultStackScreenNavigationOptions,
     //     headerLeft: () => {
     //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
     //     },
     //   }
-    },
-    transitionConfig: ( transitionProps, prevTransitionProps ) => {
-      const previousRouteName = prevTransitionProps?.scene.route.routeName
-      const newRouteName = transitionProps.scene.route.routeName
+    // },
+    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
+    //   const previousRouteName = prevTransitionProps?.scene.route.routeName
+    //   const newRouteName = transitionProps.scene.route.routeName
 
-      // 📝 Override the default presentation mode for screens that we
-      // want to present modally
-      const isModal = MODAL_ROUTES.some(
-        ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
-      )
+    //   // 📝 Override the default presentation mode for screens that we
+    //   // want to present modally
+    //   const isModal = MODAL_ROUTES.some(
+    //     ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
+    //   )
 
-      return StackViewTransitionConfigs.defaultTransitionConfig(
-        transitionProps,
-        prevTransitionProps,
-        isModal,
-      )
-    },
+    //   return StackViewTransitionConfigs.defaultTransitionConfig(
+    //     transitionProps,
+    //     prevTransitionProps,
+    //     isModal,
+    //   )
+    // },
   },
 )
 
-// HomeStack.navigationOptions = ( { navigation } ) => {
-//   let tabBarVisible = true
-//   console.log( 'navigation.state.index', navigation.state.index )
-
-//   if ( navigation.state.index > 0 ) {
-//     tabBarVisible = false
-//   }
-
-//   return {
-//     tabBarVisible,
-//   }
-// }
-
-export default HomeStack
+export default FriendsAndFamily
