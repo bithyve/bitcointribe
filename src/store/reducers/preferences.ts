@@ -14,6 +14,7 @@ import {
   CARD_DATA,
   IS_BACKUP_PROCESSING,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
+  IS_PERMISSION_SET,
 } from '../actions/preferences'
 import { UPDATE_APP_PREFERENCE } from '../constants'
 import ip, { chain } from 'icepick'
@@ -35,12 +36,12 @@ const initialState = ip.freeze( {
   isTwoFASetupDone: false,
   hasShownInitialKnowMoreSendSheet: false,
   hasCompletedTFASetup: false,
-  isContactOpen: false,
   isMigrated: false,
   applicationStatus: null,
   lastSeen: null,
   cardData: null,
-  isBackupProcessing: false
+  isBackupProcessing: false,
+  isPermissionSet: false
 } )
 
 export default ( state = initialState, { type, payload } ) => {
@@ -122,7 +123,7 @@ export default ( state = initialState, { type, payload } ) => {
       case UPDATE_LAST_SEEN:
         return Object.assign( {
         }, state, {
-          lastSeen: new Date()
+          lastSeen: payload.lastSeen
         } )
 
       case CARD_DATA:
@@ -131,6 +132,11 @@ export default ( state = initialState, { type, payload } ) => {
           cardData: payload.cardData,
         }
 
+      case IS_PERMISSION_SET:
+        return {
+          ...state,
+          isPermissionSet: payload.isPermissionSet,
+        }
       default:
         return state
   }

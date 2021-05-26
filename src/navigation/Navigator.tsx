@@ -144,6 +144,8 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    Launch,
+    Login,
     Intermediate,
     AccountDetails: {
       screen: AccountDetailsStack,

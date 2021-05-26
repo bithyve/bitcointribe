@@ -1,5 +1,4 @@
 import { Platform, NativeModules } from 'react-native'
-import { PermissionsAndroid } from 'react-native'
 import { getFormattedString } from '../../common/CommonFunctions'
 
 

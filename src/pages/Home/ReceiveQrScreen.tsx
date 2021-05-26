@@ -60,6 +60,12 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }, [ allAccounts ] )
 
   useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
+  useEffect( () => {
     let receiveAt = selectedAccount && selectedAccount.receivingAddress ? selectedAccount.receivingAddress : ''
     if ( amount ) {
       const service: TestAccount | RegularAccount | SecureAccount = accountState[ selectedAccount.shell.primarySubAccount.sourceKind ].service

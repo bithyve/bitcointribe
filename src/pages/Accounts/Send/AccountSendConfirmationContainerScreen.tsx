@@ -70,6 +70,12 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     return `${title} (Available to spend: ${formattedAvailableBalanceAmountText} ${formattedUnitText})`
   }, [ formattedAvailableBalanceAmountText, sourcePrimarySubAccount ] )
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(
       <SendConfirmationContent

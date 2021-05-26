@@ -20,6 +20,7 @@ export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS'
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
+export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -164,7 +165,6 @@ export const updateApplicationStatus = ( data ) => {
 }
 
 export const updateLastSeen = ( data ) => {
-  AsyncStorage.setItem( 'lastSeen', String( new Date() ) )
   return {
     type: UPDATE_LAST_SEEN,
     payload: {
@@ -182,3 +182,11 @@ export const setCardData = ( data ) => {
   }
 }
 
+export const setIsPermissionGiven = ( data ) => {
+  return {
+    type: IS_PERMISSION_SET,
+    payload: {
+      isPermissionSet: data
+    }
+  }
+}
