@@ -48,9 +48,9 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
       url
     } ) )
-    // setTimeout( ()=>{
-    //   this.postSplashScreenActions()
-    // }, 4000 )
+    setTimeout( ()=>{
+      this.postSplashScreenActions()
+    }, 4000 )
   };
 
    handleDeepLinkEvent = async ( { url } ) => {
@@ -152,11 +152,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
           resizeMode={'cover'}
           rate={1.0}
           ignoreSilentSwitch={'obey'}
-          onBuffer={()=>{
-            setTimeout( ()=>{
-              this.postSplashScreenActions()
-            }, 4000 )
-          }}
+
         />
         <StatusBar
           backgroundColor={'white'}

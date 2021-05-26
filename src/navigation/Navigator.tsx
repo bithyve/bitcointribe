@@ -134,8 +134,6 @@ const MODAL_ROUTES = [
 
 const HomeNavigator = createStackNavigator(
   {
-    Launch,
-    Login,
     Home: {
       screen: HomeStack,
       path: 'home',
@@ -146,6 +144,8 @@ const HomeNavigator = createStackNavigator(
         gesturesEnabled: false,
       },
     },
+    Launch,
+    Login,
     Intermediate,
     AccountDetails: {
       screen: AccountDetailsStack,
