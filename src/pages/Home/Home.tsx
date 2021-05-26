@@ -65,6 +65,7 @@ import {
   setCurrencyCode,
   setCardData,
   setIsPermissionGiven,
+  updateLastSeen
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
@@ -99,7 +100,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { NavigationActions, withNavigationFocus } from 'react-navigation'
+import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
 import semver from 'semver'
 import {
@@ -283,6 +284,8 @@ interface HomePropsTypes {
   setShowAllAccount: any;
   setIsPermissionGiven: any;
   isPermissionSet: any;
+  updateLastSeen: any;
+  isAuthenticated: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -846,8 +849,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // TODO: Will this function ever be called if the state wasn't different? If not,
       // I don't think we need to be holding on to `appState` in this component's state.
       if ( appState === nextAppState ) return
-      console.log( 'isPermissionSet', isPermissionSet )
-      console.log( 'nextAppState', nextAppState )
       if ( isPermissionSet ) {
         setIsPermissionGiven( false )
         return
@@ -866,8 +867,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
-            this.props.navigation.dispatch( NavigationActions.navigate( {
-              routeName: 'Login',
+            this.props.updateLastSeen( new Date() )
+            this.props.navigation.dispatch( StackActions.reset( {
+              index: 0,
+              actions: [ NavigationActions.navigate( {
+                routeName: 'Launch'
+              } ) ],
             } ) )
           }
         }
@@ -894,6 +899,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // this.props.autoSyncShells()
       // Keeping autoSynn disabled
       credsAuthenticated( false )
+      console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
@@ -2582,6 +2589,7 @@ const mapStateToProps = ( state ) => {
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
+    isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
   }
 }
 
@@ -2625,7 +2633,8 @@ export default withNavigationFocus(
     updateCloudPermission,
     credsAuthenticated,
     setShowAllAccount,
-    setIsPermissionGiven
+    setIsPermissionGiven,
+    updateLastSeen
   } )( Home )
 )
 

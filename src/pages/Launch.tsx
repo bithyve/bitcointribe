@@ -48,9 +48,9 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
       url
     } ) )
-    setTimeout( ()=>{
-      this.postSplashScreenActions()
-    }, 4000 )
+    // setTimeout( ()=>{
+    //   this.postSplashScreenActions()
+    // }, 4000 )
   };
 
    handleDeepLinkEvent = async ( { url } ) => {
@@ -76,31 +76,8 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
     const walletExists = await AsyncStorage.getItem( 'walletExists' )
-    const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
+    //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
     if ( !walletExists ) {
-      return
-    }
-
-    if ( Platform.OS === 'android' && nextAppState === 'background' ) {
-      // if no last seen don't do anything
-      if ( lastSeen ) {
-        //console.log( 'lastSeen', lastSeen )
-        this.props.navigation.navigate( 'Intermediate' )
-        return
-      }
-      return
-    }
-
-    if (
-      Platform.OS === 'ios' &&
-      ( nextAppState === 'inactive' || nextAppState == 'background' )
-    ) {
-      // if no last seen don't do anything
-      if ( lastSeen ) {
-        this.props.navigation.navigate( 'Intermediate' )
-        return
-      }
-
       return
     }
   };
@@ -117,12 +94,32 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
       // scenario based navigation
       if ( hasCreds ) {
-        if ( !this.url )
+        const now: any = new Date()
+        const diff = Math.abs( now - this.props.lastSeen )
+        const isHomePageOpen = Number( diff ) < Number( 20000 )
+        console.log( 'diff', diff, isHomePageOpen )
+        if( isHomePageOpen ){
+          if ( !this.url ){
+            this.props.navigation.replace( 'Home', {
+              screen: 'Home',
+            } )
+          } else {
+            const requestName = await processDL( this.url )
+            this.props.navigation.replace( 'Home', {
+              screen: 'Home',
+              params: {
+                custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+                recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+                trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+                userKey: requestName && requestName.userKey ? requestName.userKey : null,
+                swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+              }
+            } )
+          }
+        } else if ( !this.url ){
           this.props.navigation.replace( 'Login' )
-        else{
+        } else {
           const requestName = await processDL( this.url )
-          //console.log( 'requestName', requestName )
-
           this.props.navigation.replace( 'Login', {
             custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
             recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
@@ -130,13 +127,14 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
             userKey: requestName && requestName.userKey ? requestName.userKey : null,
             swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
           } )
-
         }
+
       } else {
         this.props.navigation.replace( 'PasscodeConfirm' )
       }
 
     } catch ( err ) {
+      console.log( 'err', err );
       ( this.errorBottomSheet as any ).current.snapTo( 1 )
     }
   };
@@ -154,6 +152,11 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
           resizeMode={'cover'}
           rate={1.0}
           ignoreSilentSwitch={'obey'}
+          onBuffer={()=>{
+            setTimeout( ()=>{
+              this.postSplashScreenActions()
+            }, 4000 )
+          }}
         />
         <StatusBar
           backgroundColor={'white'}
@@ -209,7 +212,9 @@ const styles = StyleSheet.create( {
 
 const mapStateToProps = ( state ) => {
   return {
-    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized )
+    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
+    lastSeen: idx( state, ( _ ) => _.preferences.lastSeen )
+
   }
 }
 

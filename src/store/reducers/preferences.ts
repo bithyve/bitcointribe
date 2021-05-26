@@ -123,7 +123,7 @@ export default ( state = initialState, { type, payload } ) => {
       case UPDATE_LAST_SEEN:
         return Object.assign( {
         }, state, {
-          lastSeen: new Date()
+          lastSeen: payload.lastSeen
         } )
 
       case CARD_DATA:

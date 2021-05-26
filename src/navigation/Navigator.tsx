@@ -134,6 +134,8 @@ const MODAL_ROUTES = [
 
 const HomeNavigator = createStackNavigator(
   {
+    Launch,
+    Login,
     Home: {
       screen: HomeStack,
       path: 'home',

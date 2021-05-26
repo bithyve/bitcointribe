@@ -166,7 +166,6 @@ export const updateApplicationStatus = ( data ) => {
 }
 
 export const updateLastSeen = ( data ) => {
-  AsyncStorage.setItem( 'lastSeen', String( new Date() ) )
   return {
     type: UPDATE_LAST_SEEN,
     payload: {
