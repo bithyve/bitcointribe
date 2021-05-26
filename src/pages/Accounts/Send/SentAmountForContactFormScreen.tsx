@@ -80,6 +80,11 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     return Array.from( selectedRecipients || [] ).reverse()
   }, [ selectedRecipients ] )
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
   function handleRecipientRemoval( recipient: RecipientDescribing ) {
     dispatch( recipientRemovedFromSending( recipient ) )

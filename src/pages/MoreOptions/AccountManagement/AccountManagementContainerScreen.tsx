@@ -107,6 +107,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
   const showUnHideArchiveAccountBottomSheet = useCallback( ( primarySubAccount, visibility ) => {
     presentBottomSheet(
       <UnHideArchiveAccountBottomSheet

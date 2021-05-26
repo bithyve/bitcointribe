@@ -34,7 +34,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
   },
   showAllAccount,
 }: Props ) => {
-  console.log( 'SHOWALL', showAllAccount )
   const columnData: Array<AccountShell[]> = useMemo( () => {
     if ( accountShells.length == 0 ) {
       return []
@@ -90,7 +89,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     let currentColumn = []
 
     sortedShells.forEach( ( accountShell, index ) => {
-      console.log( 'accountShell', accountShell )
       // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
       currentColumn.push( accountShell )
 

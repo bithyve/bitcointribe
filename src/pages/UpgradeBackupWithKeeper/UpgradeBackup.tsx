@@ -76,6 +76,7 @@ import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import QRModal from '../Accounts/QRModal'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -161,6 +162,7 @@ interface UpgradeBackupPropsTypes {
   checkMSharesHealth: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
   secureAccount: SecureAccount;
+  setIsPermissionGiven: any;
 }
 
 class UpgradeBackup extends Component<
@@ -952,6 +954,7 @@ class UpgradeBackup extends Component<
 
   requestStoragePermission = async () => {
     try {
+      this.props.setIsPermissionGiven( true )
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -1019,6 +1022,7 @@ class UpgradeBackup extends Component<
   }
 
   checkStoragePermission = async () =>  {
+    this.props.setIsPermissionGiven( true )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
@@ -1548,6 +1552,7 @@ export default withNavigationFocus(
     confirmPDFSharedFromUpgrade,
     getPDFData,
     checkMSharesHealth,
+    setIsPermissionGiven
   } )( UpgradeBackup )
 )
 

@@ -156,6 +156,12 @@ export default function Receive( props ) {
       ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 0 )
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ props.navigation ] )
+
   const showReceiveAmountBottomSheet = useCallback( () => {
     presentBottomSheet(
       <ReceiveAmountContent

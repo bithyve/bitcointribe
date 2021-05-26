@@ -46,6 +46,7 @@ import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 
 const PersonalCopyHistory = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -350,6 +351,7 @@ const PersonalCopyHistory = ( props ) => {
 
 
   const getStoragePermission = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     // await checkStoragePermission()
     if ( Platform.OS === 'android' ) {
       const granted = await requestStoragePermission()
@@ -374,6 +376,7 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   const requestStoragePermission = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     try {
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -396,6 +399,7 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   const checkStoragePermission = async () =>  {
+    dispatch( setIsPermissionGiven( true ) )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
