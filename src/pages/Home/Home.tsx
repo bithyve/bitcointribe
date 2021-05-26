@@ -51,9 +51,9 @@ import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   approveTrustedContact,
+  initializeTrustedContact,
   fetchEphemeralChannel,
   fetchTrustedChannel,
-  clearPaymentDetails,
   postRecoveryChannelSync,
 } from '../../store/actions/trustedContacts'
 import {
@@ -97,6 +97,7 @@ import {
   trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
+  QRCodeTypes,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -221,6 +222,7 @@ interface HomePropsTypes {
   postRecoveryChannelSync: any;
   downloadMShare: any;
   approveTrustedContact: any;
+  initializeTrustedContact: any;
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
@@ -241,8 +243,6 @@ interface HomePropsTypes {
   fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
-  paymentDetails: any;
-  clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
   notificationListNew: any;
@@ -448,7 +448,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       const scannedData = JSON.parse( qrData )
 
-      if ( scannedData.ver ) {
+      // check version compatibility
+      if ( scannedData.version ) {
         const isAppVersionCompatible = await checkAppVersionCompatibility( {
           relayCheckMethod: scannedData.type,
           version: scannedData.ver,
@@ -460,6 +461,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       switch ( scannedData.type ) {
+          case QRCodeTypes.CONTACT_REQUEST:
+            const channelKey = scannedData.channelKey
+            const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
+            navigation.navigate( 'ContactsListForAssociateContact', {
+              postAssociation: ( contact ) => {
+                this.props.initializeTrustedContact( contact, channelKey, contactsSecondaryChannelKey )
+              }
+            } )
+            break
+
           case 'trustedGuardian':
             const trustedGuardianRequest = {
               isGuardian: scannedData.isGuardian,
@@ -1057,49 +1068,46 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setSecondaryDeviceAddresses()
     }
 
-    if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
-      const serviceType = REGULAR_ACCOUNT
-      const {
-        paymentDetails,
-        accountsState,
-        navigation,
-        addTransferDetails,
-        clearPaymentDetails,
-      } = this.props
-      let { address, paymentURI } = paymentDetails
-      let options: any = {
-      }
-      if ( paymentURI ) {
-        try {
-          const details = accountsState[ serviceType ].service.decodePaymentURI(
-            paymentURI
-          )
-          address = details.address
-          options = details.options
-        } catch ( err ) {
-          Alert.alert( 'Unable to decode payment URI' )
-          return
-        }
-      }
+    // if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
+    //   const serviceType = REGULAR_ACCOUNT
+    //   const {
+    //     paymentDetails,
+    //     accountsState,
+    //     navigation,
+    //     addTransferDetails,
+    //   } = this.props
+    //   let { address, paymentURI } = paymentDetails
+    //   let options: any = {
+    //   }
+    //   if ( paymentURI ) {
+    //     try {
+    //       const details = accountsState[ serviceType ].service.decodePaymentURI(
+    //         paymentURI
+    //       )
+    //       address = details.address
+    //       options = details.options
+    //     } catch ( err ) {
+    //       Alert.alert( 'Unable to decode payment URI' )
+    //       return
+    //     }
+    //   }
 
-      const item = {
-        id: address,
-      }
+    //   const item = {
+    //     id: address,
+    //   }
 
-      addTransferDetails( serviceType, {
-        selectedContact: item,
-      } )
+    //   addTransferDetails( serviceType, {
+    //     selectedContact: item,
+    //   } )
 
-      clearPaymentDetails()
-
-      navigation.navigate( 'SendToContact', {
-        selectedContact: item,
-        serviceType,
-        bitcoinAmount: options.amount
-          ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-          : '',
-      } )
-    }
+    //   navigation.navigate( 'SendToContact', {
+    //     selectedContact: item,
+    //     serviceType,
+    //     bitcoinAmount: options.amount
+    //       ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
+    //       : '',
+    //   } )
+    // }
   };
 
   handleDeepLinkModal = () => {
@@ -2569,7 +2577,6 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.health.service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    paymentDetails: idx( state, ( _ ) => _.trustedContacts.paymentDetails ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
@@ -2601,6 +2608,7 @@ export default withNavigationFocus(
     postRecoveryChannelSync,
     downloadMShare,
     approveTrustedContact,
+    initializeTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
     uploadSecondaryShareForPK,
@@ -2615,7 +2623,6 @@ export default withNavigationFocus(
     fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
-    clearPaymentDetails,
     notificationsUpdated,
     setCurrencyCode,
     updatePreference,

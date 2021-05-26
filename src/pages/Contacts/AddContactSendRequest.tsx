@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import {
   View,
-  Image,
   Text,
   StyleSheet,
   SafeAreaView,
@@ -21,29 +20,20 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import NavStyles from '../../common/Styles/NavStyles'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import SendViaLink from '../../components/SendViaLink'
-import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
+import { isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-import ShareOtpWithTrustedContact from '../ManageBackup/ShareOtpWithTrustedContact'
-import { addNewSecondarySubAccount, ContactInfo } from '../../store/actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
+import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { initializeTrustedContact } from '../../store/actions/trustedContacts'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -89,237 +79,79 @@ export default function AddContactSendRequest( props ) {
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
   )
-
-  const updateEphemeralChannelLoader = useSelector(
-    ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
-  )
-
-  const updateTrustedContactsInfo = async ( contact ) => {
-    const tcInfo = trustedContactsInfo ? trustedContactsInfo : []
-    if ( tcInfo && tcInfo.length ) {
-      if (
-        tcInfo.findIndex( ( trustedContact ) => {
-          if ( !trustedContact ) return false
-
-          const presentContactName = `${trustedContact.firstName} ${
-            trustedContact.lastName ? trustedContact.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-
-          const selectedContactName = `${contact.firstName} ${
-            contact.lastName ? contact.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
-
-          return presentContactName == selectedContactName
-        } ) == -1
-      ) {
-        tcInfo.push( contact )
-      }
-    } else {
-      tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
-      tcInfo[ 1 ] = null
-      tcInfo[ 2 ] = null
-      tcInfo[ 3 ] = contact
-    }
-
-    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-  }
-
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
-    if ( Contact && Contact.firstName ) {
-      const contactName = `${Contact.firstName} ${
-        Contact.lastName ? Contact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    for( const contact of Object.values( contacts ) ){
+      if ( contact.contactDetails.id === Contact.id ) return
+    }
+    dispatch( initializeTrustedContact( Contact ) )
+  }, [ Contact ] )
 
-      let info = ''
-      if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-        const phoneNumber = Contact.phoneNumbers[ 0 ].number
-        let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-        number = number.slice( number.length - 10 ) // last 10 digits only
-        info = number
-      } else if ( Contact.emails && Contact.emails.length ) {
-        info = Contact.emails[ 0 ].email
-      }
-
-      const contactInfo: ContactInfo = {
-        contactName,
-        info: info? info.trim(): info,
-      }
-
-      let parentShell: AccountShell
-      accountShells.forEach( ( shell: AccountShell ) => {
-        if( !shell.primarySubAccount.instanceNumber ){
-          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-        }
-      } )
-      const newSecondarySubAccount = new TrustedContactsSubAccountInfo( {
-        accountShellID: parentShell.id,
-        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-      } )
-
-      dispatch(
-        addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
-      )
+  useEffect( ()=> {
+    if ( !Contact ) return
+    createTrustedContact()
+    if( trustedLink || trustedQR ){
+      setTrustedLink( '' )
+      setTrustedQR( '' )
     }
   }, [ Contact ] )
 
   useEffect( () => {
-    if ( updateEphemeralChannelLoader ) {
-      if ( trustedLink ) setTrustedLink( '' )
-      if ( trustedQR ) setTrustedQR( '' )
-      return
-    }
+    if( !Contact ) return
 
-    if ( !Contact ) {
-      console.log( 'Err: Contact missing' )
-      return
-    }
-    console.log( {
-      Contact
-    } )
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
+    let channelKey: string
 
-    const contactName = `${Contact.firstName} ${
-      Contact.lastName ? Contact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
-    const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-
-    if ( trustedContact ) {
-      if ( !trustedContact.ephemeralChannel ) {
-        console.log(
-          'Err: Ephemeral Channel does not exists for contact: ',
-          contactName,
-        )
-        return
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          currentContact = contacts[ ck ]
+          channelKey = ck
+          break
+        }
       }
 
-      const { publicKey, otp } = trustedContacts.tc.trustedContacts[
-        contactName
-      ]
-      const requester = WALLET_SETUP.walletName
+    if ( currentContact ) {
+      const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
-      if ( !trustedLink ) {
-        if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-          const phoneNumber = Contact.phoneNumbers[ 0 ].number
-          let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-          number = number.slice( number.length - 10 ) // last 10 digits only
-          const numHintType = 'num'
-          const numHint = number[ 0 ] + number.slice( number.length - 2 )
-          const numberEncPubKey = TrustedContactsService.encryptPub(
-            publicKey,
-            number,
-          ).encryptedPub
-          const numberDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
-            `/${requester}` +
-            `/${numberEncPubKey}` +
-            `/${numHintType}` +
-            `/${numHint}` +
-            `/${trustedContact.ephemeralChannel.initiatedAt}` +
-            `/v${appVersion}`
-          setIsOTPType( false )
-          setTrustedLink( numberDL )
-        } else if ( Contact.emails && Contact.emails.length ) {
-          const email = Contact.emails[ 0 ].email
-          const emailHintType = 'eml'
-          const trucatedEmail = email.replace( '.com', '' )
-          const emailHint =
-            email[ 0 ] + trucatedEmail.slice( trucatedEmail.length - 2 )
-          const emailEncPubKey = TrustedContactsService.encryptPub(
-            publicKey,
-            email,
-          ).encryptedPub
-          const emailDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
-            `/${requester}` +
-            `/${emailEncPubKey}` +
-            `/${emailHintType}` +
-            `/${emailHint}` +
-            `/${trustedContact.ephemeralChannel.initiatedAt}` +
-            `/v${appVersion}`
-          setIsOTPType( false )
-          setTrustedLink( emailDL )
-        } else if ( otp ) {
-          const otpHintType = 'otp'
-          const otpHint = 'xxx'
-          const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otp )
-            .encryptedPub
-          const otpDL =
-            `https://hexawallet.io/${config.APP_STAGE}/tc` +
-            `/${requester}` +
-            `/${otpEncPubKey}` +
-            `/${otpHintType}` +
-            `/${otpHint}` +
-            `/${trustedContact.ephemeralChannel.initiatedAt}` +
-            `/v${appVersion}`
-          setIsOTPType( true )
-          setOTP( otp )
-          setTrustedLink( otpDL )
-        } else {
-          Alert.alert( 'Invalid Contact', 'Something went wrong.' )
-          return
-        }
-        updateTrustedContactsInfo( Contact ) // Contact initialized to become TC
-      }
 
-      if ( !trustedQR ) {
-        let info = ''
-        if ( Contact.phoneNumbers && Contact.phoneNumbers.length ) {
-          const phoneNumber = Contact.phoneNumbers[ 0 ].number
-          let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-          number = number.slice( number.length - 10 ) // last 10 digits only
-          info = number
-        } else if ( Contact.emails && Contact.emails.length ) {
-          info = Contact.emails[ 0 ].email
-        } else if ( otp ) {
-          info = otp
-        }
+      // const numberDL =
+      //   `https://hexawallet.io/${config.APP_STAGE}/${
+      //     'tcg'
+      //   }` +
+      //   `/${channelKey}` +
+      //   `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
+      //   `/v${appVersion}`
+      // setTrustedLink( numberDL )
 
-        setTrustedQR(
-          JSON.stringify( {
-            requester: WALLET_SETUP.walletName,
-            publicKey,
-            info: info.trim(),
-            uploadedAt: trustedContact.ephemeralChannel.initiatedAt,
-            type: 'trustedContactQR',
-            ver: appVersion,
-          } ),
-        )
-        // setTimeout( () => {
-        //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
-        // }, 2 )
-        
-      } else {
-        // setTimeout( () => {
-        //   ( ContactRequestBottomSheet as any ).current.snapTo( 1 )
-        // }, 2 )
-      }
-      
-    } else {
-      createTrustedContact()
+      setTrustedQR(
+        JSON.stringify( {
+          type: QRCodeTypes.CONTACT_REQUEST,
+          channelKey,
+          walletName: WALLET_SETUP.walletName,
+          secondaryChannelKey,
+          version: appVersion,
+        } ),
+      )
     }
-  }, [ Contact, trustedContacts, updateEphemeralChannelLoader ] )
+  }, [ Contact, trustedContacts ] )
 
-  const openTimer = async () => {
-    setTimeout( () => {
-      setRenderTimer( true )
-    }, 2 )
-    const TCRequestTimer = JSON.parse(
-      await AsyncStorage.getItem( 'TCRequestTimer' ),
-    );
-    ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
-    if ( !TCRequestTimer ) {
-      ( TimerModalBottomSheet as any ).current.snapTo( 1 )
-    }
-  }
+
+  // const openTimer = async () => {
+  //   setTimeout( () => {
+  //     setRenderTimer( true )
+  //   }, 2 )
+  //   const TCRequestTimer = JSON.parse(
+  //     await AsyncStorage.getItem( 'TCRequestTimer' ),
+  //   );
+  //   ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
+  //   if ( !TCRequestTimer ) {
+  //     ( TimerModalBottomSheet as any ).current.snapTo( 1 )
+  //   }
+  // }
 
   const renderSendViaLinkContents = useCallback( () => {
     if ( !isEmpty( Contact ) ) {
@@ -348,7 +180,7 @@ export default function AddContactSendRequest( props ) {
             if ( isOTPType ) {
               shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
             } else {
-              openTimer()
+              // openTimer()
             }
             ( SendViaLinkBottomSheet as any ).current.snapTo( 0 )
           }}
@@ -367,7 +199,7 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [] )
-  
+
 
   const renderContactRequest = useCallback( () => {
     return (
@@ -383,11 +215,11 @@ export default function AddContactSendRequest( props ) {
         onPressBack={() => {
           if ( ContactRequestBottomSheet.current )
             ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
+          props.navigation.goBack()
         }}
         onPressDone={() => {
           ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
-          openTimer()
+          // openTimer()
         }}
         onPressShare={() => {
           setTimeout( () => {
@@ -396,7 +228,7 @@ export default function AddContactSendRequest( props ) {
           if ( isOTPType ) {
             shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
           } else {
-            openTimer()
+            // openTimer()
           }
           ( ContactRequestBottomSheet as any ).current.snapTo( 0 )
         }}
@@ -420,7 +252,7 @@ export default function AddContactSendRequest( props ) {
         }}
         onPressDone={() => {
           ( SendViaQRBottomSheet as any ).current.snapTo( 0 )
-          openTimer()
+          // openTimer()
         }}
       />
     )
@@ -572,7 +404,7 @@ export default function AddContactSendRequest( props ) {
             </View>
             <TouchableOpacity
               onPress={() => {
-                createTrustedContact()
+                // createTrustedContact()
                 props.navigation.goBack()
               }}
               style={{
@@ -608,10 +440,10 @@ export default function AddContactSendRequest( props ) {
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
-              props.navigation.goBack()
+            props.navigation.goBack()
           }}
           onPressDone={() => {
-            openTimer()
+            // openTimer()
           }}
           onPressShare={() => {
             setTimeout( () => {
@@ -620,7 +452,7 @@ export default function AddContactSendRequest( props ) {
             if ( isOTPType ) {
               shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
             } else {
-              openTimer()
+              // openTimer()
             }
           }}
         />
@@ -637,7 +469,7 @@ export default function AddContactSendRequest( props ) {
               }
             />
           </View> */}
-          {/* <View
+        {/* <View
             style={{
               flexDirection: 'row',
               backgroundColor: Colors.blue,

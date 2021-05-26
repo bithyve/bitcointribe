@@ -6,19 +6,23 @@ import {
   trustedChannelActions,
   ShareUploadables,
   Contacts,
+  UnecryptedStreamData,
+  ContactDetails,
+  ContactInfo,
 } from '../../bitcoin/utilities/Interface'
 import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
+export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
+export const SYNC_PERMANENT_CHANNEL = 'SYNC_PERMANENT_CHANNEL'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
-export const UPDATE_TRUSTED_CONTACTS_INFO = 'UPDATE_TRUSTED_CONTACTS_INFO'
-export const UPDATE_ADDRESS_BOOK_LOCALLY = 'UPDATE_ADDRESS_BOOK_LOCALLY'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 export const SYNC_TRUSTED_CHANNELS = 'SYNC_TRUSTED_CHANNELS'
 export const POST_RECOVERY_CHANNEL_SYNC = 'POST_RECOVERY_CHANNEL_SYNC'
@@ -49,6 +53,23 @@ export const approveTrustedContact = (
       contactsWalletName,
       isGuardian,
       isFromKeeper,
+    },
+  }
+}
+
+export const initializeTrustedContact = (
+  contact: any,
+  isGuardian?: boolean,
+  channelKey?: string,
+  contactsSecondaryChannelKey?: string,
+) => {
+  return {
+    type: INITIALIZE_TRUSTED_CONTACT,
+    payload: {
+      contact,
+      isGuardian,
+      channelKey,
+      contactsSecondaryChannelKey,
     },
   }
 }
@@ -116,6 +137,19 @@ export const updateTrustedChannel = (
   }
 }
 
+export const syncPermanentChannel = (
+  contactInfo: ContactInfo,
+  updates?: UnecryptedStreamData,
+  updatedSERVICES?: ServicesJSON
+) => {
+  return {
+    type: SYNC_PERMANENT_CHANNEL,
+    payload: {
+      contactInfo, updates, updatedSERVICES
+    },
+  }
+}
+
 export const fetchTrustedChannel = (
   contactInfo: {
     contactName: string;
@@ -159,15 +193,6 @@ export const syncTrustedChannels = ( contacts? ) => {
 export const postRecoveryChannelSync = () => {
   return {
     type: POST_RECOVERY_CHANNEL_SYNC,
-  }
-}
-
-export const updateTrustedContactsInfoLocally = ( trustedContactsInfo ) => {
-  return {
-    type: UPDATE_TRUSTED_CONTACTS_INFO,
-    payload: {
-      trustedContactsInfo
-    },
   }
 }
 
@@ -257,20 +282,20 @@ export const trustedChannelFetched = ( contactName: string, data: any ) => {
   }
 }
 
-export const paymentDetailsFetched = ( paymentDetails ) => {
-  return {
-    type: PAYMENT_DETAILS_FETCHED,
-    payload: {
-      paymentDetails
-    },
-  }
-}
+// export const paymentDetailsFetched = ( paymentDetails ) => {
+//   return {
+//     type: PAYMENT_DETAILS_FETCHED,
+//     payload: {
+//       paymentDetails
+//     },
+//   }
+// }
 
-export const clearPaymentDetails = () => {
-  return {
-    type: CLEAR_PAYMENT_DETAILS,
-  }
-}
+// export const clearPaymentDetails = () => {
+//   return {
+//     type: CLEAR_PAYMENT_DETAILS,
+//   }
+// }
 
 export const switchTCLoading = ( beingLoaded ) => {
   return {
@@ -280,14 +305,6 @@ export const switchTCLoading = ( beingLoaded ) => {
     },
   }
 }
-
-const updateAddressBookLocallyRequest = createAction(
-  UPDATE_ADDRESS_BOOK_LOCALLY,
-)
-
-export const updateAddressBookLocally = ( payload ) => ( dispatch ) =>
-  dispatch( updateAddressBookLocallyRequest( payload ) )
-
 export const upgradeReducer = (  ) => {
   return {
     type: UPGRADE_REDUCER,

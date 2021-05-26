@@ -99,9 +99,5 @@ export function makeContactRecipientDescription(
     initiatedAt: data.initiatedAt,
     lastSeenActive: data.lastSeen || data.lastSeenActive,
     trustKind,
-    hasXPub: data.hasXpub,
-    hasTrustedAddress: data.hasTrustedAddress,
-    hasTrustedChannelWithUser:
-      data.hasTrustedChannel || data.hasTrustedChannelWithUser,
   }
 }
