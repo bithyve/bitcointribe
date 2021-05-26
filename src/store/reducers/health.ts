@@ -1,5 +1,6 @@
+import { Platform } from 'react-native'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
@@ -41,17 +42,17 @@ import {
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
-interface obj {
-  shareType: string
-  updatedAt: number
-  status: string
-  shareId: string
-  reshareVersion: number
-  name: string
-  data: any;
-  uuid: string
+const obj = {
+  shareType: '',
+  updatedAt: 0,
+  status: 'notAccessible',
+  shareId: '',
+  reshareVersion: 0,
+  name: '',
+  data: {
+  },
+  uuid: '',
 }
-
 const initialState: {
   mnemonic: string;
   service: S3Service;
@@ -71,6 +72,7 @@ const initialState: {
     pdfDataConfirm: Boolean;
     uploadRequestedShare: Boolean;
     downloadSmShare: boolean;
+    modifyLevelDataStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -82,24 +84,9 @@ const initialState: {
   isLevel3Initialized: Boolean;
   levelHealth: {
     level: number;
-    levelInfo: {
-      shareType: string;
-      updatedAt: string;
-      status: string;
-      shareId: string;
-      reshareVersion?: number;
-      name?: string;
-    }[];
+    levelInfo: LevelInfo[];
   }[];
-  keeperInfo: {
-    shareId: string;
-    name: string;
-    uuid: string;
-    publicKey: string;
-    ephemeralAddress: string;
-    type: string;
-    data?: any;
-  }[];
+  keeperInfo: KeeperInfoInterface[];
   shares: any;
   metaShare: MetaShare;
   downloadedMShare: {
@@ -130,17 +117,8 @@ const initialState: {
   hasSMUploadedSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
   newBHRFlowStarted: boolean;
-  levelData: {
-    levelName: string
-    status: string
-    keeper1ButtonText: string
-    keeper2ButtonText: string
-    keeper1: obj,
-    keeper2: obj,
-    note:string
-    info:string
-    id: number
-  }[];
+  shieldHealth: boolean;
+  levelData: LevelData[];
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
   isLevelToNotSetupStatus: boolean;
@@ -163,6 +141,7 @@ const initialState: {
     pdfDataConfirm: false,
     uploadRequestedShare: false,
     downloadSmShare: false,
+    modifyLevelDataStatus: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -199,7 +178,42 @@ const initialState: {
   hasSMUploadedSuccessfully: false,
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
-  levelData: null,
+  shieldHealth: false,
+  levelData: [
+    {
+      levelName: 'Level 1',
+      status: 'notSetup',
+      keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive',
+      keeper2ButtonText: 'Security Question',
+      keeper1: obj,
+      keeper2: obj,
+      note:'',
+      info:'Automated Cloud Backup',
+      id: 1,
+    },
+    {
+      levelName: 'Level 2',
+      status: 'notSetup',
+      keeper1ButtonText: 'Share Recovery Key 1',
+      keeper2ButtonText: 'Share Recovery Key 2',
+      keeper1: obj,
+      keeper2: obj,
+      note:'',
+      info:'Double Backup',
+      id: 2,
+    },
+    {
+      levelName: 'Level 3',
+      status: 'notSetup',
+      keeper1ButtonText: 'Share Recovery Key 1',
+      keeper2ButtonText: 'Share Recovery Key 2',
+      keeper1: obj,
+      keeper2: obj,
+      note:'',
+      info:'Multi Key Backup',
+      id: 3,
+    },
+  ],
   keeperProcessStatus: '',
   pdfCreatedSuccessfully: false,
   isLevelToNotSetupStatus: false
@@ -452,7 +466,8 @@ export default ( state = initialState, action ) => {
       case UPDATE_LEVEL_DATA:
         return {
           ...state,
-          levelData: action.payload.levelData
+          levelData: action.payload.levelData,
+          shieldHealth: action.payload.shieldHealth
         }
 
       case KEEPER_PROCESS_STATUS:

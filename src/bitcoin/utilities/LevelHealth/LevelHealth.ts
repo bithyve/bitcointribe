@@ -457,10 +457,10 @@ export default class LevelHealth {
       let decrypted = decipher.update( encryptedMetaShare, 'hex', 'utf8' )
       decrypted += decipher.final( 'utf8' )
       const decryptedMetaShare: MetaShare = JSON.parse( decrypted )
-      const { shareId, encryptedSecret } = decryptedMetaShare
+      const { shareId, encryptedShare } = decryptedMetaShare
       const generatedShareId = crypto
         .createHash( 'sha256' )
-        .update( JSON.stringify( encryptedSecret ) )
+        .update( JSON.stringify( encryptedShare.pmShare ) )
         .digest( 'hex' )
 
       if (
@@ -719,8 +719,8 @@ export default class LevelHealth {
   public generateMessageID = (): string =>
     LevelHealth.generateRandomString( config.MSG_ID_LENGTH );
 
-  public generateLevel1Shares = (): {
-    shares: string[];
+  public generateLevel1Shares = ( secondaryMnemonics ): {
+    shares: string[]; smShares: string[];
   } => {
     // threshold shares(m) of total shares(n) will enable the recovery of the mnemonic
     const shares = secrets.share(
@@ -729,13 +729,18 @@ export default class LevelHealth {
       config.SSS_LEVEL1_THRESHOLD,
     )
 
+    const smShares = secrets.share(
+      this.stringToHex( secondaryMnemonics ),
+      config.SSS_LEVEL1_TOTAL,
+      config.SSS_LEVEL1_THRESHOLD,
+    )
+
     for ( let itr = 0; itr < shares.length; itr++ ) {
       const checksum = LevelHealth.calculateChecksum( shares[ itr ] )
       shares[ itr ] = shares[ itr ] + checksum
     }
-
     return {
-      shares
+      shares, smShares
     }
   };
 
@@ -748,7 +753,7 @@ export default class LevelHealth {
       const decryptedShareArr = []
       for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
         const element = this.metaSharesKeeper[ i ]
-        decryptedShareArr.push( element.encryptedSecret )
+        decryptedShareArr.push( element.encryptedShare.pmShare )
       }
       const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
 
@@ -1341,28 +1346,19 @@ export default class LevelHealth {
   };
 
   public createMetaSharesKeeper = (
-    secureAssets: {
-      secondaryMnemonic: string;
-      twoFASecret: string;
-      secondaryXpub: string;
-      bhXpub: string;
-    },
+    answer: string,
+    bhXpub: string,
     tag: string,
     questionId: string,
-    version?: string,
-    question?: string,
-    level?: number,
+    version: string,
+    question: string,
+    level: number,
   ): {
     metaShares: MetaShare[];
   } => {
     if ( !this.encryptedSecretsKeeper.length ) {
       throw new Error( 'Can not create MetaShares; missing encryptedSecrets' )
     }
-
-    const {
-      encryptedSocialStaticNonPMDD,
-      encryptedBuddyStaticNonPMDD,
-    } = this.generateStaticNonPMDD( secureAssets )
 
     const timestamp = new Date().toLocaleString( undefined, {
       day: 'numeric',
@@ -1372,49 +1368,32 @@ export default class LevelHealth {
       minute: '2-digit',
     } )
 
-    let index = 0
+    const encryptedXpub = LevelHealth.encryptWithAnswer( bhXpub, answer )
+
     const metaShareArray = []
     let metaShare: MetaShare
-    for ( const encryptedSecret of this.encryptedSecretsKeeper ) {
-      if ( index === 1 ) {
-        metaShare = {
-          encryptedSecret,
-          shareId: LevelHealth.getShareId( encryptedSecret ),
-          meta: {
-            version: version ? version : '0',
-            validator: 'HEXA',
-            index,
-            walletId: this.walletId,
-            tag,
-            timestamp,
-            reshareVersion: 0,
-            questionId,
-            question,
-            scheme: level == 2 ? '2of3' : level == 3 ? '3of5' : '',
-          },
-          encryptedStaticNonPMDD: encryptedBuddyStaticNonPMDD,
-        }
-      } else {
-        metaShare = {
-          encryptedSecret,
-          shareId: LevelHealth.getShareId( encryptedSecret ),
-          meta: {
-            version: version ? version : '0',
-            validator: 'HEXA',
-            index,
-            walletId: this.walletId,
-            tag,
-            timestamp,
-            reshareVersion: 0,
-            questionId,
-            question,
-            scheme: level == 2 ? '2of3' : level == 3 ? '3of5' : '',
-          },
-          encryptedStaticNonPMDD: encryptedSocialStaticNonPMDD,
-        }
+    for ( let index = 0; index < this.encryptedSecretsKeeper.length; index++ ) {
+      const element = this.encryptedSecretsKeeper[ index ]
+      metaShare = {
+        shareId: LevelHealth.getShareId( element ),
+        encryptedShare: {
+          pmShare: element,
+          smShare: this.encryptedSMSecretsKeeper.length ? this.encryptedSMSecretsKeeper[ 1 ] : '',
+          bhXpub: encryptedXpub.encryptedString
+        },
+        meta: {
+          version: version ? version : '0',
+          validator: 'HEXA',
+          index,
+          walletId: this.walletId,
+          tag,
+          timestamp,
+          reshareVersion: 0,
+          questionId,
+          question
+        },
       }
       metaShareArray.push( metaShare )
-      index++
     }
     this.oldMetaSharesKeeper = this.metaSharesKeeper
     this.metaSharesKeeper = metaShareArray
@@ -1550,6 +1529,51 @@ export default class LevelHealth {
 
     return {
       encryptedSecrets: encryptedSecretsTmp
+    }
+  };
+
+  public encryptShares = (
+    secretsToEncrypt: string[],
+    answer: string,
+    smShares?: string[],
+  ): {
+    encryptedSecrets: string[];
+    encryptedSMSecrets: string[];
+  } => {
+    const key = LevelHealth.getDerivedKey( answer )
+    const shareIDs = []
+    const encryptedSecretsTmp = []
+    const encryptedSMSecretsTmp = []
+    for ( const secret of secretsToEncrypt ) {
+      const cipher = crypto.createCipheriv(
+        LevelHealth.cipherSpec.algorithm,
+        key,
+        LevelHealth.cipherSpec.iv,
+      )
+      let encrypted = cipher.update( secret, 'utf8', 'hex' )
+      encrypted += cipher.final( 'hex' )
+      encryptedSecretsTmp.push( encrypted )
+      shareIDs.push( LevelHealth.getShareId( encrypted ) )
+    }
+    if( smShares ){
+      for ( const secret of smShares ) {
+        const cipher = crypto.createCipheriv(
+          LevelHealth.cipherSpec.algorithm,
+          key,
+          LevelHealth.cipherSpec.iv,
+        )
+        let encrypted = cipher.update( secret, 'utf8', 'hex' )
+        encrypted += cipher.final( 'hex' )
+        encryptedSMSecretsTmp.push( encrypted )
+      }
+      this.encryptedSMSecretsKeeper = encryptedSMSecretsTmp // Secondary Mnemonics share
+    }
+
+    this.encryptedSecretsKeeper = encryptedSecretsTmp
+    this.shareIDsKeeper = shareIDs // preserving just the online(relay-transmitted) shareIDs
+    return {
+      encryptedSecrets: this.encryptedSecretsKeeper,
+      encryptedSMSecrets: this.encryptedSMSecretsKeeper
     }
   };
 
@@ -1929,6 +1953,9 @@ export default class LevelHealth {
   public deletePrivateData = async (): Promise<{ success: boolean }> => {
     this.SMMetaSharesKeeper = []
     this.encryptedSMSecretsKeeper = []
+    for ( let i = 0; i < this.metaSharesKeeper.length; i++ ) {
+      this.metaSharesKeeper[ i ].encryptedShare.smShare = ''
+    }
     this.mnemonic = ''
     return {
       success: true

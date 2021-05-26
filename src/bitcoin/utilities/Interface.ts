@@ -108,7 +108,12 @@ export interface Transactions {
 }
 
 export interface MetaShare {
-  encryptedSecret: string;
+  encryptedSecret?: string;
+  encryptedShare?: {
+    pmShare: string;
+    smShare: string;
+    bhXpub: string;
+  };
   shareId: string;
   meta: {
     version: string;
@@ -124,7 +129,6 @@ export interface MetaShare {
     encryptedKeeperInfo?: string;
     scheme?: string,
   };
-  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {
@@ -638,6 +642,7 @@ export interface EphemeralDataForKeeper {
 }
 
 export interface LevelHealthInterface {
+  level?: number;
   levelInfo: LevelInfo[];
 }
 
@@ -648,6 +653,17 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
+}
+
+export interface KeeperInfoInterface {
+  shareId: string;
+  name: string;
+  type: string;
+  scheme: string;
+  currentLevel: number;
+  createdAt: number;
+  sharePosition: number;
+  data?: any;
 }
 //VersionHistory
 export interface VersionHistory {
@@ -670,6 +686,29 @@ export interface AverageTxFees {
     feePerByte: number,
     estimatedBlocks: number,
   },
+}
+
+export interface LevelDataObj {
+  shareType: string
+  updatedAt: number
+  status: string
+  shareId: string
+  reshareVersion: number
+  name: string
+  data: any;
+  uuid: string
+}
+
+export interface LevelData {
+  levelName: string
+  status: string
+  keeper1ButtonText: string
+  keeper2ButtonText: string
+  keeper1: LevelDataObj,
+  keeper2: LevelDataObj,
+  note:string
+  info:string
+  id: number
 }
 
 export enum QRCodeTypes {

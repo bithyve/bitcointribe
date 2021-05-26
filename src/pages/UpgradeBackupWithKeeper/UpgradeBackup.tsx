@@ -57,7 +57,7 @@ import {
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
@@ -615,7 +615,7 @@ class UpgradeBackup extends Component<
         this.setState( {
           isGuardianCreationClicked: true
         } )
-        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
+        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount, metaSharesKeeper } = this.props
         const firstName = 'Secondary'
         const lastName = 'Device1'
 
@@ -632,17 +632,19 @@ class UpgradeBackup extends Component<
         config.TC_REQUEST_EXPIRY
         // Keeper setup started
         keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
-        updatedKeeperInfo( {
+        const obj: KeeperInfoInterface = {
           shareId: shareId,
           name: contactName,
-          uuid: '',
-          publicKey: '',
-          ephemeralAddress: '',
           type: 'device',
+          scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+          currentLevel: this.props.levelToSetup,
+          createdAt: moment( new Date() ).valueOf(),
+          sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
           data: {
             name: contactName, index: 0
           }
-        } )
+        }
+        updatedKeeperInfo( obj )
 
         if ( shareExpired ) {
           this.setState( {
@@ -779,7 +781,7 @@ class UpgradeBackup extends Component<
     if( index === 0 ) contactName = 'Secondary Device1'
     else if( index === 3 ) contactName = 'Secondary Device2'
     else contactName = 'Secondary Device3'
-    const shareArray = [
+    const shareObj =
       {
         walletId: this.props.s3Service.getWalletId().data.walletId,
         shareId: this.state.selectedShareId[ 0 ],
@@ -787,9 +789,8 @@ class UpgradeBackup extends Component<
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-      },
-    ]
-    this.props.updateMSharesHealth( shareArray )
+      }
+    this.props.updateMSharesHealth( shareObj )
   }
 
   saveInTransitHistory = async () => {

@@ -166,8 +166,7 @@ function MBKeeperButton( props ) {
       <Text
         style={{
           ...styles.cardButtonText,
-          color:
-                value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
+          color: value.status == 'notSetup' ? Colors.textColorGrey : Colors.white,
           fontSize: RFValue( 8 ),
           marginLeft: wp( '2%' ),
         }}

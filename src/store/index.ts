@@ -183,7 +183,8 @@ import {
   autoShareLevel2KeepersWatcher,
   downloadSmShareForApprovalWatcher,
   setLevelToNotSetupStatusWatcher,
-  setHealthStatusWatcher
+  setHealthStatusWatcher,
+  modifyLevelDataWatcher,
 } from './sagas/health'
 
 import {
@@ -203,6 +204,7 @@ import {
   checkFileIsAvailableWatcher,
   readFileWatcher,
   uplaodFileWatcher,
+  updateCloudBackupWatcher,
 } from './sagas/cloud'
 
 import {
@@ -352,6 +354,7 @@ const rootSaga = function* () {
     downloadSmShareForApprovalWatcher,
     setLevelToNotSetupStatusWatcher,
     setHealthStatusWatcher,
+    modifyLevelDataWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,
@@ -385,6 +388,7 @@ const rootSaga = function* () {
     checkFileIsAvailableWatcher,
     readFileWatcher,
     uplaodFileWatcher,
+    updateCloudBackupWatcher,
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,

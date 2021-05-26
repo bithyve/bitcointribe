@@ -704,6 +704,7 @@ export default class S3Service {
         status: number;
         data: {
           encryptedSecrets: string[];
+          encryptedSMSecrets: string[];
         };
         err?: undefined;
         message?: undefined;
@@ -715,14 +716,13 @@ export default class S3Service {
         data?: undefined;
       } => {
     try {
-
-      const { shares } = this.levelhealth.generateLevel1Shares()
-      const { encryptedSecrets } = this.levelhealth.encryptSecrets( shares, answer )
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper( secureAssets, tag, questionId, version, question, level )
+      const { shares, smShares } = this.levelhealth.generateLevel1Shares( secureAssets.secondaryMnemonic )
+      const { encryptedSecrets, encryptedSMSecrets } = this.levelhealth.encryptShares( shares, answer, smShares )
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level )
       console.log( 'metaShares', metaShares )
       return {
         status: config.STATUS.SUCCESS, data: {
-          encryptedSecrets
+          encryptedSecrets, encryptedSMSecrets
         }
       }
     } catch ( err ) {
@@ -743,8 +743,8 @@ export default class S3Service {
     tag: string,
     questionId: string,
     version: string,
-    question? :string,
-    level?: number
+    question :string,
+    level: number,
   ):
     | {
         status: number;
@@ -762,8 +762,8 @@ export default class S3Service {
       } => {
     try {
       const { shares } = this.levelhealth.generateLevel2Shares( answer )
-      const { encryptedSecrets } = this.levelhealth.encryptSecrets( shares, answer )
-      const { metaShares } = this.levelhealth.createMetaSharesKeeper( secureAssets, tag, questionId, version, question, level )
+      const { encryptedSecrets } = this.levelhealth.encryptShares( shares, answer )
+      const { metaShares } = this.levelhealth.createMetaSharesKeeper( answer, secureAssets.bhXpub, tag, questionId, version, question, level )
       return {
         status: config.STATUS.SUCCESS, data: {
           encryptedSecrets
