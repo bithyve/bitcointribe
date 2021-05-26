@@ -73,6 +73,8 @@ import {
   SET_LEVEL_TO_NOT_SETUP,
   setIsLevelToNotSetupStatus,
   SET_HEALTH_STATUS,
+  MODIFY_LEVELDATA,
+  updateLevelData
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -96,10 +98,12 @@ import {
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import KeeperService from '../../bitcoin/services/KeeperService'
 import {
+  ContactInfo,
   EphemeralDataElements,
   INotification,
   KeeperInfoInterface,
   Keepers,
+  LevelData,
   LevelHealthInterface,
   LevelInfo,
   MetaShare,
@@ -131,7 +135,7 @@ import Share from 'react-native-share'
 import RNPrint from 'react-native-print'
 import idx from 'idx'
 import AccountShell from '../../common/data/models/AccountShell'
-import { remapAccountShells, restoredAccountShells } from '../actions/accounts'
+import { addNewSecondarySubAccount, remapAccountShells, restoredAccountShells } from '../actions/accounts'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { personalNodeConfigurationSet } from '../actions/nodeSettings'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -139,6 +143,7 @@ import Toast from '../../components/Toast'
 import { restoredVersionHistory } from '../actions/versionHistory'
 import { getVersions } from '../../common/utilities'
 import { initLevels } from '../actions/upgradeToNewBhr'
+import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -3910,7 +3915,8 @@ function* setHealthStatusWorker( ) {
         if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
           const delta = Math.abs( Date.now() - element2.updatedAt )
           const minutes = Math.round( delta / ( 60 * 1000 ) )
-          if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
+          if ( minutes > 2 && element2.shareType != 'cloud' ) {
+          // if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
             levelHealth[ currentLevel - 1 ].levelInfo[ i ].status = 'notAccessible'
             shareArray.push( {
               walletId: service.getWalletId().data.walletId,
@@ -3937,4 +3943,35 @@ function* setHealthStatusWorker( ) {
 export const setHealthStatusWatcher = createWatcher(
   setHealthStatusWorker,
   SET_HEALTH_STATUS
+)
+
+function* modifyLevelDataWorker( ) {
+  try {
+    console.log( 'MODIFY' )
+    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+    let levelData: LevelData[] = yield select( ( state ) => state.health.levelData )
+    let isError = false
+    const abc = JSON.stringify( levelHealth )
+    const levelHealthVar = [ ...getModifiedData( keeperInfo, JSON.parse( abc ) ) ]
+
+    levelData = checkLevelHealth( levelData, levelHealthVar )
+
+    if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
+      isError = true
+    }
+
+    const levelDataUpdated = getLevelInfoStatus( levelData )
+    yield put ( updateLevelData( levelDataUpdated, isError ) )
+    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+    console.log( 'Error EF channel', error )
+  }
+}
+
+export const modifyLevelDataWatcher = createWatcher(
+  modifyLevelDataWorker,
+  MODIFY_LEVELDATA
 )

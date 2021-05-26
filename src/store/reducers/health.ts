@@ -72,6 +72,7 @@ const initialState: {
     pdfDataConfirm: Boolean;
     uploadRequestedShare: Boolean;
     downloadSmShare: boolean;
+    modifyLevelDataStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -116,6 +117,7 @@ const initialState: {
   hasSMUploadedSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
   newBHRFlowStarted: boolean;
+  shieldHealth: boolean;
   levelData: LevelData[];
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
@@ -139,6 +141,7 @@ const initialState: {
     pdfDataConfirm: false,
     uploadRequestedShare: false,
     downloadSmShare: false,
+    modifyLevelDataStatus: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -175,6 +178,7 @@ const initialState: {
   hasSMUploadedSuccessfully: false,
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
+  shieldHealth: false,
   levelData: [
     {
       levelName: 'Level 1',
@@ -462,7 +466,8 @@ export default ( state = initialState, action ) => {
       case UPDATE_LEVEL_DATA:
         return {
           ...state,
-          levelData: action.payload.levelData
+          levelData: action.payload.levelData,
+          shieldHealth: action.payload.shieldHealth
         }
 
       case KEEPER_PROCESS_STATUS:

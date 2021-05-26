@@ -850,7 +850,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />

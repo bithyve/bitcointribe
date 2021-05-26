@@ -247,7 +247,6 @@ const SecurityQuestionHistory = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Security Question'}
         selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
       />

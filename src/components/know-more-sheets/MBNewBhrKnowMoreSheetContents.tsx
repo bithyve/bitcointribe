@@ -12,7 +12,6 @@ import { ScrollView } from 'react-native-gesture-handler'
 
 export default function MBNewBhrKnowMoreSheetContents( props ) {
   const scrollViewRef = useRef<ScrollView>()
-
   return (
     <View style={{
       ...styles.modalContainer, ...props.containerStyle
@@ -26,7 +25,7 @@ export default function MBNewBhrKnowMoreSheetContents( props ) {
         activeOpacity={10}
         onPress={() => props.titleClicked && props.titleClicked()}
       >
-        <Text style={styles.headerText}>{props.type == 'manageBackup' ? 'Manage Backup using Levels' : props.type == 'level3' ? 'Level 3' : props.type == 'level2' ? 'Level 2' : 'Level 1'}</Text>
+        <Text style={styles.headerText}>{props.type == 'manageBackup' ? 'Manage Backup using Levels' : props.type == 'Level 3' ? 'Level 3' : props.type == 'Level 1' ? 'Level 1' : 'Level 2'}</Text>
       </AppBottomSheetTouchableWrapper>
       <View style={styles.headerSeparator} />
       <ScrollView
@@ -46,13 +45,13 @@ export default function MBNewBhrKnowMoreSheetContents( props ) {
               marginBottom: wp( '3%' ),
             }}
           >
-            {props.type == 'manageBackup' ? 'Backup your wallet to recover it in case you lose your phone for some reason' : props.type == 'level3' ? 'The previous level backs up 2 Recovery Keys. This one backs up two more. Any three Recovery Keys would help you successfully recovery your wallet' : props.type == 'level2' ? 'A Recovery Key is part of the mechanism that helps you recover your wallet. We have built the backup mechanism so that no 2 Keys end up in similar formats with a single contact' : 'Backup your wallet on the cloud for a quick recovery process. However, upgrading the backup till the third level ensures increased security'}
+            {props.type == 'manageBackup' ? 'Backup your wallet to recover it in case you lose your phone for some reason' : props.type == 'Level 3' ? 'The previous level backs up 2 Recovery Keys. This one backs up two more. Any three Recovery Keys would help you successfully recovery your wallet' : props.type == 'Level 2' ? 'A Recovery Key is part of the mechanism that helps you recover your wallet. We have built the backup mechanism so that no 2 Keys end up in similar formats with a single contact' : 'Backup your wallet on the cloud for a quick recovery process. However, upgrading the backup till the third level ensures increased security'}
           </Text>
           <View style={{
             justifyContent: 'center', alignItems: 'center'
           }}>
             <Image
-              source={props.type == 'manageBackup' ? require( '../../assets/images/icons/manageBackup.png' ) : props.type == 'level3' ? require( '../../assets/images/icons/level3.png' ) : props.type == 'level2' ? require( '../../assets/images/icons/level2.png' ) : require( '../../assets/images/icons/level1.png' )}
+              source={props.type == 'manageBackup' ? require( '../../assets/images/icons/manageBackup.png' ) : props.type == 'Level 3' ? require( '../../assets/images/icons/level3.png' ) : props.type == 'Level 2' ? require( '../../assets/images/icons/level2.png' ) : require( '../../assets/images/icons/level1.png' )}
               style={styles.helperImage}
             />
           </View>
@@ -62,7 +61,7 @@ export default function MBNewBhrKnowMoreSheetContents( props ) {
               // marginBottom: wp('15%'),
             }}
           >
-            {props.type == 'manageBackup' ? 'The three levels you see are a result of multiple foolproofing mechanisms created to provide incremental layers of security' : props.type == 'level3' ? 'Backing up your wallet till Level 3 ensures that it is extremely hard for you to lose your wallet!' : props.type == 'level2' ? 'The wallet will let you know if a Recovery Key is inaccessible.In that case please ensure you take the necessary steps to properly backup the Recovery Key again' : 'You get to choose if you want to backup the wallet on the cloud or not'}
+            {props.type == 'manageBackup' ? 'The three levels you see are a result of multiple foolproofing mechanisms created to provide incremental layers of security' : props.type == 'Level 3' ? 'Backing up your wallet till Level 3 ensures that it is extremely hard for you to lose your wallet!' : props.type == 'Level 2' ? 'The wallet will let you know if a Recovery Key is inaccessible.In that case please ensure you take the necessary steps to properly backup the Recovery Key again' : 'You get to choose if you want to backup the wallet on the cloud or not'}
           </Text>
         </View>
       </ScrollView>

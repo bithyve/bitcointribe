@@ -32,6 +32,9 @@ function ManageBackupCard( props ) {
     }
   }
 
+  const textColor = value.status == 'notSetup' ? Colors.textColorGrey : Colors.white
+  const manageBackupButtonTextColor = value.status == 'notSetup' ? Colors.black : Colors.white
+
   return (
     <TouchableOpacity onPress={() => props.onPressSelectId( )}>
       <View
@@ -94,17 +97,7 @@ function ManageBackupCard( props ) {
               />
             )}
             <TouchableOpacity
-              onPress={() => {
-                this.setState( {
-                  knowMoreType:
-                    value.id == 1
-                      ? 'level1'
-                      : value.id == 2
-                        ? 'level2'
-                        : 'level3',
-                } )
-                this.knowMoreBottomSheet.snapTo( 1 )
-              }}
+              onPress={()=>props.onPressKnowMore()}
               style={{
                 ...styles.cardButtonView,
                 backgroundColor:
@@ -114,10 +107,7 @@ function ManageBackupCard( props ) {
               <Text
                 style={{
                   ...styles.cardButtonText,
-                  color:
-                    value.status == 'notSetup'
-                      ? Colors.textColorGrey
-                      : Colors.white,
+                  color: textColor,
                   width: 'auto',
                 }}
               >
@@ -140,10 +130,7 @@ function ManageBackupCard( props ) {
               <Text
                 style={{
                   ...styles.levelText,
-                  color:
-                    value.status == 'notSetup'
-                      ? Colors.textColorGrey
-                      : Colors.white,
+                  color: textColor,
                 }}
               >
                 {value.levelName}
@@ -151,10 +138,7 @@ function ManageBackupCard( props ) {
               <Text
                 style={{
                   ...styles.levelInfoText,
-                  color:
-                    value.status == 'notSetup'
-                      ? Colors.textColorGrey
-                      : Colors.white,
+                  color: textColor,
                   width: wp( '55%' ),
                 }}
               >
@@ -169,8 +153,7 @@ function ManageBackupCard( props ) {
               <Text
                 style={{
                   ...styles.manageButtonText,
-                  color:
-                    value.status == 'notSetup' ? Colors.black : Colors.white,
+                  color: manageBackupButtonTextColor
                 }}
                 onPress={() => this.selectId( value.id )}
               >
@@ -182,7 +165,7 @@ function ManageBackupCard( props ) {
                     ? 'arrowup'
                     : 'arrowright'
                 }
-                color={value.status == 'notSetup' ? Colors.black : Colors.white}
+                color={manageBackupButtonTextColor}
                 size={12}
               />
             </TouchableOpacity>
@@ -205,10 +188,7 @@ function ManageBackupCard( props ) {
                 <Text
                   numberOfLines={2}
                   style={{
-                    color:
-                      value.status == 'notSetup'
-                        ? Colors.textColorGrey
-                        : Colors.white,
+                    color: textColor,
                     fontFamily: Fonts.FiraSansRegular,
                     fontSize: RFValue( 10 ),
                   }}

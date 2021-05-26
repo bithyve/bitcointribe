@@ -172,9 +172,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedTime, setSelectedTime ] = useState(
     props.navigation.getParam( 'selectedTime' ),
   )
-  const [ selectedStatus, setSelectedStatus ] = useState(
-    props.navigation.getParam( 'selectedStatus' ),
-  )
   const [ selectedTitle, setSelectedTitle ] = useState(
     props.navigation.getParam( 'selectedTitle' ),
   )
@@ -1194,7 +1191,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={selectedTitle}
         selectedTime={selectedTime}
-        selectedStatus={selectedStatus}
         moreInfo={selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
         imageIcon={getImageIcon}

@@ -86,6 +86,7 @@ export const PDF_SUCCESSFULLY_CREATED = 'PDF_SUCCESSFULLY_CREATED'
 export const SET_LEVEL_TO_NOT_SETUP = 'SET_LEVEL_TO_NOT_SETUP'
 export const IS_LEVEL_TO_NOT_SETUP = 'IS_LEVEL_TO_NOT_SETUP'
 export const SET_HEALTH_STATUS = 'SET_HEALTH_STATUS'
+export const MODIFY_LEVELDATA = 'MODIFY_LEVELDATA'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -738,10 +739,10 @@ export const updateCloudPermission = ( cloudPermissionGranted ) => {
   }
 }
 
-export const updateLevelData = ( levelData ) =>{
+export const updateLevelData = ( levelData, shieldHealth ) =>{
   return {
     type: UPDATE_LEVEL_DATA, payload: {
-      levelData
+      levelData, shieldHealth
     }
   }
 }
@@ -781,5 +782,13 @@ export const setIsLevelToNotSetupStatus = ( status ) =>{
 export const setHealthStatus = ( ) =>{
   return {
     type: SET_HEALTH_STATUS
+  }
+}
+
+export const modifyLevelData = ( shareId, contactDetails ) =>{
+  return {
+    type: MODIFY_LEVELDATA, payload: {
+      shareId, contactDetails
+    }
   }
 }

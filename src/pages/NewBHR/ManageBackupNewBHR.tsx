@@ -43,16 +43,13 @@ import {
   keeperProcessStatus,
   setLevelToNotSetupStatus,
   setHealthStatus,
+  modifyLevelData
 } from '../../store/actions/health'
-import { modifyLevelStatus } from './ManageBackupPageData'
 import {
   LevelData,
   LevelHealthInterface,
   MetaShare,
 } from '../../bitcoin/utilities/Interface'
-import {
-  updateNewFcm,
-} from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import ModalHeader from '../../components/ModalHeader'
 import ErrorModalContents from '../../components/ErrorModalContents'
@@ -64,7 +61,6 @@ import LoaderModal from '../../components/LoaderModal'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import Loader from '../../components/loader'
 import MBNewBhrKnowMoreSheetContents from '../../components/know-more-sheets/MBNewBhrKnowMoreSheetContents'
-import MBKeeperButton from './MBKeeperButton'
 import debounce from 'lodash.debounce'
 import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/newBHR'
 import LevelStatus from '../../common/data/enums/LevelStatus'
@@ -72,7 +68,6 @@ import ManageBackupCard from './ManageBackupCard'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
-  isError: boolean;
   selectedKeeper: {
     shareType: string;
     updatedAt: number;
@@ -109,7 +104,6 @@ interface ManageBackupNewBHRPropsTypes {
   isLevelThreeMetaShareCreated: Boolean;
   metaSharesKeeper: MetaShare[];
   trustedChannelsSetupSync: any;
-  updateNewFcm: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
   deletePrivateData: any;
@@ -137,6 +131,9 @@ interface ManageBackupNewBHRPropsTypes {
   setIsKeeperTypeBottomSheetOpen: any;
   updateCloudData: any;
   levelData: LevelData[]
+  shieldHealth: boolean;
+  modifyLevelData: any;
+  modifyLevelDataStatus: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -177,7 +174,6 @@ class ManageBackupNewBHR extends Component<
     this.state = {
       selectedKeeper: obj,
       selectedId: 0,
-      isError: false,
       selectedLevelId: 0,
       selectedKeeperType: '',
       selectedKeeperName: '',
@@ -193,52 +189,18 @@ class ManageBackupNewBHR extends Component<
   componentDidMount = async () => {
     this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
     await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
-
       if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
         this.setState( {
           showLoader: true
         } )
         this.props.setLevelToNotSetupStatus()
-        this.modifyLevelData()
+        this.props.modifyLevelData()
       } else {
         await this.onRefresh()
-        this.modifyLevelData()
-      }
-      // updates the new FCM token to channels post recovery
-      if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
-        this.props.updateNewFcm()
+        this.props.modifyLevelData()
       }
     } )
   };
-
-  modifyLevelData = () => {
-    const { levelHealth, currentLevel, keeperInfo } = this.props
-    const levelHealthObject = [ ...levelHealth ]
-    const levelData = modifyLevelStatus(
-      this.props.levelData,
-      levelHealthObject,
-      currentLevel,
-      keeperInfo,
-      this.updateLevelDataToReducer
-    )
-    this.setState( {
-      isError: levelData.isError,
-    } )
-  };
-
-
-  selectId = ( value ) => {
-    if ( value != this.state.selectedId ) this.setState( {
-      selectedId: value
-    } )
-    else this.setState( {
-      selectedId: 0
-    } )
-  };
-
-  updateLevelDataToReducer = ( levelData ) =>{
-    this.props.updateLevelData( levelData )
-  }
 
   componentDidUpdate = ( prevProps, prevState ) => {
     const {
@@ -251,7 +213,6 @@ class ManageBackupNewBHR extends Component<
       prevProps.cloudBackupStatus !==
       this.props.cloudBackupStatus
     ) {
-      console.log( 'cloudBackupStatus', cloudBackupStatus )
       if ( healthLoading || cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) {
         this.setState( {
           refreshControlLoader: true,
@@ -271,8 +232,8 @@ class ManageBackupNewBHR extends Component<
       } )
     }
 
-    if( prevProps.levelHealth != this.props.levelHealth ){
-      this.modifyLevelData( )
+    if( prevProps.levelHealth != this.props.levelHealth ) {
+      this.props.modifyLevelData( )
     }
 
     if ( JSON.stringify( prevProps.levelHealth ) !==
@@ -408,11 +369,19 @@ class ManageBackupNewBHR extends Component<
       this.props.setIsKeeperTypeBottomSheetOpen( false );
       ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
     }
+
+    if( prevProps.modifyLevelDataStatus != this.props.modifyLevelDataStatus ){
+      if( this.props.modifyLevelDataStatus ) this.setState( {
+        showLoader: true
+      } )
+      else  this.setState( {
+        showLoader: false
+      } )
+    }
   };
 
   goToHistory = ( value ) => {
     const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
-
     this.setState( {
       showLoader: false
     } )
@@ -426,23 +395,34 @@ class ManageBackupNewBHR extends Component<
       selectedContact: selectedKeeper.data,
       selectedKeeper,
     }
-    if ( selectedKeeper.shareType == 'device' ) {
-      let index = 0
-      let count = 0
+    let index = 1
+    let count = 0
+    if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' ) {
       for ( let i = 0; i < this.props.levelData.length; i++ ) {
         const element = this.props.levelData[ i ]
-        if ( element.keeper1.shareType == 'device' ) count++
-        if ( element.keeper2.shareType == 'device' ) count++
+        if( selectedKeeper.shareType == 'contact' ) {
+          if ( element.keeper1.shareType == 'contact' ) count++
+          if ( element.keeper2.shareType == 'contact' ) count++
+        }
+        if( selectedKeeper.shareType == 'device' ) {
+          if ( element.keeper1.shareType == 'device' ) count++
+          if ( element.keeper2.shareType == 'device' ) count++
+        }
       }
-      if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ){
-        index = selectedKeeper.data.index
+      if( selectedKeeper.shareType == 'contact' ) {
+        if ( count == 1 && isSetup ) index = 2
+        else if ( count == 0 && isSetup ) index = 1
+        else index = selectedKeeper.data.index
       }
-      else if ( count == 0 && isSetup ) index = 0
-      else if ( count == 1 && isSetup ) index = 3
-      else if ( count == 2 && isSetup ) index = 4
-      else {
-        index = 0
+      if( selectedKeeper.shareType == 'device' ) {
+        if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
+        else if ( count == 0 && isSetup ) index = 0
+        else if ( count == 1 && isSetup ) index = 3
+        else if ( count == 2 && isSetup ) index = 4
+        else index = 0
       }
+    }
+    if ( selectedKeeper.shareType == 'device' ) {
       ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
       ( this.QrBottomSheet as any ).snapTo( 0 );
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
@@ -450,21 +430,9 @@ class ManageBackupNewBHR extends Component<
         ...navigationParams,
         isPrimaryKeeper,
         isChangeKeeperAllow,
-        index,
+        index: index > -1 ? index : 0,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
-      let index = 1
-      let count = 0
-      for ( let i = 0; i < this.props.levelData.length; i++ ) {
-        const element = this.props.levelData[ i ]
-        if ( element.keeper1.shareType == 'contact' ) count++
-        if ( element.keeper2.shareType == 'contact' ) count++
-      }
-      if ( count == 1 && isSetup ) index = 2
-      else if ( count == 0 && isSetup ) index = 1
-      else {
-        index = selectedKeeper.data.index
-      }
       ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
       ( this.QrBottomSheet as any ).snapTo( 0 );
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
@@ -490,12 +458,9 @@ class ManageBackupNewBHR extends Component<
   };
 
   onRefresh = async () => {
+    this.props.modifyLevelData( )
     // this.props.checkMSharesHealth()
     this.props.setHealthStatus()
-  };
-
-  closeErrorModal = () => {
-    ( this.ErrorBottomSheet as any ).snapTo( 0 )
   };
 
   sendApprovalRequestToPK = ( ) => {
@@ -609,14 +574,46 @@ class ManageBackupNewBHR extends Component<
     )
   }
 
+  onKeeperButtonPress = ( value, keeperNumber ) =>{
+    const { selectedKeeper } = this.state
+    if( value.id == 1 && keeperNumber == 1 ){
+      if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+        this.props.navigation.navigate(
+          'CloudBackupHistory',
+          {
+            selectedTime: selectedKeeper.updatedAt
+              ? getTime( selectedKeeper.updatedAt )
+              : 'never',
+          }
+        )
+      }
+    } else if( value.id == 1 && keeperNumber == 2 ) {
+      this.props.navigation.navigate(
+        'SecurityQuestionHistoryNewBHR',
+        {
+          selectedTime: selectedKeeper.updatedAt
+            ? getTime( selectedKeeper.updatedAt )
+            : 'never',
+        }
+      )
+    } else {
+      this.setState( {
+        showLoader: true,
+        selectedKeeper: value.keeper1
+      } )
+      requestAnimationFrame( () => {
+        this.onPressKeeperButton( value, keeperNumber )
+      } )
+    }
+  }
+
   render() {
     const {
-      isError,
       selectedLevelId,
       refreshControlLoader,
       selectedKeeper,
     } = this.state
-    const { navigation, currentLevel, levelData } = this.props
+    const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
       <View style={{
         flex: 1, backgroundColor: 'white'
@@ -659,7 +656,7 @@ class ManageBackupNewBHR extends Component<
                 }}
                 resizeMode={'contain'}
               >
-                {isError && (
+                {shieldHealth && (
                   <View style={styles.shieldErrorDot} />
                 )}
               </ImageBackground>
@@ -693,48 +690,18 @@ class ManageBackupNewBHR extends Component<
                   value={value}
                   selectedId={this.state.selectedId}
                   selectedKeeper={this.state.selectedKeeper}
-                  onPressSelectId={( )=>this.selectId( value.id )}
-                  onPressKeeper1={ value.id == 1 ? () => {
-                    if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-                      navigation.navigate(
-                        'CloudBackupHistory',
-                        {
-                          selectedTime: selectedKeeper.updatedAt
-                            ? getTime( selectedKeeper.updatedAt )
-                            : 'never',
-                          selectedStatus: 'Ugly',
-                        }
-                      )
-                    }
-                  } : () => {
-                    this.setState( {
-                      showLoader: true,
-                      selectedKeeper: value.keeper1
-                    } )
-                    requestAnimationFrame( () => {
-                      this.onPressKeeperButton( value, 1 )
-                      //this.props.onPressKeeper( value, 1 )
-                      // debounce( () => this.props.onPressKeeper( value, 1 ), 1000 )
-                    } )
+                  onPressSelectId={( )=>{ this.setState( {
+                    selectedId: value.id != this.state.selectedId ? value.id : 0
+                  } )
                   }}
-                  onPressKeeper2={value.id == 1 ? () =>
-                    navigation.navigate(
-                      'SecurityQuestionHistoryNewBHR',
-                      {
-                        selectedTime: selectedKeeper.updatedAt
-                          ? getTime( selectedKeeper.updatedAt )
-                          : 'never',
-                        selectedStatus: 'Ugly',
-                      }
-                    ) : () => {
+                  onPressKnowMore={() => {
                     this.setState( {
-                      showLoader: true,
-                      selectedKeeper: value.keeper2
+                      knowMoreType: value.levelName
                     } )
-                    requestAnimationFrame( () => {
-                      this.onPressKeeperButton( value, 2 )
-                    } )
+                    this.knowMoreBottomSheet.snapTo( 1 )
                   }}
+                  onPressKeeper1={()=> this.onKeeperButtonPress( value, 1 )}
+                  onPressKeeper2={()=> this.onKeeperButtonPress( value, 2 )}
                 />
               )
             } )}
@@ -783,7 +750,6 @@ class ManageBackupNewBHR extends Component<
                     },
                     isSetup: true,
                   }
-                  console.log( 'obj', obj )
                   this.goToHistory( obj )
                   this.props.setIsKeeperTypeBottomSheetOpen( false );
                   /** other than ThirdLevel first position */
@@ -822,11 +788,11 @@ class ManageBackupNewBHR extends Component<
             info={this.state.errorInfo}
             proceedButtonText={'Got it'}
             isIgnoreButton={false}
-            onPressProceed={() => this.closeErrorModal()}
+            onPressProceed={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )}
             isBottomImage={true}
             bottomImage={require( '../../assets/images/icons/errorImage.png' )}
           />}
-          renderHeader={()=><ModalHeader onPressHeader={() => this.closeErrorModal()} />}
+          renderHeader={()=><ModalHeader onPressHeader={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )} />}
         />
         <BottomSheet
           enabledInnerScrolling={true}
@@ -941,6 +907,8 @@ const mapStateToProps = ( state ) => {
     errorInfo: idx( state, ( _ ) => _.newBHR.errorInfo ),
     isTypeBottomSheetOpen: idx( state, ( _ ) => _.newBHR.isTypeBottomSheetOpen ),
     levelData: idx( state, ( _ ) => _.health.levelData ),
+    shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
+    modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
   }
 }
 
@@ -951,7 +919,6 @@ export default withNavigationFocus(
     checkMSharesHealth,
     initLevelTwo,
     trustedChannelsSetupSync,
-    updateNewFcm,
     setCloudData,
     deletePrivateData,
     updateKeeperInfoToTrustedChannel,
@@ -966,6 +933,7 @@ export default withNavigationFocus(
     setLevelCompletionError,
     setIsKeeperTypeBottomSheetOpen,
     updateCloudData,
+    modifyLevelData,
   } )( ManageBackupNewBHR )
 )
 
