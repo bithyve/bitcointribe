@@ -386,7 +386,9 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
 
   // initiate permanent channel
-  yield put( syncPermanentChannel( contactInfo, updates, updatedSERVICES ) )
+  yield put( syncPermanentChannel( {
+    contactInfo, updates, updatedSERVICES
+  } ) )
 }
 
 function* approveTrustedContactWorker( { payload } ) {

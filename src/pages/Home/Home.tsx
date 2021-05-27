@@ -465,7 +465,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
             navigation.navigate( 'ContactsListForAssociateContact', {
               postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( contact, false, channelKey, contactsSecondaryChannelKey )
+                this.props.initializeTrustedContact( {
+                  contact,
+                  channelKey,
+                  contactsSecondaryChannelKey,
+                } )
+                // TODO: navigate post approval
+                navigation.navigate( 'Home' )
               }
             } )
             break
@@ -939,10 +945,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
-
-    setTimeout( ()=>{
-      this.processQRData( '{"type":"CONTACT_REQUEST","channelKey":"sTsGfsGApm0aEccMaBdrM6vn","walletName":"Baker","version":"1.7.0"}' )
-    }, 2000 )
   };
 
   getNewTransactionNotifications = async () => {
