@@ -465,7 +465,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
             navigation.navigate( 'ContactsListForAssociateContact', {
               postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( contact, channelKey, contactsSecondaryChannelKey )
+                this.props.initializeTrustedContact( {
+                  contact,
+                  channelKey,
+                  contactsSecondaryChannelKey,
+                } )
+                // TODO: navigate post approval
+                navigation.navigate( 'Home' )
               }
             } )
             break

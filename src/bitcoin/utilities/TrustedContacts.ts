@@ -939,9 +939,6 @@ export default class TrustedContacts {
         channelAddress: permanentChannelAddress,
         outstreamUpdates,
       } )
-      console.log( {
-        res
-      } )
 
       const { updated, inStream } = res.data
       if ( !updated ) throw new Error( 'Failed to update permanent channel' )

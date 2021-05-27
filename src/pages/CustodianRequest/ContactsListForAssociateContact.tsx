@@ -91,15 +91,15 @@ const ContactsListForAssociateContact = ( props ) => {
     ( state ) => state.trustedContacts,
   )
 
-  useEffect( () => {
-    if (
-      approvingContact &&
-      approvedTrustedContacts &&
-      approvedTrustedContacts[ approvingContact ]
-    )
-    //     setShowLoader(false);
-      props.navigation.navigate( 'Home' )
-  }, [ approvedTrustedContacts, approvingContact ] )
+  // useEffect( () => {
+  //   if (
+  //     approvingContact &&
+  //     approvedTrustedContacts &&
+  //     approvedTrustedContacts[ approvingContact ]
+  //   )
+  //   //     setShowLoader(false);
+  //     props.navigation.navigate( 'Home' )
+  // }, [ approvedTrustedContacts, approvingContact ] )
 
   // const continueNProceed = async () => {
   //   let AssociatedContact = JSON.parse(
@@ -217,7 +217,9 @@ const ContactsListForAssociateContact = ( props ) => {
         isShowSkipContact={true}
         style={{
         }}
-        onPressContinue={()=>{}}
+        onPressContinue={() => {
+          postAssociation( contacts[ 0 ] )
+        }}
         onSelectContact={selectedContactsList}
         onPressSkip={() => {
           // selectedContactsList([data]);
