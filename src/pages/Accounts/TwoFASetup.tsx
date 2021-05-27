@@ -34,7 +34,7 @@ const TwoFASetup = props => {
           style={CommonStyles.headerLeftIconContainer}
           onPress={
             () => {
-              props.navigation.navigate( 'Home' )
+              props.navigation.navigate( 'HomeRoot' )
             }
           }
           hitSlop={{

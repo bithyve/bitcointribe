@@ -59,6 +59,9 @@ const FriendsAndFamily = createStackNavigator(
   {
     mode: 'modal',
     initialRouteName: 'Home',
+    defaultNavigationOptions: {
+      header: null
+    },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
       if ( navigation.state.index === 0 ) {

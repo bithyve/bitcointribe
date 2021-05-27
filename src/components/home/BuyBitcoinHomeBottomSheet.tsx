@@ -40,7 +40,6 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
     disabled: false
   },
-  
   {
     title: 'Scan a Voucher',
     subtitle: 'From select retail stores with FastBitcoins',
@@ -68,7 +67,9 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
         disabled={menuItem.disabled}
       >
         <ListItem
-          containerStyle={menuItem.disabled ? ListStyles.disabledContainer : ListStyles.container}
+          containerStyle={menuItem.disabled ? ListStyles.disabledContainer : [ ListStyles.container, {
+            marginHorizontal: 0
+          } ]}
           bottomDivider
         >
           <Image
@@ -88,7 +89,7 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
 
   return (
     <FlatList
-      style={styles.rootContainer}
+      // style={styles.rootContainer}
       data={menuItems}
       keyExtractor={listItemKeyExtractor}
       renderItem={renderItem}
@@ -96,11 +97,11 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
   )
 }
 
-const styles = StyleSheet.create( {
-  rootContainer: {
-    flex: 1,
-    backgroundColor: Colors.white,
-  },
-} )
+// const styles = StyleSheet.create( {
+//   rootContainer: {
+//     // flex: 1,
+//     // backgroundColor: Colors.blue,
+//   },
+// } )
 
 export default BuyBitcoinHomeBottomSheet

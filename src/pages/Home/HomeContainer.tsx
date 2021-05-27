@@ -175,7 +175,7 @@ interface HomeStateTypes {
   netBalance: number;
   bottomSheetState: BottomSheetState;
   currentBottomSheetKind: BottomSheetKind | null;
-
+  showModal: boolean;
   secondaryDeviceOtp: any;
   currencyCode: string;
   errorMessageHeader: string;
@@ -288,6 +288,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
   bottomSheetRef = createRef<BottomSheet>();
+  sheetRef = createRef();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
 
   static whyDidYouRender = true;
@@ -305,6 +306,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
       netBalance: 0,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
+      showModal: false,
       secondaryDeviceOtp: {
       },
       currencyCode: 'USD',
@@ -1473,6 +1475,9 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+    this.setState( {
+      showModal: false
+    } )
     switch ( menuItem.kind ) {
         case BuyMenuItemKind.FAST_BITCOINS:
           this.props.navigation.navigate( 'VoucherScanner' )
@@ -2504,7 +2509,13 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
             incramount={'55.09'}
             percentIncr={'2.1'}
             asset={ require( '../../assets/images/currencySymbols/icon_dollar_light.png' )}
-            openBottomSheet={( value ) => this.openBottomSheet( value )}
+            openBottomSheet={( value ) => {
+              // this.sheetRef.current.snapTo( 0 )
+              this.setState( {
+                // bottomSheetState: BottomSheetState.Open,
+                showModal: true
+              } )
+            }}
           />
 
           {/* </View> */}
@@ -2513,19 +2524,69 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           isVisible={this.state.bottomSheetState === BottomSheetState.Open}
           onPress={this.closeBottomSheet}
         />
+        {/* <BottomSheet
+          ref={this.sheetRef}
+          snapPoints={[ 450, 300, 0 ]}
+          borderRadius={10}
+          renderContent={() => {
+            return (
+              <>
+                <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
+
+                <BuyBitcoinHomeBottomSheet
+                  onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+                  // onPress={this.closeBottomSheet}
+                />
+              </>
+            )
+          }}
+        /> */}
         <Modal
-          visible={this.state.currentBottomSheetKind != null}
+          visible={this.state.showModal}
           onRequestClose={() => { this.closeBottomSheet() }}
           transparent={true}
+          style={{
+            // margin: 0,
+            flex: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
           <TouchableOpacity
-            style={{
-              flex: 1,
-              // margin: 10
-            }}
             activeOpacity={1}
-            onPressOut={() => { this.closeBottomSheet() }}
+            onPressOut={() => {
+
+              this.setState( {
+                // bottomSheetState: BottomSheetState.Closed,
+                showModal: false
+              } )}}
+            style={{
+              // flex: 1,
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              flex: 1,
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              // borderRadius: 20
+
+            }}
           >
+            <View style={styles.containerStyle}>
+
+              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
+
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              // onPress={this.closeBottomSheet}
+              />
+            </View>
+          </TouchableOpacity>
+        </Modal>
+        {this.state.currentBottomSheetKind != null && (
+          <View style={{
+            flex: 1,
+            alignItems: 'center'
+          }}>
             <BottomSheet
               ref={this.bottomSheetRef}
               snapPoints={this.getBottomSheetSnapPoints()}
@@ -2537,11 +2598,8 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
             >
               <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
             </BottomSheet>
-          </TouchableOpacity>
-        </Modal>
-        {/* {this.state.currentBottomSheetKind != null && ( */}
-
-        {/* )} */}
+          </View>
+        )}
       </>
     )
   }
@@ -2632,6 +2690,11 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  containerStyle: {
+    width: '95%',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
   cardContainer: {
     backgroundColor: Colors.white,
     width: widthPercentageToDP( '95%' ),
