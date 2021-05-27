@@ -300,7 +300,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
   const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
-  const { contactDetails, channelKey, secondaryChannelKey } = contactInfo
+  const { contactDetails } = contactInfo
   const { walletId } = regularAccount.hdWallet.getWalletId()
 
   // initialize a trusted derivative account against the following contact
@@ -308,7 +308,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     TRUSTED_CONTACTS,
     null,
     contactDetails,
-    channelKey,
+    contactInfo.channelKey,
   )
   if ( res.status !== 200 ) throw new Error( `${res.err}` )
 
