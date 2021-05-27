@@ -784,7 +784,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp ( 1 )
   },
   accountCardsSectionContainer: {
-    flex: 13,
+    flex: 16,
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

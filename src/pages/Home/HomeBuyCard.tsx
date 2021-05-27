@@ -70,12 +70,12 @@ export enum BottomSheetKind {
   }
 
 const HomeBuyCard = ( {
-    cardContainer,
-    amount,
-    incramount,
-    percentIncr,
-    asset,
-    openBottomSheet
+  cardContainer,
+  amount,
+  incramount,
+  percentIncr,
+  asset,
+  openBottomSheet
 //   netBalance,
 //   getCurrencyImageByRegion,
 //   exchangeRates,
@@ -83,59 +83,62 @@ const HomeBuyCard = ( {
 } ) => {
 //   const currencyKind: CurrencyKind = useCurrencyKind()
 
-//   const prefersBitcoin = useMemo( () => {
-//     return currencyKind === CurrencyKind.BITCOIN
-//   }, [ currencyKind ] )
+  //   const prefersBitcoin = useMemo( () => {
+  //     return currencyKind === CurrencyKind.BITCOIN
+  //   }, [ currencyKind ] )
 
 
   return (
-<View
-            style={cardContainer}
-          >
-              <View>
-            <Text style={{
-                color: Colors.blue,
-                fontSize: RFValue( 10 ),
-                marginLeft: 2,
-                fontFamily: Fonts.FiraSansRegular,
-              }}>
+    <View
+      style={cardContainer}
+    >
+      <View>
+        <Text style={{
+          color: Colors.blue,
+          fontSize: RFValue( 10 ),
+          // marginLeft: 2,
+          fontFamily: Fonts.FiraSansRegular,
+          alignSelf: 'flex-start'
+        }}>
               BTC to USD today
-            </Text>
-            <View style={{ flexDirection: 'row' }}>
-              <Text>$</Text>
-              <Text> {amount}</Text>
-              <Text> {incramount}</Text>
-            </View> 
-            </View>
-            <Button
-              raised
-              title="Buy BTC"
-              icon={
-                <Image
-                  source={require( '../../assets/images/icons/recurring_buy.png' )}
-                  style={{
-                    width: wp( 8 ),
-                    height: wp( 8 ),
-                    marginTop: wp( -3 ),
-                    marginBottom: wp( -3 ),
-                  }}
-                />
-              }
-              buttonStyle={{
-                ...ButtonStyles.floatingActionButton,
-                borderRadius: 9999,
-                alignSelf:'flex-end'
-                // paddingHorizontal: widthPercentageToDP( 10 ),
-              }}
-              titleStyle={{
-                ...ButtonStyles.floatingActionButtonText,
-                marginLeft: 8,
-              }}
-              onPress={() =>
-                openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-              }
-            />
-          </View>
+        </Text>
+        <View style={{
+          flexDirection: 'row', marginTop: hp( '1' ), alignSelf: 'flex-end'
+        }}>
+          <Text>$</Text>
+          <Text> {amount}</Text>
+          <Text> {incramount}</Text>
+        </View>
+      </View>
+      <Button
+        raised
+        title="Buy BTC"
+        icon={
+          <Image
+            source={require( '../../assets/images/icons/recurring_buy.png' )}
+            style={{
+              width: wp( 8 ),
+              height: wp( 8 ),
+              marginTop: wp( -3 ),
+              marginBottom: wp( -3 ),
+            }}
+          />
+        }
+        buttonStyle={{
+          ...ButtonStyles.floatingActionButton,
+          borderRadius: wp( 10 ),
+          alignSelf:'flex-end',
+          minHeight: hp( 3 )
+        }}
+        titleStyle={{
+          ...ButtonStyles.floatingActionButtonText,
+          marginLeft: 8,
+        }}
+        onPress={() =>
+          openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+        }
+      />
+    </View>
     // <View style={{
     //   ...styles.headerViewContainer, flex: 1
     // }}>

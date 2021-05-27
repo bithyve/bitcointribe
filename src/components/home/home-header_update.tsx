@@ -260,7 +260,7 @@ const HomeHeader = ( {
       <View style={{
         flexDirection: 'row'
       }}>
-{/* <<<<<<< Updated upstream */}
+        {/* <<<<<<< Updated upstream */}
         {/* <CurrencyKindToggleSwitch
           fiatCurrencyCode={CurrencyCode}
           onpress={() => {
@@ -303,66 +303,66 @@ const HomeHeader = ( {
           </ImageBackground>
         </TouchableOpacity>
       </View> */}
-      <View style={{
-        flex: 1, justifyContent: 'center', alignItems: 'center'
-// =======
+        <View style={{
+          flex: 1, justifyContent: 'center', alignItems: 'flex-start'
+          // =======
         // <View style={{
         // flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start'
-// >>>>>>> Stashed changes
-      }}>
-        <View
-          style={{
-            marginBottom: wp( '2%' ),
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-          }}
-        >
-          <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+          // >>>>>>> Stashed changes
+        }}>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              // marginBottom: wp('3%'),
+              marginBottom: wp( '2%' ),
+              justifyContent: 'center',
+              alignItems: 'flex-start',
             }}
           >
-            {prefersBitcoin ? (
-              <Image
-                style={{
-                  ...CommonStyles.homepageAmountImage,
-                  marginBottom: wp( '1.5%' ),
-                }}
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-              />
-            ) : currencyCode.includes( CurrencyCode ) ? (
-              setCurrencyCodeToImage(
-                getCurrencyImageName( CurrencyCode ),
-                'light'
-              )
-            ) : (
-              <Image
-                style={{
-                  ...styles.cardBitCoinImage,
-                  marginBottom: wp( '1.5%' ),
-                }}
-                source={getCurrencyImageByRegion( CurrencyCode, 'light' )}
-              />
-            )}
-            <Text style={styles.homeHeaderAmountText}>
-              {prefersBitcoin
-                ? UsNumberFormat( netBalance )
-                : exchangeRates && exchangeRates[ CurrencyCode ]
-                  ? (
-                    ( netBalance / SATOSHIS_IN_BTC ) *
+            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+              // marginBottom: wp('3%'),
+              }}
+            >
+              {prefersBitcoin ? (
+                <Image
+                  style={{
+                    ...CommonStyles.homepageAmountImage,
+                    marginBottom: wp( '1.5%' ),
+                  }}
+                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                />
+              ) : currencyCode.includes( CurrencyCode ) ? (
+                setCurrencyCodeToImage(
+                  getCurrencyImageName( CurrencyCode ),
+                  'light'
+                )
+              ) : (
+                <Image
+                  style={{
+                    ...styles.cardBitCoinImage,
+                    marginBottom: wp( '1.5%' ),
+                  }}
+                  source={getCurrencyImageByRegion( CurrencyCode, 'light' )}
+                />
+              )}
+              <Text style={styles.homeHeaderAmountText}>
+                {prefersBitcoin
+                  ? UsNumberFormat( netBalance )
+                  : exchangeRates && exchangeRates[ CurrencyCode ]
+                    ? (
+                      ( netBalance / SATOSHIS_IN_BTC ) *
                     exchangeRates[ CurrencyCode ].last
-                  ).toFixed( 2 )
-                  : 0}
-            </Text>
-            <Text style={styles.homeHeaderAmountUnitText}>
-              {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
-            </Text>
+                    ).toFixed( 2 )
+                    : 0}
+              </Text>
+              <Text style={styles.homeHeaderAmountUnitText}>
+                {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+              </Text>
+            </View>
           </View>
         </View>
-      </View>
         {/* <CurrencyKindToggleSwitch
           fiatCurrencyCode={CurrencyCode}
           onpress={() => {
@@ -433,7 +433,7 @@ const HomeHeader = ( {
           </ImageBackground>
         </TouchableOpacity>
       </View>
-      
+
       {/* <View
         style={{
           flexDirection: 'row',
@@ -486,7 +486,7 @@ const HomeHeader = ( {
           />
         </TouchableOpacity>
       </View> */}
-     </View>
+    </View>
   )
 }
 

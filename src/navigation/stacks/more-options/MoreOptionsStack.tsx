@@ -65,6 +65,9 @@ const MoreOptionsStack = createStackNavigator(
   },
   {
     initialRouteName: 'MoreOptionsRoot',
+    defaultNavigationOptions: {
+      header: null
+    },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
       console.log( 'navigation.state.index>>>>>>>>', navigation.state.index )

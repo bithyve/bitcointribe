@@ -12,6 +12,7 @@ import {
   AppState,
   InteractionManager,
   Modal,
+  Image
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
@@ -146,6 +147,8 @@ import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import HomeBuyCard from './HomeBuyCard'
+import Fonts from './../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -2492,11 +2495,48 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
     return (
       <>
         <View style={containerView}>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: 18,
+            marginHorizontal: 14
+          }}>
+            <Text style={{
+              color: Colors.blue,
+              fontSize: RFValue( 16 ),
+              marginLeft: 2,
+              fontFamily: Fonts.FiraSansMedium,
+            }}>
+            My Portfolio
+            </Text>
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row'
+              }}
+            >
+              <Image source={require( '../../assets/images/icons/setting.png' )}
+                style={{
+                  width: 20, height: 20
+                }}
+              />
+              <Text style={{
+                color: Colors.lightBlue,
+                fontSize: RFValue( 12 ),
+                marginLeft: 4,
+                fontFamily: Fonts.FiraSansItalic,
+              }}>
+               Refresh All Balances
+              </Text>
+            </TouchableOpacity>
+
+          </View>
+
           <HomeAccountCardsList
-            containerStyle={containerView}
+            // containerStyle={containerView}
             contentContainerStyle={{
-              paddingTop: 36,
+              paddingTop: 4,
               paddingLeft: 14,
+              // backgroundColor: 'red'
             }}
             currentLevel={currentLevel}
             onAddNewSelected={this.navigateToAddNewAccountScreen}
@@ -2519,87 +2559,71 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           />
 
           {/* </View> */}
-        </View>
-        <BottomSheetBackground
-          isVisible={this.state.bottomSheetState === BottomSheetState.Open}
-          onPress={this.closeBottomSheet}
-        />
-        {/* <BottomSheet
-          ref={this.sheetRef}
-          snapPoints={[ 450, 300, 0 ]}
-          borderRadius={10}
-          renderContent={() => {
-            return (
-              <>
+
+          <BottomSheetBackground
+            isVisible={this.state.bottomSheetState === BottomSheetState.Open}
+            onPress={this.closeBottomSheet}
+          />
+          <Modal
+            visible={this.state.showModal}
+            onRequestClose={() => { this.closeBottomSheet() }}
+            transparent={true}
+            style={{
+            // margin: 0,
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <TouchableOpacity
+              activeOpacity={1}
+              onPressOut={() => {
+
+                this.setState( {
+                // bottomSheetState: BottomSheetState.Closed,
+                  showModal: false
+                } )}}
+              style={{
+              // flex: 1,
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                flex: 1,
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                // borderRadius: 20
+
+              }}
+            >
+              <View style={styles.containerStyle}>
+
                 <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
 
                 <BuyBitcoinHomeBottomSheet
                   onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
                   // onPress={this.closeBottomSheet}
                 />
-              </>
-            )
-          }}
-        /> */}
-        <Modal
-          visible={this.state.showModal}
-          onRequestClose={() => { this.closeBottomSheet() }}
-          transparent={true}
-          style={{
-            // margin: 0,
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPressOut={() => {
-
-              this.setState( {
-                // bottomSheetState: BottomSheetState.Closed,
-                showModal: false
-              } )}}
-            style={{
-              // flex: 1,
-              backgroundColor: 'rgba(0,0,0,0.5)',
+              </View>
+            </TouchableOpacity>
+          </Modal>
+          {this.state.currentBottomSheetKind != null && (
+            <View style={{
               flex: 1,
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              // borderRadius: 20
-
-            }}
-          >
-            <View style={styles.containerStyle}>
-
-              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-              // onPress={this.closeBottomSheet}
-              />
+              alignItems: 'center'
+            }}>
+              <BottomSheet
+                ref={this.bottomSheetRef}
+                snapPoints={this.getBottomSheetSnapPoints()}
+                initialSnapIndex={-1}
+                animationDuration={defaultBottomSheetConfigs.animationDuration}
+                animationEasing={Easing.out( Easing.back( 1 ) )}
+                handleComponent={defaultBottomSheetConfigs.handleComponent}
+                onChange={this.handleBottomSheetPositionChange}
+              >
+                <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
+              </BottomSheet>
             </View>
-          </TouchableOpacity>
-        </Modal>
-        {this.state.currentBottomSheetKind != null && (
-          <View style={{
-            flex: 1,
-            alignItems: 'center'
-          }}>
-            <BottomSheet
-              ref={this.bottomSheetRef}
-              snapPoints={this.getBottomSheetSnapPoints()}
-              initialSnapIndex={-1}
-              animationDuration={defaultBottomSheetConfigs.animationDuration}
-              animationEasing={Easing.out( Easing.back( 1 ) )}
-              handleComponent={defaultBottomSheetConfigs.handleComponent}
-              onChange={this.handleBottomSheetPositionChange}
-            >
-              <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
-            </BottomSheet>
-          </View>
-        )}
+          )}
+        </View>
       </>
     )
   }
@@ -2698,8 +2722,9 @@ const styles = StyleSheet.create( {
   cardContainer: {
     backgroundColor: Colors.white,
     width: widthPercentageToDP( '95%' ),
+    height: hp( 9 ),
     borderRadius: widthPercentageToDP( 3 ),
-    marginBottom: 10,
+    marginBottom: hp( 1 ),
     alignItems: 'center',
     justifyContent: 'space-between',
     marginHorizontal: widthPercentageToDP( 5 ),

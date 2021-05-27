@@ -1,12 +1,18 @@
-import React from 'react'
-import { View, Text, StyleSheet, Linking, FlatList, Image, ImageBackground, StatusBar, ImageSourcePropType } from 'react-native'
+import React, { useMemo, useState } from 'react'
+import { View, Text, StyleSheet, Linking, FlatList, Image, ImageBackground, StatusBar, ImageSourcePropType, Switch } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import openLink from '../../utils/OpenLink'
 import Header from '../../navigation/stacks/Header'
+import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
+import CurrencyKind from '../../common/data/enums/CurrencyKind'
+import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
+import { useSelector, useDispatch } from 'react-redux'
+import { currencyKindSet } from '../../store/actions/preferences'
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 
 export type Props = {
   navigation: any;
@@ -19,9 +25,24 @@ interface MenuOption {
   imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
+  isSwitch: boolean;
 }
 
 const menuOptions: MenuOption[] = [
+  {
+    title: 'Use FaceId',
+    imageSource: require( '../../assets/images/icons/addressbook.png' ),
+    subtitle: 'Unlock your wallet using FaceId',
+    // screenName: 'FriendsAndFamily',
+    isSwitch: true
+  },
+  {
+    title: 'Dark Mode',
+    imageSource: require( '../../assets/images/icons/addressbook.png' ),
+    subtitle: 'Use dark Mode on your wallet',
+    // screenName: 'FriendsAndFamily',
+    isSwitch: true
+  },
   {
     title: 'Account Management',
     imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
@@ -56,18 +77,18 @@ const menuOptions: MenuOption[] = [
     screenName: 'FundingSources',
   },
   */
-  {
-    title: 'Hexa Community (Telegram)',
-    imageSource: require( '../../assets/images/icons/telegram.png' ),
-    subtitle: 'Questions, feedback and more',
-    onOptionPressed: () => {
-      Linking.openURL( 'https://t.me/HexaWallet' )
-        .then( ( _data ) => { } )
-        .catch( ( _error ) => {
-          alert( 'Make sure Telegram installed on your device' )
-        } )
-    },
-  },
+  // {
+  //   title: 'Hexa Community (Telegram)',
+  //   imageSource: require( '../../assets/images/icons/telegram.png' ),
+  //   subtitle: 'Questions, feedback and more',
+  //   onOptionPressed: () => {
+  //     Linking.openURL( 'https://t.me/HexaWallet' )
+  //       .then( ( _data ) => { } )
+  //       .catch( ( _error ) => {
+  //         alert( 'Make sure Telegram installed on your device' )
+  //       } )
+  //   },
+  // },
   {
     title: 'Wallet Settings',
     imageSource: require( '../../assets/images/icons/settings.png' ),
@@ -78,7 +99,14 @@ const menuOptions: MenuOption[] = [
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerStyle }: Props ) => {
+const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
+  // currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
+  const [ isEnabled, setIsEnabled ] = useState( false )
+  const toggleSwitch = () => setIsEnabled( previousState => !previousState )
+  const currencyCode = useSelector(
+    ( state ) => state.preferences.currencyCode,
+  )
+  console.log( 'currencyCode>>>>>>>. ', currencyCode )
 
   function handleOptionSelection( menuOption: MenuOption ) {
     if ( typeof menuOption.onOptionPressed === 'function' ) {
@@ -87,6 +115,13 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
       navigation.navigate( menuOption.screenName )
     }
   }
+  const dispatch = useDispatch()
+
+  const currencyKind: CurrencyKind = useCurrencyKind()
+
+  const prefersBitcoin = useMemo( () => {
+    return currencyKind === CurrencyKind.BITCOIN
+  }, [ currencyKind ] )
 
   return (
     <ImageBackground
@@ -103,10 +138,46 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       <Header />
       <View style={styles.accountCardsSectionContainer}>
-        {/* <SafeAreaView style={styles.modalContentContainer}> */}
-        {/* <View style={{
-        flex: 1
-      }}> */}
+        <Text style={{
+          color: Colors.blue,
+          fontSize: RFValue( 16 ),
+          marginLeft: 2,
+          fontFamily: Fonts.FiraSansMedium,
+          paddingTop: widthPercentageToDP( 8 ),
+          paddingLeft: widthPercentageToDP( 8 )
+        }}>
+            Settings & More,
+        </Text>
+        <View style={{
+          flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
+        }}>
+          <Image
+            source={require( '../../assets/images/icons/recurring_buy.png' )}
+            style={{
+              width: widthPercentageToDP( 8 ),
+              height: widthPercentageToDP( 8 ),
+            }}
+          />
+          <View>
+            <Text style={styles.addModalTitleText}>
+          Show in Bitcoin
+            </Text>
+            <Text style={styles.addModalInfoText}>
+        Lorem ipsum dolor sit amet, consectetur
+            </Text>
+          </View>
+          <CurrencyKindToggleSwitch
+            fiatCurrencyCode={currencyCode}
+            onpress={() => {
+              dispatch(
+                currencyKindSet(
+                  prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                )
+              )
+            }}
+            isOn={prefersBitcoin}
+          />
+        </View>
         <FlatList
           data={menuOptions}
           keyExtractor={listItemKeyExtractor}
@@ -139,13 +210,58 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
                   <Text style={styles.addModalTitleText}>{menuOption.title} </Text>
                   <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
                 </View>
+                {menuOption.isSwitch &&
+                <View style={{
+                  alignItems: 'flex-end',
+                  marginLeft: 'auto'
+                }}>
+                  <Switch
+                    value={isEnabled}
+                    onValueChange={toggleSwitch}
+                    thumbColor={isEnabled ? Colors.blue : Colors.white}
+                    trackColor={{
+                      false: Colors.borderColor, true: Colors.lightBlue
+                    }}
+                    onTintColor={Colors.blue}
+                  />
+                </View>
+                }
               </View>
             </AppBottomSheetTouchableWrapper>
           }}
         />
+        <TouchableOpacity
+          onPress={() => {
+            Linking.openURL( 'https://t.me/HexaWallet' )
+              .then( ( _data ) => { } )
+              .catch( ( _error ) => {
+                alert( 'Make sure Telegram installed on your device' )
+              } )
+          }}
+          style={{
+            flexDirection: 'row', margin: 15
+          }}>
+          <Image
+            source={require( '../../assets/images/icons/telegram.png' )}
+            style={{
+              width: widthPercentageToDP( 8 ),
+              height: widthPercentageToDP( 8 ),
+            }}
+          />
+          <View style={{
+            marginLeft: 10
+          }}>
+            <Text style={styles.addModalTitleText}>
+          Telegram Support Group
+            </Text>
+            <Text style={styles.addModalInfoText}>
+        Lorem ipsum dolor sit amet, consectetur
+            </Text>
+          </View>
+        </TouchableOpacity>
         {/* </View> */}
 
-        <View
+        {/* <View
           style={styles.webLinkBarContainer}
         >
           <AppBottomSheetTouchableWrapper
@@ -177,7 +293,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
           >
             <Text style={styles.addModalTitleText}>Privacy Policy</Text>
           </AppBottomSheetTouchableWrapper>
-        </View>
+        </View> */}
       </View>
     </ImageBackground>
   )
@@ -185,7 +301,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation, containerSty
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    flex: 13,
+    flex: 16,
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
@@ -233,10 +349,11 @@ const styles = StyleSheet.create( {
   },
 
   modalElementInfoView: {
+    flex: 1,
     margin: 10,
     height: heightPercentageToDP( '5%' ),
     flexDirection: 'row',
-    justifyContent: 'center',
+    // justifyContent: 'center',
     alignItems: 'center',
   },
 

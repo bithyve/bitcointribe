@@ -95,7 +95,7 @@ import { createMaterialBottomTabNavigator } from 'react-navigation-material-bott
 // import TabNavigator from './TabNavigator'
 // import { BottomTab } from '../components/home/custom-bottom-tabs'
 import Boottomtab from './Bottomtab'
-import { Text, View } from 'react-native'
+import { Text, View, Image } from 'react-native'
 
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 import SecurityStack from './stacks/security/Security&Privacy'
@@ -281,26 +281,72 @@ const Bottomtab = createMaterialBottomTabNavigator(
   {
     Home: {
       screen: HomeStack,
-
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return(
+            <Image source={require( '../assets/images/HomePageIcons/icon_add.png' )} style={{
+              width: 30, height: 30, backgroundColor: focused ? 'white': 'gray'
+            }} />
+          )}
+      }
     },
-    Freiend: FriendsAndFamily,
-    // },
+    Freiend: {
+      screen: FriendsAndFamily,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return(
+            <Image source={require( '../assets/images/icons/setting.png' )} style={{
+              width: 30, height: 30, backgroundColor: focused ? 'white': 'gray'
+            }} />
+          )}
+      },
+    },
     Securiy: {
-      screen: SecurityStack
+      screen: SecurityStack,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return(
+            <Image source={require( '../assets/images/icons/secure.png' )} style={{
+              width: 30, height: 30, backgroundColor: focused ? 'white': 'gray'
+            }} />
+          )}
+      },
     },
     Setting: {
       screen: MoreOptionsStack,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return(
+            <View style={{
+              height: '100%',
+
+            }}>
+
+              <Image source={require( '../assets/images/icons/settings.png' )} style={{
+                marginBottom: 'auto',
+                width: 30, height: 30, alignSelf: 'center', backgroundColor: focused ? 'white': 'gray'
+              }} />
+            </View>
+
+          )}
+      },
     },
   },
 
   {
+    labeled: false,
+    activeColor: 'red',
+    inactiveColor: 'white',
     barStyle: {
+      // flex: 1,
       overflow:'hidden',
       backgroundColor: Colors.blue,
       borderRadius: 45,
-      margin: 15
+      margin: 15,
+      alignItems: 'center',
+      height: 70
     },
-  }
+  },
 )
 
 const Navigator = createSwitchNavigator( {
