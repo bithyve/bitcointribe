@@ -932,7 +932,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       //     initHealthCheck();
       //   }
       // }
-      this.bootStrapNotifications()
+      // this.bootStrapNotifications()
       this.setUpFocusListener()
       //this.getNewTransactionNotifications()
 
@@ -950,7 +950,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         } )
         this.handleDeepLinking( unhandledDeepLinkURL )
       }
-
+      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
+        // updates the new FCM token to channels post recovery
+        if ( recovered ) {
+          this.props.postRecoveryChannelSync()
+        }
+      } )
       this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )

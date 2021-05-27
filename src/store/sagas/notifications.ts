@@ -15,28 +15,33 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
 function* updateFCMTokensWorker( { payload } ) {
-  const { FCMs } = payload
-  if ( FCMs.length === 0 ) {
-    throw new Error( 'No FCM token found' )
-  }
+  try{
+    const { FCMs } = payload
+    if ( FCMs.length === 0 ) {
+      throw new Error( 'No FCM token found' )
+    }
 
-  const service: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-  const { data } = yield call( service.getWalletId )
+    const service: RegularAccount = yield select(
+      ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+    )
+    const { data } = yield call( service.getWalletId )
 
-  const res = yield call(
-    RelayServices.updateFCMTokens,
-    data.walletId,
-    payload.FCMs,
-  )
-  if ( res.status === 200 ) {
-    const { updated } = res.data
-    console.log( {
-      updated
-    } )
-  } else {
-    console.log( 'Failed to update FCMs on the server' )
+    const res = yield call(
+      RelayServices.updateFCMTokens,
+      data.walletId,
+      payload.FCMs,
+    )
+
+    if ( res.status === 200 ) {
+      const { updated } = res.data
+      console.log( {
+        updated
+      } )
+    } else {
+      console.log( 'Failed to update FCMs on the server' )
+    }
+  } catch( err ){
+    console.log( 'err', err )
   }
 }
 
