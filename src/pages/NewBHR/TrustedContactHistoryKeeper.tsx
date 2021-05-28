@@ -42,8 +42,10 @@ import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
+  MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -117,6 +119,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const uploadMetaShare = useSelector(
     ( state ) => state.health.loading.uploadMetaShare,
   )
+  const MetaShares: MetaShare[] = useSelector(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+  )
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
   )
@@ -166,9 +171,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   ] )
   const [ selectedTime, setSelectedTime ] = useState(
     props.navigation.getParam( 'selectedTime' ),
-  )
-  const [ selectedStatus, setSelectedStatus ] = useState(
-    props.navigation.getParam( 'selectedStatus' ),
   )
   const [ selectedTitle, setSelectedTitle ] = useState(
     props.navigation.getParam( 'selectedTitle' ),
@@ -777,18 +779,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
       config.TC_REQUEST_EXPIRY
     // Keeper setup started
     dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-
-    dispatch( updatedKeeperInfo( {
+    const obj: KeeperInfoInterface = {
       shareId: selectedShareId,
       name: chosenContactState.name,
-      uuid: chosenContactState.id,
-      publicKey: '',
-      ephemeralAddress: '',
       type: 'contact',
+      scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
+      currentLevel: currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
       data: {
         ...chosenContactState, index
       }
-    } ) )
+    }
+    dispatch( updatedKeeperInfo( obj ) )
 
     // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
     if ( changeContact || shareExpired || isChange ) {
@@ -1163,16 +1166,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
       .toLowerCase()
       .trim()
     console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
-    dispatch( updateMSharesHealth( [
+    dispatch( updateMSharesHealth(
       {
         walletId: s3Service.getWalletId().data.walletId,
         shareId: selectedShareId,
         reshareVersion: 0,
-        updatedAt: moment( new Date() ).valueOf(),
+        updatedAt: 'notAccessible',
         name: contactName,
         shareType: 'contact',
-      },
-    ] ) )
+      } ) )
   }
 
   return (
@@ -1189,7 +1191,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={selectedTitle}
         selectedTime={selectedTime}
-        selectedStatus={selectedStatus}
         moreInfo={selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
         imageIcon={getImageIcon}

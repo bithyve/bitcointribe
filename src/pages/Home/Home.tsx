@@ -109,7 +109,7 @@ import {
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import { fetchKeeperTrustedChannel, updateNewFcm } from '../../store/actions/keeper'
+import { fetchKeeperTrustedChannel } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
@@ -274,7 +274,6 @@ interface HomePropsTypes {
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
-  updateNewFcm: any;
   setCloudData: any;
   updateKeeperInfoToUnderCustody: any;
   newBHRFlowStarted: any;
@@ -466,7 +465,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
             navigation.navigate( 'ContactsListForAssociateContact', {
               postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( contact, channelKey, contactsSecondaryChannelKey )
+                this.props.initializeTrustedContact( {
+                  contact,
+                  channelKey,
+                  contactsSecondaryChannelKey,
+                } )
+                // TODO: navigate post approval
+                navigation.navigate( 'Home' )
               }
             } )
             break
@@ -744,8 +749,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       await AsyncStorage.setItem( 'fcmToken', fcmToken )
       this.props.updateFCMTokens( fcmArray )
-      // Update FCM token to PK
-      this.props.updateNewFcm()
       AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
         // updates the new FCM token to channels post recovery
         if ( recovered ) {
@@ -2639,7 +2642,6 @@ export default withNavigationFocus(
     autoDownloadShareContact,
     setVersion,
     downloadSMShard,
-    updateNewFcm,
     setCloudData,
     updateKeeperInfoToUnderCustody,
     updateCloudPermission,

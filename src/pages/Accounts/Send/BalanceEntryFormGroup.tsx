@@ -287,7 +287,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   style={{
                     color: Colors.blue,
                     textAlign: 'center',
-                    paddingHorizontal: 10,
+                    paddingRight: 10,
                     fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansItalic,
                   }}
@@ -362,6 +362,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
+    padding: 0,
   },
 
   textBoxImage: {

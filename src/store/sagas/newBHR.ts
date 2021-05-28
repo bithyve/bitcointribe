@@ -5,8 +5,6 @@ import { generateMetaShare, generateSMMetaShares } from '../actions/health'
 import { navigateToHistoryPage, ON_PRESS_KEEPER, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError } from '../actions/newBHR'
 import { createWatcher } from '../utils/utilities'
 
-
-
 function* onPressKeeperChannelWorker( { payload } ) {
   try {
     const { value, number } = payload
@@ -16,9 +14,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const isLevel3Initialized = yield select( ( state ) => state.health.isLevel3Initialized )
     const isLevelTwoMetaShareCreated = yield select( ( state ) => state.health.isLevelTwoMetaShareCreated )
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
-    const secureAccount = yield select( ( state ) => state.accounts[ SECURE_ACCOUNT ].service )
     const metaSharesKeeper = yield select( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
-    const isSmMetaSharesCreatedFlag = yield select( ( state ) => state.health.isSmMetaSharesCreatedFlag )
     console.log( 'currentLevel', currentLevel )
 
     if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){
@@ -66,9 +62,6 @@ function* onPressKeeperChannelWorker( { payload } ) {
           yield put( generateMetaShare( value.id ) )
         } else {
           yield put( navigateToHistoryPage( obj ) )
-        }
-        if( !isSmMetaSharesCreatedFlag ){
-          yield put( generateSMMetaShares() )
         }
       } else {
         // if ( ( value.id === 2 && number === 2 && isLevelTwoMetaShareCreated &&

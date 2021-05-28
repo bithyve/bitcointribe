@@ -58,10 +58,17 @@ export const approveTrustedContact = (
 }
 
 export const initializeTrustedContact = (
-  contact: any,
-  isGuardian?: boolean,
-  channelKey?: string,
-  contactsSecondaryChannelKey?: string,
+  {
+    contact,
+    isGuardian,
+    channelKey,
+    contactsSecondaryChannelKey,
+  }:{
+      contact: any,
+      isGuardian?: boolean,
+      channelKey?: string,
+      contactsSecondaryChannelKey?: string,
+    },
 ) => {
   return {
     type: INITIALIZE_TRUSTED_CONTACT,
@@ -138,9 +145,16 @@ export const updateTrustedChannel = (
 }
 
 export const syncPermanentChannel = (
+  {
+    contactInfo,
+    updates,
+    updatedSERVICES,
+  }:
+  {
   contactInfo: ContactInfo,
   updates?: UnecryptedStreamData,
-  updatedSERVICES?: ServicesJSON
+  updatedSERVICES?: ServicesJSON,
+}
 ) => {
   return {
     type: SYNC_PERMANENT_CHANNEL,

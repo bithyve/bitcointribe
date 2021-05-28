@@ -86,7 +86,9 @@ export default function AddContactSendRequest( props ) {
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
-    dispatch( initializeTrustedContact( Contact ) )
+    dispatch( initializeTrustedContact( {
+      contact: Contact
+    } ) )
   }, [ Contact ] )
 
   useEffect( ()=> {

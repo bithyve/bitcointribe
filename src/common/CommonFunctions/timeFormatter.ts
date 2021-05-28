@@ -1,3 +1,5 @@
+import moment from 'moment'
+
 export const timeFormatter=( current, previous ) =>{
 
   const msPerMinute = 60 * 1000
@@ -40,4 +42,11 @@ export const createRandomString = ( length, characters = 'ABCDEFGHIJKLMNOPQRSTUV
     result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
   }
   return result
+}
+
+export const getTime = ( item ) => {
+  return ( item.toString() && item.toString() == '0' ) ||
+    item.toString() == 'never'
+    ? 'never'
+    : timeFormatter( moment( new Date() ), item )
 }
