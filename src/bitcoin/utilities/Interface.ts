@@ -653,6 +653,8 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
+  data?: any;
+  channelKey?: string
 }
 
 export interface KeeperInfoInterface {

@@ -110,6 +110,7 @@ import {
   notificationTag,
   notificationType,
   ShareUploadables,
+  StreamData,
   TrustedContact,
   TrustedDataElements,
   Trusted_Contacts,
@@ -147,6 +148,7 @@ import { getVersions } from '../../common/utilities'
 import { initLevels } from '../actions/upgradeToNewBhr'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
+import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -652,7 +654,6 @@ function* updateHealthLevel2Worker( { payload } ) {
       const element = metaShares[ i ]
       let shareType = ''
       if ( i == 0 ) shareType = 'cloud'
-      if ( i == 1 ) shareType = 'primaryKeeper'
       const obj = {
         shareType: shareType,
         updatedAt: 0,
@@ -3771,7 +3772,7 @@ function* setLevelToNotSetupStatusWorker( ) {
             reshareVersion: element.reshareVersion,
             updatedAt: 0,
             status: 'notAccessible',
-            shareType: i == 2 ? 'primaryKeeper' : '',
+            shareType: '',
             name: ''
           } )
         }
@@ -3850,18 +3851,33 @@ export const setHealthStatusWatcher = createWatcher(
 
 function* modifyLevelDataWorker( ) {
   try {
-    console.log( 'MODIFY' )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
     let levelData: LevelData[] = yield select( ( state ) => state.health.levelData )
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const s3Service = yield select( ( state ) => state.health.service )
+
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+
     let isError = false
     const abc = JSON.stringify( levelHealth )
-    const levelHealthVar = [ ...getModifiedData( keeperInfo, JSON.parse( abc ) ) ]
-    console.log( 'MODIFY levelHealthVar', levelHealthVar )
-
+    const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ) ) ]
+    for ( let i = 0; i < levelHealthVar.length; i++ ) {
+      const levelInfo = levelHealthVar[ i ].levelInfo
+      for ( let j = 0; j < levelInfo.length; j++ ) {
+        const element = levelInfo[ j ]
+        const currentContact: TrustedContact = contacts[ element.channelKey ]
+        if ( currentContact ) {
+          const instream: StreamData = useStreamFromPermanentChannel( s3Service.levelhealth.walletId, currentContact.permanentChannel, true )
+          if( instream ){
+            levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'accessible' : levelInfo[ j ].status
+            levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
+          }
+        }
+      }
+    }
     levelData = checkLevelHealth( levelData, levelHealthVar )
-    console.log( 'MODIFY levelData', levelData )
     if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }

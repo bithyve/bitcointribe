@@ -1073,7 +1073,9 @@ export default class TrustedContacts {
         : null, // legacy HC
       channelsToUpdate, // LS update
       toUpdate, // share under-custody update
-      ...currencyCode && { currencyCode },
+      ...currencyCode && {
+        currencyCode
+      },
     } )
 
     const {

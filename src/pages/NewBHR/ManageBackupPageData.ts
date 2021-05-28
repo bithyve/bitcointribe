@@ -125,13 +125,6 @@ const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVar ) => 
   return levelHealthVar
 }
 
-const changeNameForSecondary = ( name ) =>{
-  if( name === 'Secondary Device1' || name === 'Secondary Device2' || name === 'Secondary Device3' ){
-    return name.replace( 'Secondary', 'Personal' )
-  }
-  return name
-}
-
 const getLevelInfoStatus = ( levelDataTemp ) => {
   const levelData: LevelData[] = [ ...levelDataTemp ]
   for ( let i = 0; i < levelData.length; i++ ) {
@@ -173,7 +166,7 @@ const getLevelInfoStatus = ( levelDataTemp ) => {
       else name1 = 'Recovery Key 1'
       if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
       else name2 = 'Recovery Key 2'
-      const name = name1 && name2 ? changeNameForSecondary( name1 ) + ' & ' + changeNameForSecondary(  name2 ) : name1 && !name2 ? changeNameForSecondary( name1 ) : changeNameForSecondary( name2 )
+      const name = name1 && name2 ? name1 + ' & ' + name2 : name1 && !name2 ? name1 : name2
       levelData[ i ].note = name + ' need your attention.'
     }
   }

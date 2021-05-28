@@ -52,7 +52,6 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
-import { deviceText } from '../../common/CommonFunctions'
 import { initializeTrustedContact } from '../../store/actions/trustedContacts'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
@@ -191,7 +190,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const next = props.navigation.getParam( 'next' )
 
   useEffect( ()=>{
-    const firstName = 'Secondary'
+    const firstName = 'Personal'
     let lastName = 'Device'
     if( index === 0 ) lastName = 'Device1'
     else if( index === 3 ) lastName = 'Device2'
@@ -736,24 +735,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
 
-  const updateShare = () =>{
-    let contactName = 'Secondary Device'
-    if( index === 0 ) contactName = 'Secondary Device1'
-    else if( index === 3 ) contactName = 'Secondary Device2'
-    else contactName = 'Secondary Device3'
-    const shareObj =
-      {
-        walletId: s3Service.getWalletId().data.walletId,
-        shareId: selectedShareId,
-        reshareVersion: 0,
-        status: 'notAccessible',
-        name: contactName,
-        shareType: 'device',
-      }
-
-    console.log( 'shareArray', shareObj )
-    dispatch( updateMSharesHealth( shareObj ) )
-  }
 
   return (
     <View style={{
@@ -765,9 +746,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
+        selectedTitle={props.navigation.state.params.selectedTitle}
         selectedTime={props.navigation.state.params.selectedTime}
-        moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
+        moreInfo={props.navigation.state.params.selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
       <View style={{
@@ -792,7 +773,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           onPressChange={() => {
             if( isPrimaryKeeper ){
               setSelectedKeeperType( 'device' )
-              setSelectedKeeperName( 'Secondary Device1' )
+              setSelectedKeeperName( 'Personal Device1' )
               sendApprovalRequestToPK( )
             } else{
               ( keeperTypeBottomSheet as any ).current.snapTo( 1 )

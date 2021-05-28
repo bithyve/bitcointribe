@@ -44,12 +44,12 @@ function* onPressKeeperChannelWorker( { payload } ) {
       id: value.id,
       selectedKeeper: {
         ...keeper,
-        name: value.id === 2 && number == 1 ? 'Secondary Device1' : keeper.name,
-        shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
+        name: keeper.name,
+        shareType: keeper.shareType,
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId: '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
       },
       isSetup: keeper.status == 'notSetup' ? true : false,
-      isPrimaryKeeper: number === 1 && value.id == 2 ? true : false,
+      isPrimaryKeeper: false,
       isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && metaSharesKeeper.length === 5 ? false : true
     }
     if ( keeper.updatedAt > 0 ) {
