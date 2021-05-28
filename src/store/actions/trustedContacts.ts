@@ -63,11 +63,13 @@ export const initializeTrustedContact = (
     isGuardian,
     channelKey,
     contactsSecondaryChannelKey,
+    shareId,
   }:{
       contact: any,
       isGuardian?: boolean,
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
+      shareId?: string
     },
 ) => {
   return {
@@ -77,6 +79,7 @@ export const initializeTrustedContact = (
       isGuardian,
       channelKey,
       contactsSecondaryChannelKey,
+      shareId,
     },
   }
 }

@@ -46,6 +46,9 @@ import {
   Keepers,
   LevelHealthInterface,
   MetaShare,
+  QRCodeTypes,
+  TrustedContact,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -68,6 +71,8 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import SSS from '../../bitcoin/utilities/sss/SSS'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -181,7 +186,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+    props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
   const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
@@ -717,127 +722,88 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
 
-  // const updateTrustedContactsInfo = useCallback(
-  //   async ( contact ) => {
-  //     const tcInfo = trustedContactsInfo
+  const createGuardian = useCallback(
+    async ( chosenContactTmp? ) => {
+      if( trustedQR ) return
 
-  //     if ( tcInfo.length ) {
-  //       if ( tcInfo[ index ] ) {
-  //         let found = false
-  //         for ( let i = 3; i < tcInfo.length; i++ ) {
-  //           // push if not present in TC list
-  //           if ( tcInfo[ i ] && tcInfo[ i ].name == tcInfo[ index ].name ) {
-  //             found = true
-  //             break
-  //           }
-  //         }
+      let Contact = chosenContact
 
-  //         if ( !found ) tcInfo.push( tcInfo[ index ] )
-  //       }
+      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
 
-  //       for ( let i = 0; i < tcInfo.length; i++ ) {
-  //         if ( tcInfo[ i ] && tcInfo[ i ].name == contact.name ) {
-  //           tcInfo.splice( i, 1 )
-  //           break
-  //         }
-  //       }
+      if ( ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ) Contact = chosenContactTmp
+      setIsGuardianCreationClicked( true )
+      const obj: KeeperInfoInterface = {
+        shareId: selectedKeeper.shareId,
+        name: Contact && Contact.name ? Contact.name : '',
+        type: 'contact',
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        data: {
+          ...Contact, index
+        },
+        channelKey
+      }
+      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( initializeTrustedContact( {
+        contact: Contact, isGuardian: true, channelKey, shareId: selectedKeeper.shareId
+      } ) )
+    },
+    [ SHARES_TRANSFER_DETAILS, trustedContacts, chosenContact ],
+  )
 
-  //       tcInfo[ index ] = contact
-  //     } else {
-  //       tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
-  //       tcInfo[ 1 ] = null
-  //       tcInfo[ 2 ] = null
-  //       tcInfo[ index ] = contact
-  //     }
-  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-  //   },
-  //   [ index, trustedContactsInfo ],
-  // )
+  useEffect( () => {
+    if( !chosenContact ) return
 
-  const createGuardian = useCallback( async ( chosenContactTmp? ) => {
-    let chosenContactState = chosenContact
-    if ( ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ) chosenContactState = chosenContactTmp
-    setIsGuardianCreationClicked( true )
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
+    let channelKey: string
 
-    const contactName = `${chosenContactState.firstName} ${
-      chosenContactState.lastName ? chosenContactState.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === chosenContact.id ){
+          currentContact = contacts[ ck ]
+          channelKey = ck
+          break
+        }
+      }
 
-    let info = ''
-    if ( chosenContactState.phoneNumbers && chosenContactState.phoneNumbers.length ) {
-      const phoneNumber = chosenContactState.phoneNumbers[ 0 ].number
-      let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-      number = number.slice( number.length - 10 ) // last 10 digits only
-      info = number
-    } else if ( chosenContactState.emails && chosenContactState.emails.length ) {
-      info = chosenContactState.emails[ 0 ].email
-    }
-    const shareExpired = !SHARES_TRANSFER_DETAILS[ index ] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
-      config.TC_REQUEST_EXPIRY
-    // Keeper setup started
-    dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-    const obj: KeeperInfoInterface = {
-      shareId: selectedShareId,
-      name: chosenContactState.name,
-      type: 'contact',
-      scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
-      currentLevel: currentLevel,
-      createdAt: moment( new Date() ).valueOf(),
-      sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
-      data: {
-        ...chosenContactState, index
+    if ( currentContact ) {
+      const { secondaryChannelKey } = currentContact
+      const appVersion = DeviceInfo.getVersion()
+
+      // const numberDL =
+      //   `https://hexawallet.io/${config.APP_STAGE}/${
+      //     'tcg'
+      //   }` +
+      //   `/${channelKey}` +
+      //   `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
+      //   `/v${appVersion}`
+      // setTrustedLink( numberDL )
+
+      setTrustedQR(
+        JSON.stringify( {
+          type: QRCodeTypes.KEEPER_REQUEST,
+          channelKey,
+          walletName: WALLET_SETUP.walletName,
+          secondaryChannelKey,
+          version: appVersion,
+        } ),
+      )
+      if( isGuardianCreationClicked ) {
+        const shareObj = {
+          walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+          shareId: selectedKeeper.shareId,
+          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+          shareType: 'contact',
+          status: 'notAccessible',
+          name: chosenContact && chosenContact.name ? chosenContact.name : ''
+        }
+        dispatch( updateMSharesHealth( shareObj, false ) )
       }
     }
-    dispatch( updatedKeeperInfo( obj ) )
-
-    // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
-    if ( changeContact || shareExpired || isChange ) {
-      setTrustedLink( '' )
-      setTrustedQR( '' )
-      // updateTrustedContactsInfo( chosenContactState )
-      onOTPShare( ) // enables reshare
-      setChangeContact( false )
-    } else {
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-      const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-      const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-      trustedContact.ephemeralChannel.initiatedAt &&
-      Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-      config.TC_REQUEST_EXPIRY? true: false
-      if( !hasTrustedChannel &&
-        isEphemeralChannelExpired ){
-        setTrustedLink( '' )
-        setTrustedQR( '' )
-      }
-    }
-
-    const contactInfo = {
-      contactName,
-      info: info? info.trim(): info,
-      isGuardian: true,
-      shareIndex: index,
-      shareId: selectedShareId,
-      changeContact: changeContact || isChange,
-    }
-
-    let parentShell: AccountShell
-    accountShells.forEach( ( shell: AccountShell ) => {
-      if( !shell.primarySubAccount.instanceNumber ){
-        if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-      }
-    } )
-    const newSecondarySubAccount:SubAccountDescribing = new TrustedContactsSubAccountInfo( {
-      accountShellID: parentShell.id,
-      isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-    } )
-    dispatch(
-      addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
-    )
-
-  }, [ SHARES_TRANSFER_DETAILS[ index ], chosenContact, changeContact ] )
+  }, [ chosenContact, trustedContacts ] )
 
   useEffect( () => {
     if (

@@ -110,7 +110,9 @@ import {
   notificationTag,
   notificationType,
   ShareUploadables,
+  TrustedContact,
   TrustedDataElements,
+  Trusted_Contacts,
   VersionHistory,
   WalletImage,
 } from '../../bitcoin/utilities/Interface'
@@ -144,6 +146,7 @@ import { restoredVersionHistory } from '../actions/versionHistory'
 import { getVersions } from '../../common/utilities'
 import { initLevels } from '../actions/upgradeToNewBhr'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -314,7 +317,10 @@ function* updateSharesHealthWorker( { payload } ) {
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
         if( element.shareId == payload.shares.shareId ){
-          levelHealth[ i ].levelInfo[ j ].updatedAt = moment( new Date() ).valueOf()
+          levelHealth[ i ].levelInfo[ j ].updatedAt = payload.shares.updatedAt ? moment( new Date() ).valueOf() : levelHealth[ i ].levelInfo[ j ].updatedAt
+          levelHealth[ i ].levelInfo[ j ].name = payload.shares.name ? payload.shares.name : levelHealth[ i ].levelInfo[ j ].name ? levelHealth[ i ].levelInfo[ j ].name : ''
+          levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
+          levelHealth[ i ].levelInfo[ j ].shareType = payload.shares.shareType ? payload.shares.shareType : levelHealth[ i ].levelInfo[ j ].shareType ? levelHealth[ i ].levelInfo[ j ].shareType : ''
           if( payload.shares.status ){
             levelHealth[ i ].levelInfo[ j ].status = payload.shares.status
           }
@@ -2599,140 +2605,52 @@ export const autoDownloadShareContactWatcher = createWatcher(
 
 function* getPDFDataWorker( { payload } ) {
   try {
-    const { shareId, isReShare } = payload
-    let shareIndex = 3
+    const { shareId, Contact, channelKey } = payload
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
+    const trustedContacts: TrustedContactsService = yield select(
+      ( state ) => state.trustedContacts.service
+    )
+    const pdfInfo: {
+      filePath: string;
+      shareId: string;
+      updatedAt: number;
+    } = yield select( ( state ) => state.health.pdfInfo )
+    const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
-    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
-    if (
-      shareId &&
-        s3Service.levelhealth.metaSharesKeeper.length &&
-        s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == shareId ) > -1
-    ) {
-      shareIndex = s3Service.levelhealth.metaSharesKeeper.findIndex( ( value ) => value.shareId == shareId )
-    }
-    const primaryShare: MetaShare = s3Service.levelhealth.metaSharesKeeper[ shareIndex ]
-    const obj: KeeperInfoInterface = {
-      shareId: primaryShare.shareId,
-      name: 'Keeper PDF',
-      type: 'pdf',
-      scheme: primaryShare.meta.scheme,
-      currentLevel: currentLevel,
-      createdAt: moment( new Date() ).valueOf(),
-      sharePosition: shareIndex,
-      data: {
-      }
-    }
-    yield put( updatedKeeperInfo( obj ) )
+    const walletId = s3Service.levelhealth.walletId
+    let pdfPath = pdfInfo.filePath
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
+    let channelKeyFromCH: string
 
-    const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
-    const keeper: KeeperService = yield select( ( state ) => state.keeper.service )
-    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const secondaryShareDownloaded = yield select( ( state ) => state.health.secondaryShareDownloaded )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
-    let secondaryShare
-    // TODO get primaryKeeper shareID
-    if( s3Service.levelhealth.SMMetaSharesKeeper && s3Service.levelhealth.SMMetaSharesKeeper.length ){
-      secondaryShare = s3Service.levelhealth.SMMetaSharesKeeper[ 1 ]
-    } else {
-      if( secondaryShareDownloaded ) {
-        secondaryShare = secondaryShareDownloaded
-      } else {
-        const PKShareId =
-        currentLevel == 2 || currentLevel == 1
-          ? levelHealth[ 1 ].levelInfo[ 2 ].shareId
-          : levelHealth[ 1 ].levelInfo[ 2 ].shareId
-        const res = yield call(
-          keeper.fetchTrustedChannel,
-          PKShareId,
-          WALLET_SETUP.walletName
-        )
-        if ( res.status == 200 ) {
-          const data: TrustedDataElements = res.data.data
-          secondaryShare = data.pdfShare
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          currentContact = contacts[ ck ]
+          channelKeyFromCH = ck
+          break
         }
       }
-    }
-
-    if ( secondaryShare ) {
-      const pdfInfo: {
-        filePath: string;
-        publicKey: string;
-        privateKey: string;
-      } = yield select( ( state ) => state.health.pdfInfo )
-      const walletId = s3Service.levelhealth.walletId
-
-      if ( isReShare ) {
-        yield call( s3Service.reshareMetaShareKeeper, shareIndex )
+    if( channelKeyFromCH && channelKeyFromCH == channelKey && currentContact ) {
+      const recoveryData = {
+        channelId: currentContact.permanentChannelAddress,
+        streamId: TrustedContacts.getStreamId( walletId ),
+        channelKey: channelKey,
+        channelKey2: currentContact.secondaryChannelKey,
+        encryptedKey: LevelHealth.encryptWithAnswer(
+          shareId,
+          WALLET_SETUP.security.answer
+        ).encryptedString,
       }
-      let publicKey = pdfInfo.publicKey
-      let privateKey = pdfInfo.privateKey
-      let pdfPath = pdfInfo.filePath
-      if ( pdfInfo.publicKey === '' && pdfInfo.privateKey === '' ) {
-        console.log( 'INSIDE IF' )
-        const keyPair = ec.genKeyPair()
-        publicKey = keyPair.getPublic( 'hex' )
-        privateKey = keyPair.getPrivate( 'hex' )
+      const secondaryData = {
+        channelId: currentContact.permanentChannelAddress,
+        streamId: TrustedContacts.getStreamId( walletId ),
+        channelKey2: currentContact.secondaryChannelKey,
       }
-      const primaryShareKey = Keeper.getDerivedKey( privateKey )
-      const secondaryShareKey = Keeper.getDerivedKey( walletId )
-      const secondaryData = LevelHealth.encryptMetaShare(
-        secondaryShare,
-        secondaryShareKey
-      )
-      const primaryData = LevelHealth.encryptMetaShare(
-        primaryShare,
-        primaryShareKey
-      )
-      const primaryShareObject = JSON.stringify( {
-        key: primaryShareKey,
-        messageId: primaryData.messageId,
-      } )
-      const secondaryShareObject = JSON.stringify( {
-        key: secondaryShareKey,
-        messageId: secondaryData.messageId,
-      } )
 
-      // TODO upload Data
-      const res1 = yield call(
-        LevelHealth.uploadPDFPrimaryShare,
-        primaryData.encryptedMetaShare,
-        primaryData.messageId
-      )
-      const res2 = yield call(
-        LevelHealth.uploadPDFSecondaryShare,
-        secondaryData.encryptedMetaShare,
-        secondaryData.messageId
-      )
-      const shareObj = {
-        walletId: walletId,
-        shareId: primaryShare.shareId,
-        reshareVersion: primaryShare.meta.reshareVersion,
-        name: 'Keeper PDF',
-        shareType: 'pdf',
-        status: 'notAccessible',
-      }
-      yield put( updateMSharesHealth( shareObj, false ) )
       const qrData = [
-        JSON.stringify( {
-          type: 'pdf',
-          encryptedData: LevelHealth.encryptWithAnswer(
-            primaryShareObject,
-            WALLET_SETUP.security.answer
-          ).encryptedString,
-          encryptedKey: LevelHealth.encryptWithAnswer(
-            primaryShare.shareId,
-            WALLET_SETUP.security.answer
-          ).encryptedString,
-        } ),
-        JSON.stringify( {
-          type: 'pdf',
-          encryptedData: LevelHealth.encryptWithAnswer(
-            secondaryShareObject,
-            WALLET_SETUP.security.answer
-          ).encryptedString,
-        } ),
+        JSON.stringify( recoveryData ),
+        JSON.stringify( secondaryData ),
       ]
       const pdfData = {
         qrData: qrData,
@@ -2744,24 +2662,9 @@ function* getPDFDataWorker( { payload } ) {
         `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
       )
       yield put( setPDFInfo( {
-        filePath: pdfPath, publicKey, privateKey, updatedAt: moment( new Date() ).valueOf()
-      } ) )
-      yield put( onApprovalStatusChange( {
-        status: false,
-        initiatedAt: 0,
-        shareId: '',
+        filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
       } ) )
     }
-    const updatedSERVICES = {
-      ...SERVICES,
-      S3_SERVICE: JSON.stringify( s3Service ),
-    }
-
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
 
     yield put( pdfSuccessfullyCreated( true ) )
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
@@ -2944,7 +2847,7 @@ function* confirmPDFSharedWorker( { payload } ) {
         shareType: 'pdf',
         status: 'accessible',
       }
-      yield put( updateMSharesHealth( shareObj, true ) )
+      yield put( updateMSharesHealth( shareObj, false ) )
       yield put( onApprovalStatusChange( {
         status: false,
         initiatedAt: 0,
@@ -3955,9 +3858,10 @@ function* modifyLevelDataWorker( ) {
     let isError = false
     const abc = JSON.stringify( levelHealth )
     const levelHealthVar = [ ...getModifiedData( keeperInfo, JSON.parse( abc ) ) ]
+    console.log( 'MODIFY levelHealthVar', levelHealthVar )
 
     levelData = checkLevelHealth( levelData, levelHealthVar )
-
+    console.log( 'MODIFY levelData', levelData )
     if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }

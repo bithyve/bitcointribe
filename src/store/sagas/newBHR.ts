@@ -48,7 +48,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
         shareType: value.id === 2 && number == 1 ? 'device' : keeper.shareType,
         shareId: keeper.shareId ? keeper.shareId : value.id == 2 ? metaSharesKeeper[ 1 ] ? metaSharesKeeper[ 1 ].shareId: '' : metaSharesKeeper[ 4 ] ? metaSharesKeeper[ 4 ].shareId : ''
       },
-      isSetup: keeper.updatedAt ? false : true,
+      isSetup: keeper.status == 'notSetup' ? true : false,
       isPrimaryKeeper: number === 1 && value.id == 2 ? true : false,
       isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && metaSharesKeeper.length === 5 ? false : true
     }

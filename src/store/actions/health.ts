@@ -584,12 +584,14 @@ export const autoDownloadShareContact = (
 }
 
 
-export const getPDFData = ( shareId, isReShare ) => {
+export const getPDFData = ( shareId, Contact, channelKey, isChange? ) => {
   return {
     type: GET_PDF_DATA,
     payload: {
       shareId,
-      isReShare
+      Contact,
+      channelKey,
+      isChange,
     },
   }
 }

@@ -664,6 +664,7 @@ export interface KeeperInfoInterface {
   createdAt: number;
   sharePosition: number;
   data?: any;
+  channelKey?: string;
 }
 //VersionHistory
 export interface VersionHistory {

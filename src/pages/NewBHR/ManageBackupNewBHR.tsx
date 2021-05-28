@@ -76,6 +76,7 @@ interface ManageBackupNewBHRStateTypes {
     reshareVersion: number;
     name: string;
     data: any;
+    channelKey?: string;
   };
   selectedLevelId: number;
   selectedKeeperType: string;
@@ -170,6 +171,7 @@ class ManageBackupNewBHR extends Component<
       data: {
       },
       uuid: '',
+      channelKey: ''
     }
     this.state = {
       selectedKeeper: obj,
@@ -291,10 +293,10 @@ class ManageBackupNewBHR extends Component<
       const obj = {
         id: 2,
         selectedKeeper: {
-          shareType: 'device',
-          name: 'Secondary Device1',
+          shareType: '',
+          name: '',
           reshareVersion: 0,
-          status: 'notAccessible',
+          status: 'notSetup',
           updatedAt: 0,
           shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
             .shareId,
@@ -305,9 +307,13 @@ class ManageBackupNewBHR extends Component<
       }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
+        showLoader: false,
+        selectedLevelId: 2
       } )
-      this.goToHistory( obj )
-      this.loaderBottomSheet.snapTo( 0 )
+      this.props.setIsKeeperTypeBottomSheetOpen( false );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      // this.goToHistory( obj )
+      // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
@@ -359,6 +365,11 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.navigationObj !== this.props.navigationObj ){
+      console.log( 'prevProps.navigationObj' )
+      this.setState( {
+        selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
+      } );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
       this.goToHistory( this.props.navigationObj )
     }
 
@@ -599,7 +610,7 @@ class ManageBackupNewBHR extends Component<
     } else {
       this.setState( {
         showLoader: true,
-        selectedKeeper: value.keeper1
+        selectedKeeper: keeperNumber == 1 ? value.keeper1 : value.keeper2
       } )
       requestAnimationFrame( () => {
         this.onPressKeeperButton( value, keeperNumber )

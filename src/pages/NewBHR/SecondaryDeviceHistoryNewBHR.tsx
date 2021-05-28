@@ -27,6 +27,9 @@ import {
   Keepers,
   LevelHealthInterface,
   MetaShare,
+  QRCodeTypes,
+  TrustedContact,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
@@ -50,6 +53,9 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
 import { deviceText } from '../../common/CommonFunctions'
+import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import { v4 as uuid } from 'uuid'
+import SSS from '../../bitcoin/utilities/sss/SSS'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -130,29 +136,20 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       date: null,
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
-    // {
-    //   id: 5,
-    //   title: 'Recovery Secret In-Transit',
-    //   date: '20 May ‘19, 11:00am',
-    //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    // },
-    // {
-    //   id: 6,
-    //   title: 'Recovery Secret Not Accessible',
-    //   date: '19 May ‘19, 11:00am',
-    //   info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    // },
   ] )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
 
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true )
+  const [ isReshare, setIsReshare ] = useState(
+    props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
+  )
   const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
     : false )
+  const [ Contact, setContact ]: [any, any] = useState( null )
   const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
@@ -161,7 +158,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
-      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+      props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
     )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
@@ -172,8 +169,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     setSelectedShareId( shareId )
     setIndex( props.navigation.getParam( 'index' ) )
   }, [
-    props.navigation.getParam( 'selectedLevelId' ),
-    props.navigation.getParam( 'selectedKeeper' ),
     props.navigation.state.params,
   ] )
 
@@ -195,6 +190,20 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const next = props.navigation.getParam( 'next' )
 
+  useEffect( ()=>{
+    const firstName = 'Secondary'
+    let lastName = 'Device'
+    if( index === 0 ) lastName = 'Device1'
+    else if( index === 3 ) lastName = 'Device2'
+    else lastName = 'Device3'
+
+    const Contact = {
+      id: uuid(),
+      name: `${firstName} ${lastName ? lastName : ''}`
+    }
+    setContact( selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+  }, [ ] )
+
   const saveInTransitHistory = async () => {
     const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
     if ( shareHistory ) {
@@ -211,176 +220,84 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  // const updateTrustedContactsInfo = useCallback(
-  //   async ( contact ) => {
-  //     const tcInfo = trustedContactsInfo
-
-  //     if ( tcInfo.length ) {
-  //       tcInfo[ 0 ] = contact
-  //     } else {
-  //       tcInfo[ 0 ] = contact
-  //       tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-  //       tcInfo[ 2 ] = undefined
-  //     }
-  //     console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
-  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-  //   },
-  //   [ trustedContactsInfo ],
-  // )
-
   const createGuardian = useCallback(
     async ( changeKeeper?: boolean ) => {
+      if( secondaryQR ) return
       setIsGuardianCreationClicked( true )
-      const firstName = 'Secondary'
-      let lastName = 'Device'
-      if( index === 0 ) lastName = 'Device1'
-      else if( index === 3 ) lastName = 'Device2'
-      else lastName = 'Device3'
+      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
 
-      const contactName = `${firstName} ${lastName ? lastName : ''}`
-        .toLowerCase()
-        .trim()
-
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-      let info = null
-      if ( trustedContact && trustedContact.secondaryKey ) info = trustedContact.secondaryKey
-
-      const shareExpired =  !SHARES_TRANSFER_DETAILS[ index ] ||
-      Date.now() - SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT >
-      config.TC_REQUEST_EXPIRY
-      // Keeper setup started
-      dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
       const obj: KeeperInfoInterface = {
-        shareId: selectedShareId,
-        name: contactName,
+        shareId: selectedKeeper.shareId,
+        name: Contact && Contact.name ? Contact.name : '',
         type: 'device',
-        scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
+        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
         data: {
-          name: contactName, index
-        }
+          ...Contact, index
+        },
+        channelKey
       }
       dispatch( updatedKeeperInfo( obj ) )
-
-      if ( changeKeeper || shareExpired || isChange ) {
-        setSecondaryQR( '' )
-        // updateTrustedContactsInfo( {
-        //   firstName, lastName
-        // } )
-        // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
-      } else {
-        const hasTrustedChannel = trustedContact.symmetricKey ? true : false
-        const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&
-        trustedContact.ephemeralChannel.initiatedAt &&
-        Date.now() - trustedContact.ephemeralChannel.initiatedAt >
-        config.TC_REQUEST_EXPIRY? true: false
-
-        if (
-          !hasTrustedChannel &&
-          isEphemeralChannelExpired
-        ) setSecondaryQR( '' )
-      }
-
-      const contactInfo = {
-        contactName,
-        info: info? info.trim(): null,
-        isGuardian: true,
-        shareIndex: index,
-        shareId: selectedShareId,
-        changeContact: changeKeeper || isChange,
-      }
-
-      let parentShell: AccountShell
-      accountShells.forEach( ( shell: AccountShell ) => {
-        if( !shell.primarySubAccount.instanceNumber ){
-          if( shell.primarySubAccount.sourceKind === REGULAR_ACCOUNT ) parentShell = shell
-        }
-      } )
-      const newSecondarySubAccount: SubAccountDescribing = new TrustedContactsSubAccountInfo( {
-        accountShellID: parentShell.id,
-        isTFAEnabled: parentShell.primarySubAccount.sourceKind === SourceAccountKind.SECURE_ACCOUNT? true: false,
-      } )
-
-      dispatch(
-        addNewSecondarySubAccount( newSecondarySubAccount, parentShell, contactInfo ),
-      )
+      dispatch( initializeTrustedContact( {
+        contact: Contact, isGuardian: true, channelKey, shareId: selectedKeeper.shareId
+      } ) )
     },
-    [ SHARES_TRANSFER_DETAILS, trustedContacts ],
+    [ SHARES_TRANSFER_DETAILS, trustedContacts, Contact ],
   )
 
   useEffect( () => {
-    if ( uploadMetaShare || updateEphemeralChannelLoader ) {
-      if ( secondaryQR ) setSecondaryQR( '' )
-      return
-    }
+    if( !Contact ) return
 
-    const firstName = 'Secondary'
-    let lastName = 'Device'
-    if( index === 0 ) lastName = 'Device1'
-    else if( index === 3 ) lastName = 'Device2'
-    else lastName = 'Device3'
-    const contactName = `${firstName} ${lastName ? lastName : ''}`
-      .toLowerCase()
-      .trim()
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
+    let channelKey: string
 
-    if (
-      trustedContacts.tc.trustedContacts[ contactName ] &&
-      trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-    ) {
-      const { publicKey, secondaryKey } = trustedContacts.tc.trustedContacts[
-        contactName
-      ]
-      if( publicKey ) {
-        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          currentContact = contacts[ ck ]
+          channelKey = ck
+          break
+        }
       }
-      if( isGuardianCreationClicked ){
-        setIsGuardianCreationClicked( false )
-        updateShare()
-        setSecondaryQR(
-          JSON.stringify( {
-            isGuardian: true,
-            requester: WALLET_SETUP.walletName,
-            publicKey,
-            info: secondaryKey,
-            uploadedAt:
-            trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-              .initiatedAt,
-            type: 'secondaryDeviceGuardian',
-            ver: DeviceInfo.getVersion(),
-            isFromKeeper: true,
-          } ),
-        )
-      }
-    }
-  }, [
-    SHARES_TRANSFER_DETAILS,
-    trustedContacts,
-    uploadMetaShare,
-    updateEphemeralChannelLoader,
-    isGuardianCreationClicked
-  ] )
 
-  useEffect( () => {
-    const firstName = 'Secondary'
-    let lastName = 'Device'
-    if( index === 0 ) lastName = 'Device1'
-    else if( index === 3 ) lastName = 'Device2'
-    else lastName = 'Device3'
-    const contactName = `${firstName} ${lastName ? lastName : ''}`
-      .toLowerCase()
-      .trim()
-    const tcInstance = trustedContacts.tc.trustedContacts[ contactName ]
-    console.log( {
-      tcInstance
-    } )
-    if ( tcInstance ) {
-      if ( tcInstance.symmetricKey ) {
-        setGuardianExists( true )
+    if ( currentContact ) {
+      const { secondaryChannelKey } = currentContact
+      const appVersion = DeviceInfo.getVersion()
+
+      // const numberDL =
+      //   `https://hexawallet.io/${config.APP_STAGE}/${
+      //     'tcg'
+      //   }` +
+      //   `/${channelKey}` +
+      //   `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
+      //   `/v${appVersion}`
+      // setTrustedLink( numberDL )
+
+      setSecondaryQR(
+        JSON.stringify( {
+          type: QRCodeTypes.KEEPER_REQUEST,
+          channelKey,
+          walletName: WALLET_SETUP.walletName,
+          secondaryChannelKey,
+          version: appVersion,
+        } ),
+      )
+      if( isGuardianCreationClicked ) {
+        const shareObj = {
+          walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+          shareId: selectedKeeper.shareId,
+          reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+          shareType: 'device',
+          status: 'notAccessible',
+          name: Contact && Contact.name ? Contact.name : ''
+        }
+        dispatch( updateMSharesHealth( shareObj, false ) )
       }
     }
-  }, [ trustedContacts ] )
+  }, [ Contact, trustedContacts ] )
 
   useEffect( () => {
     ( async () => {

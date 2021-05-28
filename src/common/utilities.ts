@@ -142,34 +142,12 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
       const elementJ = levelHealthVar[ j ]
       for ( let i = 0; i < elementJ.levelInfo.length; i++ ) {
         const element = elementJ.levelInfo[ i ]
-        if (
-          keeperInfo.findIndex(
-            ( value ) =>
-              value.shareId == element.shareId && value.type == 'contact',
-          ) > -1
-        ) {
-          element.data =
-            keeperInfo[
-              keeperInfo.findIndex(
-                ( value ) =>
-                  value.shareId == element.shareId && value.type == 'contact',
-              )
-            ].data
-        }
-        if (
-          keeperInfo.findIndex(
-            ( value ) =>
-              value.shareId == element.shareId && value.type == 'device',
-          ) > -1
-        ) {
-          element.data =
-            keeperInfo[
-              keeperInfo.findIndex(
-                ( value ) =>
-                  value.shareId == element.shareId && value.type == 'device',
-              )
-            ].data
-        }
+        // Data for Contact Type
+        if ( keeperInfo.find( value => value.shareId == element.shareId && value.type == 'contact' ) ) element.data = keeperInfo.find( value  => value.shareId == element.shareId && value.type == 'contact' ).data
+        // Data for Contact Type
+        if ( keeperInfo.find( value => value.shareId == element.shareId && value.type == 'device' ) ) element.data = keeperInfo.find( value  => value.shareId == element.shareId && value.type == 'device' ).data
+        // Channel Key
+        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = keeperInfo.find( value  => value.shareId == element.shareId ).channelKey
       }
     }
   }
@@ -210,16 +188,12 @@ export const getLevelInfoStatus = ( levelDataTemp ) => {
     }
     // BOTH ACCESSIBLE
     if( element.keeper1.status == 'accessible' && element.keeper2.status == 'accessible' ){
-      if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
-      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
       levelData[ i ].note = i == 1 ? 'Backup Level 2 is secure, \nupgrade to Backup Level 3' : 'Level is complete'
     }
     // ONLY ONE ACCESSIBLE
     if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ||
     ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
       let name1 = ''; let name2 = ''
-      if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
-      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
       if( element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
       else name1 = 'Recovery Key 1'
       if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
@@ -227,6 +201,8 @@ export const getLevelInfoStatus = ( levelDataTemp ) => {
       const name = name1 && name2 ? changeNameForSecondary( name1 ) + ' & ' + changeNameForSecondary(  name2 ) : name1 && !name2 ? changeNameForSecondary( name1 ) : changeNameForSecondary( name2 )
       levelData[ i ].note = name + ' need your attention.'
     }
+    levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
+    levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
   }
   return levelData
 }
