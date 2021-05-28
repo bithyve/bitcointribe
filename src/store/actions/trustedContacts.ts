@@ -207,11 +207,12 @@ export const trustedChannelsSetupSync = () => {
   }
 }
 
-export const walletCheckIn = ( synchingContacts?: Boolean ) => {
+export const walletCheckIn = ( synchingContacts?: Boolean, currencyCode?: string ) => {
   return {
     type: WALLET_CHECK_IN,
     payload: {
-      synchingContacts
+      synchingContacts,
+      currencyCode
     },
   }
 }
