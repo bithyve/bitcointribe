@@ -82,6 +82,7 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import idx from 'idx'
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
 import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import { AxiosResponse } from 'axios'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -1165,7 +1166,13 @@ function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgre
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
 
   const existingContacts = trustedContacts.tc.trustedContactsV2
-  if( !Object.keys( existingContacts ) ) return
+  if( !Object.keys( existingContacts ).length ) {
+    yield put ( existingPermanentChannelsSynched( {
+      successful: true
+    } ) )
+    return
+  }
+
   const { walletId } = regularAccount.hdWallet.getWalletId()
   const streamId = TrustedContacts.getStreamId( walletId )
   const { inProgressChannelsOnly } = payload
@@ -1181,9 +1188,6 @@ function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgre
 
   Object.keys( existingContacts ).forEach( channelKey => {
     const contact = existingContacts[ channelKey ]
-    console.log( {
-      contact
-    } )
     const instream = useStreamFromPermanentChannel( walletId, contact.permanentChannel, true )
     console.log( {
       instream
@@ -1205,10 +1209,18 @@ function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgre
   console.log( {
     channelSyncUpdates
   } )
-  const res = yield call(
-    trustedContacts.syncPermanentChannels,
-    channelSyncUpdates
-  )
+  let res
+  if( channelSyncUpdates.length )
+    res = yield call(
+      trustedContacts.syncPermanentChannels,
+      channelSyncUpdates
+    )
+  else {
+    yield put ( existingPermanentChannelsSynched( {
+      successful: true
+    } ) )
+    return
+  }
 
   if ( res.status === 200 ) {
     const SERVICES  = yield select( ( state ) => state.storage.database.SERVICES )
@@ -1227,7 +1239,9 @@ function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgre
       successful: true
     } ) )
   } else {
-    console.log( res.err )
+    console.log( {
+      err: res.err
+    } )
     yield put ( existingPermanentChannelsSynched( {
       successful: false
     } ) )
