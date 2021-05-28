@@ -21,9 +21,11 @@ import {
   MULTI_UPDATE_TRUSTED_CHANNELS,
   SEND_VERSION_UPDATE_NOTIFICATION,
   multiUpdateTrustedChannels,
-  SYNC_PERMANENT_CHANNEL,
-  syncPermanentChannel,
+  SYNC_PERMANENT_CHANNELS,
+  syncPermanentChannels,
   INITIALIZE_TRUSTED_CONTACT,
+  SYNC_EXISTING_PERMANENT_CHANNELS,
+  existingPermanentChannelsSynched,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -83,6 +85,8 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import idx from 'idx'
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import { AxiosResponse } from 'axios'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -374,7 +378,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
   contactInfo.channelKey = trustedDerivativeAccount.channelKey
 
-  const updates: UnecryptedStreamData = {
+  const streamUpdates: UnecryptedStreamData = {
     streamId: TrustedContacts.getStreamId( walletId ),
     primaryData,
     secondaryData,
@@ -390,8 +394,11 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   }
 
   // initiate permanent channel
-  yield put( syncPermanentChannel( {
-    contactInfo, updates, updatedSERVICES
+  const channelUpdate =  {
+    contactInfo, streamUpdates
+  }
+  yield put( syncPermanentChannels( {
+    channelUpdates: [ channelUpdate ], updatedSERVICES
   } ) )
 }
 
@@ -1127,19 +1134,35 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: ContactInfo, updates: UnecryptedStreamData, updatedSERVICES?: ServicesJSON }} ) {
+function* syncPermanentChannelsWorker( { payload }: {payload: { channelUpdates: { contactInfo: ContactInfo, streamUpdates: UnecryptedStreamData }[], updatedSERVICES?: ServicesJSON }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
 
-  const { contactInfo, updates } = payload
+  const { channelUpdates } = payload
+  const channelSyncUpdates: {
+    contactDetails: ContactDetails,
+    channelKey: string,
+    streamId: string,
+    secondaryChannelKey?: string,
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    contactsSecondaryChannelKey?: string
+  }[] = []
+  for( const { contactInfo, streamUpdates } of channelUpdates ){
+    channelSyncUpdates.push( {
+      contactDetails: contactInfo.contactDetails,
+      channelKey: contactInfo.channelKey,
+      streamId: streamUpdates.streamId,
+      secondaryChannelKey: contactInfo.secondaryChannelKey,
+      unEncryptedOutstreamUpdates: streamUpdates,
+      contactsSecondaryChannelKey: contactInfo.contactsSecondaryChannelKey
+    } )
+  }
+
+  if( !channelSyncUpdates.length ) throw new Error( 'Sync permanent channels failed: channel sync updates missing' )
   const res = yield call(
-    trustedContacts.syncPermanentChannel,
-    contactInfo.contactDetails,
-    contactInfo.channelKey,
-    contactInfo.secondaryChannelKey,
-    updates,
-    contactInfo.contactsSecondaryChannelKey
+    trustedContacts.syncPermanentChannels,
+    channelSyncUpdates
   )
   if ( res.status === 200 ) {
     const SERVICES  = payload.updatedSERVICES? payload.updatedSERVICES: yield select( ( state ) => state.storage.database.SERVICES )
@@ -1158,9 +1181,104 @@ function* syncPermanentChannelWorker( { payload }: {payload: { contactInfo: Cont
   }
 }
 
-export const syncPermanentChannelWatcher = createWatcher(
-  syncPermanentChannelWorker,
-  SYNC_PERMANENT_CHANNEL,
+export const syncPermanentChannelsWatcher = createWatcher(
+  syncPermanentChannelsWorker,
+  SYNC_PERMANENT_CHANNELS,
+)
+
+function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgressChannelsOnly: boolean}} ) {
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+
+  const existingContacts = trustedContacts.tc.trustedContactsV2
+  if( !Object.keys( existingContacts ).length ) {
+    yield put ( existingPermanentChannelsSynched( {
+      successful: true
+    } ) )
+    return
+  }
+
+  const { walletId } = regularAccount.hdWallet.getWalletId()
+  const streamId = TrustedContacts.getStreamId( walletId )
+  const { inProgressChannelsOnly } = payload
+
+  const channelSyncUpdates: {
+    contactDetails: ContactDetails,
+    channelKey: string,
+    streamId: string,
+    secondaryChannelKey?: string,
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    contactsSecondaryChannelKey?: string
+  }[] = []
+
+  Object.keys( existingContacts ).forEach( channelKey => {
+    const contact = existingContacts[ channelKey ]
+    const instream = useStreamFromPermanentChannel( walletId, contact.permanentChannel, true )
+    console.log( {
+      instream
+    } )
+    if( inProgressChannelsOnly ){
+      if( !instream )
+        channelSyncUpdates.push( {
+          contactDetails: contact.contactDetails,
+          channelKey: channelKey,
+          streamId
+        } )
+    } else
+      channelSyncUpdates.push( {
+        contactDetails: contact.contactDetails,
+        channelKey: channelKey,
+        streamId
+      } )
+  } )
+  console.log( {
+    channelSyncUpdates
+  } )
+  let res
+  if( channelSyncUpdates.length )
+    res = yield call(
+      trustedContacts.syncPermanentChannels,
+      channelSyncUpdates
+    )
+  else {
+    yield put ( existingPermanentChannelsSynched( {
+      successful: true
+    } ) )
+    return
+  }
+
+  if ( res.status === 200 ) {
+    const SERVICES  = yield select( ( state ) => state.storage.database.SERVICES )
+    const updatedSERVICES: ServicesJSON = {
+      ...SERVICES,
+      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+    }
+
+    yield call( insertDBWorker, {
+      payload: {
+        SERVICES: updatedSERVICES
+      }
+    } )
+
+    yield put ( existingPermanentChannelsSynched( {
+      successful: true
+    } ) )
+  } else {
+    console.log( {
+      err: res.err
+    } )
+    yield put ( existingPermanentChannelsSynched( {
+      successful: false
+    } ) )
+  }
+}
+
+export const syncExistingPermanentChannelsWatcher = createWatcher(
+  syncExistingPermanentChannelsWorker,
+  SYNC_EXISTING_PERMANENT_CHANNELS,
 )
 
 // export function* trustedChannelsSetupSyncWorker() {
@@ -1496,7 +1614,7 @@ function* walletCheckInWorker( { payload } ) {
     if( !walletCheckInLoading ) yield put( switchTCLoading( 'walletCheckIn' ) )
     console.log( 'Wallet Check-In in progress...' )
 
-    const { synchingContacts } = payload
+    const { synchingContacts, currencyCode } = payload
     if (
       synchingContacts &&
       !Object.keys( trustedContacts.tc.trustedContacts ).length
@@ -1531,11 +1649,14 @@ function* walletCheckInWorker( { payload } ) {
       metaShares.length ? healthCheckStatus : {
       },
       metaSharesUnderCustody,
+      currencyCode
     )
 
     if ( res.status === 200 ) {
       const { updationInfo, exchangeRates, averageTxFees } = res.data
-
+      console.log( {
+        exchangeRates
+      } )
       if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
       } ) )
       else {
