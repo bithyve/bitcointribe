@@ -1008,6 +1008,7 @@ export default class TrustedContacts {
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
+    currencyCode
   ): Promise<{
     updated: boolean;
     healthCheckStatus;
@@ -1041,16 +1042,16 @@ export default class TrustedContacts {
         reshareVersion: share.meta.reshareVersion,
       } )
     }
-    const currencyCode ='USD'
-    const res = await BH_AXIOS.post( 'walletCheckIn', {
+
+    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
       HEXA_ID,
-      currencyCode,
       walletID: metaShares ? metaShares[ 0 ].meta.walletId : null,
       shareIDs: metaShares
         ? metaShares.map( ( metaShare ) => metaShare.shareId )
         : null, // legacy HC
       channelsToUpdate, // LS update
       toUpdate, // share under-custody update
+      ...currencyCode && { currencyCode },
     } )
 
     const {
@@ -1060,9 +1061,6 @@ export default class TrustedContacts {
       averageTxFees,
     } = res.data // LS data & exchange rates
     const { updationInfo } = res.data // share under-custody update info
-    console.log( '@@@-> ', {
-      exchangeRates
-    } )
     const updates: Array<{
       shareId: string;
       updatedAt: number;
