@@ -208,7 +208,6 @@ const CloudBackupHistory = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'GoogleDrive backup'}
         selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={''}
         tintColor={Colors.deepBlue}
         headerImage={require( '../../assets/images/icons/ico_cloud_backup.png' )}

@@ -162,6 +162,11 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
 
   const KnowMoreBottomSheetHandle: React.FC = () => {

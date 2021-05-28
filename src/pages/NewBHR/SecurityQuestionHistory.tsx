@@ -220,7 +220,7 @@ const SecurityQuestionHistory = ( props ) => {
         levelHealthVar.reshareVersion = 1
         levelHealthVar.name = 'Cloud'
       }
-      const shareArray = [
+      const shareObj =
         {
           walletId: s3Service.getWalletId().data.walletId,
           shareId: levelHealthVar.shareId,
@@ -228,9 +228,8 @@ const SecurityQuestionHistory = ( props ) => {
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',
-        },
-      ]
-      dispatch( updateMSharesHealth( shareArray, true ) )
+        }
+      dispatch( updateMSharesHealth( shareObj, true ) )
     }
   }
 
@@ -248,7 +247,6 @@ const SecurityQuestionHistory = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Security Question'}
         selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
       />

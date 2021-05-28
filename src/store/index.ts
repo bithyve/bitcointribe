@@ -113,13 +113,14 @@ import {
   fetchEphemeralChannelWatcher,
   updateEphemeralChannelWatcher,
   updateTrustedChannelWatcher,
-  trustedChannelsSetupSyncWatcher,
   removeTrustedContactWatcher,
   syncTrustedChannelsWatcher,
   walletCheckInWatcher,
   postRecoveryChannelSyncWatcher,
   multiUpdateTrustedChannelsWatcher,
-  sendVersionUpdateNotificationWatcher
+  sendVersionUpdateNotificationWatcher,
+  syncPermanentChannelWatcher,
+  initializeTrustedContactWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -182,7 +183,8 @@ import {
   autoShareLevel2KeepersWatcher,
   downloadSmShareForApprovalWatcher,
   setLevelToNotSetupStatusWatcher,
-  setHealthStatusWatcher
+  setHealthStatusWatcher,
+  modifyLevelDataWatcher,
 } from './sagas/health'
 
 import {
@@ -202,6 +204,7 @@ import {
   checkFileIsAvailableWatcher,
   readFileWatcher,
   uplaodFileWatcher,
+  updateCloudBackupWatcher,
 } from './sagas/cloud'
 
 import {
@@ -298,17 +301,18 @@ const rootSaga = function* () {
 
     // Trusted Contacts
     approveTrustedContactWatcher,
+    initializeTrustedContactWatcher,
     removeTrustedContactWatcher,
     updateEphemeralChannelWatcher,
     fetchEphemeralChannelWatcher,
     updateTrustedChannelWatcher,
     fetchTrustedChannelWatcher,
-    trustedChannelsSetupSyncWatcher,
     walletCheckInWatcher,
     syncTrustedChannelsWatcher,
     postRecoveryChannelSyncWatcher,
     sendVersionUpdateNotificationWatcher,
     multiUpdateTrustedChannelsWatcher,
+    syncPermanentChannelWatcher,
 
     // Health
     initHealthWatcher,
@@ -350,6 +354,7 @@ const rootSaga = function* () {
     downloadSmShareForApprovalWatcher,
     setLevelToNotSetupStatusWatcher,
     setHealthStatusWatcher,
+    modifyLevelDataWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,
@@ -383,6 +388,7 @@ const rootSaga = function* () {
     checkFileIsAvailableWatcher,
     readFileWatcher,
     uplaodFileWatcher,
+    updateCloudBackupWatcher,
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,

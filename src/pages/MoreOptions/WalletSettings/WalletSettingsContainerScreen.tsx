@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType, Alert } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
@@ -90,6 +90,12 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       accountShellID: transactionData.accountShell.id,
     } )
   }
+
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
   const showRescanningPromptBottomSheet = useCallback( () => {
     presentBottomSheet(

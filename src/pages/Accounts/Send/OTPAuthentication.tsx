@@ -59,6 +59,11 @@ export default function OTPAuthenticationScreen( { navigation } ) {
     }
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(

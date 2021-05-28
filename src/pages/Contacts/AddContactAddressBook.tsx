@@ -9,7 +9,7 @@ import {
   Linking,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -32,6 +32,7 @@ import DeviceInfo from 'react-native-device-info'
 import * as Permissions from 'expo-permissions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import Toast from '../../components/Toast'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -51,21 +52,13 @@ export default function AddContactAddressBook( props ) {
     contactListErrorBottomSheet,
     setContactListErrorBottomSheet,
   ] = useState( React.createRef() )
+  const dispatch = useDispatch()
 
   const [ contactData, setContactData ] = useState( [] )
 
   const requestContactsPermission = async () => {
     try {
-      let isContactOpen = false
-      AsyncStorage.getItem( 'isContactOpen', ( err, value ) => {
-        if ( err ) console.log( err )
-        else {
-          isContactOpen = JSON.parse( value )
-        }
-      } )
-      if ( !isContactOpen ) {
-        await AsyncStorage.setItem( 'isContactOpen', JSON.stringify( true ) )
-      }
+      dispatch( setIsPermissionGiven( true ) )
       const result = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.READ_CONTACTS,
         {
@@ -112,6 +105,7 @@ export default function AddContactAddressBook( props ) {
   }
 
   const getContactPermission = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const granted = await requestContactsPermission()
       //console.log('GRANTED', granted);
@@ -144,6 +138,7 @@ export default function AddContactAddressBook( props ) {
   }
 
   const getContactsAsync = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     if ( Platform.OS === 'android' ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
       //console.log("chckContactPermission",chckContactPermission)
@@ -181,17 +176,6 @@ export default function AddContactAddressBook( props ) {
           }
         }
       } )
-
-      let isContactOpen = false
-      AsyncStorage.getItem( 'isContactOpen', ( err, value ) => {
-        if ( err ) console.log( err )
-        else {
-          isContactOpen = JSON.parse( value )
-        }
-      } )
-      if ( !isContactOpen ) {
-        await AsyncStorage.setItem( 'isContactOpen', JSON.stringify( true ) )
-      }
     } )()
   }, [] )
 

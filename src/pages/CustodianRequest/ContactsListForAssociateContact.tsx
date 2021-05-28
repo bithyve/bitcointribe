@@ -15,7 +15,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateTrustedContactsInfoLocally } from '../../store/actions/trustedContacts'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
@@ -45,62 +44,62 @@ const ContactsListForAssociateContact = ( props ) => {
     ( state ) => state.trustedContacts.service,
   )
 
-  const updateTrustedContactsInfo = async ( contact? ) => {
-    const associatedContact = contact ? contact : contacts[ 0 ]
-    setShowLoader( true )
-    const selectedContactName = `${associatedContact.firstName} ${
-      associatedContact.lastName ? associatedContact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
-    setApprovingContact( selectedContactName )
+  // const updateTrustedContactsInfo = async ( contact? ) => {
+  //   const associatedContact = contact ? contact : contacts[ 0 ]
+  //   setShowLoader( true )
+  //   const selectedContactName = `${associatedContact.firstName} ${
+  //     associatedContact.lastName ? associatedContact.lastName : ''
+  //   }`
+  //     .toLowerCase()
+  //     .trim()
+  //   setApprovingContact( selectedContactName )
 
-    const tcInfo = trustedContactsInfo
-    if ( tcInfo.length ) {
-      if (
-        tcInfo.findIndex( ( trustedContact ) => {
-          if ( !trustedContact ) return false
+  //   const tcInfo = trustedContactsInfo
+  //   if ( tcInfo.length ) {
+  //     if (
+  //       tcInfo.findIndex( ( trustedContact ) => {
+  //         if ( !trustedContact ) return false
 
-          const presentContactName = `${trustedContact.firstName} ${
-            trustedContact.lastName ? trustedContact.lastName : ''
-          }`
-            .toLowerCase()
-            .trim()
+  //         const presentContactName = `${trustedContact.firstName} ${
+  //           trustedContact.lastName ? trustedContact.lastName : ''
+  //         }`
+  //           .toLowerCase()
+  //           .trim()
 
-          return presentContactName == selectedContactName
-        } ) == -1
-      ) {
-        tcInfo.push( associatedContact )
-        console.log( {
-          con: associatedContact
-        } )
-        postAssociation( associatedContact )
-      } else {
-        setShowLoader( false )
-        Toast( 'Contact already exists' )
-        return
-      }
-    } else {
-      tcInfo[ 3 ] = associatedContact
-      postAssociation( associatedContact )
-    }
+  //         return presentContactName == selectedContactName
+  //       } ) == -1
+  //     ) {
+  //       tcInfo.push( associatedContact )
+  //       console.log( {
+  //         con: associatedContact
+  //       } )
+  //       postAssociation( associatedContact )
+  //     } else {
+  //       setShowLoader( false )
+  //       Toast( 'Contact already exists' )
+  //       return
+  //     }
+  //   } else {
+  //     tcInfo[ 3 ] = associatedContact
+  //     postAssociation( associatedContact )
+  //   }
 
-    dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-  }
+  //   dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+  // }
 
   const { approvedTrustedContacts } = useSelector(
     ( state ) => state.trustedContacts,
   )
 
-  useEffect( () => {
-    if (
-      approvingContact &&
-      approvedTrustedContacts &&
-      approvedTrustedContacts[ approvingContact ]
-    )
-    //     setShowLoader(false);
-      props.navigation.navigate( 'Home' )
-  }, [ approvedTrustedContacts, approvingContact ] )
+  // useEffect( () => {
+  //   if (
+  //     approvingContact &&
+  //     approvedTrustedContacts &&
+  //     approvedTrustedContacts[ approvingContact ]
+  //   )
+  //   //     setShowLoader(false);
+  //     props.navigation.navigate( 'Home' )
+  // }, [ approvedTrustedContacts, approvingContact ] )
 
   // const continueNProceed = async () => {
   //   let AssociatedContact = JSON.parse(
@@ -177,7 +176,7 @@ const ContactsListForAssociateContact = ( props ) => {
                 }
               }
 
-              updateTrustedContactsInfo( data )
+              // updateTrustedContactsInfo( data )
             }}
             style={{
               height: wp( '8%' ),
@@ -218,7 +217,9 @@ const ContactsListForAssociateContact = ( props ) => {
         isShowSkipContact={true}
         style={{
         }}
-        onPressContinue={updateTrustedContactsInfo}
+        onPressContinue={() => {
+          postAssociation( contacts[ 0 ] )
+        }}
         onSelectContact={selectedContactsList}
         onPressSkip={() => {
           // selectedContactsList([data]);

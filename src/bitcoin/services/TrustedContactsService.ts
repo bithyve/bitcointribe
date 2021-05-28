@@ -8,6 +8,9 @@ import {
   ShareUploadables,
   MetaShare,
   EncDynamicNonPMDD,
+  UnecryptedStreamData,
+  ContactDetails,
+  Trusted_Contacts,
 } from '../utilities/Interface'
 
 export default class TrustedContactsService {
@@ -15,14 +18,17 @@ export default class TrustedContactsService {
     const { tc } = JSON.parse( json )
     const {
       trustedContacts,
+      trustedContactsV2,
       skippedContactsCount,
     }: {
       trustedContacts: Contacts;
+      trustedContactsV2: Trusted_Contacts;
       skippedContactsCount: number;
     } = tc
 
     return new TrustedContactsService( {
       trustedContacts,
+      trustedContactsV2,
       skippedContactsCount,
     } )
   };
@@ -213,7 +219,7 @@ export default class TrustedContactsService {
   };
 
   public updateTrustedChannel = async (
-    contactName: string,
+    channelKey: string,
     dataElements: TrustedDataElements,
     fetch?: boolean,
     shareUploadables?: ShareUploadables,
@@ -243,7 +249,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.updateTrustedChannel(
-          contactName.toLowerCase().trim(),
+          channelKey,
           dataElements,
           fetch,
           shareUploadables,
@@ -291,6 +297,52 @@ export default class TrustedContactsService {
         status: 0o1,
         err: err.message,
         message: 'Failed to fetch from contact',
+      }
+    }
+  };
+
+  public syncPermanentChannel = async (
+    contactDetails: ContactDetails,
+    channelKey: string,
+    secondaryChannelKey?: string,
+    unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    contactsSecondaryChannelKey?: string,
+  ): Promise<
+    | {
+        status: number;
+        data:
+          | {
+              updated: any;
+            }
+          | {
+              updated: any;
+            };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: string;
+        message: string;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.syncPermanentChannel(
+          contactDetails,
+          channelKey,
+          secondaryChannelKey,
+          unEncryptedOutstreamUpdates,
+          contactsSecondaryChannelKey,
+        )
+      }
+    } catch ( err ) {
+      console.log( 'err', err )
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update contact',
       }
     }
   };

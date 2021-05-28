@@ -41,23 +41,27 @@ export default function ManagePasscodeScreen( props ) {
 
   if ( reLogin ) {
     props.navigation.navigate( 'SettingGetNewPin', {
-      oldPasscode: pin 
+      oldPasscode: pin
     } )
     dispatch( switchReLogin( false, true ) )
   }
 
   useEffect( () => {
-    authenticationFailed ? setCheckAuth( true ) : setCheckAuth( false )
+    if ( authenticationFailed && pin ) {
+      setCheckAuth( true )
+    } else {
+      setCheckAuth( false )
+    }
   }, [ authenticationFailed ] )
 
   const [] = useState( false )
 
   return (
     <SafeAreaView style={{
-      flex: 1 
+      flex: 1
     }}>
       <View style={{
-        alignSelf: 'baseline' 
+        alignSelf: 'baseline'
       }}>
         <View>
           <Text style={styles.headerInfoText}>
@@ -115,7 +119,7 @@ export default function ManagePasscodeScreen( props ) {
               >
                 {pin.length >= 2 ? (
                   <Text style={{
-                    fontSize: RFValue( 10 ) 
+                    fontSize: RFValue( 10 )
                   }}>
                     <FontAwesome
                       size={8}
@@ -144,7 +148,7 @@ export default function ManagePasscodeScreen( props ) {
               >
                 {pin.length >= 3 ? (
                   <Text style={{
-                    fontSize: RFValue( 10 ) 
+                    fontSize: RFValue( 10 )
                   }}>
                     <FontAwesome
                       size={8}
@@ -173,7 +177,7 @@ export default function ManagePasscodeScreen( props ) {
               >
                 {pin.length >= 4 ? (
                   <Text style={{
-                    fontSize: RFValue( 10 ) 
+                    fontSize: RFValue( 10 )
                   }}>
                     <FontAwesome
                       size={8}
@@ -192,7 +196,7 @@ export default function ManagePasscodeScreen( props ) {
         </View>
         {checkAuth ? (
           <View style={{
-            marginLeft: 'auto' 
+            marginLeft: 'auto'
           }}>
             <Text style={styles.errorText}>
               Incorrect passcode, try again!
@@ -202,7 +206,7 @@ export default function ManagePasscodeScreen( props ) {
       </View>
       {pin.length == 4 ? (
         <View style={{
-          marginTop: 'auto' 
+          marginTop: 'auto'
         }}>
           <TouchableOpacity
             disabled={pin.length == 4 ? false : true}
@@ -222,7 +226,7 @@ export default function ManagePasscodeScreen( props ) {
         </View>
       ) : (
         <View style={{
-          marginTop: 'auto' 
+          marginTop: 'auto'
         }}></View>
       )}
 
@@ -336,7 +340,7 @@ export default function ManagePasscodeScreen( props ) {
         <View style={styles.keyPadRow}>
           <View style={styles.keyPadElementTouchable}>
             <Text style={{
-              flex: 1, padding: 15 
+              flex: 1, padding: 15
             }}></Text>
           </View>
           <TouchableOpacity
@@ -407,7 +411,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.shadowBlue,
     shadowOpacity: 1,
     shadowOffset: {
-      width: 15, height: 15 
+      width: 15, height: 15
     },
     marginBottom: heightPercentageToDP( '5%' ),
   },
@@ -454,7 +458,7 @@ const styles = StyleSheet.create( {
     shadowColor: Colors.borderColor,
     shadowOpacity: 0.35,
     shadowOffset: {
-      width: 0, height: 3 
+      width: 0, height: 3
     },
     borderColor: Colors.borderColor,
     alignItems: 'center',

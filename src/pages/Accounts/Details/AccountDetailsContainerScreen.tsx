@@ -141,6 +141,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     } ) )
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
   const showKnowMoreSheet = useCallback( () => {
     presentBottomSheet(
       <KnowMoreBottomSheet

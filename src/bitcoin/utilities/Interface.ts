@@ -1,3 +1,4 @@
+import { ImageSourcePropType } from 'react-native'
 import {
   DecentralizedBackup,
   ServicesJSON,
@@ -107,7 +108,12 @@ export interface Transactions {
 }
 
 export interface MetaShare {
-  encryptedSecret: string;
+  encryptedSecret?: string;
+  encryptedShare?: {
+    pmShare: string;
+    smShare: string;
+    bhXpub: string;
+  };
   shareId: string;
   meta: {
     version: string;
@@ -123,7 +129,6 @@ export interface MetaShare {
     encryptedKeeperInfo?: string;
     scheme?: string,
   };
-  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {
@@ -209,9 +214,10 @@ export interface DerivativeAccount {
 
 export interface TrustedContactDerivativeAccountElements
   extends DerivativeAccountElements {
-  contactName: string;
-  contactDetails?: {
-    xpub: string;
+  channelKey: string;
+  contactDetails: ContactDetails,
+  xpubDetails: {
+    xpub?: string;
     tpub?: string;
     receivingAddress?: string;
     usedAddresses?: string[];
@@ -357,16 +363,16 @@ export interface EphemeralDataElements {
     otp: string;
     encryptedKey: string;
   };
-  paymentDetails?: {
-    trusted?: {
-      address?: string;
-      paymentURI?: string;
-    };
-    alternate?: {
-      address?: string;
-      paymentURI?: string;
-    };
-  };
+  // paymentDetails?: {
+  //   trusted?: {
+  //     address?: string;
+  //     paymentURI?: string;
+  //   };
+  //   alternate?: {
+  //     address?: string;
+  //     paymentURI?: string;
+  //   };
+  // };
   trustedAddress?: string;
   trustedTestAddress?: string;
   restoreOf?: string;
@@ -463,6 +469,104 @@ export interface Contacts {
   [contactName: string]: ContactElements
 }
 
+export interface ContactDetails {
+  contactName: string,
+  info: string, // phone-number/email-address
+  id: string,
+  image?: ImageSourcePropType | null,
+}
+
+export interface ContactInfo  {
+  contactDetails: ContactDetails,
+  isGuardian?: boolean,
+  channelKey?: string,
+  secondaryChannelKey?: string
+  contactsSecondaryChannelKey?: string,
+  channelAssets?: {
+    primaryMnemonicShard?: any,
+    keeperInfo?: any,
+    secondaryMnemonicShard?: any,
+    bhXpub?: string
+  },
+}
+export interface PrimaryStreamData {
+  walletID?: string,
+  walletName?: string,
+  relationType?: TrustedContactRelationTypes,
+  FCM?: string,
+  paymentAddresses?: {
+    [accountType: string]: string
+  },
+}
+
+export interface SecondaryStreamData {
+  secondaryMnemonicShard: any,
+  bhXpub: string,
+}
+
+export interface BackupStreamData {
+  primaryMnemonicShard: any,
+  keeperInfo: any,
+}
+
+export interface UnecryptedStreamData {
+  streamId: string,
+  primaryData?: PrimaryStreamData,
+  secondaryData?: SecondaryStreamData,     // in/out-stream secondaryData = null
+  backupData?: BackupStreamData | null, // in/out-stream backupData = null
+  metaData?: {
+    flags?: {
+      active: boolean,
+      lastSeen: number,
+      newData: boolean,
+    },
+    version?: string
+  }
+}
+
+export type UnecryptedStreams = {
+  [streamId: string]: UnecryptedStreamData
+}
+export interface StreamData {
+  streamId: string,
+  primaryEncryptedData?: string // CH encrypted: encrypted via primary channel key
+  secondaryEncryptedData?: string // CH2 encrypted: encrypted via secondary channel key & is not stored in the app
+  encryptedBackupData?: string, // not stored in the app
+  metaData?: {
+    flags?: {
+      active: boolean,
+      lastSeen: number,
+      newData: boolean,
+    },
+    version?: string
+  }
+}
+
+export type Streams = {
+  [streamId: string]: StreamData
+}
+
+export enum TrustedContactRelationTypes {
+  CONTACT = 'CONTACT',
+  KEEPER  = 'KEEPER',
+  WARD = 'WARD',
+  KEEPER_WARD = 'KEEPER_WARD'
+}
+
+export interface TrustedContact {
+  contactDetails: ContactDetails,
+  relationType: TrustedContactRelationTypes,
+  permanentChannelAddress: string,
+  permanentChannel?: Streams, // encrypted and uploaded to Relay
+  unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
+  secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
+  walletID?: string, // contact's walletId
+  contactsSecondaryChannelKey?: string, // contacts secondaryKey(stored locally)
+}
+export interface Trusted_Contacts {
+  [channelKey: string]: TrustedContact
+}
+
 export interface WalletImage {
   DECENTRALIZED_BACKUP?: DecentralizedBackup;
   SERVICES?: ServicesJSON;
@@ -538,6 +642,7 @@ export interface EphemeralDataForKeeper {
 }
 
 export interface LevelHealthInterface {
+  level?: number;
   levelInfo: LevelInfo[];
 }
 
@@ -548,6 +653,17 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
+}
+
+export interface KeeperInfoInterface {
+  shareId: string;
+  name: string;
+  type: string;
+  scheme: string;
+  currentLevel: number;
+  createdAt: number;
+  sharePosition: number;
+  data?: any;
 }
 //VersionHistory
 export interface VersionHistory {
@@ -570,4 +686,32 @@ export interface AverageTxFees {
     feePerByte: number,
     estimatedBlocks: number,
   },
+}
+
+export interface LevelDataObj {
+  shareType: string
+  updatedAt: number
+  status: string
+  shareId: string
+  reshareVersion: number
+  name: string
+  data: any;
+  uuid: string
+}
+
+export interface LevelData {
+  levelName: string
+  status: string
+  keeper1ButtonText: string
+  keeper2ButtonText: string
+  keeper1: LevelDataObj,
+  keeper2: LevelDataObj,
+  note:string
+  info:string
+  id: number
+}
+
+export enum QRCodeTypes {
+  CONTACT_REQUEST = 'CONTACT_REQUEST',
+  KEEPER_REQUEST = 'KEEPER_REQUEST'
 }

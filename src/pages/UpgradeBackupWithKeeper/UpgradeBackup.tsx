@@ -30,7 +30,6 @@ import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
   trustedChannelsSetupSync,
-  updateTrustedContactsInfoLocally
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
@@ -60,7 +59,7 @@ import {
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
@@ -79,6 +78,7 @@ import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import QRModal from '../Accounts/QRModal'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -162,10 +162,10 @@ interface UpgradeBackupPropsTypes {
   getPDFData: any;
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
-  updateTrustedContactsInfoLocally: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
   secureAccount: SecureAccount;
   containerStyle: StyleProp<ViewStyle>;
+  setIsPermissionGiven: any;
 }
 
 class UpgradeBackup extends Component<
@@ -618,7 +618,7 @@ class UpgradeBackup extends Component<
         this.setState( {
           isGuardianCreationClicked: true
         } )
-        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
+        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount, metaSharesKeeper } = this.props
         const firstName = 'Secondary'
         const lastName = 'Device1'
 
@@ -635,25 +635,27 @@ class UpgradeBackup extends Component<
         config.TC_REQUEST_EXPIRY
         // Keeper setup started
         keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
-        updatedKeeperInfo( {
+        const obj: KeeperInfoInterface = {
           shareId: shareId,
           name: contactName,
-          uuid: '',
-          publicKey: '',
-          ephemeralAddress: '',
           type: 'device',
+          scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+          currentLevel: this.props.levelToSetup,
+          createdAt: moment( new Date() ).valueOf(),
+          sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
           data: {
             name: contactName, index: 0
           }
-        } )
+        }
+        updatedKeeperInfo( obj )
 
         if ( shareExpired ) {
           this.setState( {
             secondaryQR: ''
           } )
-          this.updateTrustedContactsInfo( {
-            firstName, lastName
-          } )
+          // this.updateTrustedContactsInfo( {
+          //   firstName, lastName
+          // } )
           // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
         } else {
           const hasTrustedChannel = trustedContact.symmetricKey ? true : false
@@ -696,17 +698,17 @@ class UpgradeBackup extends Component<
     }
   }
 
-  updateTrustedContactsInfo = async ( contact ) => {
-    const tcInfo = this.props.trustedContactsInfo
-    if ( tcInfo.length ) {
-      tcInfo[ 0 ] = contact
-    } else {
-      tcInfo[ 0 ] = contact
-      tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-      tcInfo[ 2 ] = undefined
-    }
-    this.props.updateTrustedContactsInfoLocally( tcInfo )
-  }
+  // updateTrustedContactsInfo = async ( contact ) => {
+  //   const tcInfo = this.props.trustedContactsInfo
+  //   if ( tcInfo.length ) {
+  //     tcInfo[ 0 ] = contact
+  //   } else {
+  //     tcInfo[ 0 ] = contact
+  //     tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+  //     tcInfo[ 2 ] = undefined
+  //   }
+  //   this.props.updateTrustedContactsInfoLocally( tcInfo )
+  // }
 
   setSecondaryDeviceQR = () => {
     try {
@@ -782,7 +784,7 @@ class UpgradeBackup extends Component<
     if( index === 0 ) contactName = 'Secondary Device1'
     else if( index === 3 ) contactName = 'Secondary Device2'
     else contactName = 'Secondary Device3'
-    const shareArray = [
+    const shareObj =
       {
         walletId: this.props.s3Service.getWalletId().data.walletId,
         shareId: this.state.selectedShareId[ 0 ],
@@ -790,9 +792,8 @@ class UpgradeBackup extends Component<
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-      },
-    ]
-    this.props.updateMSharesHealth( shareArray )
+      }
+    this.props.updateMSharesHealth( shareObj )
   }
 
   saveInTransitHistory = async () => {
@@ -957,6 +958,7 @@ class UpgradeBackup extends Component<
 
   requestStoragePermission = async () => {
     try {
+      this.props.setIsPermissionGiven( true )
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -1024,6 +1026,7 @@ class UpgradeBackup extends Component<
   }
 
   checkStoragePermission = async () =>  {
+    this.props.setIsPermissionGiven( true )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
@@ -1554,7 +1557,7 @@ export default withNavigationFocus(
     confirmPDFSharedFromUpgrade,
     getPDFData,
     checkMSharesHealth,
-    updateTrustedContactsInfoLocally
+    setIsPermissionGiven
   } )( UpgradeBackup )
 )
 

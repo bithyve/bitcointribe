@@ -42,13 +42,12 @@ import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
+  MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
 import {
@@ -120,6 +119,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const uploadMetaShare = useSelector(
     ( state ) => state.health.loading.uploadMetaShare,
   )
+  const MetaShares: MetaShare[] = useSelector(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+  )
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
   )
@@ -169,9 +171,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   ] )
   const [ selectedTime, setSelectedTime ] = useState(
     props.navigation.getParam( 'selectedTime' ),
-  )
-  const [ selectedStatus, setSelectedStatus ] = useState(
-    props.navigation.getParam( 'selectedStatus' ),
   )
   const [ selectedTitle, setSelectedTitle ] = useState(
     props.navigation.getParam( 'selectedTitle' ),
@@ -718,46 +717,46 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
 
-  const updateTrustedContactsInfo = useCallback(
-    async ( contact ) => {
-      const tcInfo = trustedContactsInfo
+  // const updateTrustedContactsInfo = useCallback(
+  //   async ( contact ) => {
+  //     const tcInfo = trustedContactsInfo
 
-      if ( tcInfo.length ) {
-        if ( tcInfo[ index ] ) {
-          let found = false
-          for ( let i = 3; i < tcInfo.length; i++ ) {
-            // push if not present in TC list
-            if ( tcInfo[ i ] && tcInfo[ i ].name == tcInfo[ index ].name ) {
-              found = true
-              break
-            }
-          }
+  //     if ( tcInfo.length ) {
+  //       if ( tcInfo[ index ] ) {
+  //         let found = false
+  //         for ( let i = 3; i < tcInfo.length; i++ ) {
+  //           // push if not present in TC list
+  //           if ( tcInfo[ i ] && tcInfo[ i ].name == tcInfo[ index ].name ) {
+  //             found = true
+  //             break
+  //           }
+  //         }
 
-          if ( !found ) tcInfo.push( tcInfo[ index ] )
-        }
+  //         if ( !found ) tcInfo.push( tcInfo[ index ] )
+  //       }
 
-        for ( let i = 0; i < tcInfo.length; i++ ) {
-          if ( tcInfo[ i ] && tcInfo[ i ].name == contact.name ) {
-            tcInfo.splice( i, 1 )
-            break
-          }
-        }
+  //       for ( let i = 0; i < tcInfo.length; i++ ) {
+  //         if ( tcInfo[ i ] && tcInfo[ i ].name == contact.name ) {
+  //           tcInfo.splice( i, 1 )
+  //           break
+  //         }
+  //       }
 
-        tcInfo[ index ] = contact
-      } else {
-        tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
-        tcInfo[ 1 ] = null
-        tcInfo[ 2 ] = null
-        tcInfo[ index ] = contact
-      }
-      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-    },
-    [ index, trustedContactsInfo ],
-  )
+  //       tcInfo[ index ] = contact
+  //     } else {
+  //       tcInfo[ 0 ] = null // securing initial 3 positions for Guardians
+  //       tcInfo[ 1 ] = null
+  //       tcInfo[ 2 ] = null
+  //       tcInfo[ index ] = contact
+  //     }
+  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+  //   },
+  //   [ index, trustedContactsInfo ],
+  // )
 
   const createGuardian = useCallback( async ( chosenContactTmp? ) => {
     let chosenContactState = chosenContact
-    if ( (chosenContact && !Object.keys( chosenContact ).length) || chosenContact == null ) chosenContactState = chosenContactTmp
+    if ( ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ) chosenContactState = chosenContactTmp
     setIsGuardianCreationClicked( true )
 
     const contactName = `${chosenContactState.firstName} ${
@@ -780,24 +779,25 @@ const TrustedContactHistoryKeeper = ( props ) => {
       config.TC_REQUEST_EXPIRY
     // Keeper setup started
     dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-
-    dispatch( updatedKeeperInfo( {
+    const obj: KeeperInfoInterface = {
       shareId: selectedShareId,
       name: chosenContactState.name,
-      uuid: chosenContactState.id,
-      publicKey: '',
-      ephemeralAddress: '',
       type: 'contact',
+      scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
+      currentLevel: currentLevel,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
       data: {
         ...chosenContactState, index
       }
-    } ) )
+    }
+    dispatch( updatedKeeperInfo( obj ) )
 
     // TODO: connect trustedLink and trustedQR state vars to redux store(updated via saga)
     if ( changeContact || shareExpired || isChange ) {
       setTrustedLink( '' )
       setTrustedQR( '' )
-      updateTrustedContactsInfo( chosenContactState )
+      // updateTrustedContactsInfo( chosenContactState )
       onOTPShare( ) // enables reshare
       setChangeContact( false )
     } else {
@@ -1166,16 +1166,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
       .toLowerCase()
       .trim()
     console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
-    dispatch( updateMSharesHealth( [
+    dispatch( updateMSharesHealth(
       {
         walletId: s3Service.getWalletId().data.walletId,
         shareId: selectedShareId,
         reshareVersion: 0,
-        updatedAt: moment( new Date() ).valueOf(),
+        updatedAt: 'notAccessible',
         name: contactName,
         shareType: 'contact',
-      },
-    ] ) )
+      } ) )
   }
 
   return (
@@ -1192,7 +1191,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={selectedTitle}
         selectedTime={selectedTime}
-        selectedStatus={selectedStatus}
         moreInfo={selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
         imageIcon={getImageIcon}

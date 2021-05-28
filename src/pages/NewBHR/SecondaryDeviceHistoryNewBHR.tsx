@@ -23,13 +23,12 @@ import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
 import {
+  KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
+  MetaShare,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -187,6 +186,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const uploadMetaShare = useSelector(
     ( state ) => state.health.loading.uploadMetaShare,
   )
+  const MetaShares: MetaShare[] = useSelector(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+  )
   const updateEphemeralChannelLoader = useSelector(
     ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
   )
@@ -209,22 +211,22 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     }
   }
 
-  const updateTrustedContactsInfo = useCallback(
-    async ( contact ) => {
-      const tcInfo = trustedContactsInfo
+  // const updateTrustedContactsInfo = useCallback(
+  //   async ( contact ) => {
+  //     const tcInfo = trustedContactsInfo
 
-      if ( tcInfo.length ) {
-        tcInfo[ 0 ] = contact
-      } else {
-        tcInfo[ 0 ] = contact
-        tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-        tcInfo[ 2 ] = undefined
-      }
-      console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
-      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-    },
-    [ trustedContactsInfo ],
-  )
+  //     if ( tcInfo.length ) {
+  //       tcInfo[ 0 ] = contact
+  //     } else {
+  //       tcInfo[ 0 ] = contact
+  //       tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+  //       tcInfo[ 2 ] = undefined
+  //     }
+  //     console.log( 'updateTrustedContactsInfo tcInfo', tcInfo )
+  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+  //   },
+  //   [ trustedContactsInfo ],
+  // )
 
   const createGuardian = useCallback(
     async ( changeKeeper?: boolean ) => {
@@ -248,23 +250,25 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       config.TC_REQUEST_EXPIRY
       // Keeper setup started
       dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
-      dispatch( updatedKeeperInfo( {
+      const obj: KeeperInfoInterface = {
         shareId: selectedShareId,
         name: contactName,
-        uuid: '',
-        publicKey: '',
-        ephemeralAddress: '',
         type: 'device',
+        scheme: MetaShares.find( value => value.shareId == selectedShareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value => value.shareId == selectedShareId ),
         data: {
           name: contactName, index
         }
-      } ) )
+      }
+      dispatch( updatedKeeperInfo( obj ) )
 
       if ( changeKeeper || shareExpired || isChange ) {
         setSecondaryQR( '' )
-        updateTrustedContactsInfo( {
-          firstName, lastName
-        } )
+        // updateTrustedContactsInfo( {
+        //   firstName, lastName
+        // } )
         // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
       } else {
         const hasTrustedChannel = trustedContact.symmetricKey ? true : false
@@ -820,18 +824,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     if( index === 0 ) contactName = 'Secondary Device1'
     else if( index === 3 ) contactName = 'Secondary Device2'
     else contactName = 'Secondary Device3'
-    const shareArray = [
+    const shareObj =
       {
         walletId: s3Service.getWalletId().data.walletId,
         shareId: selectedShareId,
         reshareVersion: 0,
-        updatedAt: moment( new Date() ).valueOf(),
+        status: 'notAccessible',
         name: contactName,
         shareType: 'device',
-      },
-    ]
-    console.log( 'shareArray', shareArray )
-    dispatch( updateMSharesHealth( shareArray ) )
+      }
+
+    console.log( 'shareArray', shareObj )
+    dispatch( updateMSharesHealth( shareObj ) )
   }
 
   return (
@@ -846,7 +850,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
         selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />

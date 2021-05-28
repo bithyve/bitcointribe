@@ -19,7 +19,7 @@ import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { insertDBWorker } from './storage'
-import { INotification, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements } from '../../bitcoin/utilities/Interface'
+import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { setCloudData } from '../actions/cloud'
@@ -113,17 +113,19 @@ function* autoShareSecondaryWorker( { payload } ) {
     const { shareId } = payload
     const name = 'Secondary Device1'
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
-    yield put( updatedKeeperInfo( {
+    const obj: KeeperInfoInterface = {
       shareId: shareId,
       name: name,
-      uuid: '',
-      publicKey: '',
-      ephemeralAddress: '',
       type: 'device',
+      scheme: s3Service.levelhealth.metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+      currentLevel: this.props.levelToSetup,
+      createdAt: moment( new Date() ).valueOf(),
+      sharePosition: s3Service.levelhealth.metaSharesKeeper.findIndex( value => value.shareId == shareId ),
       data: {
         name: name, index: 0
       }
-    } ) )
+    }
+    yield put( updatedKeeperInfo( obj ) )
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
@@ -207,6 +209,8 @@ function* autoShareContactKeeperWorker( { payload } ) {
     yield put( switchUpgradeLoader( 'contactSetupAutoShare' ) )
     const { contactList, shareIds } = payload
     const contactListToMarkDone:{type: string; name: string;}[] = []
+    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const levelToSetup: number = yield select( ( state ) => state.upgradeToNewBhr.levelToSetup )
     for ( let i = 0; i < shareIds.length; i++ ) {
       const element = shareIds[ i ]
       const name =  contactList[ i ] && contactList[ i ].firstName && contactList[ i ].lastName
@@ -216,19 +220,20 @@ function* autoShareContactKeeperWorker( { payload } ) {
           : contactList[ i ] && !contactList[ i ].firstName && contactList[ i ].lastName
             ? contactList[ i ].lastName
             : ''
-      yield put( updatedKeeperInfo(  {
+      const obj: KeeperInfoInterface = {
         shareId: element,
-        name,
-        uuid: '',
-        publicKey: '',
-        ephemeralAddress: '',
+        name: name,
         type: 'contact',
+        scheme: s3Service.levelhealth.metaSharesKeeper.find( value => value.shareId == element ).meta.scheme,
+        currentLevel: levelToSetup,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: s3Service.levelhealth.metaSharesKeeper.findIndex( value => value.shareId == element ),
         data: {
           ...contactList[ i ], index: i + 1
         }
-      } ) )
+      }
+      yield put( updatedKeeperInfo( obj ) )
     }
-    const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.getWalletId().data.walletId
     const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
@@ -273,17 +278,15 @@ function* autoShareContactKeeperWorker( { payload } ) {
             SERVICES: updatedSERVICES
           },
         } )
-        yield put( updateMSharesHealth( [
-          {
-            walletId: walletId,
-            shareId: shareId,
-            reshareVersion: share.meta.reshareVersion,
-            updatedAt: moment( new Date() ).valueOf(),
-            shareType: 'contact',
-            name: name,
-            status: status,
-          },
-        ] ) )
+        yield put( updateMSharesHealth( {
+          walletId: walletId,
+          shareId: shareId,
+          reshareVersion: share.meta.reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          shareType: 'contact',
+          name: name,
+          status: status,
+        } ) )
         const notification: INotification = {
           notificationType: notificationType.reShare,
           title: 'New share uploaded',
@@ -372,18 +375,16 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
     const scannedObj: {type: string, encryptedKey: string; encryptedData: string} = JSON.parse( scannedData )
     const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
     if( decryptedData == shareId ){
-      const shareArray = [
-        {
-          walletId: walletId,
-          shareId: shareId,
-          reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          name: 'Keeper PDF',
-          shareType: 'pdf',
-          status: 'accessible',
-        },
-      ]
-      yield put( updateMSharesHealth( shareArray ) )
+      const shareObj = {
+        walletId: walletId,
+        shareId: shareId,
+        reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
+        updatedAt: moment( new Date() ).valueOf(),
+        name: 'Keeper PDF',
+        shareType: 'pdf',
+        status: 'accessible',
+      }
+      yield put( updateMSharesHealth( shareObj ) )
       yield put( onApprovalStatusChange( {
         status: false,
         initiatedAt: 0,
