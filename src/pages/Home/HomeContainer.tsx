@@ -2498,8 +2498,8 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginTop: 18,
-            marginHorizontal: 14
+            paddingVertical: wp( 8 ),
+            paddingHorizontal: wp( 4 )
           }}>
             <Text style={{
               color: Colors.blue,

@@ -52,8 +52,8 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
     width: widthPercentageToDP( 42.6 ),
     height: heightPercentageToDP( 20.1 ),
-    borderColor: Colors.borderColor,
-    borderWidth: 1,
+    // borderColor: Colors.borderColor,
+    // borderWidth: 1,
   },
 } )
 

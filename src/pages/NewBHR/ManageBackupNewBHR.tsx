@@ -10,7 +10,8 @@ import {
   ScrollView,
   RefreshControl,
   ImageBackground,
-  Platform
+  Platform,
+  Switch
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
@@ -91,6 +92,11 @@ import debounce from 'lodash.debounce'
 import { onPressKeeper, setLevelCompletionError, setIsKeeperTypeBottomSheetOpen } from '../../store/actions/newBHR'
 import LevelStatus from '../../common/data/enums/LevelStatus'
 import Header from '../../navigation/stacks/Header'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { ListItem } from 'react-native-elements'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
 interface ManageBackupNewBHRStateTypes {
   levelData: any[];
@@ -109,6 +115,8 @@ interface ManageBackupNewBHRStateTypes {
   selectedLevelId: number;
   selectedKeeperType: string;
   selectedKeeperName: string;
+  isEnabled: boolean;
+  contactsKeptByUser: ContactRecipientDescribing[];
   errorTitle: string;
   errorInfo: string;
   refreshControlLoader: boolean;
@@ -223,6 +231,7 @@ class ManageBackupNewBHR extends Component<
       },
       uuid: '',
     }
+
     this.state = {
       selectedKeeper: obj,
       selectedId: 0,
@@ -266,6 +275,8 @@ class ManageBackupNewBHR extends Component<
       selectedLevelId: 0,
       selectedKeeperType: '',
       selectedKeeperName: '',
+      isEnabled: false,
+      contactsKeptByUser: idx( props, ( _ ) => _.addressBookData.contactsKeptByUser ) || [],
       errorTitle: '',
       errorInfo: '',
       refreshControlLoader: false,
@@ -295,6 +306,53 @@ class ManageBackupNewBHR extends Component<
         this.props.updateNewFcm()
       }
     } )
+  };
+
+
+  toggleSwitch = () => this.setState( {
+    isEnabled: !this.state.isEnabled
+  } );
+
+  handleContactSelection(
+    backendContactInfo: unknown,
+    index: number,
+    contactType: string,
+  ) {
+    this.props.navigation.navigate( 'ContactDetails', {
+      contact: backendContactInfo,
+      index,
+      contactsType: contactType,
+
+      // TODO: Figure out what this is
+      shareIndex: backendContactInfo.shareIndex,
+    } )
+  }
+
+  renderContactListItem = ( {
+    backendContactInfo,
+    contactDescription,
+    index,
+    contactsType,
+  }: {
+    backendContactInfo: unknown;
+    contactDescription: ContactRecipientDescribing;
+    index: number;
+    contactsType: string;
+  } ) => {
+    return (
+      <ListItem
+        key={String( index )}
+        bottomDivider
+        onPress={() =>
+          this.handleContactSelection( backendContactInfo, index, contactsType )
+        }
+        containerStyle={{
+          backgroundColor: 'transparent'
+        }}
+      >
+        <FriendsAndFamilyContactListItemContent contact={contactDescription} />
+      </ListItem>
+    )
   };
 
   modifyLevelData = () => {
@@ -819,6 +877,8 @@ class ManageBackupNewBHR extends Component<
       selectedLevelId,
       refreshControlLoader,
       selectedKeeper,
+      isEnabled,
+      contactsKeptByUser
     } = this.state
     const { navigation, currentLevel, containerStyle } = this.props
     return (
@@ -843,6 +903,16 @@ class ManageBackupNewBHR extends Component<
             flex: 0
           }} />
           <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 16 ),
+            marginLeft: 2,
+            fontFamily: Fonts.FiraSansMedium,
+            paddingTop: wp( 8 ),
+            paddingLeft: wp( 6 )
+          }}>
+            Security & Privacy
+          </Text>
           <View style={styles.modalHeaderTitleView}>
             {/* <View style={{
             flex: 1, flexDirection: 'row', alignItems: 'center'
@@ -879,18 +949,52 @@ class ManageBackupNewBHR extends Component<
               flex: 1
             }}
           >
-            <View style={ styles.topHealthView }>
+            <View style={{
+              flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 6 ), alignItems: 'center'
+            }}>
               <View style={{
-                justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
+                // width: '60%'
+                flex:2
               }}>
-                <ImageBackground
-                  source={require( '../../assets/images/icons/keeper_sheild.png' )}
-                  style={{
-                    ...styles.healthShieldImage, position: 'relative',
-                  }}
-                  resizeMode={'contain'}
-                >
-                  {isError && (
+                <Text style={{
+                  color: Colors.blue,
+                  fontSize: RFValue( 12 ),
+                  marginLeft: 2,
+                  fontFamily: Fonts.FiraSansRegular
+                }}>
+Wallet Backup
+                </Text>
+                <Text style={{
+                  color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular,
+                }}>{currentLevel === 1 ? 'Cloud Backup complete, you can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
+              </View>
+              {/* <View style={{
+                justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
+              }}> */}
+              {/* <ImageBackground
+                source={require( '../../assets/images/icons/keeper_sheild.png' )}
+                style={{
+                  ...styles.healthShieldImage, position: 'relative',
+                }}
+                resizeMode={'contain'}
+              >
+                {isError && (
+                  <View
+                    style={{
+                      backgroundColor: Colors.red,
+                      height: wp( '3%' ),
+                      width: wp( '3%' ),
+                      borderRadius: wp( '3%' ) / 2,
+                      position: 'absolute',
+                      top: wp( '5%' ),
+                      right: 0,
+                      borderWidth: 2,
+                      borderColor: Colors.white,
+                    }}
+                  />
+                )}
+              </ImageBackground> */}
+              {/* {isError && (
                     <View
                       style={{
                         backgroundColor: Colors.red,
@@ -905,9 +1009,38 @@ class ManageBackupNewBHR extends Component<
                       }}
                     />
                   )}
-                </ImageBackground>
-              </View>
-              <View style={styles.headerSeparator} />
+                </ImageBackground> */}
+              {/* </View> */}
+              {/* </View> */}
+              {/* <View style={ styles.topHealthView }> */}
+              {/* <View style={{
+              justifyContent:'center', alignItems:'flex-end', width: wp( '35%' ),
+            }}> */}
+              <ImageBackground
+                source={require( '../../assets/images/icons/keeper_sheild.png' )}
+                style={{
+                  ...styles.healthShieldImage, position: 'relative',
+                }}
+                resizeMode={'contain'}
+              >
+                {isError && (
+                  <View
+                    style={{
+                      backgroundColor: Colors.red,
+                      height: wp( '3%' ),
+                      width: wp( '3%' ),
+                      borderRadius: wp( '3%' ) / 2,
+                      position: 'absolute',
+                      top: wp( '5%' ),
+                      right: 0,
+                      borderWidth: 2,
+                      borderColor: Colors.white,
+                    }}
+                  />
+                )}
+              </ImageBackground>
+              {/* </View> */}
+              {/* <View style={styles.headerSeparator} />
               {currentLevel ?
                 <View style={{
                   width: wp( '35%' )
@@ -923,9 +1056,9 @@ class ManageBackupNewBHR extends Component<
                   <Text style={styles.backupText}>Wallet Security</Text>
                   <Text style={styles.backupInfoText}>Complete Level 1</Text>
                 </View>
-              }
+              } */}
             </View>
-            <View style={{
+            {/* <View style={{
               justifyContent:'center',
               alignItems:'center',
               width: wp( '85%' ),
@@ -935,7 +1068,7 @@ class ManageBackupNewBHR extends Component<
               <Text style={{
                 color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, textAlign: 'center'
               }}>{currentLevel === 1 ? 'Cloud Backup complete, \nyou can upgrade the backup to Level 2' : currentLevel === 2 ? 'Double Backup complete, \nyou can upgrade the backup to Level 3' : currentLevel === 3 ? 'Multi-key Backup complete' : 'Cloud Backup incomplete, \nplease complete Level 1' }</Text>
-            </View>
+            </View> */}
             <View
               style={{
                 flex: 1,
@@ -951,10 +1084,10 @@ class ManageBackupNewBHR extends Component<
                       style={{
                         borderRadius: 10,
                         marginTop: wp( '7%' ),
-                        backgroundColor:
-                      value.status == 'good' || value.status == 'bad'
-                        ? Colors.blue
-                        : Colors.backgroundColor,
+                        //   backgroundColor:
+                        // value.status == 'good' || value.status == 'bad'
+                        //   ? Colors.blue
+                        //   : Colors.backgroundColor,
                         shadowRadius:
                       selectedId && selectedId == value.id ? 10 : 0,
                         shadowColor: Colors.borderColor,
@@ -970,7 +1103,7 @@ class ManageBackupNewBHR extends Component<
                       }}
                     >
                       <View style={styles.cardView}>
-                        <View style={{
+                        {/* <View style={{
                           flexDirection: 'row'
                         }}>
                           {value.status == 'good' || value.status == 'bad' ? (
@@ -1040,21 +1173,61 @@ class ManageBackupNewBHR extends Component<
                           Know More
                             </Text>
                           </TouchableOpacity>
-                        </View>
+                        </View> */}
 
                         <View style={{
-                          flexDirection: 'row', marginTop: 'auto'
+                          flexDirection: 'row', marginTop: 'auto', alignItems: 'center', justifyContent: 'flex-start'
                         }}>
+                          {value.status == 'good' || value.status == 'bad' ? (
+                            <View
+                              style={{
+                                ...styles.cardHealthImageView,
+                                elevation:
+                              selectedId == value.id || selectedId == 0
+                                ? 10
+                                : 0,
+                                backgroundColor:
+                            value.status == 'good'
+                              ? Colors.green
+                              : Colors.red,
+                              }}
+                            >
+                              {value.status == 'good' ? (
+                                <Image
+                                  source={require( '../../assets/images/icons/check_white.png' )}
+                                  style={{
+                                    ...styles.cardHealthImage,
+                                    width: wp( '4%' ),
+                                  }}
+                                />
+                              ) : (
+                                <Image
+                                  source={require( '../../assets/images/icons/icon_error_white.png' )}
+                                  style={styles.cardHealthImage}
+                                />
+                              )}
+                            </View>
+                          ) : (
+                            <Image
+                              source={require( '../../assets/images/icons/icon_setup.png' )}
+                              style={{
+                                borderRadius: wp( '7%' ) / 2,
+                                width: wp( '6%' ),
+                                height: wp( '6%' ),
+                              }}
+                            />
+                          )}
                           <View style={{
-                            justifyContent: 'center'
+                            justifyContent: 'center', paddingHorizontal: 10
                           }}>
                             <Text
                               style={{
                                 ...styles.levelText,
                                 color:
-                              value.status == 'notSetup'
-                                ? Colors.textColorGrey
-                                : Colors.white,
+                                // value.status == 'notSetup'
+                                // ?
+                                Colors.textColorGrey,
+                                // : Colors.white,
                               }}
                             >
                               {value.levelName}
@@ -1063,9 +1236,10 @@ class ManageBackupNewBHR extends Component<
                               style={{
                                 ...styles.levelInfoText,
                                 color:
-                              value.status == 'notSetup'
-                                ? Colors.textColorGrey
-                                : Colors.white,
+                                // value.status == 'notSetup'
+                                // ?
+                                Colors.textColorGrey,
+                                // : Colors.white,
                                 width: wp( '55%' )
                               }}
                             >
@@ -1081,9 +1255,10 @@ class ManageBackupNewBHR extends Component<
                               style={{
                                 ...styles.manageButtonText,
                                 color:
-                              value.status == 'notSetup'
-                                ? Colors.black
-                                : Colors.white,
+                                // value.status == 'notSetup'
+                                // ?
+                                Colors.blue
+                                // : Colors.white,
                               }}
                               onPress={() => this.selectId( value.id )}
                             >
@@ -1096,9 +1271,10 @@ class ManageBackupNewBHR extends Component<
                                   : 'arrowright'
                               }
                               color={
-                                value.status == 'notSetup'
-                                  ? Colors.black
-                                  : Colors.white
+                                // value.status == 'notSetup'
+                                // ?
+                                Colors.blue
+                                // : Colors.white
                               }
                               size={12}
                             />
@@ -1199,6 +1375,64 @@ class ManageBackupNewBHR extends Component<
                 )
               } )}
             </View>
+            <View style={styles.modalElementInfoView}>
+              <View style={{
+                justifyContent: 'center',
+              }}>
+                <Text style={styles.addModalTitleText}>Enable Tor </Text>
+                <Text style={styles.addModalInfoText}>When you want to be anonymous online</Text>
+              </View>
+              <View style={{
+                alignItems: 'flex-end',
+                marginLeft: 'auto'
+              }}>
+                <Switch
+                  value={isEnabled}
+                  onValueChange={this.toggleSwitch}
+                  thumbColor={isEnabled ? Colors.blue : Colors.white}
+                  trackColor={{
+                    false: Colors.borderColor, true: Colors.lightBlue
+                  }}
+                  onTintColor={Colors.blue}
+                />
+              </View>
+            </View>
+            {/* {contactsKeptByUser.length > 0 && */}
+            <View style={{
+              marginTop: wp( '5%' ), backgroundColor: Colors.white, height: '100%',
+              borderTopLeftRadius: wp( 4 ),
+              borderTopRightRadius: wp( 4 ),
+              paddingLeft: wp ( '6%' )
+            }}>
+              <Text style={styles.pageTitle}>I am the Keeper of</Text>
+              <Text style={styles.pageInfoText}>
+              Contacts whose wallets I can help restore
+              </Text>
+
+              <View style={{
+                marginBottom: 15
+              }}>
+                <View style={{
+                  height: 'auto'
+                }}>
+                  {
+                    contactsKeptByUser.map( ( item, index ) => {
+                      return this.renderContactListItem( {
+                        backendContactInfo: item,
+                        contactDescription: makeContactRecipientDescription(
+                          item,
+                          ContactTrustKind.USER_IS_KEEPING,
+                        ),
+                        index,
+                        contactsType: 'I\'m Keeper of',
+                      } )
+                    } ) || <View style={{
+                      height: wp( '22%' ) + 30
+                    }} />}
+                </View>
+              </View>
+            </View>
+            {/* } */}
           </ScrollView>
           {this.state.showLoader ? <Loader isLoading={true}/> : null}
           <BottomSheet
@@ -1460,8 +1694,53 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  pageTitle: {
+    color: Colors.blue,
+    fontSize: RFValue( 16 ),
+    // fontFamily: Fonts.FiraSansRegular,
+    paddingTop: wp ( '2%' ),
+    fontFamily: Fonts.FiraSansMedium,
+    // paddingLeft: wp ( '4%' )
+  },
+  cardTitle: {
+    color: Colors.blue,
+    fontSize: RFValue( 12 ),
+    // fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
+    marginVertical: wp( 2 ),
+    // marginHorizontal: wp( 4 )
+  },
+  pageInfoText: {
+    // paddingLeft: wp ( '4%' ),
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 10 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: 3,
+  },
+  addModalTitleText: {
+    color: Colors.blue,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansRegular
+  },
+
+  addModalInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 11 ),
+    marginTop: 5,
+    fontFamily: Fonts.FiraSansRegular
+  },
+
+  modalElementInfoView: {
+    flex: 1,
+    // margin: 10,
+    height: hp( '5%' ),
+    flexDirection: 'row',
+    // justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: wp ( '6%' )
+  },
   accountCardsSectionContainer: {
-    flex: 13,
+    flex: 16,
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
@@ -1504,8 +1783,8 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
   },
   healthShieldImage: {
-    width: wp( '17%' ),
-    height: wp( '25%' ),
+    width: wp( '10%' ),
+    height: wp( '18%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1528,21 +1807,23 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 18 ),
   },
   cardView: {
-    height: wp( '35%' ),
+    height: wp( '11%' ),
     width: wp( '85%' ),
     padding: 15,
+    borderBottomWidth: 0.5,
+    borderColor: Colors.textColorGrey,
   },
   cardHealthImageView: {
     backgroundColor: Colors.red,
-    shadowColor: Colors.deepBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0, height: 3
-    },
-    shadowRadius: 10,
+    // shadowColor: Colors.deepBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0, height: 3
+    // },
+    // shadowRadius: 10,
     borderRadius: wp( '7%' ) / 2,
-    width: wp( '7%' ),
-    height: wp( '7%' ),
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -1566,12 +1847,12 @@ const styles = StyleSheet.create( {
     width: wp( '24%' ),
   },
   levelText: {
-    fontSize: RFValue( 18 ),
+    fontSize: RFValue( 16 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
   levelInfoText: {
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 10 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
   },
