@@ -878,7 +878,7 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader,
       selectedKeeper,
       isEnabled,
-      contactsKeptByUser
+      contactsKeptByUser,
     } = this.state
     const { navigation, currentLevel, containerStyle } = this.props
     return (
@@ -1102,7 +1102,8 @@ Wallet Backup
                       selectedId == value.id || selectedId == 0 ? 1 : 0.3,
                       }}
                     >
-                      <View style={styles.cardView}>
+                      <View style={styles.cardView}
+                      >
                         {/* <View style={{
                           flexDirection: 'row'
                         }}>
@@ -1288,7 +1289,10 @@ Wallet Backup
                               backgroundColor: Colors.white, height: 0.5
                             }}
                           />
-                          <View style={styles.cardView}>
+                          <View style={[ styles.cardView, {
+                            height: wp( '27%' ),
+                            // backgroundColor: 'red'
+                          } ]}>
                             <View style={{
                               width: wp( '70%' )
                             }}>
@@ -1298,7 +1302,7 @@ Wallet Backup
                                   color:
                                 value.status == 'notSetup'
                                   ? Colors.textColorGrey
-                                  : Colors.white,
+                                  : Colors.blue,
                                   fontFamily: Fonts.FiraSansRegular,
                                   fontSize: RFValue( 10 ),
                                 }}

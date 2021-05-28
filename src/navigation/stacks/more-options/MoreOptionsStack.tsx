@@ -12,6 +12,9 @@ import AccountManagementStack from './AccountManagementStack'
 import NodeSettingsContainerScreen from '../../../pages/MoreOptions/NodeSettings/NodeSettingsContainerScreen'
 import Header from '../Header'
 import QRStack from '../home/QRStack'
+import Colors from '../../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../../common/Fonts'
 
 
 const MoreOptionsStack = createStackNavigator(
@@ -37,8 +40,20 @@ const MoreOptionsStack = createStackNavigator(
     },
     NodeSettings: {
       screen: NodeSettingsContainerScreen,
-      navigationOptions: {
-        title: 'Node Settings',
+      navigationOptions: ( { navigation } ) => {
+        return {
+          title: 'Node Settings',
+          headerTitleStyle:{
+            color: Colors.blue,
+            fontSize: RFValue( 18 ),
+            fontFamily: Fonts.FiraSansMedium,
+            textAlign: 'left',
+            marginHorizontal: 0
+          },
+          headerLeft: () => {
+            return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+          },
+        }
       },
     },
     FundingSources: {
@@ -65,9 +80,9 @@ const MoreOptionsStack = createStackNavigator(
   },
   {
     initialRouteName: 'MoreOptionsRoot',
-    defaultNavigationOptions: {
-      header: null
-    },
+    // defaultNavigationOptions: {
+    //   header: null
+    // },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
       console.log( 'navigation.state.index>>>>>>>>', navigation.state.index )

@@ -528,7 +528,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               />
             }
             style={{
-              flex: 1, marginBottom: hp( '6%' )
+              flex: 1
             }}
           >
             <View style={{
@@ -601,9 +601,10 @@ class FriendsAndFamilyScreen extends PureComponent<
               Recently Sent
               </Text>
               <View style={{
-                flexDirection: 'row',  alignSelf: 'flex-start', marginHorizontal: wp( 3 ), marginTop: hp ( '1%' )
+                flexDirection: 'row',  alignSelf: 'flex-start', marginTop: hp ( '1%' )
               }}>
-                {( otherTrustedContacts.length > 0 &&
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {( otherTrustedContacts.length > 0 &&
                     otherTrustedContacts.map( ( item, index ) => {
                       return this.renderContactItem( {
                         backendContactInfo: item,
@@ -615,8 +616,10 @@ class FriendsAndFamilyScreen extends PureComponent<
                         contactsType: 'Other Contacts',
                       } )
                     } ) ) || <View style={{
-                  height: wp( '22%' ) + 30
-                }} />}
+                    height: wp( '22%' ) + 30
+                  }} />}
+                </ScrollView>
+
               </View>
             </View>
 
