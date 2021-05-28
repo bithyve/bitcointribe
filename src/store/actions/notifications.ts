@@ -9,6 +9,9 @@ export const UPDATE_FCM_TOKENS = 'UPDATE_FCM_TOKENS'
 export const SEND_NOTIFICATION = 'SEND_NOTIFICATION'
 export const FETCH_NOTIFICATIONS = 'FETCH_NOTIFICATIONS'
 export const NOTIFICATION_UPDATED = 'NOTIFICATION_UPDATED'
+export const SETUP_NOTIFICATION_LIST = 'SETUP_NOTIFICATION_LIST'
+export const UPDATED_NOTIFICATION_LIST = 'UPDATED_NOTIFICATION_LIST'
+export const FETCH_NOTIFICATION_STARTED = 'FETCH_NOTIFICATION_STARTED'
 
 export const updateFCMTokens = ( FCMs: string[] ) => {
   return {
@@ -40,6 +43,11 @@ export const fetchNotifications = () => {
     type: FETCH_NOTIFICATIONS,
   }
 }
+export const setupNotificationList = ( ) => {
+  return {
+    type: SETUP_NOTIFICATION_LIST
+  }
+}
 
 // types and action creators: dispatched sagas
 
@@ -60,5 +68,22 @@ export const notificationsUpdated = ( notifications ) => {
     payload: {
       notificationListNew: notifications
     },
+  }
+}
+
+export const updateNotificationList = ( notifications ) => {
+  return {
+    type: UPDATED_NOTIFICATION_LIST,
+    payload: {
+      updatedNotificationList: notifications
+    },
+  }
+}
+
+export const fetchNotificationStarted = ( fetchStarted ) => {
+  return {
+    type: FETCH_NOTIFICATION_STARTED, payload: {
+      fetchStarted
+    }
   }
 }

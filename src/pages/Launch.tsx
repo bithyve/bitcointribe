@@ -23,12 +23,16 @@ import {
 import { connect } from 'react-redux'
 import idx from 'idx'
 import { processDL } from '../common/CommonFunctions'
+import {
+  fetchNotifications,
+} from '../store/actions/notifications'
 
 type LaunchScreenProps = {
   initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
+  fetchNotifications: any;
 }
 
 type LaunchScreenState = { }
@@ -84,6 +88,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   postSplashScreenActions = async () => {
     try {
+      this.props.fetchNotifications()
       const url = await Linking.getInitialURL()
       //console.log( 'url', url )
 
@@ -215,5 +220,6 @@ const mapStateToProps = ( state ) => {
 }
 
 export default connect( mapStateToProps, {
-  initializeDB
+  initializeDB,
+  fetchNotifications
 } )( Launch )

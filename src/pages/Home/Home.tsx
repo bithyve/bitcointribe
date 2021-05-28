@@ -60,6 +60,8 @@ import {
   updateFCMTokens,
   fetchNotifications,
   notificationsUpdated,
+  setupNotificationList,
+  updateNotificationList
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -285,6 +287,10 @@ interface HomePropsTypes {
   isPermissionSet: any;
   updateLastSeen: any;
   isAuthenticated: any;
+  setupNotificationList: any;
+  asyncNotificationList: any;
+  updateNotificationList: any;
+  fetchStarted: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -346,13 +352,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressNotifications = async () => {
-    const notificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
+    const { updateNotificationList, asyncNotificationList } = this.props
+    // const notificationList = JSON.parse(
+    //   await AsyncStorage.getItem( 'notificationList' )
+    // )
     const tmpList = []
-    if ( notificationList ) {
-      for ( let i = 0; i < notificationList.length; i++ ) {
-        const element = notificationList[ i ]
+    if ( asyncNotificationList ) {
+      for ( let i = 0; i < asyncNotificationList.length; i++ ) {
+        const element = asyncNotificationList[ i ]
         const obj = {
           ...element,
           read: element.isMandatory ? false : true,
@@ -360,7 +367,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         tmpList.push( obj )
       }
     }
-    await AsyncStorage.setItem( 'notificationList', JSON.stringify( tmpList ) )
+    updateNotificationList( tmpList )
+    //await AsyncStorage.setItem( 'notificationList', JSON.stringify( tmpList ) )
     tmpList.sort( function ( left, right ) {
       return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
     } )
@@ -630,47 +638,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  // scheduleNotification = async () => {
-  //   PushNotification.cancelAllLocalNotifications()
-  //   const channelIdRandom = moment().valueOf()
-
-  //   PushNotification.createChannel(
-  //     {
-  //       channelId: `${channelIdRandom}`,
-  //       channelName: 'reminder',
-  //       channelDescription: 'A channel to categorise your notifications',
-  //       playSound: false,
-  //       soundName: 'default',
-  //       importance: 4, // (optional) default: 4. Int value of the Android notification importance
-  //       vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
-  //     },
-  //     ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
-  //   )
-  //   const date = new Date()
-  //   date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
-
-  //   //let date =  new Date(Date.now() + (3 * 60 * 1000));
-  //   PushNotification.localNotificationSchedule( {
-  //     channelId: channelIdRandom,
-  //     vibrate: true,
-  //     vibration: 300,
-  //     priority: 'high',
-  //     showWhen: true,
-  //     autoCancel: true,
-  //     soundName: 'default',
-  //     title: 'We have not seen you in a while!',
-  //     message:
-  //       'Opening your app regularly ensures you get all the notifications and security updates', // (required)
-  //     date: date,
-  //     repeatType: 'day',
-  //     allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
-  //   } )
-
-  //   PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
-  //     console.log( 'SCHEDULE notiifcations', notiifcations )
-  //   } )
-  // };
-
   localNotification = async ( notificationDetails ) => {
     const channelIdRandom = moment().valueOf()
     PushNotification.createChannel(
@@ -704,40 +671,40 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  bootStrapNotifications = async () => {
-    this.props.setIsPermissionGiven( true )
-    const t0 = performance.now()
-    if ( Platform.OS === 'ios' ) {
-      firebase
-        .messaging()
-        .hasPermission()
-        .then( ( enabled ) => {
-          if ( enabled ) {
-            this.storeFCMToken()
-            this.createNotificationListeners()
-          } else {
-            firebase
-              .messaging()
-              .requestPermission( {
-                provisional: true,
-              } )
-              .then( () => {
-                this.storeFCMToken()
-                this.createNotificationListeners()
-              } )
-              .catch( () => {
-                console.log( 'Permission rejected.' )
-              } )
-          }
-        } )
-        .catch()
-    } else {
-      this.storeFCMToken()
-      this.createNotificationListeners()
-    }
-    const t1 = performance.now()
-    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
-  };
+  // bootStrapNotifications = async () => {
+  //   this.props.setIsPermissionGiven( true )
+  //   const t0 = performance.now()
+  //   if ( Platform.OS === 'ios' ) {
+  //     firebase
+  //       .messaging()
+  //       .hasPermission()
+  //       .then( ( enabled ) => {
+  //         if ( enabled ) {
+  //           this.storeFCMToken()
+  //           this.createNotificationListeners()
+  //         } else {
+  //           firebase
+  //             .messaging()
+  //             .requestPermission( {
+  //               provisional: true,
+  //             } )
+  //             .then( () => {
+  //               this.storeFCMToken()
+  //               this.createNotificationListeners()
+  //             } )
+  //             .catch( () => {
+  //               console.log( 'Permission rejected.' )
+  //             } )
+  //         }
+  //       } )
+  //       .catch()
+  //   } else {
+  //     this.storeFCMToken()
+  //     this.createNotificationListeners()
+  //   }
+  //   const t1 = performance.now()
+  //   console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
+  // };
 
   storeFCMToken = async () => {
     const fcmToken = await messaging().getToken()
@@ -765,7 +732,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         console.log( 'NOTIFICATION:', notification )
         // process the notification
         if ( notification.data ) {
-          this.props.fetchNotifications()
+          //this.props.fetchNotifications()
           this.onNotificationOpen( notification )
           // (required) Called when a remote is received or opened, or local notification is opened
           notification.finish( PushNotificationIOS.FetchResult.NoData )
@@ -809,13 +776,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async ( item ) => {
     console.log( 'item', item )
+    const { updateNotificationList, asyncNotificationList } = this.props
+
     const content = JSON.parse( item.data.content )
     // let asyncNotificationList = notificationListNew;
-    let asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
+    // let asyncNotificationList = JSON.parse(
+    //   await AsyncStorage.getItem( 'notificationList' )
+    // )
+    let asyncList = []
     if ( !asyncNotificationList ) {
-      asyncNotificationList = []
+      asyncList = []
+    } else {
+      console.log( 'asyncNotificationList TYPE', typeof asyncNotificationList )
     }
     let readStatus = true
     if ( content.notificationType == releaseNotificationTopic ) {
@@ -839,13 +811,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       info: item.body,
       notificationId: content.notificationId,
     }
-    asyncNotificationList.push( obj )
+    asyncList.push( obj )
     // this.props.notificationsUpdated(asyncNotificationList);
-
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify( asyncNotificationList )
-    )
+    updateNotificationList( asyncList )
+    // await AsyncStorage.setItem(
+    //   'notificationList',
+    //   JSON.stringify( asyncNotificationList )
+    // )
     asyncNotificationList.sort( function ( left, right ) {
       return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
     } )
@@ -936,6 +908,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       //   }
       // }
       // this.bootStrapNotifications()
+      this.createNotificationListeners()
       this.setUpFocusListener()
       //this.getNewTransactionNotifications()
 
@@ -967,7 +940,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   getNewTransactionNotifications = async () => {
     const t0 = performance.now()
     const newTransactions = []
-    const { accountsState } = this.props
+    const { accountsState, updateNotificationList, asyncNotificationList } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
     // console.log( ':regularAccount', regularAccount )
@@ -986,20 +959,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     if ( newTransactions.length ) {
       // let asyncNotification = notificationListNew;
-      const asyncNotification = JSON.parse(
-        await AsyncStorage.getItem( 'notificationList' )
-      )
-      let asyncNotificationList = []
-      if ( asyncNotification.length ) {
-        asyncNotificationList = []
+      // const asyncNotification = JSON.parse(
+      //   await AsyncStorage.getItem( 'notificationList' )
+      // )
+      let asyncNotification = []
+      if ( asyncNotificationList.length ) {
+        asyncNotification = []
         for ( let i = 0; i < asyncNotification.length; i++ ) {
-          asyncNotificationList.push( asyncNotification[ i ] )
+          asyncNotification.push( asyncNotification[ i ] )
         }
       }
 
       for ( let i = 0; i < newTransactions.length; i++ ) {
         let present = false
-        for ( const tx of asyncNotificationList ) {
+        for ( const tx of asyncNotification ) {
           if (
             tx.notificationsData &&
             newTransactions[ i ].txid === tx.notificationsData.txid
@@ -1029,11 +1002,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
         this.localNotification( notificationDetails )
       }
-      //this.props.notificationsUpdated(asyncNotificationList);
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify( asyncNotificationList )
-      )
+      // await AsyncStorage.setItem(
+      //   'notificationList',
+      //   JSON.stringify( asyncNotificationList )
+      // )
+      updateNotificationList( asyncNotificationList )
       asyncNotificationList.sort( function ( left, right ) {
         return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
       } )
@@ -1054,7 +1027,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       prevProps.notificationList !== this.props.notificationList ||
       prevProps.releaseCasesValue !== this.props.releaseCasesValue
     ) {
-      this.setupNotificationList()
+      this.props.setupNotificationList()
+    }
+
+    if (
+      prevProps.asyncNotificationList !== this.props.asyncNotificationList
+    ) {
+      this.props.asyncNotificationList.sort( function ( left, right ) {
+        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
+      } )
+
+      this.setState( {
+        notificationData: this.props.asyncNotificationList,
+        notificationDataChange: !this.state.notificationDataChange,
+      } )
     }
 
     if (
@@ -1076,46 +1062,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setSecondaryDeviceAddresses()
     }
 
-    // if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
-    //   const serviceType = REGULAR_ACCOUNT
-    //   const {
-    //     paymentDetails,
-    //     accountsState,
-    //     navigation,
-    //     addTransferDetails,
-    //   } = this.props
-    //   let { address, paymentURI } = paymentDetails
-    //   let options: any = {
-    //   }
-    //   if ( paymentURI ) {
-    //     try {
-    //       const details = accountsState[ serviceType ].service.decodePaymentURI(
-    //         paymentURI
-    //       )
-    //       address = details.address
-    //       options = details.options
-    //     } catch ( err ) {
-    //       Alert.alert( 'Unable to decode payment URI' )
-    //       return
-    //     }
-    //   }
-
-    //   const item = {
-    //     id: address,
-    //   }
-
-    //   addTransferDetails( serviceType, {
-    //     selectedContact: item,
-    //   } )
-
-    //   navigation.navigate( 'SendToContact', {
-    //     selectedContact: item,
-    //     serviceType,
-    //     bitcoinAmount: options.amount
-    //       ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-    //       : '',
-    //   } )
-    // }
   };
 
   handleDeepLinkModal = () => {
@@ -1822,11 +1768,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async ( value ) => {
-    const asyncNotifications = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
+    const { updateNotificationList, asyncNotificationList } = this.props
+
+    // const asyncNotifications = JSON.parse(
+    //   await AsyncStorage.getItem( 'notificationList' )
+    // )
     console.log( 'Notification clicked Home>onNotificationClicked' )
-    console.log( 'asyncNotifications ', asyncNotifications )
+    console.log( 'asyncNotifications ', asyncNotificationList )
     console.log( 'notification passed ', value )
 
     const { notificationData } = this.state
@@ -1836,14 +1784,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       const element = tempNotificationData[ i ]
       if ( element.notificationId == value.notificationId ) {
         if (
-          asyncNotifications &&
-          asyncNotifications.length &&
-          asyncNotifications.findIndex(
+          asyncNotificationList &&
+          asyncNotificationList.length &&
+          asyncNotificationList.findIndex(
             ( item ) => item.notificationId == value.notificationId
           ) > -1
         ) {
-          asyncNotifications[
-            asyncNotifications.findIndex(
+          asyncNotificationList[
+            asyncNotificationList.findIndex(
               ( item ) => item.notificationId == value.notificationId
             )
           ].read = true
@@ -1851,11 +1799,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         tempNotificationData[ i ].read = true
       }
     }
-
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify( asyncNotifications )
-    )
+    updateNotificationList( tempNotificationData )
+    // await AsyncStorage.setItem(
+    //   'notificationList',
+    //   JSON.stringify( asyncNotifications )
+    // )
 
     this.setState( {
       notificationData: tempNotificationData,
@@ -1919,237 +1867,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           alert( 'Make sure Telegram installed on your device' )
         } )
       return
-    }
-  };
-
-  setupNotificationList = async () => {
-    const {
-      releaseCasesValue,
-      keeperApproveStatus,
-      onApprovalStatusChange,
-      s3Service,
-      levelHealth,
-      notificationList,
-      fetchKeeperTrustedChannel,
-      secureAccount,
-      UNDER_CUSTODY,
-      database,
-      updateKeeperInfoToUnderCustody
-    } = this.props
-    // let asyncNotification = notificationListNew;
-    const asyncNotification = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    let asyncNotificationList = []
-    if ( asyncNotification ) {
-      asyncNotificationList = []
-      for ( let i = 0; i < asyncNotification.length; i++ ) {
-        asyncNotificationList.push( asyncNotification[ i ] )
-      }
-    }
-    const tmpList = asyncNotificationList
-    if ( notificationList ) {
-      // console.log(
-      //   "notificationList['notifications']",
-      //   notificationList["notifications"]
-      // );
-      for ( let i = 0; i < notificationList[ 'notifications' ].length; i++ ) {
-        const element = notificationList[ 'notifications' ][ i ]
-        // console.log("element", element);
-        let readStatus = false
-        if ( element.notificationType == releaseNotificationTopic ) {
-          const releaseCases = this.props.releaseCasesValue
-          // JSON.parse(
-          //   await AsyncStorage.getItem('releaseCases'),
-          // );
-          if (
-            element.body &&
-            element.body.split( ' ' )[ 1 ] == releaseCases.build
-          ) {
-            if ( releaseCases.remindMeLaterClick ) {
-              readStatus = false
-            }
-            if ( releaseCases.ignoreClick ) {
-              readStatus = true
-            }
-          } else {
-            readStatus = true
-          }
-        }
-
-        if ( element.notificationType == 'newKeeperInfo' ) {
-          const data = JSON.parse( element.data )
-          if ( data.walletName && data.walletId ) {
-            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
-          }
-        }
-        if ( element.notificationType == 'uploadSecondaryShare' ) {
-          const data = JSON.parse( element.data )
-          if ( data.shareID == keeperApproveStatus.shareId ) {
-            onApprovalStatusChange( {
-              status: true,
-              initiatedAt: moment( new Date() ).valueOf(),
-              shareId: data.shareID,
-            } )
-          }
-        }
-        if (
-          element.notificationType == 'secureXpub' &&
-          !database.DECENTRALIZED_BACKUP.PK_SHARE
-        ) {
-          const shareId = s3Service.levelhealth.metaSharesKeeper[ 1 ].shareId
-          const share = getKeeperInfoFromShareId( levelHealth, shareId )
-          fetchKeeperTrustedChannel(
-            shareId,
-            element.notificationType,
-            share.name
-          )
-        }
-        if ( element.notificationType == 'reShare' ) {
-          // console.log('element.notificationType', element.notificationType)
-          // console.log('UNDER_CUSTODY', UNDER_CUSTODY)
-
-          let existingShares: MetaShare[]
-          if ( Object.keys( UNDER_CUSTODY ).length ) {
-            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
-            } )
-          }
-          if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
-            if (
-              existingShares.findIndex(
-                ( value ) =>
-                  value.shareId === JSON.parse( element.data ).selectedShareId
-              ) == -1
-            ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
-              this.props.autoDownloadShareContact(
-                JSON.parse( element.data ).selectedShareId,
-                JSON.parse( element.data ).walletId
-              )
-            }
-          }
-        }
-        if ( element.notificationType == 'smUploadedForPK' ) {
-          if (
-            keeperApproveStatus.shareId == 'PK_recovery' &&
-            keeperApproveStatus.transferDetails &&
-            keeperApproveStatus.transferDetails.key
-          ) {
-            const result = await S3Service.downloadSMShare(
-              keeperApproveStatus.transferDetails.key
-            )
-            if ( result && result.data ) {
-              onApprovalStatusChange( {
-                status: true,
-                initiatedAt: moment( new Date() ).valueOf(),
-                shareId: 'PK_recovery',
-                secondaryShare: result.data.metaShare,
-              } )
-            }
-          }
-
-          let existingShares: MetaShare[]
-          if ( Object.keys( UNDER_CUSTODY ).length ) {
-            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
-            } )
-          }
-
-          if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
-            if (
-              existingShares.findIndex(
-                ( value ) =>
-                  value.shareId === JSON.parse( element.data ).selectedShareId
-              ) == -1
-            ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
-              this.props.autoDownloadShareContact(
-                JSON.parse( element.data ).selectedShareId,
-                JSON.parse( element.data ).walletId
-              )
-            }
-          }
-        }
-
-        if (
-          asyncNotificationList.findIndex(
-            ( value ) => value.notificationId == element.notificationId
-          ) > -1
-        ) {
-          const temp =
-            asyncNotificationList[
-              asyncNotificationList.findIndex(
-                ( value ) => value.notificationId == element.notificationId
-              )
-            ]
-          if ( element.notificationType != releaseNotificationTopic ) {
-            readStatus = temp.read
-          }
-
-          const obj = {
-            ...temp,
-            read: readStatus,
-            type: element.notificationType,
-            title: element.title,
-            info: element.body,
-            isMandatory: element.tag == 'mandatory' ? true : false,
-            time: timeFormatter(
-              moment( new Date() ),
-              moment( element.date ).valueOf()
-            ),
-            date: new Date( element.date ),
-          }
-          tmpList[
-            tmpList.findIndex(
-              ( value ) => value.notificationId == element.notificationId
-            )
-          ] = obj
-        } else {
-          const obj = {
-            type: element.notificationType,
-            isMandatory: element.tag == 'mandatory' ? true : false,
-            read: readStatus,
-            title: element.title,
-            time: timeFormatter(
-              moment( new Date() ),
-              moment( element.date ).valueOf()
-            ),
-            date: new Date( element.date ),
-            info: element.body,
-            notificationId: element.notificationId,
-          }
-          tmpList.push( obj )
-        }
-      }
-      //this.props.notificationsUpdated(tmpList);
-      await AsyncStorage.setItem( 'notificationList', JSON.stringify( tmpList ) )
-      tmpList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-      } )
-
-      this.setState( {
-        notificationData: tmpList,
-        notificationDataChange: !this.state.notificationDataChange,
-      } )
     }
   };
 
@@ -2605,6 +2322,8 @@ const mapStateToProps = ( state ) => {
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
     isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
     isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
+    asyncNotificationList: idx( state, ( _ ) => _.notifications.updatedNotificationList ),
+    fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
   }
 }
 
@@ -2648,7 +2367,9 @@ export default withNavigationFocus(
     credsAuthenticated,
     setShowAllAccount,
     setIsPermissionGiven,
-    updateLastSeen
+    updateLastSeen,
+    setupNotificationList,
+    updateNotificationList
   } )( Home )
 )
 
