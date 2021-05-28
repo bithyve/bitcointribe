@@ -351,6 +351,7 @@ export default class TrustedContactsService {
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
+    currencyCode
   ): Promise<
     | {
         status: number;
@@ -385,6 +386,7 @@ export default class TrustedContactsService {
           metaShares,
           healthCheckStatus,
           metaSharesUnderCustody,
+          currencyCode
         ),
       }
     } catch ( err ) {

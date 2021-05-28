@@ -66,8 +66,11 @@ function* fetchDBWorker() {
       if ( yield call( AsyncStorage.getItem, 'walletExists' ) ) {
         // actions post DB fetch
 
+        // get user's selected currency
+        const { currencyCode } = yield select( ( state ) => state.preferences )
+
         // sync the wallet w/ Relay
-        yield put( walletCheckIn() )
+        yield put( walletCheckIn( false, currencyCode || 'USD' ) )
 
         // reset the sync status for all account shells
         yield put( clearAccountSyncCache() )

@@ -1468,7 +1468,7 @@ function* walletCheckInWorker( { payload } ) {
     if( !walletCheckInLoading ) yield put( switchTCLoading( 'walletCheckIn' ) )
     console.log( 'Wallet Check-In in progress...' )
 
-    const { synchingContacts } = payload
+    const { synchingContacts, currencyCode } = payload
     if (
       synchingContacts &&
       !Object.keys( trustedContacts.tc.trustedContacts ).length
@@ -1503,11 +1503,14 @@ function* walletCheckInWorker( { payload } ) {
       metaShares.length ? healthCheckStatus : {
       },
       metaSharesUnderCustody,
+      currencyCode
     )
 
     if ( res.status === 200 ) {
       const { updationInfo, exchangeRates, averageTxFees } = res.data
-
+      console.log( {
+        exchangeRates
+      } )
       if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
       } ) )
       else {
