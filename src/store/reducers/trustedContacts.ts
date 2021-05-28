@@ -11,6 +11,8 @@ import {
   APPROVE_TRUSTED_CONTACT,
   CLEAR_TRUSTED_CONTACTS_CACHE,
   UPGRADE_REDUCER,
+  SYNC_EXISTING_PERMANENT_CHANNELS,
+  EXISTING_PERMANENT_CHANNELS_SYNCHED,
 } from '../actions/trustedContacts'
 import {
   EphemeralDataElements,
@@ -46,7 +48,7 @@ export type TrustedContactsState = {
   loading: {
     updateEphemeralChannel: boolean;
     updateTrustedChannel: boolean;
-    trustedChannelsSetupSync: boolean;
+    existingPermanentChannelsSynching: boolean;
     approvingTrustedContact: boolean;
     walletCheckIn: boolean;
   };
@@ -63,7 +65,7 @@ const initialState: TrustedContactsState = {
   loading: {
     updateEphemeralChannel: false,
     updateTrustedChannel: false,
-    trustedChannelsSetupSync: false,
+    existingPermanentChannelsSynching: false,
     approvingTrustedContact: false,
     walletCheckIn: false,
   },
@@ -96,6 +98,24 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
           loading: {
             ...state.loading,
             approvingTrustedContact: true,
+          },
+        }
+
+      case SYNC_EXISTING_PERMANENT_CHANNELS:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            existingPermanentChannelsSynching: true,
+          },
+        }
+
+      case EXISTING_PERMANENT_CHANNELS_SYNCHED:
+        return {
+          ...state,
+          loading: {
+            ...state.loading,
+            existingPermanentChannelsSynching: false,
           },
         }
 

@@ -306,6 +306,7 @@ export default class TrustedContactsService {
     {
     contactDetails: ContactDetails,
     channelKey: string,
+    streamId: string,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     contactsSecondaryChannelKey?: string

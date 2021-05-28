@@ -904,6 +904,7 @@ export default class TrustedContacts {
     {
     contactDetails: ContactDetails,
     channelKey: string,
+    streamId: string,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     contactsSecondaryChannelKey?: string
@@ -916,7 +917,7 @@ export default class TrustedContacts {
       }
       const channelOutstreams = {
       }
-      for ( const { contactDetails, channelKey, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
+      for ( const { contactDetails, channelKey, streamId, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
         let contact: TrustedContact = this.trustedContactsV2[ channelKey ]
         if ( !contact ) {
         // initialize contact
@@ -946,6 +947,7 @@ export default class TrustedContacts {
           contact, channelKey
         }
         channelOutstreams[ permanentChannelAddress ] = {
+          streamId,
           outstreamUpdates
         }
       }
@@ -958,12 +960,11 @@ export default class TrustedContacts {
 
         const { channelInstreams } = res.data
         for( const permanentChannelAddress of Object.keys( channelInstreams ) ){
-          const { updated, inStream } = channelInstreams[ permanentChannelAddress ]
+          const { updated, instream } = channelInstreams[ permanentChannelAddress ]
           if ( !updated ) console.log( 'Failed to update permanent channel: ', permanentChannelAddress )
-
-          if( inStream ){
+          if( instream ){
             const { contact, channelKey } = channelMapping[ permanentChannelAddress ]
-            this.cacheInstream( contact, channelKey, inStream )
+            this.cacheInstream( contact, channelKey, instream )
           }
         }
 
