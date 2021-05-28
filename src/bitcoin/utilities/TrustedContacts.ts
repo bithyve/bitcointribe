@@ -899,57 +899,79 @@ export default class TrustedContacts {
     contact.permanentChannel[ inStream.streamId ] = inStream
   };
 
-  public syncPermanentChannel = async (
+  public syncPermanentChannels = async (
+    channelSyncDetails:
+    {
     contactDetails: ContactDetails,
     channelKey: string,
+    streamId: string,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     contactsSecondaryChannelKey?: string
+  }[]
   ): Promise<{
     updated: boolean;
   }> => {
     try {
-      let contact: TrustedContact = this.trustedContactsV2[ channelKey ]
-      if ( !contact ) {
+      const channelMapping = {
+      }
+      const channelOutstreams = {
+      }
+      for ( const { contactDetails, channelKey, streamId, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
+        let contact: TrustedContact = this.trustedContactsV2[ channelKey ]
+        if ( !contact ) {
         // initialize contact
-        const newContact: TrustedContact = {
-          contactDetails,
-          permanentChannelAddress: crypto
-            .createHash( 'sha256' )
-            .update( channelKey )
-            .digest( 'hex' ),
-          relationType: idx( unEncryptedOutstreamUpdates, ( _ ) => _.primaryData.relationType ),
-          secondaryChannelKey,
-          contactsSecondaryChannelKey
+          const newContact: TrustedContact = {
+            contactDetails,
+            permanentChannelAddress: crypto
+              .createHash( 'sha256' )
+              .update( channelKey )
+              .digest( 'hex' ),
+            relationType: idx( unEncryptedOutstreamUpdates, ( _ ) => _.primaryData.relationType ),
+            secondaryChannelKey,
+            contactsSecondaryChannelKey
+          }
+          this.trustedContactsV2[ channelKey ] = newContact
+          contact = newContact
         }
-        this.trustedContactsV2[ channelKey ] = newContact
-        contact = newContact
+
+        let outstreamUpdates: StreamData
+        if( unEncryptedOutstreamUpdates )
+          outstreamUpdates = this.cacheOutstream( contact, channelKey, unEncryptedOutstreamUpdates, secondaryChannelKey )
+
+        const { permanentChannelAddress } = ( this.trustedContactsV2[
+          channelKey
+        ] as TrustedContact )
+
+        channelMapping[ permanentChannelAddress ] = {
+          contact, channelKey
+        }
+        channelOutstreams[ permanentChannelAddress ] = {
+          streamId,
+          outstreamUpdates
+        }
       }
 
-      let outstreamUpdates: StreamData
-      if( unEncryptedOutstreamUpdates )
-        outstreamUpdates = this.cacheOutstream( contact, channelKey, unEncryptedOutstreamUpdates, secondaryChannelKey )
+      if( Object.keys( channelOutstreams ).length ){
+        const res: AxiosResponse = await BH_AXIOS.post( 'syncPermanentChannels', {
+          HEXA_ID,
+          channelOutstreams,
+        } )
 
-      const { permanentChannelAddress } = ( this.trustedContactsV2[
-        channelKey
-      ] as TrustedContact )
+        const { channelInstreams } = res.data
+        for( const permanentChannelAddress of Object.keys( channelInstreams ) ){
+          const { updated, instream } = channelInstreams[ permanentChannelAddress ]
+          if ( !updated ) console.log( 'Failed to update permanent channel: ', permanentChannelAddress )
+          if( instream ){
+            const { contact, channelKey } = channelMapping[ permanentChannelAddress ]
+            this.cacheInstream( contact, channelKey, instream )
+          }
+        }
 
-      const res: AxiosResponse = await BH_AXIOS.post( 'syncPermanentChannel', {
-        HEXA_ID,
-        channelAddress: permanentChannelAddress,
-        outstreamUpdates,
-      } )
-
-      const { updated, inStream } = res.data
-      if ( !updated ) throw new Error( 'Failed to update permanent channel' )
-
-      if( inStream ){
-        this.cacheInstream( contact, channelKey, inStream )
-      }
-
-      return {
-        updated
-      }
+        return {
+          updated: true
+        }
+      } else throw new Error( 'No channels to update' )
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )

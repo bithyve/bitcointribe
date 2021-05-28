@@ -119,8 +119,9 @@ import {
   postRecoveryChannelSyncWatcher,
   multiUpdateTrustedChannelsWatcher,
   sendVersionUpdateNotificationWatcher,
-  syncPermanentChannelWatcher,
-  initializeTrustedContactWatcher
+  syncPermanentChannelsWatcher,
+  initializeTrustedContactWatcher,
+  syncExistingPermanentChannelsWatcher
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -216,9 +217,6 @@ import {
   confirmPDFSharedFromUpgradeWatcher,
 } from './sagas/upgradeToNewBhr'
 
-import { fromPrivateKey } from 'bip32'
-import reducer from './reducers/fbtc'
-
 import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import newBHR from './reducers/newBHR'
 import { onPressKeeperChannelWatcher } from './sagas/newBHR'
@@ -312,7 +310,8 @@ const rootSaga = function* () {
     postRecoveryChannelSyncWatcher,
     sendVersionUpdateNotificationWatcher,
     multiUpdateTrustedChannelsWatcher,
-    syncPermanentChannelWatcher,
+    syncPermanentChannelsWatcher,
+    syncExistingPermanentChannelsWatcher,
 
     // Health
     initHealthWatcher,
