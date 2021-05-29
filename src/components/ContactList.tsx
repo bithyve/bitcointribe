@@ -395,9 +395,9 @@ export default function ContactList( props ) {
       }} />
       <View style={styles.selectedContactContainer}>
         {selectedContacts.length > 0
-          ? selectedContacts.map( ( value ) => {
+          ? selectedContacts.map( ( value, index ) => {
             return (
-              <View style={styles.selectedContactView}>
+              <View key={index} style={styles.selectedContactView}>
                 <Text style={styles.selectedContactNameText}>
                   {value.name ? value.name.split( ' ' )[ 0 ] : ''}{' '}
                   <Text style={{

@@ -905,8 +905,8 @@ class ContactDetails extends PureComponent<
             this.props.navigation.goBack()
           }}
           onPressShare={() => {
-              ( this.shareBottomSheet as any ).current.snapTo( 0 )
-              this.props.navigation.goBack()
+            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            this.props.navigation.goBack()
           }}
         />
       )
@@ -1131,7 +1131,7 @@ class ContactDetails extends PureComponent<
               {this.Contact.hasTrustedChannel &&
               !(
                 this.Contact.hasXpub || this.Contact.hasTrustedAddress
-              ) ? null : ( this.Contact.contactName === 'Secondary Device' || this.Contact.contactName === 'Secondary Device1' || this.Contact.contactName === 'Secondary Device2' || this.Contact.contactName === 'Secondary Device3' ) &&
+              ) ? null : ( this.Contact.contactName === 'Personal Device' || this.Contact.contactName === 'Personal Device1' || this.Contact.contactName === 'Personal Device2' || this.Contact.contactName === 'Personal Device3' ) &&
                 !(
                   this.Contact.hasXpub || this.Contact.hasTrustedAddress
                 ) ? null : (
@@ -1144,7 +1144,7 @@ class ContactDetails extends PureComponent<
 
                         this.Contact.hasXpub || this.Contact.hasTrustedAddress
                           ? this.onPressSend()
-                          : ( this.Contact.contactName != 'Secondary Device' || this.Contact.contactName != 'Secondary Device1' || this.Contact.contactName != 'Secondary Device2' || this.Contact.contactName != 'Secondary Device3' )
+                          : ( this.Contact.contactName != 'Personal Device' || this.Contact.contactName != 'Personal Device1' || this.Contact.contactName != 'Personal Device2' || this.Contact.contactName != 'Personal Device3' )
                             ? this.onPressResendRequest()
                             : null
                       }}
@@ -1330,7 +1330,9 @@ class ContactDetails extends PureComponent<
                     {uploadingSmShare ? (
                       <ActivityIndicator size="small" />
                     ) : (
-                      <Text style={[styles.buttonText, { marginLeft: 0, marginRight: 0, width: wp('30%'), textAlign: 'center' }]}>Show Secondary Key</Text>
+                      <Text style={[ styles.buttonText, {
+                        marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
+                      } ]}>Show Secondary Key</Text>
                     )}
                   </View>
                 </TouchableOpacity>

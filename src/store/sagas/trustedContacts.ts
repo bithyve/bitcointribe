@@ -44,7 +44,9 @@ import {
   SecondaryStreamData,
   BackupStreamData,
   ContactInfo,
-  ContactDetails
+  ContactDetails,
+  KeeperInfoInterface,
+  MetaShare
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
@@ -57,6 +59,7 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
+  SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -81,6 +84,7 @@ import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import idx from 'idx'
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
 import { AxiosResponse } from 'axios'
 
@@ -351,7 +355,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
     walletName,
-    relationType: TrustedContactRelationTypes.CONTACT,
+    relationType: contactInfo.isGuardian ? TrustedContactRelationTypes.KEEPER : TrustedContactRelationTypes.CONTACT,
     FCM,
     paymentAddresses
   }
@@ -470,18 +474,27 @@ export const approveTrustedContactWatcher = createWatcher(
 )
 
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, isGuardian?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string}} ) {
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, isGuardian?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
   const accountShells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells,
   )
-  const { contact, isGuardian, channelKey, contactsSecondaryChannelKey } = payload
+  const keeperInfo: KeeperInfoInterface[] = yield select(
+    ( state ) => state.health.keeperInfo,
+  )
+  const MetaShares: MetaShare[] = yield select(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+  )
+  const secureAccount: SecureAccount = yield select(
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+  )
+  const { contact, isGuardian, channelKey, contactsSecondaryChannelKey, shareId } = payload
   let info = ''
-  if ( contact.phoneNumbers && contact.phoneNumbers.length ) {
+  if ( contact && contact.phoneNumbers && contact.phoneNumbers.length ) {
     const phoneNumber = contact.phoneNumbers[ 0 ].number
     let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
     number = number.slice( number.length - 10 ) // last 10 digits only
     info = number
-  } else if ( contact.emails && contact.emails.length ) {
+  } else if ( contact && contact.emails && contact.emails.length ) {
     info = contact.emails[ 0 ].email
   }
 
@@ -500,6 +513,21 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   if( isGuardian ) {
     // TODO: prepare channel assets and plug into contactInfo obj
+    contactInfo.isGuardian = isGuardian
+    contactInfo.channelAssets = {
+      primaryMnemonicShard:
+      {
+        ...MetaShares.find( value=>value.shareId==shareId ),
+        encryptedShare: {
+          pmShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.pmShare,
+          smShare: '',
+          bhXpub: '',
+        }
+      },
+      secondaryMnemonicShard: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare,
+      keeperInfo: keeperInfo,
+      bhXpub: secureAccount.secureHDWallet.xpubs.bh,
+    }
   }
 
   let parentShell: AccountShell
@@ -718,7 +746,7 @@ function* updateEphemeralChannelWorker( { payload } ) {
     let generatedKey = false
     if (
       !contactInfo.info &&
-   ( contactInfo.contactName == 'Secondary Device'.toLowerCase() || contactInfo.contactName == 'Secondary Device1'.toLowerCase() ||  contactInfo.contactName == 'Secondary Device2'.toLowerCase() ||  contactInfo.contactName == 'Secondary Device3'.toLowerCase() )
+   ( contactInfo.contactName == 'Personal Device'.toLowerCase() || contactInfo.contactName == 'Personal Device1'.toLowerCase() ||  contactInfo.contactName == 'Personal Device2'.toLowerCase() ||  contactInfo.contactName == 'Personal Device3'.toLowerCase() )
     ) {
     // contact info = null, for secondary device (initially)
       contactInfo.info = SSS.generateKey( SSS.cipherSpec.keyLength )

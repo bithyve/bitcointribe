@@ -22,14 +22,7 @@ function ManageBackupCard( props ) {
 
   const keeperButtonText = ( buttonText, number ) =>{
     if( !buttonText ) return 'Share Recovery Key ' + number
-    switch ( buttonText ) {
-        case 'Secondary Device1': return 'Personal Device1'
-        case 'Secondary Device2': return 'Personal Device2'
-        case 'Secondary Device3': return 'Personal Device3'
-        case 'Keeper PDF': return 'PDF Backup'
-        default:
-          return buttonText
-    }
+    else return buttonText
   }
 
   const textColor = value.status == 'notSetup' ? Colors.textColorGrey : Colors.white
