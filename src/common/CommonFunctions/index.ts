@@ -9,6 +9,7 @@ import { Alert } from 'react-native'
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
 
 export const nameToInitials = fullName => {
+  if( !fullName ) return
   const namesArray = fullName.split( ' ' )
   if ( namesArray.length === 1 ) return `${namesArray[ 0 ].charAt( 0 )}`
   else

@@ -1217,9 +1217,6 @@ function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgre
   Object.keys( existingContacts ).forEach( channelKey => {
     const contact = existingContacts[ channelKey ]
     const instream = useStreamFromPermanentChannel( walletId, contact.permanentChannel, true )
-    console.log( {
-      instream
-    } )
     if( inProgressChannelsOnly ){
       if( !instream )
         channelSyncUpdates.push( {
@@ -1234,9 +1231,7 @@ function* syncExistingPermanentChannelsWorker( { payload }: {payload: { inProgre
         streamId
       } )
   } )
-  console.log( {
-    channelSyncUpdates
-  } )
+
   let res
   if( channelSyncUpdates.length )
     res = yield call(
