@@ -175,6 +175,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
         contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
         lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
+        isFinalized: stream? true: false,
       }
 
       if( fnf.isGuardian || fnf.isWard ){
@@ -344,9 +345,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       contact: backendContactInfo,
       index,
       contactsType: contactType,
-
-      // TODO: Figure out what this is
-      shareIndex: backendContactInfo.shareIndex,
     } )
   }
 
