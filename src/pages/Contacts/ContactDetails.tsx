@@ -51,7 +51,7 @@ import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import SendShareModal from '../ManageBackup/SendShareModal'
 import {
-  MetaShare,
+  MetaShare, QRCodeTypes, TrustedContact, Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { removeTrustedContact } from '../../store/actions/trustedContacts'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -64,7 +64,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 
 const getImageIcon = ( item ) => {
-  if ( item ) {
+  if ( Object.keys( item ).length ) {
     if ( item.image ) {
       return (
         <View style={styles.headerImageView}>
@@ -93,15 +93,9 @@ const getImageIcon = ( item ) => {
           <View style={styles.headerImageView}>
             <View style={styles.headerImageInitials}>
               <Text style={styles.headerImageInitialsText}>
-                {item
+                {item.contactName
                   ? nameToInitials(
-                    item.firstName && item.lastName
-                      ? item.firstName + ' ' + item.lastName
-                      : item.firstName && !item.lastName
-                        ? item.firstName
-                        : !item.firstName && item.lastName
-                          ? item.lastName
-                          : ''
+                    item.contactName
                   )
                   : ''}
               </Text>
@@ -379,6 +373,7 @@ class ContactDetails extends PureComponent<
 
   onPressResendRequest = () => {
     if ( this.Contact.isGuardian ) {
+      this.createDeepLink( this.Contact )
       setTimeout( () => {
         ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
       }, 2 )
@@ -677,130 +672,36 @@ class ContactDetails extends PureComponent<
   //   }
   // };
 
-  // createDeepLink = () => {
-  //   const {
-  //     uploadMetaShare,
-  //     updateEphemeralChannelLoader,
-  //     trustedContacts,
-  //     WALLET_SETUP,
-  //     DECENTRALIZED_BACKUP,
-  //   } = this.props
-  //   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP
-  //   if ( uploadMetaShare || updateEphemeralChannelLoader ) {
-  //     if ( this.state.trustedLink ) {
-  //       this.setState( {
-  //         trustedLink: '',
-  //       } )
-  //     }
-  //     if ( this.state.trustedQR ) {
-  //       this.setState( {
-  //         trustedQR: '',
-  //       } )
-  //     }
-  //     return
-  //   }
-  //   if ( !SHARES_TRANSFER_DETAILS[ this.index ] ) {
-  //     this.setState( {
-  //       errorMessageHeader: 'Failed to share',
-  //       errorMessage:
-  //         'There was some error while sharing the Recovery Key, please try again',
-  //     } );
-  //     ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
-  //     return
-  //   }
-  //   if ( !this.Contact ) {
-  //     return
-  //   }
+  createDeepLink = ( contact ) => {
+    const { trustedContacts, WALLET_SETUP } = this.props
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
+    let channelKey: string
 
-  //   const contactName = `${this.Contact.firstName} ${
-  //     this.Contact.lastName ? this.Contact.lastName : ''
-  //   }`
-  //     .toLowerCase()
-  //     .trim()
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === contact.id ){
+          currentContact = contacts[ ck ]
+          channelKey = ck
+          break
+        }
+      }
 
-  //   if (
-  //     !trustedContacts.tc.trustedContacts[ contactName ] &&
-  //     !trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-  //   ) {
-  //     console.log(
-  //       'Err: Contact/Ephemeral Channel does not exists for contact: ',
-  //       contactName
-  //     )
-  //     return
-  //   }
+    if ( currentContact ) {
+      const { secondaryChannelKey } = currentContact
+      const appVersion = DeviceInfo.getVersion()
 
-  //   const { publicKey, ephemeralChannel, otp } = trustedContacts.tc.trustedContacts[ contactName ]
-  //   const otpValue = otp ? otp : ephemeralChannel && ephemeralChannel.data[ 0 ] ? ephemeralChannel.data[ 0 ].shareTransferDetails.otp : ''
-  //   const requester = WALLET_SETUP.walletName
-  //   const appVersion = DeviceInfo.getVersion()
-  //   if ( this.Contact.phoneNumbers && this.Contact.phoneNumbers.length ) {
-  //     const phoneNumber = this.Contact.phoneNumbers[ 0 ].number
-  //     console.log( {
-  //       phoneNumber
-  //     } )
-  //     let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-  //     number = number.slice( number.length - 10 ) // last 10 digits only
-  //     const numHintType = 'num'
-  //     const numHint = number[ 0 ] + number.slice( number.length - 2 )
-  //     const numberEncPubKey = TrustedContactsService.encryptPub(
-  //       publicKey,
-  //       number
-  //     ).encryptedPub
-  //     const numberDL =
-  //       `https://hexawallet.io/${config.APP_STAGE}/tcg` +
-  //       `/${requester}` +
-  //       `/${numberEncPubKey}` +
-  //       `/${numHintType}` +
-  //       `/${numHint}` +
-  //       `/${trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel.initiatedAt}` +
-  //       `/v${appVersion}`
-  //     this.setState( {
-  //       trustedLink: numberDL,
-  //     } )
-  //   } else if ( this.Contact.emails && this.Contact.emails.length ) {
-  //     const email = this.Contact.emails[ 0 ].email
-  //     const emailHintType = 'eml'
-  //     const trucatedEmail = email.replace( '.com', '' )
-  //     const emailHint =
-  //       email[ 0 ] + trucatedEmail.slice( trucatedEmail.length - 2 )
-  //     const emailEncPubKey = TrustedContactsService.encryptPub( publicKey, email )
-  //       .encryptedPub
-  //     const emailDL =
-  //       `https://hexawallet.io/${config.APP_STAGE}/tcg` +
-  //       `/${requester}` +
-  //       `/${emailEncPubKey}` +
-  //       `/${emailHintType}` +
-  //       `/${emailHint}` +
-  //       `/${trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel.initiatedAt}` +
-  //       `/v${appVersion}`
-  //     this.setState( {
-  //       trustedLink: emailDL,
-  //     } )
-  //   } else if ( otpValue ) {
-  //     const otpHintType = 'otp'
-  //     const otpHint = 'xxx'
-  //     const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otpValue )
-  //       .encryptedPub
-  //     const otpDL =
-  //       `https://hexawallet.io/${config.APP_STAGE}/tc` +
-  //       `/${requester}` +
-  //       `/${otpEncPubKey}` +
-  //       `/${otpHintType}` +
-  //       `/${otpHint}` +
-  //       `/${trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel.initiatedAt}` +
-  //       `/v${appVersion}`
-
-  //     console.log( {
-  //       otpDL
-  //     } )
-  //     this.setState( {
-  //       trustedLink: otpDL,
-  //     } )
-  //   } else {
-  //     Alert.alert( 'Invalid Contact', 'Something went wrong.' )
-  //     return
-  //   }
-  // };
+      this.setState( {
+        trustedQR: JSON.stringify( {
+          type: QRCodeTypes.CONTACT_REQUEST,
+          channelKey,
+          walletName: WALLET_SETUP.walletName,
+          secondaryChannelKey,
+          version: appVersion,
+        } )
+      } )
+    }
+  }
 
   SendShareModalFunction = () => {
     if ( !isEmpty( this.Contact ) ) {
@@ -1046,43 +947,35 @@ class ContactDetails extends PureComponent<
                   </Text>
                 ) : null}
               </View>
-              {this.Contact.hasTrustedChannel &&
-              !(
-                this.Contact.hasXpub || this.Contact.hasTrustedAddress
-              ) ? null : ( this.Contact.contactName === 'Personal Device' || this.Contact.contactName === 'Personal Device1' || this.Contact.contactName === 'Personal Device2' || this.Contact.contactName === 'Personal Device3' ) &&
-                !(
-                  this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                ) ? null : (
-                    <TouchableOpacity
-                      disabled={isSendDisabled}
-                      onPress={() => {
-                        this.setState( {
-                          isSendDisabled: true,
-                        } )
+              <TouchableOpacity
+                disabled={isSendDisabled}
+                onPress={() => {
+                  this.setState( {
+                    isSendDisabled: true,
+                  } )
 
-                        this.Contact.hasXpub || this.Contact.hasTrustedAddress
-                          ? this.onPressSend()
-                          : ( this.Contact.contactName != 'Personal Device' || this.Contact.contactName != 'Personal Device1' || this.Contact.contactName != 'Personal Device2' || this.Contact.contactName != 'Personal Device3' )
-                            ? this.onPressResendRequest()
-                            : null
-                      }}
-                      style={styles.resendContainer}
-                    >
-                      {this.Contact.hasXpub || this.Contact.hasTrustedAddress ? (
-                        <Image
-                          source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                          style={styles.bitcoinIconStyle}
-                        />
-                      ) : null}
-                      <Text style={styles.sendTextStyle}>
-                        {this.Contact.isFinalized
-                          ? 'Send'
-                          : this.Contact.isGuardian
-                            ? 'Reshare'
-                            : 'Resend Request'}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
+                  this.Contact.isFinalized
+                    ? this.onPressSend()
+                    : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.Contact.contactName )
+                      ? this.onPressResendRequest()
+                      : null
+                }}
+                style={styles.resendContainer}
+              >
+                {this.Contact.isFinalized ? (
+                  <Image
+                    source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                    style={styles.bitcoinIconStyle}
+                  />
+                ) : null}
+                <Text style={styles.sendTextStyle}>
+                  {this.Contact.isFinalized
+                    ? 'Send'
+                    : this.Contact.isGuardian
+                      ? 'Reshare'
+                      : 'Resend Request'}
+                </Text>
+              </TouchableOpacity>
             </View>
           </View>
           {Loading ? (
