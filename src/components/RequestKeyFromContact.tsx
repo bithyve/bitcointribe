@@ -21,7 +21,6 @@ import CopyThisText from '../components/CopyThisText'
 import UserDetails from './UserDetails'
 
 export default function RequestKeyFromContact( props ) {
-  const [ contactName, setContactName ] = useState( '' )
   const [ shareLink, setShareLink ] = useState( '' )
   // console.log('props.QR RequestKeyFromContact > ', props.QR);
 
@@ -49,18 +48,6 @@ export default function RequestKeyFromContact( props ) {
       setServiceType( props.serviceType )
     }
   }, [ props.serviceType ] )
-
-  useEffect( () => {
-    const contactName =
-			Contact && Contact.firstName && Contact.lastName
-			  ? Contact.firstName + ' ' + Contact.lastName
-			  : Contact && Contact.firstName && !Contact.lastName
-			    ? Contact.firstName
-			    : Contact && !Contact.firstName && Contact.lastName
-			      ? Contact.lastName
-			      : ''
-    setContactName( contactName )
-  }, [ Contact ] )
 
   const shareOption = async () => {
     try {
@@ -129,7 +116,6 @@ export default function RequestKeyFromContact( props ) {
       } ]}>
         <UserDetails
           titleStyle={styles.titleStyle}
-          contactName={contactName}
           contactText={props.contactText}
           Contact={Contact} />
       </View>

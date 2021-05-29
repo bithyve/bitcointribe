@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   View,
   Image,
@@ -162,9 +162,9 @@ export default function CopyThisText( props ) {
                 {props.contactText}
               </Text>
             ) : null}
-            {props.contactName && props.fromScreen !== 'TimerModalContents' ? (
+            {( props.Contact.contactName || props.Contact.name ) && props.fromScreen !== 'TimerModalContents' ? (
               <Text style={props.titleStyle}>
-                {props.contactName}
+                {props.Contact.contactName || props.Contact.name}
               </Text>
             ) : null}
             {props.Contact &&
@@ -189,11 +189,6 @@ export default function CopyThisText( props ) {
                     {props.Contact && props.Contact.emails[ 0 ].email}
                   </Text>
                 ) : null}
-            {props.contactName && props.fromScreen == 'TimerModalContents' ? (
-              <Text style={styles.contactName}>
-                {props.contactName}
-              </Text>
-            ) : null}
           </View>
         </View>
         {props.Contact.image ? (
@@ -216,7 +211,7 @@ export default function CopyThisText( props ) {
             <Text
               style={styles.initialsText}
             >
-              {nameToInitials( props.contactName )}
+              {nameToInitials( props.Contact.contactName || props.Contact.name )}
             </Text>
           </View>
         )}
