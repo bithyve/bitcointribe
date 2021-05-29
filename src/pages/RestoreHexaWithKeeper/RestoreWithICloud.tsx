@@ -44,7 +44,7 @@ import { requestTimedout } from '../../store/utils/utilities'
 import RestoreWallet from './RestoreWallet'
 import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { deviceText, isEmpty } from '../../common/CommonFunctions'
+import { isEmpty } from '../../common/CommonFunctions'
 import CloudBackup from '../../common/CommonFunctions/CloudBackup'
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import SSS from '../../bitcoin/utilities/sss/SSS'
@@ -936,7 +936,7 @@ class RestoreWithICloud extends Component<
                         fontSize: RFValue( 18 ),
                       }}
                     >
-                      {deviceText( item.title )}
+                      {item.title}
                     </Text>
                     <Text style={styles.cardsInfoText}>{item.info}</Text>
                     <Text style={styles.cardsInfoText}>

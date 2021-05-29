@@ -1390,7 +1390,8 @@ export default class LevelHealth {
           timestamp,
           reshareVersion: 0,
           questionId,
-          question
+          question,
+          scheme: level == 2 ? '2of3' : '3of5',
         },
       }
       metaShareArray.push( metaShare )

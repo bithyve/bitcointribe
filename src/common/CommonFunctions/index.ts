@@ -107,7 +107,7 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-function* stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) {
+export const stateDataToBackup = ( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) => {
   // state data to backup
   const STATE_DATA = {
   }
@@ -282,18 +282,6 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
     else return levelHealthVar[ 0 ].levelInfo
   }
   return levelHealthVar[ currentLevel - 1 ].levelInfo
-}
-
-
-export const deviceText = ( text ) =>{
-  switch ( text ) {
-      case 'Secondary Device1': return 'Personal Device1'
-      case 'Secondary Device2': return 'Personal Device2'
-      case 'Secondary Device3': return 'Personal Device3'
-
-      default:
-        return text
-  }
 }
 
 export const processDL = async ( url ) =>{

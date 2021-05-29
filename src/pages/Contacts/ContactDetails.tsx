@@ -1049,7 +1049,7 @@ class ContactDetails extends PureComponent<
               {this.Contact.hasTrustedChannel &&
               !(
                 this.Contact.hasXpub || this.Contact.hasTrustedAddress
-              ) ? null : ( this.Contact.contactName === 'Secondary Device' || this.Contact.contactName === 'Secondary Device1' || this.Contact.contactName === 'Secondary Device2' || this.Contact.contactName === 'Secondary Device3' ) &&
+              ) ? null : ( this.Contact.contactName === 'Personal Device' || this.Contact.contactName === 'Personal Device1' || this.Contact.contactName === 'Personal Device2' || this.Contact.contactName === 'Personal Device3' ) &&
                 !(
                   this.Contact.hasXpub || this.Contact.hasTrustedAddress
                 ) ? null : (
@@ -1062,7 +1062,7 @@ class ContactDetails extends PureComponent<
 
                         this.Contact.hasXpub || this.Contact.hasTrustedAddress
                           ? this.onPressSend()
-                          : ( this.Contact.contactName != 'Secondary Device' || this.Contact.contactName != 'Secondary Device1' || this.Contact.contactName != 'Secondary Device2' || this.Contact.contactName != 'Secondary Device3' )
+                          : ( this.Contact.contactName != 'Personal Device' || this.Contact.contactName != 'Personal Device1' || this.Contact.contactName != 'Personal Device2' || this.Contact.contactName != 'Personal Device3' )
                             ? this.onPressResendRequest()
                             : null
                       }}

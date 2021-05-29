@@ -109,8 +109,7 @@ const initialState: {
   secondaryShareDownloaded: any;
   pdfInfo: {
     filePath: string;
-    publicKey: string;
-    privateKey: string;
+    shareId: string;
     updatedAt: number;
   },
   isSmMetaSharesCreatedFlag: boolean;
@@ -170,8 +169,7 @@ const initialState: {
   secondaryShareDownloaded: null,
   pdfInfo: {
     filePath: '',
-    publicKey: '',
-    privateKey: '',
+    shareId: '',
     updatedAt: 0
   },
   isSmMetaSharesCreatedFlag: false,
@@ -435,6 +433,7 @@ export default ( state = initialState, action ) => {
         }
 
       case SET_PDF_INFO:
+        console.log( 'action.payload.data', action.payload.data )
         return {
           ...state,
           pdfInfo: action.payload.data,

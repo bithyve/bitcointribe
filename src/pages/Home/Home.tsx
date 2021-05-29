@@ -466,9 +466,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             navigation.navigate( 'ContactsListForAssociateContact', {
               postAssociation: ( contact ) => {
                 this.props.initializeTrustedContact( {
-                  contact,
-                  channelKey,
-                  contactsSecondaryChannelKey,
+                  contact, channelKey, contactsSecondaryChannelKey
+                } )
+                // TODO: navigate post approval
+                navigation.navigate( 'Home' )
+              }
+            } )
+            break
+
+          case QRCodeTypes.KEEPER_REQUEST:
+            const channelKey1 = scannedData.channelKey
+            const contactsSecondaryChannelKey1 = scannedData.secondaryChannelKey
+            navigation.navigate( 'ContactsListForAssociateContact', {
+              postAssociation: ( contact ) => {
+                this.props.initializeTrustedContact( {
+                  contact, channelKey: channelKey1, contactsSecondaryChannelKey: contactsSecondaryChannelKey1
                 } )
                 // TODO: navigate post approval
                 navigation.navigate( 'Home' )

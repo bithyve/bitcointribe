@@ -29,7 +29,7 @@ import { fetchEphemeralChannel } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import { trustedChannelsSetupSync } from '../../store/actions/trustedContacts'
+import { syncExistingPermanentChannels } from '../../store/actions/trustedContacts'
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -76,6 +76,7 @@ interface ManageBackupNewBHRStateTypes {
     reshareVersion: number;
     name: string;
     data: any;
+    channelKey?: string;
   };
   selectedLevelId: number;
   selectedKeeperType: string;
@@ -103,7 +104,7 @@ interface ManageBackupNewBHRPropsTypes {
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
   metaSharesKeeper: MetaShare[];
-  trustedChannelsSetupSync: any;
+  syncExistingPermanentChannels: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
   deletePrivateData: any;
@@ -170,6 +171,7 @@ class ManageBackupNewBHR extends Component<
       data: {
       },
       uuid: '',
+      channelKey: ''
     }
     this.state = {
       selectedKeeper: obj,
@@ -239,8 +241,8 @@ class ManageBackupNewBHR extends Component<
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
       if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-        levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
       ) {
         this.loaderBottomSheet.snapTo( 1 )
       }
@@ -251,14 +253,17 @@ class ManageBackupNewBHR extends Component<
       ) {
         this.props.setCloudData( )
       } else if(
-        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' )
+        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
+          levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+          levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 )
       ) {
         this.props.deletePrivateData()
       }
       else if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 2 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 3 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
       ) {
         this.props.updateCloudData()
       }
@@ -273,11 +278,13 @@ class ManageBackupNewBHR extends Component<
             -1
         ) > -1
       ) {
-        this.props.trustedChannelsSetupSync()
+        this.props.syncExistingPermanentChannels( {
+          inProgressChannelsOnly: true
+        } )
       }
     }
 
-    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       this.props.updateCloudData()
     }
 
@@ -291,10 +298,10 @@ class ManageBackupNewBHR extends Component<
       const obj = {
         id: 2,
         selectedKeeper: {
-          shareType: 'device',
-          name: 'Secondary Device1',
+          shareType: '',
+          name: '',
           reshareVersion: 0,
-          status: 'notAccessible',
+          status: 'notSetup',
           updatedAt: 0,
           shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
             .shareId,
@@ -305,9 +312,13 @@ class ManageBackupNewBHR extends Component<
       }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
+        showLoader: false,
+        selectedLevelId: 2
       } )
-      this.goToHistory( obj )
-      this.loaderBottomSheet.snapTo( 0 )
+      this.props.setIsKeeperTypeBottomSheetOpen( false );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      // this.goToHistory( obj )
+      // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
@@ -359,6 +370,11 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.navigationObj !== this.props.navigationObj ){
+      console.log( 'prevProps.navigationObj' )
+      this.setState( {
+        selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
+      } );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
       this.goToHistory( this.props.navigationObj )
     }
 
@@ -428,7 +444,7 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
-        isPrimaryKeeper,
+        isPrimaryKeeper: isPrimaryKeeper,
         isChangeKeeperAllow,
         index: index > -1 ? index : 0,
       } )
@@ -599,7 +615,7 @@ class ManageBackupNewBHR extends Component<
     } else {
       this.setState( {
         showLoader: true,
-        selectedKeeper: value.keeper1
+        selectedKeeper: keeperNumber == 1 ? value.keeper1 : value.keeper2
       } )
       requestAnimationFrame( () => {
         this.onPressKeeperButton( value, keeperNumber )
@@ -918,7 +934,7 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
-    trustedChannelsSetupSync,
+    syncExistingPermanentChannels,
     setCloudData,
     deletePrivateData,
     updateKeeperInfoToTrustedChannel,
