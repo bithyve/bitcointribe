@@ -96,7 +96,6 @@ export function makeContactRecipientDescription(
     walletName: data.contactsWalletName || data.walletName,
     avatarImageSource: data.avatarImageSource || data.image,
     availableBalance: data.bitcoinAmount || data.amount || 0,
-    initiatedAt: data.initiatedAt,
     lastSeenActive: data.lastSeen || data.lastSeenActive,
     trustKind,
   }
