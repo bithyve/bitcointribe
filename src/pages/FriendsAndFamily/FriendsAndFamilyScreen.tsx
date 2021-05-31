@@ -20,7 +20,7 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   clearTrustedContactsCache,
-  trustedChannelsSetupSync,
+  syncExistingPermanentChannels,
   removeTrustedContact,
 } from '../../store/actions/trustedContacts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -56,8 +56,8 @@ interface FriendsAndFamilyPropTypes {
   isFocused: boolean;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
-  trustedChannelsSetupSync: any;
-  trustedChannelsSetupSyncing: any;
+  syncExistingPermanentChannels: any;
+  existingPermanentChannelsSynching: any;
   removeTrustedContact: any;
   clearTrustedContactsCache: any;
 }
@@ -105,7 +105,9 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      // this.props.trustedChannelsSetupSync()
+      this.props.syncExistingPermanentChannels( {
+        inProgressChannelsOnly: true
+      } )
       this.updateAddressBook()
     } )
     this.props.clearTrustedContactsCache()
@@ -119,14 +121,14 @@ class FriendsAndFamilyScreen extends PureComponent<
       prevProps.trustedContactsService.tc.trustedContactsV2 != this.props.trustedContactsService.tc.trustedContactsV2
     ) this.updateAddressBook()
 
-    // if (
-    //   prevProps.trustedChannelsSetupSyncing !==
-    //   this.props.trustedChannelsSetupSyncing
-    // ) {
-    //   this.setState( {
-    //     showLoader: this.props.trustedChannelsSetupSyncing,
-    //   } )
-    // }
+    if (
+      prevProps.existingPermanentChannelsSynching !==
+      this.props.existingPermanentChannelsSynching
+    )
+      this.setState( {
+        showLoader: this.props.existingPermanentChannelsSynching,
+      } )
+
   }
 
   componentWillUnmount() {
@@ -173,6 +175,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
         contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
         lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
+        isFinalized: stream? true: false,
       }
 
       if( fnf.isGuardian || fnf.isWard ){
@@ -342,9 +345,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       contact: backendContactInfo,
       index,
       contactsType: contactType,
-
-      // TODO: Figure out what this is
-      shareIndex: backendContactInfo.shareIndex,
     } )
   }
 
@@ -428,13 +428,12 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { trustedChannelsSetupSync } = this.props
+    const { syncExistingPermanentChannels } = this.props
 
     const {
       myKeepers,
       ImKeeping,
       otherContacts,
-      onRefresh,
       showLoader
     } = this.state
     return (
@@ -444,7 +443,9 @@ class FriendsAndFamilyScreen extends PureComponent<
             <RefreshControl
               refreshing={showLoader}
               onRefresh={() => {
-                trustedChannelsSetupSync()
+                syncExistingPermanentChannels( {
+                  inProgressChannelsOnly: true
+                } )
               }}
             />
           }
@@ -621,15 +622,15 @@ const mapStateToProps = ( state ) => {
   return {
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
-    trustedChannelsSetupSyncing: idx(
+    existingPermanentChannelsSynching: idx(
       state,
-      ( _ ) => _.trustedContacts.loading.trustedChannelsSetupSync,
+      ( _ ) => _.trustedContacts.loading.existingPermanentChannelsSynching,
     ),
   }
 }
 
 export default connect( mapStateToProps, {
-  trustedChannelsSetupSync,
+  syncExistingPermanentChannels,
   removeTrustedContact,
   clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )

@@ -653,6 +653,8 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
+  data?: any;
+  channelKey?: string
 }
 
 export interface KeeperInfoInterface {
@@ -664,6 +666,7 @@ export interface KeeperInfoInterface {
   createdAt: number;
   sharePosition: number;
   data?: any;
+  channelKey?: string;
 }
 //VersionHistory
 export interface VersionHistory {

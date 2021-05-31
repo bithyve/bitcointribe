@@ -111,7 +111,7 @@ function* autoShareSecondaryWorker( { payload } ) {
   try {
     yield put( switchUpgradeLoader( 'secondarySetupAutoShare' ) )
     const { shareId } = payload
-    const name = 'Secondary Device1'
+    const name = 'Personal Device1'
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const obj: KeeperInfoInterface = {
       shareId: shareId,
