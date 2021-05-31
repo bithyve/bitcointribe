@@ -864,6 +864,9 @@ export default class TrustedContacts {
         }
         outstream.secondaryEncryptedData = this.encryptData( secondaryChannelKey, unencryptedOutstream.secondaryData ).encryptedData
         outstreamUpdates.secondaryEncryptedData = outstream.secondaryEncryptedData
+      } else if ( secondaryData === null ){
+        unencryptedOutstream.secondaryData = null // remove secondary data
+        outstream.secondaryEncryptedData = null
       }
 
       if( backupData ){
@@ -873,6 +876,9 @@ export default class TrustedContacts {
         }
         outstream.encryptedBackupData = this.encryptData( channelKey, unencryptedOutstream.backupData ).encryptedData
         outstreamUpdates.encryptedBackupData = outstream.encryptedBackupData
+      } else if ( backupData === null ){
+        unencryptedOutstream.backupData = null // remove backupData data
+        outstream.encryptedBackupData = null
       }
 
       if( metaData ){
@@ -881,6 +887,7 @@ export default class TrustedContacts {
           ...metaData
         }
         outstreamUpdates.metaData = outstream.metaData
+        contact.isActive = idx( metaData, ( _ ) => _.flags.active )
       }
     }
     return outstreamUpdates
@@ -898,6 +905,7 @@ export default class TrustedContacts {
     }
     contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
     contact.permanentChannel[ inStream.streamId ] = inStream
+    contact.isActive = idx( inStream.metaData, ( _ ) => _.flags.active )
   };
 
   public syncPermanentChannels = async (
@@ -928,6 +936,7 @@ export default class TrustedContacts {
               .createHash( 'sha256' )
               .update( channelKey )
               .digest( 'hex' ),
+            isActive: true,
             relationType: idx( unEncryptedOutstreamUpdates, ( _ ) => _.primaryData.relationType ),
             secondaryChannelKey,
             contactsSecondaryChannelKey
@@ -935,6 +944,8 @@ export default class TrustedContacts {
           this.trustedContactsV2[ channelKey ] = newContact
           contact = newContact
         }
+
+        if( !contact.isActive ) continue // skip non-active contacts
 
         let outstreamUpdates: StreamData
         if( unEncryptedOutstreamUpdates )
@@ -961,12 +972,12 @@ export default class TrustedContacts {
 
         const { channelInstreams } = res.data
         for( const permanentChannelAddress of Object.keys( channelInstreams ) ){
-          const { updated, instream } = channelInstreams[ permanentChannelAddress ]
+          const { updated, isChannelActive, instream } = channelInstreams[ permanentChannelAddress ]
+          const { contact, channelKey } = channelMapping[ permanentChannelAddress ]
+
           if ( !updated ) console.log( 'Failed to update permanent channel: ', permanentChannelAddress )
-          if( instream ){
-            const { contact, channelKey } = channelMapping[ permanentChannelAddress ]
-            this.cacheInstream( contact, channelKey, instream )
-          }
+          if( !isChannelActive ) ( contact as TrustedContact ).isActive = isChannelActive
+          if( instream ) this.cacheInstream( contact, channelKey, instream )
         }
 
         return {

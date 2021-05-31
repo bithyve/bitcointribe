@@ -559,6 +559,7 @@ export interface TrustedContact {
   contactDetails: ContactDetails,
   relationType: TrustedContactRelationTypes,
   permanentChannelAddress: string,
+  isActive: boolean,
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
   secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
