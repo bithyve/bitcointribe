@@ -49,7 +49,7 @@ import {
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
-import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -159,8 +159,8 @@ class FriendsAndFamilyScreen extends PureComponent<
     const otherContacts = []
 
     for( const contact of Object.values( contacts ) ){
-      const { contactDetails, relationType, unencryptedPermanentChannel } = contact
-      const stream: UnecryptedStreamData = useStreamFromPermanentChannel( walletId, unencryptedPermanentChannel, true )
+      const { contactDetails, relationType } = contact
+      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
       const fnf = {
         id: contactDetails.id,
