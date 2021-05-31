@@ -249,13 +249,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    <View style={{
-      height: '95%'
-    }}>
-      {renderMessage()}
-      {renderFooter()}
-    </View>
-
+    {renderMessage()}
+    {renderFooter()}
   </View>
   )
 }
@@ -279,7 +274,7 @@ const styles = StyleSheet.create( {
     marginRight: wp( '10%' ),
     marginLeft: wp( '3%' ),
     marginTop: wp( '5%' ),
-    flex: 1.7
+    // flex: 1.7
   },
   modalTitleText: {
     marginBottom: wp( '5%' ),

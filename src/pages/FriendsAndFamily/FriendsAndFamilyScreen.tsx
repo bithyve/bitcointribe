@@ -59,6 +59,7 @@ import HomeHeader from '../../components/home/home-header_update'
 import Header from '../../navigation/stacks/Header'
 // import { SafeAreaView } from 'react-native-safe-area-context'
 import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import ModalContainer from '../../components/home/ModalContainer'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -473,7 +474,7 @@ class FriendsAndFamilyScreen extends PureComponent<
           this.handleContactSelection( backendContactInfo, index, contactsType )
         }
         containerStyle={{
-          backgroundColor: 'transparent'
+          backgroundColor: Colors.backgroundColor
         }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
@@ -546,13 +547,14 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { syncExistingPermanentChannels } = this.props
-
+    const { syncExistingPermanentChannels, navigation } = this.props
+    const { isLoadContacts, selectedContact } = this.state
     const {
       myKeepers,
       ImKeeping,
       otherContacts,
-      showLoader
+      showLoader,
+      showModal
     } = this.state
     return (
       <ImageBackground
@@ -628,7 +630,10 @@ class FriendsAndFamilyScreen extends PureComponent<
                     isLoadContacts: true,
                     showModal: true
                   }, () => {
-                    this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
+                    // this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
+                    this.setState( {
+                      showModal: true,
+                    } )
                   } )
                 }}
                 style={{
@@ -741,20 +746,52 @@ class FriendsAndFamilyScreen extends PureComponent<
                 <View style={{
                   height: 'auto'
                 }}>
-                  {( otherContacts.length && otherContacts.map( ( item, index ) => {
-                    return this.renderContactListItem( {
-                      backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(
-                        item,
-                        ContactTrustKind.OTHER,
-                      ),
-                      index,
-                      contactsType: 'Other Contacts',
-                    } )
-                  } ) ) || <View style={{
-                    height: wp( '22%' ) + 30
-                  }} />}
 
+                  {myKeepers.length > 0 &&
+                  <>
+                    {myKeepers.map( ( item, index ) => {
+                      return this.renderContactListItem( {
+                        backendContactInfo: item,
+                        contactDescription: makeContactRecipientDescription(
+                          item,
+                          ContactTrustKind.KEEPER_OF_USER,
+                        ),
+                        index,
+                        contactsType: 'My Keepers',
+                      } )
+                    } )}
+                  </>
+                  }
+                  {ImKeeping.length > 0 &&
+                  <>
+                    {ImKeeping.map( ( item, index ) => {
+                      return this.renderContactListItem( {
+                        backendContactInfo: item,
+                        contactDescription: makeContactRecipientDescription(
+                          item,
+                          ContactTrustKind.USER_IS_KEEPING,
+                        ),
+                        index,
+                        contactsType: 'I\'m Keeper of',
+                      } )
+                    } )}
+                  </>
+                  }
+                  {otherContacts.length > 0 &&
+                  <>
+                    {otherContacts.map( ( item, index ) => {
+                      return this.renderContactListItem( {
+                        backendContactInfo: item,
+                        contactDescription: makeContactRecipientDescription(
+                          item,
+                          ContactTrustKind.OTHER,
+                        ),
+                        index,
+                        contactsType: 'Other Contacts',
+                      } )
+                    } )}
+                  </>
+                  }
                   {/* <TouchableOpacity
                     onPress={() => {
                       this.setState( {
@@ -801,38 +838,64 @@ class FriendsAndFamilyScreen extends PureComponent<
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
-        <Modal
-          visible={this.state.showModal}
-          onRequestClose={() => { this.setState( {
-            showModal: false
-          } ) }}
-          transparent={true}
-        >
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              // margin: 10
+        <ModalContainer visible={showModal} closeBottomSheet={() => this.setState( {
+          showModal: false,
+        } )} >
+          <AddContactAddressBook
+            isLoadContacts={isLoadContacts}
+            proceedButtonText={'Confirm & Proceed'}
+            onPressContinue={() => {
+              if ( selectedContact && selectedContact.length ) {
+                navigation.navigate( 'AddContactSendRequest', {
+                  SelectedContact: selectedContact,
+                } )
+                // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+                this.setState( {
+                  showModal: false,
+                } )
+              }
             }}
-            activeOpacity={1}
-            onPressOut={() => { this.setState( {
-              showModal: false
-            } ) }}
-          >
-            <BottomSheet
-              enabledGestureInteraction={false}
-              enabledInnerScrolling={true}
-              ref={this.addContactAddressBookBottomSheetRef}
-              snapPoints={[
-                -50,
-                Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                  ? hp( '82%' )
-                  : hp( '82%' ),
-              ]}
-              renderContent={this.renderAddContactFriendsAndFamily}
-              renderHeader={this.renderAddContactAddressBookHeader}
-            />
-          </TouchableOpacity>
-        </Modal>
+            onSelectContact={( selectedData ) => {
+              this.setState( {
+                selectedContact: selectedData,
+              } )
+            }}
+            onPressBack={() => {
+              console.log( 'onPressBackonPressBackonPressBackonPressBackonPressBackonPressBack' )
+
+              // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+              this.setState( {
+                showModal: false,
+              } )
+            }}
+            onSkipContinue={() => {
+              let { skippedContactsCount } = this.props.trustedContactsService.tc
+              let data
+              if ( !skippedContactsCount ) {
+                skippedContactsCount = 1
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount}`,
+                  name: `F&F request awaiting ${skippedContactsCount}`,
+                }
+              } else {
+                data = {
+                  firstName: 'F&F request',
+                  lastName: `awaiting ${skippedContactsCount + 1}`,
+                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                }
+              }
+
+              navigation.navigate( 'AddContactSendRequest', {
+                SelectedContact: [ data ],
+              } )
+              // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+              this.setState( {
+                showModal: false,
+              } )
+            }}
+          />
+        </ModalContainer>
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}

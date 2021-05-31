@@ -60,149 +60,144 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       : 'Order being processed'
   }
   return ( <View style={{
-    ...styles.modalContentContainer
+    ...styles.modalContentContainer,
   }}>
+    <View style={styles.successModalHeaderView}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={onPress}
+        style={{
+          flexDirection: 'row'
+        }}
+      >
+        <FontAwesome name="long-arrow-left" color={Colors.blue} size={19} style={{
+          marginTop: hp( 0.5 )
+        }} />
+        <Text style={styles.modalTitleText}>{rampTitle}</Text>
+      </TouchableOpacity>
+      <Text style={{
+        ...styles.modalInfoText,
+        marginTop: wp( 1.5 ),
+        marginBottom: wp( 5 ),
+      }}>{rampMessage}</Text>
+    </View>
     <View style={{
-      height: '95%'
+      flexDirection: 'row',
+      // marginLeft: wp( '1.5%' ),
+      alignSelf: 'center',
+      width: wp( '90%' ),
+      height: hp( 9 ),
+      backgroundColor: Colors.backgroundColor1,
+      alignItems: 'center',
+      marginBottom: wp( 2 ),
+      borderRadius: wp( 2 )
     }}>
-      <View style={styles.successModalHeaderView}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={onPress}
-          style={{
-            flexDirection: 'row'
-          }}
-        >
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={19} style={{
-            marginTop: hp( 0.5 )
-          }} />
-          <Text style={styles.modalTitleText}>{rampTitle}</Text>
-        </TouchableOpacity>
-        <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( 1.5 ),
-          marginBottom: wp( 5 ),
-        }}>{rampMessage}</Text>
-      </View>
-      <View style={{
-        flexDirection: 'row',
-        // marginLeft: wp( '1.5%' ),
-        alignSelf: 'center',
-        width: wp( '90%' ),
-        height: hp( 9 ),
-        backgroundColor: Colors.backgroundColor1,
-        alignItems: 'center',
-        marginBottom: wp( 2 ),
-        borderRadius: wp( 2 )
-      }}>
-        <View style={styles.headerImageView}>
-          <View style={styles.headerImageInitials}>
-            <Image
-              source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
-              style={styles.headerImage}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
-
-        <ListItem.Content style={{
-          flex: 1,
-        }}>
-          <ListItem.Subtitle
-            style={ListStyles.infoHeaderSubtitleText}
-            numberOfLines={1}
-          >
-              bitcoin will be transferred to
-          </ListItem.Subtitle>
-
-          <ListItem.Title
-            style={styles.destinationTitleText}
-            numberOfLines={1}
-          >
-              Ramp Account
-          </ListItem.Title>
-        </ListItem.Content>
-      </View>
-
-      <View style={{
-        flexDirection: 'row',
-        alignSelf: 'center',
-        width: wp( '90%' ),
-        height: hp( 9 ),
-        backgroundColor: Colors.backgroundColor1,
-        alignItems: 'center',
-        marginBottom: wp( 2 ),
-        borderRadius: wp( 2 )
-      }}>
-        <View style={styles.headerImageView}>
-          <View style={styles.headerImageInitials}>
-            <Image
-              source={require( '../../../assets/images/icons/icon_address_type.png' )}
-              style={styles.headerImage}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
-        <ListItem.Content style={{
-          flex: 1
-        }}>
-          <ListItem.Subtitle
-            style={ListStyles.infoHeaderSubtitleText}
-            numberOfLines={1}
-          >
-              bitcoin will be transferred to
-          </ListItem.Subtitle>
-
-          <ListItem.Title
-            style={styles.destinationTitleText}
-            numberOfLines={1}
-          >
-            {rampReceiveAddress}
-          </ListItem.Title>
-        </ListItem.Content>
-      </View>
-      {rampFromBuyMenu
-        ? <View style={{
-          alignSelf: 'flex-end',
-          flexDirection: 'row',
-          alignItems: 'center',
-          alignContent: 'center',
-          marginTop: hp( '1.5' ),
-          marginRight: wp( '9%' ),
-        }}>
-          <Text style={{
-            fontStyle: 'italic',
-            fontSize: RFValue( 11 ),
-            color: Colors.textColorGrey
-          }}>
-        Powered by
-          </Text>
+      <View style={styles.headerImageView}>
+        <View style={styles.headerImageInitials}>
           <Image
-            source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
-            style={{
-              marginLeft: 5,
-              width: 62,
-              height: 27,
-            }}
+            source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+            style={styles.headerImage}
+            resizeMode="contain"
           />
         </View>
-        : null
-      }
-      <View style={{
-        flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
-      }} >
-        <AppBottomSheetTouchableWrapper
-          disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
-          onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-          style={{
-            ...styles.successModalButtonView
-          }}
-        >
-          <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
-
-        </AppBottomSheetTouchableWrapper>
       </View>
 
+      <ListItem.Content style={{
+        flex: 1,
+      }}>
+        <ListItem.Subtitle
+          style={ListStyles.infoHeaderSubtitleText}
+          numberOfLines={1}
+        >
+              bitcoin will be transferred to
+        </ListItem.Subtitle>
+
+        <ListItem.Title
+          style={styles.destinationTitleText}
+          numberOfLines={1}
+        >
+              Ramp Account
+        </ListItem.Title>
+      </ListItem.Content>
+    </View>
+
+    <View style={{
+      flexDirection: 'row',
+      alignSelf: 'center',
+      width: wp( '90%' ),
+      height: hp( 9 ),
+      backgroundColor: Colors.backgroundColor1,
+      alignItems: 'center',
+      marginBottom: wp( 2 ),
+      borderRadius: wp( 2 )
+    }}>
+      <View style={styles.headerImageView}>
+        <View style={styles.headerImageInitials}>
+          <Image
+            source={require( '../../../assets/images/icons/icon_address_type.png' )}
+            style={styles.headerImage}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
+      <ListItem.Content style={{
+        flex: 1
+      }}>
+        <ListItem.Subtitle
+          style={ListStyles.infoHeaderSubtitleText}
+          numberOfLines={1}
+        >
+              bitcoin will be transferred to
+        </ListItem.Subtitle>
+
+        <ListItem.Title
+          style={styles.destinationTitleText}
+          numberOfLines={1}
+        >
+          {rampReceiveAddress}
+        </ListItem.Title>
+      </ListItem.Content>
+    </View>
+    {rampFromBuyMenu
+      ? <View style={{
+        alignSelf: 'flex-end',
+        flexDirection: 'row',
+        alignItems: 'center',
+        alignContent: 'center',
+        marginTop: hp( '1.5' ),
+        marginRight: wp( '9%' ),
+      }}>
+        <Text style={{
+          fontStyle: 'italic',
+          fontSize: RFValue( 11 ),
+          color: Colors.textColorGrey
+        }}>
+        Powered by
+        </Text>
+        <Image
+          source={require( '../../../assets/images/icons/ramp_logo_large.png' )}
+          style={{
+            marginLeft: 5,
+            width: 62,
+            height: 27,
+          }}
+        />
+      </View>
+      : null
+    }
+    <View style={{
+      flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto', marginBottom: hp( '1%' )
+    }} >
+      <AppBottomSheetTouchableWrapper
+        disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
+        onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+        style={{
+          ...styles.successModalButtonView
+        }}
+      >
+        <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
+
+      </AppBottomSheetTouchableWrapper>
     </View>
 
   </View>
@@ -256,6 +251,7 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '3%' ),
+    marginTop: hp( '1%' )
   },
   modalTitleText: {
     color: Colors.blue,

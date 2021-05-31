@@ -11,8 +11,7 @@ import {
   TouchableOpacity,
   AppState,
   InteractionManager,
-  Modal,
-  Image
+  Image,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
@@ -149,6 +148,7 @@ import { setShowAllAccount } from '../../store/actions/accounts'
 import HomeBuyCard from './HomeBuyCard'
 import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -2550,78 +2550,18 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
             percentIncr={'2.1'}
             asset={ require( '../../assets/images/currencySymbols/icon_dollar_light.png' )}
             openBottomSheet={( value ) => {
-              // this.sheetRef.current.snapTo( 0 )
-              this.setState( {
-                // bottomSheetState: BottomSheetState.Open,
-                showModal: true
-              } )
+              this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
             }}
           />
 
           {/* </View> */}
-
-          <BottomSheetBackground
-            isVisible={this.state.bottomSheetState === BottomSheetState.Open}
-            onPress={this.closeBottomSheet}
-          />
-          <Modal
-            visible={this.state.showModal}
-            onRequestClose={() => { this.closeBottomSheet() }}
-            transparent={true}
-            style={{
-            // margin: 0,
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <TouchableOpacity
-              activeOpacity={1}
-              onPressOut={() => {
-
-                this.setState( {
-                // bottomSheetState: BottomSheetState.Closed,
-                  showModal: false
-                } )}}
-              style={{
-              // flex: 1,
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                flex: 1,
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                // borderRadius: 20
-
-              }}
-            >
-              <View style={styles.containerStyle}>
-
-                <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
-
-                <BuyBitcoinHomeBottomSheet
-                  onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-                  // onPress={this.closeBottomSheet}
-                />
-              </View>
-            </TouchableOpacity>
-          </Modal>
           {this.state.currentBottomSheetKind != null && (
-            <View style={{
-              flex: 1,
-              alignItems: 'center'
-            }}>
-              <BottomSheet
-                ref={this.bottomSheetRef}
-                snapPoints={this.getBottomSheetSnapPoints()}
-                initialSnapIndex={-1}
-                animationDuration={defaultBottomSheetConfigs.animationDuration}
-                animationEasing={Easing.out( Easing.back( 1 ) )}
-                handleComponent={defaultBottomSheetConfigs.handleComponent}
-                onChange={this.handleBottomSheetPositionChange}
-              >
-                <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
-              </BottomSheet>
-            </View>
+            <ModalContainer visible={this.state.currentBottomSheetKind != null} closeBottomSheet={this.closeBottomSheet} >
+
+              {/* <View style={styles.containerStyle}> */}
+              {this.renderBottomSheetContent()}
+              {/* </View> */}
+            </ModalContainer>
           )}
         </View>
       </>

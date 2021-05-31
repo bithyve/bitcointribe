@@ -574,7 +574,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '2%' ),
+    paddingTop: hp( '4%' ),
     marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
