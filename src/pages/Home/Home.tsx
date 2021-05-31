@@ -55,6 +55,7 @@ import {
   fetchEphemeralChannel,
   fetchTrustedChannel,
   postRecoveryChannelSync,
+  InitTrustedContactFlowKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -466,7 +467,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             navigation.navigate( 'ContactsListForAssociateContact', {
               postAssociation: ( contact ) => {
                 this.props.initializeTrustedContact( {
-                  contact, channelKey, contactsSecondaryChannelKey
+                  contact,
+                  flowKind: InitTrustedContactFlowKind.APPROVAL,
+                  channelKey,
+                  contactsSecondaryChannelKey
                 } )
                 // TODO: navigate post approval
                 navigation.navigate( 'Home' )
@@ -480,7 +484,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             navigation.navigate( 'ContactsListForAssociateContact', {
               postAssociation: ( contact ) => {
                 this.props.initializeTrustedContact( {
-                  contact, channelKey: channelKey1, contactsSecondaryChannelKey: contactsSecondaryChannelKey1
+                  contact,
+                  flowKind: InitTrustedContactFlowKind.APPROVAL,
+                  channelKey: channelKey1,
+                  contactsSecondaryChannelKey: contactsSecondaryChannelKey1
                 } )
                 // TODO: navigate post approval
                 navigation.navigate( 'Home' )
@@ -969,6 +976,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
+    this.processQRData('{"type":"CONTACT_REQUEST","channelKey":"smYWlOo8QYyfXOLbH3T7UvPF","walletName":"Danny","version":"1.7.5"}')
   };
 
   getNewTransactionNotifications = async () => {

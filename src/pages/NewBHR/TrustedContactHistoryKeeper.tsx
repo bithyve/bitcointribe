@@ -71,7 +71,7 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 
 const TrustedContactHistoryKeeper = ( props ) => {
@@ -747,7 +747,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
       }
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( initializeTrustedContact( {
-        contact: Contact, isGuardian: true, channelKey, shareId: selectedKeeper.shareId
+        contact: Contact,
+        flowKind: InitTrustedContactFlowKind.SETUP,
+        isGuardian: true,
+        channelKey,
+        shareId: selectedKeeper.shareId
       } ) )
     },
     [ SHARES_TRANSFER_DETAILS, trustedContacts, chosenContact ],

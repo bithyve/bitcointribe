@@ -52,7 +52,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
-import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 
@@ -240,7 +240,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( initializeTrustedContact( {
-        contact: Contact, isGuardian: true, channelKey, shareId: selectedKeeper.shareId
+        contact: Contact,
+        flowKind: InitTrustedContactFlowKind.SETUP,
+        isGuardian: true,
+        channelKey,
+        shareId: selectedKeeper.shareId
       } ) )
     },
     [ SHARES_TRANSFER_DETAILS, trustedContacts, Contact ],

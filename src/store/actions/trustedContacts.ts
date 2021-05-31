@@ -59,15 +59,22 @@ export const approveTrustedContact = (
   }
 }
 
+export enum InitTrustedContactFlowKind {
+  SETUP = 'SETUP',
+  APPROVAL = 'APPROVAL'
+}
+
 export const initializeTrustedContact = (
   {
     contact,
+    flowKind,
     isGuardian,
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
   }:{
       contact: any,
+      flowKind: InitTrustedContactFlowKind,
       isGuardian?: boolean,
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
@@ -78,6 +85,7 @@ export const initializeTrustedContact = (
     type: INITIALIZE_TRUSTED_CONTACT,
     payload: {
       contact,
+      flowKind,
       isGuardian,
       channelKey,
       contactsSecondaryChannelKey,
