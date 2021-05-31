@@ -20,8 +20,9 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   clearTrustedContactsCache,
-  syncExistingPermanentChannels,
+  syncPermanentChannels,
   removeTrustedContact,
+  PermanentChannelSyncKind,
 } from '../../store/actions/trustedContacts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
@@ -56,7 +57,7 @@ interface FriendsAndFamilyPropTypes {
   isFocused: boolean;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
-  syncExistingPermanentChannels: any;
+  syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
   removeTrustedContact: any;
   clearTrustedContactsCache: any;
@@ -105,8 +106,8 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.props.syncExistingPermanentChannels( {
-        inProgressChannelsOnly: true
+      this.props.syncPermanentChannels( {
+        permanentChannelSyncKind: PermanentChannelSyncKind.NON_FINALIZED_CONTACTS,
       } )
       this.updateAddressBook()
     } )
@@ -428,7 +429,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { syncExistingPermanentChannels } = this.props
+    const { syncPermanentChannels } = this.props
 
     const {
       myKeepers,
@@ -443,8 +444,8 @@ class FriendsAndFamilyScreen extends PureComponent<
             <RefreshControl
               refreshing={showLoader}
               onRefresh={() => {
-                syncExistingPermanentChannels( {
-                  inProgressChannelsOnly: true
+                syncPermanentChannels( {
+                  permanentChannelSyncKind: PermanentChannelSyncKind.NON_FINALIZED_CONTACTS,
                 } )
               }}
             />
@@ -630,7 +631,7 @@ const mapStateToProps = ( state ) => {
 }
 
 export default connect( mapStateToProps, {
-  syncExistingPermanentChannels,
+  syncPermanentChannels,
   removeTrustedContact,
   clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )
