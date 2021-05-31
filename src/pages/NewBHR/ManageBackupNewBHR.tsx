@@ -25,7 +25,7 @@ import DeviceInfo from 'react-native-device-info'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { fetchEphemeralChannel, PermanentChannelSyncKind } from '../../store/actions/trustedContacts'
+import { fetchEphemeralChannel, PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
@@ -279,7 +279,7 @@ class ManageBackupNewBHR extends Component<
         ) > -1
       ) {
         this.props.syncPermanentChannels( {
-          permanentChannelSyncKind: PermanentChannelSyncKind.NON_FINALIZED_CONTACTS,
+          permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
         } )
       }
     }

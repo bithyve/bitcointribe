@@ -137,9 +137,12 @@ export default function AddContactSendRequest( props ) {
           walletName: WALLET_SETUP.walletName,
           secondaryChannelKey,
           version: appVersion,
-        } ))}
+        } )
+      )
+    }
+
   }, [ Contact, trustedContacts ] )
-  
+
   // const openTimer = async () => {
   //   setTimeout( () => {
   //     setRenderTimer( true )

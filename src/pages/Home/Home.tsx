@@ -976,7 +976,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
-    this.processQRData('{"type":"CONTACT_REQUEST","channelKey":"smYWlOo8QYyfXOLbH3T7UvPF","walletName":"Danny","version":"1.7.5"}')
   };
 
   getNewTransactionNotifications = async () => {

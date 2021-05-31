@@ -25,7 +25,7 @@ import {
   INITIALIZE_TRUSTED_CONTACT,
   existingPermanentChannelsSynched,
   InitTrustedContactFlowKind,
-  PermanentChannelSyncKind,
+  PermanentChannelsSyncKind,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -197,7 +197,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     contactInfo, streamUpdates
   }
   yield put( syncPermanentChannels( {
-    permanentChannelSyncKind: PermanentChannelSyncKind.SUPPLIED_CONTACTS,
+    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
     channelUpdates: [ channelUpdate ],
     updatedSERVICES
   } ) )
@@ -936,7 +936,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelSyncKind: PermanentChannelSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates: UnecryptedStreamData }[], updatedSERVICES?: ServicesJSON }} ) {
+function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates: UnecryptedStreamData }[], updatedSERVICES?: ServicesJSON }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
@@ -958,10 +958,10 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
   let flowKind: InitTrustedContactFlowKind // todo
   let contactIdentifier: string
 
-  const { permanentChannelSyncKind, channelUpdates } = payload
+  const { permanentChannelsSyncKind, channelUpdates } = payload
 
-  switch( permanentChannelSyncKind ){
-      case PermanentChannelSyncKind.SUPPLIED_CONTACTS:
+  switch( permanentChannelsSyncKind ){
+      case PermanentChannelsSyncKind.SUPPLIED_CONTACTS:
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
         for( const { contactInfo, streamUpdates } of channelUpdates ){
           channelSyncUpdates.push( {
@@ -977,7 +977,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         }
         break
 
-      case PermanentChannelSyncKind.EXISTING_CONTACTS:
+      case PermanentChannelsSyncKind.EXISTING_CONTACTS:
         if( !Object.keys( existingContacts ).length ) {
           yield put ( existingPermanentChannelsSynched( {
             successful: true
@@ -995,7 +995,14 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         } )
         break
 
-      case PermanentChannelSyncKind.NON_FINALIZED_CONTACTS:
+      case PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS:
+        if( !Object.keys( existingContacts ).length ) {
+          yield put ( existingPermanentChannelsSynched( {
+            successful: true
+          } ) )
+          return
+        }
+
         Object.keys( existingContacts ).forEach( channelKey => {
           const contact = existingContacts[ channelKey ]
           const instream = useStreamFromContact( contact, walletId, true )
@@ -1026,11 +1033,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       }
     } )
 
-    if( permanentChannelSyncKind === PermanentChannelSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVAL ){
-      const accountsState: AccountsState = yield select( state => state.accounts )
-      const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-      const { walletId } = regularAccount.hdWallet.getWalletId()
-
+    if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVAL ){
       const contact: TrustedContact = trustedContacts.tc.trustedContactsV2[ contactIdentifier ]
       const instream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
       const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
@@ -1045,7 +1048,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         Toast( 'Contact successfully added to Friends and Family' )
     }
 
-    if( [ PermanentChannelSyncKind.EXISTING_CONTACTS,  PermanentChannelSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelSyncKind ) )
+    if( [ PermanentChannelsSyncKind.EXISTING_CONTACTS,  PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelsSyncKind ) )
       yield put ( existingPermanentChannelsSynched( {
         successful: true
       } ) )
@@ -1054,11 +1057,11 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       err: res.err
     } )
 
-    if( permanentChannelSyncKind === PermanentChannelSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVAL )
+    if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVAL )
       Toast( 'Failed to add Keeper/Contact' )
 
 
-    if( [ PermanentChannelSyncKind.EXISTING_CONTACTS,  PermanentChannelSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelSyncKind ) )
+    if( [ PermanentChannelsSyncKind.EXISTING_CONTACTS,  PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelsSyncKind ) )
       yield put ( existingPermanentChannelsSynched( {
         successful: false
       } ) )

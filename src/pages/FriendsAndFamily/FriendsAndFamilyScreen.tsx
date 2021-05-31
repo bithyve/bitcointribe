@@ -22,7 +22,7 @@ import {
   clearTrustedContactsCache,
   syncPermanentChannels,
   removeTrustedContact,
-  PermanentChannelSyncKind,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
@@ -107,7 +107,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
       this.props.syncPermanentChannels( {
-        permanentChannelSyncKind: PermanentChannelSyncKind.NON_FINALIZED_CONTACTS,
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
       } )
       this.updateAddressBook()
     } )
@@ -445,7 +445,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               refreshing={showLoader}
               onRefresh={() => {
                 syncPermanentChannels( {
-                  permanentChannelSyncKind: PermanentChannelSyncKind.NON_FINALIZED_CONTACTS,
+                  permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
                 } )
               }}
             />

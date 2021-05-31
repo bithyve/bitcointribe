@@ -156,7 +156,7 @@ export const updateTrustedChannel = (
   }
 }
 
-export enum PermanentChannelSyncKind {
+export enum PermanentChannelsSyncKind {
   SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
   EXISTING_CONTACTS = 'EXISTING_CONTACTS',
   NON_FINALIZED_CONTACTS = 'NON_FINALIZED_CONTACTS'
@@ -164,12 +164,12 @@ export enum PermanentChannelSyncKind {
 
 export const syncPermanentChannels = (
   {
-    permanentChannelSyncKind,
+    permanentChannelsSyncKind,
     channelUpdates,
     updatedSERVICES,
   }:
   {
-    permanentChannelSyncKind: PermanentChannelSyncKind,
+    permanentChannelsSyncKind: PermanentChannelsSyncKind,
     channelUpdates: {
     contactInfo: ContactInfo,
     streamUpdates?: UnecryptedStreamData,
@@ -180,7 +180,7 @@ export const syncPermanentChannels = (
   return {
     type: SYNC_PERMANENT_CHANNELS,
     payload: {
-      permanentChannelSyncKind,
+      permanentChannelsSyncKind,
       channelUpdates,
       updatedSERVICES
     },
