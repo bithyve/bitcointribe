@@ -301,22 +301,20 @@ export default class TrustedContactsService {
     }
   };
 
-  public syncPermanentChannel = async (
+  public syncPermanentChannels = async (
+    channelSyncDetails:
+    {
     contactDetails: ContactDetails,
     channelKey: string,
+    streamId: string,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-    contactsSecondaryChannelKey?: string,
+    contactsSecondaryChannelKey?: string
+  }[]
   ): Promise<
     | {
         status: number;
-        data:
-          | {
-              updated: any;
-            }
-          | {
-              updated: any;
-            };
+        data: { updated?: Boolean },
         err?: undefined;
         message?: undefined;
       }
@@ -329,20 +327,15 @@ export default class TrustedContactsService {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.syncPermanentChannel(
-          contactDetails,
-          channelKey,
-          secondaryChannelKey,
-          unEncryptedOutstreamUpdates,
-          contactsSecondaryChannelKey,
+        data: await this.tc.syncPermanentChannels(
+          channelSyncDetails
         )
       }
     } catch ( err ) {
-      console.log( 'err', err )
       return {
         status: 0o1,
         err: err.message,
-        message: 'Failed to update contact',
+        message: 'Failed to sync permanent channels',
       }
     }
   };
@@ -351,6 +344,7 @@ export default class TrustedContactsService {
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
+    currencyCode
   ): Promise<
     | {
         status: number;
@@ -385,6 +379,7 @@ export default class TrustedContactsService {
           metaShares,
           healthCheckStatus,
           metaSharesUnderCustody,
+          currencyCode
         ),
       }
     } catch ( err ) {

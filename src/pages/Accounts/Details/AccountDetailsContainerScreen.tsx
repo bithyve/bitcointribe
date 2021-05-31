@@ -275,11 +275,17 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     // properly lay itself out above the rest of the content and become visible
     // when the loading starts
     if( accountShell.syncStatus===SyncStatus.PENDING )
-      setTimeout( () => {
+    // setTimeout( () => {
+    //   dispatch( refreshAccountShell( accountShell, {
+    //     autoSync: true
+    //   } ) )
+    // }, 100 )
+      requestAnimationFrame( () => {
         dispatch( refreshAccountShell( accountShell, {
           autoSync: true
         } ) )
-      }, 100 )
+      } )
+
   }, [] )
 
   useEffect( () => {

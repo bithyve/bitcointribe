@@ -20,7 +20,9 @@ export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
-export const SYNC_PERMANENT_CHANNEL = 'SYNC_PERMANENT_CHANNEL'
+export const SYNC_PERMANENT_CHANNELS = 'SYNC_PERMANENT_CHANNELS'
+export const SYNC_EXISTING_PERMANENT_CHANNELS = 'SYNC_EXISTING_PERMANENT_CHANNELS'
+export const EXISTING_PERMANENT_CHANNELS_SYNCHED = 'EXISTING_PERMANENT_CHANNELS_SYNCHED'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
@@ -144,23 +146,42 @@ export const updateTrustedChannel = (
   }
 }
 
-export const syncPermanentChannel = (
+export const syncPermanentChannels = (
   {
-    contactInfo,
-    updates,
+    channelUpdates,
     updatedSERVICES,
   }:
   {
-  contactInfo: ContactInfo,
-  updates?: UnecryptedStreamData,
+    channelUpdates: {
+    contactInfo: ContactInfo,
+    streamUpdates?: UnecryptedStreamData,
+  }[],
   updatedSERVICES?: ServicesJSON,
 }
 ) => {
   return {
-    type: SYNC_PERMANENT_CHANNEL,
+    type: SYNC_PERMANENT_CHANNELS,
     payload: {
-      contactInfo, updates, updatedSERVICES
+      channelUpdates, updatedSERVICES
     },
+  }
+}
+
+export const syncExistingPermanentChannels = ( { inProgressChannelsOnly }: {inProgressChannelsOnly?: boolean} ) => {
+  return {
+    type: SYNC_EXISTING_PERMANENT_CHANNELS,
+    payload: {
+      inProgressChannelsOnly
+    }
+  }
+}
+
+export const existingPermanentChannelsSynched = ( { successful }: {successful: boolean} ) => {
+  return {
+    type: EXISTING_PERMANENT_CHANNELS_SYNCHED,
+    payload: {
+      successful
+    }
   }
 }
 
@@ -186,11 +207,12 @@ export const trustedChannelsSetupSync = () => {
   }
 }
 
-export const walletCheckIn = ( synchingContacts?: Boolean ) => {
+export const walletCheckIn = ( synchingContacts?: Boolean, currencyCode?: string ) => {
   return {
     type: WALLET_CHECK_IN,
     payload: {
-      synchingContacts
+      synchingContacts,
+      currencyCode
     },
   }
 }

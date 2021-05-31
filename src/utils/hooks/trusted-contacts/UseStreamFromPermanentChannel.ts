@@ -10,8 +10,8 @@ export default function useStreamFromPermanentChannel(
 
   if( instream ){
     // return counterparty's stream(instream from user's perspective)
-    Object.keys( channel ).forEach( ( streamId ) => {
+    for( const streamId of Object.keys( channel ) ){
       if( usersStreamId !== streamId ) return channel[ streamId ]
-    } )
+    }
   } else return channel[ usersStreamId ] // return user's stream(outstream from user's perspective)
 }
