@@ -93,12 +93,11 @@ export const initializeTrustedContact = (
   }
 }
 
-export const removeTrustedContact = ( contactName, shareIndex? ) => {
+export const removeTrustedContact = ( { channelKey } : {channelKey: string} ) => {
   return {
     type: REMOVE_TRUSTED_CONTACT,
     payload: {
-      contactName,
-      shareIndex,
+      channelKey
     },
   }
 }
@@ -170,7 +169,7 @@ export const syncPermanentChannels = (
   }:
   {
     permanentChannelsSyncKind: PermanentChannelsSyncKind,
-    channelUpdates: {
+    channelUpdates?: {
     contactInfo: ContactInfo,
     streamUpdates?: UnecryptedStreamData,
   }[],
