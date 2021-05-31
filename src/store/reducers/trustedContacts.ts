@@ -11,8 +11,9 @@ import {
   APPROVE_TRUSTED_CONTACT,
   CLEAR_TRUSTED_CONTACTS_CACHE,
   UPGRADE_REDUCER,
-  SYNC_EXISTING_PERMANENT_CHANNELS,
+  SYNC_PERMANENT_CHANNELS,
   EXISTING_PERMANENT_CHANNELS_SYNCHED,
+  PermanentChannelsSyncKind
 } from '../actions/trustedContacts'
 import {
   EphemeralDataElements,
@@ -101,14 +102,16 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
           },
         }
 
-      case SYNC_EXISTING_PERMANENT_CHANNELS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            existingPermanentChannelsSynching: true,
-          },
-        }
+      case SYNC_PERMANENT_CHANNELS:
+        const permanentChannelsSyncKind = action.payload.permanentChannelsSyncKind
+        if( [ PermanentChannelsSyncKind.EXISTING_CONTACTS, PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelsSyncKind ) )
+          return {
+            ...state,
+            loading: {
+              ...state.loading,
+              existingPermanentChannelsSynching: true,
+            },
+          }
 
       case EXISTING_PERMANENT_CHANNELS_SYNCHED:
         return {

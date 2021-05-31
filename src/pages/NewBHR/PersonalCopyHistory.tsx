@@ -50,7 +50,7 @@ import { setIsPermissionGiven } from '../../store/actions/preferences'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import config from '../../bitcoin/HexaConfig'
-import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
 const PersonalCopyHistory = ( props ) => {
@@ -473,7 +473,11 @@ const PersonalCopyHistory = ( props ) => {
       }
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( initializeTrustedContact( {
-        contact: Contact, isGuardian: true, channelKey, shareId: selectedKeeper.shareId
+        contact: Contact,
+        flowKind: InitTrustedContactFlowKind.SETUP,
+        isGuardian: true,
+        channelKey,
+        shareId: selectedKeeper.shareId
       } ) )
     },
     [ trustedContacts ],

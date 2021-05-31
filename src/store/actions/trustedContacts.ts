@@ -21,7 +21,6 @@ export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
 export const UPDATE_TRUSTED_CHANNEL = 'UPDATE_TRUSTED_CHANNEL'
 export const SYNC_PERMANENT_CHANNELS = 'SYNC_PERMANENT_CHANNELS'
-export const SYNC_EXISTING_PERMANENT_CHANNELS = 'SYNC_EXISTING_PERMANENT_CHANNELS'
 export const EXISTING_PERMANENT_CHANNELS_SYNCHED = 'EXISTING_PERMANENT_CHANNELS_SYNCHED'
 export const FETCH_TRUSTED_CHANNEL = 'FETCH_TRUSTED_CHANNEL'
 export const TRUSTED_CHANNELS_SETUP_SYNC = 'TRUSTED_CHANNELS_SETUP_SYNC'
@@ -59,15 +58,22 @@ export const approveTrustedContact = (
   }
 }
 
+export enum InitTrustedContactFlowKind {
+  SETUP = 'SETUP',
+  APPROVAL = 'APPROVAL'
+}
+
 export const initializeTrustedContact = (
   {
     contact,
+    flowKind,
     isGuardian,
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
   }:{
       contact: any,
+      flowKind: InitTrustedContactFlowKind,
       isGuardian?: boolean,
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
@@ -78,6 +84,7 @@ export const initializeTrustedContact = (
     type: INITIALIZE_TRUSTED_CONTACT,
     payload: {
       contact,
+      flowKind,
       isGuardian,
       channelKey,
       contactsSecondaryChannelKey,
@@ -149,12 +156,20 @@ export const updateTrustedChannel = (
   }
 }
 
+export enum PermanentChannelsSyncKind {
+  SUPPLIED_CONTACTS = 'SUPPLIED_CONTACTS',
+  EXISTING_CONTACTS = 'EXISTING_CONTACTS',
+  NON_FINALIZED_CONTACTS = 'NON_FINALIZED_CONTACTS'
+}
+
 export const syncPermanentChannels = (
   {
+    permanentChannelsSyncKind,
     channelUpdates,
     updatedSERVICES,
   }:
   {
+    permanentChannelsSyncKind: PermanentChannelsSyncKind,
     channelUpdates: {
     contactInfo: ContactInfo,
     streamUpdates?: UnecryptedStreamData,
@@ -165,17 +180,10 @@ export const syncPermanentChannels = (
   return {
     type: SYNC_PERMANENT_CHANNELS,
     payload: {
-      channelUpdates, updatedSERVICES
+      permanentChannelsSyncKind,
+      channelUpdates,
+      updatedSERVICES
     },
-  }
-}
-
-export const syncExistingPermanentChannels = ( { inProgressChannelsOnly }: {inProgressChannelsOnly?: boolean} ) => {
-  return {
-    type: SYNC_EXISTING_PERMANENT_CHANNELS,
-    payload: {
-      inProgressChannelsOnly
-    }
   }
 }
 

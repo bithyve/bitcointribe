@@ -3,6 +3,7 @@ import {
   DecentralizedBackup,
   ServicesJSON,
 } from '../../common/interfaces/Interfaces'
+import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 
 export interface InputUTXOs {
   txId: string;
@@ -488,6 +489,7 @@ export interface ContactInfo  {
     secondaryMnemonicShard?: any,
     bhXpub?: string
   },
+  flowKind?: InitTrustedContactFlowKind
 }
 export interface PrimaryStreamData {
   walletID?: string,

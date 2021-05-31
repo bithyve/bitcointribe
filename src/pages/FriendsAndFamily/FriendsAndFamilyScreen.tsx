@@ -20,8 +20,9 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   clearTrustedContactsCache,
-  syncExistingPermanentChannels,
+  syncPermanentChannels,
   removeTrustedContact,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
@@ -49,14 +50,14 @@ import {
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
-import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
-  syncExistingPermanentChannels: any;
+  syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
   removeTrustedContact: any;
   clearTrustedContactsCache: any;
@@ -105,8 +106,8 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.props.syncExistingPermanentChannels( {
-        inProgressChannelsOnly: true
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
       } )
       this.updateAddressBook()
     } )
@@ -159,8 +160,8 @@ class FriendsAndFamilyScreen extends PureComponent<
     const otherContacts = []
 
     for( const contact of Object.values( contacts ) ){
-      const { contactDetails, relationType, unencryptedPermanentChannel } = contact
-      const stream: UnecryptedStreamData = useStreamFromPermanentChannel( walletId, unencryptedPermanentChannel, true )
+      const { contactDetails, relationType } = contact
+      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
       const fnf = {
         id: contactDetails.id,
@@ -428,7 +429,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { syncExistingPermanentChannels } = this.props
+    const { syncPermanentChannels } = this.props
 
     const {
       myKeepers,
@@ -443,8 +444,8 @@ class FriendsAndFamilyScreen extends PureComponent<
             <RefreshControl
               refreshing={showLoader}
               onRefresh={() => {
-                syncExistingPermanentChannels( {
-                  inProgressChannelsOnly: true
+                syncPermanentChannels( {
+                  permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
                 } )
               }}
             />
@@ -630,7 +631,7 @@ const mapStateToProps = ( state ) => {
 }
 
 export default connect( mapStateToProps, {
-  syncExistingPermanentChannels,
+  syncPermanentChannels,
   removeTrustedContact,
   clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )

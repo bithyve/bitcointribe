@@ -148,7 +148,7 @@ import { getVersions } from '../../common/utilities'
 import { initLevels } from '../actions/upgradeToNewBhr'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
-import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -3869,7 +3869,7 @@ function* modifyLevelDataWorker( ) {
         const element = levelInfo[ j ]
         const currentContact: TrustedContact = contacts[ element.channelKey ]
         if ( currentContact ) {
-          const instream: StreamData = useStreamFromPermanentChannel( s3Service.levelhealth.walletId, currentContact.permanentChannel, true )
+          const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
           if( instream ){
             levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'accessible' : levelInfo[ j ].status
             levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen

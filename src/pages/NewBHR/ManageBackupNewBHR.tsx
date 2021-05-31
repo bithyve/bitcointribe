@@ -25,11 +25,11 @@ import DeviceInfo from 'react-native-device-info'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { fetchEphemeralChannel } from '../../store/actions/trustedContacts'
+import { fetchEphemeralChannel, PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import { syncExistingPermanentChannels } from '../../store/actions/trustedContacts'
+import { syncPermanentChannels } from '../../store/actions/trustedContacts'
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -104,7 +104,7 @@ interface ManageBackupNewBHRPropsTypes {
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
   metaSharesKeeper: MetaShare[];
-  syncExistingPermanentChannels: any;
+  syncPermanentChannels: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
   deletePrivateData: any;
@@ -278,8 +278,8 @@ class ManageBackupNewBHR extends Component<
             -1
         ) > -1
       ) {
-        this.props.syncExistingPermanentChannels( {
-          inProgressChannelsOnly: true
+        this.props.syncPermanentChannels( {
+          permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
         } )
       }
     }
@@ -934,7 +934,7 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
-    syncExistingPermanentChannels,
+    syncPermanentChannels,
     setCloudData,
     deletePrivateData,
     updateKeeperInfoToTrustedChannel,
