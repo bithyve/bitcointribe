@@ -353,174 +353,56 @@ export const initializeTrustedContactWatcher = createWatcher(
   INITIALIZE_TRUSTED_CONTACT,
 )
 
-function* removeTrustedContactWorker( { payload } ) {
+function* removeTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {
   const trustedContactsService: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
-  const trustedContactsInfo = yield select(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
-  const regularAccount: RegularAccount = yield select(
-    ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
-  )
-  const { DECENTRALIZED_BACKUP } = yield select(
-    ( state ) => state.storage.database,
-  )
-  const shareTransferDetails = {
-    ...DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-  }
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const { walletId } = regularAccount.hdWallet.getWalletId()
 
-  let { contactName, shareIndex } = payload // shareIndex is passed in case of Guardian
-  contactName = contactName.toLowerCase().trim()
+  const { channelKey } = payload
+  const contact: TrustedContact = trustedContactsService.tc.trustedContactsV2[ channelKey ]
+  if( !contact.isActive ) return // already removed
 
-  const {
-    walletID,
-    FCMs,
-    isGuardian,
-    trustedChannel,
-  } = trustedContactsService.tc.trustedContacts[ contactName ]
-
-  const dataElements: TrustedDataElements = {
-    remove: true,
-  }
-  // if (isGuardian) dataElements = { removeGuardian: true }; // deprecates guardian to trusted contact
-  // else
-  //   dataElements = {
-  //     remove: true,
-  //   };
-
-  if ( trustedChannel ) {
-    // removing established trusted contacts
-    yield call(
-      trustedContactsService.updateTrustedChannel,
-      contactName,
-      dataElements,
-    )
-  }
-
-  if ( isGuardian && !trustedChannel ) {
-    // Guardians gets removed post request expiry
-    trustedContactsService.tc.trustedContacts[ contactName ].isGuardian = false
-    // if (shareIndex !== null && shareIndex <= 2)
-    //   s3Service.resetSharesHealth(shareIndex);
-    delete shareTransferDetails[ shareIndex ] // enables createGuardian on manage backup
-
-    // resets the highlight flag for manage backup
-    let autoHighlightFlags = yield call(
-      AsyncStorage.getItem,
-      'AutoHighlightFlags',
-    )
-    if ( autoHighlightFlags ) {
-      autoHighlightFlags = JSON.parse( autoHighlightFlags )
-      if ( shareIndex === 0 )
-        autoHighlightFlags = {
-          ...autoHighlightFlags, secondaryDevice: false
-        }
-      else if ( shareIndex === 1 )
-        autoHighlightFlags = {
-          ...autoHighlightFlags, trustedContact1: false
-        }
-      else if ( shareIndex === 2 )
-        autoHighlightFlags = {
-          ...autoHighlightFlags, trustedContact2: false
-        }
-
-      AsyncStorage.setItem(
-        'AutoHighlightFlags',
-        JSON.stringify( autoHighlightFlags ),
-      )
-    }
-  }
-  delete trustedContactsService.tc.trustedContacts[ contactName ]
-
-  // remove contact details from trusted derivative account
-  const { trustedContactToDA, derivativeAccounts } = regularAccount.hdWallet
-  const accountNumber = trustedContactToDA[ contactName ]
-  if ( accountNumber ) {
-    delete derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ].contactDetails
-  }
-
-  const tcInfo = trustedContactsInfo
-  if ( tcInfo.length ) {
-    for ( let itr = 0; itr < tcInfo.length; itr++ ) {
-      const trustedContact = tcInfo[ itr ]
-      if ( trustedContact ) {
-        const presentContactName = `${trustedContact.firstName} ${
-          trustedContact.lastName ? trustedContact.lastName : ''
-        }`
-          .toLowerCase()
-          .trim()
-
-        if ( presentContactName === contactName ) {
-          if ( itr < 3 ) {
-            // let found = false;
-            // for (let i = 3; i < tcInfo.length; i++) {
-            //   if (tcInfo[i] && tcInfo[i].name == tcInfo[itr].name) {
-            //     found = true;
-            //     break;
-            //   }
-            // }
-            // push if not already present in TC list
-            // if (!found) tcInfo.push(tcInfo[itr]);
-            tcInfo[ itr ] = null // Guardian position nullified
-          } else tcInfo.splice( itr, 1 )
-          // yield call(
-          //   AsyncStorage.setItem,
-          //   'TrustedContactsInfo',
-          //   JSON.stringify(tcInfo),
-          // );
-          // yield put( updateTrustedContactsInfoLocally( tcInfo ) )
-          break
-        }
-      }
-    }
-  }
-
-  let dbPayload = {
-  }
-  const { SERVICES } = yield select( ( state ) => state.storage.database )
-  const updatedSERVICES = {
-    ...SERVICES,
-    REGULAR_ACCOUNT: JSON.stringify( regularAccount ),
-    TRUSTED_CONTACTS: JSON.stringify( trustedContactsService ),
-  }
-  dbPayload = {
-    SERVICES: updatedSERVICES
-  }
-
-  if ( isGuardian ) {
-    const updatedBackup = {
-      ...DECENTRALIZED_BACKUP,
-      SHARES_TRANSFER_DETAILS: shareTransferDetails,
-    }
-    dbPayload = {
-      ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup
-    }
-  }
-
-  yield call( insertDBWorker, {
-    payload: dbPayload,
-  } )
-
-  if ( walletID && FCMs ) {
-    const recipient = {
-      walletID,
-      FCMs,
-    }
-    const { walletName } = yield select(
-      ( state ) => state.storage.database.WALLET_SETUP,
-    )
-
-    const notification: INotification = {
-      notificationType: notificationType.contact,
-      title: 'Friends and Family notification',
-      body: `F&F removed by ${walletName}`,
-      data: {
+  const streamUpdates: UnecryptedStreamData = {
+    streamId: TrustedContacts.getStreamId( walletId ),
+    secondaryData: null,
+    backupData: null,
+    metaData: {
+      flags:{
+        active: false,
+        newData: false,
+        lastSeen: Date.now(),
       },
-      tag: notificationTag.IMP,
     }
-    sendNotification( recipient, notification )
   }
+
+  const contactInfo: ContactInfo = {
+    contactDetails: contact.contactDetails,
+    channelKey: channelKey,
+  }
+
+  const channelUpdate =  {
+    contactInfo, streamUpdates
+  }
+
+  yield put( syncPermanentChannels( {
+    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+    channelUpdates: [ channelUpdate ]
+  } ) )
+
+  // TODO: Send remove notification
+  // const notification: INotification = {
+  //   notificationType: notificationType.contact,
+  //   title: 'Friends and Family notification',
+  //   body: `F&F removed by ${walletName}`,
+  //   data: {
+  //   },
+  //   tag: notificationTag.IMP,
+  // }
+  // sendNotification( recipient, notification )
+
 }
 
 export const removeTrustedContactWatcher = createWatcher(
@@ -986,12 +868,13 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         }
 
         Object.keys( existingContacts ).forEach( channelKey => {
-          const contact = existingContacts[ channelKey ]
-          channelSyncUpdates.push( {
-            contactDetails: contact.contactDetails,
-            channelKey: channelKey,
-            streamId
-          } )
+          const contact: TrustedContact = existingContacts[ channelKey ]
+          if( contact.isActive )
+            channelSyncUpdates.push( {
+              contactDetails: contact.contactDetails,
+              channelKey: channelKey,
+              streamId
+            } )
         } )
         break
 
@@ -1004,9 +887,9 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         }
 
         Object.keys( existingContacts ).forEach( channelKey => {
-          const contact = existingContacts[ channelKey ]
+          const contact: TrustedContact = existingContacts[ channelKey ]
           const instream = useStreamFromContact( contact, walletId, true )
-          if( !instream )
+          if( contact.isActive && !instream )
             channelSyncUpdates.push( {
               contactDetails: contact.contactDetails,
               channelKey: channelKey,

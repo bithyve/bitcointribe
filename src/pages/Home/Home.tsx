@@ -462,6 +462,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       switch ( scannedData.type ) {
           case QRCodeTypes.CONTACT_REQUEST:
+          case QRCodeTypes.KEEPER_REQUEST:
             const channelKey = scannedData.channelKey
             const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
             navigation.navigate( 'ContactsListForAssociateContact', {
@@ -471,23 +472,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                   flowKind: InitTrustedContactFlowKind.APPROVAL,
                   channelKey,
                   contactsSecondaryChannelKey
-                } )
-                // TODO: navigate post approval
-                navigation.navigate( 'Home' )
-              }
-            } )
-            break
-
-          case QRCodeTypes.KEEPER_REQUEST:
-            const channelKey1 = scannedData.channelKey
-            const contactsSecondaryChannelKey1 = scannedData.secondaryChannelKey
-            navigation.navigate( 'ContactsListForAssociateContact', {
-              postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( {
-                  contact,
-                  flowKind: InitTrustedContactFlowKind.APPROVAL,
-                  channelKey: channelKey1,
-                  contactsSecondaryChannelKey: contactsSecondaryChannelKey1
                 } )
                 // TODO: navigate post approval
                 navigation.navigate( 'Home' )
