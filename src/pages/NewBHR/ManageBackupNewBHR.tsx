@@ -26,11 +26,11 @@ import DeviceInfo from 'react-native-device-info'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { fetchEphemeralChannel } from '../../store/actions/trustedContacts'
+import { fetchEphemeralChannel, PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import { trustedChannelsSetupSync } from '../../store/actions/trustedContacts'
+import { syncPermanentChannels } from '../../store/actions/trustedContacts'
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -72,6 +72,13 @@ import FriendsAndFamilyContactListItemContent from '../../components/friends-and
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import ManageBackupCard from './ManageBackupCard'
+import { TrustedContactRelationTypes, UnecryptedStreamData } from '../../bitcoin/utilities/Interface'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import {
+  REGULAR_ACCOUNT,
+} from '../../common/constants/wallet-service-types'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -83,6 +90,7 @@ interface ManageBackupNewBHRStateTypes {
     reshareVersion: number;
     name: string;
     data: any;
+    channelKey?: string;
   };
   selectedLevelId: number;
   selectedKeeperType: string;
@@ -95,6 +103,7 @@ interface ManageBackupNewBHRStateTypes {
   QrBottomSheetsFlag: boolean;
   showLoader: boolean;
   knowMoreType: string;
+  ImKeeping: any[];
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -114,7 +123,7 @@ interface ManageBackupNewBHRPropsTypes {
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
   metaSharesKeeper: MetaShare[];
-  trustedChannelsSetupSync: any;
+  syncPermanentChannels: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
   deletePrivateData: any;
@@ -145,12 +154,15 @@ interface ManageBackupNewBHRPropsTypes {
   shieldHealth: boolean;
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
+  trustedContactsService: TrustedContactsService;
+  regularAccount: RegularAccount;
 }
 
 class ManageBackupNewBHR extends Component<
   ManageBackupNewBHRPropsTypes,
   ManageBackupNewBHRStateTypes
 > {
+  focusListener: any;
   NoInternetBottomSheet: any;
   unsubscribe: any;
   ErrorBottomSheet: any;
@@ -162,6 +174,7 @@ class ManageBackupNewBHR extends Component<
 
   constructor( props ) {
     super( props )
+    this.focusListener = null
     this.NoInternetBottomSheet = React.createRef()
     this.unsubscribe = null
     this.ErrorBottomSheet
@@ -181,6 +194,7 @@ class ManageBackupNewBHR extends Component<
       data: {
       },
       uuid: '',
+      channelKey: ''
     }
 
     this.state = {
@@ -196,7 +210,8 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader: false,
       QrBottomSheetsFlag: false,
       showLoader: false,
-      knowMoreType: 'manageBackup'
+      knowMoreType: 'manageBackup',
+      ImKeeping: [],
     }
   }
 
@@ -218,27 +233,47 @@ class ManageBackupNewBHR extends Component<
       //   this.props.updateNewFcm()
       // }
     } )
-  };
-
-
-  toggleSwitch = () => this.setState( {
-    isEnabled: !this.state.isEnabled
-  } );
-
-  handleContactSelection(
-    backendContactInfo: unknown,
-    index: number,
-    contactType: string,
-  ) {
-    this.props.navigation.navigate( 'ContactDetails', {
-      contact: backendContactInfo,
-      index,
-      contactsType: contactType,
-
-      // TODO: Figure out what this is
-      shareIndex: backendContactInfo.shareIndex,
+    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+      this.updateAddressBook()
     } )
-  }
+  };
+  updateAddressBook = async () => {
+    const { trustedContactsService, regularAccount } = this.props
+    const contacts = trustedContactsService.tc.trustedContactsV2
+    const { walletId } = regularAccount.hdWallet.getWalletId()
+    const ImKeeping = []
+    const otherContacts = []
+    for( const contact of Object.values( contacts ) ){
+      const { contactDetails, relationType } = contact
+      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
+
+      const fnf = {
+        id: contactDetails.id,
+        contactName: contactDetails.contactName,
+        connectedVia: contactDetails.info,
+        image: contactDetails.image,
+        // usesOTP,
+        // hasXpub,
+        // hasTrustedAddress,
+        relationType,
+        isGuardian: [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
+        isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
+        contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
+        lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
+        isFinalized: stream? true: false,
+      }
+      //  feature/2.0
+
+      if( fnf.isGuardian || fnf.isWard ){
+        if( fnf.isWard ) ImKeeping.push( fnf )
+      } else otherContacts.push( fnf )
+    }
+
+    this.setState( {
+      ImKeeping,
+    }
+    )
+  };
 
   renderContactListItem = ( {
     backendContactInfo,
@@ -259,13 +294,32 @@ class ManageBackupNewBHR extends Component<
           this.handleContactSelection( backendContactInfo, index, contactsType )
         }
         containerStyle={{
-          backgroundColor: 'transparent'
+          backgroundColor: Colors.backgroundColor
         }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
       </ListItem>
     )
   };
+
+  toggleSwitch = () => this.setState( {
+    isEnabled: !this.state.isEnabled
+  } );
+
+  handleContactSelection(
+    backendContactInfo: unknown,
+    index: number,
+    contactType: string,
+  ) {
+    this.props.navigation.navigate( 'ContactDetails', {
+      contact: backendContactInfo,
+      index,
+      contactsType: contactType,
+
+      // TODO: Figure out what this is
+      shareIndex: backendContactInfo.shareIndex,
+    } )
+  }
 
   // modifyLevelData = () => {
   //   const { levelHealth, currentLevel, keeperInfo } = this.props
@@ -302,6 +356,10 @@ class ManageBackupNewBHR extends Component<
       cloudBackupStatus,
       levelHealth
     } = this.props
+
+    if (
+      prevProps.trustedContactsService.tc.trustedContactsV2 != this.props.trustedContactsService.tc.trustedContactsV2
+    ) this.updateAddressBook()
     if (
       prevProps.healthLoading !== this.props.healthLoading ||
       prevProps.cloudBackupStatus !==
@@ -333,8 +391,8 @@ class ManageBackupNewBHR extends Component<
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
       if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-        levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
       ) {
         this.loaderBottomSheet.snapTo( 1 )
       }
@@ -345,14 +403,17 @@ class ManageBackupNewBHR extends Component<
       ) {
         this.props.setCloudData( )
       } else if(
-        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' )
+        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
+          levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+          levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 )
       ) {
         this.props.deletePrivateData()
       }
       else if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 2 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 2 ].levelInfo[ 3 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 4 ].status == 'accessible' &&
-      levelHealth[ 2 ].levelInfo[ 5 ].status == 'accessible' )
+        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 2 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 3 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
       ) {
         this.props.updateCloudData()
       }
@@ -367,11 +428,13 @@ class ManageBackupNewBHR extends Component<
             -1
         ) > -1
       ) {
-        this.props.trustedChannelsSetupSync()
+        this.props.syncPermanentChannels( {
+          permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+        } )
       }
     }
 
-    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].status == 'notAccessible' &&  levelHealth[ 1 ].levelInfo[ 2 ].status == 'accessible' && levelHealth[ 1 ].levelInfo[ 3 ].status == 'accessible' && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       this.props.updateCloudData()
     }
 
@@ -385,10 +448,10 @@ class ManageBackupNewBHR extends Component<
       const obj = {
         id: 2,
         selectedKeeper: {
-          shareType: 'device',
-          name: 'Secondary Device1',
+          shareType: '',
+          name: '',
           reshareVersion: 0,
-          status: 'notAccessible',
+          status: 'notSetup',
           updatedAt: 0,
           shareId: this.props.s3Service.levelhealth.metaSharesKeeper[ 1 ]
             .shareId,
@@ -399,9 +462,13 @@ class ManageBackupNewBHR extends Component<
       }
       this.setState( {
         selectedKeeper: obj.selectedKeeper,
+        showLoader: false,
+        selectedLevelId: 2
       } )
-      this.goToHistory( obj )
-      this.loaderBottomSheet.snapTo( 0 )
+      this.props.setIsKeeperTypeBottomSheetOpen( false );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      // this.goToHistory( obj )
+      // this.loaderBottomSheet.snapTo( 0 )
     }
     if (
       JSON.stringify( prevProps.metaSharesKeeper ) !==
@@ -453,6 +520,11 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.navigationObj !== this.props.navigationObj ){
+      console.log( 'prevProps.navigationObj' )
+      this.setState( {
+        selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
+      } );
+      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
       this.goToHistory( this.props.navigationObj )
     }
 
@@ -473,6 +545,10 @@ class ManageBackupNewBHR extends Component<
       } )
     }
   };
+
+  componentWillUnmount() {
+    this.focusListener.remove()
+  }
 
   goToHistory = ( value ) => {
     const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
@@ -522,7 +598,7 @@ class ManageBackupNewBHR extends Component<
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
-        isPrimaryKeeper,
+        isPrimaryKeeper: isPrimaryKeeper,
         isChangeKeeperAllow,
         index: index > -1 ? index : 0,
       } )
@@ -693,7 +769,7 @@ class ManageBackupNewBHR extends Component<
     } else {
       this.setState( {
         showLoader: true,
-        selectedKeeper: value.keeper1
+        selectedKeeper: keeperNumber == 1 ? value.keeper1 : value.keeper2
       } )
       requestAnimationFrame( () => {
         this.onPressKeeperButton( value, keeperNumber )
@@ -708,6 +784,9 @@ class ManageBackupNewBHR extends Component<
       selectedKeeper,
       isEnabled,
       contactsKeptByUser,
+      ImKeeping,
+      selectedKeeperName,
+      selectedKeeperType
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -970,8 +1049,9 @@ Wallet Backup
                 <View style={{
                   height: 'auto'
                 }}>
-                  {
-                    contactsKeptByUser.map( ( item, index ) => {
+                  {ImKeeping.length > 0 &&
+                  <>
+                    {ImKeeping.map( ( item, index ) => {
                       return this.renderContactListItem( {
                         backendContactInfo: item,
                         contactDescription: makeContactRecipientDescription(
@@ -981,9 +1061,9 @@ Wallet Backup
                         index,
                         contactsType: 'I\'m Keeper of',
                       } )
-                    } ) || <View style={{
-                      height: wp( '22%' ) + 30
-                    }} />}
+                    } )}
+                  </>
+                  }
                 </View>
               </View>
             </View>
@@ -1004,33 +1084,38 @@ Wallet Backup
                 headerText={'Backup Recovery Key'}
                 subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
                 onPressSetup={async ( type, name ) => {
-                  this.setState( {
-                    selectedKeeperType: type,
-                    selectedKeeperName: name,
-                  } )
-                  if (
-                    selectedLevelId == 3 &&
+                  try{
+                    this.setState( {
+                      selectedKeeperType: type,
+                      selectedKeeperName: name,
+                    } )
+                    if (
+                      selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2 &&
                   this.props.metaSharesKeeper.length != 5
-                  ) {
-                    this.props.generateMetaShare( selectedLevelId )
-                  } else if( selectedLevelId == 3 ) {
-                    this.sendApprovalRequestToPK( )
-                  } else {
-                    const obj = {
-                      id: selectedLevelId,
-                      selectedKeeper: {
-                        ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-                      },
-                      isSetup: true,
+                    ) {
+                      this.props.generateMetaShare( selectedLevelId )
+                    } else if( selectedLevelId == 3 ) {
+                      this.sendApprovalRequestToPK( )
+                    } else {
+                      const obj = {
+                        id: selectedLevelId,
+                        selectedKeeper: {
+                          ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name: selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+                          shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                        },
+                        isSetup: true,
+                      }
+                      this.goToHistory( obj )
+                      this.props.setIsKeeperTypeBottomSheetOpen( false );
+                      /** other than ThirdLevel first position */
+                      ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
                     }
-                    this.goToHistory( obj )
-                    this.props.setIsKeeperTypeBottomSheetOpen( false );
-                    /** other than ThirdLevel first position */
-                    ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+                  } catch( err ){
+                    console.log( 'err', err )
+
                   }
                 }}
                 onPressBack={() =>{
@@ -1187,6 +1272,8 @@ const mapStateToProps = ( state ) => {
     levelData: idx( state, ( _ ) => _.health.levelData ),
     shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
+    trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
+    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
   }
 }
 
@@ -1196,7 +1283,7 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
-    trustedChannelsSetupSync,
+    syncPermanentChannels,
     setCloudData,
     deletePrivateData,
     updateKeeperInfoToTrustedChannel,

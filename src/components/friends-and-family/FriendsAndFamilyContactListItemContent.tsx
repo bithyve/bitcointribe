@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
@@ -28,35 +28,6 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
   const secondNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' ).slice( 1 ).join( ' ' )
   }, [ contact ] )
-
-
-  const hasExpirationBadge = useMemo( () => {
-    // TODO: Establish more clarity about what this logic is supposed to mean.
-    return (
-      (
-        contact.hasTrustedChannelWithUser == false
-        || contact.trustKind != ContactTrustKind.USER_IS_KEEPING
-      ) &&
-      (
-        contact.hasXPub ||
-        contact.hasTrustedAddress
-      ) == false
-    )
-  }, [ contact ] )
-
-  const secondsUntilTrustedContactRequestExpiration = useMemo( () => {
-    if ( hasExpirationBadge == false ) { return }
-
-    return (
-      ( HexaConfig.TC_REQUEST_EXPIRY / 1000 ) -
-      ( ( Date.now() - contact.initiatedAt ) / 1000 )
-    )
-  }, [ hasExpirationBadge ] )
-
-  const isTrustedContactRequestExpired = useMemo( () => {
-    return secondsUntilTrustedContactRequestExpiration <= 0
-  }, [ secondsUntilTrustedContactRequestExpiration ] )
-
 
   return (
     <>
@@ -116,57 +87,12 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
         </ListItem.Subtitle> */}
 
       </ListItem.Content>
-
-      {hasExpirationBadge && (
-        <ListItem.Content style={{
-          flex: 0, marginRight: 6
-        }}>
-          {isTrustedContactRequestExpired && (
-            <View
-              style={styles.expirationBadgeContainer}
-            >
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue( 10 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Expired
-              </Text>
-            </View>
-          ) || (
-            <CountDown
-              size={12}
-              until={secondsUntilTrustedContactRequestExpiration}
-              digitStyle={{
-                backgroundColor: '#FFF',
-                borderWidth: 0,
-                borderColor: '#FFF',
-                margin: -10,
-              }}
-              digitTxtStyle={{
-                color: Colors.textColorGrey,
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular,
-              }}
-              separatorStyle={{
-                color: Colors.textColorGrey
-              }}
-              timeToShow={[ 'H', 'M', 'S' ]}
-              timeLabels={{
-                h: null, m: null, s: null
-              }}
-              showSeparator
-            />
-          )}
-        </ListItem.Content>
-      )}
-
       <Image
-        style={{width: 15, height: 15}}
-        source={require('../../assets/images/icons/own-node.png')}
-        />
+        style={{
+          width: 15, height: 15
+        }}
+        source={require( '../../assets/images/icons/own-node.png' )}
+      />
     </>
   )
 }

@@ -894,6 +894,7 @@ export default class TrustedContacts {
     const unencryptedInstream: UnecryptedStreamData = {
       streamId: inStream.streamId,
       primaryData: this.decryptData( channelKey, inStream.primaryEncryptedData ).data,
+      metaData: inStream.metaData,
     }
     contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
     contact.permanentChannel[ inStream.streamId ] = inStream
@@ -1073,7 +1074,9 @@ export default class TrustedContacts {
         : null, // legacy HC
       channelsToUpdate, // LS update
       toUpdate, // share under-custody update
-      ...currencyCode && { currencyCode },
+      ...currencyCode && {
+        currencyCode
+      },
     } )
 
     const {

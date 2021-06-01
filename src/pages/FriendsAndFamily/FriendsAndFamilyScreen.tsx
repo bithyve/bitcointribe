@@ -24,8 +24,9 @@ import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   clearTrustedContactsCache,
-  syncExistingPermanentChannels,
+  syncPermanentChannels,
   removeTrustedContact,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
@@ -60,13 +61,14 @@ import Header from '../../navigation/stacks/Header'
 // import { SafeAreaView } from 'react-native-safe-area-context'
 import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
 import ModalContainer from '../../components/home/ModalContainer'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
-  syncExistingPermanentChannels: any;
+  syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
   removeTrustedContact: any;
   clearTrustedContactsCache: any;
@@ -119,12 +121,10 @@ class FriendsAndFamilyScreen extends PureComponent<
   componentDidMount() {
     console.log( '>>>>>>>>>. componentDidMount F&F >>>>>>>>' )
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.props.syncExistingPermanentChannels( {
-        inProgressChannelsOnly: true
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
       } )
       this.updateAddressBook()
-      console.log( 'updateAddressBook' )
-
     } )
     this.props.clearTrustedContactsCache()
     this.props.navigation.setParams( {
@@ -171,77 +171,11 @@ class FriendsAndFamilyScreen extends PureComponent<
     const { walletId } = regularAccount.hdWallet.getWalletId()
 
     const myKeepers = []
-    //  HEAD
-    //     const contactsKeptByUser = []
-    //     const otherTrustedContacts = []
-    //     // console.log( 'trustedContactsInfo', trustedContactsInfo )
-    //     if ( trustedContactsInfo ) {
-    //       if ( trustedContactsInfo.length ) {
-    //         const trustedContacts = []
-    //         for ( let index = 0; index < trustedContactsInfo.length; index++ ) {
-    //           const contactInfo = trustedContactsInfo[ index ]
-    //           if ( !contactInfo ) continue
-    //           const contactName = `${contactInfo.firstName} ${
-    //             contactInfo.lastName ? contactInfo.lastName : ''
-    //           }`
-    //           let connectedVia
-    //           if ( contactInfo.phoneNumbers && contactInfo.phoneNumbers.length ) {
-    //             connectedVia = contactInfo.phoneNumbers[ 0 ].number
-    //           } else if ( contactInfo.emails && contactInfo.emails.length ) {
-    //             connectedVia = contactInfo.emails[ 0 ].email
-    //           }
-
-    //           let hasXpub = false
-    //           const {
-    //             trustedContactToDA,
-    //             derivativeAccounts,
-    //           } = regularAccount.hdWallet
-    //           const accountNumber =
-    //             trustedContactToDA[ contactName.toLowerCase().trim() ]
-    //           if ( accountNumber ) {
-    //             const trustedContact: TrustedContactDerivativeAccountElements =
-    //               derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ]
-    //             if (
-    //               trustedContact.contactDetails &&
-    //               trustedContact.contactDetails.xpub
-    //             ) {
-    //               hasXpub = true
-    //             }
-    //           }
-
-    //           const {
-    //             isWard,
-    //             trustedAddress,
-    //             contactsWalletName,
-    //             otp,
-    //             lastSeen,
-    //           } = trustedContactsService.tc.trustedContacts[
-    //             contactName.toLowerCase().trim()
-    //           ]
-
-    //           let usesOTP = false
-    //           if ( !connectedVia && otp ) {
-    //             usesOTP = true
-    //             connectedVia = otp
-    //           }
-
-    //           const hasTrustedAddress = !!trustedAddress
-
-    //           const isGuardian = index < 3 ? true : false
-    //           let shareIndex
-    //           if ( isGuardian ) {
-    //             shareIndex = index
-    //           }
-    // =======
     const ImKeeping = []
     const otherContacts = []
-    console.log( '>>>>>>>>' )
-
     for( const contact of Object.values( contacts ) ){
-      console.log( '>>>>>>>>>inside loop' )
-
-      const { contactDetails, relationType, unencryptedPermanentChannel } = contact
-      const stream: UnecryptedStreamData = useStreamFromPermanentChannel( walletId, unencryptedPermanentChannel, true )
+      const { contactDetails, relationType } = contact
+      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
       const fnf = {
         id: contactDetails.id,
@@ -256,6 +190,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
         contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
         lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
+        isFinalized: stream? true: false,
       }
       //  feature/2.0
 
@@ -426,9 +361,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       contact: backendContactInfo,
       index,
       contactsType: contactType,
-
-      // TODO: Figure out what this is
-      shareIndex: backendContactInfo.shareIndex,
     } )
   }
 
@@ -547,7 +479,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { syncExistingPermanentChannels, navigation } = this.props
+    const { syncPermanentChannels, navigation } = this.props
     const { isLoadContacts, selectedContact } = this.state
     const {
       myKeepers,
@@ -570,40 +502,14 @@ class FriendsAndFamilyScreen extends PureComponent<
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <Header />
-        {/* <View
-          style={{
-            flex: 3.8,
-            paddingTop:
-                Platform.OS == 'ios' && DeviceInfo.hasNotch
-                  ? hp( '5%' )
-                  : 0,
-          }}
-        >
-          <HomeHeader
-            onPressNotifications={this.onPressNotifications}
-            navigateToQRScreen={this.navigateToQRScreen}
-            notificationData={notificationData}
-            walletName={walletName}
-            getCurrencyImageByRegion={getCurrencyImageByRegion}
-            netBalance={netBalance}
-            exchangeRates={exchangeRates}
-            CurrencyCode={currencyCode}
-            navigation={navigation}
-            currentLevel={currentLevel}
-            //  onSwitchToggle={this.onSwitchToggle}
-            // setCurrencyToggleValue={this.setCurrencyToggleValue}
-            // navigation={this.props.navigation}
-            // overallHealth={overallHealth}
-          />
-        </View> */}
         <View style={styles.accountCardsSectionContainer}>
           <ScrollView
             refreshControl={
               <RefreshControl
                 refreshing={showLoader}
                 onRefresh={() => {
-                  syncExistingPermanentChannels( {
-                    inProgressChannelsOnly: true
+                  syncPermanentChannels( {
+                    permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
                   } )
                 }}
               />
@@ -861,8 +767,6 @@ class FriendsAndFamilyScreen extends PureComponent<
               } )
             }}
             onPressBack={() => {
-              console.log( 'onPressBackonPressBackonPressBackonPressBackonPressBackonPressBack' )
-
               // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
               this.setState( {
                 showModal: false,
@@ -932,7 +836,7 @@ const mapStateToProps = ( state ) => {
 }
 
 export default connect( mapStateToProps, {
-  syncExistingPermanentChannels,
+  syncPermanentChannels,
   removeTrustedContact,
   clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )

@@ -31,16 +31,27 @@ import {
   emptyShareTransferDetailsForContactChange,
   downloadSmShareForApproval,
   keeperProcessStatus,
+  updatedKeeperInfo,
+  updateMSharesHealth,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
+  KeeperInfoInterface,
   LevelHealthInterface,
+  MetaShare,
+  TrustedContact,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
 import QRModal from '../Accounts/QRModal'
 import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
+import { v4 as uuid } from 'uuid'
+import SSS from '../../bitcoin/utilities/sss/SSS'
+import config from '../../bitcoin/HexaConfig'
+import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -102,7 +113,7 @@ const PersonalCopyHistory = ( props ) => {
     props.navigation.state.params.selectedKeeper
   )
   const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+    props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
@@ -118,13 +129,21 @@ const PersonalCopyHistory = ( props ) => {
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
-
+  const MetaShares: MetaShare[] = useSelector(
+    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+  )
+  const trustedContacts: TrustedContactsService = useSelector(
+    ( state ) => state.trustedContacts.service,
+  )
+  const [ Contact, setContact ]:[any, any] = useState( {
+  } )
+  const index = 5
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
-      props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ? false : true
+      props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
     )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
@@ -136,6 +155,14 @@ const PersonalCopyHistory = ( props ) => {
     props.navigation.getParam( 'selectedKeeper' ),
     props.navigation.state.params
   ] )
+
+  useEffect( ()=>{
+    const Contact = selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : {
+      id: uuid(),
+      name: 'Personal Copy'
+    }
+    setContact( Contact )
+  }, [ ] )
 
   useEffect( ()=>  {
     if( Platform.OS === 'ios' ) {
@@ -171,9 +198,7 @@ const PersonalCopyHistory = ( props ) => {
   // };
 
   const generatePDF = async() => {
-    console.log( 'isChange', isChange )
-    console.log( 'useEffect pdfInfo', pdfInfo )
-    dispatch( getPDFData( selectedKeeper.shareId, isChange ) )
+    createGuardian( Contact )
     const shareHistory = JSON.parse(
       await AsyncStorage.getItem( 'shareHistory' )
     )
@@ -215,7 +240,7 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
-      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+      if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
         ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
       }
     }
@@ -268,7 +293,17 @@ const PersonalCopyHistory = ( props ) => {
         onPressBack={() => {
           ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
         }}
-        onPressShare={() => {}}
+        onPressShare={() => {
+          const shareObj = {
+            walletId: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.walletId,
+            shareId: selectedKeeper.shareId,
+            reshareVersion: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.reshareVersion,
+            shareType: 'pdf',
+            status: 'notAccessible',
+            name: 'Personal Copy'
+          }
+          dispatch( updateMSharesHealth( shareObj, false ) )
+        }}
         onPressConfirm={() => {
           try {
             dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) );
@@ -418,6 +453,56 @@ const PersonalCopyHistory = ( props ) => {
     )
   }, [] )
 
+  const createGuardian = useCallback(
+    async ( Contact ) => {
+      if( selectedKeeper.channelKey ) return
+      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+
+      const obj: KeeperInfoInterface = {
+        shareId: selectedKeeper.shareId,
+        name: Contact && Contact.name ? Contact.name : '',
+        type: 'pdf',
+        scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
+        currentLevel: currentLevel,
+        createdAt: moment( new Date() ).valueOf(),
+        sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
+        data: {
+          ...Contact, index: 5
+        },
+        channelKey
+      }
+      dispatch( updatedKeeperInfo( obj ) )
+      dispatch( initializeTrustedContact( {
+        contact: Contact,
+        flowKind: InitTrustedContactFlowKind.SETUP,
+        isGuardian: true,
+        channelKey,
+        shareId: selectedKeeper.shareId
+      } ) )
+    },
+    [ trustedContacts ],
+  )
+
+  useEffect( () => {
+    if( !Contact ) return
+
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let channelKey: string
+
+    if( contacts )
+      for( const ck of Object.keys( contacts ) ){
+        if ( contacts[ ck ].contactDetails.id === Contact.id ){
+          channelKey = ck
+          break
+        }
+      }
+
+    if ( channelKey ) {
+      dispatch( getPDFData( selectedKeeper.shareId, Contact, channelKey, isChange ) )
+      const appVersion = DeviceInfo.getVersion()
+      console.log( 'setSecondaryQR Contact', Contact )
+    }
+  }, [ Contact, trustedContacts ] )
 
   const renderStoragePermissionModalHeader = useCallback( () => {
     return (
