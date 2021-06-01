@@ -10,12 +10,12 @@ import {
   ContactDetails,
   ContactInfo,
 } from '../../bitcoin/utilities/Interface'
-import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
+export const REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
@@ -89,6 +89,15 @@ export const initializeTrustedContact = (
       channelKey,
       contactsSecondaryChannelKey,
       shareId,
+    },
+  }
+}
+
+export const rejectTrustedContact = ( { channelKey } : {channelKey: string} ) => {
+  return {
+    type: REJECT_TRUSTED_CONTACT,
+    payload: {
+      channelKey
     },
   }
 }
@@ -181,7 +190,7 @@ export const syncPermanentChannels = (
     payload: {
       permanentChannelsSyncKind,
       channelUpdates,
-      updatedSERVICES
+      updatedSERVICES,
     },
   }
 }

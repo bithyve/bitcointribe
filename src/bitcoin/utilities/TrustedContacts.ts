@@ -914,9 +914,9 @@ export default class TrustedContacts {
   public syncPermanentChannels = async (
     channelSyncDetails:
     {
-    contactDetails: ContactDetails,
     channelKey: string,
     streamId: string,
+    contactDetails?: ContactDetails,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     contactsSecondaryChannelKey?: string
@@ -929,10 +929,12 @@ export default class TrustedContacts {
       }
       const channelOutstreams = {
       }
-      for ( const { contactDetails, channelKey, streamId, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
+      for ( const { channelKey, streamId, contactDetails, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
         let contact: TrustedContact = this.trustedContactsV2[ channelKey ]
+
         if ( !contact ) {
         // initialize contact
+          if( !contactDetails ) throw new Error( 'Init failed: contact details missing' )
           const newContact: TrustedContact = {
             contactDetails,
             isActive: true,

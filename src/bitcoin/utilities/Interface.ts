@@ -478,7 +478,7 @@ export interface ContactDetails {
 }
 
 export interface ContactInfo  {
-  contactDetails: ContactDetails,
+  contactDetails?: ContactDetails,
   isKeeper?: boolean,
   channelKey?: string,
   secondaryChannelKey?: string

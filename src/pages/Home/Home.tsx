@@ -52,6 +52,7 @@ import { connect } from 'react-redux'
 import {
   approveTrustedContact,
   initializeTrustedContact,
+  rejectTrustedContact,
   fetchEphemeralChannel,
   fetchTrustedChannel,
   postRecoveryChannelSync,
@@ -224,6 +225,7 @@ interface HomePropsTypes {
   downloadMShare: any;
   approveTrustedContact: any;
   initializeTrustedContact: any;
+  rejectTrustedContact: any;
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
@@ -1496,6 +1498,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onTrustedContactRejected = () => {
     this.closeBottomSheet()
+    const { trustedContactRequest } = this.state
+    this.props.rejectTrustedContact( {
+      channelKey: trustedContactRequest.channelKey,
+    } )
   };
 
   onPhoneNumberChange = () => {};
@@ -2633,6 +2639,7 @@ export default withNavigationFocus(
     downloadMShare,
     approveTrustedContact,
     initializeTrustedContact,
+    rejectTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
     uploadSecondaryShareForPK,
