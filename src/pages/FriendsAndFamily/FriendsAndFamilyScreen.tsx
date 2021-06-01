@@ -164,6 +164,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
       const fnf = {
         id: contactDetails.id,
+        isActive: contact.isActive,
         channelKey,
         contactName: contactDetails.contactName,
         connectedVia: contactDetails.info,
@@ -179,10 +180,15 @@ class FriendsAndFamilyScreen extends PureComponent<
         isFinalized: stream? true: false,
       }
 
-      if( fnf.isGuardian || fnf.isWard ){
-        if( fnf.isGuardian ) myKeepers.push( fnf )
-        if( fnf.isWard ) ImKeeping.push( fnf )
-      } else otherContacts.push( fnf )
+      if( fnf.isActive ){
+        if( fnf.isGuardian || fnf.isWard ){
+          if( fnf.isGuardian ) myKeepers.push( fnf )
+          if( fnf.isWard ) ImKeeping.push( fnf )
+        } else otherContacts.push( fnf )
+      } else {
+        // TODO: inject in expired contacts list
+      }
+
     }
 
     this.setState( {
