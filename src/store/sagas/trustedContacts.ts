@@ -916,7 +916,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       }
     } )
 
-    if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVAL ){
+    if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
       const contact: TrustedContact = trustedContacts.tc.trustedContactsV2[ contactIdentifier ]
       const instream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
       const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
@@ -940,7 +940,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       err: res.err
     } )
 
-    if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVAL )
+    if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT )
       Toast( 'Failed to add Keeper/Contact' )
 
 
