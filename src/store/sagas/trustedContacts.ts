@@ -154,7 +154,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
     walletName,
-    relationType: contactInfo.isGuardian ? TrustedContactRelationTypes.KEEPER : TrustedContactRelationTypes.CONTACT,
+    relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : TrustedContactRelationTypes.CONTACT,
     FCM,
     paymentAddresses
   }
@@ -162,7 +162,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   let secondaryData: SecondaryStreamData = null
   let backupData: BackupStreamData = null
   const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
-  if( contactInfo.isGuardian && channelAssets ){
+  if( contactInfo.isKeeper && channelAssets ){
     const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard, bhXpub } = channelAssets
     backupData = {
       primaryMnemonicShard,
@@ -275,7 +275,7 @@ export const approveTrustedContactWatcher = createWatcher(
 )
 
 
-function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isGuardian?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
+function* initializeTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
   const accountShells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells,
   )
@@ -288,7 +288,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const secureAccount: SecureAccount = yield select(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
   )
-  const { contact, flowKind, isGuardian, channelKey, contactsSecondaryChannelKey, shareId } = payload
+  const { contact, flowKind, isKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
   let info = ''
   if ( contact && contact.phoneNumbers && contact.phoneNumbers.length ) {
     const phoneNumber = contact.phoneNumbers[ 0 ].number
@@ -313,9 +313,9 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactsSecondaryChannelKey
   }
 
-  if( isGuardian ) {
+  if( isKeeper ) {
     // TODO: prepare channel assets and plug into contactInfo obj
-    contactInfo.isGuardian = isGuardian
+    contactInfo.isKeeper = isKeeper
     contactInfo.channelAssets = {
       primaryMnemonicShard:
       {
@@ -942,7 +942,6 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
 
     if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT )
       Toast( 'Failed to add Keeper/Contact' )
-
 
     if( [ PermanentChannelsSyncKind.EXISTING_CONTACTS,  PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS ].includes( permanentChannelsSyncKind ) )
       yield put ( existingPermanentChannelsSynched( {

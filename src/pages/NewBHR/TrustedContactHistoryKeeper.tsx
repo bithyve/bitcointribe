@@ -749,7 +749,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       dispatch( initializeTrustedContact( {
         contact: Contact,
         flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-        isGuardian: true,
+        isKeeper: true,
         channelKey,
         shareId: selectedKeeper.shareId
       } ) )

@@ -479,7 +479,7 @@ export interface ContactDetails {
 
 export interface ContactInfo  {
   contactDetails: ContactDetails,
-  isGuardian?: boolean,
+  isKeeper?: boolean,
   channelKey?: string,
   secondaryChannelKey?: string
   contactsSecondaryChannelKey?: string,
