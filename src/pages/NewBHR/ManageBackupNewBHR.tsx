@@ -269,21 +269,6 @@ class ManageBackupNewBHR extends Component<
       }
     }
 
-    if( prevProps.levelHealth != this.props.levelHealth ){
-      this.props.autoShareToLevel2Keepers( )
-      if (
-        this.props.levelHealth.findIndex(
-          ( value ) =>
-            value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
-            -1
-        ) > -1
-      ) {
-        this.props.syncPermanentChannels( {
-          permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-        } )
-      }
-    }
-
     if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       this.props.updateCloudData()
     }
@@ -477,6 +462,17 @@ class ManageBackupNewBHR extends Component<
     this.props.modifyLevelData( )
     // this.props.checkMSharesHealth()
     this.props.setHealthStatus()
+    if (
+      this.props.levelHealth.findIndex(
+        ( value ) =>
+          value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
+          -1
+      ) > -1
+    ) {
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+      } )
+    }
   };
 
   sendApprovalRequestToPK = ( ) => {

@@ -158,12 +158,13 @@ class FriendsAndFamilyScreen extends PureComponent<
     const myKeepers = []
     const ImKeeping = []
     const otherContacts = []
-
+    let i = 0
     for( const contact of Object.values( contacts ) ){
       const { contactDetails, relationType } = contact
       const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
       const fnf = {
+        channelKey: Object.keys( contacts )[ i ],
         id: contactDetails.id,
         contactName: contactDetails.contactName,
         connectedVia: contactDetails.info,
@@ -183,6 +184,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         if( fnf.isGuardian ) myKeepers.push( fnf )
         if( fnf.isWard ) ImKeeping.push( fnf )
       } else otherContacts.push( fnf )
+      i++
     }
 
     this.setState( {
@@ -499,7 +501,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( ImKeeping.length && ImKeeping.filter( ( item, index ) => {
+                {( ImKeeping.length && ImKeeping.map( ( item, index ) => {
                   return this.renderContactListItem( {
                     backendContactInfo: item,
                     contactDescription: makeContactRecipientDescription(

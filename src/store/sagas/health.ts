@@ -109,6 +109,7 @@ import {
   MetaShare,
   notificationTag,
   notificationType,
+  QRCodeTypes,
   ShareUploadables,
   StreamData,
   TrustedContact,
@@ -2611,6 +2612,7 @@ function* getPDFDataWorker( { payload } ) {
     const trustedContacts: TrustedContactsService = yield select(
       ( state ) => state.trustedContacts.service
     )
+    const appVersion = DeviceInfo.getVersion()
     const pdfInfo: {
       filePath: string;
       shareId: string;
@@ -2634,19 +2636,25 @@ function* getPDFDataWorker( { payload } ) {
       }
     if( channelKeyFromCH && channelKeyFromCH == channelKey && currentContact ) {
       const recoveryData = {
+        type: QRCodeTypes.RECOVERY_REQUEST,
+        walletName: WALLET_SETUP.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey: channelKey,
         channelKey2: currentContact.secondaryChannelKey,
+        version: appVersion,
         encryptedKey: LevelHealth.encryptWithAnswer(
           shareId,
           WALLET_SETUP.security.answer
         ).encryptedString,
       }
       const secondaryData = {
+        type: QRCodeTypes.RECOVERY_REQUEST,
+        walletName: WALLET_SETUP.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey2: currentContact.secondaryChannelKey,
+        version: appVersion,
       }
 
       const qrData = [
