@@ -5,7 +5,6 @@ import BottomSheet from '@gorhom/bottom-sheet'
 export interface Props {
   bottomSheetRef: React.RefObject<BottomSheet>;
   trustedContactRequest: any;
-  recoveryRequest: any;
   onPressAccept: ( key: any ) => void;
   onPressReject: ( key: any ) => void;
   onPhoneNumberChange: ( key: any ) => void;
@@ -14,15 +13,12 @@ export interface Props {
 const TrustedContactRequestContent: React.FC<Props> = ( {
   bottomSheetRef,
   trustedContactRequest,
-  recoveryRequest,
   onPressAccept,
   onPressReject,
   onPhoneNumberChange,
 }: Props ) => {
-  if ( !trustedContactRequest && !recoveryRequest ) return
-
-  const { requester, hintType, hint, isGuardian, isQR, isRecovery } =
-    trustedContactRequest || recoveryRequest
+  if ( !trustedContactRequest ) return
+  const { walletName, isKeeper, isQR, hintType, hint } = trustedContactRequest
 
   return (
     <TrustedContactRequest
@@ -30,15 +26,13 @@ const TrustedContactRequestContent: React.FC<Props> = ( {
       inputType={
         hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
       }
-      isGuardian={isGuardian}
-      isRecovery={isRecovery}
+      isGuardian={isKeeper}
+      isRecovery={false}
       hint={hint}
       bottomSheetRef={bottomSheetRef}
-      trustedContactName={requester}
-      onPressAccept={( key ) => onPressAccept( key )}
-      onPressReject={( key ) => {
-        onPressReject( key )
-      }}
+      trustedContactName={walletName}
+      onPressAccept={onPressAccept}
+      onPressReject={onPressReject}
       onPhoneNumberChange={( text ) => {
         onPhoneNumberChange( text )
       }}

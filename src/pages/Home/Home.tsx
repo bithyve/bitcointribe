@@ -463,20 +463,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       switch ( scannedData.type ) {
           case QRCodeTypes.CONTACT_REQUEST:
           case QRCodeTypes.KEEPER_REQUEST:
-            const channelKey = scannedData.channelKey
-            const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
-            navigation.navigate( 'ContactsListForAssociateContact', {
-              postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( {
-                  contact,
-                  flowKind: InitTrustedContactFlowKind.APPROVAL,
-                  channelKey,
-                  contactsSecondaryChannelKey
-                } )
-                // TODO: navigate post approval
-                navigation.navigate( 'Home' )
-              }
-            } )
+            const trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type
+            }
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
             break
 
           case 'trustedGuardian':
@@ -1472,7 +1477,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onTrustedContactRequestAccepted = ( key ) => {
     this.closeBottomSheet()
-    this.processDLRequest( key, false )
+    const { navigation } = this.props
+    const { trustedContactRequest } = this.state
+
+    navigation.navigate( 'ContactsListForAssociateContact', {
+      postAssociation: ( contact ) => {
+        this.props.initializeTrustedContact( {
+          contact,
+          flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+          channelKey: trustedContactRequest.channelKey,
+          contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+        } )
+        // TODO: navigate post approval (from within saga)
+        navigation.navigate( 'Home' )
+      }
+    } )
   };
 
   onTrustedContactRejected = () => {
@@ -2321,12 +2340,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest, recoveryRequest } = this.state
+          const { trustedContactRequest } = this.state
 
           return (
             <TrustedContactRequestContent
               trustedContactRequest={trustedContactRequest}
-              recoveryRequest={recoveryRequest}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
               onPhoneNumberChange={this.onPhoneNumberChange}
