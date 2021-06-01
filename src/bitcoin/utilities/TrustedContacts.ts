@@ -975,11 +975,11 @@ export default class TrustedContacts {
 
         const { channelInstreams } = res.data
         for( const permanentChannelAddress of Object.keys( channelInstreams ) ){
-          const { updated, isChannelActive, instream } = channelInstreams[ permanentChannelAddress ]
+          const { updated, isActive, instream } = channelInstreams[ permanentChannelAddress ]
           const { contact, channelKey } = channelMapping[ permanentChannelAddress ]
 
           if ( !updated ) console.log( 'Failed to update permanent channel: ', permanentChannelAddress )
-          if( typeof isChannelActive === 'boolean' ) ( contact as TrustedContact ).isActive = isChannelActive
+          if( typeof isActive === 'boolean' ) ( contact as TrustedContact ).isActive = isActive
           if( instream ) this.cacheInstream( contact, channelKey, instream )
         }
 
