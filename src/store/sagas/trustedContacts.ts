@@ -16,9 +16,6 @@ import { createWatcher } from '../utils/utilities'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
   TrustedContactDerivativeAccountElements,
-  INotification,
-  notificationType,
-  notificationTag,
   UnecryptedStreamData,
   PrimaryStreamData,
   TrustedContactRelationTypes,
@@ -44,7 +41,6 @@ import {
 } from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import RelayServices from '../../bitcoin/services/RelayService'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import Toast from '../../components/Toast'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -684,51 +680,3 @@ export const walletCheckInWatcher = createWatcher(
   walletCheckInWorker,
   WALLET_CHECK_IN,
 )
-
-// function* sendVersionUpdateNotificationWorker( { payload }: {payload: {version: string}} ) {
-//   const trustedContacts: TrustedContactsService = yield select(
-//     ( state ) => state.trustedContacts.service,
-//   )
-//   const { walletName } = yield select(
-//     ( state ) => state.storage.database.WALLET_SETUP,
-//   )
-
-//   const contacts: Contacts = trustedContacts.tc.trustedContacts
-//   const notifReceivers = []
-//   Object.keys( contacts ).forEach( ( contactName ) => {
-//     const contact = contacts[ contactName ]
-//     if ( contact.walletID && contact.FCMs ){
-//       notifReceivers.push( {
-//         walletId: contact.walletID,
-//         FCMs: contact.FCMs,
-//       } )
-//     }
-//   } )
-
-//   if( notifReceivers.length ){
-//     const notification: INotification = {
-//       notificationType: notificationType.contact,
-//       title: 'Backup Secured',
-//       body: `Your backup (Recovery Key) has been secured with ${walletName} as they are on the latest version now`,
-//       data: {
-//       },
-//       tag: notificationTag.IMP,
-//     }
-
-//     yield call(
-//       RelayServices.sendNotifications,
-//       notifReceivers,
-//       notification,
-//     )
-
-//     const trustedData = {
-//       version: payload.version
-//     }
-//     yield put( multiUpdateTrustedChannels( trustedData ) )
-//   }
-// }
-
-// export const sendVersionUpdateNotificationWatcher = createWatcher(
-//   sendVersionUpdateNotificationWorker,
-//   SEND_VERSION_UPDATE_NOTIFICATION,
-// )
