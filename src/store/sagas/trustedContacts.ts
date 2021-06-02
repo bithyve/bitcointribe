@@ -373,7 +373,14 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
     }
   }
 
+  const contactDetails: ContactDetails = { // temp contact object
+    contactName: '',
+    info: '',
+    id: ''
+  }
+
   const contactInfo: ContactInfo = {
+    contactDetails,
     channelKey: channelKey,
     flowKind: InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT
   }
@@ -385,6 +392,7 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
   yield put( syncPermanentChannels( {
     permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
     channelUpdates: [ channelUpdate ],
+    shouldNotUpdateSERVICES: true
   } ) )
 }
 
@@ -857,7 +865,7 @@ export const fetchTrustedChannelWatcher = createWatcher(
   FETCH_TRUSTED_CHANNEL,
 )
 
-function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates: UnecryptedStreamData }[], updatedSERVICES?: ServicesJSON}} ) {
+function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates: UnecryptedStreamData }[], updatedSERVICES?: ServicesJSON, shouldNotUpdateSERVICES?: boolean }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
@@ -940,7 +948,22 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
     trustedContacts.syncPermanentChannels,
     channelSyncUpdates
   )
+
   if ( res.status === 200 ) {
+    const { shouldNotUpdateSERVICES }  = payload
+    if( shouldNotUpdateSERVICES ){
+      if( flowKind === InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT ){
+        const temporaryContact = trustedContacts.tc.trustedContactsV2[ contactIdentifier ] // temporary trusted contact object
+        const instream = useStreamFromContact( temporaryContact, walletId, true )
+        console.log({temporaryContact, instream})
+        const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+        if( fcmToken ){
+          //TODO: send rejection notification
+        }
+      }
+      return
+    }
+
     const SERVICES  = payload.updatedSERVICES? payload.updatedSERVICES: yield select( ( state ) => state.storage.database.SERVICES )
     const updatedSERVICES: ServicesJSON = {
       ...SERVICES,

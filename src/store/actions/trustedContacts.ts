@@ -61,6 +61,7 @@ export const approveTrustedContact = (
 export enum InitTrustedContactFlowKind {
   SETUP_TRUSTED_CONTACT = 'SETUP_TRUSTED_CONTACT',
   APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT',
+  REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
 }
 
 export const initializeTrustedContact = (
@@ -175,6 +176,7 @@ export const syncPermanentChannels = (
     permanentChannelsSyncKind,
     channelUpdates,
     updatedSERVICES,
+    shouldNotUpdateSERVICES
   }:
   {
     permanentChannelsSyncKind: PermanentChannelsSyncKind,
@@ -183,6 +185,7 @@ export const syncPermanentChannels = (
     streamUpdates?: UnecryptedStreamData,
   }[],
   updatedSERVICES?: ServicesJSON,
+  shouldNotUpdateSERVICES?: boolean
 }
 ) => {
   return {
@@ -191,6 +194,7 @@ export const syncPermanentChannels = (
       permanentChannelsSyncKind,
       channelUpdates,
       updatedSERVICES,
+      shouldNotUpdateSERVICES
     },
   }
 }
