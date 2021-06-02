@@ -241,8 +241,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( initializeTrustedContact( {
         contact: Contact,
-        flowKind: InitTrustedContactFlowKind.SETUP,
-        isGuardian: true,
+        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+        isKeeper: true,
         channelKey,
         shareId: selectedKeeper.shareId
       } ) )
