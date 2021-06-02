@@ -19,7 +19,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  clearTrustedContactsCache,
   syncPermanentChannels,
   PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
@@ -109,7 +108,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       // } )
       this.updateAddressBook()
     } )
-    this.props.clearTrustedContactsCache()
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
     } )
@@ -516,7 +514,6 @@ const mapStateToProps = ( state ) => {
 
 export default connect( mapStateToProps, {
   syncPermanentChannels,
-  clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {
