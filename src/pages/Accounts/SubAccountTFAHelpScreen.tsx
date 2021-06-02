@@ -7,6 +7,7 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
+  Keyboard,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -39,28 +40,37 @@ import idx from 'idx'
 import { AccountsState } from '../../store/reducers/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { resetSendState } from '../../store/actions/sending'
+import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import SecurityQuestion from '../../pages/NewBHR/SecurityQuestion'
 
 export type Props = {
   navigation: any;
 };
 
 const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
-  const [ QrBottomSheet ] = useState( React.createRef() )
+  const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ QRModalHeader, setQRModalHeader ] = useState( '' )
   const [
     ResetTwoFASuccessBottomSheet,
-  ] = useState( React.createRef() )
+  ] = useState( React.createRef<BottomSheet>() )
   const [ failureMessage, setFailureMessage ] = useState( '' )
   const [ failureMessageHeader, setFailureMessageHeader ] = useState( '' )
   const [
     ServerNotRespondingBottomSheet,
-  ] = useState( React.createRef() )
+  ] = useState( React.createRef<BottomSheet>() )
+  const [
+    SecurityQuestionBottomSheet,
+  ] = useState( React.createRef<BottomSheet>() )
 
   const accountsState: AccountsState = useAccountsState()
   const sourceAccountShell = useSourceAccountShellForSending()
   const dispatch = useDispatch()
   const twoFASetupDetails = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.twoFASetup )
+  const s3ServiceSecure: SecureAccount = useSelector(
+    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
+  )
+
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
 
@@ -108,12 +118,11 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   }, [ accountsState.twoFAHelpFlags ] )
 
   const getQrCodeData = ( qrData ) => {
+    console.log( 'QRModalHeader', QRModalHeader )
     setTimeout( () => {
       setQrBottomSheetsFlag( false )
     }, 2 )
-    console.log( 'qrData', typeof qrData )
     if( qrData.includes( '{' ) ) {
-      console.log( 'qrData in IF', qrData )
       dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, QRModalHeader, SECURE_ACCOUNT ) )
     } else {
       console.log( 'qrData in ELSE', qrData )
@@ -235,6 +244,35 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     )
   }, [] )
 
+  const renderSecurityQuestionContent = useCallback( () => {
+    return (
+      <SecurityQuestion
+        onFocus={() => {
+          if ( Platform.OS == 'ios' )
+            ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
+        }}
+        onBlur={() => {
+          if ( Platform.OS == 'ios' )
+            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+        }}
+        onPressConfirm={async () => {
+          getQrCodeData( s3ServiceSecure.secureHDWallet.secondaryMnemonic )
+          // Keyboard.dismiss()
+        }}
+      />
+    )
+  }, [] )
+
+  const renderSecurityQuestionHeader = useCallback( () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+    )
+  }, [] )
+
   return (
     <SafeAreaView style={{
       flex: 1
@@ -278,8 +316,15 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
               setTimeout( () => {
                 setQRModalHeader( 'Reset 2FA' )
               }, 2 )
-              if ( QrBottomSheet.current ) {
-                ( QrBottomSheet as any ).current.snapTo( 1 )
+              console.log( 's3ServiceSecure.secureHDWallet.secondaryMnemonic', s3ServiceSecure.secureHDWallet.secondaryMnemonic )
+              if( s3ServiceSecure.secureHDWallet.secondaryMnemonic ) {
+                if ( SecurityQuestionBottomSheet.current ) {
+                  ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+                }
+              } else {
+                if ( QrBottomSheet.current ) {
+                  ( QrBottomSheet as any ).current.snapTo( 1 )
+                }
               }
             }}
             style={{
@@ -420,6 +465,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         ]}
         renderContent={renderServerNotRespondingContent}
         renderHeader={renderServerNotRespondingHeader}
+      />
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={SecurityQuestionBottomSheet as any}
+        snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
+        renderContent={renderSecurityQuestionContent}
+        renderHeader={renderSecurityQuestionHeader}
       />
     </SafeAreaView>
   )

@@ -36,7 +36,7 @@ import {
 import {
   downloadMShare,
   uploadRequestedShare,
-  initHealthCheck,
+  // initHealthCheck,
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
@@ -232,7 +232,7 @@ interface HomePropsTypes {
   uploadSecondaryShareForPK: any;
   s3Service: S3Service;
   initializeHealthSetup: any;
-  initHealthCheck: any;
+  // initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -2644,7 +2644,7 @@ export default withNavigationFocus(
     uploadRequestedShare,
     uploadSecondaryShareForPK,
     initializeHealthSetup,
-    initHealthCheck,
+    // initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,

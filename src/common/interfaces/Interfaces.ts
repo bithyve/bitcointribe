@@ -38,7 +38,7 @@ export interface DecentralizedBackup {
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;
-  PK_SHARE?: MetaShare
+  SM_SHARE?: string
 }
 
 export interface ServicesJSON {
