@@ -80,6 +80,7 @@ import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import ModalContainer from '../../components/home/ModalContainer'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -105,6 +106,7 @@ interface ManageBackupNewBHRStateTypes {
   showLoader: boolean;
   knowMoreType: string;
   ImKeeping: any[];
+  listModal: boolean;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -213,6 +215,7 @@ class ManageBackupNewBHR extends Component<
       showLoader: false,
       knowMoreType: 'manageBackup',
       ImKeeping: [],
+      listModal: false,
     }
   }
 
@@ -465,9 +468,13 @@ class ManageBackupNewBHR extends Component<
         selectedKeeper: obj.selectedKeeper,
         showLoader: false,
         selectedLevelId: 2
+      }, () => {
+        this.setState( {
+          listModal: true
+        } )
       } )
-      this.props.setIsKeeperTypeBottomSheetOpen( false );
-      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      this.props.setIsKeeperTypeBottomSheetOpen( false )
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
       // this.goToHistory( obj )
       // this.loaderBottomSheet.snapTo( 0 )
     }
@@ -524,17 +531,25 @@ class ManageBackupNewBHR extends Component<
       console.log( 'prevProps.navigationObj' )
       this.setState( {
         selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
-      } );
-      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      } )
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      this.setState( {
+        listModal: true
+      } )
       this.goToHistory( this.props.navigationObj )
     }
 
     if( prevProps.isTypeBottomSheetOpen !== this.props.isTypeBottomSheetOpen && this.props.isTypeBottomSheetOpen === true ){
       this.setState( {
         showLoader: false
+      }, () => {
+        this.setState( {
+          listModal: true
+        } )
       } )
-      this.props.setIsKeeperTypeBottomSheetOpen( false );
-      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      this.props.setIsKeeperTypeBottomSheetOpen( false )
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+
     }
 
     if( prevProps.modifyLevelDataStatus != this.props.modifyLevelDataStatus ){
@@ -594,7 +609,10 @@ class ManageBackupNewBHR extends Component<
       }
     }
     if ( selectedKeeper.shareType == 'device' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      this.setState( {
+        listModal: false
+      } );
       ( this.QrBottomSheet as any ).snapTo( 0 );
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
@@ -604,7 +622,10 @@ class ManageBackupNewBHR extends Component<
         index: index > -1 ? index : 0,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+      this.setState( {
+        listModal: false
+      } );
       ( this.QrBottomSheet as any ).snapTo( 0 );
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
@@ -613,7 +634,10 @@ class ManageBackupNewBHR extends Component<
         isChangeKeeperAllow
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      // ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+      this.setState( {
+        listModal: false
+      } );
       ( this.QrBottomSheet as any ).snapTo( 0 );
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate(
@@ -638,8 +662,11 @@ class ManageBackupNewBHR extends Component<
     this.setState( {
       QrBottomSheetsFlag: true
     } );
-    ( this.QrBottomSheet as any ).snapTo( 1 );
-    ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+    ( this.QrBottomSheet as any ).snapTo( 1 )
+    // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+    this.setState( {
+      listModal: false
+    } )
   };
 
   renderQrContent = () => {
@@ -787,7 +814,8 @@ class ManageBackupNewBHR extends Component<
       contactsKeptByUser,
       ImKeeping,
       selectedKeeperName,
-      selectedKeeperType
+      selectedKeeperType,
+      listModal
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -1079,72 +1107,59 @@ Wallet Backup
             </View>
           </ScrollView>
           {this.state.showLoader ? <Loader isLoading={true}/> : null}
-          <BottomSheet
-            enabledGestureInteraction={false}
-            enabledInnerScrolling={true}
-            ref={( c )=>this.keeperTypeBottomSheet = c}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp( '75%' )
-                : hp( '75%' ),
-            ]}
-            renderContent={() => (
-              <KeeperTypeModalContents
-                headerText={'Backup Recovery Key'}
-                subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
-                onPressSetup={async ( type, name ) => {
-                  try{
-                    this.setState( {
-                      selectedKeeperType: type,
-                      selectedKeeperName: name,
-                    } )
-                    if (
-                      selectedLevelId == 3 &&
+          <ModalContainer visible={listModal} closeBottomSheet={() => {}}>
+            <KeeperTypeModalContents
+              headerText={'Backup Recovery Key'}
+              subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
+              onPressSetup={async ( type, name ) => {
+                try{
+                  this.setState( {
+                    selectedKeeperType: type,
+                    selectedKeeperName: name,
+                  } )
+                  if (
+                    selectedLevelId == 3 &&
                   !this.props.isLevelThreeMetaShareCreated &&
                   !this.props.isLevel3Initialized &&
                   this.props.currentLevel == 2 &&
                   this.props.metaSharesKeeper.length != 5
-                    ) {
-                      this.props.generateMetaShare( selectedLevelId )
-                    } else if( selectedLevelId == 3 ) {
-                      this.sendApprovalRequestToPK( )
-                    } else {
-                      const obj = {
-                        id: selectedLevelId,
-                        selectedKeeper: {
-                          ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name: selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                          shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-                        },
-                        isSetup: true,
-                      }
-                      this.goToHistory( obj )
-                      this.props.setIsKeeperTypeBottomSheetOpen( false );
-                      /** other than ThirdLevel first position */
-                      ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+                  ) {
+                    this.props.generateMetaShare( selectedLevelId )
+                  } else if( selectedLevelId == 3 ) {
+                    this.sendApprovalRequestToPK( )
+                  } else {
+                    const obj = {
+                      id: selectedLevelId,
+                      selectedKeeper: {
+                        ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name: selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+                        shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                      },
+                      isSetup: true,
                     }
-                  } catch( err ){
-                    console.log( 'err', err )
-
+                    this.goToHistory( obj )
+                    this.props.setIsKeeperTypeBottomSheetOpen( false )
+                    /** other than ThirdLevel first position */
+                    // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+                    this.setState( {
+                      listModal: false
+                    } )
                   }
-                }}
-                onPressBack={() =>{
-                  this.props.setIsKeeperTypeBottomSheetOpen( false );
-                  ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+                } catch( err ){
+                  console.log( 'err', err )
+
                 }
-                }
-                selectedLevelId={selectedLevelId}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                onPressHeader={() =>{
-                  this.props.setIsKeeperTypeBottomSheetOpen( false );
-                  ( this.keeperTypeBottomSheet as any ).snapTo( 0 )}
-                }
-              />
-            )}
-          />
+              }}
+              onPressBack={() =>{
+                this.props.setIsKeeperTypeBottomSheetOpen( false )
+                // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
+                this.setState( {
+                  listModal: false
+                } )
+              }
+              }
+              selectedLevelId={selectedLevelId}
+            />
+          </ModalContainer>
           <BottomSheet
             enabledInnerScrolling={true}
             ref={( c ) => { this.ErrorBottomSheet = c }}
@@ -1199,7 +1214,10 @@ Wallet Backup
             renderHeader={() => (
               <SmallHeaderModal
                 onPressHeader={() => {
-                  ( this.keeperTypeBottomSheet as any ).snapTo( 1 );
+                  // ( this.keeperTypeBottomSheet as any ).snapTo( 1 );
+                  this.setState( {
+                    listModal: true
+                  } );
                   ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
                 }}
               />
