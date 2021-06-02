@@ -10,12 +10,12 @@ import {
   ContactDetails,
   ContactInfo,
 } from '../../bitcoin/utilities/Interface'
-import { createAction } from 'redux-actions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 export const APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT'
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
+export const REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const UPDATE_EPHEMERAL_CHANNEL = 'UPDATE_EPHEMERAL_CHANNEL'
 export const FETCH_EPHEMERAL_CHANNEL = 'FETCH_EPHEMERAL_CHANNEL'
@@ -59,22 +59,23 @@ export const approveTrustedContact = (
 }
 
 export enum InitTrustedContactFlowKind {
-  SETUP = 'SETUP',
-  APPROVAL = 'APPROVAL'
+  SETUP_TRUSTED_CONTACT = 'SETUP_TRUSTED_CONTACT',
+  APPROVE_TRUSTED_CONTACT = 'APPROVE_TRUSTED_CONTACT',
+  REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
 }
 
 export const initializeTrustedContact = (
   {
     contact,
     flowKind,
-    isGuardian,
+    isKeeper,
     channelKey,
     contactsSecondaryChannelKey,
     shareId,
   }:{
       contact: any,
       flowKind: InitTrustedContactFlowKind,
-      isGuardian?: boolean,
+      isKeeper?: boolean,
       channelKey?: string,
       contactsSecondaryChannelKey?: string,
       shareId?: string
@@ -85,10 +86,19 @@ export const initializeTrustedContact = (
     payload: {
       contact,
       flowKind,
-      isGuardian,
+      isKeeper,
       channelKey,
       contactsSecondaryChannelKey,
       shareId,
+    },
+  }
+}
+
+export const rejectTrustedContact = ( { channelKey } : {channelKey: string} ) => {
+  return {
+    type: REJECT_TRUSTED_CONTACT,
+    payload: {
+      channelKey
     },
   }
 }
@@ -166,6 +176,7 @@ export const syncPermanentChannels = (
     permanentChannelsSyncKind,
     channelUpdates,
     updatedSERVICES,
+    shouldNotUpdateSERVICES
   }:
   {
     permanentChannelsSyncKind: PermanentChannelsSyncKind,
@@ -174,6 +185,7 @@ export const syncPermanentChannels = (
     streamUpdates?: UnecryptedStreamData,
   }[],
   updatedSERVICES?: ServicesJSON,
+  shouldNotUpdateSERVICES?: boolean
 }
 ) => {
   return {
@@ -181,7 +193,8 @@ export const syncPermanentChannels = (
     payload: {
       permanentChannelsSyncKind,
       channelUpdates,
-      updatedSERVICES
+      updatedSERVICES,
+      shouldNotUpdateSERVICES
     },
   }
 }

@@ -478,8 +478,8 @@ export interface ContactDetails {
 }
 
 export interface ContactInfo  {
-  contactDetails: ContactDetails,
-  isGuardian?: boolean,
+  contactDetails?: ContactDetails,
+  isKeeper?: boolean,
   channelKey?: string,
   secondaryChannelKey?: string
   contactsSecondaryChannelKey?: string,
