@@ -234,8 +234,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setLoadContacts( true )
       }, 2 )
       // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
-      setTrustedContactModal( true )
-      // props.navigation.navigate( 'TrustedContact' )
+      // setTrustedContactModal( true )
+      props.navigation.navigate( 'TrustedContactNewBHR', {
+        LoadContacts: true,
+        onPressContinue:async ( selectedContacts ) => {
+          Keyboard.dismiss()
+          createGuardian( getContacts( selectedContacts ) )
+        }
+      } )
     }
   }, [ isChange ] )
 
@@ -246,8 +252,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
           setLoadContacts( true )
         }, 2 )
         // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
-        setTrustedContactModal( true )
-        // props.navigation.navigate( 'TrustedContact' )
+        // setTrustedContactModal( true )
+        props.navigation.navigate( 'TrustedContactNewBHR', {
+          LoadContacts: true,
+          onPressContinue:async ( selectedContacts ) => {
+            Keyboard.dismiss()
+            createGuardian( getContacts( selectedContacts ) )
+          }
+        } )
       }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
@@ -313,83 +325,86 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }
       }, 2 )
       // ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
-      setTrustedContactModal( false )
+      // setTrustedContactModal( false )
+      props.navigation.navigate( 'AddContactSendRequest', {
+        SelectedContact: chosenContact,
+      } )
       // RequestKeyFromContact.goBack()
       // ( shareBottomSheet as any ).current.snapTo( 1 )
-      props.navigation.navigate( 'RequestKeyFromContact', {
-        isModal: true,
-        headerText:`Send Recovery Key${'\n'}to contact`,
-        subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
-        contactText:'Sharing Recovery Key with',
-        contact:{
-          chosenContact
-        },
-        QR:
-          trustedQR,
-        link:{
-          trustedLink
-        },
-        contactEmail:'',
-        onPressBack: () => {
-          // ( shareBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.goBack()
-        },
-        onPressDone: () => {
-          // ( shareBottomSheet as any ).current.snapTo( 0 )
-          props.navigation.goBack()
-        },
-        onPressShare: () => {
-          if ( isOTPType ) {
-            setTimeout( () => {
-              setRenderTimer( true )
-            }, 2 )
-            // ( shareBottomSheet as any ).current.snapTo( 0 );
-            props.navigation.goBack()
-            ( shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
-          }
-          else {
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
-            const popAction = StackActions.pop( {
-              n: isChange ? 2 : 1
-            } )
-            props.navigation.dispatch( popAction )
-          }
-        }
-      } )
+      // props.navigation.navigate( 'RequestKeyFromContact', {
+      //   isModal: true,
+      //   headerText:`Send Recovery Key${'\n'}to contact`,
+      //   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
+      //   contactText:'Sharing Recovery Key with',
+      //   contact:{
+      //     chosenContact
+      //   },
+      //   QR:
+      //     trustedQR,
+      //   link:{
+      //     trustedLink
+      //   },
+      //   contactEmail:'',
+      //   onPressBack: () => {
+      //     // ( shareBottomSheet as any ).current.snapTo( 0 )
+      //     props.navigation.goBack()
+      //   },
+      //   onPressDone: () => {
+      //     // ( shareBottomSheet as any ).current.snapTo( 0 )
+      //     props.navigation.goBack()
+      //   },
+      //   onPressShare: () => {
+      //     if ( isOTPType ) {
+      //       setTimeout( () => {
+      //         setRenderTimer( true )
+      //       }, 2 )
+      //       // ( shareBottomSheet as any ).current.snapTo( 0 );
+      //       props.navigation.goBack();
+      //       ( shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
+      //     }
+      //     else {
+      //       // ( shareBottomSheet as any ).current.snapTo( 0 )
+      //       props.navigation.goBack()
+      //       const popAction = StackActions.pop( {
+      //         n: isChange ? 2 : 1
+      //       } )
+      //       props.navigation.dispatch( popAction )
+      //     }
+      //   }
+      // } )
       return selectedContacts[ 0 ]
     },
     [ SelectedContacts, chosenContact ],
   )
 
-  const renderTrustedContactsContent = useCallback( () => {
-    return (
-      <TrustedContacts
-        LoadContacts={LoadContacts}
-        onPressBack={() => {
-          // ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
-          setTrustedContactModal( false )
-          // props.navigation.goBack()
-        }}
-        onPressContinue={async ( selectedContacts ) => {
-          Keyboard.dismiss()
-          createGuardian( getContacts( selectedContacts ) )
-        }}
-      />
-    )
-  }, [ LoadContacts, getContacts ] )
+  // const renderTrustedContactsContent = useCallback( () => {
+  //   return (
+  //     <TrustedContacts
+  //       LoadContacts={LoadContacts}
+  //       onPressBack={() => {
+  //         // ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
+  //         setTrustedContactModal( false )
+  //         // props.navigation.goBack()
+  //       }}
+  //       onPressContinue={async ( selectedContacts ) => {
+  //         Keyboard.dismiss()
+  //         createGuardian( getContacts( selectedContacts ) )
+  //       }}
+  //     />
+  //   )
+  // }, [ LoadContacts, getContacts ] )
 
-  const renderTrustedContactsHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          // ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
-          setTrustedContactModal( false )
-          // props.navigation.goBack()
-        }}
-      />
-    )
-  }, [] )
+  // const renderTrustedContactsHeader = useCallback( () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         // ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
+  //         setTrustedContactModal( false )
+  //         // props.navigation.goBack()
+  //       }}
+  //     />
+  //   )
+  // }, [] )
 
   const updateHistory = useCallback(
     ( shareHistory ) => {
@@ -512,11 +527,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const onPressReshare = useCallback( async () => {
-    // ( shareBottomSheet as any ).current.snapTo( 1 )
-    props.navigation.navigate( 'RequestKeyFromContact' )
+    ( shareBottomSheet as any ).current.snapTo( 1 )
+    // props.navigation.navigate( 'RequestKeyFromContact' )
+    // props.navigation.navigate( 'AddContactSendRequest', {
+    //   SelectedContact: chosenContact,
+    // } )
     // ( ReshareBottomSheet as any ).current.snapTo( 0 )
     setReshareModal( false )
-    props.navigation.navigate( '' )
+    // props.navigation.navigate( '' )
     createGuardian( getContacts( chosenContact ) )
   }, [ selectedTitle, chosenContact, getContacts ] )
 
@@ -560,8 +578,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }, 2 )
 
           // ( trustedContactsBottomSheet as any ).current.snapTo( 1 );
-          setTrustedContactModal( true )
-          // props.navigation.navigate('')
+          // setTrustedContactModal( true )
+          props.navigation.navigate( 'TrustedContactNewBHR', {
+            LoadContacts: true,
+            onPressContinue:async ( selectedContacts ) => {
+              Keyboard.dismiss()
+              createGuardian( getContacts( selectedContacts ) )
+            }
+          } );
           ( ChangeBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressIgnore={() => {
@@ -947,6 +971,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   ] )
 
   const SendShareModalFunction = useCallback( () => {
+    console.log( '>>>>>>>>>>>>>> SendShareModalFunction >>>>>>>>>>> 111' )
+
     if ( chosenContact && !isEmpty( chosenContact ) ) {
       return (
         <RequestKeyFromContact
@@ -1244,7 +1270,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
               setLoadContacts( true )
             }, 2 )
             // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
-            setTrustedContactModal( true )
+            // setTrustedContactModal( true )
+            props.navigation.navigate( 'TrustedContactNewBHR', {
+              LoadContacts: true,
+              onPressContinue:async ( selectedContacts ) => {
+                console.log( 'selectedContacts >>>>>', selectedContacts )
+
+                Keyboard.dismiss()
+                createGuardian( getContacts( selectedContacts ) )
+              }
+            } )
           }}
           onPressReshare={() => {
             // ( ReshareBottomSheet as any ).current.snapTo( 1 )
@@ -1252,7 +1287,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
           isVersionMismatch={isVersionMismatch}
           isChangeKeeperAllow={isChangeKeeperAllow}
-          reshareButtonText={'Reshare'}
+          reshareButtonText={'Reshare....'}
           changeButtonText={'Change'}
         />
       </View>
@@ -1268,7 +1303,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           LoadContacts={LoadContacts}
           onPressBack={() => {
             // ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
-            setTrustedContactModal( false )
+            // setTrustedContactModal( false )
           }}
           onPressContinue={async ( selectedContacts ) => {
             Keyboard.dismiss()
@@ -1317,7 +1352,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           title={'Reshare with the same contact?'}
           info={'Proceed if you want to reshare the link/ QR with the same contact'}
           note={'For a different contact, please go back and choose ‘Change contact’'}
-          proceedButtonText={'Reshare'}
+          proceedButtonText={'Reshare..'}
           cancelButtonText={'Back'}
           isIgnoreButton={true}
           onPressProceed={() => {

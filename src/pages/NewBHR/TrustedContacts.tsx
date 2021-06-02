@@ -1,17 +1,17 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text } from 'react-native';
-import { useSelector } from 'react-redux';
-import Fonts from '../../common/Fonts';
-import BackupStyles from './Styles';
-import Colors from '../../common/Colors';
-import { RFValue } from 'react-native-responsive-fontsize';
-import ContactList from '../../components/ContactList';
+import React, { useState, useCallback } from 'react'
+import { View, Text, SafeAreaView, StatusBar } from 'react-native'
+import { useSelector } from 'react-redux'
+import Fonts from '../../common/Fonts'
+import BackupStyles from './Styles'
+import Colors from '../../common/Colors'
+import { RFValue } from 'react-native-responsive-fontsize'
+import ContactList from '../../components/ContactList'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
-} from 'react-native-responsive-screen';
-import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper';
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService';
+} from 'react-native-responsive-screen'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
 const TrustedContacts = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
@@ -24,8 +24,8 @@ const TrustedContacts = ( props ) => {
   }, [] )
 
   const onPressContinue = useCallback( () => {
-    props.onPressContinue( contacts )
-  }, [ contacts, props.onPressContinue ] )
+    props.navigation.state.params.onPressContinue( contacts )
+  }, [ contacts, props.navigation.state.params.onPressContinue ] )
 
   const onPressSkip = () => {
     let { skippedContactsCount } = trustedContacts.tc
@@ -44,7 +44,7 @@ const TrustedContacts = ( props ) => {
         name: `F&F request awaiting ${skippedContactsCount + 1}`,
       }
     }
-    props.onPressContinue( [ data ] )
+    props.navigation.state.params.onPressContinue( [ data ] )
   }
 
   const renderContactList = useCallback(
@@ -63,7 +63,7 @@ const TrustedContacts = ( props ) => {
   )
 
   return (
-    <View
+    <SafeAreaView
       style={{
         // height: '90%',
         // flex: 1,
@@ -72,6 +72,7 @@ const TrustedContacts = ( props ) => {
         // width: '100%',
       }}
     >
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
         style={{
           ...BackupStyles.modalHeaderTitleView,
@@ -127,12 +128,12 @@ const TrustedContacts = ( props ) => {
               fontWeight: 'bold',
             }}
           >
-            send Recovery Keys
+            send Recovery Keys..
           </Text>
         </Text>
-        {props.LoadContacts ? renderContactList() : null}
+        {props.navigation.state.params.LoadContacts ? renderContactList() : null}
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

@@ -518,9 +518,11 @@ export default function ContactList( props ) {
       {selectedContacts.length >= 1 && (
         <View
           style={{
-            position: 'absolute',
-            bottom: 0,
+            // flex: 1,
+            // position: 'absolute',
+            // bottom: 0,
             width: wp( '50%' ),
+            // height: hp ( '100%' ),
             alignSelf: 'center',
           }}
         >
@@ -586,7 +588,7 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 15, height: 15
     },
-    marginBottom: 20,
+    // marginBottom: 20,
   },
   selectedContactView: {
     width: wp( '42%' ),

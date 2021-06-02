@@ -68,6 +68,7 @@ import TrustedContactHistoryNewBHR from '../../../pages/NewBHR/TrustedContactHis
 // import PersonalCopyHistoryKeeper from '../../../pages/Keeper/PersonalCopyHistory';
 import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory'
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
+import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
 import Header from '../Header'
 
 const MODAL_ROUTES = [
@@ -180,6 +181,7 @@ const SecurityStack = createStackNavigator(
       }
     },
     RequestKeyFromContact,
+    TrustedContactNewBHR,
   },
   {
     headerLayoutPreset: 'center',

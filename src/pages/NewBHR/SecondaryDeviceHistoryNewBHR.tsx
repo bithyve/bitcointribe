@@ -769,7 +769,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
             createGuardian()
           }}
-          reshareButtonText={'Reshare'}
+          reshareButtonText={'Reshare..'}
           onPressReshare={async () => {
             // ( ReshareBottomSheet as any ).current.snapTo( 1 )
             setReshareModal( true )
@@ -890,8 +890,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           cancelButtonText={'Back'}
           isIgnoreButton={true}
           onPressProceed={() => {
-            ( ReshareBottomSheet as any ).current.snapTo( 0 )
-
+            // ( ReshareBottomSheet as any ).current.snapTo( 0 )
+            setReshareModal( false )
             if ( blockReshare ) {
               ( QrBottomSheet.current as any ).snapTo( 1 )
             } else {
@@ -900,7 +900,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             }
           }}
           onPressIgnore={() => {
-            ( ReshareBottomSheet as any ).current.snapTo( 0 )
+            // ( ReshareBottomSheet as any ).current.snapTo( 0 )
+            setReshareModal( false )
           }}
           isBottomImage={false}
         />
