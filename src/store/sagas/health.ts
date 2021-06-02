@@ -264,16 +264,28 @@ function* generateMetaSharesWorker( { payload } ) {
         }
       }
 
-      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const { SERVICES, DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
         ...SERVICES,
         S3_SERVICE: JSON.stringify( s3Service ),
       }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
+      if( level == 2 ) {
+        const updatedDECENTRALIZED_BACKUP = {
+          ...DECENTRALIZED_BACKUP,
+          SM_SHARE: res.data.encryptedSMSecrets[ 0 ]
         }
-      } )
+        yield call( insertDBWorker, {
+          payload: {
+            SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP
+          }
+        } )
+      } else  if( level == 3 ) {
+        yield call( insertDBWorker, {
+          payload: {
+            SERVICES: updatedSERVICES
+          }
+        } )
+      }
     } else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
       throw new Error( res.err )

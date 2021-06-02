@@ -32,6 +32,7 @@ import {
   twoFAResetted,
   secondaryXprivGenerated,
   getSMAndReSetTFAOrGenerateSXpriv,
+  setResetTwoFALoader,
 } from '../../store/actions/accounts'
 import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
@@ -42,6 +43,7 @@ import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAcco
 import { resetSendState } from '../../store/actions/sending'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import SecurityQuestion from '../../pages/NewBHR/SecurityQuestion'
+import Loader from '../../components/loader'
 
 export type Props = {
   navigation: any;
@@ -70,11 +72,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const s3ServiceSecure: SecureAccount = useSelector(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service
   )
+  const resetTwoFALoader: boolean = accountsState.resetTwoFALoader
+  const [ showLoader, setShowLoader ] = useState( true )
 
   useEffect( () => {
     const resettedTwoFA = idx( accountsState.twoFAHelpFlags, ( _ ) => _.twoFAResetted )
-
     if ( resettedTwoFA ) {
+      dispatch( setResetTwoFALoader( false ) )
       navigation.navigate( 'TwoFASetup', {
         twoFASetup: twoFASetupDetails,
         onPressBack: () => {
@@ -98,6 +102,11 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     }
   }, [ accountsState.twoFAHelpFlags ] )
 
+  useEffect( ()=>{
+    if( resetTwoFALoader ) setShowLoader( true )
+    else setShowLoader( false )
+  }, [ resetTwoFALoader ] )
+
   useEffect( () => {
     const generatedSecureXPriv = idx( accountsState.twoFAHelpFlags, ( _ ) => _.xprivGenerated )
     if ( generatedSecureXPriv ) {
@@ -117,18 +126,19 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     }
   }, [ accountsState.twoFAHelpFlags ] )
 
-  const getQrCodeData = ( qrData ) => {
-    console.log( 'QRModalHeader', QRModalHeader )
+  const getQrCodeData = ( qrData, type? ) => {
+    const actionType = type ? type : QRModalHeader
     setTimeout( () => {
       setQrBottomSheetsFlag( false )
     }, 2 )
     if( qrData.includes( '{' ) ) {
-      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, QRModalHeader, SECURE_ACCOUNT ) )
+      if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
+      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, SECURE_ACCOUNT ) )
     } else {
-      console.log( 'qrData in ELSE', qrData )
-      if ( QRModalHeader === 'Reset 2FA' ) {
+      if ( actionType === 'Reset 2FA' ) {
+        if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
         dispatch( resetTwoFA( qrData ) )
-      } else if ( QRModalHeader === 'Sweep Funds' ) {
+      } else if ( actionType === 'Sweep Funds' ) {
         dispatch( generateSecondaryXpriv( SECURE_ACCOUNT, qrData ) )
       }
     }
@@ -140,9 +150,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         isFromKeeperDeviceHistory={false}
         QRModalHeader={QRModalHeader}
         title={'Scan the Regenerate/Exit Key'}
-        infoText={
-          'This can be found on the last page of your PDF personal copy'
-        }
+        infoText={'This can be found on the last page of your PDF personal copy'}
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={( qrData ) => {
@@ -256,8 +264,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
             ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
         }}
         onPressConfirm={async () => {
-          getQrCodeData( s3ServiceSecure.secureHDWallet.secondaryMnemonic )
-          // Keyboard.dismiss()
+          getQrCodeData( s3ServiceSecure.secureHDWallet.secondaryMnemonic, 'Reset 2FA' );
+          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+          Keyboard.dismiss()
         }}
       />
     )
@@ -313,15 +322,14 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              setTimeout( () => {
-                setQRModalHeader( 'Reset 2FA' )
-              }, 2 )
-              console.log( 's3ServiceSecure.secureHDWallet.secondaryMnemonic', s3ServiceSecure.secureHDWallet.secondaryMnemonic )
               if( s3ServiceSecure.secureHDWallet.secondaryMnemonic ) {
                 if ( SecurityQuestionBottomSheet.current ) {
                   ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
                 }
               } else {
+                setTimeout( () => {
+                  setQRModalHeader( 'Reset 2FA' )
+                }, 2 )
                 if ( QrBottomSheet.current ) {
                   ( QrBottomSheet as any ).current.snapTo( 1 )
                 }
@@ -427,6 +435,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           eiusmod tempor
         </Text> */}
       </View>
+      {showLoader ? <Loader isLoading={true}/> : null}
       <BottomSheet
         onOpenEnd={() => {
           setQrBottomSheetsFlag( true )
