@@ -62,6 +62,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const getImageIcon = ( item ) => {
   if ( Object.keys( item ).length ) {
@@ -152,6 +153,7 @@ interface ContactDetailsStateTypes {
   SMShareQR: string;
   qrModalTitle: string;
   isSmSharePresent: boolean;
+  reshareModal: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -225,6 +227,7 @@ class ContactDetails extends PureComponent<
       ],
       qrModalTitle: '',
       isSmSharePresent: false,
+      reshareModal: false,
     }
 
     this.Contact = this.props.navigation.state.params.contact
@@ -375,7 +378,10 @@ class ContactDetails extends PureComponent<
     if ( this.Contact.isGuardian ) {
       this.createDeepLink( this.Contact )
       setTimeout( () => {
-        ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
+        // ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
+        this.setState( {
+          reshareModal: true
+        } )
       }, 2 )
     } else {
       this.props.navigation.navigate( 'AddContactSendRequest', {
@@ -894,6 +900,7 @@ class ContactDetails extends PureComponent<
       encryptedExitKey,
       isSendDisabled,
       trustedContactHistory,
+      reshareModal
     } = this.state
     return (
       <View style={{
@@ -1262,7 +1269,7 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderExitKeyQRContents}
           renderHeader={this.renderExitKeyQRHeader}
         />
-        <BottomSheet
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
           ref={this.ReshareBottomSheet as any}
@@ -1274,7 +1281,34 @@ class ContactDetails extends PureComponent<
           ]}
           renderContent={this.renderReshareContent}
           renderHeader={this.renderReshareHeader}
-        />
+        /> */}
+        <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
+          reshareModal: false
+        } )}>
+          <ErrorModalContents
+            modalRef={this.ReshareBottomSheet}
+            title={'Reshare Recovery Key\nwith Keeper'}
+            info={'Did your Keeper not receive the Recovery Key?'}
+            note={'You can reshare the Recovery Key with your Keeper'}
+            proceedButtonText={'Reshare'}
+            cancelButtonText={'Back'}
+            isIgnoreButton={true}
+            onPressProceed={() => {
+              ( this.shareBottomSheet as any ).current.snapTo( 1 )
+              // ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                reshareModal: false
+              } )
+            }}
+            onPressIgnore={() => {
+              // ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                reshareModal: false
+              } )
+            }}
+            isBottomImage={false}
+          />
+        </ModalContainer>
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}

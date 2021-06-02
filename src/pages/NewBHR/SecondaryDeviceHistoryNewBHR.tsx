@@ -55,6 +55,7 @@ import semver from 'semver'
 import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -77,6 +78,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
+  const [ reshareModal, setReshareModal ] = useState( false )
 
   const SHARES_TRANSFER_DETAILS = useSelector(
     ( state ) =>
@@ -769,7 +771,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
-            ( ReshareBottomSheet as any ).current.snapTo( 1 )
+            // ( ReshareBottomSheet as any ).current.snapTo( 1 )
+            setReshareModal( true )
           }}
           changeButtonText={'Change'}
           isChangeKeeperAllow={isChangeKeeperAllow}
@@ -862,7 +865,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
       />
-      <BottomSheet
+      {/* <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={ReshareBottomSheet as any}
@@ -872,7 +875,36 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         ]}
         renderContent={renderReshareContent}
         renderHeader={renderReshareHeader}
-      />
+      /> */}
+      <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
+        <ErrorModalContents
+          modalRef={ReshareBottomSheet}
+          title={'Reshare with the same device?'}
+          info={
+            'Proceed if you want to reshare the link/ QR with the same device'
+          }
+          note={
+            'For a different device, please go back and choose ‘Change device'
+          }
+          proceedButtonText={'Reshare'}
+          cancelButtonText={'Back'}
+          isIgnoreButton={true}
+          onPressProceed={() => {
+            ( ReshareBottomSheet as any ).current.snapTo( 0 )
+
+            if ( blockReshare ) {
+              ( QrBottomSheet.current as any ).snapTo( 1 )
+            } else {
+              ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
+              createGuardian()
+            }
+          }}
+          onPressIgnore={() => {
+            ( ReshareBottomSheet as any ).current.snapTo( 0 )
+          }}
+          isBottomImage={false}
+        />
+      </ModalContainer>
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}

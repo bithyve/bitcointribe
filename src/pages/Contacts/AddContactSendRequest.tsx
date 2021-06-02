@@ -368,7 +368,7 @@ export default function AddContactSendRequest( props ) {
           }}>
             <TouchableOpacity
               onPress={() => {
-                props.navigation.goBack()
+                props.navigation.popToTop()
               }}
               hitSlop={{
                 top: 20, left: 20, bottom: 20, right: 20
@@ -408,7 +408,7 @@ export default function AddContactSendRequest( props ) {
             <TouchableOpacity
               onPress={() => {
                 // createTrustedContact()
-                props.navigation.goBack()
+                props.navigation.popToTop()
               }}
               style={{
                 height: wp( '8%' ),

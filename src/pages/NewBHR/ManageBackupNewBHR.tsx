@@ -10,7 +10,8 @@ import {
   RefreshControl,
   ImageBackground,
   Platform,
-  Switch
+  Switch,
+  Image
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
@@ -1038,11 +1039,20 @@ Wallet Backup
               borderTopRightRadius: wp( 4 ),
               paddingLeft: wp ( '6%' )
             }}>
-              <Text style={styles.pageTitle}>I am the Keeper of</Text>
+              <View style={{
+                flexDirection: 'row', justifyContent:'space-between'
+              }}>
+                <Text style={styles.pageTitle}>I am the Keeper of</Text>
+                <TouchableOpacity>
+                  <Image
+                    style={styles.moreImage}
+                    source={require( '../../assets/images/icons/icon_more.png' )}
+                  />
+                </TouchableOpacity>
+              </View>
               <Text style={styles.pageInfoText}>
                Contacts whose wallets I can help restore
               </Text>
-
               <View style={{
                 marginBottom: 15
               }}>
@@ -1303,6 +1313,10 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  moreImage: {
+    width: wp( '10%' ),
+    height: wp( '10%' ),
+  },
   pageTitle: {
     color: Colors.blue,
     fontSize: RFValue( 16 ),

@@ -24,28 +24,28 @@ export default function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   // console.log('props.QR RequestKeyFromContact > ', props.QR);
 
-  const contact = props.contact
+  const contact = props.navigation ? props.navigation.state.params.contact : props.contact
   const [ serviceType, setServiceType ] = useState(
-    props.serviceType ? props.serviceType : '',
+    props.navigation ? props.navigation.state.params.serviceType : props.serviceType ? props.serviceType : '',
   )
   //console.log("amountCurrency", props.amountCurrency);
-  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
-  } )
+  const [ Contact, setContact ] = useState( props.navigation ? props.navigation.state.params.contact : props.contact )
 
   useEffect( () => {
-    setShareLink( props.link )
+    setShareLink( props.navigation ? props.navigation.state.params.link : props.link )
     // if ( props.infoText ) setInfoText( props.infoText )
   }, [ props.link ] )
 
   useEffect( () => {
     if ( contact ) {
-      setContact( props.contact )
+      setContact( props.navigation ? props.navigation.state.params.link : props.link )
     }
   }, [ contact ] )
 
   useEffect( () => {
-    if ( props.serviceType ) {
-      setServiceType( props.serviceType )
+    const serviceTypeProp = props.navigation ? props.navigation.state.params.serviceType : props.serviceType
+    if ( serviceTypeProp ) {
+      setServiceType( serviceTypeProp )
     }
   }, [ props.serviceType ] )
 
@@ -65,7 +65,11 @@ export default function RequestKeyFromContact( props ) {
       Share.open( options )
         .then( ( res ) => {
           // if (res.success) {
-          props.onPressShare()
+          if ( props.navigation ) {
+            props.navigation.state.params.onPressShare()
+          } else {
+            props.onPressShare()
+          }
           // }
         } )
         .catch( ( err ) => {
@@ -75,17 +79,25 @@ export default function RequestKeyFromContact( props ) {
 
     }
   }
-
+  const isModalProp = props.navigation ? props.navigation.state.params.isModal : props.isModal
+  const headerText = props.navigation ? props.navigation.state.params.headerText : props.headerText
+  const subHeaderText = props.navigation ? props.navigation.state.params.subHeaderText : props.subHeaderText
+  const qrProp = props.navigation ? props.navigation.state.params.QR : props.QR
   return (
     <View style={styles.modalContainer}>
       <View
         style={styles.mainView}
       >
-        {props.isModal &&
+        {isModalProp &&
 					<View style={styles.topSubView}>
 					  <AppBottomSheetTouchableWrapper
 					    onPress={() => {
-					      props.onPressBack()
+					      if ( props.navigation ) {
+					        props.navigation.state.params.onPressBack()
+					      } else {
+					        props.onPressBack()
+					      }
+
 					    }}
 					    style={styles.backButton}
 					  >
@@ -94,16 +106,16 @@ export default function RequestKeyFromContact( props ) {
 					  <View style={{
 					    flex: 1, marginLeft: 5
 					  }}>
-					    {props.headerText &&
+					    {headerText &&
 								<Text style={styles.modalHeaderTitleText}>
-								  {props.headerText}
+								  {headerText}
 								</Text>
 					    }
-					    {props.subHeaderText &&
+					    {subHeaderText &&
 								<Text
 								  style={styles.subHeaderText}
 								>
-								  {props.subHeaderText}
+								  {subHeaderText}
 								</Text>
 					    }
 					  </View>
@@ -111,12 +123,12 @@ export default function RequestKeyFromContact( props ) {
         }
       </View>
       <View style={[ styles.topContainer, {
-        marginTop: !props.isModal ? 0 : hp( '1.7%' ),
-        marginBottom: !props.isModal ? 0 : hp( '1.7%' ),
+        marginTop: !isModalProp ? 0 : hp( '1.7%' ),
+        marginBottom: !isModalProp ? 0 : hp( '1.7%' ),
       } ]}>
         <UserDetails
           titleStyle={styles.titleStyle}
-          contactText={props.contactText}
+          contactText={props.navigation ? props.navigation.state.params.contactText : props.contactText}
           Contact={Contact} />
       </View>
       <ScrollView contentContainerStyle={{
@@ -125,17 +137,17 @@ export default function RequestKeyFromContact( props ) {
         <View
           style={[ styles.mainContainer,
             {
-              marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-              marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+              marginTop: !isModalProp ? hp( '2%' ) : hp( '1.7%' ),
+              marginBottom: !isModalProp ? hp( '2%' ) : hp( '1.7%' ),
             } ]}
         >
           <View style={[ styles.qrContainer, {
-            marginTop: !props.isModal ? 0 : hp( '4%' )
+            marginTop: !isModalProp ? 0 : hp( '4%' )
           } ]}>
-            {!props.QR ? (
+            {!qrProp ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
-              <QRCode value={props.QR} size={hp( '27%' )} />
+              <QRCode value={qrProp} size={hp( '27%' )} />
             )}
           </View>
           <CopyThisText

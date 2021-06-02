@@ -18,6 +18,7 @@ import TabNavigator from '../../TabNavigator'
 import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
+import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -55,6 +56,12 @@ const FriendsAndFamily = createStackNavigator(
         header: null,
       },
     },
+    AddContact: {
+      screen: AddContactAddressBook,
+      navigationOptions: {
+        header: null,
+      },
+    }
   },
   {
     mode: 'modal',

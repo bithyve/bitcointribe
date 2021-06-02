@@ -77,7 +77,6 @@ interface FriendsAndFamilyPropTypes {
 interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   showModal: boolean;
-  selectedContact: any[];
   loading: boolean;
   myKeepers: any[];
   ImKeeping: any[];
@@ -108,7 +107,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       onRefresh: false,
       isLoadContacts: false,
       showModal: false,
-      selectedContact: [],
       loading: true,
       myKeepers: [],
       ImKeeping: [],
@@ -414,73 +412,10 @@ class FriendsAndFamilyScreen extends PureComponent<
     )
   };
 
-  renderAddContactFriendsAndFamily = () => {
-    const { navigation } = this.props
-    const { isLoadContacts, selectedContact } = this.state
-    if( !isLoadContacts ) return
-    return (
-      <AddContactAddressBook
-        isLoadContacts={isLoadContacts}
-        proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={() => {
-          if ( selectedContact && selectedContact.length ) {
-            navigation.navigate( 'AddContactSendRequest', {
-              SelectedContact: selectedContact,
-            } )
-            this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-            this.setState( {
-              showModal: false,
-            } )
-          }
-        }}
-        onSelectContact={( selectedData ) => {
-          this.setState( {
-            selectedContact: selectedData,
-          } )
-        }}
-        onPressBack={() => {
-          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-          this.setState( {
-            showModal: false,
-          } )
-        }}
-        onSkipContinue={() => {
-          let { skippedContactsCount } = this.props.trustedContactsService.tc
-          let data
-          if ( !skippedContactsCount ) {
-            skippedContactsCount = 1
-            data = {
-              firstName: 'F&F request',
-              lastName: `awaiting ${skippedContactsCount}`,
-              name: `F&F request awaiting ${skippedContactsCount}`,
-            }
-          } else {
-            data = {
-              firstName: 'F&F request',
-              lastName: `awaiting ${skippedContactsCount + 1}`,
-              name: `F&F request awaiting ${skippedContactsCount + 1}`,
-            }
-          }
-
-          navigation.navigate( 'AddContactSendRequest', {
-            SelectedContact: [ data ],
-          } )
-          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-          this.setState( {
-            showModal: false,
-          } )
-        }}
-      />
-    )
-  };
-
-  renderAddContactAddressBookHeader = () => {
-    return <ModalHeader />
-  };
 
   render() {
     const { syncPermanentChannels, navigation } = this.props
-    const { isLoadContacts, selectedContact } = this.state
+    const { isLoadContacts } = this.state
     const {
       myKeepers,
       ImKeeping,
@@ -534,12 +469,8 @@ class FriendsAndFamilyScreen extends PureComponent<
                 onPress={() => {
                   this.setState( {
                     isLoadContacts: true,
-                    showModal: true
                   }, () => {
-                    // this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
-                    this.setState( {
-                      showModal: true,
-                    } )
+                    navigation.navigate( 'AddContact' )
                   } )
                 }}
                 style={{
@@ -585,11 +516,23 @@ class FriendsAndFamilyScreen extends PureComponent<
             <View style={{
               width: wp ( '95%' ), height: hp ( '15%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
             }}>
-              <Text
-                style={styles.cardTitle}
-              >
-              Recently Sent
-              </Text>
+              <View style={{
+                flexDirection: 'row',  justifyContent: 'space-between'
+              }}>
+                <Text
+                  style={styles.cardTitle}
+                >
+            Recently Sent
+                </Text>
+                <TouchableOpacity>
+                  <Image
+                    style={styles.moreImage}
+                    source={require( '../../assets/images/icons/icon_more.png' )}
+                  />
+                </TouchableOpacity>
+              </View>
+
+
               <View style={{
                 flexDirection: 'row',  alignSelf: 'flex-start', marginTop: hp ( '1%' )
               }}>
@@ -744,62 +687,14 @@ class FriendsAndFamilyScreen extends PureComponent<
           </ScrollView>
         </View>
         {showLoader ? <Loader /> : null}
-        <ModalContainer visible={showModal} closeBottomSheet={() => this.setState( {
+        {/* <ModalContainer visible={showModal} closeBottomSheet={() => this.setState( {
           showModal: false,
         } )} >
           <AddContactAddressBook
             isLoadContacts={isLoadContacts}
             proceedButtonText={'Confirm & Proceed'}
-            onPressContinue={() => {
-              if ( selectedContact && selectedContact.length ) {
-                navigation.navigate( 'AddContactSendRequest', {
-                  SelectedContact: selectedContact,
-                } )
-                // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-                this.setState( {
-                  showModal: false,
-                } )
-              }
-            }}
-            onSelectContact={( selectedData ) => {
-              this.setState( {
-                selectedContact: selectedData,
-              } )
-            }}
-            onPressBack={() => {
-              // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-              this.setState( {
-                showModal: false,
-              } )
-            }}
-            onSkipContinue={() => {
-              let { skippedContactsCount } = this.props.trustedContactsService.tc
-              let data
-              if ( !skippedContactsCount ) {
-                skippedContactsCount = 1
-                data = {
-                  firstName: 'F&F request',
-                  lastName: `awaiting ${skippedContactsCount}`,
-                  name: `F&F request awaiting ${skippedContactsCount}`,
-                }
-              } else {
-                data = {
-                  firstName: 'F&F request',
-                  lastName: `awaiting ${skippedContactsCount + 1}`,
-                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                }
-              }
-
-              navigation.navigate( 'AddContactSendRequest', {
-                SelectedContact: [ data ],
-              } )
-              // this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-              this.setState( {
-                showModal: false,
-              } )
-            }}
           />
-        </ModalContainer>
+        </ModalContainer> */}
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -947,6 +842,10 @@ const styles = StyleSheet.create( {
     height: wp( '10%' ),
     marginLeft: 5,
   },
+  moreImage: {
+    width: wp( '10%' ),
+    height: wp( '10%' ),
+  }
 } )
 
 function makeNavigationOptions( { navigation, } ): NavigationScreenConfig<NavigationStackOptions, any> {

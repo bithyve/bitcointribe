@@ -44,7 +44,7 @@ import Intermediate from '../../../pages/Intermediate'
 import NewOwnQuestions from '../../../pages/NewOwnQuestions'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
-
+import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
@@ -179,6 +179,7 @@ const SecurityStack = createStackNavigator(
         title: 'Wyre Home'
       }
     },
+    RequestKeyFromContact,
   },
   {
     headerLayoutPreset: 'center',

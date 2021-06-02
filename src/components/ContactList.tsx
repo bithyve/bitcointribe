@@ -388,10 +388,10 @@ export default function ContactList( props ) {
 
   return (
     <View style={{
-      flex: 1, ...props.style
+      ...props.style
     }}>
       <SafeAreaView style={{
-        flex: 0
+        // flex: 0
       }} />
       <View style={styles.selectedContactContainer}>
         {selectedContacts.length > 0
@@ -448,7 +448,7 @@ export default function ContactList( props ) {
         />
       </View>
       <View style={{
-        flex: 1, flexDirection: 'row', position: 'relative'
+        flexDirection: 'row', position: 'relative'
       }}>
         {filterContactData ? (
           <FlatList
@@ -542,7 +542,7 @@ export default function ContactList( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       )}
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={contactListErrorBottomSheet}
         snapPoints={[
@@ -562,7 +562,7 @@ export default function ContactList( props ) {
         ]}
         renderContent={renderContactPermissionModalContent}
         renderHeader={renderContactPermissionModalHeader}
-      />
+      /> */}
     </View>
   )
 }
