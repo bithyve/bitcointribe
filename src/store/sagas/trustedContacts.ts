@@ -1,9 +1,7 @@
 import { call, put, select } from 'redux-saga/effects'
 import {
-  switchTCLoading,
   REMOVE_TRUSTED_CONTACT,
   WALLET_CHECK_IN,
-  SEND_VERSION_UPDATE_NOTIFICATION,
   SYNC_PERMANENT_CHANNELS,
   syncPermanentChannels,
   INITIALIZE_TRUSTED_CONTACT,
@@ -526,7 +524,6 @@ function* walletCheckInWorker( { payload } ) {
   )
 
   try{
-    if( !walletCheckInLoading ) yield put( switchTCLoading( 'walletCheckIn' ) )
     console.log( 'Wallet Check-In in progress...' )
 
     const { synchingContacts, currencyCode } = payload
@@ -535,7 +532,6 @@ function* walletCheckInWorker( { payload } ) {
       !Object.keys( trustedContacts.tc.trustedContacts ).length
     ) {
       yield put( calculateOverallHealth( s3Service ) )
-      yield put( switchTCLoading( 'walletCheckIn' ) )
       return // aborting checkIn if walletSync is specifically done in context of trusted-contacts
     }
 
@@ -669,10 +665,8 @@ function* walletCheckInWorker( { payload } ) {
     }
 
     if ( metaShares.length ) yield put( calculateOverallHealth( s3Service ) )
-    yield put( switchTCLoading( 'walletCheckIn' ) )
   } catch( err ){
     console.log( 'Wallet Check-In failed w/ the following err: ', err )
-    yield put( switchTCLoading( 'walletCheckIn' ) )
   }
 }
 
