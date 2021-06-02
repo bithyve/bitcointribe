@@ -53,6 +53,7 @@ import { connect } from 'react-redux'
 import {
   approveTrustedContact,
   initializeTrustedContact,
+  rejectTrustedContact,
   fetchEphemeralChannel,
   fetchTrustedChannel,
   postRecoveryChannelSync,
@@ -234,6 +235,7 @@ interface HomePropsTypes {
   downloadMShare: any;
   approveTrustedContact: any;
   initializeTrustedContact: any;
+  rejectTrustedContact: any;
   fetchTrustedChannel: any;
   fetchEphemeralChannel: any;
   uploadRequestedShare: any;
@@ -477,37 +479,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       switch ( scannedData.type ) {
           case QRCodeTypes.CONTACT_REQUEST:
-            const channelKey = scannedData.channelKey
-            const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
-            navigation.navigate( 'ContactsListForAssociateContact', {
-              postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( {
-                  contact,
-                  flowKind: InitTrustedContactFlowKind.APPROVAL,
-                  channelKey,
-                  contactsSecondaryChannelKey
-                } )
-                // TODO: navigate post approval
-                navigation.navigate( 'Home' )
-              }
-            } )
-            break
-
           case QRCodeTypes.KEEPER_REQUEST:
-            const channelKey1 = scannedData.channelKey
-            const contactsSecondaryChannelKey1 = scannedData.secondaryChannelKey
-            navigation.navigate( 'ContactsListForAssociateContact', {
-              postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( {
-                  contact,
-                  flowKind: InitTrustedContactFlowKind.APPROVAL,
-                  channelKey: channelKey1,
-                  contactsSecondaryChannelKey: contactsSecondaryChannelKey1
-                } )
-                // TODO: navigate post approval
-                navigation.navigate( 'Home' )
-              }
-            } )
+            const trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type
+            }
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
             break
 
           case 'trustedGuardian':
@@ -1503,11 +1494,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onTrustedContactRequestAccepted = ( key ) => {
     this.closeBottomSheet()
-    this.processDLRequest( key, false )
+    const { navigation } = this.props
+    const { trustedContactRequest } = this.state
+
+    navigation.navigate( 'ContactsListForAssociateContact', {
+      postAssociation: ( contact ) => {
+        this.props.initializeTrustedContact( {
+          contact,
+          flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+          channelKey: trustedContactRequest.channelKey,
+          contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+        } )
+        // TODO: navigate post approval (from within saga)
+        navigation.navigate( 'Home' )
+      }
+    } )
   };
 
   onTrustedContactRejected = () => {
     this.closeBottomSheet()
+    const { trustedContactRequest } = this.state
+    this.props.rejectTrustedContact( {
+      channelKey: trustedContactRequest.channelKey,
+    } )
   };
 
   onPhoneNumberChange = () => {};
@@ -2240,6 +2249,232 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
+  renderBottomSheetContent() {
+    const { UNDER_CUSTODY, navigation } = this.props
+    const { custodyRequest } = this.state
+
+    switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return (
+            <>
+              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
+
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+                // onPress={this.closeBottomSheet}
+              />
+            </>
+          )
+
+        case BottomSheetKind.SWAN_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetSwanInfo
+                swanDeepLinkContent={this.state.swanDeepLinkContent}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+                onPress={this.onBackPress}
+              />
+            </>
+          )
+        case BottomSheetKind.WYRE_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetWyreInfo
+                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
+                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
+                wyreFromDeepLink={this.state.wyreFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+                onPress={this.onBackPress}
+              />
+            </>
+          )
+
+        case BottomSheetKind.RAMP_STATUS_INFO:
+          return (
+            <>
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetRampInfo
+                rampDeepLinkContent={this.state.rampDeepLinkContent}
+                rampFromBuyMenu={this.state.rampFromBuyMenu}
+                rampFromDeepLink={this.state.rampFromDeepLink}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+                onPress={this.onBackPress}
+              />
+            </>
+          )
+
+        case BottomSheetKind.CUSTODIAN_REQUEST:
+          return (
+            <>
+              <CustodianRequestModalContents
+                userName={custodyRequest.requester}
+                onPressAcceptSecret={() => {
+                  this.closeBottomSheet()
+
+                  if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
+                    Alert.alert(
+                      'Request expired!',
+                      'Please ask the sender to initiate a new request',
+                    )
+                  } else {
+                    if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
+                      Alert.alert(
+                        'Failed to store',
+                        'You cannot custody multiple shares of the same user.',
+                      )
+                    } else {
+                      if ( custodyRequest.isQR ) {
+                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
+                      } else {
+                        navigation.navigate( 'CustodianRequestOTP', {
+                          custodyRequest,
+                        } )
+                      }
+                    }
+                  }
+                }}
+                onPressRejectSecret={() => {
+                  this.closeBottomSheet()
+                  this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
+                }}
+              />
+
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
+          return (
+            <CustodianRequestRejectedModalContents
+              onPressViewTrustedContacts={this.closeBottomSheet}
+              userName={custodyRequest.requester}
+            />
+          )
+
+        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
+          const { trustedContactRequest } = this.state
+
+          return (
+            <TrustedContactRequestContent
+              trustedContactRequest={trustedContactRequest}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
+              onPhoneNumberChange={this.onPhoneNumberChange}
+              bottomSheetRef={this.bottomSheetRef}
+            />
+          )
+
+        case BottomSheetKind.NOTIFICATIONS_LIST:
+          const { notificationLoading, notificationData } = this.state
+
+          return (
+            <NotificationListContent
+              notificationLoading={notificationLoading}
+              NotificationData={notificationData}
+              onNotificationClicked={this.onNotificationClicked}
+              onPressBack={this.closeBottomSheet}
+            />
+          )
+
+        case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
+          const { isLoadContacts, selectedContact } = this.state
+
+          return (
+            <AddContactAddressBook
+              isLoadContacts={isLoadContacts}
+              proceedButtonText={'Confirm & Proceed'}
+              onPressContinue={() => {
+                if ( selectedContact && selectedContact.length ) {
+                  this.closeBottomSheet()
+
+                  navigation.navigate( 'AddContactSendRequest', {
+                    SelectedContact: selectedContact,
+                  } )
+                }
+              }}
+              onSelectContact={( selectedContact ) => {
+                this.setState( {
+                  selectedContact,
+                } )
+              }}
+              onPressBack={this.closeBottomSheet}
+              onSkipContinue={() => {
+                let { skippedContactsCount } = this.props.trustedContacts.tc
+                let data
+                if ( !skippedContactsCount ) {
+                  skippedContactsCount = 1
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount}`,
+                    name: `F&F request awaiting ${skippedContactsCount}`,
+                  }
+                } else {
+                  data = {
+                    firstName: 'F&F request',
+                    lastName: `awaiting ${skippedContactsCount + 1}`,
+                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                  }
+                }
+
+                this.closeBottomSheet()
+
+                navigation.navigate( 'AddContactSendRequest', {
+                  SelectedContact: [ data ],
+                } )
+              }}
+            />
+          )
+
+        case BottomSheetKind.ERROR:
+          const { errorMessageHeader, errorMessage } = this.state
+
+          return (
+            <ErrorModalContents
+              title={errorMessageHeader}
+              info={errorMessage}
+              onPressProceed={this.closeBottomSheet}
+              isBottomImage={true}
+              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+            />
+          )
+
+        case BottomSheetKind.CLOUD_ERROR:
+          return (
+            <ErrorModalContents
+              title={'Automated Cloud Backup Error'}
+              info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
+              note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
+              onPressProceed={()=>{
+                this.props.setCloudData()
+                this.closeBottomSheet()
+              }}
+              onPressIgnore={()=> {
+                this.props.updateCloudPermission( false )
+                this.closeBottomSheet()
+              }}
+              proceedButtonText={'Try Again'}
+              cancelButtonText={'Skip'}
+              isIgnoreButton={true}
+              isBottomImage={true}
+              isBottomImageStyle={styles.cloudErrorModalImage}
+              bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
+            />
+          )
+
+        default:
+          break
+    }
+  }
+
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
 
@@ -2348,6 +2583,7 @@ export default withNavigationFocus(
     downloadMShare,
     approveTrustedContact,
     initializeTrustedContact,
+    rejectTrustedContact,
     fetchTrustedChannel,
     uploadRequestedShare,
     uploadSecondaryShareForPK,

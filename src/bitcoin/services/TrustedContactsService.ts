@@ -304,9 +304,9 @@ export default class TrustedContactsService {
   public syncPermanentChannels = async (
     channelSyncDetails:
     {
-    contactDetails: ContactDetails,
     channelKey: string,
     streamId: string,
+    contactDetails?: ContactDetails,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     contactsSecondaryChannelKey?: string

@@ -51,14 +51,12 @@ import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import SendShareModal from '../ManageBackup/SendShareModal'
 import {
-  MetaShare, QRCodeTypes, TrustedContact, Trusted_Contacts,
+  QRCodeTypes, TrustedContact, Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { removeTrustedContact } from '../../store/actions/trustedContacts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
@@ -1192,43 +1190,40 @@ class ContactDetails extends PureComponent<
               ) : null}
             </View>
           )}
-          {/* {this.Contact.isRemovable ? (
-            <TouchableOpacity
-              style={{
-                ...styles.bottomButton,
-              }}
-              onPress={() => {
-                Alert.alert(
-                  'Remove Contact',
-                  'Are you sure about removing the contact?',
-                  [
-                    {
-                      text: 'Yes',
-                      onPress: () => {
-                        this.props.removeTrustedContact(
-                          contact.contactName,
-                          contact.shareIndex
-                        )
-                        this.props.navigation.goBack()
-                      },
-                    },
-                    {
-                      text: 'Cancel',
-                      onPress: () => {},
-                      style: 'cancel',
-                    },
-                  ],
+          <TouchableOpacity
+            style={{
+              ...styles.bottomButton,
+            }}
+            onPress={() => {
+              Alert.alert(
+                'Remove Contact',
+                'Are you sure about removing the contact?',
+                [
                   {
-                    cancelable: false
-                  }
-                )
-              }}
-            >
-              <View>
-                <Text style={styles.buttonText} numberOfLines={1}>Remove</Text>
-              </View>
-            </TouchableOpacity>
-          ) : null} */}
+                    text: 'Yes',
+                    onPress: () => {
+                      this.props.removeTrustedContact( {
+                        channelKey: contact.channelKey
+                      } )
+                      this.props.navigation.goBack()
+                    },
+                  },
+                  {
+                    text: 'Cancel',
+                    onPress: () => {},
+                    style: 'cancel',
+                  },
+                ],
+                {
+                  cancelable: false
+                }
+              )
+            }}
+          >
+            <View>
+              <Text style={styles.buttonText} numberOfLines={1}>Remove</Text>
+            </View>
+          </TouchableOpacity>
         </View>
         <BottomSheet
           enabledInnerScrolling={true}

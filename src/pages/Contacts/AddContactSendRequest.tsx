@@ -88,7 +88,7 @@ export default function AddContactSendRequest( props ) {
     }
     dispatch( initializeTrustedContact( {
       contact: Contact,
-      flowKind: InitTrustedContactFlowKind.SETUP
+      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
     } ) )
   }, [ Contact ] )
 
