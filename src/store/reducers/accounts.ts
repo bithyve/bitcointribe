@@ -36,7 +36,8 @@ import {
   RESET_TWO_FA,
   VALIDATE_TWO_FA,
   SET_SHOW_ALL_ACCOUNT,
-  RESET_ACCOUNT_UPDATE_FLAG
+  RESET_ACCOUNT_UPDATE_FLAG,
+  RESET_TWO_FA_LOADER
 } from '../actions/accounts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -112,6 +113,7 @@ export type AccountsState = {
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
   showAllAccount: boolean | null;
+  resetTwoFALoader: boolean;
 };
 
 const initialState: AccountsState = {
@@ -161,7 +163,8 @@ const initialState: AccountsState = {
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
-  showAllAccount: false
+  showAllAccount: false,
+  resetTwoFALoader: false,
 }
 
 export default ( state: AccountsState = initialState, action ): AccountsState => {
@@ -526,6 +529,12 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           isUpdatingAccountSettings: false,
           hasAccountSettingsUpdateSucceeded: false,
           hasAccountSettingsUpdateFailed: false,
+        }
+
+      case RESET_TWO_FA_LOADER:
+        return {
+          ...state,
+          resetTwoFALoader: action.payload.flag,
         }
       default:
         return state

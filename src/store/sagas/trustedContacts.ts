@@ -23,7 +23,8 @@ import {
   ContactDetails,
   KeeperInfoInterface,
   MetaShare,
-  TrustedContact
+  TrustedContact,
+  ChannelAssets
 } from '../../bitcoin/utilities/Interface'
 import {
   calculateOverallHealth,
@@ -111,7 +112,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
     walletName,
-    relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : TrustedContactRelationTypes.CONTACT,
+    relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : contactInfo.contactsSecondaryChannelKey ? TrustedContactRelationTypes.WARD : TrustedContactRelationTypes.CONTACT,
     FCM,
     paymentAddresses
   }
@@ -250,7 +251,9 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       if( flowKind === InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT ){
         const temporaryContact = trustedContacts.tc.trustedContacts[ contactIdentifier ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
-        console.log({temporaryContact, instream})
+        console.log( {
+          temporaryContact, instream
+        } )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         if( fcmToken ){
           //TODO: send rejection notification
@@ -314,15 +317,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const accountShells: AccountShell[] = yield select(
     ( state ) => state.accounts.accountShells,
   )
-  const keeperInfo: KeeperInfoInterface[] = yield select(
-    ( state ) => state.health.keeperInfo,
-  )
-  const MetaShares: MetaShare[] = yield select(
-    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
-  )
-  const secureAccount: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
   const { contact, flowKind, isKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
   let info = ''
   if ( contact && contact.phoneNumbers && contact.phoneNumbers.length ) {
@@ -349,22 +343,13 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   }
 
   if( isKeeper ) {
+    const channelAssets: ChannelAssets = yield select(
+      ( state ) => state.health.keeperInfo,
+    )
+    if( channelAssets.shareId == shareId ) delete channelAssets[ 'shareId' ]
     // TODO: prepare channel assets and plug into contactInfo obj
     contactInfo.isKeeper = isKeeper
-    contactInfo.channelAssets = {
-      primaryMnemonicShard:
-      {
-        ...MetaShares.find( value=>value.shareId==shareId ),
-        encryptedShare: {
-          pmShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.pmShare,
-          smShare: '',
-          bhXpub: '',
-        }
-      },
-      secondaryMnemonicShard: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare,
-      keeperInfo: keeperInfo,
-      bhXpub: secureAccount.secureHDWallet.xpubs.bh,
-    }
+    contactInfo.channelAssets = channelAssets
   }
 
   let parentShell: AccountShell
@@ -581,7 +566,7 @@ function* walletCheckInWorker( { payload } ) {
           yield put( setAverageTxFee( averageTxFees ) )
       }
 
-      let shareRemoved = false
+      const shareRemoved = false
       // if ( updationInfo ) {
       //   // removing shares under-custody based on reshare-version@HealthSchema
       //   Object.keys( underCustody ).forEach( ( tag ) => {

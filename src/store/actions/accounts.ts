@@ -53,6 +53,7 @@ export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
 export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
 export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
 export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
+export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
 
 export const getAllAccountsData = () => {
   return {
@@ -671,5 +672,13 @@ export const setShowAllAccount = ( showAllAccount ) => {
 export const resetAccountUpdateFlag = () => {
   return {
     type: RESET_ACCOUNT_UPDATE_FLAG,
+  }
+}
+
+export const setResetTwoFALoader = ( flag ) => {
+  return {
+    type: RESET_TWO_FA_LOADER, payload:{
+      flag
+    }
   }
 }

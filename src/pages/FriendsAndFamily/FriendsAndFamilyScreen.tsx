@@ -186,7 +186,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       } else {
         // TODO: inject in expired contacts list
       }
-
     }
 
     this.setState( {
@@ -381,7 +380,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( ImKeeping.length && ImKeeping.filter( ( item, index ) => {
+                {( ImKeeping.length && ImKeeping.map( ( item, index ) => {
                   return this.renderContactListItem( {
                     backendContactInfo: item,
                     contactDescription: makeContactRecipientDescription(

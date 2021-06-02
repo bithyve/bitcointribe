@@ -177,6 +177,7 @@ import {
   setLevelToNotSetupStatusWatcher,
   setHealthStatusWatcher,
   modifyLevelDataWatcher,
+  createChannelAssetsWatcher,
 } from './sagas/health'
 
 import {
@@ -336,6 +337,7 @@ const rootSaga = function* () {
     setLevelToNotSetupStatusWatcher,
     setHealthStatusWatcher,
     modifyLevelDataWatcher,
+    createChannelAssetsWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,

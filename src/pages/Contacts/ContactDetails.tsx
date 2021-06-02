@@ -41,17 +41,14 @@ import {
   uploadRequestedShare,
   ErrorSending,
   UploadSuccessfully,
-  uploadEncMShare,
 } from '../../store/actions/sss'
 import {  uploadRequestedSMShare, UploadSMSuccessfully } from '../../store/actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import config from '../../bitcoin/HexaConfig'
 import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import SendShareModal from '../ManageBackup/SendShareModal'
 import {
-  QRCodeTypes, TrustedContact, Trusted_Contacts,
+  QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { removeTrustedContact } from '../../store/actions/trustedContacts'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -60,6 +57,7 @@ import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 const getImageIcon = ( item ) => {
   if ( Object.keys( item ).length ) {
@@ -133,6 +131,7 @@ interface ContactDetailsPropTypes {
   UploadSMSuccessfully: any;
   uploadingSmShare: any;
   newBHRFlowStarted : any;
+  s3Service: S3Service
 }
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
@@ -149,7 +148,6 @@ interface ContactDetailsStateTypes {
   trustedContactHistory: any;
   SMShareQR: string;
   qrModalTitle: string;
-  isSmSharePresent: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -222,7 +220,6 @@ class ContactDetails extends PureComponent<
         },
       ],
       qrModalTitle: '',
-      isSmSharePresent: false,
     }
 
     this.Contact = this.props.navigation.state.params.contact
@@ -267,12 +264,6 @@ class ContactDetails extends PureComponent<
         Loading: false,
       } )
     }
-    if ( prevProps.uploadSuccessfull !== this.props.uploadSuccessfull ) {
-      this.generateHelpRestoreQR()
-    }
-    if ( prevProps.hasSMUploadedSuccessfully !== this.props.hasSMUploadedSuccessfully ) {
-      this.generateHelpRestoreQR( true )
-    }
     if ( prevProps.errorSending !== this.props.errorSending ) {
       this.setState( {
         errorMessageHeader: 'Error sending Recovery Secret',
@@ -284,11 +275,6 @@ class ContactDetails extends PureComponent<
       this.props.ErrorSending( null )
     }
 
-    if( this.contactsType == 'I\'m Keeper of' && this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ] && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ].SECONDARY_SHARE && this.props.UNDER_CUSTODY[ this.props.trustedContacts.tc.trustedContacts[ this.ContactName ].contactsWalletName ].SECONDARY_SHARE.shareId ){
-      this.setState( {
-        isSmSharePresent: true
-      } )
-    }
     // this.updateContactDetailsUI()
   }
 
@@ -495,22 +481,20 @@ class ContactDetails extends PureComponent<
     }
   };
 
-  generateHelpRestoreQR = ( isSmKey? ) => {
-    const { trustedContacts, UNDER_CUSTODY, UploadSuccessfully, UploadSMSuccessfully } = this.props
+  generateQR = ( type ) => {
+    const appVersion = DeviceInfo.getVersion()
+    const { trustedContacts } = this.props
+    const contacts: TrustedContact = trustedContacts.tc.trustedContactsV2[ this.Contact.channelKey ]
+    const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
     if ( !this.Contact ) {
       Alert.alert( 'Contact details missing' )
       return
     }
 
-    const contactName = `${this.Contact.firstName} ${
-      this.Contact.lastName ? this.Contact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
-
     if (
-      !trustedContacts.tc.trustedContacts[ contactName ] &&
-      !trustedContacts.tc.trustedContacts[ contactName ].isWard
+      !contacts &&
+      ( contacts.relationType == TrustedContactRelationTypes.KEEPER_WARD ||
+      contacts.relationType == TrustedContactRelationTypes.WARD )
     ) {
       Alert.alert(
         'Restore request failed',
@@ -518,157 +502,32 @@ class ContactDetails extends PureComponent<
       )
       return
     }
-
-    const requester = trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
-    const appVersion = DeviceInfo.getVersion()
-    if( isSmKey ){
-      if (
-        UNDER_CUSTODY[ requester ] &&
-        UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS &&
-        Date.now() - UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS.UPLOADED_AT <
-          config.TC_REQUEST_EXPIRY
-      ) {
-        const { KEY, UPLOADED_AT } = UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS
-        const qrString = JSON.stringify( {
-          requester: requester,
-          publicKey: KEY,
-          uploadedAt: UPLOADED_AT,
-          type: 'ReverseRecoveryQR',
-          ver: appVersion,
-        } )
-
-        setTimeout( () => {
-          this.setState( {
-            trustedQR: qrString
-          } )
-        }, 2 );
-
-        ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
-
-        UploadSMSuccessfully( false )
-      }
+    let qrString = ''
+    if( type == 'recovery' ){
+      qrString = JSON.stringify( {
+        type: QRCodeTypes.RECOVERY_REQUEST,
+        walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
+        channelId: contacts.permanentChannelAddress,
+        streamId: instream.streamId,
+        channelKey: this.Contact.channelKey,
+        channelKey2: contacts.contactsSecondaryChannelKey,
+        version: appVersion
+      } )
     } else {
-      if (
-        UNDER_CUSTODY[ requester ] &&
-        UNDER_CUSTODY[ requester ].TRANSFER_DETAILS &&
-        Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT <
-          config.TC_REQUEST_EXPIRY
-      ) {
-        const { KEY, UPLOADED_AT } = UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
-        const qrString = JSON.stringify( {
-          requester: requester,
-          publicKey: KEY,
-          uploadedAt: UPLOADED_AT,
-          type: 'ReverseRecoveryQR',
-          ver: appVersion,
-        } )
-        this.setState( {
-          trustedQR: qrString
-        } )
-        setTimeout( () => {
-          ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
-        }, 2 )
-        UploadSuccessfully( false )
-      }
+      qrString = JSON.stringify( {
+        type: QRCodeTypes.RECOVERY_REQUEST,
+        walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
+        channelId: contacts.permanentChannelAddress,
+        streamId: instream.streamId,
+        channelKey2: contacts.contactsSecondaryChannelKey,
+        version: appVersion
+      } )
     }
+    this.setState( {
+      trustedQR: qrString
+    } );
+    ( this.SendViaQRBottomSheet as any ).current.snapTo( 1 )
   };
-
-  // setExitKey= () => {
-  //   const { trustedContacts, UNDER_CUSTODY } = this.props
-  //   if ( !this.Contact || !this.Contact.isWard ) {
-  //     return
-  //   }
-
-  //   const contactName = `${this.Contact.firstName} ${
-  //     this.Contact.lastName ? this.Contact.lastName : ''
-  //   }`
-  //     .toLowerCase()
-  //     .trim()
-
-  //   if (
-  //     !trustedContacts.tc.trustedContacts[ contactName ] &&
-  //     !trustedContacts.tc.trustedContacts[ contactName ].isWard
-  //   ) {
-  //     return
-  //   }
-  //   const requester =
-  //     trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
-
-  //   const metaShare: MetaShare = UNDER_CUSTODY[ requester ].META_SHARE
-  //   if ( metaShare.meta.index === 0 ) {
-  //     const encryptedExitKey = metaShare.encryptedStaticNonPMDD
-  //     this.setState( {
-  //       encryptedExitKey: JSON.stringify( {
-  //         type: 'encryptedExitKey',
-  //         encryptedExitKey,
-  //       } ),
-  //     } )
-  //   }
-  // };
-
-  // onHelpRestore = ( isSmKey? ) => {
-  //   const { trustedContacts, UNDER_CUSTODY, uploadRequestedShare, uploadRequestedSMShare } = this.props
-  //   if ( !this.Contact ) {
-  //     console.log( 'Err: Contact missing' )
-  //     return
-  //   }
-
-  //   const contactName = `${this.Contact.firstName} ${
-  //     this.Contact.lastName ? this.Contact.lastName : ''
-  //   }`
-  //     .toLowerCase()
-  //     .trim()
-
-  //   if (
-  //     !trustedContacts.tc.trustedContacts[ contactName ] &&
-  //     !trustedContacts.tc.trustedContacts[ contactName ].isWard
-  //   ) {
-  //     Alert.alert(
-  //       'Restore request failed',
-  //       'You are not a keeper of the selected contact'
-  //     )
-  //     return
-  //   }
-  //   const requester =
-  //     trustedContacts.tc.trustedContacts[ contactName ].contactsWalletName
-  //   const encryptionKey = S3Service.generateRequestCreds().key
-  //   if( isSmKey ){
-  //     this.setState( {
-  //       qrModalTitle: 'Share Secondary Key'
-  //     } )
-  //     if (
-  //       !UNDER_CUSTODY[ requester ] ||
-  //       !UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS
-  //     ) {
-  //       uploadRequestedSMShare( requester, encryptionKey )
-  //     } else if (
-  //       Date.now() - UNDER_CUSTODY[ requester ].SM_TRANSFER_DETAILS.UPLOADED_AT >
-  //       config.TC_REQUEST_EXPIRY
-  //     ) {
-  //       uploadRequestedSMShare( requester, encryptionKey )
-  //     } else {
-  //       this.generateHelpRestoreQR( true )
-  //     }
-  //   }
-  //   else{
-  //     this.setState( {
-  //       qrModalTitle: 'Send Recovery Secret'
-  //     } )
-  //     if (
-  //       !UNDER_CUSTODY[ requester ] ||
-  //       !UNDER_CUSTODY[ requester ].TRANSFER_DETAILS
-  //     ) {
-  //       uploadRequestedShare( requester, encryptionKey )
-  //     } else if (
-  //       Date.now() - UNDER_CUSTODY[ requester ].TRANSFER_DETAILS.UPLOADED_AT >
-  //       config.TC_REQUEST_EXPIRY
-  //     ) {
-  //       uploadRequestedShare( requester, encryptionKey )
-  //     } else {
-  //       this.generateHelpRestoreQR()
-  //     }
-  //   }
-  // };
 
   createDeepLink = ( contact ) => {
     const { trustedContacts, WALLET_SETUP } = this.props
@@ -1111,7 +970,7 @@ class ContactDetails extends PureComponent<
                 }}
                 onPress={()=>
                 {
-                  // this.onHelpRestore()
+                  this.generateQR( 'recovery' )
                 }
                 }
               >
@@ -1127,31 +986,30 @@ class ContactDetails extends PureComponent<
                   )}
                 </View>
               </TouchableOpacity>
-              { this.state.isSmSharePresent ? (
-                <TouchableOpacity
-                  style={{
-                    ...styles.bottomButton,
-                    justifyContent: 'space-around',
-                  }}
-                  onPress={() => {
-                    // this.onHelpRestore( true )
-                  }}
-                >
-                  <Image
-                    source={require( '../../assets/images/icons/icon_restore.png' )}
-                    style={styles.buttonImage}
-                  />
-                  <View>
-                    {uploadingSmShare ? (
-                      <ActivityIndicator size="small" />
-                    ) : (
-                      <Text style={[ styles.buttonText, {
-                        marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
-                      } ]}>Show Secondary Key</Text>
-                    )}
-                  </View>
-                </TouchableOpacity>
-              ) : null}
+              <TouchableOpacity
+                style={{
+                  ...styles.bottomButton,
+                  justifyContent: 'space-around',
+                }}
+                onPress={() => {
+                  this.generateQR( 'approval' )
+                }}
+              >
+                <Image
+                  source={require( '../../assets/images/icons/icon_restore.png' )}
+                  style={styles.buttonImage}
+                />
+                <View>
+                  {uploadingSmShare ? (
+                    <ActivityIndicator size="small" />
+                  ) : (
+                    <Text style={[ styles.buttonText, {
+                      marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
+                    } ]}>Show Secondary Key</Text>
+                  )}
+                </View>
+              </TouchableOpacity>
+
               {encryptedExitKey ? (
                 <TouchableOpacity
                   style={{
@@ -1325,6 +1183,7 @@ const mapStateToProps = ( state ) => {
     ),
     hasSMUploadedSuccessfully: idx( state, ( _ ) => _.health.hasSMUploadedSuccessfully ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
+    s3Service: idx( state, ( _ ) => _.health.service )
   }
 }
 export default connect( mapStateToProps, {
