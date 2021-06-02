@@ -19,7 +19,6 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  clearTrustedContactsCache,
   syncPermanentChannels,
   PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
@@ -109,7 +108,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       // } )
       this.updateAddressBook()
     } )
-    this.props.clearTrustedContactsCache()
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
     } )
@@ -117,7 +115,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidUpdate( prevProps, prevState ) {
     if (
-      prevProps.trustedContactsService.tc.trustedContactsV2 != this.props.trustedContactsService.tc.trustedContactsV2
+      prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
     ) this.updateAddressBook()
 
     if (
@@ -150,7 +148,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   updateAddressBook = async () => {
     const { trustedContactsService, regularAccount } = this.props
-    const contacts = trustedContactsService.tc.trustedContactsV2
+    const contacts = trustedContactsService.tc.trustedContacts
     const { walletId } = regularAccount.hdWallet.getWalletId()
 
     const myKeepers = []
@@ -515,7 +513,6 @@ const mapStateToProps = ( state ) => {
 
 export default connect( mapStateToProps, {
   syncPermanentChannels,
-  clearTrustedContactsCache
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {

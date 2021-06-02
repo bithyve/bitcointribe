@@ -82,7 +82,7 @@ export default function AddContactSendRequest( props ) {
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
@@ -104,7 +104,7 @@ export default function AddContactSendRequest( props ) {
   useEffect( () => {
     if( !Contact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 

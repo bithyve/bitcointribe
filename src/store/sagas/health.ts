@@ -2636,7 +2636,7 @@ function* getPDFDataWorker( { payload } ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
     let pdfPath = pdfInfo.filePath
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKeyFromCH: string
 
@@ -3938,7 +3938,7 @@ function* modifyLevelDataWorker( ) {
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const s3Service = yield select( ( state ) => state.health.service )
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
 
     let isError = false
     const abc = JSON.stringify( levelHealth )
