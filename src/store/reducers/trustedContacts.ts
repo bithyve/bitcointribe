@@ -2,15 +2,6 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { SERVICES_ENRICHED } from '../actions/storage'
 import { TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import {
-  TRUSTED_CONTACT_APPROVED,
-  EPHEMERAL_CHANNEL_FETCHED,
-  EPHEMERAL_CHANNEL_UPDATED,
-  TRUSTED_CHANNEL_UPDATED,
-  TRUSTED_CHANNEL_FETCHED,
-  SWITCH_TC_LOADING,
-  APPROVE_TRUSTED_CONTACT,
-  CLEAR_TRUSTED_CONTACTS_CACHE,
-  UPGRADE_REDUCER,
   SYNC_PERMANENT_CHANNELS,
   EXISTING_PERMANENT_CHANNELS_SYNCHED,
   PermanentChannelsSyncKind
@@ -28,29 +19,8 @@ import idx from 'idx'
 
 export type TrustedContactsState = {
   service: TrustedContactsService;
-
-  approvedTrustedContacts: {
-    [contactName: string]: {
-      approved: boolean;
-    };
-  };
-
-  ephemeralChannel: {
-    [contactName: string]: { updated: boolean; data?: EphemeralDataElements };
-  };
-
-  trustedChannel: { [contactName: string]: { updated: boolean; data?: unknown } };
-
-  // paymentDetails: {
-  //   address?: string;
-  //   paymentURI?: string;
-  // };
-
   loading: {
-    updateEphemeralChannel: boolean;
-    updateTrustedChannel: boolean;
     existingPermanentChannelsSynching: boolean;
-    approvingTrustedContact: boolean;
     walletCheckIn: boolean;
   };
   trustedContactRecipients: ContactRecipientDescribing[];
@@ -59,15 +29,8 @@ export type TrustedContactsState = {
 
 const initialState: TrustedContactsState = {
   service: null,
-  approvedTrustedContacts: null,
-  ephemeralChannel: null,
-  trustedChannel: null,
-  // paymentDetails: null,
   loading: {
-    updateEphemeralChannel: false,
-    updateTrustedChannel: false,
     existingPermanentChannelsSynching: false,
-    approvingTrustedContact: false,
     walletCheckIn: false,
   },
   trustedContactRecipients: [],
@@ -76,14 +39,6 @@ const initialState: TrustedContactsState = {
 
 export default ( state: TrustedContactsState = initialState, action ): TrustedContactsState => {
   switch ( action.type ) {
-      case CLEAR_TRUSTED_CONTACTS_CACHE:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            approvingTrustedContact: false,
-          },
-        }
       case SERVICES_ENRICHED:
         return {
           ...state,
@@ -91,15 +46,6 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
           trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
             trustedContacts: action.payload.services[ TRUSTED_CONTACTS ].tc.trustedContacts,
           } ),
-        }
-
-      case APPROVE_TRUSTED_CONTACT:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            approvingTrustedContact: true,
-          },
         }
 
       case SYNC_PERMANENT_CHANNELS:
@@ -121,104 +67,10 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
             existingPermanentChannelsSynching: false,
           },
         }
-
-      case TRUSTED_CONTACT_APPROVED:
-        return {
-          ...state,
-          approvedTrustedContacts: {
-            ...state.approvedTrustedContacts,
-            [ action.payload.contactName ]: {
-              approved: action.payload.approved,
-            },
-          },
-          loading: {
-            ...state.loading,
-            approvingTrustedContact: false,
-          },
-        }
-
-      case EPHEMERAL_CHANNEL_UPDATED:
-        return {
-          ...state,
-          ephemeralChannel: {
-            ...state.ephemeralChannel,
-            [ action.payload.contactName ]: {
-              updated: action.payload.updated,
-              data: action.payload.data,
-            },
-          },
-        }
-
-      case EPHEMERAL_CHANNEL_FETCHED:
-        return {
-          ...state,
-          ephemeralChannel: {
-            ...state.ephemeralChannel,
-            [ action.payload.contactName ]: {
-              data: action.payload.data,
-            },
-          },
-        }
-
-      case TRUSTED_CHANNEL_UPDATED:
-        return {
-          ...state,
-          trustedChannel: {
-            ...state.trustedChannel,
-            [ action.payload.contactName ]: {
-              updated: action.payload.updated,
-              data: action.payload.data,
-            },
-          },
-        }
-
-      case TRUSTED_CHANNEL_FETCHED:
-        return {
-          ...state,
-          trustedChannel: {
-            ...state.trustedChannel,
-            [ action.payload.contactName ]: {
-              data: action.payload.data,
-            },
-          },
-        }
-
-        // case PAYMENT_DETAILS_FETCHED:
-        //   return {
-        //     ...state,
-        //     paymentDetails: action.payload.paymentDetails,
-        //   }
-
-        // case CLEAR_PAYMENT_DETAILS:
-        //   return {
-        //     ...state,
-        //     paymentDetails: null,
-        //   }
-
-      case SWITCH_TC_LOADING:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            [ action.payload.beingLoaded ]: !state.loading[
-              action.payload.beingLoaded
-            ],
-          },
-        }
-
-      case UPGRADE_REDUCER:
-        return {
-          ...state,
-          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
-            trustedContacts: action.payload.services[ TRUSTED_CONTACTS ].tc.trustedContacts,
-          } ),
-        }
-
   }
 
   return state
 }
-
 
 function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
   trustedContacts: Trusted_Contacts;

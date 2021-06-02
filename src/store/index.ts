@@ -108,17 +108,8 @@ import {
 } from './sagas/notifications'
 
 import {
-  approveTrustedContactWatcher,
-  fetchTrustedChannelWatcher,
-  fetchEphemeralChannelWatcher,
-  updateEphemeralChannelWatcher,
-  updateTrustedChannelWatcher,
   removeTrustedContactWatcher,
-  syncTrustedChannelsWatcher,
   walletCheckInWatcher,
-  postRecoveryChannelSyncWatcher,
-  multiUpdateTrustedChannelsWatcher,
-  sendVersionUpdateNotificationWatcher,
   syncPermanentChannelsWatcher,
   initializeTrustedContactWatcher,
   rejectTrustedContactWatcher,
@@ -298,19 +289,10 @@ const rootSaga = function* () {
     fetchNotificationsWatcher,
 
     // Trusted Contacts
-    approveTrustedContactWatcher,
     initializeTrustedContactWatcher,
     rejectTrustedContactWatcher,
     removeTrustedContactWatcher,
-    updateEphemeralChannelWatcher,
-    fetchEphemeralChannelWatcher,
-    updateTrustedChannelWatcher,
-    fetchTrustedChannelWatcher,
     walletCheckInWatcher,
-    syncTrustedChannelsWatcher,
-    postRecoveryChannelSyncWatcher,
-    sendVersionUpdateNotificationWatcher,
-    multiUpdateTrustedChannelsWatcher,
     syncPermanentChannelsWatcher,
 
     // Health

@@ -672,7 +672,7 @@ class ContactDetails extends PureComponent<
 
   createDeepLink = ( contact ) => {
     const { trustedContacts, WALLET_SETUP } = this.props
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 
