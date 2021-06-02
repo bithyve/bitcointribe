@@ -477,6 +477,14 @@ export interface ContactDetails {
   image?: ImageSourcePropType | null,
 }
 
+export interface ChannelAssets {
+  shareId?: string,
+  primaryMnemonicShard?: any,
+  keeperInfo?: any,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string
+}
+
 export interface ContactInfo  {
   contactDetails?: ContactDetails,
   isKeeper?: boolean,

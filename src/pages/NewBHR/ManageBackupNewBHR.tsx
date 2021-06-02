@@ -43,7 +43,8 @@ import {
   keeperProcessStatus,
   setLevelToNotSetupStatus,
   setHealthStatus,
-  modifyLevelData
+  modifyLevelData,
+  createChannelAssets
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -135,6 +136,7 @@ interface ManageBackupNewBHRPropsTypes {
   shieldHealth: boolean;
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
+  createChannelAssets: any
 }
 
 class ManageBackupNewBHR extends Component<
@@ -495,7 +497,7 @@ class ManageBackupNewBHR extends Component<
         modalRef={this.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          this.props.downloadSmShareForApproval( qrScannedData )
+          this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
           this.setState( {
             QrBottomSheetsFlag: false
           } )
@@ -510,7 +512,7 @@ class ManageBackupNewBHR extends Component<
           // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
-          //     this.props.downloadSmShareForApproval( qrScannedData )
+          //     this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
           //     this.setState( {
           //       QrBottomSheetsFlag: false
           //     } )
@@ -946,6 +948,7 @@ export default withNavigationFocus(
     setIsKeeperTypeBottomSheetOpen,
     updateCloudData,
     modifyLevelData,
+    createChannelAssets,
   } )( ManageBackupNewBHR )
 )
 

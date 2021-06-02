@@ -35,6 +35,8 @@ import {
   onApprovalStatusChange,
   downloadSmShareForApproval,
   keeperProcessStatus,
+  setChannelAssets,
+  createChannelAssets,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
 import SendShareModal from './SendShareModal'
@@ -49,6 +51,7 @@ import {
   QRCodeTypes,
   TrustedContact,
   Trusted_Contacts,
+  ChannelAssets
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -203,6 +206,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -218,9 +222,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
     setIndex( props.navigation.getParam( 'index' ) )
+    if( channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ){
+      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
+    }
   }, [
-    props.navigation.getParam( 'selectedLevelId' ),
-    props.navigation.getParam( 'selectedKeeper' ),
     props.navigation.state.params,
   ] )
 
@@ -805,6 +810,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
           name: chosenContact && chosenContact.name ? chosenContact.name : ''
         }
         dispatch( updateMSharesHealth( shareObj, false ) )
+        dispatch( setChannelAssets( {
+        } ) )
       }
     }
   }, [ chosenContact, trustedContacts ] )
@@ -1087,7 +1094,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           setIsApprovalStarted( true )
-          dispatch( downloadSmShareForApproval( qrScannedData ) )
+          dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
@@ -1098,7 +1105,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           // setIsApprovalStarted( true )
           // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
-          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //   dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           //   setQrBottomSheetsFlag( false )
           // } catch ( err ) {
           //   console.log( {
