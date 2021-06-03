@@ -477,6 +477,14 @@ export interface ContactDetails {
   image?: ImageSourcePropType | null,
 }
 
+export interface ChannelAssets {
+  shareId?: string,
+  primaryMnemonicShard?: any,
+  keeperInfo?: any,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string
+}
+
 export interface ContactInfo  {
   contactDetails?: ContactDetails,
   isKeeper?: boolean,
@@ -719,5 +727,6 @@ export interface LevelData {
 
 export enum QRCodeTypes {
   CONTACT_REQUEST = 'CONTACT_REQUEST',
-  KEEPER_REQUEST = 'KEEPER_REQUEST'
+  KEEPER_REQUEST = 'KEEPER_REQUEST',
+  RECOVERY_REQUEST = 'RECOVERY_REQUEST'
 }

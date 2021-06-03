@@ -59,6 +59,8 @@ import {
 import {
   ContactInfo,
   DerivativeAccountTypes,
+  TrustedContact,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -85,6 +87,8 @@ import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { recreatePrimarySubAccounts } from '../utils/accountShellMapping'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -1362,42 +1366,31 @@ export const fetchReceiveAddressWatcher = createWatcher(
 
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, serviceType: string } } ) {
   try {
-    const { qrdata, QRModalHeader, serviceType } = payload
-    console.log( 'payload', payload )
-    // qrData = '{"requester":"Shivani","publicKey":"M80Nz8hMm6lrce7SADVwapF8","uploadedAt":1616149096398,"type":"ReverseRecoveryQR","ver":"1.5.0"}';
+    const { qrdata, QRModalHeader } = payload
     const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select( ( state ) => state.storage.database )
     const s3Service = yield select( ( state ) => state.health.service )
+    const walletId = s3Service.levelhealth.walletId
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     let secondaryMnemonic
-    const sharesArray = [ DECENTRALIZED_BACKUP.PK_SHARE ]
-    console.log( 'qrData', qrdata )
+    const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
     const qrDataObj = JSON.parse( qrdata )
-    console.log( 'qrDataObj', qrDataObj )
-    if( qrDataObj.type && qrDataObj.type == 'pdf' ) {
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    let currentContact: TrustedContact
 
-      const walletId = s3Service.levelhealth.walletId
-      const key = LevelHealth.getDerivedKey( walletId )
-      console.log( 'key', key )
-      const data = yield LevelHealth.decryptWithAnswer( qrDataObj.encryptedData, WALLET_SETUP.security.answer )
-      console.log( 'data', data )
-      const data1 = JSON.parse( data.decryptedString )
-      console.log( 'data1', data1 )
-      const res = yield call( S3Service.downloadSMPDFShare, data1.messageId, key )
-      if ( res.status === 200 ) {
-        console.log( 'SHARES DOWNLOAD pdf', res.data )
-        sharesArray.push( res.data.metaShare )
-      }
-    } else {
-      const res = yield call( S3Service.downloadSMShare, qrDataObj.publicKey )
-      if ( res.status === 200 ) {
-        console.log( 'SHARES DOWNLOAD', res.data )
-        sharesArray.push( res.data.metaShare )
+    if( contacts ){
+      for( const ck of Object.values( contacts ) ){
+        if( ck.permanentChannelAddress == qrDataObj.channelId ){
+          currentContact = ck
+          break
+        }
       }
     }
-    console.log( 'sharesArray', sharesArray )
+
+    const shard: string = currentContact.unencryptedPermanentChannel[ TrustedContacts.getStreamId( walletId ) ].secondaryData.secondaryMnemonicShard
+    sharesArray.push( shard )
     if( sharesArray.length>1 ){
       secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, WALLET_SETUP.security.answer )
     }
-    console.log( 'secondaryMnemonic', secondaryMnemonic.mnemonic )
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
     } else if ( QRModalHeader === 'Sweep Funds' ) {

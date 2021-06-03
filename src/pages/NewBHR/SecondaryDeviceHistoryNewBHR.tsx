@@ -11,7 +11,7 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { downloadSmShareForApproval, ErrorSending, keeperProcessStatus } from '../../store/actions/health'
+import { createChannelAssets, downloadSmShareForApproval, ErrorSending, keeperProcessStatus, setChannelAssets } from '../../store/actions/health'
 import { updatedKeeperInfo, updateMSharesHealth, secondaryShareDownloaded } from '../../store/actions/health'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -23,6 +23,7 @@ import _ from 'underscore'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
 import {
+  ChannelAssets,
   KeeperInfoInterface,
   Keepers,
   LevelHealthInterface,
@@ -146,7 +147,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isReshare, setIsReshare ] = useState(
     props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
-  const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
     : false )
@@ -154,6 +154,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
   const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -166,9 +167,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         ? props.navigation.getParam( 'isChangeKeeperType' )
         : false
     )
-    const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
-    setSelectedShareId( shareId )
     setIndex( props.navigation.getParam( 'index' ) )
+    if( channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ){
+      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
+    }
   }, [
     props.navigation.state.params,
   ] )
@@ -300,6 +302,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           name: Contact && Contact.name ? Contact.name : ''
         }
         dispatch( updateMSharesHealth( shareObj, false ) )
+        dispatch( setChannelAssets( {
+        } ) )
       }
     }
   }, [ Contact, trustedContacts ] )
@@ -630,7 +634,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           setIsApprovalStarted( true )
-          dispatch( downloadSmShareForApproval( qrScannedData ) )
+          dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
@@ -642,7 +646,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
-          //     dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //     dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           //     setQrBottomSheetsFlag( false )
           //   }
           // } catch ( err ) {

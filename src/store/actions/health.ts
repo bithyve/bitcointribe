@@ -87,6 +87,7 @@ export const SET_LEVEL_TO_NOT_SETUP = 'SET_LEVEL_TO_NOT_SETUP'
 export const IS_LEVEL_TO_NOT_SETUP = 'IS_LEVEL_TO_NOT_SETUP'
 export const SET_HEALTH_STATUS = 'SET_HEALTH_STATUS'
 export const MODIFY_LEVELDATA = 'MODIFY_LEVELDATA'
+export const SET_CHANNEL_ASSETS = 'SET_CHANNEL_ASSETS'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -791,6 +792,22 @@ export const modifyLevelData = ( shareId, contactDetails ) =>{
   return {
     type: MODIFY_LEVELDATA, payload: {
       shareId, contactDetails
+    }
+  }
+}
+
+export const setChannelAssets = ( channelAssets ) => {
+  return {
+    type: SET_CHANNEL_ASSETS, payload: {
+      channelAssets
+    }
+  }
+}
+
+export const createChannelAssets = ( shareId, scannedData? ) => {
+  return {
+    type: SET_CHANNEL_ASSETS, payload: {
+      shareId, scannedData
     }
   }
 }
