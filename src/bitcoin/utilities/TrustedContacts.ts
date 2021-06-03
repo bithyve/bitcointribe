@@ -289,18 +289,16 @@ export default class TrustedContacts {
     exchangeRates: { [currency: string]: number };
     averageTxFees: any;
   }> => {
-    const channelsToUpdate = {
+    const updateChannelsLS = []
+    const channelAddressToKeyMapping = {
     }
-
-    // TODO: modify last seen sync mech in accordance w/ new trusted contacts
-    // for ( const contact of Object.values( this.trustedContacts ) ) {
-    //   const { trustedChannel, publicKey } = contact
-    //   if ( trustedChannel ) {
-    //     channelsToUpdate[ trustedChannel.address ] = {
-    //       publicKey
-    //     }
-    //   }
-    // }
+    for ( const channelKey of Object.keys( this.trustedContacts ) ) {
+      const { permanentChannelAddress, permanentChannel, isActive } = this.trustedContacts[ channelKey ]
+      if( isActive && Object.keys( permanentChannel ).length > 1 ){ // contact established(in-stream available)
+        updateChannelsLS.push( permanentChannelAddress )
+        channelAddressToKeyMapping[ permanentChannelAddress ] = channelKey
+      }
+    }
 
     const toUpdate = [] // healths to update(shares under custody)
     for ( const share of metaSharesUnderCustody ) {
@@ -317,7 +315,7 @@ export default class TrustedContacts {
       shareIDs: metaShares
         ? metaShares.map( ( metaShare ) => metaShare.shareId )
         : null, // legacy HC
-      channelsToUpdate, // LS update
+      updateChannelsLS, // LS update
       toUpdate, // share under-custody update
       ...currencyCode && {
         currencyCode
@@ -362,37 +360,14 @@ export default class TrustedContacts {
       }
     }
 
-    // if ( Object.keys( updatedLastSeens ).length ) {
-    //   for ( const contactName of Object.keys( this.trustedContacts ) ) {
-    //     const { trustedChannel } = this.trustedContacts[ contactName ]
-    //     if ( trustedChannel ) {
-    //       const { publicKey, lastSeen } = updatedLastSeens[
-    //         trustedChannel.address
-    //       ] // counterparty's pub
-    //       trustedChannel.data.forEach( ( subChan: TrustedData ) => {
-    //         if ( subChan.publicKey === publicKey ) {
-    //           subChan.lastSeen = lastSeen
-    //           this.trustedContacts[ contactName ].lastSeen = lastSeen
+    Object.keys( updatedLastSeens ).forEach( ( permanentChannelAddress ) => {
+      const { lastSeen, instreamId } = updatedLastSeens[ permanentChannelAddress ]
+      const channelKey = channelAddressToKeyMapping[ permanentChannelAddress ]
 
-    //           // update health via channel
-    //           if ( lastSeen > 0 && metaShares ) {
-    //             for ( let index = 0; index < metaShares.length; index++ ) {
-    //               if ( metaShares[ index ].meta.guardian === contactName ) {
-    //                 healthCheckStatus[ index ] = {
-    //                   shareId: metaShares[ index ].shareId,
-    //                   updatedAt: lastSeen,
-    //                   reshareVersion: healthCheckStatus[ index ]
-    //                     ? healthCheckStatus[ index ].reshareVersion
-    //                     : 0,
-    //                 }
-    //               }
-    //             }
-    //           }
-    //         }
-    //       } )
-    //     }
-    //   }
-    // }
+      const contact = this.trustedContacts[ channelKey ]
+      contact.unencryptedPermanentChannel[ instreamId ].metaData.flags.lastSeen = lastSeen
+      contact.permanentChannel[ instreamId ].metaData.flags.lastSeen = lastSeen
+    } )
 
     return {
       updated,
