@@ -486,7 +486,7 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( !Contact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let channelKey: string
 
     if( contacts )

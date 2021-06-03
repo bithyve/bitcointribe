@@ -51,12 +51,8 @@ import {
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
-  approveTrustedContact,
   initializeTrustedContact,
   rejectTrustedContact,
-  fetchEphemeralChannel,
-  fetchTrustedChannel,
-  postRecoveryChannelSync,
   InitTrustedContactFlowKind,
 } from '../../store/actions/trustedContacts'
 import {
@@ -97,7 +93,6 @@ import {
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
-  trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
   QRCodeTypes,
@@ -106,7 +101,6 @@ import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
-import semver from 'semver'
 import {
   updatePreference,
   setFCMToken,
@@ -115,7 +109,6 @@ import {
 import { fetchKeeperTrustedChannel } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import PersonalNode from '../../common/data/models/PersonalNode'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
@@ -136,7 +129,6 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
@@ -231,13 +223,9 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   fetchNotifications: any;
   updateFCMTokens: any;
-  postRecoveryChannelSync: any;
   downloadMShare: any;
-  approveTrustedContact: any;
   initializeTrustedContact: any;
   rejectTrustedContact: any;
-  fetchTrustedChannel: any;
-  fetchEphemeralChannel: any;
   uploadRequestedShare: any;
   uploadSecondaryShareForPK: any;
   s3Service: S3Service;
@@ -774,12 +762,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       await AsyncStorage.setItem( 'fcmToken', fcmToken )
       this.props.updateFCMTokens( fcmArray )
-      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
-        // updates the new FCM token to channels post recovery
-        if ( recovered ) {
-          this.props.postRecoveryChannelSync()
-        }
-      } )
     }
   };
 
@@ -990,7 +972,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    // console.log( ':regularAccount', regularAccount )
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
@@ -998,7 +979,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    // console.log( ':newTransactionsRegular', newTransactionsRegular )
+
     if ( newTransactionsRegular && newTransactionsRegular.length )
       newTransactions.push( ...newTransactionsRegular )
     if ( newTransactionsSecure && newTransactionsSecure.length )
@@ -1607,208 +1588,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
           } )
           break
-    }
-  };
-
-  processDLRequest = ( key, rejected ) => {
-    try {
-      const { trustedContactRequest, recoveryRequest } = this.state
-      let {
-        requester,
-        isGuardian,
-        approvedTC,
-        encryptedKey,
-        publicKey,
-        info,
-        isQR,
-        uploadedAt,
-        isRecovery,
-        version,
-        isFromKeeper,
-        isPrimaryKeeperRecovery,
-      } = trustedContactRequest || recoveryRequest
-      const {
-        UNDER_CUSTODY,
-        uploadRequestedShare,
-        navigation,
-        approveTrustedContact,
-        fetchTrustedChannel,
-        walletName,
-        trustedContacts,
-        uploadSecondaryShareForPK,
-      } = this.props
-
-      if ( !isRecovery ) {
-        if ( requester === walletName ) {
-          Toast( 'Cannot be your own Contact/Guardian' )
-          return
-        }
-
-        let expiry = config.TC_REQUEST_EXPIRY
-        if ( !semver.valid( version ) ) {
-          // expiry support for 0.7, 0.9 and 1.0
-          expiry = config.LEGACY_TC_REQUEST_EXPIRY
-        }
-
-        if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
-          Alert.alert(
-            `${isQR ? 'QR' : 'Link'} expired!`,
-            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`
-          )
-        } else {
-          if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
-            Alert.alert(
-              'Failed to accept',
-              `You already custody a share against the wallet name: ${requester}`
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-                info = key
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-                return
-              }
-            }
-
-            let existingContactName
-            Object.keys( trustedContacts.tc.trustedContacts ).forEach(
-              ( contactName ) => {
-                const contact = trustedContacts.tc.trustedContacts[ contactName ]
-                if ( contact.contactsPubKey === publicKey ) {
-                  existingContactName = contactName
-                }
-              }
-            )
-            if ( existingContactName && !approvedTC ) {
-              Toast( 'Contact already exists against this request' )
-              return
-            }
-
-            if ( publicKey && !rejected ) {
-              if ( !approvedTC ) {
-                navigation.navigate( 'ContactsListForAssociateContact', {
-                  postAssociation: ( contact ) => {
-                    let contactName = ''
-                    if ( contact ) {
-                      contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                      }`
-                        .toLowerCase()
-                        .trim()
-                    } else {
-                      // contactName = `${requester}'s Wallet`.toLowerCase();
-                      Alert.alert( 'Contact association failed' )
-                      return
-                    }
-                    if ( !semver.valid( version ) ) {
-                      // for 0.7, 0.9 and 1.0: info remains null
-                      info = null
-                    }
-
-                    const contactInfo = {
-                      contactName,
-                      info,
-                    }
-
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                      isGuardian,
-                      isFromKeeper
-                    )
-                  },
-                  isGuardian,
-                } )
-              } else {
-                if ( !existingContactName ) {
-                  Alert.alert(
-                    'Invalid Link/QR',
-                    'You are not a valid trusted contact for approving this request'
-                  )
-                  return
-                }
-                const contactInfo = {
-                  contactName: existingContactName,
-                  info,
-                }
-
-                fetchTrustedChannel(
-                  contactInfo,
-                  trustedChannelActions.downloadShare,
-                  requester
-                )
-              }
-            } else if ( publicKey && rejected ) {
-              // don't associate; only fetch the payment details from EC
-              // fetchEphemeralChannel(null, null, publicKey);
-            }
-          }
-        }
-      } else {
-        if ( !isPrimaryKeeperRecovery ) {
-          if ( requester === walletName ) {
-            Toast( 'You do not host any key of your own' )
-            return
-          }
-
-          if ( !UNDER_CUSTODY[ requester ] ) {
-            this.setState(
-              {
-                errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
-                errorMessage:
-                  'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
-              },
-              () => {
-                this.openBottomSheet( BottomSheetKind.ERROR )
-              }
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-              }
-            }
-            if ( publicKey ) {
-              uploadRequestedShare( recoveryRequest.requester, publicKey )
-            }
-          }
-        } else {
-          if ( !publicKey ) {
-            try {
-              publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                .decryptedPub
-            } catch ( err ) {
-              Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.'
-              )
-            }
-          }
-
-          if ( publicKey ) {
-            uploadSecondaryShareForPK(
-              recoveryRequest.requester,
-              publicKey.substring( 0, 24 )
-            )
-          }
-        }
-      }
-    } catch ( error ) {
-      console.log( 'PKRECOVERY error', error )
     }
   };
 
@@ -2576,15 +2355,11 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
     fetchNotifications,
     updateFCMTokens,
-    postRecoveryChannelSync,
     downloadMShare,
-    approveTrustedContact,
     initializeTrustedContact,
     rejectTrustedContact,
-    fetchTrustedChannel,
     uploadRequestedShare,
     uploadSecondaryShareForPK,
     initializeHealthSetup,
