@@ -52,7 +52,7 @@ function* onPressKeeperChannelWorker( { payload } ) {
       isPrimaryKeeper: false,
       isChangeKeeperAllow: currentLevel == 1 && value.id == 2 ? false : currentLevel == 2 && metaSharesKeeper.length === 5 ? false : true
     }
-    if ( keeper.updatedAt > 0 ) {
+    if ( keeper.status != 'notSetup' ) {
       yield put( navigateToHistoryPage( obj ) )
     } else {
       if ( value.id === 2 && number === 1 && currentLevel === 1 ) {
@@ -64,9 +64,6 @@ function* onPressKeeperChannelWorker( { payload } ) {
           yield put( navigateToHistoryPage( obj ) )
         }
       } else {
-        // if ( ( value.id === 2 && number === 2 && isLevelTwoMetaShareCreated &&
-        //   isLevel2Initialized ) || ( value.id === 3 && isLevelThreeMetaShareCreated &&
-        //     isLevel3Initialized ) )
         yield put( setIsKeeperTypeBottomSheetOpen( true ) )
       }
     }

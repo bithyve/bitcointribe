@@ -46,7 +46,7 @@ import { SERVICES_ENRICHED } from '../actions/storage'
 const obj = {
   shareType: '',
   updatedAt: 0,
-  status: 'notAccessible',
+  status: 'notSetup',
   shareId: '',
   reshareVersion: 0,
   name: '',

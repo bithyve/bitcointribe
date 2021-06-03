@@ -166,7 +166,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         : false
     )
     setIndex( props.navigation.getParam( 'index' ) )
-    if( channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ){
+    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
       dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
     }
   }, [

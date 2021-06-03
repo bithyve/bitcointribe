@@ -1374,7 +1374,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     let secondaryMnemonic
     const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
     const qrDataObj = JSON.parse( qrdata )
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
 
     if( contacts ){

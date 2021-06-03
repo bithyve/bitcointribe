@@ -236,12 +236,9 @@ class ManageBackupNewBHR extends Component<
       } )
     }
 
-    if( prevProps.levelHealth != this.props.levelHealth ) {
-      this.props.modifyLevelData( )
-    }
-
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
+      this.props.modifyLevelData( )
       if(
         ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
         levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
