@@ -68,14 +68,9 @@ function ManageBackupCard( props ) {
               <View
                 style={{
                   ...styles.cardHealthImageView,
-                  elevation:
-                               selectedId == value.id || selectedId == 0
-                                 ? 10
-                                 : 0,
+                  elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
                   backgroundColor:
-                             value.status == 'good'
-                               ? Colors.green
-                               : Colors.red,
+                    value.status == 'good' ? Colors.green : Colors.red,
                 }}
               >
                 {value.status == 'good' ? (
@@ -103,6 +98,32 @@ function ManageBackupCard( props ) {
                 }}
               />
             )}
+            {/* <TouchableOpacity
+              onPress={()=>props.onPressKnowMore()}
+              style={{
+                ...styles.cardButtonView,
+                backgroundColor:
+                  value.status == 'notSetup' ? Colors.white : Colors.deepBlue,
+              }}
+            >
+              <Text
+                style={{
+                  ...styles.cardButtonText,
+                  color: textColor,
+                  width: 'auto',
+                }}
+              >
+                Know More
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 'auto',
+            }}
+          > */}
             <View
               style={{
                 justifyContent: 'center',

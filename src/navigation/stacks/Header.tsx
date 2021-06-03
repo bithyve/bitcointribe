@@ -1,28 +1,24 @@
 import React, { createRef, PureComponent } from 'react'
 import {
-  Text,
   View,
-  StyleSheet,
-  StatusBar,
-  ImageBackground,
   Platform,
   Linking,
   Alert,
-  Image,
   AppState,
   InteractionManager,
+  TouchableOpacity,
   Modal,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,
-  widthPercentageToDP,
+  // widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
-import { BottomSheetView, TouchableOpacity } from '@gorhom/bottom-sheet'
+import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
@@ -37,7 +33,7 @@ import {
 import {
   downloadMShare,
   uploadRequestedShare,
-  initHealthCheck,
+  // initHealthCheck,
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
@@ -51,11 +47,9 @@ import {
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
-  approveTrustedContact,
-  fetchEphemeralChannel,
-  fetchTrustedChannel,
-  clearPaymentDetails,
-  postRecoveryChannelSync,
+  initializeTrustedContact,
+  rejectTrustedContact,
+  InitTrustedContactFlowKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -65,6 +59,8 @@ import {
 import {
   setCurrencyCode,
   setCardData,
+  setIsPermissionGiven,
+  updateLastSeen
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
@@ -93,24 +89,22 @@ import {
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
-  trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
+  QRCodeTypes,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { NavigationActions, withNavigationFocus } from 'react-navigation'
+import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
-import semver from 'semver'
 import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import { fetchKeeperTrustedChannel, updateNewFcm } from '../../store/actions/keeper'
+import { fetchKeeperTrustedChannel } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import PersonalNode from '../../common/data/models/PersonalNode'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 // import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
@@ -131,7 +125,6 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
@@ -146,8 +139,7 @@ import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../common/Fonts'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -218,16 +210,14 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   fetchNotifications: any;
   updateFCMTokens: any;
-  postRecoveryChannelSync: any;
   downloadMShare: any;
-  approveTrustedContact: any;
-  fetchTrustedChannel: any;
-  fetchEphemeralChannel: any;
+  initializeTrustedContact: any;
+  rejectTrustedContact: any;
   uploadRequestedShare: any;
   uploadSecondaryShareForPK: any;
   s3Service: S3Service;
   initializeHealthSetup: any;
-  initHealthCheck: any;
+  // initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -241,8 +231,6 @@ interface HomePropsTypes {
   fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
-  paymentDetails: any;
-  clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
   notificationListNew: any;
@@ -274,7 +262,6 @@ interface HomePropsTypes {
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
-  updateNewFcm: any;
   setCloudData: any;
   updateKeeperInfoToUnderCustody: any;
   newBHRFlowStarted: any;
@@ -282,6 +269,10 @@ interface HomePropsTypes {
   updateCloudPermission: any;
   credsAuthenticated: any;
   setShowAllAccount: any;
+  setIsPermissionGiven: any;
+  isPermissionSet: any;
+  updateLastSeen: any;
+  isAuthenticated: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -335,11 +326,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       wyreFromBuyMenu: null,
       wyreFromDeepLink: null
     }
-    console.log( 'this.props.navigation.getParam', this.props.navigation.state.params )
-    this.appStateListener = AppState.addEventListener(
-      'change',
-      this.onAppStateChange
-    )
   }
 
   navigateToQRScreen = () => {
@@ -451,7 +437,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     try {
       const scannedData = JSON.parse( qrData )
 
-      if ( scannedData.ver ) {
+      // check version compatibility
+      if ( scannedData.version ) {
         const isAppVersionCompatible = await checkAppVersionCompatibility( {
           relayCheckMethod: scannedData.type,
           version: scannedData.ver,
@@ -463,6 +450,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       switch ( scannedData.type ) {
+          case QRCodeTypes.CONTACT_REQUEST:
+          case QRCodeTypes.KEEPER_REQUEST:
+            const trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type
+            }
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
+            break
+
           case 'trustedGuardian':
             const trustedGuardianRequest = {
               isGuardian: scannedData.isGuardian,
@@ -617,46 +627,46 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  scheduleNotification = async () => {
-    PushNotification.cancelAllLocalNotifications()
-    const channelIdRandom = moment().valueOf()
+  // scheduleNotification = async () => {
+  //   PushNotification.cancelAllLocalNotifications()
+  //   const channelIdRandom = moment().valueOf()
 
-    PushNotification.createChannel(
-      {
-        channelId: `${channelIdRandom}`,
-        channelName: 'reminder',
-        channelDescription: 'A channel to categorise your notifications',
-        playSound: false,
-        soundName: 'default',
-        importance: 4, // (optional) default: 4. Int value of the Android notification importance
-        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
-      },
-      ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
-    )
-    const date = new Date()
-    date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
+  //   PushNotification.createChannel(
+  //     {
+  //       channelId: `${channelIdRandom}`,
+  //       channelName: 'reminder',
+  //       channelDescription: 'A channel to categorise your notifications',
+  //       playSound: false,
+  //       soundName: 'default',
+  //       importance: 4, // (optional) default: 4. Int value of the Android notification importance
+  //       vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
+  //     },
+  //     ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+  //   )
+  //   const date = new Date()
+  //   date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
 
-    //let date =  new Date(Date.now() + (3 * 60 * 1000));
-    PushNotification.localNotificationSchedule( {
-      channelId: channelIdRandom,
-      vibrate: true,
-      vibration: 300,
-      priority: 'high',
-      showWhen: true,
-      autoCancel: true,
-      soundName: 'default',
-      title: 'We have not seen you in a while!',
-      message:
-        'Opening your app regularly ensures you get all the notifications and security updates', // (required)
-      date: date,
-      repeatType: 'day',
-      allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
-    } )
+  //   //let date =  new Date(Date.now() + (3 * 60 * 1000));
+  //   PushNotification.localNotificationSchedule( {
+  //     channelId: channelIdRandom,
+  //     vibrate: true,
+  //     vibration: 300,
+  //     priority: 'high',
+  //     showWhen: true,
+  //     autoCancel: true,
+  //     soundName: 'default',
+  //     title: 'We have not seen you in a while!',
+  //     message:
+  //       'Opening your app regularly ensures you get all the notifications and security updates', // (required)
+  //     date: date,
+  //     repeatType: 'day',
+  //     allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
+  //   } )
 
-    PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
-      // console.log( 'SCHEDULE notiifcations', notiifcations )
-    } )
-  };
+  //   PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
+  //     console.log( 'SCHEDULE notiifcations', notiifcations )
+  //   } )
+  // };
 
   localNotification = async ( notificationDetails ) => {
     const channelIdRandom = moment().valueOf()
@@ -670,8 +680,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         importance: 4, // (optional) default: 4. Int value of the Android notification importance
         vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
       },
-      ( created ) => {}
-      // console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
+      ( created ) =>
+        console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
     )
 
     PushNotification.localNotification( {
@@ -692,6 +702,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   bootStrapNotifications = async () => {
+    this.props.setIsPermissionGiven( true )
+    const t0 = performance.now()
     if ( Platform.OS === 'ios' ) {
       firebase
         .messaging()
@@ -699,7 +711,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         .then( ( enabled ) => {
           if ( enabled ) {
             this.storeFCMToken()
-            this.scheduleNotification()
             this.createNotificationListeners()
           } else {
             firebase
@@ -709,25 +720,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               } )
               .then( () => {
                 this.storeFCMToken()
-                this.scheduleNotification()
                 this.createNotificationListeners()
               } )
               .catch( () => {
-                // console.log( 'Permission rejected.' )
+                console.log( 'Permission rejected.' )
               } )
           }
         } )
         .catch()
     } else {
       this.storeFCMToken()
-      this.scheduleNotification()
       this.createNotificationListeners()
     }
+    const t1 = performance.now()
+    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   storeFCMToken = async () => {
     const fcmToken = await messaging().getToken()
-    // console.log( 'TOKEN', fcmToken )
+    console.log( 'TOKEN', fcmToken )
     const fcmArray = [ fcmToken ]
     const fcmTokenFromAsync = this.props.fcmTokenValue
     if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
@@ -735,21 +746,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       await AsyncStorage.setItem( 'fcmToken', fcmToken )
       this.props.updateFCMTokens( fcmArray )
-      // Update FCM token to PK
-      this.props.updateNewFcm()
-      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
-        // updates the new FCM token to channels post recovery
-        if ( recovered ) {
-          this.props.postRecoveryChannelSync()
-        }
-      } )
     }
   };
 
   createNotificationListeners = async () => {
+    this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       onNotification: ( notification ) => {
-        // console.log( 'NOTIFICATION:', notification )
+        console.log( 'NOTIFICATION:', notification )
         // process the notification
         if ( notification.data ) {
           this.props.fetchNotifications()
@@ -761,8 +765,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
       onAction: ( notification ) => {
-        // console.log( 'ACTION:', notification.action )
-        // console.log( 'NOTIFICATION:', notification )
+        console.log( 'ACTION:', notification.action )
+        console.log( 'NOTIFICATION:', notification )
 
         // process the action
       },
@@ -795,7 +799,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationOpen = async ( item ) => {
-    // console.log( 'item', item )
+    console.log( 'item', item )
     const content = JSON.parse( item.data.content )
     // let asyncNotificationList = notificationListNew;
     let asyncNotificationList = JSON.parse(
@@ -845,29 +849,36 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onAppStateChange = async ( nextAppState ) => {
     const { appState } = this.state
+    const { isPermissionSet, setIsPermissionGiven } = this.props
     try {
       // TODO: Will this function ever be called if the state wasn't different? If not,
       // I don't think we need to be holding on to `appState` in this component's state.
       if ( appState === nextAppState ) return
+      if ( isPermissionSet ) {
+        setIsPermissionGiven( false )
+        return
+      }
       this.setState(
         {
           appState: nextAppState,
         },
-
         async () => {
-          if ( Platform.OS == 'android' ? ( nextAppState == 'active' ) : ( nextAppState == 'background' ) ) {
-            this.props.navigation.dispatch( NavigationActions.navigate( {
-              routeName: 'Login',
-            } ) )
-          }
           if ( nextAppState === 'active' ) {
-            this.scheduleNotification()
+          //this.scheduleNotification()
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
+            console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
+            this.props.updateLastSeen( new Date() )
+            this.props.navigation.dispatch( StackActions.reset( {
+              index: 0,
+              actions: [ NavigationActions.navigate( {
+                routeName: 'Launch'
+              } ) ],
+            } ) )
           }
         }
       )
@@ -884,136 +895,141 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       newBHRFlowStarted,
       credsAuthenticated
     } = this.props
-    credsAuthenticated( false )
-
-    const versionData = []
-    this.closeBottomSheet()
-    if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
-      this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
-    }
-    this.calculateNetBalance()
-
-    if( newBHRFlowStarted === true )
-    {
-      const { healthCheckInitializedKeeper } = s3Service.levelhealth
-      if ( healthCheckInitializedKeeper === false ) {
-        initializeHealthSetup()
-      }
-    }
-
-    //const { healthCheckInitialized } = s3Service.sss;
-    //   console.log("healthCheckInitialized", healthCheckInitialized);
-    //   if (!healthCheckInitialized) {
-    //     initHealthCheck();
-    //   }
-    // }
-    this.bootStrapNotifications()
-    this.setUpFocusListener()
-    this.getNewTransactionNotifications()
-
-    Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-    Linking.getInitialURL().then( this.handleDeepLinking )
-    // call this once deeplink is detected aswell
-    this.handleDeepLinkModal()
-    const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
-
-    if ( unhandledDeepLinkURL ) {
-      navigation.setParams( {
-        unhandledDeepLinkURL: null,
-      } )
-      this.handleDeepLinking( unhandledDeepLinkURL )
-    }
-
+    this.appStateListener = AppState.addEventListener(
+      'change',
+      this.onAppStateChange
+    )
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSync disabled
+      // Keeping autoSynn disabled
+      credsAuthenticated( false )
+      console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
-      this.props.setVersion()
+      this.closeBottomSheet()
+
+      this.calculateNetBalance()
+
+      if( newBHRFlowStarted === true )
+      {
+        const { healthCheckInitializedKeeper } = s3Service.levelhealth
+        if ( healthCheckInitializedKeeper === false ) {
+          initializeHealthSetup()
+        }
+      }
+
+      //const { healthCheckInitialized } = s3Service.sss;
+      //   console.log("healthCheckInitialized", healthCheckInitialized);
+      //   if (!healthCheckInitialized) {
+      //     initHealthCheck();
+      //   }
+      // }
+      this.bootStrapNotifications()
+      this.setUpFocusListener()
+      //this.getNewTransactionNotifications()
+
+      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      Linking.getInitialURL().then( this.handleDeepLinking )
+
+      // call this once deeplink is detected aswell
+      // this.handleDeepLinkModal()
+
+      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+
+      if ( unhandledDeepLinkURL ) {
+        navigation.setParams( {
+          unhandledDeepLinkURL: null,
+        } )
+        this.handleDeepLinking( unhandledDeepLinkURL )
+      }
+
+      // this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
-  getNewTransactionNotifications = async () => {
-    const newTransactions = []
-    const { accountsState } = this.props
-    const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
-    const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    // console.log( ':regularAccount', regularAccount )
+  // getNewTransactionNotifications = async () => {
+  //   const t0 = performance.now()
+  //   const newTransactions = []
+  //   const { accountsState } = this.props
+  //   const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
+  //   const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
 
-    const newTransactionsRegular =
-      regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
-      regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    const newTransactionsSecure =
-      secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
-      secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    // console.log( ':newTransactionsRegular', newTransactionsRegular )
-    if ( newTransactionsRegular && newTransactionsRegular.length )
-      newTransactions.push( ...newTransactionsRegular )
-    if ( newTransactionsSecure && newTransactionsSecure.length )
-      newTransactions.push( ...newTransactionsSecure )
+  //   const newTransactionsRegular =
+  //     regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
+  //     regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
+  //   const newTransactionsSecure =
+  //     secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
+  //     secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
 
-    if ( newTransactions.length ) {
-      // let asyncNotification = notificationListNew;
-      const asyncNotification = JSON.parse(
-        await AsyncStorage.getItem( 'notificationList' )
-      )
-      let asyncNotificationList = []
-      if ( asyncNotification.length ) {
-        asyncNotificationList = []
-        for ( let i = 0; i < asyncNotification.length; i++ ) {
-          asyncNotificationList.push( asyncNotification[ i ] )
-        }
-      }
+  //   if ( newTransactionsRegular && newTransactionsRegular.length )
+  //     newTransactions.push( ...newTransactionsRegular )
+  //   if ( newTransactionsSecure && newTransactionsSecure.length )
+  //     newTransactions.push( ...newTransactionsSecure )
 
-      for ( let i = 0; i < newTransactions.length; i++ ) {
-        let present = false
-        for ( const tx of asyncNotificationList ) {
-          if (
-            tx.notificationsData &&
-            newTransactions[ i ].txid === tx.notificationsData.txid
-          )
-            present = true
-        }
-        if ( present ) continue
+  //   if ( newTransactions.length ) {
+  //     // let asyncNotification = notificationListNew;
+  //     const asyncNotification = JSON.parse(
+  //       await AsyncStorage.getItem( 'notificationList' )
+  //     )
+  //     let asyncNotificationList = []
+  //     if ( asyncNotification.length ) {
+  //       asyncNotificationList = []
+  //       for ( let i = 0; i < asyncNotification.length; i++ ) {
+  //         asyncNotificationList.push( asyncNotification[ i ] )
+  //       }
+  //     }
 
-        const obj = {
-          type: 'contact',
-          isMandatory: false,
-          read: false,
-          title: 'Alert from FastBitcoins',
-          time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
-          date: new Date(),
-          info: 'You have a new transaction',
-          notificationId: createRandomString( 17 ),
-          notificationsData: newTransactions[ i ],
-        }
-        asyncNotificationList.push( obj )
-        const notificationDetails = {
-          id: obj.notificationId,
-          title: obj.title,
-          body: obj.info,
-        }
-        // console.log( ':asyncNotificationList', asyncNotificationList )
+  //     for ( let i = 0; i < newTransactions.length; i++ ) {
+  //       let present = false
+  //       for ( const tx of asyncNotificationList ) {
+  //         if (
+  //           tx.notificationsData &&
+  //           newTransactions[ i ].txid === tx.notificationsData.txid
+  //         )
+  //           present = true
+  //       }
+  //       if ( present ) continue
 
-        this.localNotification( notificationDetails )
-      }
-      //this.props.notificationsUpdated(asyncNotificationList);
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify( asyncNotificationList )
-      )
-      asyncNotificationList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-      } )
-      setTimeout( () => {
-        this.setState( {
-          notificationData: asyncNotificationList,
-          notificationDataChange: !this.state.notificationDataChange,
-        } )
-      }, 2 )
-    }
-  };
+  //       const obj = {
+  //         type: 'contact',
+  //         isMandatory: false,
+  //         read: false,
+  //         title: 'Alert from FastBitcoins',
+  //         time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
+  //         date: new Date(),
+  //         info: 'You have a new transaction',
+  //         notificationId: createRandomString( 17 ),
+  //         notificationsData: newTransactions[ i ],
+  //       }
+  //       asyncNotificationList.push( obj )
+  //       const notificationDetails = {
+  //         id: obj.notificationId,
+  //         title: obj.title,
+  //         body: obj.info,
+  //       }
+  //       console.log( ':asyncNotificationList', asyncNotificationList )
+
+  //       this.localNotification( notificationDetails )
+  //     }
+  //     //this.props.notificationsUpdated(asyncNotificationList);
+  //     await AsyncStorage.setItem(
+  //       'notificationList',
+  //       JSON.stringify( asyncNotificationList )
+  //     )
+  //     asyncNotificationList.sort( function ( left, right ) {
+  //       return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
+  //     } )
+  //     setTimeout( () => {
+  //       this.setState( {
+  //         notificationData: asyncNotificationList,
+  //         notificationDataChange: !this.state.notificationDataChange,
+  //       } )
+  //     }, 2 )
+  //   }
+  //   const t1 = performance.now()
+  //   console.log( 'getNewTransactionNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
+  // };
 
   componentDidUpdate = ( prevProps, prevState ) => {
 
@@ -1043,117 +1059,47 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setSecondaryDeviceAddresses()
     }
 
-    if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
-      const serviceType = REGULAR_ACCOUNT
-      const {
-        paymentDetails,
-        accountsState,
-        navigation,
-        addTransferDetails,
-        clearPaymentDetails,
-      } = this.props
-      let { address, paymentURI } = paymentDetails
-      let options: any = {
-      }
-      if ( paymentURI ) {
-        try {
-          const details = accountsState[ serviceType ].service.decodePaymentURI(
-            paymentURI
-          )
-          address = details.address
-          options = details.options
-        } catch ( err ) {
-          Alert.alert( 'Unable to decode payment URI' )
-          return
-        }
-      }
+    // if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
+    //   const serviceType = REGULAR_ACCOUNT
+    //   const {
+    //     paymentDetails,
+    //     accountsState,
+    //     navigation,
+    //     addTransferDetails,
+    //   } = this.props
+    //   let { address, paymentURI } = paymentDetails
+    //   let options: any = {
+    //   }
+    //   if ( paymentURI ) {
+    //     try {
+    //       const details = accountsState[ serviceType ].service.decodePaymentURI(
+    //         paymentURI
+    //       )
+    //       address = details.address
+    //       options = details.options
+    //     } catch ( err ) {
+    //       Alert.alert( 'Unable to decode payment URI' )
+    //       return
+    //     }
+    //   }
 
-      const item = {
-        id: address,
-      }
+    //   const item = {
+    //     id: address,
+    //   }
 
-      addTransferDetails( serviceType, {
-        selectedContact: item,
-      } )
+    //   addTransferDetails( serviceType, {
+    //     selectedContact: item,
+    //   } )
 
-      clearPaymentDetails()
-
-      navigation.navigate( 'SendToContact', {
-        selectedContact: item,
-        serviceType,
-        bitcoinAmount: options.amount
-          ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-          : '',
-      } )
-    }
+    //   navigation.navigate( 'SendToContact', {
+    //     selectedContact: item,
+    //     serviceType,
+    //     bitcoinAmount: options.amount
+    //       ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
+    //       : '',
+    //   } )
+    // }
   };
-
-  handleDeepLinkModal = () => {
-    const custodyRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.custodyRequest : null//this.props.navigation.getParam( 'custodyRequest' )
-    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
-    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
-    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
-    console.log( 'trustedContactRequest', trustedContactRequest )
-    if ( swanRequest ) {
-      this.setState( {
-        swanDeepLinkContent:swanRequest.url,
-      }, () => {
-        this.props.currentSwanSubAccount
-          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
-          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
-        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
-      } )
-    }
-
-    if ( custodyRequest ) {
-      this.setState(
-        {
-          custodyRequest,
-        },
-        () => {
-          this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-        }
-      )
-    } else if ( recoveryRequest || trustedContactRequest ) {
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( userKey ) {
-      this.props.navigation.navigate( 'VoucherScanner', {
-        userKey,
-      } )
-    }
-  };
-
-  cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
-
-    if ( typeof this.appStateListener === 'function' ) {
-      AppState.removeEventListener( 'change', this.appStateListener )
-    }
-
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-    clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    if ( this.firebaseNotificationListener ) {
-      this.firebaseNotificationListener()
-    }
-  }
-
-  componentWillUnmount() {
-    this.cleanupListeners()
-  }
 
   openBottomSheetOnLaunch(
     kind: BottomSheetKind,
@@ -1165,7 +1111,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    // console.log( 'Home::handleDeepLinkEvent::URL: ', url )
+    console.log( 'Home::handleDeepLinkEvent::URL: ', url )
 
     const { navigation, isFocused } = this.props
 
@@ -1180,6 +1126,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else {
       this.handleDeepLinking( url )
     }
+
   };
 
   handleDeepLinking = async ( url: string | null ) => {
@@ -1372,6 +1319,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setUpFocusListener = () => {
+    const t0 = performance.now()
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
@@ -1384,6 +1332,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
     this.setCurrencyCodeFromAsync()
+    const t1 = performance.now()
+    console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   setSecondaryDeviceAddresses = async () => {
@@ -1438,45 +1388,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  onNotificationListOpen = async () => {
-    // let asyncNotificationList = notificationListNew;
-    const asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    if ( asyncNotificationList ) {
-      for ( let i = 0; i < asyncNotificationList.length; i++ ) {
-        if ( asyncNotificationList[ i ] ) {
-          asyncNotificationList[ i ].time = timeFormatter(
-            moment( new Date() ),
-            moment( asyncNotificationList[ i ].date ).valueOf()
-          )
-        }
-      }
-      // this.props.notificationsUpdated(asyncNotificationList);
 
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify( asyncNotificationList )
-      )
-      asyncNotificationList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-      } )
-
-      this.setState( {
-        notificationData: asyncNotificationList,
-        notificationDataChange: !this.state.notificationDataChange,
-      } )
-    }
-  };
-
-  onTrustedContactRequestAccepted = ( key ) => {
-    this.closeBottomSheet()
-    this.processDLRequest( key, false )
-  };
-
-  onTrustedContactRejected = () => {
-    this.closeBottomSheet()
-  };
 
   onPhoneNumberChange = () => {};
 
@@ -1511,7 +1423,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Ramp Account',
-              defaultDescription: 'BTC purchased from Ramp',
+              defaultDescription: 'Sats purchased from Ramp',
               serviceAccountKind: ServiceAccountKind.RAMP,
             } )
 
@@ -1531,7 +1443,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Wyre Account',
-              defaultDescription: 'BTC purchased from Wyre',
+              defaultDescription: 'Sats purchased from Wyre',
               serviceAccountKind: ServiceAccountKind.WYRE,
             } )
             this.props.addNewAccountShell( newSubAccount )
@@ -1551,219 +1463,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  processDLRequest = ( key, rejected ) => {
-    try {
-      const { trustedContactRequest, recoveryRequest } = this.state
-      let {
-        requester,
-        isGuardian,
-        approvedTC,
-        encryptedKey,
-        publicKey,
-        info,
-        isQR,
-        uploadedAt,
-        isRecovery,
-        version,
-        isFromKeeper,
-        isPrimaryKeeperRecovery,
-      } = trustedContactRequest || recoveryRequest
-      const {
-        UNDER_CUSTODY,
-        uploadRequestedShare,
-        navigation,
-        approveTrustedContact,
-        fetchTrustedChannel,
-        walletName,
-        trustedContacts,
-        uploadSecondaryShareForPK,
-      } = this.props
 
-      if ( !isRecovery ) {
-        if ( requester === walletName ) {
-          Toast( 'Cannot be your own Contact/Guardian' )
-          return
-        }
-
-        let expiry = config.TC_REQUEST_EXPIRY
-        if ( !semver.valid( version ) ) {
-          // expiry support for 0.7, 0.9 and 1.0
-          expiry = config.LEGACY_TC_REQUEST_EXPIRY
-        }
-
-        if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
-          Alert.alert(
-            `${isQR ? 'QR' : 'Link'} expired!`,
-            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`
-          )
-        } else {
-          if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
-            Alert.alert(
-              'Failed to accept',
-              `You already custody a share against the wallet name: ${requester}`
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-                info = key
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-                return
-              }
-            }
-
-            let existingContactName
-            Object.keys( trustedContacts.tc.trustedContacts ).forEach(
-              ( contactName ) => {
-                const contact = trustedContacts.tc.trustedContacts[ contactName ]
-                if ( contact.contactsPubKey === publicKey ) {
-                  existingContactName = contactName
-                }
-              }
-            )
-            if ( existingContactName && !approvedTC ) {
-              Toast( 'Contact already exists against this request' )
-              return
-            }
-
-            if ( publicKey && !rejected ) {
-              if ( !approvedTC ) {
-                navigation.navigate( 'ContactsListForAssociateContact', {
-                  postAssociation: ( contact ) => {
-                    let contactName = ''
-                    if ( contact ) {
-                      contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                      }`
-                        .toLowerCase()
-                        .trim()
-                    } else {
-                      // contactName = `${requester}'s Wallet`.toLowerCase();
-                      Alert.alert( 'Contact association failed' )
-                      return
-                    }
-                    if ( !semver.valid( version ) ) {
-                      // for 0.7, 0.9 and 1.0: info remains null
-                      info = null
-                    }
-
-                    const contactInfo = {
-                      contactName,
-                      info,
-                    }
-
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                      isGuardian,
-                      isFromKeeper
-                    )
-                  },
-                  isGuardian,
-                } )
-              } else {
-                if ( !existingContactName ) {
-                  Alert.alert(
-                    'Invalid Link/QR',
-                    'You are not a valid trusted contact for approving this request'
-                  )
-                  return
-                }
-                const contactInfo = {
-                  contactName: existingContactName,
-                  info,
-                }
-
-                fetchTrustedChannel(
-                  contactInfo,
-                  trustedChannelActions.downloadShare,
-                  requester
-                )
-              }
-            } else if ( publicKey && rejected ) {
-              // don't associate; only fetch the payment details from EC
-              // fetchEphemeralChannel(null, null, publicKey);
-            }
-          }
-        }
-      } else {
-        if ( !isPrimaryKeeperRecovery ) {
-          if ( requester === walletName ) {
-            Toast( 'You do not host any key of your own' )
-            return
-          }
-
-          if ( !UNDER_CUSTODY[ requester ] ) {
-            this.setState(
-              {
-                errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
-                errorMessage:
-                  'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
-              },
-              () => {
-                this.openBottomSheet( BottomSheetKind.ERROR )
-              }
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-              }
-            }
-            if ( publicKey ) {
-              uploadRequestedShare( recoveryRequest.requester, publicKey )
-            }
-          }
-        } else {
-          if ( !publicKey ) {
-            try {
-              publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                .decryptedPub
-            } catch ( err ) {
-              Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.'
-              )
-            }
-          }
-
-          if ( publicKey ) {
-            uploadSecondaryShareForPK(
-              recoveryRequest.requester,
-              publicKey.substring( 0, 24 )
-            )
-          }
-        }
-      }
-    } catch ( error ) {
-      // console.log( 'PKRECOVERY error', error )
-    }
-  };
-
-  handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: selectedAccount.id,
-    } )
-  };
-
-  handleBottomSheetPositionChange = ( newIndex: number ) => {
-    if ( newIndex === 0 ) {
-      this.onBottomSheetClosed()
-    }
-  };
 
   openBottomSheet = (
     kind: BottomSheetKind,
@@ -1796,17 +1496,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.onBottomSheetClosed()
   };
 
-  onBackPress = () => {
-    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-  };
 
   onNotificationClicked = async ( value ) => {
     const asyncNotifications = JSON.parse(
       await AsyncStorage.getItem( 'notificationList' )
     )
-    // console.log( 'Notification clicked Home>onNotificationClicked' )
-    // console.log( 'asyncNotifications ', asyncNotifications )
-    // console.log( 'notification passed ', value )
+    console.log( 'Notification clicked Home>onNotificationClicked' )
+    console.log( 'asyncNotifications ', asyncNotifications )
+    console.log( 'notification passed ', value )
 
     const { notificationData } = this.state
     const { navigation, } = this.props
@@ -1992,15 +1689,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           if ( Object.keys( UNDER_CUSTODY ).length ) {
             existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
               console.log( tag )
-              // return UNDER_CUSTODY[ tag ].META_SHARE
+              return UNDER_CUSTODY[ tag ].META_SHARE
             } )
           }
           if ( existingShares.length ) {
-            // console.log(
-            //   'existingShares.length',
-            //   existingShares.length,
-            //   existingShares
-            // )
+            console.log(
+              'existingShares.length',
+              existingShares.length,
+              existingShares
+            )
             if (
               existingShares.findIndex(
                 ( value ) =>
@@ -2040,27 +1737,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           let existingShares: MetaShare[]
           if ( Object.keys( UNDER_CUSTODY ).length ) {
             existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              // console.log( tag )
+              console.log( tag )
               return UNDER_CUSTODY[ tag ].META_SHARE
             } )
           }
 
           if ( existingShares.length ) {
-            // console.log(
-            //   'existingShares.length',
-            //   existingShares.length,
-            //   existingShares
-            // )
+            console.log(
+              'existingShares.length',
+              existingShares.length,
+              existingShares
+            )
             if (
               existingShares.findIndex(
                 ( value ) =>
                   value.shareId === JSON.parse( element.data ).selectedShareId
               ) == -1
             ) {
-              // console.log(
-              //   'element.notificationType 1',
-              //   element.notificationType
-              // )
+              console.log(
+                'element.notificationType 1',
+                element.notificationType
+              )
               this.props.autoDownloadShareContact(
                 JSON.parse( element.data ).selectedShareId,
                 JSON.parse( element.data ).walletId
@@ -2245,37 +1942,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           // navigation={this.props.navigation}
           // overallHealth={overallHealth}
         />
-        <Modal
+        <ModalContainer
           visible={this.state.currentBottomSheetKind != null}
-          onRequestClose={() => { this.closeBottomSheet() }}
-          transparent={true}
+          closeBottomSheet={() => { this.closeBottomSheet() }}
         >
-          <TouchableOpacity
-            style={{
-              flex: 1,
-              // margin: 10
-            }}
-            activeOpacity={1}
-            onPressOut={() => { this.closeBottomSheet() }}
-          >
-            <BottomSheet
-              ref={this.bottomSheetRef}
-              snapPoints={this.getBottomSheetSnapPoints()}
-              initialSnapIndex={-1}
-              animationDuration={defaultBottomSheetConfigs.animationDuration}
-              animationEasing={Easing.out( Easing.back( 1 ) )}
-              handleComponent={defaultBottomSheetConfigs.handleComponent}
-              onChange={this.handleBottomSheetPositionChange}
-            >
-              <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
-            </BottomSheet>
-          </TouchableOpacity>
-        </Modal>
+          {this.renderBottomSheetContent()}
+        </ModalContainer>
       </View>
     )
   }
 }
-
 const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications,
@@ -2296,7 +1972,6 @@ const mapStateToProps = ( state ) => {
     s3Service: idx( state, ( _ ) => _.health.service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    paymentDetails: idx( state, ( _ ) => _.trustedContacts.paymentDetails ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
@@ -2315,22 +1990,22 @@ const mapStateToProps = ( state ) => {
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
+    isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
+    isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
   }
 }
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
     fetchNotifications,
     updateFCMTokens,
-    postRecoveryChannelSync,
     downloadMShare,
-    approveTrustedContact,
-    fetchTrustedChannel,
+    initializeTrustedContact,
+    rejectTrustedContact,
     uploadRequestedShare,
     uploadSecondaryShareForPK,
     initializeHealthSetup,
-    initHealthCheck,
+    // initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,
@@ -2340,7 +2015,6 @@ export default withNavigationFocus(
     fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
-    clearPaymentDetails,
     notificationsUpdated,
     setCurrencyCode,
     updatePreference,
@@ -2352,62 +2026,13 @@ export default withNavigationFocus(
     autoDownloadShareContact,
     setVersion,
     downloadSMShard,
-    updateNewFcm,
     setCloudData,
     updateKeeperInfoToUnderCustody,
     updateCloudPermission,
     credsAuthenticated,
-    setShowAllAccount
+    setShowAllAccount,
+    setIsPermissionGiven,
+    updateLastSeen
   } )( Home )
 )
 
-const styles = StyleSheet.create( {
-  cardContainer: {
-    backgroundColor: Colors.white,
-    width: widthPercentageToDP( '95%' ),
-    // height: heightPercentageToDP( '7%' ),
-    // borderColor: Colors.borderColor,
-    // borderWidth: 1,
-    borderRadius: widthPercentageToDP( 3 ),
-    marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: widthPercentageToDP( 5 ),
-    alignSelf: 'center',
-    flexDirection: 'row',
-    paddingHorizontal: widthPercentageToDP ( 2 )
-  },
-  accountCardsSectionContainer: {
-    flex: 13,
-    // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
-    flexDirection: 'column',
-    justifyContent: 'space-around'
-  },
-
-  floatingActionButtonContainer: {
-    // position: 'absolute',
-    // zIndex: 0,
-    // bottom: TAB_BAR_HEIGHT,
-    // right: 0,
-    // flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignSelf: 'flex-end',
-    padding: heightPercentageToDP( 1.5 ),
-  },
-
-  cloudErrorModalImage: {
-    width: wp( '30%' ),
-    height: wp( '25%' ),
-    marginLeft: 'auto',
-    resizeMode: 'stretch',
-    marginBottom: hp( '-3%' ),
-  }
-} )

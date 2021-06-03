@@ -30,6 +30,7 @@ import {
 } from '../../store/actions/health'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const SecurityQuestionHistory = ( props ) => {
   const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
@@ -58,6 +59,14 @@ const SecurityQuestionHistory = ( props ) => {
     setSecurityQuestionBottomSheet,
   ] = useState( React.createRef() )
   const [
+    questionModal,
+    showQuestionModal,
+  ] = useState( false )
+  const [
+    successModal,
+    showSuccessModal,
+  ] = useState( false )
+  const [
     HealthCheckSuccessBottomSheet,
     setHealthCheckSuccessBottomSheet,
   ] = useState( React.createRef() )
@@ -84,18 +93,22 @@ const SecurityQuestionHistory = ( props ) => {
       <SecurityQuestion
         onFocus={() => {
           if ( Platform.OS == 'ios' )
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
+            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
+            showQuestionModal( true )
         }}
         onBlur={() => {
           if ( Platform.OS == 'ios' )
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            showQuestionModal( true )
         }}
         onPressConfirm={async () => {
           Keyboard.dismiss()
           saveConfirmationHistory()
-          updateHealthForSQ();
-          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 );
-          ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 1 )
+          updateHealthForSQ()
+          // ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+          showQuestionModal( false )
+          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 1 )
+          showSuccessModal( true )
         }}
       />
     )
@@ -105,7 +118,8 @@ const SecurityQuestionHistory = ( props ) => {
     return (
       <ModalHeader
         onPressHeader={() => {
-          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+          // ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+          showQuestionModal( false )
         }}
       />
     )
@@ -121,7 +135,8 @@ const SecurityQuestionHistory = ( props ) => {
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
         onPressProceed={() => {
-          ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
+          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
+          showSuccessModal( false )
           dispatch( checkMSharesHealth() )
           props.navigation.goBack()
         }}
@@ -190,7 +205,7 @@ const SecurityQuestionHistory = ( props ) => {
   }
 
   useEffect( () => {
-    if ( next ) ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+    if ( next )showQuestionModal( true )
   }, [ next ] )
 
   useEffect( () => {
@@ -259,7 +274,8 @@ const SecurityQuestionHistory = ( props ) => {
           type={'security'}
           IsReshare
           onPressConfirm={() => {
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            showQuestionModal( true )
           }}
           data={sortedHistory( securityQuestionsHistory )}
           confirmButtonText={'Confirm Answer'}
@@ -267,21 +283,28 @@ const SecurityQuestionHistory = ( props ) => {
           // changeButtonText={'Change Question'}
           disableChange={true}
           onPressReshare={() => {
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            showQuestionModal( true )
           }}
           onPressChange={() => {
             props.navigation.navigate( 'NewOwnQuestions' )
           }}
         />
       </View>
-      <BottomSheet
+      <ModalContainer visible={questionModal} closeBottomSheet={() => {}} >
+        {renderSecurityQuestionContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={SecurityQuestionBottomSheet as any}
         snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
         renderContent={renderSecurityQuestionContent}
         renderHeader={renderSecurityQuestionHeader}
-      />
-      <BottomSheet
+      /> */}
+      <ModalContainer visible={successModal} closeBottomSheet={() => {}} >
+        {renderHealthCheckSuccessModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
         ref={HealthCheckSuccessBottomSheet as any}
@@ -291,7 +314,7 @@ const SecurityQuestionHistory = ( props ) => {
         ]}
         renderContent={renderHealthCheckSuccessModalContent}
         renderHeader={renderHealthCheckSuccessModalHeader}
-      />
+      /> */}
     </View>
   )
 }

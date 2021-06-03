@@ -346,11 +346,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.navigation.navigate( 'AddNewAccount' )
   };
 
-  navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned: this.processQRData,
-    } )
-  };
   onPressNotifications = async () => {
     const notificationList = JSON.parse(
       await AsyncStorage.getItem( 'notificationList' )
@@ -2177,6 +2172,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                   navigation.navigate( 'AddContactSendRequest', {
                     SelectedContact: selectedContact,
+                    headerText:'Add a contact  ',
+                    subHeaderText:'Send a Friends and Family request',
+                    contactText:'Adding to Friends and Family:',
+                    showDone:true,
                   } )
                 }
               }}
@@ -2208,6 +2207,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                 navigation.navigate( 'AddContactSendRequest', {
                   SelectedContact: [ data ],
+                  headerText:'Add a contact  ',
+                  subHeaderText:'Send a Friends and Family request',
+                  contactText:'Adding to Friends and Family:',
+                  showDone:true,
                 } )
               }}
             />

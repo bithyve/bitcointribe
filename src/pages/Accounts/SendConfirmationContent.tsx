@@ -32,7 +32,7 @@ export default function SendConfirmationContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white
+      backgroundColor: Colors.white
     }}>
       <View
         style={{
@@ -58,6 +58,7 @@ export default function SendConfirmationContent( props ) {
       {props.infoText && (
         <View
           style={{
+            flex:1,
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
             marginRight: wp( '8%' ),
@@ -73,7 +74,7 @@ export default function SendConfirmationContent( props ) {
       )}
       <View
         style={{
-          flex: props.recipients.length === 0 ? 1 : 0,
+          // flex: props.recipients.length === 0 ? 1 : 0,
           flexDirection: 'row',
           marginTop: 'auto',
           alignItems: 'center',
@@ -115,7 +116,7 @@ export default function SendConfirmationContent( props ) {
               width: wp( '25%' ),
               height: hp( '18%' ),
               resizeMode: 'cover',
-               marginLeft: 'auto',
+              marginLeft: 'auto',
               marginBottom: props.recipients.length === 0 ? 'auto' : 0,
             }}
             source={

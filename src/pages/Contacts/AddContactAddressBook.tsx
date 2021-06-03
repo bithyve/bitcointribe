@@ -309,6 +309,10 @@ export default function AddContactAddressBook( props ) {
     if ( selectedContacts && selectedContacts.length ) {
       props.navigation.navigate( 'AddContactSendRequest', {
         SelectedContact: selectedContacts,
+        headerText:'Add a contact  ',
+        subHeaderText:'Send a Friends and Family request',
+        contactText:'Adding to Friends and Family:',
+        showDone:true,
       } )
     }
   }
@@ -338,6 +342,10 @@ export default function AddContactAddressBook( props ) {
 
     props.navigation.navigate( 'AddContactSendRequest', {
       SelectedContact: [ data ],
+      headerText:'Add a contact  ',
+      subHeaderText:'Send a Friends and Family request',
+      contactText:'Adding to Friends and Family:',
+      showDone:true,
     } )
   }
   console.log( 'permissionModal >>>>>  value', permissionModal )

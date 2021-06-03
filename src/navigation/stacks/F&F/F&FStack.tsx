@@ -19,6 +19,7 @@ import ContactDetails from '../../../pages/Contacts/ContactDetails'
 import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
+import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -61,10 +62,11 @@ const FriendsAndFamily = createStackNavigator(
       navigationOptions: {
         header: null,
       },
-    }
+    },
+    RequestKeyFromContact
   },
   {
-    mode: 'modal',
+    // mode: 'modal',
     initialRouteName: 'Home',
     defaultNavigationOptions: {
       header: null

@@ -92,6 +92,8 @@ export default function Login( props ) {
   //   React.createRef<BottomSheet>(),
   // )
   const [ loaderModal, setloaderModal ] = useState( false )
+  const [ errorModal, setErrorModal ] = useState( false )
+
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
@@ -163,7 +165,8 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( JailMonkey.isJailBroken() ) {
-      ErrorBottomSheet.current.snapTo( 1 )
+      // ErrorBottomSheet.current.snapTo( 1 )
+      setErrorModal( true )
       setTimeout( () => {
         setJailBrokenTitle(
           Platform.OS == 'ios'
@@ -180,7 +183,8 @@ export default function Login( props ) {
     }
     DeviceInfo.isPinOrFingerprintSet().then( ( isPinOrFingerprintSet ) => {
       if ( !isPinOrFingerprintSet ) {
-        ErrorBottomSheet.current.snapTo( 1 )
+        // ErrorBottomSheet.current.snapTo( 1 )
+        setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
             'Your phone does not have any secure entry like Pin or Biometric',
@@ -331,7 +335,8 @@ export default function Login( props ) {
         info={JailBrokenInfo}
         proceedButtonText={'Ok'}
         onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
+          // ErrorBottomSheet.current.snapTo( 0 )
+          setErrorModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../assets/images/icons/errorImage.png' )}
@@ -339,15 +344,15 @@ export default function Login( props ) {
     )
   }, [ JailBrokenTitle ] )
 
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+  // const renderErrorModalHeader = useCallback( () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         ErrorBottomSheet.current.snapTo( 0 )
+  //       }}
+  //     />
+  //   )
+  // }, [] )
 
   return (
     <View style={{
@@ -672,7 +677,10 @@ export default function Login( props ) {
           {renderLoaderModalContent()}
         </ModalContainer>
       </View>
-      <BottomSheet
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+        {renderErrorModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )
         }}
@@ -687,7 +695,7 @@ export default function Login( props ) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
-      />
+      /> */}
     </View>
   )
 }

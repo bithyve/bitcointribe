@@ -150,6 +150,7 @@ interface ContactDetailsStateTypes {
   SMShareQR: string;
   qrModalTitle: string;
   reshareModal: boolean;
+  showQRCode: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -189,6 +190,7 @@ class ContactDetails extends PureComponent<
       trustedQR: '',
       SMShareQR: '',
       encryptedExitKey: '',
+      showQRCode: false,
       trustedContactHistory: [
         {
           id: 1,
@@ -370,6 +372,10 @@ class ContactDetails extends PureComponent<
     } else {
       this.props.navigation.navigate( 'AddContactSendRequest', {
         SelectedContact: [ this.Contact ],
+        headerText:'Add a contact  ',
+        subHeaderText:'Send a Friends and Family request',
+        contactText:'Adding to Friends and Family:',
+        showDone:true,
       } )
     }
   };
@@ -490,7 +496,7 @@ class ContactDetails extends PureComponent<
   generateQR = ( type ) => {
     const appVersion = DeviceInfo.getVersion()
     const { trustedContacts } = this.props
-    const contacts: TrustedContact = trustedContacts.tc.trustedContactsV2[ this.Contact.channelKey ]
+    const contacts: TrustedContact = trustedContacts.tc.trustedContacts[ this.Contact.channelKey ]
     const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
     if ( !this.Contact ) {
       Alert.alert( 'Contact details missing' )
@@ -579,15 +585,24 @@ class ContactDetails extends PureComponent<
           link={this.state.trustedLink}
           contactEmail={''}
           onPressBack={() => {
-            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // this.setState( {
+            //   showQRCode: false
+            // } )
             this.props.navigation.goBack()
           }}
           onPressDone={() => {
-            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // this.setState( {
+            //   showQRCode: false
+            // } )
             this.props.navigation.goBack()
           }}
           onPressShare={() => {
-            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            this.setState( {
+              showQRCode: false
+            } )
             this.props.navigation.goBack()
           }}
         />
@@ -595,15 +610,15 @@ class ContactDetails extends PureComponent<
     }
   };
 
-  SendModalFunction = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( this.shareBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  };
+  // SendModalFunction = () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         ( this.shareBottomSheet as any ).current.snapTo( 0 )
+  //       }}
+  //     />
+  //   )
+  // };
 
   renderSendViaLinkContents = () => {
     return (
@@ -728,11 +743,21 @@ class ContactDetails extends PureComponent<
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
-          ( this.shareBottomSheet as any ).current.snapTo( 1 );
           ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+          // ( this.shareBottomSheet as any ).current.snapTo( 1 );
+          // this.setState( {
+          //   showQRCode: true
+          // } )
+          // this.props.navigation.navigate( 'RequestKeyFromContact' )
+          this.props.navigation.navigate( 'AddContactSendRequest', {
+            SelectedContact: [ this.Contact ],
+          } )
         }}
         onPressIgnore={() => {
           ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+          this.setState( {
+            showQRCode: false
+          } )
         }}
         isBottomImage={false}
       />
@@ -1147,10 +1172,22 @@ class ContactDetails extends PureComponent<
             cancelButtonText={'Back'}
             isIgnoreButton={true}
             onPressProceed={() => {
-              ( this.shareBottomSheet as any ).current.snapTo( 1 )
+              // ( this.shareBottomSheet as any ).current.snapTo( 1 )
+              this.props.navigation.navigate( 'AddContactSendRequest', {
+                SelectedContact: [ this.Contact ],
+                headerText:`Send Recovery Key${'\n'}to contact`,
+                subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
+                contactText:'Sharing Recovery Key with',
+                showDone:false,
+              } )
+
               // ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
               this.setState( {
                 reshareModal: false
+              }, () => {
+                // this.setState( {
+                //   showQRCode: true
+                // } )
               } )
             }}
             onPressIgnore={() => {
@@ -1175,7 +1212,12 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}
         />
-        <BottomSheet
+        <ModalContainer visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
+          showQRCode: false
+        } )}>
+          {this.SendShareModalFunction}
+        </ModalContainer>
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
           ref={this.shareBottomSheet as any}
@@ -1187,7 +1229,7 @@ class ContactDetails extends PureComponent<
           ]}
           renderContent={this.SendShareModalFunction}
           renderHeader={this.SendModalFunction}
-        />
+        /> */}
       </View>
     )
   }

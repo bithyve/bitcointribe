@@ -39,10 +39,10 @@ export default function NotificationListContent( props ) {
         </View>
       </View>
       <ScrollView style={{
-        height: 'auto'
+        // height: 'auto'
       }}>
         <View style={{
-          flex: 1
+          // flex: 1
         }}>
           {props.notificationLoading
             ? null
@@ -123,7 +123,7 @@ export default function NotificationListContent( props ) {
 }
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   modalHeaderTitleView: {

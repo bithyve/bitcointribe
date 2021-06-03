@@ -128,7 +128,7 @@ const TrustedContacts = ( props ) => {
               fontWeight: 'bold',
             }}
           >
-            send Recovery Keys..
+            send Recovery Keys
           </Text>
         </Text>
         {props.navigation.state.params.LoadContacts ? renderContactList() : null}

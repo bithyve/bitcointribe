@@ -108,6 +108,7 @@ interface ManageBackupNewBHRStateTypes {
   knowMoreType: string;
   ImKeeping: any[];
   listModal: boolean;
+  errorModal: boolean;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -218,6 +219,7 @@ class ManageBackupNewBHR extends Component<
       knowMoreType: 'manageBackup',
       ImKeeping: [],
       listModal: false,
+      errorModal: false,
     }
   }
 
@@ -510,8 +512,11 @@ class ManageBackupNewBHR extends Component<
         errorInfo: this.props.errorInfo,
         showLoader: false
       } )
-      this.props.setLevelCompletionError( null, null, LevelStatus.PENDING );
-      ( this.ErrorBottomSheet as any ).snapTo( 1 )
+      this.props.setLevelCompletionError( null, null, LevelStatus.PENDING )
+      // ( this.ErrorBottomSheet as any ).snapTo( 1 )
+      this.setState( {
+        errorModal: true
+      } )
     }
 
     if( prevProps.navigationObj !== this.props.navigationObj ){
@@ -813,7 +818,8 @@ class ManageBackupNewBHR extends Component<
       ImKeeping,
       selectedKeeperName,
       selectedKeeperType,
-      listModal
+      listModal,
+      errorModal
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -834,17 +840,7 @@ class ManageBackupNewBHR extends Component<
           {/* <View style={{
         flex: 1, backgroundColor: 'white'
       }}> */}
-          <Text style={{
-            color: Colors.blue,
-            fontSize: RFValue( 16 ),
-            marginLeft: 2,
-            fontFamily: Fonts.FiraSansMedium,
-            paddingTop: wp( 8 ),
-            paddingLeft: wp( 6 ),
-            paddingBottom: wp( 4 ),
-          }}>
-            Security & Privacy
-          </Text>
+
           {/* <View style={styles.modalHeaderTitleView}> */}
           {/* <View style={{
             flex: 1, flexDirection: 'row', alignItems: 'center'
@@ -882,6 +878,17 @@ class ManageBackupNewBHR extends Component<
               flex: 1
             }}
           >
+            <Text style={{
+              color: Colors.blue,
+              fontSize: RFValue( 16 ),
+              marginLeft: 2,
+              fontFamily: Fonts.FiraSansMedium,
+              paddingTop: wp( 8 ),
+              paddingLeft: wp( 6 ),
+              paddingBottom: wp( 4 ),
+            }}>
+            Security & Privacy
+            </Text>
             <View style={{
               flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: wp( 6 ), alignItems: 'center'
             }}>
@@ -1157,8 +1164,22 @@ Wallet Backup
               }
               selectedLevelId={selectedLevelId}
             />
+          </ModalContainer >
+          <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+            <ErrorModalContents
+              modalRef={this.ErrorBottomSheet as any}
+              title={this.state.errorTitle}
+              info={this.state.errorInfo}
+              proceedButtonText={'Got it'}
+              isIgnoreButton={false}
+              onPressProceed={() => this.setState( {
+                errorModal: false
+              } )}
+              isBottomImage={true}
+              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+            />
           </ModalContainer>
-          <BottomSheet
+          {/* <BottomSheet
             enabledInnerScrolling={true}
             ref={( c ) => { this.ErrorBottomSheet = c }}
             snapPoints={[
@@ -1178,7 +1199,7 @@ Wallet Backup
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />}
             renderHeader={()=><ModalHeader onPressHeader={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )} />}
-          />
+          /> */}
           <BottomSheet
             enabledInnerScrolling={true}
             ref={( c )=>this.ApprovePrimaryKeeperBottomSheet=c}

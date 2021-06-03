@@ -258,7 +258,8 @@ class FriendsAndFamilyScreen extends PureComponent<
   } ) => {
     return (
       <View style={{
-        alignItems: 'center'
+        alignItems: 'center',
+        flex: 1
       }}>
         <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
         <Text style={{
@@ -396,7 +397,7 @@ class FriendsAndFamilyScreen extends PureComponent<
             </View>
             {otherContacts.length > 0 &&
             <View style={{
-              width: wp ( '95%' ), height: hp ( '15%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
+              width: wp ( '95%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
             }}>
               <View style={{
                 flexDirection: 'row',  justifyContent: 'space-between'
@@ -416,7 +417,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
 
               <View style={{
-                flexDirection: 'row',  alignSelf: 'flex-start', marginTop: hp ( '1%' )
+                flexDirection: 'row',  alignSelf: 'flex-start', flex: 1, marginLeft: wp( 1 )
               }}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {otherContacts.map( ( item, index ) => {
@@ -618,8 +619,8 @@ export default connect( mapStateToProps, {
 
 const styles = StyleSheet.create( {
   avatarImage: {
-    ...ImageStyles.thumbnailImageLarge,
-    borderRadius: wp( 14 )/2,
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp( 12 )/2,
     marginHorizontal: wp ( 1 )
   },
   accountCardsSectionContainer: {

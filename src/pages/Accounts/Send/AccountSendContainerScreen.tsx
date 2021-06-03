@@ -33,6 +33,7 @@ import { NavigationStackOptions } from 'react-navigation-stack'
 import ModalHeader from '../../../components/ModalHeader'
 import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
 import Colors from '../../../common/Colors'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 export type Props = {
   navigation: any;
@@ -155,9 +156,13 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [] )
 
   const toggleKnowMoreSheet = () => {
+    console.log( '<<<<<<>>>>>>' )
+    showKnowMoreBottomSheet()
     const shouldShow = !isShowingKnowMoreSheet
     setIsShowingKnowMoreSheet( shouldShow )
     if ( shouldShow ) {
+      console.log( 'alaaal' )
+
       showKnowMoreBottomSheet()
     }
   }
@@ -175,21 +180,28 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }} />
   }
 
-  const showKnowMoreBottomSheet = useCallback( () => {
-    presentBottomSheet(
-      <SendHelpContents titleClicked={dismissBottomSheet} />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '89%' ],
-        handleComponent: KnowMoreBottomSheetHandle,
-        onChange: ( newIndex ) => {
-          if ( newIndex < 1 ) {
-            dispatch( initialKnowMoreSendSheetShown() )
-          }
-        }
-      },
+  // const showKnowMoreBottomSheet = useCallback( () => {
+  //   presentBottomSheet(
+  //     <SendHelpContents titleClicked={dismissBottomSheet} />,
+  //     {
+  //       ...defaultBottomSheetConfigs,
+  //       snapPoints: [ 0, '89%' ],
+  //       handleComponent: KnowMoreBottomSheetHandle,
+  //       onChange: ( newIndex ) => {
+  //         if ( newIndex < 1 ) {
+  //           dispatch( initialKnowMoreSendSheetShown() )
+  //         }
+  //       }
+  //     },
+  //   )
+  // }, [ presentBottomSheet, dismissBottomSheet ] )
+  const showKnowMoreBottomSheet = () => {
+    return(
+      // <ModalContainer visible={true} closeBottomSheet={() => {}}>
+      <SendHelpContents titleClicked={dismissBottomSheet} />
+      // </ModalContainer>
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   useEffect( () => {
     if ( primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT && hasShownInitialKnowMoreSendSheet == false ) {

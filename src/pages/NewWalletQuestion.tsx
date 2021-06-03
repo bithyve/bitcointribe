@@ -699,7 +699,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           />
         </View>
       ) : null}
-      <ModalContainer visible={loaderModal} closeBottomSheet={() => {setLoaderModal( false )}} >
+      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
         {renderLoaderModalContent()}
       </ModalContainer>
       {/* <BottomSheet

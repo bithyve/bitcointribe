@@ -333,6 +333,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
       // setTrustedContactModal( false )
       props.navigation.navigate( 'AddContactSendRequest', {
         SelectedContact: chosenContact,
+        headerText:'Add a contact  ',
+        subHeaderText:'Send a Friends and Family request',
+        contactText:'Adding to Friends and Family:',
+        showDone:true,
       } )
       // RequestKeyFromContact.goBack()
       // ( shareBottomSheet as any ).current.snapTo( 1 )

@@ -68,6 +68,22 @@ export default function AddContactSendRequest( props ) {
     ? props.navigation.getParam( 'SelectedContact' )
     : []
 
+  const headerText = props.navigation.getParam( 'headerText' )
+    ? props.navigation.getParam( 'headerText' )
+    : ''
+
+  const subHeaderText = props.navigation.getParam( 'subHeaderText' )
+    ? props.navigation.getParam( 'subHeaderText' )
+    : ''
+
+  const contactText = props.navigation.getParam( 'contactText' )
+    ? props.navigation.getParam( 'contactText' )
+    : ''
+
+  const showDone = props.navigation.getParam( 'showDone' )
+    ? props.navigation.getParam( 'showDone' )
+    : false
+
   const [ Contact ] = useState(
     SelectedContact ? SelectedContact[ 0 ] : {
     },
@@ -163,7 +179,7 @@ export default function AddContactSendRequest( props ) {
           isFromReceive={true}
           headerText={'Share'}
           subHeaderText={'Send to your contact'}
-          contactText={'Adding to Friends and Family:'}
+          contactText={contactText}
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
             WALLET_SETUP.walletName
@@ -210,7 +226,7 @@ export default function AddContactSendRequest( props ) {
         isFromReceive={true}
         headerText={'Friends and Family Request'}
         subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
-        contactText={'Adding to Friends and Family:'}
+        contactText={contactText}
         contact={Contact}
         QR={trustedQR}
         link={trustedLink}
@@ -245,7 +261,7 @@ export default function AddContactSendRequest( props ) {
         isFromReceive={true}
         headerText={'Friends and Family Request'}
         subHeaderText={'Scan the QR from your Contact\'s Hexa Wallet'}
-        contactText={'Adding to Friends and Family:'}
+        contactText={contactText}
         contact={Contact}
         QR={trustedQR}
         contactEmail={''}
@@ -392,7 +408,7 @@ export default function AddContactSendRequest( props ) {
                   fontFamily: Fonts.FiraSansRegular,
                 }}
               >
-                Add a contact{' '}
+                {headerText}
               </Text>
               <Text
                 style={{
@@ -402,9 +418,10 @@ export default function AddContactSendRequest( props ) {
                   paddingTop: 5,
                 }}
               >
-                Send a Friends and Family request
+                {subHeaderText}
               </Text>
             </View>
+            {showDone  &&
             <TouchableOpacity
               onPress={() => {
                 // createTrustedContact()
@@ -431,6 +448,7 @@ export default function AddContactSendRequest( props ) {
                 Done
               </Text>
             </TouchableOpacity>
+            }
           </View>
         </View>
         <RequestKeyFromContact

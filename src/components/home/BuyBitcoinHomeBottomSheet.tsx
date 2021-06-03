@@ -1,10 +1,9 @@
 import React from 'react'
-import { StyleSheet, ImageSourcePropType, FlatList, Image, Platform } from 'react-native'
+import { StyleSheet, ImageSourcePropType, FlatList, Image, Platform, TouchableOpacity } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import Colors from '../../common/Colors'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;

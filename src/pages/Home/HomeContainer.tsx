@@ -2408,6 +2408,10 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                   navigation.navigate( 'AddContactSendRequest', {
                     SelectedContact: selectedContact,
+                    headerText:'Add a contact  ',
+                    subHeaderText:'Send a Friends and Family request',
+                    contactText:'Adding to Friends and Family:',
+                    showDone:true,
                   } )
                 }
               }}
@@ -2439,6 +2443,10 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                 navigation.navigate( 'AddContactSendRequest', {
                   SelectedContact: [ data ],
+                  headerText:'Add a contact  ',
+                  subHeaderText:'Send a Friends and Family request',
+                  contactText:'Adding to Friends and Family:',
+                  showDone:true,
                 } )
               }}
             />
