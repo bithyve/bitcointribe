@@ -26,6 +26,13 @@ export type BuyBitcoinBottomSheetMenuItem = {
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
+    title: 'Set up automatic buys',
+    subtitle: 'Stack sats with Swan Bitcoin',
+    kind: BuyMenuItemKind.SWAN,
+    imageSource: require( '../../assets/images/icons/swan.png' ),
+    disabled: false
+  },
+  {
     title: Platform.OS == 'ios' ? 'Buy with Ramp' : 'Buy with Ramp',
     subtitle: 'Low fee for those big buys',
     kind: BuyMenuItemKind.RAMP,
@@ -44,13 +51,6 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     subtitle: 'From select retail stores with FastBitcoins',
     kind: BuyMenuItemKind.FAST_BITCOINS,
     imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-    disabled: false
-  },
-  {
-    title: 'Set up automatic buys',
-    subtitle: 'Stack sats with Swan Bitcoin',
-    kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/swan.png' ),
     disabled: false
   }
 ]
