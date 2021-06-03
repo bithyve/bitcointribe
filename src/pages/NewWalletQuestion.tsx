@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   TextInput,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../common/Fonts'
@@ -40,6 +40,7 @@ import { setVersion } from '../store/actions/versionHistory'
 import { initializeHealthSetup, initNewBHRFlow } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
+import ModalContainer from '../components/home/ModalContainer'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -124,7 +125,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
-  const [ loaderBottomSheet ] = useState( React.createRef() )
+  // const [ loaderBottomSheet ] = useState( React.createRef() )
+  const [ loaderModal, setLoaderModal ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
@@ -138,7 +140,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
-      ( loaderBottomSheet as any ).current.snapTo( 0 )
+      // ( loaderBottomSheet as any ).current.snapTo( 0 )
+      setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
@@ -159,7 +162,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
       } else{
-        ( loaderBottomSheet as any ).current.snapTo( 0 )
+        // ( loaderBottomSheet as any ).current.snapTo( 0 )
+        setLoaderModal( false )
         props.navigation.navigate( 'HomeNav', {
           walletName,
         } ) }
@@ -168,7 +172,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = () =>{
     showLoader()
-    requestAnimationFrame(() => {
+    requestAnimationFrame( () => {
       const security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
@@ -189,11 +193,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         'securityQuestionHistory',
         JSON.stringify( securityQuestionHistory ),
       )
-    })
+    } )
   }
 
   const showLoader = () => {
-    ( loaderBottomSheet as any ).current.snapTo( 1 )
+    // ( loaderBottomSheet as any ).current.snapTo( 1 )
+    setLoaderModal( true )
     setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
@@ -694,7 +699,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           />
         </View>
       ) : null}
-      <BottomSheet
+      <ModalContainer visible={loaderModal} closeBottomSheet={() => {setLoaderModal( false )}} >
+        {renderLoaderModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         onCloseEnd={() => { }}
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}
@@ -702,7 +710,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         snapPoints={[ -50, hp( '100%' ) ]}
         renderContent={renderLoaderModalContent}
         renderHeader={renderLoaderModalHeader}
-      />
+      /> */}
 
     </View>
   )

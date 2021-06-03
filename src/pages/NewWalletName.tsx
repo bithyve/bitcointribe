@@ -36,6 +36,7 @@ import { BottomSheetView } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
 import { Easing } from 'react-native-reanimated'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
+import ModalContainer from '../components/home/ModalContainer'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -50,7 +51,7 @@ export default function NewWalletName( props ) {
 
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
-  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( BottomSheetKind.CLOUD_PERMISSION )
+  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const bottomSheetRef = createRef<BottomSheet>()
@@ -142,7 +143,8 @@ export default function NewWalletName( props ) {
 
   const closeBottomSheet = () => {
     setIsCloudPermissionRender( false )
-    bottomSheetRef.current.snapTo( 0 )
+    // bottomSheetRef.current.snapTo( 0 )
+    setCurrentBottomSheetKind( null )
     onBottomSheetClosed()
   }
 
@@ -262,11 +264,15 @@ export default function NewWalletName( props ) {
           ) : null}
         </KeyboardAvoidingView>
       </View>
-      <BottomSheetBackground
+      {/* <BottomSheetBackground
         isVisible={bottomSheetState === BottomSheetState.Open}
         onPress={closeBottomSheet}
-      />
-      {currentBottomSheetKind != null && (
+      /> */}
+      <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {closeBottomSheet}} >
+        {renderBottomSheetContent()}
+      </ModalContainer>
+
+      {/* {currentBottomSheetKind != null && (
         <BottomSheet
           ref={bottomSheetRef}
           snapPoints={getBottomSheetSnapPoints()}
@@ -278,7 +284,7 @@ export default function NewWalletName( props ) {
         >
           <BottomSheetView>{renderBottomSheetContent()}</BottomSheetView>
         </BottomSheet>
-      )}
+      )} */}
     </SafeAreaView>
   )
 }
