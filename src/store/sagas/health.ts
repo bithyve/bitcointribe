@@ -2724,7 +2724,7 @@ function* sharePDFWorker( { payload } ) {
             yield call(
               Mailer.mail,
               {
-                subject: 'Use Recovery Key for '+walletName,
+                subject: 'Recovery Key  '+walletName,
                 body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
                 isHTML: true,
                 attachment: {
@@ -2733,7 +2733,7 @@ function* sharePDFWorker( { payload } ) {
                     ? 'file://' + pdfInfo.filePath
                     : pdfInfo.filePath, // The absolute path of the file from which to read data.
                   type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                  name: 'Use Recovery Key for '+walletName, // Optional: Custom filename for attachment
+                  name: 'Recovery Key  '+walletName, // Optional: Custom filename for attachment
                 },
               },
               ( err, event ) => {
@@ -2745,7 +2745,7 @@ function* sharePDFWorker( { payload } ) {
             )
           } else {
             const shareOptions = {
-              title: 'Use Recovery Key for '+walletName,
+              title: 'Recovery Key  '+walletName,
               message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
               url:
               Platform.OS == 'android'
@@ -2753,7 +2753,7 @@ function* sharePDFWorker( { payload } ) {
                 : pdfInfo.filePath,
               type: 'application/pdf',
               showAppsToView: true,
-              subject: 'Use Recovery Key for '+walletName,
+              subject: 'Recovery Key  '+walletName,
             }
 
             try {
@@ -2807,7 +2807,7 @@ function* sharePDFWorker( { payload } ) {
 
         case 'Other':
           const shareOptions = {
-            title: 'Use Recovery Key for '+walletName,
+            title: 'Recovery Key  '+walletName,
             message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
             url:
             Platform.OS == 'android'
@@ -2815,7 +2815,7 @@ function* sharePDFWorker( { payload } ) {
               : pdfInfo.filePath,
             type: 'application/pdf',
             showAppsToView: true,
-            subject: 'Use Recovery Key for '+walletName,
+            subject: 'Recovery Key  '+walletName,
           }
 
           try {

@@ -28,7 +28,7 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
   const { rampHostedUrl } = useRampIntegrationState()
 
   const [ accountName, setAccountName ] = useState( currentSubAccount.defaultTitle )
-  const [ accountDescription, setAccountDescription ] = useState( 'BTC purchased from Ramp' )
+  const [ accountDescription, setAccountDescription ] = useState( 'Sats purchased from Ramp' )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   const canProceed = useMemo( () => {
     return (
