@@ -482,9 +482,11 @@ function* walletCheckInWorker( { payload } ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
-  const walletCheckInLoading: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.loading.walletCheckIn,
-  )
+  const accountsState: AccountsState = yield select( state => state.accounts )
+  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
+  const { walletId } = regularAccount.hdWallet.getWalletId()
+
+
   if( newBHRFlowStarted === true ){
     s3Service = yield select( ( state ) => state.health.service )
   } else {
@@ -541,6 +543,7 @@ function* walletCheckInWorker( { payload } ) {
     yield put( updateMSharesHealth( shareArray, true )  )
     const res = yield call(
       trustedContacts.walletCheckIn,
+      walletId,
       metaShares.length ? metaShares.slice( 0, 3 ) : null, // metaShares is null during wallet-setup
       metaShares.length ? healthCheckStatus : {
       },
@@ -549,7 +552,7 @@ function* walletCheckInWorker( { payload } ) {
     )
 
     if ( res.status === 200 ) {
-      const { updationInfo, exchangeRates, averageTxFees } = res.data
+      const { exchangeRates, averageTxFees } = res.data
       console.log( {
         exchangeRates
       } )
@@ -566,40 +569,6 @@ function* walletCheckInWorker( { payload } ) {
           yield put( setAverageTxFee( averageTxFees ) )
       }
 
-      const shareRemoved = false
-      // if ( updationInfo ) {
-      //   // removing shares under-custody based on reshare-version@HealthSchema
-      //   Object.keys( underCustody ).forEach( ( tag ) => {
-      //     for ( const info of updationInfo ) {
-      //       if ( info.updated ) {
-      //         // if (info.walletId === UNDER_CUSTODY[tag].META_SHARE.meta.walletId) {
-      //         //   // UNDER_CUSTODY[tag].LAST_HEALTH_UPDATE = info.updatedAt;
-      //         //   if (info.encryptedDynamicNonPMDD)
-      //         //     UNDER_CUSTODY[tag].ENC_DYNAMIC_NONPMDD =
-      //         //       info.encryptedDynamicNonPMDD;
-      //         // }
-      //       } else {
-      //         if ( info.removeShare ) {
-      //           if (
-      //             info.walletId === underCustody[ tag ].META_SHARE.meta.walletId
-      //           ) {
-      //             delete underCustody[ tag ]
-      //             shareRemoved = true
-      //             for ( const contactName of Object.keys(
-      //               trustedContacts.tc.trustedContacts,
-      //             ) ) {
-      //               const contact =
-      //                 trustedContacts.tc.trustedContacts[ contactName ]
-      //               if ( contact.walletID === info.walletId ) {
-      //                 contact.isWard = false
-      //               }
-      //             }
-      //           }
-      //         }
-      //       }
-      //     }
-      //   } )
-      // }
 
       const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
       const { healthCheckStatus } = res.data
@@ -609,8 +578,7 @@ function* walletCheckInWorker( { payload } ) {
 
       if (
         preSyncTC !== postSyncTC ||
-        preSyncHCStatus !== postSyncHCStatus ||
-        shareRemoved
+        preSyncHCStatus !== postSyncHCStatus
       ) {
         let dbPayload = {
         }
@@ -629,16 +597,6 @@ function* walletCheckInWorker( { payload } ) {
         }
         dbPayload = {
           SERVICES: updatedSERVICES,
-        }
-
-        if ( shareRemoved ) {
-          const updatedBackup = {
-            ...DECENTRALIZED_BACKUP,
-            UNDER_CUSTODY: underCustody,
-          }
-          dbPayload = {
-            ...dbPayload, DECENTRALIZED_BACKUP: updatedBackup
-          }
         }
 
         yield call( insertDBWorker, {

@@ -271,6 +271,7 @@ export default class TrustedContacts {
   };
 
   public walletCheckIn = async (
+    walletId: string,
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
@@ -289,13 +290,22 @@ export default class TrustedContacts {
     exchangeRates: { [currency: string]: number };
     averageTxFees: any;
   }> => {
-    const updateChannelsLS = []
+    const updateChannelsLS = {
+    }
     const channelAddressToKeyMapping = {
     }
+    const outStreamId = TrustedContacts.getStreamId( walletId )
+    const currentTS = Date.now()
+
     for ( const channelKey of Object.keys( this.trustedContacts ) ) {
-      const { permanentChannelAddress, permanentChannel, isActive } = this.trustedContacts[ channelKey ]
+      const contact = this.trustedContacts[ channelKey ]
+      const { permanentChannelAddress, permanentChannel, isActive } = contact
       if( isActive && Object.keys( permanentChannel ).length > 1 ){ // contact established(in-stream available)
-        updateChannelsLS.push( permanentChannelAddress )
+        contact.unencryptedPermanentChannel[ outStreamId ].metaData.flags.lastSeen = currentTS
+        contact.permanentChannel[ outStreamId ].metaData.flags.lastSeen = currentTS
+        updateChannelsLS[ permanentChannelAddress ] = {
+          lastSeen: currentTS
+        }
         channelAddressToKeyMapping[ permanentChannelAddress ] = channelKey
       }
     }
@@ -311,7 +321,7 @@ export default class TrustedContacts {
 
     const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
       HEXA_ID,
-      walletID: metaShares ? metaShares[ 0 ].meta.walletId : null,
+      walletID: walletId,
       shareIDs: metaShares
         ? metaShares.map( ( metaShare ) => metaShare.shareId )
         : null, // legacy HC

@@ -70,6 +70,7 @@ export default class TrustedContactsService {
   };
 
   public walletCheckIn = async (
+    walletId: string,
     metaShares: MetaShare[],
     healthCheckStatus,
     metaSharesUnderCustody: MetaShare[],
@@ -105,6 +106,7 @@ export default class TrustedContactsService {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.tc.walletCheckIn(
+          walletId,
           metaShares,
           healthCheckStatus,
           metaSharesUnderCustody,
