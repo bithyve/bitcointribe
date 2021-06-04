@@ -49,6 +49,8 @@ import { makeContactRecipientDescription } from '../../utils/sending/RecipientFa
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { v4 as uuid } from 'uuid'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -279,25 +281,12 @@ class FriendsAndFamilyScreen extends PureComponent<
           this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
         }}
         onSkipContinue={() => {
-          let { skippedContactsCount } = this.props.trustedContactsService.tc
-          let data
-          if ( !skippedContactsCount ) {
-            skippedContactsCount = 1
-            data = {
-              firstName: 'F&F request',
-              lastName: `awaiting ${skippedContactsCount}`,
-              name: `F&F request awaiting ${skippedContactsCount}`,
-            }
-          } else {
-            data = {
-              firstName: 'F&F request',
-              lastName: `awaiting ${skippedContactsCount + 1}`,
-              name: `F&F request awaiting ${skippedContactsCount + 1}`,
-            }
+          const contactDummy = {
+            id: uuid(),
+            name: SKIPPED_CONTACT_NAME,
           }
-
           navigation.navigate( 'AddContactSendRequest', {
-            SelectedContact: [ data ],
+            SelectedContact: [ contactDummy ],
           } )
           this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
         }}

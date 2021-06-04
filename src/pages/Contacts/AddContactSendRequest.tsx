@@ -121,15 +121,6 @@ export default function AddContactSendRequest( props ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
 
-      // const numberDL =
-      //   `https://hexawallet.io/${config.APP_STAGE}/${
-      //     'tcg'
-      //   }` +
-      //   `/${channelKey}` +
-      //   `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
-      //   `/v${appVersion}`
-      // setTrustedLink( numberDL )
-
       setTrustedQR(
         JSON.stringify( {
           type: QRCodeTypes.CONTACT_REQUEST,

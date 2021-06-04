@@ -34,7 +34,6 @@ export default class TrustedContacts {
       .digest( 'hex' ).slice( 0, 9 )
 
   public trustedContacts: Trusted_Contacts;
-  public skippedContactsCount = 0;
 
   constructor( stateVars ) {
     this.initializeStateVars( stateVars )
@@ -80,10 +79,6 @@ export default class TrustedContacts {
     this.trustedContacts =
       stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {
       }
-    this.skippedContactsCount =
-      stateVars && stateVars.skippedContactsCount
-        ? stateVars.skippedContactsCount
-        : this.skippedContactsCount
   };
 
   public cacheOutstream = (
