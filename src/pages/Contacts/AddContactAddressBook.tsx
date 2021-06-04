@@ -411,17 +411,17 @@ export default function AddContactAddressBook( props ) {
       <View style={{
         flex : 1
       }}>
-        <View
+        {/* <View
           style={{
             paddingLeft: wp( '5%' ),
             paddingRight: wp( '5%' ),
             paddingTop: wp( '5%' ),
           }}
         >
-          {/* <Text style={styles.modalHeaderInfoText}>
+          <Text style={styles.modalHeaderInfoText}>
             {'Add contacts from your Address Book, or add a new contact'}
-          </Text> */}
-        </View>
+          </Text>
+        </View> */}
         <View style={{
           height: '95%', ...props.style
         }}>

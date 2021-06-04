@@ -39,10 +39,10 @@ export default function NotificationListContent( props ) {
         </View>
       </View>
       <ScrollView style={{
-        // height: 'auto'
+
       }}>
         <View style={{
-          // flex: 1
+          height: 'auto'
         }}>
           {props.notificationLoading
             ? null

@@ -1,6 +1,5 @@
 import React, { createRef, PureComponent } from 'react'
 import {
-  Text,
   View,
   StyleSheet,
   StatusBar,

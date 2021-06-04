@@ -45,7 +45,7 @@ function ManageBackupCard( props ) {
             width: 5,
             height: 5,
           },
-          elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
+          // elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
           opacity: selectedId == value.id || selectedId == 0 ? 1 : 0.3,
         }}
       >

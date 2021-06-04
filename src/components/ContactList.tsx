@@ -388,11 +388,9 @@ export default function ContactList( props ) {
 
   return (
     <View style={{
-      ...props.style
+      ...props.style, height: '95%', flex: 1
     }}>
-      <SafeAreaView style={{
-        // flex: 0
-      }} />
+      <SafeAreaView />
       <View style={styles.selectedContactContainer}>
         {selectedContacts.length > 0
           ? selectedContacts.map( ( value, index ) => {
@@ -498,31 +496,15 @@ export default function ContactList( props ) {
             }}
           />
         ) : null}
-        {/* <View style={styles.contactIndexView}>
-              <AppBottomSheetTouchableWrapper
-                onPress={() => {
-                }}
-              >
-                <Text style={styles.contactIndexText}>#</Text>
-              </AppBottomSheetTouchableWrapper>
-              {alphabetsList.map(value => (
-                <AppBottomSheetTouchableWrapper
-                  onPress={() => {
-                  }}
-                >
-                  <Text style={styles.contactIndexText}>{value}</Text>
-                </AppBottomSheetTouchableWrapper>
-              ))}
-            </View>*/}
+
       </View>
       {selectedContacts.length >= 1 && (
         <View
           style={{
-            // flex: 1,
-            // position: 'absolute',
-            // bottom: 0,
+            position: 'absolute',
+            bottom: 0,
+            // flex:1,
             width: wp( '50%' ),
-            // height: hp ( '100%' ),
             alignSelf: 'center',
           }}
         >
@@ -588,7 +570,7 @@ const styles = StyleSheet.create( {
     shadowOffset: {
       width: 15, height: 15
     },
-    // marginBottom: 20,
+    marginBottom: 20,
   },
   selectedContactView: {
     width: wp( '42%' ),

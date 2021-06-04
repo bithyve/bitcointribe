@@ -140,6 +140,7 @@ import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import ModalContainer from '../../components/home/ModalContainer'
+import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -1390,8 +1391,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
 
-  onPhoneNumberChange = () => {};
-
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
     switch ( menuItem.kind ) {
         case BuyMenuItemKind.FAST_BITCOINS:
@@ -1887,22 +1886,113 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
+
+  onTrustedContactRequestAccepted = ( key ) => {
+    this.closeBottomSheet()
+    const { navigation } = this.props
+    const { trustedContactRequest } = this.state
+
+    navigation.navigate( 'ContactsListForAssociateContact', {
+      postAssociation: ( contact ) => {
+        this.props.initializeTrustedContact( {
+          contact,
+          flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+          channelKey: trustedContactRequest.channelKey,
+          contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+        } )
+        // TODO: navigate post approval (from within saga)
+        navigation.navigate( 'Home' )
+      }
+    } )
+  };
+
+  onTrustedContactRejected = () => {
+    this.closeBottomSheet()
+    const { trustedContactRequest } = this.state
+    this.props.rejectTrustedContact( {
+      channelKey: trustedContactRequest.channelKey,
+    } )
+  };
+
+  onPhoneNumberChange = () => {};
+
   renderBottomSheetContent() {
     const { UNDER_CUSTODY, navigation } = this.props
     const { custodyRequest } = this.state
-    // case BottomSheetKind.NOTIFICATIONS_LIST:
-    const { notificationLoading, notificationData } = this.state
+    switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.NOTIFICATIONS_LIST:
+          const { notificationLoading, notificationData } = this.state
+          return (
+            <NotificationListContent
+              notificationLoading={notificationLoading}
+              NotificationData={notificationData}
+              onNotificationClicked={this.onNotificationClicked}
+              onPressBack={this.closeBottomSheet}
+            />
+          )
 
-    return (
-      <NotificationListContent
-        notificationLoading={notificationLoading}
-        NotificationData={notificationData}
-        onNotificationClicked={this.onNotificationClicked}
-        onPressBack={this.closeBottomSheet}
-      />
-    )
+        case BottomSheetKind.CUSTODIAN_REQUEST:
+          return (
+            <>
+              <CustodianRequestModalContents
+                userName={custodyRequest.requester}
+                onPressAcceptSecret={() => {
+                  this.closeBottomSheet()
+
+                  if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
+                    Alert.alert(
+                      'Request expired!',
+                      'Please ask the sender to initiate a new request',
+                    )
+                  } else {
+                    if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
+                      Alert.alert(
+                        'Failed to store',
+                        'You cannot custody multiple shares of the same user.',
+                      )
+                    } else {
+                      if ( custodyRequest.isQR ) {
+                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
+                      } else {
+                        navigation.navigate( 'CustodianRequestOTP', {
+                          custodyRequest,
+                        } )
+                      }
+                    }
+                  }
+                }}
+                onPressRejectSecret={() => {
+                  this.closeBottomSheet()
+                  this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
+                }}
+              />
+
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              />
+            </>
+          )
+        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
+          return (
+            <CustodianRequestRejectedModalContents
+              onPressViewTrustedContacts={this.closeBottomSheet}
+              userName={custodyRequest.requester}
+            />
+          )
+        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
+          const { trustedContactRequest } = this.state
+
+          return (
+            <TrustedContactRequestContent
+              trustedContactRequest={trustedContactRequest}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
+              onPhoneNumberChange={this.onPhoneNumberChange}
+              bottomSheetRef={this.bottomSheetRef}
+            />
+          )
+    }
   }
-
 
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
@@ -1914,7 +2004,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       currentLevel,
       newBHRFlowStarted
     } = this.props
-    console.log( 'newBHRFlowStarted >>>>>>>.', newBHRFlowStarted )
+
 
     return (
       <View
@@ -1944,7 +2034,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         />
         <ModalContainer
           visible={this.state.currentBottomSheetKind != null}
-          closeBottomSheet={() => { this.closeBottomSheet() }}
+          closeBottomSheet={() => {}}
         >
           {this.renderBottomSheetContent()}
         </ModalContainer>
