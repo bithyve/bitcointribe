@@ -12,6 +12,9 @@ export const NOTIFICATION_UPDATED = 'NOTIFICATION_UPDATED'
 export const SETUP_NOTIFICATION_LIST = 'SETUP_NOTIFICATION_LIST'
 export const UPDATED_NOTIFICATION_LIST = 'UPDATED_NOTIFICATION_LIST'
 export const FETCH_NOTIFICATION_STARTED = 'FETCH_NOTIFICATION_STARTED'
+export const GET_MESSAGES = 'GET_MESSAGES'
+export const STORE_MESSAGE_TIMESTAMP = 'STORE_MESSAGE_TIMESTAMP'
+export const MESSAGES_FETCHED = 'MESSAGES_FETCHED'
 
 export const updateFCMTokens = ( FCMs: string[] ) => {
   return {
@@ -54,6 +57,7 @@ export const setupNotificationList = ( ) => {
 export const NOTIFICATIONS_FETCHED = 'NOTIFICATIONS_FETCHED'
 
 export const notificationsFetched = ( notifications ) => {
+  console.log( 'notificationsFetched notifications', notifications )
   return {
     type: NOTIFICATIONS_FETCHED,
     payload: {
@@ -87,3 +91,26 @@ export const fetchNotificationStarted = ( fetchStarted ) => {
     }
   }
 }
+
+export const getMessages = () => {
+  return {
+    type: GET_MESSAGES,
+  }
+}
+
+export const storeMessagesTimeStamp = () => {
+  return {
+    type: STORE_MESSAGE_TIMESTAMP,
+  }
+}
+
+export const messageFetched = ( messages ) => {
+  console.log( 'messagesFetched messages', messages )
+  return {
+    type: MESSAGES_FETCHED,
+    payload: {
+      messages
+    },
+  }
+}
+

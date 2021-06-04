@@ -21,6 +21,7 @@ export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
 export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
+export const SET_WALLET_ID = 'SET_WALLET_ID'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -187,6 +188,16 @@ export const setIsPermissionGiven = ( data ) => {
     type: IS_PERMISSION_SET,
     payload: {
       isPermissionSet: data
+    }
+  }
+}
+
+export const setWalletId = ( data ) => {
+  console.log( 'SET_WALLET_ID', data )
+  return {
+    type: SET_WALLET_ID,
+    payload: {
+      walletId: data
     }
   }
 }

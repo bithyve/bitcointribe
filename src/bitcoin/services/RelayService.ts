@@ -216,4 +216,38 @@ export default class RelayServices {
       }
     }
   };
+
+
+  public static getMessages = async (
+    walletID: string,
+    storeMessageTime?: string
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          notifications: [];
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.getMessages( walletID, storeMessageTime ),
+      }
+    } catch ( err ) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch notifications',
+      }
+    }
+  };
 }

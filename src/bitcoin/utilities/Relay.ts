@@ -199,4 +199,32 @@ export default class Relay {
       throw new Error( 'Failed to deliver notification' )
     }
   };
+
+
+  public static getMessages = async (
+    walletID: string,
+    storeMessageTime?: string
+  ): Promise<{
+    notifications:[];
+  }> => {
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'fetchNotifications', {
+        HEXA_ID,
+        walletID,
+        storeMessageTime
+      } )
+    } catch ( err ) {
+      console.log( {
+        err
+      } )
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { notifications, DHInfos } = res.data
+    return {
+      notifications, DHInfos
+    }
+  };
 }

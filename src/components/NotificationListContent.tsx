@@ -13,6 +13,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import DeviceInfo from 'react-native-device-info'
 import Loader from './loader'
 import { getEnvReleaseTopic } from '../utils/geEnvSpecificParams'
+import { getTime } from '../common/CommonFunctions/timeFormatter'
 
 const releaseNotificationTopic = getEnvReleaseTopic()
 
@@ -79,7 +80,7 @@ export default function NotificationListContent( props ) {
                       </Text>
                     </View>
                     <Text style={styles.notificationElementTimeText}>
-                      {value.time}
+                      {getTime( value.timeStamp )}
                     </Text>
                     {value.isMandatory ? (
                       <FontAwesome
