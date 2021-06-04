@@ -484,7 +484,7 @@ class ContactDetails extends PureComponent<
   generateQR = ( type ) => {
     const appVersion = DeviceInfo.getVersion()
     const { trustedContacts } = this.props
-    const contacts: TrustedContact = trustedContacts.tc.trustedContactsV2[ this.Contact.channelKey ]
+    const contacts: TrustedContact = trustedContacts.tc.trustedContacts[ this.Contact.channelKey ]
     const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
     if ( !this.Contact ) {
       Alert.alert( 'Contact details missing' )
