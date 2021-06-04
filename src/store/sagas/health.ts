@@ -74,7 +74,8 @@ import {
   setIsLevelToNotSetupStatus,
   SET_HEALTH_STATUS,
   MODIFY_LEVELDATA,
-  updateLevelData
+  updateLevelData,
+  setChannelAssets
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -109,6 +110,7 @@ import {
   MetaShare,
   notificationTag,
   notificationType,
+  QRCodeTypes,
   ShareUploadables,
   StreamData,
   TrustedContact,
@@ -148,7 +150,8 @@ import { getVersions } from '../../common/utilities'
 import { initLevels } from '../actions/upgradeToNewBhr'
 import { checkLevelHealth, getLevelInfoStatus, getModifiedData } from '../../common/utilities'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
-import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import { ChannelAssets } from '../../bitcoin/utilities/Interface'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -263,16 +266,28 @@ function* generateMetaSharesWorker( { payload } ) {
         }
       }
 
-      const { SERVICES } = yield select( ( state ) => state.storage.database )
+      const { SERVICES, DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
       const updatedSERVICES = {
         ...SERVICES,
         S3_SERVICE: JSON.stringify( s3Service ),
       }
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
+      if( level == 2 ) {
+        const updatedDECENTRALIZED_BACKUP = {
+          ...DECENTRALIZED_BACKUP,
+          SM_SHARE: res.data.encryptedSMSecrets[ 0 ]
         }
-      } )
+        yield call( insertDBWorker, {
+          payload: {
+            SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP
+          }
+        } )
+      } else  if( level == 3 ) {
+        yield call( insertDBWorker, {
+          payload: {
+            SERVICES: updatedSERVICES
+          }
+        } )
+      }
     } else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
       throw new Error( res.err )
@@ -2611,6 +2626,7 @@ function* getPDFDataWorker( { payload } ) {
     const trustedContacts: TrustedContactsService = yield select(
       ( state ) => state.trustedContacts.service
     )
+    const appVersion = DeviceInfo.getVersion()
     const pdfInfo: {
       filePath: string;
       shareId: string;
@@ -2620,7 +2636,7 @@ function* getPDFDataWorker( { payload } ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
     let pdfPath = pdfInfo.filePath
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKeyFromCH: string
 
@@ -2634,19 +2650,25 @@ function* getPDFDataWorker( { payload } ) {
       }
     if( channelKeyFromCH && channelKeyFromCH == channelKey && currentContact ) {
       const recoveryData = {
+        type: QRCodeTypes.RECOVERY_REQUEST,
+        walletName: WALLET_SETUP.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey: channelKey,
         channelKey2: currentContact.secondaryChannelKey,
+        version: appVersion,
         encryptedKey: LevelHealth.encryptWithAnswer(
           shareId,
           WALLET_SETUP.security.answer
         ).encryptedString,
       }
       const secondaryData = {
+        type: QRCodeTypes.RECOVERY_REQUEST,
+        walletName: WALLET_SETUP.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey2: currentContact.secondaryChannelKey,
+        version: appVersion,
       }
 
       const qrData = [
@@ -2701,7 +2723,7 @@ function* sharePDFWorker( { payload } ) {
             yield call(
               Mailer.mail,
               {
-                subject: 'Use Recovery Key for '+walletName,
+                subject: 'Recovery Key  '+walletName,
                 body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
                 isHTML: true,
                 attachment: {
@@ -2710,7 +2732,7 @@ function* sharePDFWorker( { payload } ) {
                     ? 'file://' + pdfInfo.filePath
                     : pdfInfo.filePath, // The absolute path of the file from which to read data.
                   type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
-                  name: 'Use Recovery Key for '+walletName, // Optional: Custom filename for attachment
+                  name: 'Recovery Key  '+walletName, // Optional: Custom filename for attachment
                 },
               },
               ( err, event ) => {
@@ -2722,7 +2744,7 @@ function* sharePDFWorker( { payload } ) {
             )
           } else {
             const shareOptions = {
-              title: 'Use Recovery Key for '+walletName,
+              title: 'Recovery Key  '+walletName,
               message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
               url:
               Platform.OS == 'android'
@@ -2730,7 +2752,7 @@ function* sharePDFWorker( { payload } ) {
                 : pdfInfo.filePath,
               type: 'application/pdf',
               showAppsToView: true,
-              subject: 'Use Recovery Key for '+walletName,
+              subject: 'Recovery Key  '+walletName,
             }
 
             try {
@@ -2784,7 +2806,7 @@ function* sharePDFWorker( { payload } ) {
 
         case 'Other':
           const shareOptions = {
-            title: 'Use Recovery Key for '+walletName,
+            title: 'Recovery Key  '+walletName,
             message: `A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.`,
             url:
             Platform.OS == 'android'
@@ -2792,7 +2814,7 @@ function* sharePDFWorker( { payload } ) {
               : pdfInfo.filePath,
             type: 'application/pdf',
             showAppsToView: true,
-            subject: 'Use Recovery Key for '+walletName,
+            subject: 'Recovery Key  '+walletName,
           }
 
           try {
@@ -3849,6 +3871,64 @@ export const setHealthStatusWatcher = createWatcher(
   SET_HEALTH_STATUS
 )
 
+function* createChannelAssetsWorker( { payload } ) {
+  try {
+    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+    const { shareId, scannedData } = payload
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const s3Service = yield select( ( state ) => state.health.service )
+    const walletId = s3Service.levelhealth.walletId
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const MetaShares: MetaShare[] = yield select(
+      ( state ) => state.health.service.levelhealth.metaSharesKeeper,
+    )
+    const secureAccount: SecureAccount = yield select(
+      ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+    )
+    const qrDataObj = JSON.parse( scannedData )
+    let currentContact: TrustedContact
+
+    if( contacts ){
+      for( const ck of Object.values( contacts ) ){
+        if( ck.permanentChannelAddress == qrDataObj.channelId ){
+          currentContact = ck
+          break
+        }
+      }
+    }
+    let secondaryShare: string = MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare
+    if( scannedData ) {
+      secondaryShare = currentContact.unencryptedPermanentChannel[ TrustedContacts.getStreamId( walletId ) ].secondaryData.secondaryMnemonicShard
+    }
+    const channelAssets: ChannelAssets = {
+      primaryMnemonicShard:
+      {
+        ...MetaShares.find( value=>value.shareId==shareId ),
+        encryptedShare: {
+          pmShare: MetaShares.find( value=>value.shareId==shareId ).encryptedShare.pmShare,
+          smShare: '',
+          bhXpub: '',
+        }
+      },
+      secondaryMnemonicShard: secondaryShare,
+      keeperInfo: keeperInfo,
+      bhXpub: secureAccount.secureHDWallet.xpubs.bh,
+      shareId
+    }
+    yield put ( setChannelAssets( channelAssets ) )
+    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+    console.log( 'Error EF channel', error )
+  }
+}
+
+export const createChannelAssetsWatcher = createWatcher(
+  createChannelAssetsWorker,
+  MODIFY_LEVELDATA
+)
+
 function* modifyLevelDataWorker( ) {
   try {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
@@ -3858,7 +3938,7 @@ function* modifyLevelDataWorker( ) {
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const s3Service = yield select( ( state ) => state.health.service )
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
 
     let isError = false
     const abc = JSON.stringify( levelHealth )
@@ -3869,7 +3949,7 @@ function* modifyLevelDataWorker( ) {
         const element = levelInfo[ j ]
         const currentContact: TrustedContact = contacts[ element.channelKey ]
         if ( currentContact ) {
-          const instream: StreamData = useStreamFromPermanentChannel( s3Service.levelhealth.walletId, currentContact.permanentChannel, true )
+          const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
           if( instream ){
             levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'accessible' : levelInfo[ j ].status
             levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen

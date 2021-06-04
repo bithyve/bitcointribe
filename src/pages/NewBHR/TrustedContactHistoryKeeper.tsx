@@ -35,6 +35,8 @@ import {
   onApprovalStatusChange,
   downloadSmShareForApproval,
   keeperProcessStatus,
+  setChannelAssets,
+  createChannelAssets,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
 import SendShareModal from './SendShareModal'
@@ -49,6 +51,7 @@ import {
   QRCodeTypes,
   TrustedContact,
   Trusted_Contacts,
+  ChannelAssets
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -71,7 +74,7 @@ import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 
 const TrustedContactHistoryKeeper = ( props ) => {
@@ -203,6 +206,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -218,9 +222,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
     setIndex( props.navigation.getParam( 'index' ) )
+    if( channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ){
+      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
+    }
   }, [
-    props.navigation.getParam( 'selectedLevelId' ),
-    props.navigation.getParam( 'selectedKeeper' ),
     props.navigation.state.params,
   ] )
 
@@ -576,152 +581,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     )
   }
 
-  const createDeepLink = useCallback( () => {
-    try {
-      if ( !SHARES_TRANSFER_DETAILS[ index ] ) {
-        setTimeout( () => {
-          setErrorMessageHeader( 'Failed to share' )
-          setErrorMessage(
-            'There was some error while sharing the Recovery Key, please try again',
-          )
-        }, 2 );
-        ( ErrorBottomSheet as any ).current.snapTo( 1 )
-        return
-      }
-
-      if ( !chosenContact ) {
-        console.log( 'Err: Contact missing' )
-        return
-      }
-
-      const contactName = `${chosenContact.firstName} ${
-        chosenContact.lastName ? chosenContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
-      if (
-        !trustedContacts.tc.trustedContacts[ contactName ] &&
-        !trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-      ) {
-        console.log(
-          'Err: Trusted Contact/Ephemeral Channel does not exists for contact: ',
-          contactName,
-        )
-        return
-      }
-      const {
-        publicKey,
-        symmetricKey,
-        otp,
-      } = trustedContacts.tc.trustedContacts[ contactName ]
-      const requester = WALLET_SETUP.walletName
-      const appVersion = DeviceInfo.getVersion()
-      if ( chosenContact.phoneNumbers && chosenContact.phoneNumbers.length ) {
-        const phoneNumber = chosenContact.phoneNumbers[ 0 ].number
-        console.log( {
-          phoneNumber
-        } )
-        let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-        number = number.slice( number.length - 10 ) // last 10 digits only
-        const numHintType = 'num'
-        const numHint = number[ 0 ] + number.slice( number.length - 2 )
-        const numberEncPubKey = TrustedContactsService.encryptPub(
-          publicKey,
-          number,
-        ).encryptedPub
-        const uploadedAt = symmetricKey
-          ? SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT
-          : trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-            .initiatedAt
-
-        const numberDL =
-          `https://hexawallet.io/${config.APP_STAGE}/${
-            symmetricKey ? 'atcg' : 'tcg'
-          }` +
-          `/${requester}` +
-          `/${numberEncPubKey}` +
-          `/${numHintType}` +
-          `/${numHint}_keeper` +
-          `/${uploadedAt}` +
-          `/v${appVersion}`
-        console.log( {
-          numberDL
-        } )
-        updateShare()
-        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
-        setIsOTPType( false )
-        setTrustedLink( numberDL )
-        setIsReshare( true )
-      } else if ( chosenContact.emails && chosenContact.emails.length ) {
-        const email = chosenContact.emails[ 0 ].email
-        const emailHintType = 'eml'
-        const trucatedEmail = email.replace( '.com', '' )
-        const emailHint =
-          email[ 0 ] + trucatedEmail.slice( trucatedEmail.length - 2 )
-        const emailEncPubKey = TrustedContactsService.encryptPub(
-          publicKey,
-          email,
-        ).encryptedPub
-        const uploadedAt = symmetricKey
-          ? SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT
-          : trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-            .initiatedAt
-
-        const emailDL =
-          `https://hexawallet.io/${config.APP_STAGE}/${
-            symmetricKey ? 'atcg' : 'tcg'
-          }` +
-          `/${requester}` +
-          `/${emailEncPubKey}` +
-          `/${emailHintType}` +
-          `/${emailHint}_keeper` +
-          `/${uploadedAt}` +
-          `/v${appVersion}`
-        console.log( {
-          emailDL
-        } )
-        updateShare()
-        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
-        setIsOTPType( false )
-        setTrustedLink( emailDL )
-        setIsReshare( true )
-      } else if ( otp ) {
-        const otpHintType = 'otp'
-        const otpHint = 'xxx'
-        const otpEncPubKey = TrustedContactsService.encryptPub( publicKey, otp )
-          .encryptedPub
-        const uploadedAt = symmetricKey
-          ? SHARES_TRANSFER_DETAILS[ index ].UPLOADED_AT
-          : trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-            .initiatedAt
-
-        const otpDL =
-          `https://hexawallet.io/${config.APP_STAGE}/${
-            symmetricKey ? 'atcg' : 'tcg'
-          }` +
-          `/${requester}` +
-          `/${otpEncPubKey}` +
-          `/${otpHintType}` +
-          `/${otpHint}_keeper` +
-          `/${uploadedAt}` +
-          `/v${appVersion}`
-        updateShare()
-        dispatch( keeperProcessStatus( KeeperProcessStatus.COMPLETED ) )
-        setIsOTPType( true )
-        setOTP( otp )
-        setTrustedLink( otpDL )
-        setIsReshare( true )
-      } else {
-        dispatch( keeperProcessStatus( '' ) )
-        Alert.alert( 'Invalid Contact', 'Something went wrong.' )
-        return
-      }
-    } catch ( error ) {
-      dispatch( keeperProcessStatus( '' ) )
-      console.log( 'error TC', error )
-    }
-  }, [ chosenContact, trustedContacts, SHARES_TRANSFER_DETAILS[ index ] ] )
-
   const createGuardian = useCallback(
     async ( chosenContactTmp? ) => {
       if( trustedQR ) return
@@ -747,7 +606,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
       }
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( initializeTrustedContact( {
-        contact: Contact, isGuardian: true, channelKey, shareId: selectedKeeper.shareId
+        contact: Contact,
+        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+        isKeeper: true,
+        channelKey,
+        shareId: selectedKeeper.shareId
       } ) )
     },
     [ SHARES_TRANSFER_DETAILS, trustedContacts, chosenContact ],
@@ -756,7 +619,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   useEffect( () => {
     if( !chosenContact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 
@@ -801,86 +664,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
           name: chosenContact && chosenContact.name ? chosenContact.name : ''
         }
         dispatch( updateMSharesHealth( shareObj, false ) )
+        dispatch( setChannelAssets( {
+        } ) )
       }
     }
   }, [ chosenContact, trustedContacts ] )
-
-  useEffect( () => {
-    if (
-      uploadMetaShare ||
-      updateEphemeralChannelLoader ||
-      updateTrustedChannelLoader
-    ) {
-      if ( trustedLink ) setTrustedLink( '' )
-      if ( trustedQR ) setTrustedQR( '' )
-      return
-    }
-
-    if (
-      chosenContact &&
-      chosenContact.firstName &&
-      SHARES_TRANSFER_DETAILS[ index ]
-    ) {
-      const contactName = `${chosenContact.firstName} ${
-        chosenContact.lastName ? chosenContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
-      console.log( {
-        contactName
-      } )
-      if ( !trustedContacts.tc.trustedContacts[ contactName ] ) return
-
-      createDeepLink()
-
-      const {
-        publicKey,
-        symmetricKey,
-        otp,
-      } = trustedContacts.tc.trustedContacts[ contactName ]
-
-      let info = ''
-      if ( chosenContact.phoneNumbers && chosenContact.phoneNumbers.length ) {
-        const phoneNumber = chosenContact.phoneNumbers[ 0 ].number
-        let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-        number = number.slice( number.length - 10 ) // last 10 digits only
-        info = number
-      } else if ( chosenContact.emails && chosenContact.emails.length ) {
-        info = chosenContact.emails[ 0 ].email
-      } else if ( otp ) {
-        info = otp
-      }
-      if( isGuardianCreationClicked ){
-        setIsGuardianCreationClicked( false )
-        if ( publicKey ){
-          updateShare()
-          setTrustedQR(
-            JSON.stringify( {
-              approvedTC: symmetricKey ? true : false,
-              isGuardian: true,
-              requester: WALLET_SETUP.walletName,
-              publicKey,
-              info: info.trim(),
-              uploadedAt:
-              trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel
-                .initiatedAt,
-              type: 'trustedGuardian',
-              ver: DeviceInfo.getVersion(),
-              isFromKeeper: true,
-            } ),
-          )
-        }
-      }
-    }
-  }, [
-    SHARES_TRANSFER_DETAILS[ index ],
-    chosenContact,
-    trustedContacts,
-    uploadMetaShare,
-    updateEphemeralChannelLoader,
-    updateTrustedChannelLoader,
-    isGuardianCreationClicked
-  ] )
 
   const SendShareModalFunction = useCallback( () => {
     if ( chosenContact && !isEmpty( chosenContact ) ) {
@@ -1083,7 +871,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           setIsApprovalStarted( true )
-          dispatch( downloadSmShareForApproval( qrScannedData ) )
+          dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
@@ -1094,7 +882,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           // setIsApprovalStarted( true )
           // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
-          //   dispatch( downloadSmShareForApproval( qrScannedData ) )
+          //   dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           //   setQrBottomSheetsFlag( false )
           // } catch ( err ) {
           //   console.log( {

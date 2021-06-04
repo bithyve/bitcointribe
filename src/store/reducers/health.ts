@@ -1,6 +1,6 @@
 import { Platform } from 'react-native'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
+import { ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
@@ -38,7 +38,8 @@ import {
   UPDATE_LEVEL_DATA,
   KEEPER_PROCESS_STATUS,
   PDF_SUCCESSFULLY_CREATED,
-  IS_LEVEL_TO_NOT_SETUP
+  IS_LEVEL_TO_NOT_SETUP,
+  SET_CHANNEL_ASSETS
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
@@ -121,6 +122,7 @@ const initialState: {
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
   isLevelToNotSetupStatus: boolean;
+  channelAssets: ChannelAssets,
 } = {
   mnemonic: '',
   service: null,
@@ -214,7 +216,9 @@ const initialState: {
   ],
   keeperProcessStatus: '',
   pdfCreatedSuccessfully: false,
-  isLevelToNotSetupStatus: false
+  isLevelToNotSetupStatus: false,
+  channelAssets: {
+  }
 }
 
 export default ( state = initialState, action ) => {
@@ -486,6 +490,13 @@ export default ( state = initialState, action ) => {
           ...state,
           isLevelToNotSetupStatus: action.payload.status
         }
+
+      case SET_CHANNEL_ASSETS:
+        return {
+          ...state,
+          channelAssets: action.payload.channelAssets
+        }
+
   }
   return state
 }

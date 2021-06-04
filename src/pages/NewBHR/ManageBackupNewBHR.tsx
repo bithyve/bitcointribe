@@ -25,11 +25,11 @@ import DeviceInfo from 'react-native-device-info'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { fetchEphemeralChannel } from '../../store/actions/trustedContacts'
+import { fetchEphemeralChannel, PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
-import { syncExistingPermanentChannels } from '../../store/actions/trustedContacts'
+import { syncPermanentChannels } from '../../store/actions/trustedContacts'
 import {
   generateMetaShare,
   checkMSharesHealth,
@@ -43,7 +43,8 @@ import {
   keeperProcessStatus,
   setLevelToNotSetupStatus,
   setHealthStatus,
-  modifyLevelData
+  modifyLevelData,
+  createChannelAssets
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -104,7 +105,7 @@ interface ManageBackupNewBHRPropsTypes {
   service: any;
   isLevelThreeMetaShareCreated: Boolean;
   metaSharesKeeper: MetaShare[];
-  syncExistingPermanentChannels: any;
+  syncPermanentChannels: any;
   isNewFCMUpdated: Boolean;
   setCloudData: any;
   deletePrivateData: any;
@@ -135,6 +136,7 @@ interface ManageBackupNewBHRPropsTypes {
   shieldHealth: boolean;
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
+  createChannelAssets: any
 }
 
 class ManageBackupNewBHR extends Component<
@@ -266,21 +268,6 @@ class ManageBackupNewBHR extends Component<
         levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
       ) {
         this.props.updateCloudData()
-      }
-    }
-
-    if( prevProps.levelHealth != this.props.levelHealth ){
-      this.props.autoShareToLevel2Keepers( )
-      if (
-        this.props.levelHealth.findIndex(
-          ( value ) =>
-            value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
-            -1
-        ) > -1
-      ) {
-        this.props.syncExistingPermanentChannels( {
-          inProgressChannelsOnly: true
-        } )
       }
     }
 
@@ -477,6 +464,17 @@ class ManageBackupNewBHR extends Component<
     this.props.modifyLevelData( )
     // this.props.checkMSharesHealth()
     this.props.setHealthStatus()
+    if (
+      this.props.levelHealth.findIndex(
+        ( value ) =>
+          value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
+          -1
+      ) > -1
+    ) {
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+      } )
+    }
   };
 
   sendApprovalRequestToPK = ( ) => {
@@ -499,7 +497,7 @@ class ManageBackupNewBHR extends Component<
         modalRef={this.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          this.props.downloadSmShareForApproval( qrScannedData )
+          this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
           this.setState( {
             QrBottomSheetsFlag: false
           } )
@@ -514,7 +512,7 @@ class ManageBackupNewBHR extends Component<
           // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
-          //     this.props.downloadSmShareForApproval( qrScannedData )
+          //     this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
           //     this.setState( {
           //       QrBottomSheetsFlag: false
           //     } )
@@ -934,7 +932,7 @@ export default withNavigationFocus(
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
-    syncExistingPermanentChannels,
+    syncPermanentChannels,
     setCloudData,
     deletePrivateData,
     updateKeeperInfoToTrustedChannel,
@@ -950,6 +948,7 @@ export default withNavigationFocus(
     setIsKeeperTypeBottomSheetOpen,
     updateCloudData,
     modifyLevelData,
+    createChannelAssets,
   } )( ManageBackupNewBHR )
 )
 

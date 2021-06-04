@@ -1978,22 +1978,14 @@ export default class LevelHealth {
     }
   };
 
-  public static getSecondaryMnemonics = ( secretsArray: MetaShare[], answer: string ) => {
+  public static getSecondaryMnemonics = ( secretsArray: string[], answer: string ) => {
     const decryptedShareArr = []
     for ( let i = 0; i < secretsArray.length; i++ ) {
       const element = secretsArray[ i ]
-      decryptedShareArr.push( element.encryptedSecret )
+      decryptedShareArr.push( element )
     }
     const { decryptedSecrets } = LevelHealth.decryptSecrets( decryptedShareArr, answer )
-
-    const secretsArr = [] // secrets w/o checksum
-    for ( const secret of decryptedSecrets ) {
-      secretsArr.push( secret.slice( 0, secret.length - 8 ) )
-    }
-
-    const recoveredMnemonicHex = secrets.combine( secretsArr )
-    console.log( 'recoveredMnemonicHex', recoveredMnemonicHex )
-    console.log( 'LevelHealth.hexToString(recoveredMnemonicHex)', LevelHealth.hexToString( recoveredMnemonicHex ) )
+    const recoveredMnemonicHex = secrets.combine( decryptedSecrets )
     return {
       mnemonic: LevelHealth.hexToString( recoveredMnemonicHex )
     }

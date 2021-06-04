@@ -19,9 +19,8 @@ import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
-  clearTrustedContactsCache,
-  syncExistingPermanentChannels,
-  removeTrustedContact,
+  syncPermanentChannels,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
@@ -49,16 +48,15 @@ import {
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
-import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
+import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
   regularAccount: RegularAccount;
   trustedContactsService: TrustedContactsService;
-  syncExistingPermanentChannels: any;
+  syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
-  removeTrustedContact: any;
   clearTrustedContactsCache: any;
 }
 interface FriendsAndFamilyStateTypes {
@@ -105,12 +103,11 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.props.syncExistingPermanentChannels( {
-        inProgressChannelsOnly: true
-      } )
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+      // } )
       this.updateAddressBook()
     } )
-    this.props.clearTrustedContactsCache()
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
     } )
@@ -118,7 +115,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidUpdate( prevProps, prevState ) {
     if (
-      prevProps.trustedContactsService.tc.trustedContactsV2 != this.props.trustedContactsService.tc.trustedContactsV2
+      prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
     ) this.updateAddressBook()
 
     if (
@@ -151,19 +148,22 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   updateAddressBook = async () => {
     const { trustedContactsService, regularAccount } = this.props
-    const contacts = trustedContactsService.tc.trustedContactsV2
+    const contacts = trustedContactsService.tc.trustedContacts
     const { walletId } = regularAccount.hdWallet.getWalletId()
 
     const myKeepers = []
     const ImKeeping = []
     const otherContacts = []
 
-    for( const contact of Object.values( contacts ) ){
-      const { contactDetails, relationType, unencryptedPermanentChannel } = contact
-      const stream: UnecryptedStreamData = useStreamFromPermanentChannel( walletId, unencryptedPermanentChannel, true )
+    for( const channelKey of Object.keys( contacts ) ){
+      const contact = contacts[ channelKey ]
+      const { contactDetails, relationType } = contact
+      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
       const fnf = {
         id: contactDetails.id,
+        isActive: contact.isActive,
+        channelKey,
         contactName: contactDetails.contactName,
         connectedVia: contactDetails.info,
         image: contactDetails.image,
@@ -178,10 +178,14 @@ class FriendsAndFamilyScreen extends PureComponent<
         isFinalized: stream? true: false,
       }
 
-      if( fnf.isGuardian || fnf.isWard ){
-        if( fnf.isGuardian ) myKeepers.push( fnf )
-        if( fnf.isWard ) ImKeeping.push( fnf )
-      } else otherContacts.push( fnf )
+      if( fnf.isActive ){
+        if( fnf.isGuardian || fnf.isWard ){
+          if( fnf.isGuardian ) myKeepers.push( fnf )
+          if( fnf.isWard ) ImKeeping.push( fnf )
+        } else otherContacts.push( fnf )
+      } else {
+        // TODO: inject in expired contacts list
+      }
     }
 
     this.setState( {
@@ -190,128 +194,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       otherContacts
     }
     )
-
-    // if ( trustedContactsInfo ) {
-    //   if ( trustedContactsInfo.length ) {
-    //     const trustedContacts = []
-    //     for ( let index = 0; index < trustedContactsInfo.length; index++ ) {
-    //       const contactInfo = trustedContactsInfo[ index ]
-    //       if ( !contactInfo ) continue
-    //       const contactName = `${contactInfo.firstName} ${
-    //         contactInfo.lastName ? contactInfo.lastName : ''
-    //       }`
-    //       let connectedVia
-    //       if ( contactInfo.phoneNumbers && contactInfo.phoneNumbers.length ) {
-    //         connectedVia = contactInfo.phoneNumbers[ 0 ].number
-    //       } else if ( contactInfo.emails && contactInfo.emails.length ) {
-    //         connectedVia = contactInfo.emails[ 0 ].email
-    //       }
-
-    //       let hasXpub = false
-    //       const {
-    //         trustedContactToDA,
-    //         derivativeAccounts,
-    //       } = regularAccount.hdWallet
-    //       const accountNumber =
-    //         trustedContactToDA[ contactName.toLowerCase().trim() ]
-    //       if ( accountNumber ) {
-    //         const trustedContact: TrustedContactDerivativeAccountElements =
-    //           derivativeAccounts[ TRUSTED_CONTACTS ][ accountNumber ]
-    //         if (
-    //           trustedContact.contactDetails &&
-    //           trustedContact.contactDetails.xpub
-    //         ) {
-    //           hasXpub = true
-    //         }
-    //       }
-
-    //       const {
-    //         isWard,
-    //         trustedAddress,
-    //         contactsWalletName,
-    //         otp,
-    //         lastSeen,
-    //       } = trustedContactsService.tc.trustedContacts[
-    //         contactName.toLowerCase().trim()
-    //       ]
-
-    //       let usesOTP = false
-    //       if ( !connectedVia && otp ) {
-    //         usesOTP = true
-    //         connectedVia = otp
-    //       }
-
-    //       const hasTrustedAddress = !!trustedAddress
-
-    //       const isGuardian = index < 3 ? true : false
-    //       let shareIndex
-    //       if ( isGuardian ) {
-    //         shareIndex = index
-    //       }
-
-    //       const initiatedAt =
-    //         trustedContactsService.tc.trustedContacts[
-    //           contactName.toLowerCase().trim()
-    //         ].ephemeralChannel.initiatedAt
-
-    //       const hasTrustedChannel = trustedContactsService.tc.trustedContacts[
-    //         contactName.toLowerCase().trim()
-    //       ].symmetricKey
-    //         ? true
-    //         : false
-
-    //       const element = {
-    //         contactName:
-    //           contactInfo.firstName === 'F&F request' && contactsWalletName
-    //             ? contactsWalletName
-    //             : contactName,
-    //         connectedVia,
-    //         usesOTP,
-    //         hasXpub,
-    //         hasTrustedAddress,
-    //         isGuardian,
-    //         isWard,
-    //         initiatedAt,
-    //         shareIndex,
-    //         hasTrustedChannel,
-    //         contactsWalletName,
-    //         lastSeen,
-    //         ...contactInfo,
-    //       }
-    //       trustedContacts.push( element )
-    //       if ( element.isGuardian ) {
-    //         const isRemovable = !element.hasTrustedChannel ? true : false // un-confirmed guardians are removable
-    //         myKeepers.push( {
-    //           ...element, isRemovable
-    //         } )
-    //       }
-    //       if ( element.isWard ) {
-    //         contactsKeptByUser.push( element )
-    //       }
-    //       if ( !element.isWard && !element.isGuardian ) {
-    //         otherTrustedContacts.push( {
-    //           ...element, isRemovable: true
-    //         } )
-    //       }
-    //     }
-
-    //     this.setState(
-    //       {
-    //         myKeepers: myKeepers,
-    //         contactsKeptByUser,
-    //         otherTrustedContacts,
-    //         trustedContacts,
-    //       },
-    //       () =>
-    //         this.props.updateAddressBookLocally( {
-    //           MyKeeper: myKeepers,
-    //           contactsKeptByUser,
-    //           otherTrustedContacts,
-    //           trustedContacts,
-    //         } ),
-    //     )
-    //   }
-    // }
   };
 
   renderHelpHeader = () => {
@@ -428,7 +310,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   render() {
-    const { syncExistingPermanentChannels } = this.props
+    const { syncPermanentChannels } = this.props
 
     const {
       myKeepers,
@@ -443,8 +325,8 @@ class FriendsAndFamilyScreen extends PureComponent<
             <RefreshControl
               refreshing={showLoader}
               onRefresh={() => {
-                syncExistingPermanentChannels( {
-                  inProgressChannelsOnly: true
+                syncPermanentChannels( {
+                  permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
                 } )
               }}
             />
@@ -498,7 +380,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( ImKeeping.length && ImKeeping.filter( ( item, index ) => {
+                {( ImKeeping.length && ImKeeping.map( ( item, index ) => {
                   return this.renderContactListItem( {
                     backendContactInfo: item,
                     contactDescription: makeContactRecipientDescription(
@@ -630,9 +512,7 @@ const mapStateToProps = ( state ) => {
 }
 
 export default connect( mapStateToProps, {
-  syncExistingPermanentChannels,
-  removeTrustedContact,
-  clearTrustedContactsCache
+  syncPermanentChannels,
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {

@@ -3,6 +3,7 @@ import {
   DecentralizedBackup,
   ServicesJSON,
 } from '../../common/interfaces/Interfaces'
+import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 
 export interface InputUTXOs {
   txId: string;
@@ -476,9 +477,17 @@ export interface ContactDetails {
   image?: ImageSourcePropType | null,
 }
 
+export interface ChannelAssets {
+  shareId?: string,
+  primaryMnemonicShard?: any,
+  keeperInfo?: any,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string
+}
+
 export interface ContactInfo  {
-  contactDetails: ContactDetails,
-  isGuardian?: boolean,
+  contactDetails?: ContactDetails,
+  isKeeper?: boolean,
   channelKey?: string,
   secondaryChannelKey?: string
   contactsSecondaryChannelKey?: string,
@@ -488,6 +497,7 @@ export interface ContactInfo  {
     secondaryMnemonicShard?: any,
     bhXpub?: string
   },
+  flowKind?: InitTrustedContactFlowKind
 }
 export interface PrimaryStreamData {
   walletID?: string,
@@ -557,6 +567,7 @@ export interface TrustedContact {
   contactDetails: ContactDetails,
   relationType: TrustedContactRelationTypes,
   permanentChannelAddress: string,
+  isActive: boolean,
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
   secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
@@ -716,5 +727,6 @@ export interface LevelData {
 
 export enum QRCodeTypes {
   CONTACT_REQUEST = 'CONTACT_REQUEST',
-  KEEPER_REQUEST = 'KEEPER_REQUEST'
+  KEEPER_REQUEST = 'KEEPER_REQUEST',
+  RECOVERY_REQUEST = 'RECOVERY_REQUEST'
 }

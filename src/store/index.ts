@@ -108,20 +108,11 @@ import {
 } from './sagas/notifications'
 
 import {
-  approveTrustedContactWatcher,
-  fetchTrustedChannelWatcher,
-  fetchEphemeralChannelWatcher,
-  updateEphemeralChannelWatcher,
-  updateTrustedChannelWatcher,
   removeTrustedContactWatcher,
-  syncTrustedChannelsWatcher,
   walletCheckInWatcher,
-  postRecoveryChannelSyncWatcher,
-  multiUpdateTrustedChannelsWatcher,
-  sendVersionUpdateNotificationWatcher,
   syncPermanentChannelsWatcher,
   initializeTrustedContactWatcher,
-  syncExistingPermanentChannelsWatcher
+  rejectTrustedContactWatcher,
 } from './sagas/trustedContacts'
 
 import nodeSettingsReducer from './reducers/nodeSettings'
@@ -186,6 +177,7 @@ import {
   setLevelToNotSetupStatusWatcher,
   setHealthStatusWatcher,
   modifyLevelDataWatcher,
+  createChannelAssetsWatcher,
 } from './sagas/health'
 
 import {
@@ -298,20 +290,11 @@ const rootSaga = function* () {
     fetchNotificationsWatcher,
 
     // Trusted Contacts
-    approveTrustedContactWatcher,
     initializeTrustedContactWatcher,
+    rejectTrustedContactWatcher,
     removeTrustedContactWatcher,
-    updateEphemeralChannelWatcher,
-    fetchEphemeralChannelWatcher,
-    updateTrustedChannelWatcher,
-    fetchTrustedChannelWatcher,
     walletCheckInWatcher,
-    syncTrustedChannelsWatcher,
-    postRecoveryChannelSyncWatcher,
-    sendVersionUpdateNotificationWatcher,
-    multiUpdateTrustedChannelsWatcher,
     syncPermanentChannelsWatcher,
-    syncExistingPermanentChannelsWatcher,
 
     // Health
     initHealthWatcher,
@@ -354,6 +337,7 @@ const rootSaga = function* () {
     setLevelToNotSetupStatusWatcher,
     setHealthStatusWatcher,
     modifyLevelDataWatcher,
+    createChannelAssetsWatcher,
     // Keeper saga
     fetchKeeperTrustedChannelWatcher,
     updateNewFCMWatcher,

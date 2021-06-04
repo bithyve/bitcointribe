@@ -36,7 +36,7 @@ import {
 import {
   downloadMShare,
   uploadRequestedShare,
-  initHealthCheck,
+  // initHealthCheck,
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
@@ -50,11 +50,9 @@ import {
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
-  approveTrustedContact,
   initializeTrustedContact,
-  fetchEphemeralChannel,
-  fetchTrustedChannel,
-  postRecoveryChannelSync,
+  rejectTrustedContact,
+  InitTrustedContactFlowKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -96,7 +94,6 @@ import {
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
-  trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
   QRCodeTypes,
@@ -105,7 +102,6 @@ import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
-import semver from 'semver'
 import {
   updatePreference,
   setFCMToken,
@@ -114,7 +110,6 @@ import {
 import { fetchKeeperTrustedChannel } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import PersonalNode from '../../common/data/models/PersonalNode'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
@@ -135,7 +130,6 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
@@ -221,17 +215,14 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   fetchNotifications: any;
   updateFCMTokens: any;
-  postRecoveryChannelSync: any;
   downloadMShare: any;
-  approveTrustedContact: any;
   initializeTrustedContact: any;
-  fetchTrustedChannel: any;
-  fetchEphemeralChannel: any;
+  rejectTrustedContact: any;
   uploadRequestedShare: any;
   uploadSecondaryShareForPK: any;
   s3Service: S3Service;
   initializeHealthSetup: any;
-  initHealthCheck: any;
+  // initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -469,31 +460,26 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       switch ( scannedData.type ) {
           case QRCodeTypes.CONTACT_REQUEST:
-            const channelKey = scannedData.channelKey
-            const contactsSecondaryChannelKey = scannedData.secondaryChannelKey
-            navigation.navigate( 'ContactsListForAssociateContact', {
-              postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( {
-                  contact, channelKey, contactsSecondaryChannelKey
-                } )
-                // TODO: navigate post approval
-                navigation.navigate( 'Home' )
-              }
-            } )
-            break
-
           case QRCodeTypes.KEEPER_REQUEST:
-            const channelKey1 = scannedData.channelKey
-            const contactsSecondaryChannelKey1 = scannedData.secondaryChannelKey
-            navigation.navigate( 'ContactsListForAssociateContact', {
-              postAssociation: ( contact ) => {
-                this.props.initializeTrustedContact( {
-                  contact, channelKey: channelKey1, contactsSecondaryChannelKey: contactsSecondaryChannelKey1
-                } )
-                // TODO: navigate post approval
-                navigation.navigate( 'Home' )
-              }
-            } )
+            const trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type
+            }
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
             break
 
           case 'trustedGuardian':
@@ -728,12 +714,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       await AsyncStorage.setItem( 'fcmToken', fcmToken )
       this.props.updateFCMTokens( fcmArray )
-      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
-        // updates the new FCM token to channels post recovery
-        if ( recovered ) {
-          this.props.postRecoveryChannelSync()
-        }
-      } )
     }
   };
 
@@ -955,7 +935,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { accountsState, updateNotificationList, asyncNotificationList } = this.props
     const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
     const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    // console.log( ':regularAccount', regularAccount )
 
     const newTransactionsRegular =
       regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
@@ -963,7 +942,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const newTransactionsSecure =
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
       secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    // console.log( ':newTransactionsRegular', newTransactionsRegular )
+
     if ( newTransactionsRegular && newTransactionsRegular.length )
       newTransactions.push( ...newTransactionsRegular )
     if ( newTransactionsSecure && newTransactionsSecure.length )
@@ -1432,11 +1411,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onTrustedContactRequestAccepted = ( key ) => {
     this.closeBottomSheet()
-    this.processDLRequest( key, false )
+    const { navigation } = this.props
+    const { trustedContactRequest } = this.state
+
+    navigation.navigate( 'ContactsListForAssociateContact', {
+      postAssociation: ( contact ) => {
+        this.props.initializeTrustedContact( {
+          contact,
+          flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+          channelKey: trustedContactRequest.channelKey,
+          contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+        } )
+        // TODO: navigate post approval (from within saga)
+        navigation.navigate( 'Home' )
+      }
+    } )
   };
 
   onTrustedContactRejected = () => {
     this.closeBottomSheet()
+    const { trustedContactRequest } = this.state
+    this.props.rejectTrustedContact( {
+      channelKey: trustedContactRequest.channelKey,
+    } )
   };
 
   onPhoneNumberChange = () => {};
@@ -1490,7 +1487,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Ramp Account',
-              defaultDescription: 'BTC purchased from Ramp',
+              defaultDescription: 'Sats purchased from Ramp',
               serviceAccountKind: ServiceAccountKind.RAMP,
             } )
 
@@ -1510,7 +1507,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             const newSubAccount = new ExternalServiceSubAccountInfo( {
               instanceNumber: 1,
               defaultTitle: 'Wyre Account',
-              defaultDescription: 'BTC purchased from Wyre',
+              defaultDescription: 'Sats purchased from Wyre',
               serviceAccountKind: ServiceAccountKind.WYRE,
             } )
             this.props.addNewAccountShell( newSubAccount )
@@ -1527,208 +1524,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
           } )
           break
-    }
-  };
-
-  processDLRequest = ( key, rejected ) => {
-    try {
-      const { trustedContactRequest, recoveryRequest } = this.state
-      let {
-        requester,
-        isGuardian,
-        approvedTC,
-        encryptedKey,
-        publicKey,
-        info,
-        isQR,
-        uploadedAt,
-        isRecovery,
-        version,
-        isFromKeeper,
-        isPrimaryKeeperRecovery,
-      } = trustedContactRequest || recoveryRequest
-      const {
-        UNDER_CUSTODY,
-        uploadRequestedShare,
-        navigation,
-        approveTrustedContact,
-        fetchTrustedChannel,
-        walletName,
-        trustedContacts,
-        uploadSecondaryShareForPK,
-      } = this.props
-
-      if ( !isRecovery ) {
-        if ( requester === walletName ) {
-          Toast( 'Cannot be your own Contact/Guardian' )
-          return
-        }
-
-        let expiry = config.TC_REQUEST_EXPIRY
-        if ( !semver.valid( version ) ) {
-          // expiry support for 0.7, 0.9 and 1.0
-          expiry = config.LEGACY_TC_REQUEST_EXPIRY
-        }
-
-        if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
-          Alert.alert(
-            `${isQR ? 'QR' : 'Link'} expired!`,
-            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`
-          )
-        } else {
-          if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
-            Alert.alert(
-              'Failed to accept',
-              `You already custody a share against the wallet name: ${requester}`
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-                info = key
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-                return
-              }
-            }
-
-            let existingContactName
-            Object.keys( trustedContacts.tc.trustedContacts ).forEach(
-              ( contactName ) => {
-                const contact = trustedContacts.tc.trustedContacts[ contactName ]
-                if ( contact.contactsPubKey === publicKey ) {
-                  existingContactName = contactName
-                }
-              }
-            )
-            if ( existingContactName && !approvedTC ) {
-              Toast( 'Contact already exists against this request' )
-              return
-            }
-
-            if ( publicKey && !rejected ) {
-              if ( !approvedTC ) {
-                navigation.navigate( 'ContactsListForAssociateContact', {
-                  postAssociation: ( contact ) => {
-                    let contactName = ''
-                    if ( contact ) {
-                      contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                      }`
-                        .toLowerCase()
-                        .trim()
-                    } else {
-                      // contactName = `${requester}'s Wallet`.toLowerCase();
-                      Alert.alert( 'Contact association failed' )
-                      return
-                    }
-                    if ( !semver.valid( version ) ) {
-                      // for 0.7, 0.9 and 1.0: info remains null
-                      info = null
-                    }
-
-                    const contactInfo = {
-                      contactName,
-                      info,
-                    }
-
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                      isGuardian,
-                      isFromKeeper
-                    )
-                  },
-                  isGuardian,
-                } )
-              } else {
-                if ( !existingContactName ) {
-                  Alert.alert(
-                    'Invalid Link/QR',
-                    'You are not a valid trusted contact for approving this request'
-                  )
-                  return
-                }
-                const contactInfo = {
-                  contactName: existingContactName,
-                  info,
-                }
-
-                fetchTrustedChannel(
-                  contactInfo,
-                  trustedChannelActions.downloadShare,
-                  requester
-                )
-              }
-            } else if ( publicKey && rejected ) {
-              // don't associate; only fetch the payment details from EC
-              // fetchEphemeralChannel(null, null, publicKey);
-            }
-          }
-        }
-      } else {
-        if ( !isPrimaryKeeperRecovery ) {
-          if ( requester === walletName ) {
-            Toast( 'You do not host any key of your own' )
-            return
-          }
-
-          if ( !UNDER_CUSTODY[ requester ] ) {
-            this.setState(
-              {
-                errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
-                errorMessage:
-                  'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
-              },
-              () => {
-                this.openBottomSheet( BottomSheetKind.ERROR )
-              }
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-              }
-            }
-            if ( publicKey ) {
-              uploadRequestedShare( recoveryRequest.requester, publicKey )
-            }
-          }
-        } else {
-          if ( !publicKey ) {
-            try {
-              publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                .decryptedPub
-            } catch ( err ) {
-              Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.'
-              )
-            }
-          }
-
-          if ( publicKey ) {
-            uploadSecondaryShareForPK(
-              recoveryRequest.requester,
-              publicKey.substring( 0, 24 )
-            )
-          }
-        }
-      }
-    } catch ( error ) {
-      console.log( 'PKRECOVERY error', error )
     }
   };
 
@@ -2052,12 +1847,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest, recoveryRequest } = this.state
+          const { trustedContactRequest } = this.state
 
           return (
             <TrustedContactRequestContent
               trustedContactRequest={trustedContactRequest}
-              recoveryRequest={recoveryRequest}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
               onPhoneNumberChange={this.onPhoneNumberChange}
@@ -2341,18 +2135,15 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
     fetchNotifications,
     updateFCMTokens,
-    postRecoveryChannelSync,
     downloadMShare,
-    approveTrustedContact,
     initializeTrustedContact,
-    fetchTrustedChannel,
+    rejectTrustedContact,
     uploadRequestedShare,
     uploadSecondaryShareForPK,
     initializeHealthSetup,
-    initHealthCheck,
+    // initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,

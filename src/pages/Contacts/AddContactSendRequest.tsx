@@ -33,7 +33,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import { initializeTrustedContact } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -82,12 +82,13 @@ export default function AddContactSendRequest( props ) {
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
     dispatch( initializeTrustedContact( {
-      contact: Contact
+      contact: Contact,
+      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
     } ) )
   }, [ Contact ] )
 
@@ -103,7 +104,7 @@ export default function AddContactSendRequest( props ) {
   useEffect( () => {
     if( !Contact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 
@@ -136,11 +137,11 @@ export default function AddContactSendRequest( props ) {
           walletName: WALLET_SETUP.walletName,
           secondaryChannelKey,
           version: appVersion,
-        } ),
+        } )
       )
     }
-  }, [ Contact, trustedContacts ] )
 
+  }, [ Contact, trustedContacts ] )
 
   // const openTimer = async () => {
   //   setTimeout( () => {
