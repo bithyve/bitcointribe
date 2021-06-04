@@ -3897,20 +3897,29 @@ function* createChannelAssetsWorker( { payload } ) {
       const secureAccount: SecureAccount = yield select(
         ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
       )
+
       let secondaryShare: string = MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare
       if( scannedData ) {
         const qrDataObj = JSON.parse( scannedData )
         let currentContact: TrustedContact
-
+        let channelKey: string
         if( contacts ){
-          for( const ck of Object.values( contacts ) ){
-            if( ck.permanentChannelAddress == qrDataObj.channelId ){
-              currentContact = ck
+          for( const ck of Object.keys( contacts ) ){
+            channelKey=ck
+            currentContact = contacts[ ck ]
+            if( currentContact.permanentChannelAddress == qrDataObj.channelId ){
               break
             }
           }
         }
-        secondaryShare = currentContact.unencryptedPermanentChannel[ TrustedContacts.getStreamId( walletId ) ].secondaryData.secondaryMnemonicShard
+        const res = yield call( trustedContacts.retrieveFromStream, {
+          walletId, channelKey, options: {
+            retrieveSecondaryData: true,
+          }, secondaryChannelKey: qrDataObj.channelKey2
+        } )
+        console.log( 'res', res )
+        secondaryShare = res.data.secondaryData.secondaryMnemonicShard
+        console.log( 'secondaryShare', secondaryShare )
       }
       const channelAssets: ChannelAssets = {
         primaryMnemonicShard:
