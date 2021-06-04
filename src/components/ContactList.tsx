@@ -61,12 +61,6 @@ export default function ContactList( props ) {
     ( state ) => state.trustedContacts.loading,
   )
 
-  const data = {
-    firstName: 'F&F request',
-    lastName: 'awaiting',
-    name: 'F&F request awaiting',
-  }
-
   useEffect( () => {
     if ( props.selectedContacts ) {
       setSelectedContacts( selectedcontactlist )
