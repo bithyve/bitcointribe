@@ -37,7 +37,6 @@ import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
-import config from '../../bitcoin/HexaConfig'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
@@ -60,6 +59,8 @@ import Header from '../../navigation/stacks/Header'
 import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
 import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { v4 as uuid } from 'uuid'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -168,16 +169,23 @@ class FriendsAndFamilyScreen extends PureComponent<
     const ImKeeping = []
     const otherContacts = []
 
+    let skippedContactsCounter = 1
     for( const channelKey of Object.keys( contacts ) ){
       const contact = contacts[ channelKey ]
       const { contactDetails, relationType } = contact
       const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
+      let contactName = contactDetails.contactName
+      if( contactName === SKIPPED_CONTACT_NAME ){ // skipped contacts instance count append
+        contactName = `${SKIPPED_CONTACT_NAME} ${skippedContactsCounter}`
+        skippedContactsCounter++
+      }
+
       const fnf = {
         id: contactDetails.id,
         isActive: contact.isActive,
         channelKey,
-        contactName: contactDetails.contactName,
+        contactName,
         connectedVia: contactDetails.info,
         image: contactDetails.image,
         // usesOTP,
@@ -295,6 +303,47 @@ class FriendsAndFamilyScreen extends PureComponent<
     )
   };
 
+  renderAddContactFriendsAndFamily = () => {
+    const { navigation } = this.props
+    const { isLoadContacts, selectedContact } = this.state
+    if( !isLoadContacts ) return
+    return (
+      <AddContactAddressBook
+        isLoadContacts={isLoadContacts}
+        proceedButtonText={'Confirm & Proceed'}
+        onPressContinue={() => {
+          if ( selectedContact && selectedContact.length ) {
+            navigation.navigate( 'AddContactSendRequest', {
+              SelectedContact: selectedContact,
+            } )
+            this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+          }
+        }}
+        onSelectContact={( selectedData ) => {
+          this.setState( {
+            selectedContact: selectedData,
+          } )
+        }}
+        onPressBack={() => {
+          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+        }}
+        onSkipContinue={() => {
+          const contactDummy = {
+            id: uuid(),
+            name: SKIPPED_CONTACT_NAME,
+          }
+          navigation.navigate( 'AddContactSendRequest', {
+            SelectedContact: [ contactDummy ],
+          } )
+          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
+        }}
+      />
+    )
+  };
+
+  renderAddContactAddressBookHeader = () => {
+    return <ModalHeader />
+  };
 
   render() {
     const { syncPermanentChannels, navigation } = this.props
