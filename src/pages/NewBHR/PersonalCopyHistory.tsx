@@ -684,7 +684,7 @@ const PersonalCopyHistory = ( props ) => {
           onPressConfirm={() => {
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
           }}
-          reshareButtonText={'Reshare..'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             console.log(
               'onPressReshare PersonalCopyShareBottomSheet',

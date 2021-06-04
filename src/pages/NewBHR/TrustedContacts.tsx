@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { View, Text, SafeAreaView, StatusBar } from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { useSelector } from 'react-redux'
 import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
@@ -71,6 +72,18 @@ const TrustedContacts = ( props ) => {
           marginLeft: 20,
         }}
       >
+        <AppBottomSheetTouchableWrapper
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+          style={{
+            height: 30,
+            width: 30,
+            justifyContent: 'center'
+          }}
+        >
+          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+        </AppBottomSheetTouchableWrapper>
         <Text style={BackupStyles.modalHeaderTitleText}>
           Associate a contact
         </Text>

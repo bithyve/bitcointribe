@@ -160,12 +160,12 @@ const HomeStack = createStackNavigator(
     //     header: null,
     //   },
     // },
-    ReLogin: {
-      screen: ReLogin,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
+    // ReLogin: {
+    //   screen: ReLogin,
+    //   navigationOptions: {
+    //     gesturesEnabled: false,
+    //   },
+    // },
     Intermediate,
     ManageBackup,
     SecondaryDevice,

@@ -332,7 +332,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       // ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
       // setTrustedContactModal( false )
       props.navigation.navigate( 'AddContactSendRequest', {
-        SelectedContact: chosenContact,
+        SelectedContact: selectedContacts,
         headerText:'Add a contact  ',
         subHeaderText:'Send a Friends and Family request',
         contactText:'Adding to Friends and Family:',
@@ -759,8 +759,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ chosenContact, trustedContacts ] )
 
   const SendShareModalFunction = useCallback( () => {
-    console.log( '>>>>>>>>>>>>>> SendShareModalFunction >>>>>>>>>>> 111' )
-
     if ( chosenContact && !isEmpty( chosenContact ) ) {
       return (
         <RequestKeyFromContact
@@ -773,11 +771,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
+          // ( shareBottomSheet as any ).current.snapTo( 0 )
             props.navigation.goBack()
           }}
           onPressDone={() => {
-            // ( shareBottomSheet as any ).current.snapTo( 0 )
+          // ( shareBottomSheet as any ).current.snapTo( 0 )
             props.navigation.goBack()
           }}
           onPressShare={() => {
@@ -786,11 +784,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
                 setRenderTimer( true )
               }, 2 )
               // ( shareBottomSheet as any ).current.snapTo( 0 );
-              props.navigation.goBack()
+              props.navigation.goBack();
               ( shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
             }
             else {
-              // ( shareBottomSheet as any ).current.snapTo( 0 )
+            // ( shareBottomSheet as any ).current.snapTo( 0 )
               props.navigation.goBack()
               const popAction = StackActions.pop( {
                 n: isChange ? 2 : 1
@@ -846,7 +844,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
                 n: isChange ? 2 : 1
               } )
               props.navigation.dispatch( popAction )
-              // props.navigation.replace( 'ManageBackupNewBHR' )
+            // props.navigation.replace( 'ManageBackupNewBHR' )
             }
           }}
         />
@@ -1049,7 +1047,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           type={'contact'}
           IsReshare={isReshare}
           data={sortedHistory( trustedContactHistory )}
-          confirmButtonText={'Share Now..'}
+          confirmButtonText={'Share Now'}
           onPressChange={() => {
             ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
           }}
@@ -1064,8 +1062,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
               onPressContinue:async ( selectedContacts ) => {
                 console.log( 'selectedContacts >>>>>', selectedContacts )
 
-                Keyboard.dismiss()
-                createGuardian( getContacts( selectedContacts ) )
+                // Keyboard.dismiss()
+                // createGuardian( getContacts( selectedContacts ) )
               }
             } )
           }}
@@ -1075,7 +1073,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
           isVersionMismatch={isVersionMismatch}
           isChangeKeeperAllow={isChangeKeeperAllow}
-          reshareButtonText={'Reshare....'}
+          reshareButtonText={'Reshare'}
           changeButtonText={'Change'}
         />
       </View>
@@ -1086,7 +1084,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         renderContent={renderTrustedContactsContent}
         renderHeader={renderTrustedContactsHeader}
       /> */}
-      <ModalContainer visible={showTrustedContactModal} closeBottomSheet={() => setTrustedContactModal( false )}>
+      {/* <ModalContainer visible={showTrustedContactModal} closeBottomSheet={() => setTrustedContactModal( false )}>
         <TrustedContacts
           LoadContacts={LoadContacts}
           onPressBack={() => {
@@ -1098,7 +1096,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
             createGuardian( getContacts( selectedContacts ) )
           }}
         />
-      </ModalContainer>
+      </ModalContainer> */}
 
       <BottomSheet
         onCloseEnd={() => {
@@ -1140,7 +1138,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           title={'Reshare with the same contact?'}
           info={'Proceed if you want to reshare the link/ QR with the same contact'}
           note={'For a different contact, please go back and choose ‘Change contact’'}
-          proceedButtonText={'Reshare..'}
+          proceedButtonText={'Reshare'}
           cancelButtonText={'Back'}
           isIgnoreButton={true}
           onPressProceed={() => {
@@ -1175,7 +1173,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         renderContent={renderErrorModalContent}
         renderHeader={() => <ModalHeader />}
       />
-      <BottomSheet
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={shareBottomSheet as any}
         snapPoints={[
@@ -1184,7 +1182,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ]}
         renderContent={SendShareModalFunction}
         renderHeader={SendModalFunction}
-      />
+      /> */}
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}

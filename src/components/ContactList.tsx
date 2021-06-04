@@ -404,7 +404,7 @@ export default function ContactList( props ) {
 
   return (
     <View style={{
-      ...props.style, height: '95%', flex: 1
+      ...props.style, height: '95%'
     }}>
       <SafeAreaView />
       <View style={styles.selectedContactContainer}>
@@ -518,8 +518,8 @@ export default function ContactList( props ) {
         <View
           style={{
             position: 'absolute',
-            bottom: 0,
-            // flex:1,
+            bottom: hp( 18 ),
+            // // flex:1,
             width: wp( '50%' ),
             alignSelf: 'center',
           }}
