@@ -14,17 +14,12 @@ import {
 export default class TrustedContactsService {
   public static fromJSON = ( json: string ) => {
     const { tc } = JSON.parse( json )
-    const {
-      trustedContacts,
-      skippedContactsCount,
-    }: {
+    const { trustedContacts, }: {
       trustedContacts: Trusted_Contacts;
-      skippedContactsCount: number;
     } = tc
 
     return new TrustedContactsService( {
       trustedContacts,
-      skippedContactsCount,
     } )
   };
 

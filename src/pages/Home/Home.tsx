@@ -81,6 +81,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
+import { v4 as uuid } from 'uuid'
 import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
@@ -142,6 +143,7 @@ import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -2172,27 +2174,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }}
               onPressBack={this.closeBottomSheet}
               onSkipContinue={() => {
-                let { skippedContactsCount } = this.props.trustedContacts.tc
-                let data
-                if ( !skippedContactsCount ) {
-                  skippedContactsCount = 1
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount}`,
-                    name: `F&F request awaiting ${skippedContactsCount}`,
-                  }
-                } else {
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount + 1}`,
-                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                  }
-                }
-
                 this.closeBottomSheet()
-
+                const contactDummy = {
+                  id: uuid(),
+                  name: SKIPPED_CONTACT_NAME,
+                }
                 navigation.navigate( 'AddContactSendRequest', {
-                  SelectedContact: [ data ],
+                  SelectedContact: [ contactDummy ],
                 } )
               }}
             />

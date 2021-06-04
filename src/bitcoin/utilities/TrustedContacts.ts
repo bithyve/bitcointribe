@@ -34,7 +34,6 @@ export default class TrustedContacts {
       .digest( 'hex' ).slice( 0, 9 )
 
   public trustedContacts: Trusted_Contacts;
-  public skippedContactsCount = 0;
 
   constructor( stateVars ) {
     this.initializeStateVars( stateVars )
@@ -80,10 +79,6 @@ export default class TrustedContacts {
     this.trustedContacts =
       stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {
       }
-    this.skippedContactsCount =
-      stateVars && stateVars.skippedContactsCount
-        ? stateVars.skippedContactsCount
-        : this.skippedContactsCount
   };
 
   public cacheOutstream = (
@@ -179,7 +174,8 @@ export default class TrustedContacts {
     }
     contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
     contact.permanentChannel[ inStream.streamId ] = inStream
-    contact.isActive = idx( inStream.metaData, ( _ ) => _.flags.active )
+    contact.isActive = idx( unencryptedInstream.metaData, ( _ ) => _.flags.active )
+    contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
   };
 
   public syncPermanentChannels = async (
