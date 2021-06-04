@@ -20,8 +20,9 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import Loader from '../../components/loader'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { v4 as uuid } from 'uuid'
 
 const ContactsListForAssociateContact = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
@@ -36,13 +37,6 @@ const ContactsListForAssociateContact = ( props ) => {
   function selectedContactsList( list ) {
     if ( list.length > 0 ) setContacts( [ ...list ] )
   }
-
-  const trustedContactsInfo = useSelector(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
-  )
 
   // const updateTrustedContactsInfo = async ( contact? ) => {
   //   const associatedContact = contact ? contact : contacts[ 0 ]
@@ -159,24 +153,12 @@ const ContactsListForAssociateContact = ( props ) => {
             disabled={approvingTrustedContact}
             onPress={() => {
               setShowLoader( true )
-              let { skippedContactsCount } = trustedContacts.tc
-              let data
-              if ( !skippedContactsCount ) {
-                skippedContactsCount = 1
-                data = {
-                  firstName: 'F&F request',
-                  lastName: `awaiting ${skippedContactsCount}`,
-                  name: `F&F request awaiting ${skippedContactsCount}`,
-                }
-              } else {
-                data = {
-                  firstName: 'F&F request',
-                  lastName: `awaiting ${skippedContactsCount + 1}`,
-                  name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                }
+              const contactDummy = {
+                id: uuid(),
+                name: SKIPPED_CONTACT_NAME,
               }
 
-              // updateTrustedContactsInfo( data )
+              // updateTrustedContactsInfo( contactDummy )
             }}
             style={{
               height: wp( '8%' ),

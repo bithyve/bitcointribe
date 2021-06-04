@@ -33,7 +33,6 @@ import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
-import config from '../../bitcoin/HexaConfig'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import AddressBookHelpContents from '../../components/Helper/AddressBookHelpContents'
@@ -157,16 +156,23 @@ class FriendsAndFamilyScreen extends PureComponent<
     const ImKeeping = []
     const otherContacts = []
 
+    let skippedContactsCounter = 1
     for( const channelKey of Object.keys( contacts ) ){
       const contact = contacts[ channelKey ]
       const { contactDetails, relationType } = contact
       const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
+      let contactName = contactDetails.contactName
+      if( contactName === SKIPPED_CONTACT_NAME ){ // skipped contacts instance count append
+        contactName = `${SKIPPED_CONTACT_NAME} ${skippedContactsCounter}`
+        skippedContactsCounter++
+      }
+
       const fnf = {
         id: contactDetails.id,
         isActive: contact.isActive,
         channelKey,
-        contactName: contactDetails.contactName,
+        contactName,
         connectedVia: contactDetails.info,
         image: contactDetails.image,
         // usesOTP,
