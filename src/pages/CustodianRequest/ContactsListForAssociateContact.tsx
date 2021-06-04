@@ -157,8 +157,7 @@ const ContactsListForAssociateContact = ( props ) => {
                 id: uuid(),
                 name: SKIPPED_CONTACT_NAME,
               }
-
-              // updateTrustedContactsInfo( contactDummy )
+              postAssociation( contactDummy )
             }}
             style={{
               height: wp( '8%' ),
@@ -204,8 +203,11 @@ const ContactsListForAssociateContact = ( props ) => {
         }}
         onSelectContact={selectedContactsList}
         onPressSkip={() => {
-          // selectedContactsList([data]);
-          // updateTrustedContactsInfo();
+          const contactDummy = {
+            id: uuid(),
+            name: SKIPPED_CONTACT_NAME,
+          }
+          postAssociation( contactDummy )
         }}
       />
       {showLoader ? <Loader isLoading={true} /> : null}
