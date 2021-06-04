@@ -39,7 +39,8 @@ import {
   KEEPER_PROCESS_STATUS,
   PDF_SUCCESSFULLY_CREATED,
   IS_LEVEL_TO_NOT_SETUP,
-  SET_CHANNEL_ASSETS
+  SET_CHANNEL_ASSETS,
+  APPROVAL_STATUS
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
@@ -122,7 +123,8 @@ const initialState: {
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
   isLevelToNotSetupStatus: boolean;
-  channelAssets: ChannelAssets,
+  channelAssets: ChannelAssets;
+  approvalStatus: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -218,7 +220,8 @@ const initialState: {
   pdfCreatedSuccessfully: false,
   isLevelToNotSetupStatus: false,
   channelAssets: {
-  }
+  },
+  approvalStatus: false
 }
 
 export default ( state = initialState, action ) => {
@@ -495,6 +498,12 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           channelAssets: action.payload.channelAssets
+        }
+
+      case APPROVAL_STATUS:
+        return {
+          ...state,
+          approvalStatus: action.payload.flag
         }
 
   }
