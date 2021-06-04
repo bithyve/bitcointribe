@@ -7,7 +7,10 @@ import {
   StreamData,
   TrustedContact,
   Trusted_Contacts,
-  ContactDetails
+  ContactDetails,
+  SecondaryStreamData,
+  BackupStreamData,
+  PrimaryStreamData
 } from './Interface'
 import crypto from 'crypto'
 import config from '../HexaConfig'
@@ -257,6 +260,68 @@ export default class TrustedContacts {
           updated: true
         }
       } else throw new Error( 'No channels to update' )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+      throw new Error( err.message )
+    }
+  };
+
+  public retrieveFromStream = async (
+    {
+      walletId,
+      channelKey,
+      options,
+      secondaryChannelKey
+    }: {
+    walletId: string,
+    channelKey: string,
+    options: {
+      retrievePrimaryData?: boolean,
+      retrieveBackupData?: boolean,
+      retrieveSecondaryData?: boolean,
+    }
+    secondaryChannelKey?: string,
+  }
+  ): Promise<{
+    primaryData?: PrimaryStreamData,
+    backupData?: BackupStreamData,
+    secondaryData?: SecondaryStreamData,
+  }> => {
+    try {
+      const contact: TrustedContact = this.trustedContacts[ channelKey ]
+      const { permanentChannelAddress } = contact
+      const streamId = TrustedContacts.getStreamId( walletId )
+
+      const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {
+        HEXA_ID,
+        permanentChannelAddress,
+        streamId,
+        options
+      } )
+
+      const streamData: {
+        primaryEncryptedData?: string,
+        encryptedBackupData?: string,
+        secondaryEncryptedData?: string,
+      } = res.data.streamData
+      console.log( {
+        streamData
+      } )
+      const unencryptedStreamData: {
+        primaryData?: PrimaryStreamData,
+        backupData?: BackupStreamData,
+        secondaryData?: SecondaryStreamData,
+      } = {
+      }
+      if( options.retrievePrimaryData && streamData.primaryEncryptedData )
+        unencryptedStreamData.primaryData = this.decryptData( channelKey, streamData.primaryEncryptedData ).data
+      if( options.retrieveBackupData && streamData.encryptedBackupData )
+        unencryptedStreamData[ 'backupData' ] = this.decryptData( channelKey, streamData.encryptedBackupData ).data
+      if( options.retrieveSecondaryData && streamData.secondaryEncryptedData && secondaryChannelKey )
+        unencryptedStreamData[ 'secondaryData' ] = this.decryptData( secondaryChannelKey, streamData.secondaryEncryptedData ).data
+
+      return unencryptedStreamData
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
