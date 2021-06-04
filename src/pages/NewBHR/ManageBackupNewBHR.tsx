@@ -44,7 +44,8 @@ import {
   setLevelToNotSetupStatus,
   setHealthStatus,
   modifyLevelData,
-  createChannelAssets
+  createChannelAssets,
+  setApprovalStatus
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -136,7 +137,9 @@ interface ManageBackupNewBHRPropsTypes {
   shieldHealth: boolean;
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
-  createChannelAssets: any
+  createChannelAssets: any;
+  setApprovalStatus: any;
+  approvalStatus: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -377,6 +380,20 @@ class ManageBackupNewBHR extends Component<
       else  this.setState( {
         showLoader: false
       } )
+    }
+
+    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ){
+      const obj = {
+        id: this.state.selectedLevelId,
+        selectedKeeper: {
+          ...this.state.selectedKeeper,
+          name: this.state.selectedKeeper.name ? this.state.selectedKeeper.name : this.state.selectedKeeperName,
+          shareType: this.state.selectedKeeper.shareType ? this.state.selectedKeeper.shareType : this.state.selectedKeeperType,
+          shareId: this.state.selectedKeeper.shareId ? this.state.selectedKeeper.shareId :  this.state.selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+        },
+        isSetup: true,
+      }
+      this.goToHistory( obj )
     }
   };
 
@@ -923,6 +940,7 @@ const mapStateToProps = ( state ) => {
     levelData: idx( state, ( _ ) => _.health.levelData ),
     shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
+    approvalStatus: idx( state, ( _ ) => _.health.approvalStatus ),
   }
 }
 
@@ -949,6 +967,7 @@ export default withNavigationFocus(
     updateCloudData,
     modifyLevelData,
     createChannelAssets,
+    setApprovalStatus
   } )( ManageBackupNewBHR )
 )
 

@@ -344,7 +344,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   if( isKeeper ) {
     const channelAssets: ChannelAssets = yield select(
-      ( state ) => state.health.keeperInfo,
+      ( state ) => state.health.channelAssets,
     )
     if( channelAssets.shareId == shareId ) delete channelAssets[ 'shareId' ]
     // TODO: prepare channel assets and plug into contactInfo obj
