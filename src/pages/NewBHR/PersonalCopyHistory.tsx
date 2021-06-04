@@ -33,9 +33,11 @@ import {
   keeperProcessStatus,
   updatedKeeperInfo,
   updateMSharesHealth,
+  createChannelAssets,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
+  ChannelAssets,
   KeeperInfoInterface,
   LevelHealthInterface,
   MetaShare,
@@ -138,6 +140,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ Contact, setContact ]:[any, any] = useState( {
   } )
   const index = 5
+  const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -150,9 +153,10 @@ const PersonalCopyHistory = ( props ) => {
         ? props.navigation.getParam( 'isChangeKeeperType' )
         : false
     )
+    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
+      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
+    }
   }, [
-    props.navigation.getParam( 'selectedLevelId' ),
-    props.navigation.getParam( 'selectedKeeper' ),
     props.navigation.state.params
   ] )
 

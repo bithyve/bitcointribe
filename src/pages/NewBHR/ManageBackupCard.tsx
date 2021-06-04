@@ -150,7 +150,7 @@ function ManageBackupCard( props ) {
             </View>
             <TouchableOpacity
               activeOpacity={10}
-              onPress={() => this.selectId( value.id )}
+              onPress={() => props.onPressSelectId( )}
               style={styles.manageButton}
             >
               <Text
@@ -158,7 +158,7 @@ function ManageBackupCard( props ) {
                   ...styles.manageButtonText,
                   color: manageBackupButtonTextColor
                 }}
-                onPress={() => this.selectId( value.id )}
+                onPress={() => props.onPressSelectId( )}
               >
                 {value.status == 'notSetup' ? 'Setup' : 'Manage'}
               </Text>

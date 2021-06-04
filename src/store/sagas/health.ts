@@ -75,7 +75,8 @@ import {
   SET_HEALTH_STATUS,
   MODIFY_LEVELDATA,
   updateLevelData,
-  setChannelAssets
+  setChannelAssets,
+  CREATE_CHANNEL_ASSETS
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -2858,7 +2859,17 @@ function* confirmPDFSharedWorker( { payload } ) {
     ) {
       shareIndex = metaShare.findIndex( ( value ) => value.shareId == shareId )
     }
-    const scannedObj: {type: string, encryptedKey: string; encryptedData: string} = JSON.parse( scannedData )
+
+    const scannedObj:  {
+      type: string,
+      walletName: string,
+      channelId: string,
+      streamId: string,
+      channelKey: string,
+      channelKey2: string,
+      version: string,
+      encryptedKey: string,
+    } = JSON.parse( scannedData )
     const decryptedData = LevelHealth.decryptWithAnswer( scannedObj.encryptedKey, answer ).decryptedString
     if( decryptedData == shareId ){
       const shareObj = {
@@ -3841,8 +3852,7 @@ function* setHealthStatusWorker( ) {
         if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
           const delta = Math.abs( Date.now() - element2.updatedAt )
           const minutes = Math.round( delta / ( 60 * 1000 ) )
-          if ( minutes > 2 && element2.shareType != 'cloud' ) {
-          // if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
+          if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
             levelHealth[ currentLevel - 1 ].levelInfo[ i ].status = 'notAccessible'
             shareArray.push( {
               walletId: service.getWalletId().data.walletId,
@@ -3873,36 +3883,37 @@ export const setHealthStatusWatcher = createWatcher(
 
 function* createChannelAssetsWorker( { payload } ) {
   try {
-    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const { shareId, scannedData } = payload
-    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
-    const s3Service = yield select( ( state ) => state.health.service )
-    const walletId = s3Service.levelhealth.walletId
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
-    const secureAccount: SecureAccount = yield select(
-      ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-    )
-    const qrDataObj = JSON.parse( scannedData )
-    let currentContact: TrustedContact
+    if( MetaShares && MetaShares.length ){
+      yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
+      const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+      const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+      const s3Service = yield select( ( state ) => state.health.service )
+      const walletId = s3Service.levelhealth.walletId
+      const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+      const secureAccount: SecureAccount = yield select(
+        ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
+      )
+      let secondaryShare: string = MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare
+      if( scannedData ) {
+        const qrDataObj = JSON.parse( scannedData )
+        let currentContact: TrustedContact
 
-    if( contacts ){
-      for( const ck of Object.values( contacts ) ){
-        if( ck.permanentChannelAddress == qrDataObj.channelId ){
-          currentContact = ck
-          break
+        if( contacts ){
+          for( const ck of Object.values( contacts ) ){
+            if( ck.permanentChannelAddress == qrDataObj.channelId ){
+              currentContact = ck
+              break
+            }
+          }
         }
+        secondaryShare = currentContact.unencryptedPermanentChannel[ TrustedContacts.getStreamId( walletId ) ].secondaryData.secondaryMnemonicShard
       }
-    }
-    let secondaryShare: string = MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare
-    if( scannedData ) {
-      secondaryShare = currentContact.unencryptedPermanentChannel[ TrustedContacts.getStreamId( walletId ) ].secondaryData.secondaryMnemonicShard
-    }
-    const channelAssets: ChannelAssets = {
-      primaryMnemonicShard:
+      const channelAssets: ChannelAssets = {
+        primaryMnemonicShard:
       {
         ...MetaShares.find( value=>value.shareId==shareId ),
         encryptedShare: {
@@ -3911,13 +3922,14 @@ function* createChannelAssetsWorker( { payload } ) {
           bhXpub: '',
         }
       },
-      secondaryMnemonicShard: secondaryShare,
-      keeperInfo: keeperInfo,
-      bhXpub: secureAccount.secureHDWallet.xpubs.bh,
-      shareId
+        secondaryMnemonicShard: secondaryShare,
+        keeperInfo: keeperInfo,
+        bhXpub: secureAccount.secureHDWallet.xpubs.bh,
+        shareId
+      }
+      yield put ( setChannelAssets( channelAssets ) )
+      yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     }
-    yield put ( setChannelAssets( channelAssets ) )
-    yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     console.log( 'Error EF channel', error )
@@ -3926,18 +3938,18 @@ function* createChannelAssetsWorker( { payload } ) {
 
 export const createChannelAssetsWatcher = createWatcher(
   createChannelAssetsWorker,
-  MODIFY_LEVELDATA
+  CREATE_CHANNEL_ASSETS
 )
 
 function* modifyLevelDataWorker( ) {
   try {
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
     let levelData: LevelData[] = yield select( ( state ) => state.health.levelData )
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const s3Service = yield select( ( state ) => state.health.service )
-
     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
 
     let isError = false
@@ -3961,7 +3973,7 @@ function* modifyLevelDataWorker( ) {
     if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
-
+    yield put( updateHealth( levelHealthVar, currentLevel ) )
     const levelDataUpdated = getLevelInfoStatus( levelData )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )

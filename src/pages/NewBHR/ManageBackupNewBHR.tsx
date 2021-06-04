@@ -392,12 +392,9 @@ class ManageBackupNewBHR extends Component<
       } )
     }
 
-    if( prevProps.levelHealth != this.props.levelHealth ) {
-      this.props.modifyLevelData( )
-    }
-
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
+      this.props.modifyLevelData( )
       if(
         ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
         levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
@@ -641,6 +638,9 @@ class ManageBackupNewBHR extends Component<
   };
 
   onPressKeeperButton = ( value, number ) => {
+    this.setState( {
+      selectedLevelId: value.id
+    } )
     this.props.onPressKeeper( value, number )
   };
 

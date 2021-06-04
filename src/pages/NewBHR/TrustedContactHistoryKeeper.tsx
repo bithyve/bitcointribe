@@ -226,7 +226,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
     setSelectedShareId( shareId )
     setIndex( props.navigation.getParam( 'index' ) )
-    if( channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ){
+    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
       dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
     }
   }, [

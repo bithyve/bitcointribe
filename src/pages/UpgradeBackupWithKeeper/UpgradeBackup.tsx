@@ -27,10 +27,6 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import {
-  fetchEphemeralChannel,
-  trustedChannelsSetupSync,
-} from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
@@ -157,7 +153,6 @@ interface UpgradeBackupPropsTypes {
   updateLevelToSetup: any;
   levelToSetup: number;
   updateAvailableKeeperData: any;
-  trustedChannelsSetupSync: any;
   confirmPDFSharedFromUpgrade: any;
   getPDFData: any;
   isUpgradeLevelInitialized: boolean;
@@ -259,7 +254,6 @@ class UpgradeBackup extends Component<
 
   componentDidMount = () => {
     this.props.checkMSharesHealth()
-    this.props.trustedChannelsSetupSync()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
     let keepersInfo: {shareId: string; type: string; count: number; contactDetails?: any; status?: boolean}[] = [ {
@@ -1534,7 +1528,6 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
     initializeHealthSetup,
     updateHealthForCloud,
     updateMSharesHealth,
@@ -1553,7 +1546,6 @@ export default withNavigationFocus(
     setAvailableKeeperData,
     updateLevelToSetup,
     updateAvailableKeeperData,
-    trustedChannelsSetupSync,
     confirmPDFSharedFromUpgrade,
     getPDFData,
     checkMSharesHealth,
