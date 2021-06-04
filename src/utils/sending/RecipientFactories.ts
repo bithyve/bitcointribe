@@ -68,8 +68,9 @@ export function makeContactRecipientDescription(
   let recipientKind = RecipientKind.CONTACT
 
   let displayedName = data.contactName || data.displayedName
-  if ( displayedName.startsWith( SKIPPED_CONTACT_NAME )  ) displayedName = null
-  displayedName = displayedName || data.contactsWalletName || data.walletName
+  if ( displayedName.startsWith( SKIPPED_CONTACT_NAME ) )
+    displayedName = data.contactsWalletName || data.walletName || displayedName
+
   // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
   if ( !displayedName ) {
     recipientKind = RecipientKind.ADDRESS
