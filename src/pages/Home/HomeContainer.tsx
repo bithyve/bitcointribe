@@ -149,6 +149,7 @@ import HomeBuyCard from './HomeBuyCard'
 import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ModalContainer from '../../components/home/ModalContainer'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
@@ -2501,12 +2502,14 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } = this.props
 
     return (
-      <>
-        <View style={containerView}>
+      <View style={containerView}>
+        <ScrollView style={{
+          flex:1
+        }}>
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingVertical: wp( 8 ),
+            paddingVertical: wp( 6 ),
             paddingHorizontal: wp( 4 )
           }}>
             <Text style={{
@@ -2542,7 +2545,7 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <HomeAccountCardsList
             // containerStyle={containerView}
             contentContainerStyle={{
-              paddingTop: 4,
+              // paddingTop: 4,
               paddingLeft: 14,
               // backgroundColor: 'red'
             }}
@@ -2571,8 +2574,9 @@ class HomeContainer extends PureComponent<HomePropsTypes, HomeStateTypes> {
               {/* </View> */}
             </ModalContainer>
           )}
-        </View>
-      </>
+        </ScrollView>
+      </View>
+
     )
   }
 }
