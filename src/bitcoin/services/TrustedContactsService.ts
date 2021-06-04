@@ -6,6 +6,9 @@ import {
   UnecryptedStreamData,
   ContactDetails,
   Trusted_Contacts,
+  PrimaryStreamData,
+  BackupStreamData,
+  SecondaryStreamData,
 } from '../utilities/Interface'
 
 export default class TrustedContactsService {
@@ -69,6 +72,59 @@ export default class TrustedContactsService {
     }
   };
 
+  public retrieveFromStream = async (
+    {
+      walletId,
+      channelKey,
+      options,
+      secondaryChannelKey
+    }: {
+    walletId: string,
+    channelKey: string,
+    options: {
+      retrievePrimaryData?: boolean,
+      retrieveBackupData?: boolean,
+      retrieveSecondaryData?: boolean,
+    }
+    secondaryChannelKey?: string,
+  }
+  ): Promise<{
+    status: number;
+    data: {
+        primaryData?: PrimaryStreamData;
+        backupData?: BackupStreamData;
+        secondaryData?: SecondaryStreamData;
+    };
+    err?: undefined;
+    message?: undefined;
+   }
+  | {
+    status: number;
+    data?: undefined,
+    err: string;
+    message: string;
+   }> => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await this.tc.retrieveFromStream(
+          {
+            walletId,
+            channelKey,
+            options,
+            secondaryChannelKey
+          }
+        )
+      }
+    } catch ( err ) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to retrieve data from stream',
+      }
+    }
+  };
+
   public walletCheckIn = async (
     walletId: string,
     metaShares: MetaShare[],
@@ -122,3 +178,4 @@ export default class TrustedContactsService {
     }
   };
 }
+
