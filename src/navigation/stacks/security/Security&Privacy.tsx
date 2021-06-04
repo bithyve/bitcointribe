@@ -70,6 +70,7 @@ import PersonalCopyHistoryNewBHR from '../../../pages/NewBHR/PersonalCopyHistory
 import CloudBackupHistory from '../../../pages/NewBHR/CloudBackupHistory'
 import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
 import Launch from '../../../pages/Launch'
+import Login from '../../../pages/Login'
 import Header from '../Header'
 
 const MODAL_ROUTES = [
@@ -92,6 +93,7 @@ const SecurityStack = createStackNavigator(
 
     },
     Launch,
+    Login,
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {

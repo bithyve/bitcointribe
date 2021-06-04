@@ -74,6 +74,7 @@ import QRStack from '../home/QRStack'
 import Home from '../../../pages/Home/Home'
 import TabNavigator from '../../TabNavigator'
 import Header from '../Header'
+import Login from '../../../pages/Login'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -95,6 +96,13 @@ const HomeStack = createStackNavigator(
       },
     },
     Launch,
+    ReLogin: {
+      screen: ReLogin,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    Login,
     AddNewAccount: {
       screen: AddNewAccountStack,
       navigationOptions: {

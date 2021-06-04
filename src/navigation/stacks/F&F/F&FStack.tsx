@@ -21,6 +21,8 @@ import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
+import Login from '../../../pages/Login'
+import ReLogin from '../../../pages/ReLogin'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -40,7 +42,14 @@ const FriendsAndFamily = createStackNavigator(
         // tabBarVisibl
       },
     },
+    Login,
     Launch,
+    ReLogin: {
+      screen: ReLogin,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     ContactDetails: {
       screen: ContactDetails,
       navigationOptions: {

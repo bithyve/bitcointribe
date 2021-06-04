@@ -16,6 +16,8 @@ import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
 import Launch from '../../../pages/Launch'
+import ReLogin from '../../../pages/ReLogin'
+import Login from '../../../pages/Login'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -27,6 +29,13 @@ const MoreOptionsStack = createStackNavigator(
       },
     },
     Launch,
+    Login,
+    ReLogin: {
+      screen: ReLogin,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
     AccountManagement: {
       screen: AccountManagementStack,
       navigationOptions: {
