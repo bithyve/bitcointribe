@@ -174,7 +174,8 @@ export default class TrustedContacts {
     }
     contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
     contact.permanentChannel[ inStream.streamId ] = inStream
-    contact.isActive = idx( inStream.metaData, ( _ ) => _.flags.active )
+    contact.isActive = idx( unencryptedInstream.metaData, ( _ ) => _.flags.active )
+    contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
   };
 
   public syncPermanentChannels = async (

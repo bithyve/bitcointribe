@@ -15,6 +15,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import idx from 'idx'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 
 export type TrustedContactsState = {
   service: TrustedContactsService;
@@ -97,12 +98,17 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
         trustKind = ContactTrustKind.OTHER
       }
 
-      const instream = idx( currentContact, ( _ ) => _.unencryptedPermanentChannel[ '' ] )
-      const walletName: string | null = idx( instream, ( _ ) => _.primaryData.walletName )
-      const lastSeenActive: number | null = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
+      const contactsWalletId = currentContact.walletID
+      let walletName, lastSeenActive
+      if( contactsWalletId ) {
+        const instreamId = TrustedContacts.getStreamId( contactsWalletId )
+        const instream = idx( currentContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+        walletName = idx( instream, ( _ ) => _.primaryData.walletName )
+        lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
+      }
 
       let displayedName
-      if ( contactName === SKIPPED_CONTACT_NAME && walletName ) {
+      if ( contactName.startsWith( SKIPPED_CONTACT_NAME )  && walletName ) {
         displayedName = walletName
       } else {
         displayedName = contactName
