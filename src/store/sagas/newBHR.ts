@@ -1,7 +1,6 @@
-import { call, delay, put, select } from 'redux-saga/effects'
-import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
+import { put, select } from 'redux-saga/effects'
 import LevelStatus from '../../common/data/enums/LevelStatus'
-import { generateMetaShare, generateSMMetaShares } from '../actions/health'
+import { generateMetaShare } from '../actions/health'
 import { navigateToHistoryPage, ON_PRESS_KEEPER, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError } from '../actions/newBHR'
 import { createWatcher } from '../utils/utilities'
 

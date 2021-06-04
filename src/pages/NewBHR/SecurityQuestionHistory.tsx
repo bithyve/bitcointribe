@@ -207,24 +207,11 @@ const SecurityQuestionHistory = ( props ) => {
 
   const updateHealthForSQ = () => {
     if ( levelHealth.length > 0 && levelHealth[ 0 ].levelInfo.length > 0 ) {
-      const levelHealthVar =
-        currentLevel == 0 || currentLevel == 1
-          ? levelHealth[ 0 ].levelInfo[ 1 ]
-          : currentLevel == 2
-            ? levelHealth[ 1 ].levelInfo[ 1 ]
-            : levelHealth[ 2 ].levelInfo[ 1 ]
-      // health update for 1st upload to cloud
-      if ( levelHealthVar.shareType == 'cloud' ) {
-        levelHealthVar.updatedAt = '' + moment( new Date() ).valueOf()
-        levelHealthVar.status = 'accessible'
-        levelHealthVar.reshareVersion = 1
-        levelHealthVar.name = 'Cloud'
-      }
       const shareObj =
         {
           walletId: s3Service.getWalletId().data.walletId,
-          shareId: levelHealthVar.shareId,
-          reshareVersion: levelHealthVar.reshareVersion,
+          shareId: levelHealth[ 0 ].levelInfo[ 1 ].shareId,
+          reshareVersion: levelHealth[ 0 ].levelInfo[ 1 ].reshareVersion,
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',

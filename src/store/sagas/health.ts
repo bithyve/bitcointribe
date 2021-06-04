@@ -3852,8 +3852,7 @@ function* setHealthStatusWorker( ) {
         if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
           const delta = Math.abs( Date.now() - element2.updatedAt )
           const minutes = Math.round( delta / ( 60 * 1000 ) )
-          if ( minutes > 2 && element2.shareType != 'cloud' ) {
-          // if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
+          if ( minutes > TIME_SLOTS.SHARE_SLOT2 && element2.shareType != 'cloud' ) {
             levelHealth[ currentLevel - 1 ].levelInfo[ i ].status = 'notAccessible'
             shareArray.push( {
               walletId: service.getWalletId().data.walletId,

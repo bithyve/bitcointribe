@@ -454,6 +454,9 @@ class ManageBackupNewBHR extends Component<
   };
 
   onPressKeeperButton = ( value, number ) => {
+    this.setState( {
+      selectedLevelId: value.id
+    } )
     this.props.onPressKeeper( value, number )
   };
 
