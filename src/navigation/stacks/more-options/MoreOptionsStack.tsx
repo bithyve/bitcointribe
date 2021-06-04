@@ -15,7 +15,7 @@ import QRStack from '../home/QRStack'
 import Colors from '../../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Fonts from '../../../common/Fonts'
-
+import Launch from '../../../pages/Launch'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -26,6 +26,7 @@ const MoreOptionsStack = createStackNavigator(
         // tabBarVisibl
       },
     },
+    Launch,
     AccountManagement: {
       screen: AccountManagementStack,
       navigationOptions: {

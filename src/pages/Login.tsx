@@ -243,12 +243,12 @@ export default function Login( props ) {
             //console.log( 'creationFlag**', creationFlag )
 
             if( !creationFlag ) {
-              props.navigation.navigate( 'HomeRoot', {
+              props.navigation.navigate( 'Home', {
                 screen: 'Home',
               }
               )
             } else if( requestName ){
-              props.navigation.navigate( 'HomeRoot', {
+              props.navigation.navigate( 'Home', {
                 screen: 'Home',
                 params: {
                   custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,

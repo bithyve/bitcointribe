@@ -20,6 +20,7 @@ import Header from '../Header'
 import AddContactSendRequest from '../../../pages/Contacts/AddContactSendRequest'
 import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
+import Launch from '../../../pages/Launch'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -39,6 +40,7 @@ const FriendsAndFamily = createStackNavigator(
         // tabBarVisibl
       },
     },
+    Launch,
     ContactDetails: {
       screen: ContactDetails,
       navigationOptions: {

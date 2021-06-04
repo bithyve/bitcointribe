@@ -41,7 +41,7 @@ import Intermediate from '../../../pages/Intermediate'
 import NewOwnQuestions from '../../../pages/NewOwnQuestions'
 import AccountDetailsStack from '../accounts/AccountDetailsStack'
 import WyreIntegrationScreen from '../../../pages/WyreIntegration/WyreIntegrationScreen'
-
+import Launch from '../../../pages/Launch'
 
 import RestoreWithICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import RestoreWithoutICloud from '../../../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
@@ -87,13 +87,14 @@ const MODAL_ROUTES = [
 
 const HomeStack = createStackNavigator(
   {
-    HomeRoot: {
+    Home: {
       screen: Home,
       navigationOptions: {
         header: null,
         // tabBarVisibl
       },
     },
+    Launch,
     AddNewAccount: {
       screen: AddNewAccountStack,
       navigationOptions: {
@@ -241,7 +242,7 @@ const HomeStack = createStackNavigator(
   },
   {
     mode: 'modal',
-    initialRouteName: 'HomeRoot',
+    initialRouteName: 'Home',
     defaultNavigationOptions: {
       header: null
     },
