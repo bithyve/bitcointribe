@@ -118,83 +118,6 @@ export default class LevelHealth {
     }
   };
 
-  public static downloadPdfShare = async (
-    messageId: string,
-    key: string,
-  ): Promise<
-    | {
-        metaShare: MetaShare;
-        encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-        messageId: string;
-      }
-    | {
-        metaShare: MetaShare;
-        messageId: string;
-        encryptedDynamicNonPMDD?: undefined;
-      }
-  > => {
-
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'downloadPDFShare', {
-        HEXA_ID,
-        messageId,
-      } )
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-    }
-
-    const { share, encryptedDynamicNonPMDD } = res.data
-    const metaShare = LevelHealth.decryptMetaShare( share, key )
-      .decryptedMetaShare
-    return {
-      metaShare, encryptedDynamicNonPMDD, messageId
-    }
-  };
-
-  public static downloadSMShare = async (
-    encryptedKey: string,
-    otp?: string,
-  ): Promise<
-    | {
-        status: number;
-        metaShare: MetaShare;
-        messageId: string;
-      }
-    | {
-        status: number;
-        metaShare: MetaShare;
-        messageId: string;
-      }
-  > => {
-    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if ( otp ) {
-      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
-    }
-    const messageId: string = LevelHealth.getMessageId(
-      key,
-      config.MSG_ID_LENGTH,
-    )
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'downloadSecondaryShare', {
-        HEXA_ID,
-        messageId,
-      } )
-    } catch ( err ) {
-      if ( err.response ) throw new Error( err.response.data.err )
-      if ( err.code ) throw new Error( err.code )
-    }
-
-    const { share } = res.data
-    const metaShare = LevelHealth.decryptMetaShare( share, key )
-      .decryptedMetaShare
-    return {
-      status: 200, metaShare, messageId
-    }
-  };
-
   public static downloadDynamicNonPMDD = async (
     walletID: string,
   ): Promise<{
@@ -1908,46 +1831,6 @@ export default class LevelHealth {
     this.SMMetaSharesKeeper = metaShareArray
     return {
       metaShares: this.SMMetaSharesKeeper
-    }
-  };
-
-  public static uploadRequestedSMShare = async (
-    encryptedKey: string,
-    metaShare: MetaShare,
-    otp?: string,
-    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
-  ): Promise<{ success: boolean }> => {
-    let key = encryptedKey // if no OTP is provided the key is non-OTP encrypted and can be used directly
-    if ( otp ) {
-      key = LevelHealth.decryptViaOTP( encryptedKey, otp ).decryptedData
-    }
-    const { encryptedMetaShare, messageId } = LevelHealth.encryptMetaShare(
-      metaShare,
-      key,
-    )
-
-    let res: AxiosResponse
-    try {
-      res = await BH_AXIOS.post( 'uploadSecondaryShare', {
-        HEXA_ID,
-        share: encryptedMetaShare,
-        messageId,
-        encryptedDynamicNonPMDD,
-      } )
-
-      const { success } = res.data
-      if ( !success ) {
-        return {
-          success: false
-        }
-      }
-      return {
-        success
-      }
-    } catch ( err ) {
-      return {
-        success: false
-      }
     }
   };
 

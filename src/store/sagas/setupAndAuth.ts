@@ -51,7 +51,6 @@ function* setupWalletWorker( { payload } ) {
       SECURE_ACCOUNT: JSON.stringify( secureAcc ),
       S3_SERVICE: JSON.stringify( s3Service ),
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-      KEEPERS_INFO: JSON.stringify( keepersInfo ),
     },
     VERSION: DeviceInfo.getVersion(),
   }

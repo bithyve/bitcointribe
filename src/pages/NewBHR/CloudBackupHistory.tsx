@@ -24,7 +24,6 @@ import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import {
   checkMSharesHealth,
-  updateMSharesHealth,
 } from '../../store/actions/health'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'

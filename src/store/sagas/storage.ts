@@ -19,8 +19,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import semver from 'semver'
-import { sendVersionUpdateNotification, walletCheckIn } from '../actions/trustedContacts'
-import KeeperService from '../../bitcoin/services/KeeperService'
+import { walletCheckIn } from '../actions/trustedContacts'
 import { updateWalletImageHealth } from '../actions/health'
 import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
@@ -184,7 +183,6 @@ function* servicesEnricherWorker( { payload } ) {
       SECURE_ACCOUNT,
       S3_SERVICE,
       TRUSTED_CONTACTS,
-      KEEPERS_INFO,
     } = database.SERVICES
 
 
@@ -199,7 +197,6 @@ function* servicesEnricherWorker( { payload } ) {
           SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
           S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
           TRUSTED_CONTACTS: new TrustedContactsService(),
-          KEEPERS_INFO: new KeeperService(),
         }
         // hydrating new/missing async storage variables
         yield call(
@@ -219,9 +216,6 @@ function* servicesEnricherWorker( { payload } ) {
           TRUSTED_CONTACTS: TRUSTED_CONTACTS
             ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
             : new TrustedContactsService(),
-          KEEPERS_INFO: KEEPERS_INFO
-            ? KeeperService.fromJSON( KEEPERS_INFO )
-            : new KeeperService(),
         }
       }
 
@@ -284,7 +278,6 @@ function* servicesEnricherWorker( { payload } ) {
         services.SECURE_ACCOUNT = secureAccount
 
         console.log( 'services.TRUSTED_CONTACTS', services.TRUSTED_CONTACTS )
-        services.KEEPERS_INFO = new KeeperService()
         //yield put( upgradeReducer( ) )
         migrated = true
       }
@@ -297,9 +290,6 @@ function* servicesEnricherWorker( { payload } ) {
         TRUSTED_CONTACTS: TRUSTED_CONTACTS
           ? TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
           : new TrustedContactsService(),
-        KEEPERS_INFO: KEEPERS_INFO
-          ? KeeperService.fromJSON( KEEPERS_INFO )
-          : new KeeperService(),
       }
     }
 
@@ -315,7 +305,6 @@ function* servicesEnricherWorker( { payload } ) {
           SECURE_ACCOUNT: JSON.stringify( services.SECURE_ACCOUNT ),
           S3_SERVICE: JSON.stringify( services.S3_SERVICE ),
           TRUSTED_CONTACTS: JSON.stringify( services.TRUSTED_CONTACTS ),
-          KEEPERS_INFO: JSON.stringify( services.KEEPERS_INFO )
         }
       yield call( insertDBWorker, {
         payload: database,
