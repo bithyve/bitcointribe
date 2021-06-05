@@ -206,7 +206,7 @@ const CloudBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'GoogleDrive backup'}
+        selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'Google Drive backup'}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
         tintColor={Colors.deepBlue}
