@@ -1373,21 +1373,27 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     let secondaryMnemonic
     const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     const qrDataObj = JSON.parse( qrdata )
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
     let currentContact: TrustedContact
-
+    let channelKey: string
     if( contacts ){
-      for( const ck of Object.values( contacts ) ){
-        if( ck.permanentChannelAddress == qrDataObj.channelId ){
-          currentContact = ck
+      for( const ck of Object.keys( contacts ) ){
+        channelKey=ck
+        currentContact = contacts[ ck ]
+        if( currentContact.permanentChannelAddress == qrDataObj.channelId ){
           break
         }
       }
     }
-
-    const shard: string = currentContact.unencryptedPermanentChannel[ TrustedContacts.getStreamId( walletId ) ].secondaryData.secondaryMnemonicShard
+    const res = yield call( trustedContacts.retrieveFromStream, {
+      walletId, channelKey, options: {
+        retrieveSecondaryData: true,
+      }, secondaryChannelKey: qrDataObj.channelKey2
+    } )
+    const shard: string = res.data.secondaryData.secondaryMnemonicShard
     sharesArray.push( shard )
+
     if( sharesArray.length>1 ){
       secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, WALLET_SETUP.security.answer )
     }

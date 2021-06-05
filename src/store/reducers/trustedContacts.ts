@@ -7,7 +7,6 @@ import {
   PermanentChannelsSyncKind
 } from '../actions/trustedContacts'
 import {
-  EphemeralDataElements,
   TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
@@ -16,6 +15,7 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import idx from 'idx'
+import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 
 export type TrustedContactsState = {
   service: TrustedContactsService;
@@ -72,27 +72,24 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
   return state
 }
 
+export const SKIPPED_CONTACT_NAME = 'F&F request awaiting'
+
 function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
   trustedContacts: Trusted_Contacts;
 } ): ContactRecipientDescribing[] {
   if( trustedContacts && Object.keys( trustedContacts ).length ){
     return Object.values( trustedContacts ).reduce( (
       accumulatedRecipients: ContactRecipientDescribing[],
-      currentTCObject: TrustedContact | null,
+      currentContact: TrustedContact | null,
     ): ContactRecipientDescribing[] => {
-      if ( !currentTCObject ) { return accumulatedRecipients }
+      if ( !currentContact ) { return accumulatedRecipients }
 
-      const { contactDetails, relationType } = currentTCObject
+      const { contactDetails, relationType } = currentContact
       const contactName = contactDetails.contactName
-      const isGuardian = relationType === TrustedContactRelationTypes.KEEPER ? true : false
-      const isWard: boolean = relationType === TrustedContactRelationTypes.WARD? true : false
-      const walletName: string | null = idx( currentTCObject, ( _ ) => _.unencryptedPermanentChannel[ '' ].primaryData.walletName )
-      const lastSeenActive: number | null = idx( currentTCObject, ( _ ) => _.unencryptedPermanentChannel[ '' ].metaData.flags.lastSeen )
+      const isGuardian = [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ) ? true : false
+      const isWard: boolean = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType )? true : false
 
       let trustKind: ContactTrustKind
-
-      // TODO: Figure out the meaning of these properties and whether or not this is
-      // actually the correct logic.
       if ( isWard ) {
         trustKind = ContactTrustKind.KEEPER_OF_USER
       } else if ( isGuardian ) {
@@ -101,24 +98,23 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
         trustKind = ContactTrustKind.OTHER
       }
 
-
-      let displayedName = contactName || walletName
-
-      // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
-      if ( displayedName &&
-      [
-        'f&f request',
-        'f&f request awaiting',
-        'f & f request',
-        'f & f request awaiting',
-      ].some( ( placeholder ) => displayedName.includes( placeholder ) )
-      ) {
-        displayedName = walletName
+      const contactsWalletId = currentContact.walletID
+      let walletName, lastSeenActive
+      if( contactsWalletId ) {
+        const instreamId = TrustedContacts.getStreamId( contactsWalletId )
+        const instream = idx( currentContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+        walletName = idx( instream, ( _ ) => _.primaryData.walletName )
+        lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
       }
 
+      let displayedName
+      if ( contactName.startsWith( SKIPPED_CONTACT_NAME )  && walletName ) {
+        displayedName = walletName
+      } else {
+        displayedName = contactName
+      }
 
       let recipientKind = RecipientKind.CONTACT
-
       // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
       if ( !displayedName ) {
         recipientKind = RecipientKind.ADDRESS
@@ -126,7 +122,6 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
       }
 
       const avatarImageSource = contactDetails.image
-
       const contactRecipient: ContactRecipientDescribing = {
         id: contactDetails.id,
         kind: recipientKind,

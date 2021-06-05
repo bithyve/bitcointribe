@@ -44,7 +44,8 @@ import {
   setLevelToNotSetupStatus,
   setHealthStatus,
   modifyLevelData,
-  createChannelAssets
+  createChannelAssets,
+  setApprovalStatus
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -136,7 +137,9 @@ interface ManageBackupNewBHRPropsTypes {
   shieldHealth: boolean;
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
-  createChannelAssets: any
+  createChannelAssets: any;
+  setApprovalStatus: any;
+  approvalStatus: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -236,12 +239,9 @@ class ManageBackupNewBHR extends Component<
       } )
     }
 
-    if( prevProps.levelHealth != this.props.levelHealth ) {
-      this.props.modifyLevelData( )
-    }
-
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
+      this.props.modifyLevelData( )
       if(
         ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
         levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
@@ -381,6 +381,20 @@ class ManageBackupNewBHR extends Component<
         showLoader: false
       } )
     }
+
+    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ){
+      const obj = {
+        id: this.state.selectedLevelId,
+        selectedKeeper: {
+          ...this.state.selectedKeeper,
+          name: this.state.selectedKeeper.name ? this.state.selectedKeeper.name : this.state.selectedKeeperName,
+          shareType: this.state.selectedKeeper.shareType ? this.state.selectedKeeper.shareType : this.state.selectedKeeperType,
+          shareId: this.state.selectedKeeper.shareId ? this.state.selectedKeeper.shareId :  this.state.selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+        },
+        isSetup: true,
+      }
+      this.goToHistory( obj )
+    }
   };
 
   goToHistory = ( value ) => {
@@ -457,6 +471,9 @@ class ManageBackupNewBHR extends Component<
   };
 
   onPressKeeperButton = ( value, number ) => {
+    this.setState( {
+      selectedLevelId: value.id
+    } )
     this.props.onPressKeeper( value, number )
   };
 
@@ -923,6 +940,7 @@ const mapStateToProps = ( state ) => {
     levelData: idx( state, ( _ ) => _.health.levelData ),
     shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
+    approvalStatus: idx( state, ( _ ) => _.health.approvalStatus ),
   }
 }
 
@@ -949,6 +967,7 @@ export default withNavigationFocus(
     updateCloudData,
     modifyLevelData,
     createChannelAssets,
+    setApprovalStatus
   } )( ManageBackupNewBHR )
 )
 

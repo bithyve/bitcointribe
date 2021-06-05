@@ -7,7 +7,10 @@ import {
   StreamData,
   TrustedContact,
   Trusted_Contacts,
-  ContactDetails
+  ContactDetails,
+  SecondaryStreamData,
+  BackupStreamData,
+  PrimaryStreamData
 } from './Interface'
 import crypto from 'crypto'
 import config from '../HexaConfig'
@@ -31,7 +34,6 @@ export default class TrustedContacts {
       .digest( 'hex' ).slice( 0, 9 )
 
   public trustedContacts: Trusted_Contacts;
-  public skippedContactsCount = 0;
 
   constructor( stateVars ) {
     this.initializeStateVars( stateVars )
@@ -77,10 +79,6 @@ export default class TrustedContacts {
     this.trustedContacts =
       stateVars && stateVars.trustedContacts ? stateVars.trustedContacts : {
       }
-    this.skippedContactsCount =
-      stateVars && stateVars.skippedContactsCount
-        ? stateVars.skippedContactsCount
-        : this.skippedContactsCount
   };
 
   public cacheOutstream = (
@@ -97,26 +95,30 @@ export default class TrustedContacts {
       const unencryptedOutStream: UnecryptedStreamData = {
         streamId,
         primaryData,
-        secondaryData,
-        backupData,
         metaData
       }
       contact.unencryptedPermanentChannel = {
         [ streamId ]: unencryptedOutStream
       }
 
+      const primaryEncryptedData = primaryData? this.encryptData( channelKey, primaryData ).encryptedData: null
+      const secondaryEncryptedData = secondaryData && secondaryChannelKey? this.encryptData( secondaryChannelKey, secondaryData ).encryptedData: null
+      const encryptedBackupData = backupData? this.encryptData( channelKey, backupData ).encryptedData: null
+
       const outstream: StreamData = {
         streamId,
-        primaryEncryptedData : unencryptedOutStream.primaryData? this.encryptData( channelKey, unencryptedOutStream.primaryData ).encryptedData: null,
-        secondaryEncryptedData: unencryptedOutStream.secondaryData && secondaryChannelKey? this.encryptData( secondaryChannelKey, unencryptedOutStream.secondaryData ).encryptedData: null,
-        encryptedBackupData : unencryptedOutStream.backupData? this.encryptData( channelKey, unencryptedOutStream.backupData ).encryptedData: null,
+        primaryEncryptedData,
         metaData: unencryptedOutStream.metaData
       }
       contact.permanentChannel = {
         [ streamId ]: outstream
       }
 
-      outstreamUpdates =  outstream
+      outstreamUpdates = {
+        ...outstream,
+        secondaryEncryptedData,
+        encryptedBackupData
+      }
     } else {
       // update output stream
       const unencryptedOutstream = ( contact.unencryptedPermanentChannel as UnecryptedStreams )[ streamId ]
@@ -130,39 +132,29 @@ export default class TrustedContacts {
           ...unencryptedOutstream.primaryData,
           ...primaryData
         }
-        outstream.primaryEncryptedData = this.encryptData( channelKey, unencryptedOutstream.primaryData ).encryptedData
-        outstreamUpdates.primaryEncryptedData = outstream.primaryEncryptedData
+        const primaryEncryptedData = this.encryptData( channelKey, unencryptedOutstream.primaryData ).encryptedData
+        outstream.primaryEncryptedData = primaryEncryptedData
+        outstreamUpdates.primaryEncryptedData = primaryEncryptedData
       }
 
-      if( secondaryData && secondaryChannelKey ){
-        unencryptedOutstream.secondaryData = {
-          ...unencryptedOutstream.secondaryData,
-          ...secondaryData
-        }
-        outstream.secondaryEncryptedData = this.encryptData( secondaryChannelKey, unencryptedOutstream.secondaryData ).encryptedData
-        outstreamUpdates.secondaryEncryptedData = outstream.secondaryEncryptedData
-      } else if ( secondaryData === null ){
-        unencryptedOutstream.secondaryData = null // remove secondary data
-        outstream.secondaryEncryptedData = null
-      }
+      if( secondaryData && secondaryChannelKey )
+        outstreamUpdates.secondaryEncryptedData = this.encryptData( secondaryChannelKey, secondaryData ).encryptedData
+      else if ( secondaryData === null )
+        outstreamUpdates.secondaryEncryptedData = null
 
-      if( backupData ){
-        unencryptedOutstream.backupData = {
-          ...unencryptedOutstream.backupData,
-          ...backupData
-        }
-        outstream.encryptedBackupData = this.encryptData( channelKey, unencryptedOutstream.backupData ).encryptedData
-        outstreamUpdates.encryptedBackupData = outstream.encryptedBackupData
-      } else if ( backupData === null ){
-        unencryptedOutstream.backupData = null // remove backupData data
-        outstream.encryptedBackupData = null
-      }
+
+      if( backupData )
+        outstreamUpdates.encryptedBackupData = this.encryptData( channelKey, backupData ).encryptedData
+      else if ( backupData === null )
+        outstreamUpdates.encryptedBackupData = null
+
 
       if( metaData ){
         unencryptedOutstream.metaData = {
           ...unencryptedOutstream.metaData,
           ...metaData
         }
+        outstream.metaData = unencryptedOutstream.metaData
         outstreamUpdates.metaData = unencryptedOutstream.metaData
         contact.isActive = idx( metaData, ( _ ) => _.flags.active )
       }
@@ -182,7 +174,8 @@ export default class TrustedContacts {
     }
     contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
     contact.permanentChannel[ inStream.streamId ] = inStream
-    contact.isActive = idx( inStream.metaData, ( _ ) => _.flags.active )
+    contact.isActive = idx( unencryptedInstream.metaData, ( _ ) => _.flags.active )
+    contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
   };
 
   public syncPermanentChannels = async (
@@ -263,6 +256,68 @@ export default class TrustedContacts {
           updated: true
         }
       } else throw new Error( 'No channels to update' )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+      throw new Error( err.message )
+    }
+  };
+
+  public retrieveFromStream = async (
+    {
+      walletId,
+      channelKey,
+      options,
+      secondaryChannelKey
+    }: {
+    walletId: string,
+    channelKey: string,
+    options: {
+      retrievePrimaryData?: boolean,
+      retrieveBackupData?: boolean,
+      retrieveSecondaryData?: boolean,
+    }
+    secondaryChannelKey?: string,
+  }
+  ): Promise<{
+    primaryData?: PrimaryStreamData,
+    backupData?: BackupStreamData,
+    secondaryData?: SecondaryStreamData,
+  }> => {
+    try {
+      const contact: TrustedContact = this.trustedContacts[ channelKey ]
+      const { permanentChannelAddress } = contact
+      const streamId = TrustedContacts.getStreamId( walletId )
+
+      const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {
+        HEXA_ID,
+        permanentChannelAddress,
+        streamId,
+        options
+      } )
+
+      const streamData: {
+        primaryEncryptedData?: string,
+        encryptedBackupData?: string,
+        secondaryEncryptedData?: string,
+      } = res.data.streamData
+      console.log( {
+        streamData
+      } )
+      const unencryptedStreamData: {
+        primaryData?: PrimaryStreamData,
+        backupData?: BackupStreamData,
+        secondaryData?: SecondaryStreamData,
+      } = {
+      }
+      if( options.retrievePrimaryData && streamData.primaryEncryptedData )
+        unencryptedStreamData.primaryData = this.decryptData( channelKey, streamData.primaryEncryptedData ).data
+      if( options.retrieveBackupData && streamData.encryptedBackupData )
+        unencryptedStreamData[ 'backupData' ] = this.decryptData( channelKey, streamData.encryptedBackupData ).data
+      if( options.retrieveSecondaryData && streamData.secondaryEncryptedData && secondaryChannelKey )
+        unencryptedStreamData[ 'secondaryData' ] = this.decryptData( secondaryChannelKey, streamData.secondaryEncryptedData ).data
+
+      return unencryptedStreamData
     } catch ( err ) {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )

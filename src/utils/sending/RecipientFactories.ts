@@ -6,6 +6,7 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 
 type AddressRecipientFactoryProps = {
   address: string;
@@ -61,27 +62,14 @@ export function makeAccountRecipientDescription(
 
 
 export function makeContactRecipientDescription(
-  data: unknown,
+  data: any,
   trustKind: ContactTrustKind = ContactTrustKind.OTHER,
 ): ContactRecipientDescribing {
   let recipientKind = RecipientKind.CONTACT
 
-  // 📝 Attempt at being more robust for the issue noted here: https://github.com/bithyve/hexa/issues/2004#issuecomment-728635654
   let displayedName = data.contactName || data.displayedName
-
-  if (
-    displayedName &&
-    [
-      'f&f request',
-      'f&f request awaiting',
-      'f & f request',
-      'f & f request awaiting',
-    ].some( ( placeholder ) => displayedName.startsWith( placeholder ) )
-  ) {
-    displayedName = null
-  }
-
-  displayedName = displayedName || data.contactsWalletName || data.walletName
+  if ( displayedName.startsWith( SKIPPED_CONTACT_NAME ) )
+    displayedName = data.contactsWalletName || data.walletName || displayedName
 
   // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
   if ( !displayedName ) {

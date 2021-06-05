@@ -88,6 +88,8 @@ export const IS_LEVEL_TO_NOT_SETUP = 'IS_LEVEL_TO_NOT_SETUP'
 export const SET_HEALTH_STATUS = 'SET_HEALTH_STATUS'
 export const MODIFY_LEVELDATA = 'MODIFY_LEVELDATA'
 export const SET_CHANNEL_ASSETS = 'SET_CHANNEL_ASSETS'
+export const CREATE_CHANNEL_ASSETS = 'CREATE_CHANNEL_ASSETS'
+export const APPROVAL_STATUS = 'APPROVAL_STATUS'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -806,8 +808,16 @@ export const setChannelAssets = ( channelAssets ) => {
 
 export const createChannelAssets = ( shareId, scannedData? ) => {
   return {
-    type: SET_CHANNEL_ASSETS, payload: {
+    type: CREATE_CHANNEL_ASSETS, payload: {
       shareId, scannedData
+    }
+  }
+}
+
+export const setApprovalStatus = ( flag ) => {
+  return {
+    type: APPROVAL_STATUS, payload: {
+      flag
     }
   }
 }
