@@ -105,7 +105,9 @@ import {
 import {
   updateFCMTokensWatcher,
   fetchNotificationsWatcher,
-  getMessageWatcher
+  getMessageWatcher,
+  updateMessageStatusWatcher,
+  updateMessageStatusInAppWatcher
 } from './sagas/notifications'
 
 import {
@@ -290,6 +292,8 @@ const rootSaga = function* () {
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
     getMessageWatcher,
+    updateMessageStatusWatcher,
+    updateMessageStatusInAppWatcher,
 
     // Trusted Contacts
     initializeTrustedContactWatcher,

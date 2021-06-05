@@ -58,7 +58,9 @@ import {
   updateFCMTokens,
   notificationsUpdated,
   setupNotificationList,
-  updateNotificationList
+  updateNotificationList,
+  updateMessageStatusInApp,
+  updateMessageStatus
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -294,6 +296,8 @@ interface HomePropsTypes {
   fetchStarted: any;
   messages: any;
   setWalletId: any;
+  updateMessageStatusInApp: any;
+  updateMessageStatus: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -363,30 +367,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressNotifications = async () => {
-    //const { updateNotificationList, asyncNotificationList } = this.props
-    // const notificationList = JSON.parse(
-    //   await AsyncStorage.getItem( 'notificationList' )
-    // )
-    // const tmpList = []
-    // if ( asyncNotificationList ) {
-    //   for ( let i = 0; i < asyncNotificationList.length; i++ ) {
-    //     const element = asyncNotificationList[ i ]
-    //     const obj = {
-    //       ...element,
-    //       read: element.isMandatory ? false : true,
-    //     }
-    //     tmpList.push( obj )
-    //   }
-    // }
-    // updateNotificationList( tmpList )
-    // //await AsyncStorage.setItem( 'notificationList', JSON.stringify( tmpList ) )
-    // tmpList.sort( function ( left, right ) {
-    //   return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-    // } )
-    // this.setState( {
-    //   notificationData: tmpList,
-    //   notificationDataChange: !this.state.notificationDataChange,
-    // } )
     setTimeout( () => {
       this.setState( {
         notificationLoading: false,
@@ -689,54 +669,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  // bootStrapNotifications = async () => {
-  //   this.props.setIsPermissionGiven( true )
-  //   const t0 = performance.now()
-  //   if ( Platform.OS === 'ios' ) {
-  //     firebase
-  //       .messaging()
-  //       .hasPermission()
-  //       .then( ( enabled ) => {
-  //         if ( enabled ) {
-  //           this.storeFCMToken()
-  //           this.createNotificationListeners()
-  //         } else {
-  //           firebase
-  //             .messaging()
-  //             .requestPermission( {
-  //               provisional: true,
-  //             } )
-  //             .then( () => {
-  //               this.storeFCMToken()
-  //               this.createNotificationListeners()
-  //             } )
-  //             .catch( () => {
-  //               console.log( 'Permission rejected.' )
-  //             } )
-  //         }
-  //       } )
-  //       .catch()
-  //   } else {
-  //     this.storeFCMToken()
-  //     this.createNotificationListeners()
-  //   }
-  //   const t1 = performance.now()
-  //   console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
-  // };
-
-  storeFCMToken = async () => {
-    const fcmToken = await messaging().getToken()
-    console.log( 'TOKEN', fcmToken )
-    const fcmArray = [ fcmToken ]
-    const fcmTokenFromAsync = this.props.fcmTokenValue
-    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
-      this.props.setFCMToken( fcmToken )
-
-      await AsyncStorage.setItem( 'fcmToken', fcmToken )
-      this.props.updateFCMTokens( fcmArray )
-    }
-  };
-
   createNotificationListeners = async () => {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
@@ -787,56 +719,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async ( item ) => {
     console.log( 'item', item )
-    // const { updateNotificationList, asyncNotificationList } = this.props
-
-    // const content = JSON.parse( item.data.content )
-    // // let asyncNotificationList = notificationListNew;
-    // // let asyncNotificationList = JSON.parse(
-    // //   await AsyncStorage.getItem( 'notificationList' )
-    // // )
-    // let asyncList = []
-    // if ( !asyncNotificationList ) {
-    //   asyncList = []
-    // } else {
-    //   console.log( 'asyncNotificationList TYPE', typeof asyncNotificationList )
-    // }
-    // let readStatus = true
-    // if ( content.notificationType == releaseNotificationTopic ) {
-    //   const releaseCases = this.props.releaseCasesValue
-    //   //JSON.parse(await AsyncStorage.getItem('releaseCases'));
-    //   if ( releaseCases.ignoreClick ) {
-    //     readStatus = true
-    //   } else if ( releaseCases.remindMeLaterClick ) {
-    //     readStatus = false
-    //   } else {
-    //     readStatus = false
-    //   }
-    // }
-    // const obj = {
-    //   type: content.notificationType,
-    //   isMandatory: false,
-    //   read: readStatus,
-    //   title: item.title,
-    //   time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
-    //   date: new Date(),
-    //   info: item.body,
-    //   notificationId: content.notificationId,
-    // }
-    // asyncList.push( obj )
-    // // this.props.notificationsUpdated(asyncNotificationList);
-    // updateNotificationList( asyncList )
-    // // await AsyncStorage.setItem(
-    // //   'notificationList',
-    // //   JSON.stringify( asyncNotificationList )
-    // // )
-    // asyncNotificationList.sort( function ( left, right ) {
-    //   return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-    // } )
-    // this.setState( {
-    //   notificationData: asyncNotificationList,
-    //   notificationDataChange: !this.state.notificationDataChange,
-    // } )
-    // this.onPressNotifications()
   };
 
   onAppStateChange = async ( nextAppState ) => {
@@ -941,89 +823,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  // getNewTransactionNotifications = async () => {
-  //   const t0 = performance.now()
-  //   const newTransactions = []
-  //   const { accountsState, updateNotificationList, asyncNotificationList } = this.props
-  //   const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
-  //   const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-
-  //   const newTransactionsRegular =
-  //     regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
-  //     regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-  //   const newTransactionsSecure =
-  //     secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
-  //     secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-
-  //   if ( newTransactionsRegular && newTransactionsRegular.length )
-  //     newTransactions.push( ...newTransactionsRegular )
-  //   if ( newTransactionsSecure && newTransactionsSecure.length )
-  //     newTransactions.push( ...newTransactionsSecure )
-
-  //   if ( newTransactions.length ) {
-  //     // let asyncNotification = notificationListNew;
-  //     // const asyncNotification = JSON.parse(
-  //     //   await AsyncStorage.getItem( 'notificationList' )
-  //     // )
-  //     let asyncNotification = []
-  //     if ( asyncNotificationList.length ) {
-  //       asyncNotification = []
-  //       for ( let i = 0; i < asyncNotification.length; i++ ) {
-  //         asyncNotification.push( asyncNotification[ i ] )
-  //       }
-  //     }
-
-  //     for ( let i = 0; i < newTransactions.length; i++ ) {
-  //       let present = false
-  //       for ( const tx of asyncNotification ) {
-  //         if (
-  //           tx.notificationsData &&
-  //           newTransactions[ i ].txid === tx.notificationsData.txid
-  //         )
-  //           present = true
-  //       }
-  //       if ( present ) continue
-
-  //       const obj = {
-  //         type: 'contact',
-  //         isMandatory: false,
-  //         read: false,
-  //         title: 'Alert from FastBitcoins',
-  //         time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
-  //         date: new Date(),
-  //         info: 'You have a new transaction',
-  //         notificationId: createRandomString( 17 ),
-  //         notificationsData: newTransactions[ i ],
-  //       }
-  //       asyncNotificationList.push( obj )
-  //       const notificationDetails = {
-  //         id: obj.notificationId,
-  //         title: obj.title,
-  //         body: obj.info,
-  //       }
-  //       console.log( ':asyncNotificationList', asyncNotificationList )
-
-  //       this.localNotification( notificationDetails )
-  //     }
-  //     // await AsyncStorage.setItem(
-  //     //   'notificationList',
-  //     //   JSON.stringify( asyncNotificationList )
-  //     // )
-  //     updateNotificationList( asyncNotificationList )
-  //     asyncNotificationList.sort( function ( left, right ) {
-  //       return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-  //     } )
-  //     setTimeout( () => {
-  //       this.setState( {
-  //         notificationData: asyncNotificationList,
-  //         notificationDataChange: !this.state.notificationDataChange,
-  //       } )
-  //     }, 2 )
-  //   }
-  //   const t1 = performance.now()
-  //   console.log( 'getNewTransactionNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
-  // };
-
   notificationCheck = () =>{
     const { messages } = this.props
     console.log( 'messages inside notificationCheck', messages )
@@ -1031,25 +830,29 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
       } )
-      console.log( 'messages after sort', messages )
       this.setState( {
         notificationData: messages,
         notificationDataChange: !this.state.notificationDataChange,
-      }, () => {
-        console.log( 'notificationData', this.state.notificationData )
-
       } )
       const message = messages.find( message => message.status === 'unread' )
-      console.log( 'message****', message )
-      this.handleNotificationBottomSheetSelection( message )
+      if( message ){
+        this.handleNotificationBottomSheetSelection( message )}
     }
   }
 
   handleNotificationBottomSheetSelection = ( message ) => {
     console.log( 'handleNotificationBottomSheetSelection', message )
+    const storeName = Platform.OS == 'ios' ? 'App Store' : 'Play Store'
     this.setState( {
       currentMessage: message
     } )
+    const statusValue = [ {
+      notificationId: message.notificationId,
+      status : 'read'
+    } ]
+    this.props.updateMessageStatus( statusValue )
+
+    this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
         case NotificationType.FNF_REQUEST:
           this.setState( {
@@ -1094,7 +897,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
-            notificationNote: 'For updating you will be taken to the App Store/ Play Store',
+            notificationNote: 'For updating you will be taken to the ' + storeName,
             notificationAdditionalInfo: message.AdditionalInfo,
             notificationProceedText: 'Upgrade',
             notificationIgnoreText: 'Remind me later',
@@ -1108,37 +911,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   componentDidUpdate = ( prevProps, prevState ) => {
-
-    // if (
-    //   prevProps.notificationList !== this.props.notificationList ||
-    //   prevProps.releaseCasesValue !== this.props.releaseCasesValue
-    // ) {
-    //   this.props.setupNotificationList()
-    // }
-
-    // if (
-    //   prevProps.asyncNotificationList !== this.props.asyncNotificationList
-    // ) {
-    //   this.props.asyncNotificationList.sort( function ( left, right ) {
-    //     return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-    //   } )
-
-    //   this.setState( {
-    //     notificationData: this.props.asyncNotificationList,
-    //     notificationDataChange: !this.state.notificationDataChange,
-    //   } )
-    // }
-
     if (
       prevProps.accountsState.accountShells !==
       this.props.accountsState.accountShells
     ) {
       this.calculateNetBalance()
       // this.getNewTransactionNotifications()
-    }
-
-    if ( prevProps.fcmTokenValue !== this.props.fcmTokenValue ) {
-      this.storeFCMToken()
     }
 
     if (
@@ -1673,76 +1451,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onNotificationClicked = async ( value ) => {
-    // const { updateNotificationList, asyncNotificationList } = this.props
-
-    // // const asyncNotifications = JSON.parse(
-    // //   await AsyncStorage.getItem( 'notificationList' )
-    // // )
-    // console.log( 'Notification clicked Home>onNotificationClicked' )
-    // console.log( 'asyncNotifications ', asyncNotificationList )
-    // console.log( 'notification passed ', value )
-
-    // const { notificationData } = this.state
-    // const { navigation, } = this.props
-    // const tempNotificationData = notificationData
-    // for ( let i = 0; i < tempNotificationData.length; i++ ) {
-    //   const element = tempNotificationData[ i ]
-    //   if ( element.notificationId == value.notificationId ) {
-    //     if (
-    //       asyncNotificationList &&
-    //       asyncNotificationList.length &&
-    //       asyncNotificationList.findIndex(
-    //         ( item ) => item.notificationId == value.notificationId
-    //       ) > -1
-    //     ) {
-    //       asyncNotificationList[
-    //         asyncNotificationList.findIndex(
-    //           ( item ) => item.notificationId == value.notificationId
-    //         )
-    //       ].read = true
-    //     }
-    //     tempNotificationData[ i ].read = true
-    //   }
-    // }
-    // updateNotificationList( tempNotificationData )
-    // // await AsyncStorage.setItem(
-    // //   'notificationList',
-    // //   JSON.stringify( asyncNotifications )
-    // // )
-
-    // this.setState( {
-    //   notificationData: tempNotificationData,
-    //   notificationDataChange: !this.state.notificationDataChange,
-    // } )
-
-    // if ( value.info && value.info.includes( 'F&F request accepted by' ) ) {
-    //   navigation.navigate( 'FriendsAndFamily' )
-    //   return
-    // }
-
-    // if ( value.type == releaseNotificationTopic ) {
-    //   RelayServices.fetchReleases( value.info.split( ' ' )[ 1 ] )
-    //     .then( async ( res ) => {
-    //       if ( res.data.releases.length ) {
-    //         const releaseNotes = res.data.releases.length
-    //           ? res.data.releases.find( ( el ) => {
-    //             return el.build === value.info.split( ' ' )[ 1 ]
-    //           } )
-    //           : ''
-    //         navigation.navigate( 'UpdateApp', {
-    //           releaseData: [ releaseNotes ],
-    //           isOpenFromNotificationList: true,
-    //           releaseNumber: value.info.split( ' ' )[ 1 ],
-    //         } )
-    //       }
-    //     } )
-    //     .catch( ( error ) => {
-    //       console.error( error )
-    //     } )
-    // }
-    // if ( value.type == 'contact' ) {
-    //   this.closeBottomSheet()
-    // }
+    if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
+      this.handleNotificationBottomSheetSelection( value )
   };
 
   onPressElement = ( item ) => {
@@ -1964,9 +1674,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.NOTIFICATIONS_LIST:
-          console.log( 'BottomSheetKind.NOTIFICATIONS_LIST', BottomSheetKind.NOTIFICATIONS_LIST )
-
-          console.log( 'notificationData:', this.state.notificationData )
           return (
             <NotificationListContent
               notificationLoading={this.state.notificationLoading}
@@ -2304,6 +2011,8 @@ export default withNavigationFocus(
     setupNotificationList,
     updateNotificationList,
     setWalletId,
+    updateMessageStatusInApp,
+    updateMessageStatus
   } )( Home )
 )
 

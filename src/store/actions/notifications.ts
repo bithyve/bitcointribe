@@ -15,6 +15,8 @@ export const FETCH_NOTIFICATION_STARTED = 'FETCH_NOTIFICATION_STARTED'
 export const GET_MESSAGES = 'GET_MESSAGES'
 export const STORE_MESSAGE_TIMESTAMP = 'STORE_MESSAGE_TIMESTAMP'
 export const MESSAGES_FETCHED = 'MESSAGES_FETCHED'
+export const UPDATE_MESSAGES_STATUS_INAPP = 'UPDATE_MESSAGES_STATUS_INAPP'
+export const UPDATE_MESSAGES_STATUS = 'UPDATE_MESSAGES_STATUS'
 
 export const updateFCMTokens = ( FCMs: string[] ) => {
   return {
@@ -110,6 +112,25 @@ export const messageFetched = ( messages ) => {
     type: MESSAGES_FETCHED,
     payload: {
       messages
+    },
+  }
+}
+
+export const updateMessageStatusInApp = ( messageNotificationId ) => {
+  console.log( 'updateMessageStatus messages', messageNotificationId )
+  return {
+    type: UPDATE_MESSAGES_STATUS_INAPP,
+    payload: {
+      messageNotificationId
+    },
+  }
+}
+
+export const updateMessageStatus = ( data : [] ) => {
+  return {
+    type: UPDATE_MESSAGES_STATUS,
+    payload: {
+      data
     },
   }
 }

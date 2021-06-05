@@ -11,6 +11,8 @@ import {
   GET_MESSAGES,
   storeMessagesTimeStamp,
   messageFetched,
+  UPDATE_MESSAGES_STATUS_INAPP,
+  UPDATE_MESSAGES_STATUS
 } from '../actions/notifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import RelayServices from '../../bitcoin/services/RelayService'
@@ -95,6 +97,11 @@ export function* getMessageWorker() {
     ( state ) => state.notifications.storeMessageTime,
   )
   console.log( 'messages getMessageWorker', typeof messages, messages,  )
+  /**
+   * Relay call of get Message once relay update remove code line 118 - 166 dummy data and uncomment below code
+   * testing is pending with Relay
+   */
+
   // const res = yield call( RelayServices.getMessages, walletId, storeMessageTime )
   // if ( res.status === 200 ) {
   //   const { notifications } = res.data
@@ -110,7 +117,7 @@ export function* getMessageWorker() {
   // }
   const notifications = [ {
     'type' : 'FNF_REQUEST',
-    'status': 'unread',
+    'status': 'read',
     'title': 'F&F request',
     'info': 'F&F request awaiting',
     'timeStamp': moment( new Date() ),
@@ -162,4 +169,59 @@ export function* getMessageWorker() {
 export const getMessageWatcher = createWatcher(
   getMessageWorker,
   GET_MESSAGES,
+)
+
+
+export function* updateMessageStatusInAppWorker( { payload } ) {
+  const { messageNotificationId } = payload
+  const messages = yield select(
+    ( state ) => state.notifications.messages,
+  )
+  const messageArray = messages.map( message => (
+    message.notificationId === messageNotificationId? {
+      ...message, 'status': 'read',
+    }: message
+  ) )
+  console.log( 'messageArray', messageArray )
+  yield put( messageFetched( messageArray ) )
+}
+
+export const updateMessageStatusInAppWatcher = createWatcher(
+  updateMessageStatusInAppWorker,
+  UPDATE_MESSAGES_STATUS_INAPP,
+)
+
+
+export function* updateMessageStatusWorker( { payload } ) {
+  try{
+    const { data } = payload
+    if ( data.length === 0 ) {
+      throw new Error( 'No data found' )
+    }
+    const walletId = yield select( ( state ) => state.preferences.walletId, )
+
+    console.log( 'data updateFCMTokensWorker', data )
+
+    const res = yield call(
+      RelayServices.updateMessageStatus,
+      walletId,
+      data,
+    )
+
+    if ( res.status === 200 ) {
+      const { updated } = res.data
+      console.log( {
+        updated
+      } )
+    } else {
+      console.log( 'Failed to update messageStatus on the server' )
+    }
+  } catch( err ){
+    console.log( 'err', err )
+  }
+}
+
+export const updateMessageStatusWatcher = createWatcher(
+  updateMessageStatusWorker,
+  UPDATE_MESSAGES_STATUS,
 )

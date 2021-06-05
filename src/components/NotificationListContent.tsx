@@ -54,7 +54,7 @@ export default function NotificationListContent( props ) {
                   onPress={() => props.onNotificationClicked( value )}
                   style={{
                     ...styles.notificationElement,
-                    backgroundColor: value.read
+                    backgroundColor: value.status === 'read'
                       ? Colors.white
                       : Colors.shadowBlue,
                   }}
