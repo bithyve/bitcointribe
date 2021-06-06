@@ -12,7 +12,6 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import { COMPLETED_WALLET_SETUP } from '../actions/setupAndAuth'
 
 const initialState: {
@@ -28,7 +27,6 @@ const initialState: {
     secureAcc: SecureAccount;
     s3Service: S3Service;
     trustedContacts: TrustedContactsService;
-    keepersInfo: KeeperService;
   };
 } = {
   databaseInitialized: false,

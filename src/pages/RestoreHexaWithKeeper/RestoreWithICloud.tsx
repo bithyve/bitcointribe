@@ -58,7 +58,6 @@ import {
   downloadMShare,
   recoverWallet,
   updateCloudMShare,
-  downloadPdfShare,
 } from '../../store/actions/health'
 import axios from 'axios'
 import { initializeHealthSetup, initNewBHRFlow } from '../../store/actions/health'
@@ -161,8 +160,6 @@ interface RestoreWithICloudPropsTypes {
   calculateExchangeRate: any;
   initializeHealthSetup: any;
   downloadMShare: any;
-  downloadPdfShare: any;
-  metaShare: any;
   DECENTRALIZED_BACKUP: any;
   recoverWallet: any;
   updateCloudMShare: any;
@@ -559,12 +556,12 @@ class RestoreWithICloud extends Component<
     if ( scannedData && scannedData.type === 'pdf' ) {
       console.log( 'isndie if', scannedData.type )
 
-      this.props.downloadPdfShare( {
-        encryptedKey: scannedData.encryptedData,
-        otp: this.state.answer,
-        downloadType: 'recovery',
-        replaceIndex: Object.keys( RECOVERY_SHARES ).length,
-      } )
+      // this.props.downloadPdfShare( {
+      //   encryptedKey: scannedData.encryptedData,
+      //   otp: this.state.answer,
+      //   downloadType: 'recovery',
+      //   replaceIndex: Object.keys( RECOVERY_SHARES ).length,
+      // } )
     } else if (
       scannedData &&
       scannedData.type &&
@@ -1512,7 +1509,6 @@ const mapStateToProps = ( state ) => {
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     walletImageChecked: idx( state, ( _ ) => _.health.walletImageChecked ),
     SERVICES: idx( state, ( _ ) => _.storage.database.SERVICES ),
-    metaShare: idx( state, ( _ ) => _.health.metaShare ),
     walletRecoveryFailed: idx( state, ( _ ) => _.health.walletRecoveryFailed ),
     DECENTRALIZED_BACKUP:
       idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP ) || {
@@ -1533,7 +1529,6 @@ export default withNavigationFocus(
     initializeHealthSetup,
     downloadMShare,
     recoverWallet,
-    downloadPdfShare,
     updateCloudMShare,
     requestShare,
     getCloudDataRecovery,

@@ -189,80 +189,6 @@ export default class S3Service {
     }
   };
 
-  public static downloadShare = async (
-    encryptedKey: string,
-    otp?: string,
-  ): Promise<
-    | {
-        status: number;
-        data:
-          | {
-              metaShare: MetaShare;
-              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-            }
-          | {
-              metaShare: MetaShare;
-              encryptedDynamicNonPMDD?: undefined;
-            };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await LevelHealth.downloadShare( encryptedKey, otp ),
-      }
-    } catch ( err ) {
-      return {
-        status: 502, err: err.message, message: ErrMap[ 502 ]
-      }
-    }
-  };
-
-  public static downloadPdfShare = async (
-    messageId: string,
-    key: string,
-  ): Promise<
-    | {
-        status: number;
-        data:
-          | {
-              metaShare: MetaShare;
-              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-            }
-          | {
-              metaShare: MetaShare;
-              encryptedDynamicNonPMDD?: undefined;
-            };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await LevelHealth.downloadPdfShare( messageId, key ),
-      }
-    } catch ( err ) {
-      return {
-        status: 502, err: err.message, message: ErrMap[ 502 ]
-      }
-    }
-  };
-
   public static downloadDynamicNonPMDD = async (
     walletId: string,
   ): Promise<
@@ -1609,43 +1535,6 @@ export default class S3Service {
 
    };
 
-  public static downloadSMShare = async (
-    encryptedKey: string,
-    otp?: string,
-  ): Promise<
-    | {
-        status: number;
-        data:
-          | {
-              metaShare: MetaShare;
-              encryptedDynamicNonPMDD: EncDynamicNonPMDD;
-            }
-          | {
-              metaShare: MetaShare;
-              encryptedDynamicNonPMDD?: undefined;
-            };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await LevelHealth.downloadSMShare( encryptedKey, otp ),
-      }
-    } catch ( err ) {
-      return {
-        status: 502, err: err.message, message: ErrMap[ 502 ]
-      }
-    }
-  };
-
   public static removeUnwantedUnderCustody = async (
     metaShares: MetaShare[],
   ): Promise<
@@ -1718,44 +1607,6 @@ export default class S3Service {
     } catch ( err ) {
       return {
         status: 510, err: err.message, message: ErrMap[ 510 ]
-      }
-    }
-  };
-
-  public static uploadRequestedSMShare = async (
-    encryptedKey: string,
-    otp?: string,
-    metaShare?: MetaShare,
-    encryptedDynamicNonPMDD?: EncDynamicNonPMDD,
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          success: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: string;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await LevelHealth.uploadRequestedSMShare(
-          encryptedKey,
-          metaShare,
-          otp,
-          encryptedDynamicNonPMDD,
-        ),
-      }
-    } catch ( err ) {
-      return {
-        status: 503, err: err.message, message: ErrMap[ 503 ]
       }
     }
   };

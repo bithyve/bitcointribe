@@ -840,7 +840,6 @@ class UpgradeBackup extends Component<
           // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
-          //     this.props.downloadSmShareForApproval( qrScannedData )
           //     this.setState( {
           //       QrBottomSheetsFlag: false
           //     } )

@@ -11,8 +11,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { createChannelAssets, downloadSmShareForApproval, ErrorSending, keeperProcessStatus, setChannelAssets } from '../../store/actions/health'
-import { updatedKeeperInfo, updateMSharesHealth, secondaryShareDownloaded } from '../../store/actions/health'
+import { createChannelAssets, ErrorSending, setApprovalStatus, setChannelAssets } from '../../store/actions/health'
+import { updatedKeeperInfo, updateMSharesHealth } from '../../store/actions/health'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
@@ -35,27 +35,17 @@ import {
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import {
-  REGULAR_ACCOUNT,
-  TRUSTED_CONTACTS,
-  TEST_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import KeeperDeviceHelpContents from '../../components/Helper/KeeperDeviceHelpContents'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import ApproveSetup from './ApproveSetup'
-import AccountShell from '../../common/data/models/AccountShell'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
 import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -83,32 +73,23 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     ( state ) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   )
-  const fcmTokenValue = useSelector( ( state ) => state.preferences.fcmTokenValue )
+  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
 
   const WALLET_SETUP = useSelector(
     ( state ) => state.storage.database.WALLET_SETUP,
   )
 
-  const trustedContactsInfo = useSelector(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
-
   const dispatch = useDispatch()
   const [ secondaryQR, setSecondaryQR ] = useState( '' )
-  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
 
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
-  )
-  const accountShells: AccountShell[] = useSelector(
-    ( state ) => state.accounts.accountShells,
   )
 
   const [ ReshareBottomSheet ] = useState(
     React.createRef(),
   )
   const [ ChangeBottomSheet ] = useState( React.createRef() )
-  const [ guardianExists, setGuardianExists ] = useState( false )
 
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( [
     {
@@ -139,7 +120,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   ] )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState(
@@ -149,9 +129,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     ? props.navigation.state.params.isChangeKeeperType
     : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
-  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
-  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
-  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
 
   useEffect( () => {
@@ -172,23 +149,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }, [
     props.navigation.state.params,
   ] )
-
   const [ secondaryDeviceBottomSheet ] = useState(
     React.createRef(),
   )
   const [
     secondaryDeviceMessageBottomSheet,
   ] = useState( React.createRef() )
-  const uploadMetaShare = useSelector(
-    ( state ) => state.health.loading.uploadMetaShare,
-  )
   const MetaShares: MetaShare[] = useSelector(
     ( state ) => state.health.service.levelhealth.metaSharesKeeper,
   )
-  const updateEphemeralChannelLoader = useSelector(
-    ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
-  )
-
   const next = props.navigation.getParam( 'next' )
 
   useEffect( ()=>{
@@ -222,11 +191,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const createGuardian = useCallback(
-    async ( changeKeeper?: boolean ) => {
-      if( secondaryQR ) return
+    async ( ) => {
+      if( secondaryQR || isReshare ) return
       setIsGuardianCreationClicked( true )
-      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
-
+      const channelKey: string = !isChange && selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
@@ -570,7 +538,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           } else {
             const changeKeeper = true;
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-            createGuardian( changeKeeper )
+            createGuardian( )
           }
         }}
         onPressIgnore={() => {
@@ -631,7 +599,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          setIsApprovalStarted( true )
           dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
@@ -640,7 +607,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          // setIsApprovalStarted( true )
           // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
@@ -714,7 +680,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
     }
-    console.log( 'changeIndex', changeIndex )
+    dispatch( setApprovalStatus( false ) )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -736,12 +702,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( !downloadSmShare ) setIsApprovalStarted( false )
-    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
+    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+  }, [ approvalStatus ] )
+
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
 
 
   return (
@@ -755,7 +726,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={props.navigation.state.params.selectedTitle}
-        selectedTime={props.navigation.state.params.selectedTime}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'never'}
         moreInfo={props.navigation.state.params.selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
       />
@@ -929,7 +902,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         ]}
         renderContent={() => (
           <ApproveSetup
-            isContinueDisabled={false}
+            isContinueDisabled={!approvalStatus}
             onPressContinue={() => {
               onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
               ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
