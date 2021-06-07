@@ -21,7 +21,7 @@ import Login from '../../../pages/Login'
 
 const MoreOptionsStack = createStackNavigator(
   {
-    MoreOptionsRoot: {
+    Home: {
       screen: MoreOptionsContainerScreen,
       navigationOptions: {
         header: null,
@@ -89,7 +89,7 @@ const MoreOptionsStack = createStackNavigator(
     },
   },
   {
-    initialRouteName: 'MoreOptionsRoot',
+    initialRouteName: 'Home',
     // defaultNavigationOptions: {
     //   header: null
     // },
