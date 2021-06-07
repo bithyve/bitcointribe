@@ -29,11 +29,11 @@ import {
   getPDFData,
   confirmPDFShared,
   emptyShareTransferDetailsForContactChange,
-  downloadSmShareForApproval,
   keeperProcessStatus,
   updatedKeeperInfo,
   updateMSharesHealth,
   createChannelAssets,
+  setApprovalStatus,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -41,7 +41,6 @@ import {
   KeeperInfoInterface,
   LevelHealthInterface,
   MetaShare,
-  TrustedContact,
   Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { StackActions } from 'react-navigation'
@@ -54,6 +53,7 @@ import SSS from '../../bitcoin/utilities/sss/SSS'
 import config from '../../bitcoin/HexaConfig'
 import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -124,9 +124,6 @@ const PersonalCopyHistory = ( props ) => {
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
-  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
-  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
-  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
   const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
@@ -141,6 +138,7 @@ const PersonalCopyHistory = ( props ) => {
   } )
   const index = 5
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
+  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -460,7 +458,7 @@ const PersonalCopyHistory = ( props ) => {
   const createGuardian = useCallback(
     async ( Contact ) => {
       if( selectedKeeper.channelKey ) return
-      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKey: string = !isChange && selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
@@ -635,14 +633,19 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( !downloadSmShare ) setIsApprovalStarted( false )
-    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
+    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+  }, [ approvalStatus ] )
 
-  const deviceText = ( text ) =>{
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
+
+  const deviceText = ( text ) => {
     switch ( text ) {
         case 'Keeper PDF': return 'PDF Backup'
 
@@ -664,8 +667,9 @@ const PersonalCopyHistory = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={deviceText( props.navigation.state.params.selectedTitle )}
-        selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'never'}
         moreInfo={deviceText( props.navigation.state.params.selectedTitle )}
         headerImage={require( '../../assets/images/icons/note.png' )}
       />

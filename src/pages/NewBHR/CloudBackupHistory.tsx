@@ -24,7 +24,6 @@ import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import {
   checkMSharesHealth,
-  updateMSharesHealth,
 } from '../../store/actions/health'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
@@ -206,7 +205,7 @@ const CloudBackupHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'GoogleDrive backup'}
+        selectedTitle={Platform.OS == 'ios' ? 'iCloud backup' : 'Google Drive backup'}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
         tintColor={Colors.deepBlue}

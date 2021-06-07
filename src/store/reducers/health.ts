@@ -10,26 +10,20 @@ import {
   ERROR_SENDING,
   S3_LOADING_STATUS,
   INIT_LOADING_STATUS,
-  UPDATE_MSHARE_LOADING_STATUS,
   MSHARES,
-  UPDATE_EFCHANNEL_LOADING_STATUS,
   IS_LEVEL_TWO_METASHARE,
   IS_LEVEL_THREE_METASHARE,
   IS_LEVEL2_INITIALIZED,
-  SHARE_RECEIVED,
-  DOWNLOADED_MSHARE_HEALTH,
   ERROR_RECEIVING_HEALTH,
   WALLET_RECOVERY_FAILED_HEALTH,
   WALLET_IMAGE_HEALTH_CHECKED,
   S3_LOADING_KEEPER,
   IS_LEVEL3_INITIALIZED,
   PDF_GENERATED,
-  ON_APPROVAL_STATUS_CHANGE,
   MNEMONIC_RECOVERED_HEALTH,
   DOWNLOADED_SM_SHARES,
   REMOVE_SN,
   SET_PDF_INFO,
-  DOWNLOADED_PDFSHARE_HEALTH,
   PUT_KEEPER_INFO,
   SM_META_SHARE_GENERATE,
   UPLOAD_SUCCESSFULLY_SM,
@@ -63,18 +57,14 @@ const initialState: {
     checkMSharesHealth: Boolean;
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
-    updateEFChannelStatus: Boolean;
-    uploadMetaShare: Boolean;
-    approvalRequest: Boolean;
-    reshareWithSameKeeper: Boolean;
-    keeperSetupStatus: Boolean;
-    autoShareContact: Boolean;
+    autoShareKeepersData: Boolean;
     pdfDataProcess: Boolean;
     pdfShare: Boolean;
     pdfDataConfirm: Boolean;
-    uploadRequestedShare: Boolean;
-    downloadSmShare: boolean;
     modifyLevelDataStatus: boolean;
+    healthExpiryStatus: boolean;
+    setToBaseStatus: boolean;
+    createChannelAssetsStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -91,23 +81,7 @@ const initialState: {
   keeperInfo: KeeperInfoInterface[];
   shares: any;
   metaShare: MetaShare;
-  downloadedMShare: {
-    [otp: string]: { status: Boolean; err?: String };
-  };
-  downloadedPdfShare: {
-    [otp: string]: { status: Boolean; err?: String };
-  };
   errorReceiving: Boolean;
-  keeperApproveStatus: {
-    status: Boolean;
-    initiatedAt: number;
-    shareId: string;
-    secondaryShare?: MetaShare;
-    transferDetails?: {
-      key: string;
-      otp: string;
-    }
-  }
   secondaryShareDownloaded: any;
   pdfInfo: {
     filePath: string;
@@ -133,18 +107,14 @@ const initialState: {
     checkMSharesHealth: false,
     initLoader: false,
     updateMSharesHealth: false,
-    updateEFChannelStatus: false,
-    uploadMetaShare: false,
-    approvalRequest: false,
-    reshareWithSameKeeper: false,
-    keeperSetupStatus: false,
-    autoShareContact: false,
+    autoShareKeepersData: false,
     pdfDataProcess: false,
     pdfShare: false,
     pdfDataConfirm: false,
-    uploadRequestedShare: false,
-    downloadSmShare: false,
-    modifyLevelDataStatus: false
+    modifyLevelDataStatus: false,
+    healthExpiryStatus: false,
+    setToBaseStatus: false,
+    createChannelAssetsStatus: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -158,18 +128,7 @@ const initialState: {
   shares: null,
   keeperInfo: [],
   metaShare: null,
-  downloadedMShare: {
-  },
-  downloadedPdfShare: {
-  },
   errorReceiving: false,
-  keeperApproveStatus: {
-    status: false,
-    initiatedAt: 0,
-    shareId: '',
-    secondaryShare: null,
-    transferDetails: null
-  },
   secondaryShareDownloaded: null,
   pdfInfo: {
     filePath: '',
@@ -281,28 +240,10 @@ export default ( state = initialState, action ) => {
           },
         }
 
-      case UPDATE_MSHARE_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            updateMSharesHealth: action.payload.beingLoaded,
-          },
-        }
-
       case MSHARES:
         return {
           ...state,
           shares: action.payload.shares,
-        }
-
-      case UPDATE_EFCHANNEL_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            updateEFChannelStatus: action.payload.beingLoaded,
-          },
         }
 
       case IS_LEVEL_TWO_METASHARE:
@@ -333,36 +274,6 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           isLevel3Initialized: true,
-        }
-
-      case SHARE_RECEIVED:
-        return {
-          ...state,
-          metaShare: action.payload.metaShare,
-        }
-
-      case DOWNLOADED_MSHARE_HEALTH:
-        return {
-          ...state,
-          downloadedMShare: {
-            ...state.downloadedMShare,
-            [ action.payload.otp ]: {
-              status: action.payload.status,
-              err: action.payload.err,
-            },
-          },
-        }
-
-      case DOWNLOADED_PDFSHARE_HEALTH:
-        return {
-          ...state,
-          downloadedPdfShare: {
-            ...state.downloadedPdfShare,
-            [ action.payload.otp ]: {
-              status: action.payload.status,
-              err: action.payload.err,
-            },
-          },
         }
 
       case ERROR_RECEIVING_HEALTH:
@@ -406,18 +317,6 @@ export default ( state = initialState, action ) => {
           ...state,
           pdfGenerated: {
             ...action.payload.generated,
-          },
-        }
-
-      case ON_APPROVAL_STATUS_CHANGE:
-        return {
-          ...state,
-          keeperApproveStatus: {
-            status: action.payload.status,
-            initiatedAt: action.payload.initiatedAt,
-            shareId: action.payload.shareId,
-            secondaryShare: action.payload.secondaryShare,
-            transferDetails: action.payload.transferDetails,
           },
         }
 

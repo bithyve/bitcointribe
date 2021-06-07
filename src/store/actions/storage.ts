@@ -1,7 +1,6 @@
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import dataManager from '../../storage/database-manager'
@@ -74,7 +73,6 @@ export const servicesInitialized = ( services: {
   secureAcc: SecureAccount;
   s3Service: S3Service;
   trustedContacts: TrustedContactsService;
-  keepersInfo: KeeperService;
 } ) => {
   return {
     type: SERVICES_INITIALIZED,

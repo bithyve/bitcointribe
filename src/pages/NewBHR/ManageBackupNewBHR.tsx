@@ -25,7 +25,7 @@ import DeviceInfo from 'react-native-device-info'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import { fetchEphemeralChannel, PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
+import { PermanentChannelsSyncKind } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
@@ -35,10 +35,7 @@ import {
   checkMSharesHealth,
   initLevelTwo,
   deletePrivateData,
-  updateKeeperInfoToTrustedChannel,
-  secondaryShareDownloaded,
   autoShareToLevel2Keepers,
-  downloadSmShareForApproval,
   updateLevelData,
   keeperProcessStatus,
   setLevelToNotSetupStatus,
@@ -110,12 +107,7 @@ interface ManageBackupNewBHRPropsTypes {
   isNewFCMUpdated: Boolean;
   setCloudData: any;
   deletePrivateData: any;
-  updateKeeperInfoToTrustedChannel: any;
-  secondaryShareDownloaded: any
   autoShareToLevel2Keepers: any;
-  downloadSmShareForApproval: any;
-  downloadSmShare: boolean;
-  secondaryShareDownloadedStatus: any;
   cloudPermissionGranted: boolean;
   updateLevelData: any;
   keeperProcessStatusFlag: string;
@@ -333,17 +325,8 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.keeperProcessStatusFlag != this.props.keeperProcessStatusFlag && this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
-      this.props.updateKeeperInfoToTrustedChannel()
+      // this.props.updateKeeperInfoToTrustedChannel()
       this.props.keeperProcessStatus( '' )
-    }
-
-    if (
-      ( prevProps.secondaryShareDownloadedStatus !== this.props.secondaryShareDownloadedStatus ||
-      prevProps.downloadSmShare !==
-      this.props.downloadSmShare ) && !this.props.downloadSmShare && this.props.secondaryShareDownloadedStatus
-    ) {
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
-      ( this.QrBottomSheet as any ).snapTo( 0 )
     }
 
     if( prevProps.status !== this.props.status && this.props.status === LevelStatus.FAILED ){
@@ -357,11 +340,9 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.navigationObj !== this.props.navigationObj ){
-      console.log( 'prevProps.navigationObj' )
       this.setState( {
         selectedKeeper: this.props.navigationObj.selectedKeeper, selectedLevelId: this.props.navigationObj.id
-      } );
-      ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
+      } )
       this.goToHistory( this.props.navigationObj )
     }
 
@@ -383,17 +364,8 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ){
-      const obj = {
-        id: this.state.selectedLevelId,
-        selectedKeeper: {
-          ...this.state.selectedKeeper,
-          name: this.state.selectedKeeper.name ? this.state.selectedKeeper.name : this.state.selectedKeeperName,
-          shareType: this.state.selectedKeeper.shareType ? this.state.selectedKeeper.shareType : this.state.selectedKeeperType,
-          shareId: this.state.selectedKeeper.shareId ? this.state.selectedKeeper.shareId :  this.state.selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-        },
-        isSetup: true,
-      }
-      this.goToHistory( obj )
+      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
+      ( this.QrBottomSheet as any ).snapTo( 0 )
     }
   };
 
@@ -403,13 +375,8 @@ class ManageBackupNewBHR extends Component<
       showLoader: false
     } )
     const navigationParams = {
-      selectedTime: selectedKeeper.updatedAt
-        ? getTime( selectedKeeper.updatedAt )
-        : 'never',
-      selectedStatus: selectedKeeper.status,
-      selectedTitle: selectedKeeper.name,
+      selectedTitle: selectedKeeper.name ? selectedKeeper.name : this.state.selectedKeeperName,
       selectedLevelId: id,
-      selectedContact: selectedKeeper.data,
       selectedKeeper,
     }
     let index = 1
@@ -439,10 +406,11 @@ class ManageBackupNewBHR extends Component<
         else index = 0
       }
     }
+    ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
+    ( this.QrBottomSheet as any ).snapTo( 0 );
+    ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
+    this.props.setApprovalStatus( false )
     if ( selectedKeeper.shareType == 'device' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-      ( this.QrBottomSheet as any ).snapTo( 0 );
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
         isPrimaryKeeper: isPrimaryKeeper,
@@ -450,18 +418,12 @@ class ManageBackupNewBHR extends Component<
         index: index > -1 ? index : 0,
       } )
     } else if ( selectedKeeper.shareType == 'contact' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-      ( this.QrBottomSheet as any ).snapTo( 0 );
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,
         isChangeKeeperAllow
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
-      ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
-      ( this.QrBottomSheet as any ).snapTo( 0 );
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
       this.props.navigation.navigate(
         'PersonalCopyHistoryNewBHR',
         navigationParams,
@@ -514,6 +476,7 @@ class ManageBackupNewBHR extends Component<
         modalRef={this.QrBottomSheet}
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
+          this.props.setApprovalStatus( false )
           this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
           this.setState( {
             QrBottomSheetsFlag: false
@@ -927,8 +890,6 @@ const mapStateToProps = ( state ) => {
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     service: idx( state, ( _ ) => _.keeper.service ),
     isNewFCMUpdated: idx( state, ( _ ) => _.keeper.isNewFCMUpdated ),
-    downloadSmShare: idx( state, ( _ ) => _.health.loading.downloadSmShare ),
-    secondaryShareDownloadedStatus: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
     cloudPermissionGranted: idx( state, ( _ ) => _.health.cloudPermissionGranted ),
     keeperProcessStatusFlag:  idx( state, ( _ ) => _.health.keeperProcessStatus ),
     isLevelToNotSetupStatus: idx( state, ( _ ) => _.health.isLevelToNotSetupStatus ),
@@ -946,17 +907,13 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
     generateMetaShare,
     checkMSharesHealth,
     initLevelTwo,
     syncPermanentChannels,
     setCloudData,
     deletePrivateData,
-    updateKeeperInfoToTrustedChannel,
-    secondaryShareDownloaded,
     autoShareToLevel2Keepers,
-    downloadSmShareForApproval,
     updateLevelData,
     keeperProcessStatus,
     setLevelToNotSetupStatus,

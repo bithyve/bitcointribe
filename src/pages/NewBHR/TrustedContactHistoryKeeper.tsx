@@ -8,7 +8,6 @@ import {
   StatusBar,
   Platform,
   AsyncStorage,
-  Alert,
   Keyboard,
 } from 'react-native'
 import {
@@ -32,14 +31,11 @@ import {
   ErrorSending,
   updateMSharesHealth,
   updatedKeeperInfo,
-  onApprovalStatusChange,
-  downloadSmShareForApproval,
-  keeperProcessStatus,
   setChannelAssets,
   createChannelAssets,
+  setApprovalStatus,
 } from '../../store/actions/health'
 import { useDispatch } from 'react-redux'
-import SendShareModal from './SendShareModal'
 import SendViaLink from '../../components/SendViaLink'
 import SendViaQR from '../../components/SendViaQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -56,26 +52,17 @@ import {
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import FriendsAndFamilyHelpContents from '../../components/Helper/FriendsAndFamilyHelpContents'
-import {
-  REGULAR_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import { isEmpty } from '../../common/CommonFunctions/index'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import QRModal from '../Accounts/QRModal'
 import { StackActions } from 'react-navigation'
 import ApproveSetup from './ApproveSetup'
-import S3Service from '../../bitcoin/services/sss/S3Service'
-import AccountShell from '../../common/data/models/AccountShell'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import { addNewSecondarySubAccount } from '../../store/actions/accounts'
-import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
-import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import semver from 'semver'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
+import { getTime } from '../../common/CommonFunctions/timeFormatter'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -98,8 +85,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ renderTimer, setRenderTimer ] = useState( false )
   const [ chosenContactIndex, setChosenContactIndex ] = useState( 1 )
   const [ chosenContact, setChosenContact ] = useState(
-    props.navigation.state.params.selectedContact
-      ? props.navigation.state.params.selectedContact
+    props.navigation.state.params.selectedKeeper.data.index
+      ? props.navigation.state.params.selectedKeeper.data
       : null,
   )
   const [ trustedContactsBottomSheet, setTrustedContactsBottomSheet ] = useState(
@@ -124,28 +111,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
     ( state ) => state.storage.database,
   )
   const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP
-  const uploadMetaShare = useSelector(
-    ( state ) => state.health.loading.uploadMetaShare,
-  )
   const MetaShares: MetaShare[] = useSelector(
     ( state ) => state.health.service.levelhealth.metaSharesKeeper,
-  )
-  const updateEphemeralChannelLoader = useSelector(
-    ( state ) => state.trustedContacts.loading.updateEphemeralChannel,
-  )
-  const updateTrustedChannelLoader = useSelector(
-    ( state ) => state.trustedContacts.loading.updateTrustedChannel,
   )
   const trustedContacts: TrustedContactsService = useSelector(
     ( state ) => state.trustedContacts.service,
   )
-  const trustedContactsInfo = useSelector(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
-  const accountShells: AccountShell[] = useSelector(
-    ( state ) => state.accounts.accountShells,
-  )
-
   const [ isOTPType, setIsOTPType ] = useState( false )
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
@@ -177,21 +148,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
       info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
     },
   ] )
-  const [ selectedTime, setSelectedTime ] = useState(
-    props.navigation.getParam( 'selectedTime' ),
-  )
   const [ selectedTitle, setSelectedTitle ] = useState(
     props.navigation.getParam( 'selectedTitle' ),
   )
   const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
-  const s3Service: S3Service = useSelector( ( state ) => state.health.service )
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
   const [ isReshare, setIsReshare ] = useState(
     props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
-  const [ selectedShareId, setSelectedShareId ] = useState( props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : '' )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
@@ -199,14 +165,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ isChange, setIsChange ] = useState( props.navigation.getParam( 'isChangeKeeperType' )
     ? props.navigation.getParam( 'isChangeKeeperType' )
     : false )
-  const [ isApprovalStarted, setIsApprovalStarted ] = useState( false )
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
-  const secondaryShareDownloadedStatus = useSelector( ( state ) => state.health.secondaryShareDownloaded )
-  const downloadSmShare = useSelector( ( state ) => state.health.loading.downloadSmShare )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
+  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -219,8 +183,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         ? props.navigation.getParam( 'isChangeKeeperType' )
         : false
     )
-    const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
-    setSelectedShareId( shareId )
     setIndex( props.navigation.getParam( 'index' ) )
     if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
       dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
@@ -240,7 +202,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( () => {
     ( async () => {
-      if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
+      if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
         setTimeout( () => {
           setLoadContacts( true )
         }, 2 );
@@ -248,8 +210,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
       }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
-      const shareId = !props.navigation.state.params.selectedKeeper.shareId && selectedLevelId == 3 ? levelHealth[ 2 ].levelInfo[ 4 ].shareId : props.navigation.state.params.selectedKeeper.shareId ? props.navigation.state.params.selectedKeeper.shareId : ''
-      setSelectedShareId( shareId )
     } )()
     const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
     const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
@@ -276,7 +236,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const setContactInfo = useCallback( async () => {
     const keeperInfoTemp: any[] = [ ...keeperInfo ]
     if ( keeperInfoTemp.length > 0 ) {
-      const keeperInfoIndex = keeperInfoTemp.findIndex( ( value ) => value.shareId == selectedShareId )
+      const keeperInfoIndex = keeperInfoTemp.findIndex( ( value ) => value.shareId == selectedKeeper.shareId )
       if ( keeperInfoIndex > -1 && keeperInfoTemp[ keeperInfoIndex ].type == 'contact' ) {
         setSelectedContacts( [ keeperInfoTemp[ keeperInfoIndex ].data ] )
         const tempContact = keeperInfoTemp[ keeperInfoIndex ].data
@@ -587,7 +547,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
       let Contact = chosenContact
 
-      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKey: string = !isChange && selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
 
       if ( ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ) Contact = chosenContactTmp
       setIsGuardianCreationClicked( true )
@@ -870,7 +830,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          setIsApprovalStarted( true )
           dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
@@ -879,7 +838,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          // setIsApprovalStarted( true )
           // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
@@ -906,30 +864,17 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( !downloadSmShare ) setIsApprovalStarted( false )
-    if( secondaryShareDownloadedStatus && !downloadSmShare && isApprovalStarted ){
+    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
-  }, [ secondaryShareDownloadedStatus, downloadSmShare, isApprovalStarted ] )
+  }, [ approvalStatus ] )
 
-  const updateShare = () => {
-    const contactName = `${chosenContact.firstName} ${
-      chosenContact.lastName ? chosenContact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
-    console.log( 'AFTER RESHARE selectedKeeper.shareId', selectedShareId )
-    dispatch( updateMSharesHealth(
-      {
-        walletId: s3Service.getWalletId().data.walletId,
-        shareId: selectedShareId,
-        reshareVersion: 0,
-        updatedAt: 'notAccessible',
-        name: contactName,
-        shareType: 'contact',
-      } ) )
-  }
+  useEffect( ()=>{
+    if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( setApprovalStatus( true ) )
+    }
+  }, [ channelAssets ] )
 
   return (
     <View style={{
@@ -944,7 +889,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={selectedTitle}
-        selectedTime={selectedTime}
+        selectedTime={selectedKeeper.updatedAt
+          ? getTime( selectedKeeper.updatedAt )
+          : 'never'}
         moreInfo={selectedTitle}
         headerImage={require( '../../assets/images/icons/icon_secondarydevice.png' )}
         imageIcon={getImageIcon}

@@ -35,16 +35,9 @@ import {
 } from '../../common/constants/wallet-service-types'
 import {
   downloadMShare,
-  uploadRequestedShare,
-  // initHealthCheck,
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
-  onApprovalStatusChange,
-  autoDownloadShareContact,
-  uploadSecondaryShareForPK,
-  downloadSMShard,
-  updateKeeperInfoToUnderCustody,
   updateCloudPermission,
 } from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
@@ -70,7 +63,6 @@ import {
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
-  getKeeperInfoFromShareId,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
@@ -97,7 +89,6 @@ import {
 } from '../../store/actions/accounts'
 import {
   LevelHealthInterface,
-  MetaShare,
   QRCodeTypes,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
@@ -110,7 +101,6 @@ import {
   setSecondaryDeviceAddress,
   setWalletId
 } from '../../store/actions/preferences'
-import { fetchKeeperTrustedChannel } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
@@ -230,11 +220,8 @@ interface HomePropsTypes {
   downloadMShare: any;
   initializeTrustedContact: any;
   rejectTrustedContact: any;
-  uploadRequestedShare: any;
-  uploadSecondaryShareForPK: any;
   s3Service: S3Service;
   initializeHealthSetup: any;
-  // initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -265,22 +252,16 @@ interface HomePropsTypes {
   database: any;
   setCardData: any;
   cardDataProps: any;
-  fetchKeeperTrustedChannel: any;
-  keeperApproveStatus: any;
-  onApprovalStatusChange: any;
   secureAccount: any;
-  autoDownloadShareContact: any;
   accountShells: AccountShell[];
   setVersion: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
-  downloadSMShard: any;
   rampFromBuyMenu: boolean | null;
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   setCloudData: any;
-  updateKeeperInfoToUnderCustody: any;
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
   updateCloudPermission: any;
@@ -1944,7 +1925,6 @@ const mapStateToProps = ( state ) => {
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
-    keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
@@ -1963,10 +1943,7 @@ export default withNavigationFocus(
     downloadMShare,
     initializeTrustedContact,
     rejectTrustedContact,
-    uploadRequestedShare,
-    uploadSecondaryShareForPK,
     initializeHealthSetup,
-    // initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,
@@ -1982,13 +1959,8 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     setCardData,
-    fetchKeeperTrustedChannel,
-    onApprovalStatusChange,
-    autoDownloadShareContact,
     setVersion,
-    downloadSMShard,
     setCloudData,
-    updateKeeperInfoToUnderCustody,
     updateCloudPermission,
     credsAuthenticated,
     setShowAllAccount,
