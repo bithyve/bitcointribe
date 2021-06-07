@@ -165,17 +165,26 @@ export default class TrustedContacts {
   public cacheInstream = (
     contact: TrustedContact,
     channelKey: string,
-    inStream: StreamData,
+    instreamUpdates: StreamData,
   ) => {
-    const unencryptedInstream: UnecryptedStreamData = {
-      streamId: inStream.streamId,
-      primaryData: this.decryptData( channelKey, inStream.primaryEncryptedData ).data,
-      metaData: inStream.metaData,
+    let encryptedInstream = contact.permanentChannel[ instreamUpdates.streamId ]
+    let unencryptedInstream = contact.unencryptedPermanentChannel[ instreamUpdates.streamId ]
+
+    encryptedInstream = {
+      ...encryptedInstream,
+      ...instreamUpdates,
     }
-    contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
-    contact.permanentChannel[ inStream.streamId ] = inStream
+
+    unencryptedInstream = {
+      ...unencryptedInstream,
+      primaryData: instreamUpdates.primaryEncryptedData? this.decryptData( channelKey, instreamUpdates.primaryEncryptedData ).data: unencryptedInstream.primaryData,
+      metaData: instreamUpdates.metaData? instreamUpdates.metaData: unencryptedInstream.metaData,
+    }
+
     contact.isActive = idx( unencryptedInstream.metaData, ( _ ) => _.flags.active )
-    contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
+    contact.hasNewData = idx( unencryptedInstream.metaData, ( _ ) => _.flags.newData )
+    if( !contact.walletID )
+      contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
   };
 
   public syncPermanentChannels = async (
@@ -186,7 +195,8 @@ export default class TrustedContacts {
     contactDetails?: ContactDetails,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-    contactsSecondaryChannelKey?: string
+    contactsSecondaryChannelKey?: string,
+    metaSync?: boolean,
   }[]
   ): Promise<{
     updated: boolean;
@@ -196,7 +206,7 @@ export default class TrustedContacts {
       }
       const channelOutstreams = {
       }
-      for ( const { channelKey, streamId, contactDetails, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
+      for ( const { channelKey, streamId, contactDetails, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey, metaSync } of channelSyncDetails ){
         let contact: TrustedContact = this.trustedContacts[ channelKey ]
 
         if ( !contact ) {
@@ -205,6 +215,7 @@ export default class TrustedContacts {
           const newContact: TrustedContact = {
             contactDetails,
             isActive: true,
+            hasNewData: false,
             permanentChannelAddress: crypto
               .createHash( 'sha256' )
               .update( channelKey )
@@ -232,7 +243,8 @@ export default class TrustedContacts {
         }
         channelOutstreams[ permanentChannelAddress ] = {
           streamId,
-          outstreamUpdates
+          metaSync,
+          outstreamUpdates,
         }
       }
 

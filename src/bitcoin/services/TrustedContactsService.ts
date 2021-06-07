@@ -37,6 +37,7 @@ export default class TrustedContactsService {
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
     contactsSecondaryChannelKey?: string
+    metaSync?: boolean
   }[]
   ): Promise<
     | {
