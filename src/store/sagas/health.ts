@@ -1337,7 +1337,7 @@ function* getPDFDataWorker( { payload } ) {
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey: channelKey,
-        channelKey2: currentContact.secondaryChannelKey,
+        secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
         encryptedKey: LevelHealth.encryptWithAnswer(
           shareId,
@@ -1349,7 +1349,7 @@ function* getPDFDataWorker( { payload } ) {
         walletName: WALLET_SETUP.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
-        channelKey2: currentContact.secondaryChannelKey,
+        secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
       }
 

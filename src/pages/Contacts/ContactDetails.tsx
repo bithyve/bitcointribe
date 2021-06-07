@@ -10,7 +10,6 @@ import {
   ScrollView,
   Platform,
   Alert,
-  ActivityIndicator,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import NavStyles from '../../common/Styles/NavStyles'
@@ -29,9 +28,7 @@ import _ from 'underscore'
 import moment from 'moment'
 import {
   clearTransfer,
-  addNewSecondarySubAccount
 } from '../../store/actions/accounts'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import BottomSheet from 'reanimated-bottom-sheet'
 import SendViaLink from '../../components/SendViaLink'
 import ModalHeader from '../../components/ModalHeader'
@@ -49,10 +46,8 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
-import { removeTrustedContact } from '../../store/actions/trustedContacts'
+import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import AccountShell from '../../common/data/models/AccountShell'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
@@ -120,8 +115,9 @@ interface ContactDetailsPropTypes {
   recipientSelectedForAmountSetting: any;
   amountForRecipientUpdated: any;
   UploadSuccessfully: any;
-  addNewSecondarySubAccount: any;
   removeTrustedContact: any;
+  syncPermanentChannels: any;
+  uploadRequestedSMShare: any;
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
   newBHRFlowStarted : any;
@@ -246,6 +242,8 @@ class ContactDetails extends PureComponent<
       contact: this.Contact ? this.Contact : {
       },
     } )
+
+    this.syncContact()
   }
 
   componentWillUnmount() {
@@ -321,32 +319,32 @@ class ContactDetails extends PureComponent<
   // };
 
   onPressSend = () => {
-    this.props.clearTransfer( REGULAR_ACCOUNT )
+    // this.props.clearTransfer( REGULAR_ACCOUNT )
 
-    // if ( this.contactsType == 'My Keepers' ) {
-    //   this.saveInTransitHistory( 'isSent' )
-    // }
+    // // if ( this.contactsType == 'My Keepers' ) {
+    // //   this.saveInTransitHistory( 'isSent' )
+    // // }
 
-    const contactName = `${this.Contact.firstName} ${this.Contact.lastName ? this.Contact.lastName : ''
-    }`
+    // const contactName = `${this.Contact.firstName} ${this.Contact.lastName ? this.Contact.lastName : ''
+    // }`
 
-    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.displayedName ===  contactName )
+    // const recipient = this.props.trustedContactRecipients.find( recipient => recipient.displayedName ===  contactName )
 
-    this.props.sourceAccountSelectedForSending(
-      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
-    )
-    this.props.addRecipientForSending( recipient )
-    this.props.recipientSelectedForAmountSetting( recipient )
-    this.props.amountForRecipientUpdated( {
-      recipient,
-      amount: 0
-    } )
+    // this.props.sourceAccountSelectedForSending(
+    //   this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
+    // )
+    // this.props.addRecipientForSending( recipient )
+    // this.props.recipientSelectedForAmountSetting( recipient )
+    // this.props.amountForRecipientUpdated( {
+    //   recipient,
+    //   amount: 0
+    // } )
 
-    this.props.navigation.dispatch(
-      resetStackToSend( {
-        selectedRecipientID: recipient.id,
-      } )
-    )
+    // this.props.navigation.dispatch(
+    //   resetStackToSend( {
+    //     selectedRecipientID: recipient.id,
+    //   } )
+    // )
   };
 
   onPressResendRequest = () => {
@@ -361,6 +359,23 @@ class ContactDetails extends PureComponent<
       } )
     }
   };
+
+  syncContact = ( hardSync?: boolean ) => {
+    const { contact } = this.state
+    if( contact ){
+      const contactInfo = {
+        channelKey: this.Contact.channelKey,
+      }
+      const channelUpdate =  {
+        contactInfo
+      }
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates: [ channelUpdate ],
+        hardSync,
+      } )
+    }
+  }
 
   getHistoryForTrustedContacts = async () => {
     let OtherTrustedContactsHistory = []
@@ -504,7 +519,7 @@ class ContactDetails extends PureComponent<
         channelId: contacts.permanentChannelAddress,
         streamId: instream.streamId,
         channelKey: this.Contact.channelKey,
-        channelKey2: contacts.contactsSecondaryChannelKey,
+        secondaryChannelKey: contacts.contactsSecondaryChannelKey,
         version: appVersion
       } )
     } else {
@@ -513,7 +528,7 @@ class ContactDetails extends PureComponent<
         walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
         channelId: contacts.permanentChannelAddress,
         streamId: instream.streamId,
-        channelKey2: contacts.contactsSecondaryChannelKey,
+        secondaryChannelKey: contacts.contactsSecondaryChannelKey,
         version: appVersion
       } )
     }
@@ -737,7 +752,7 @@ class ContactDetails extends PureComponent<
   };
 
   render() {
-    const { navigation, newBHRFlowStarted } = this.props
+    const { navigation } = this.props
     const {
       contact,
       Loading,
@@ -1036,7 +1051,7 @@ class ContactDetails extends PureComponent<
                     text: 'Yes',
                     onPress: () => {
                       this.props.removeTrustedContact( {
-                        channelKey: contact.channelKey
+                        channelKey: this.Contact.channelKey
                       } )
                       this.props.navigation.goBack()
                     },
@@ -1172,10 +1187,10 @@ export default connect( mapStateToProps, {
   recipientSelectedForAmountSetting,
   amountForRecipientUpdated,
   UploadSuccessfully,
-  addNewSecondarySubAccount,
   ErrorSending,
   removeTrustedContact,
-  UploadSMSuccessfully
+  syncPermanentChannels,
+  UploadSMSuccessfully,
 } )( ContactDetails )
 
 const styles = StyleSheet.create( {

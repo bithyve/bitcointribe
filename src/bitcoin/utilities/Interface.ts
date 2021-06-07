@@ -567,7 +567,8 @@ export interface TrustedContact {
   contactDetails: ContactDetails,
   relationType: TrustedContactRelationTypes,
   permanentChannelAddress: string,
-  isActive: boolean,
+  isActive: boolean, // is the channel active
+  hasNewData: boolean, // instream has new data
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
   secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
