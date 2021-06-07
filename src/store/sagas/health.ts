@@ -2655,7 +2655,7 @@ function* getPDFDataWorker( { payload } ) {
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey: channelKey,
-        channelKey2: currentContact.secondaryChannelKey,
+        secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
         encryptedKey: LevelHealth.encryptWithAnswer(
           shareId,
@@ -2667,7 +2667,7 @@ function* getPDFDataWorker( { payload } ) {
         walletName: WALLET_SETUP.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
-        channelKey2: currentContact.secondaryChannelKey,
+        secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
       }
 
@@ -3879,7 +3879,7 @@ function* createChannelAssetsWorker( { payload } ) {
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const s3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContactsV2
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
