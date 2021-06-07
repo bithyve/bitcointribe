@@ -13,6 +13,7 @@ import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import { useSelector, useDispatch } from 'react-redux'
 import { currencyKindSet } from '../../store/actions/preferences'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export type Props = {
   navigation: any;
@@ -138,79 +139,80 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
       <Header />
       <View style={styles.accountCardsSectionContainer}>
-        <Text style={{
-          color: Colors.blue,
-          fontSize: RFValue( 16 ),
-          marginLeft: 2,
-          fontFamily: Fonts.FiraSansMedium,
-          paddingTop: widthPercentageToDP( 8 ),
-          paddingLeft: widthPercentageToDP( 8 )
-        }}>
+        <ScrollView>
+          <Text style={{
+            color: Colors.blue,
+            fontSize: RFValue( 16 ),
+            marginLeft: 2,
+            fontFamily: Fonts.FiraSansMedium,
+            paddingTop: widthPercentageToDP( 8 ),
+            paddingLeft: widthPercentageToDP( 8 )
+          }}>
             Settings & More,
-        </Text>
-        <View style={{
-          flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
-        }}>
-          <Image
-            source={require( '../../assets/images/icons/recurring_buy.png' )}
-            style={{
-              width: widthPercentageToDP( 8 ),
-              height: widthPercentageToDP( 8 ),
-            }}
-          />
-          <View>
-            <Text style={styles.addModalTitleText}>
+          </Text>
+          <View style={{
+            flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
+          }}>
+            <Image
+              source={require( '../../assets/images/icons/recurring_buy.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View>
+              <Text style={styles.addModalTitleText}>
           Show in Bitcoin
-            </Text>
-            <Text style={styles.addModalInfoText}>
+              </Text>
+              <Text style={styles.addModalInfoText}>
         Lorem ipsum dolor sit amet, consectetur
-            </Text>
-          </View>
-          <CurrencyKindToggleSwitch
-            fiatCurrencyCode={currencyCode}
-            onpress={() => {
-              dispatch(
-                currencyKindSet(
-                  prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-                )
-              )
-            }}
-            isOn={prefersBitcoin}
-          />
-        </View>
-        <FlatList
-          data={menuOptions}
-          keyExtractor={listItemKeyExtractor}
-          ItemSeparatorComponent={() => (
-            <View style={{
-              backgroundColor: Colors.white
-            }}>
-              <View style={styles.separatorView} />
+              </Text>
             </View>
-          )}
-          renderItem={( { item: menuOption }: { item: MenuOption } ) => {
-            return <AppBottomSheetTouchableWrapper
-              onPress={() => handleOptionSelection( menuOption )}
-              style={styles.addModalView}
-            >
-              <View style={styles.modalElementInfoView}>
-                <View style={{
-                  justifyContent: 'center'
-                }}>
-                  <Image
-                    source={menuOption.imageSource}
-                    style={{
-                      width: 25, height: 25, resizeMode: 'contain'
-                    }}
-                  />
-                </View>
-                <View style={{
-                  justifyContent: 'center', marginLeft: 10
-                }}>
-                  <Text style={styles.addModalTitleText}>{menuOption.title} </Text>
-                  <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
-                </View>
-                {menuOption.isSwitch &&
+            <CurrencyKindToggleSwitch
+              fiatCurrencyCode={currencyCode}
+              onpress={() => {
+                dispatch(
+                  currencyKindSet(
+                    prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                  )
+                )
+              }}
+              isOn={prefersBitcoin}
+            />
+          </View>
+          <FlatList
+            data={menuOptions}
+            keyExtractor={listItemKeyExtractor}
+            ItemSeparatorComponent={() => (
+              <View style={{
+                backgroundColor: Colors.white
+              }}>
+                <View style={styles.separatorView} />
+              </View>
+            )}
+            renderItem={( { item: menuOption }: { item: MenuOption } ) => {
+              return <AppBottomSheetTouchableWrapper
+                onPress={() => handleOptionSelection( menuOption )}
+                style={styles.addModalView}
+              >
+                <View style={styles.modalElementInfoView}>
+                  <View style={{
+                    justifyContent: 'center'
+                  }}>
+                    <Image
+                      source={menuOption.imageSource}
+                      style={{
+                        width: 25, height: 25, resizeMode: 'contain'
+                      }}
+                    />
+                  </View>
+                  <View style={{
+                    justifyContent: 'center', marginLeft: 10
+                  }}>
+                    <Text style={styles.addModalTitleText}>{menuOption.title} </Text>
+                    <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
+                  </View>
+                  {menuOption.isSwitch &&
                 <View style={{
                   alignItems: 'flex-end',
                   marginLeft: 'auto'
@@ -225,43 +227,43 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     onTintColor={Colors.blue}
                   />
                 </View>
-                }
-              </View>
-            </AppBottomSheetTouchableWrapper>
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => {
-            Linking.openURL( 'https://t.me/HexaWallet' )
-              .then( ( _data ) => { } )
-              .catch( ( _error ) => {
-                alert( 'Make sure Telegram installed on your device' )
-              } )
-          }}
-          style={{
-            flexDirection: 'row', margin: 15
-          }}>
-          <Image
-            source={require( '../../assets/images/icons/telegram.png' )}
-            style={{
-              width: widthPercentageToDP( 8 ),
-              height: widthPercentageToDP( 8 ),
+                  }
+                </View>
+              </AppBottomSheetTouchableWrapper>
             }}
           />
-          <View style={{
-            marginLeft: 10
-          }}>
-            <Text style={styles.addModalTitleText}>
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL( 'https://t.me/HexaWallet' )
+                .then( ( _data ) => { } )
+                .catch( ( _error ) => {
+                  alert( 'Make sure Telegram installed on your device' )
+                } )
+            }}
+            style={{
+              flexDirection: 'row', margin: 15
+            }}>
+            <Image
+              source={require( '../../assets/images/icons/telegram.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View style={{
+              marginLeft: 10
+            }}>
+              <Text style={styles.addModalTitleText}>
           Telegram Support Group
-            </Text>
-            <Text style={styles.addModalInfoText}>
+              </Text>
+              <Text style={styles.addModalInfoText}>
         Lorem ipsum dolor sit amet, consectetur
-            </Text>
-          </View>
-        </TouchableOpacity>
-        {/* </View> */}
+              </Text>
+            </View>
+          </TouchableOpacity>
+          {/* </View> */}
 
-        {/* <View
+          {/* <View
           style={styles.webLinkBarContainer}
         >
           <AppBottomSheetTouchableWrapper
@@ -294,6 +296,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             <Text style={styles.addModalTitleText}>Privacy Policy</Text>
           </AppBottomSheetTouchableWrapper>
         </View> */}
+        </ScrollView>
       </View>
     </ImageBackground>
   )
