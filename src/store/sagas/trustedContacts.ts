@@ -216,7 +216,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         Object.keys( existingContacts ).forEach( channelKey => {
           const contact: TrustedContact = existingContacts[ channelKey ]
           if( contact.isActive ){
-            if( contact.hasNewData || hardSync )
+            if( metaSync || contact.hasNewData || hardSync )
               channelSyncUpdates.push( {
                 channelKey: channelKey,
                 streamId,

@@ -167,8 +167,10 @@ export default class TrustedContacts {
     channelKey: string,
     instreamUpdates: StreamData,
   ) => {
-    let encryptedInstream = contact.permanentChannel[ instreamUpdates.streamId ]
-    let unencryptedInstream = contact.unencryptedPermanentChannel[ instreamUpdates.streamId ]
+    let encryptedInstream = contact.permanentChannel[ instreamUpdates.streamId ] || {
+    }
+    let unencryptedInstream = contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] || {
+    }
 
     encryptedInstream = {
       ...encryptedInstream,
@@ -177,14 +179,17 @@ export default class TrustedContacts {
 
     unencryptedInstream = {
       ...unencryptedInstream,
-      primaryData: instreamUpdates.primaryEncryptedData? this.decryptData( channelKey, instreamUpdates.primaryEncryptedData ).data: unencryptedInstream.primaryData,
-      metaData: instreamUpdates.metaData? instreamUpdates.metaData: unencryptedInstream.metaData,
+      streamId: instreamUpdates.streamId,
+      primaryData: instreamUpdates.primaryEncryptedData? this.decryptData( channelKey, instreamUpdates.primaryEncryptedData ).data: ( unencryptedInstream as UnecryptedStreamData ).primaryData,
+      metaData: instreamUpdates.metaData? instreamUpdates.metaData: ( unencryptedInstream as UnecryptedStreamData ).metaData,
     }
 
-    contact.isActive = idx( unencryptedInstream.metaData, ( _ ) => _.flags.active )
-    contact.hasNewData = idx( unencryptedInstream.metaData, ( _ ) => _.flags.newData )
+    contact.permanentChannel[ instreamUpdates.streamId ] = ( encryptedInstream as StreamData )
+    contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] = ( unencryptedInstream as UnecryptedStreamData )
+    contact.isActive = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.active )
+    contact.hasNewData = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.newData )
     if( !contact.walletID )
-      contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
+      contact.walletID = idx( ( unencryptedInstream as UnecryptedStreamData ).primaryData, ( _ ) => _.walletID )
   };
 
   public syncPermanentChannels = async (
@@ -215,7 +220,7 @@ export default class TrustedContacts {
           const newContact: TrustedContact = {
             contactDetails,
             isActive: true,
-            hasNewData: false,
+            hasNewData: true,
             permanentChannelAddress: crypto
               .createHash( 'sha256' )
               .update( channelKey )
