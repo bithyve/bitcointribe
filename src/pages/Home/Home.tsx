@@ -35,16 +35,9 @@ import {
 } from '../../common/constants/wallet-service-types'
 import {
   downloadMShare,
-  uploadRequestedShare,
-  // initHealthCheck,
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
-  onApprovalStatusChange,
-  autoDownloadShareContact,
-  uploadSecondaryShareForPK,
-  downloadSMShard,
-  updateKeeperInfoToUnderCustody,
   updateCloudPermission,
 } from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
@@ -67,7 +60,6 @@ import {
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
-  getKeeperInfoFromShareId,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
@@ -94,7 +86,6 @@ import {
 } from '../../store/actions/accounts'
 import {
   LevelHealthInterface,
-  MetaShare,
   QRCodeTypes,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
@@ -106,7 +97,6 @@ import {
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import { fetchKeeperTrustedChannel } from '../../store/actions/keeper'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
@@ -227,11 +217,8 @@ interface HomePropsTypes {
   downloadMShare: any;
   initializeTrustedContact: any;
   rejectTrustedContact: any;
-  uploadRequestedShare: any;
-  uploadSecondaryShareForPK: any;
   s3Service: S3Service;
   initializeHealthSetup: any;
-  // initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -262,22 +249,16 @@ interface HomePropsTypes {
   database: any;
   setCardData: any;
   cardDataProps: any;
-  fetchKeeperTrustedChannel: any;
-  keeperApproveStatus: any;
-  onApprovalStatusChange: any;
   secureAccount: any;
-  autoDownloadShareContact: any;
   accountShells: AccountShell[];
   setVersion: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
-  downloadSMShard: any;
   rampFromBuyMenu: boolean | null;
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
   setCloudData: any;
-  updateKeeperInfoToUnderCustody: any;
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
   updateCloudPermission: any;
@@ -932,12 +913,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
       }
 
-      //const { healthCheckInitialized } = s3Service.sss;
-      //   console.log("healthCheckInitialized", healthCheckInitialized);
-      //   if (!healthCheckInitialized) {
-      //     initHealthCheck();
-      //   }
-      // }
       this.bootStrapNotifications()
       this.setUpFocusListener()
       //this.getNewTransactionNotifications()
@@ -1736,19 +1711,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setupNotificationList = async () => {
-    const {
-      releaseCasesValue,
-      keeperApproveStatus,
-      onApprovalStatusChange,
-      s3Service,
-      levelHealth,
-      notificationList,
-      fetchKeeperTrustedChannel,
-      secureAccount,
-      UNDER_CUSTODY,
-      database,
-      updateKeeperInfoToUnderCustody
-    } = this.props
+    const { notificationList, } = this.props
     // let asyncNotification = notificationListNew;
     const asyncNotification = JSON.parse(
       await AsyncStorage.getItem( 'notificationList' )
@@ -1787,119 +1750,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }
           } else {
             readStatus = true
-          }
-        }
-
-        if ( element.notificationType == 'newKeeperInfo' ) {
-          const data = JSON.parse( element.data )
-          if ( data.walletName && data.walletId ) {
-            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
-          }
-        }
-        if ( element.notificationType == 'uploadSecondaryShare' ) {
-          const data = JSON.parse( element.data )
-          if ( data.shareID == keeperApproveStatus.shareId ) {
-            onApprovalStatusChange( {
-              status: true,
-              initiatedAt: moment( new Date() ).valueOf(),
-              shareId: data.shareID,
-            } )
-          }
-        }
-        if (
-          element.notificationType == 'secureXpub' &&
-          !database.DECENTRALIZED_BACKUP.PK_SHARE
-        ) {
-          const shareId = s3Service.levelhealth.metaSharesKeeper[ 1 ].shareId
-          const share = getKeeperInfoFromShareId( levelHealth, shareId )
-          fetchKeeperTrustedChannel(
-            shareId,
-            element.notificationType,
-            share.name
-          )
-        }
-        if ( element.notificationType == 'reShare' ) {
-          // console.log('element.notificationType', element.notificationType)
-          // console.log('UNDER_CUSTODY', UNDER_CUSTODY)
-
-          let existingShares: MetaShare[]
-          if ( Object.keys( UNDER_CUSTODY ).length ) {
-            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
-            } )
-          }
-          if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
-            if (
-              existingShares.findIndex(
-                ( value ) =>
-                  value.shareId === JSON.parse( element.data ).selectedShareId
-              ) == -1
-            ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
-              this.props.autoDownloadShareContact(
-                JSON.parse( element.data ).selectedShareId,
-                JSON.parse( element.data ).walletId
-              )
-            }
-          }
-        }
-        if ( element.notificationType == 'smUploadedForPK' ) {
-          if (
-            keeperApproveStatus.shareId == 'PK_recovery' &&
-            keeperApproveStatus.transferDetails &&
-            keeperApproveStatus.transferDetails.key
-          ) {
-            const result = await S3Service.downloadSMShare(
-              keeperApproveStatus.transferDetails.key
-            )
-            if ( result && result.data ) {
-              onApprovalStatusChange( {
-                status: true,
-                initiatedAt: moment( new Date() ).valueOf(),
-                shareId: 'PK_recovery',
-                secondaryShare: result.data.metaShare,
-              } )
-            }
-          }
-
-          let existingShares: MetaShare[]
-          if ( Object.keys( UNDER_CUSTODY ).length ) {
-            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
-            } )
-          }
-
-          if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
-            if (
-              existingShares.findIndex(
-                ( value ) =>
-                  value.shareId === JSON.parse( element.data ).selectedShareId
-              ) == -1
-            ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
-              this.props.autoDownloadShareContact(
-                JSON.parse( element.data ).selectedShareId,
-                JSON.parse( element.data ).walletId
-              )
-            }
           }
         }
 
@@ -2334,7 +2184,6 @@ const mapStateToProps = ( state ) => {
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
-    keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
@@ -2350,10 +2199,7 @@ export default withNavigationFocus(
     downloadMShare,
     initializeTrustedContact,
     rejectTrustedContact,
-    uploadRequestedShare,
-    uploadSecondaryShareForPK,
     initializeHealthSetup,
-    // initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,
@@ -2369,13 +2215,8 @@ export default withNavigationFocus(
     setFCMToken,
     setSecondaryDeviceAddress,
     setCardData,
-    fetchKeeperTrustedChannel,
-    onApprovalStatusChange,
-    autoDownloadShareContact,
     setVersion,
-    downloadSMShard,
     setCloudData,
-    updateKeeperInfoToUnderCustody,
     updateCloudPermission,
     credsAuthenticated,
     setShowAllAccount,

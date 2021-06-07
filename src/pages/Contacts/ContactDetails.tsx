@@ -38,11 +38,10 @@ import ModalHeader from '../../components/ModalHeader'
 import DeviceInfo from 'react-native-device-info'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import {
-  uploadRequestedShare,
   ErrorSending,
   UploadSuccessfully,
 } from '../../store/actions/sss'
-import {  uploadRequestedSMShare, UploadSMSuccessfully } from '../../store/actions/health'
+import { UploadSMSuccessfully } from '../../store/actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SendViaQR from '../../components/SendViaQR'
@@ -109,13 +108,11 @@ interface ContactDetailsPropTypes {
   trustedContacts: TrustedContactsService;
   trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
-  uploading: any;
   errorSending: any;
   uploadSuccessfull: any;
   UNDER_CUSTODY: any;
   DECENTRALIZED_BACKUP: any;
   WALLET_SETUP: any;
-  uploadMetaShare: any;
   updateEphemeralChannelLoader: any;
   ErrorSending: any;
   clearTransfer: any;
@@ -124,13 +121,10 @@ interface ContactDetailsPropTypes {
   recipientSelectedForAmountSetting: any;
   amountForRecipientUpdated: any;
   UploadSuccessfully: any;
-  uploadRequestedShare: any;
   addNewSecondarySubAccount: any;
   removeTrustedContact: any;
-  uploadRequestedSMShare: any;
   hasSMUploadedSuccessfully: Boolean;
   UploadSMSuccessfully: any;
-  uploadingSmShare: any;
   newBHRFlowStarted : any;
   s3Service: S3Service
 }
@@ -774,7 +768,7 @@ class ContactDetails extends PureComponent<
   };
 
   render() {
-    const { navigation, uploading, uploadingSmShare, newBHRFlowStarted } = this.props
+    const { navigation, newBHRFlowStarted } = this.props
     const {
       contact,
       Loading,
@@ -1010,13 +1004,7 @@ class ContactDetails extends PureComponent<
                   source={require( '../../assets/images/icons/icon_restore.png' )}
                   style={styles.buttonImage}
                 />
-                <View>
-                  {uploading ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={styles.buttonText} numberOfLines={1}>Help Restore</Text>
-                  )}
-                </View>
+                <Text style={styles.buttonText} numberOfLines={1}>Help Restore</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={{
@@ -1031,15 +1019,9 @@ class ContactDetails extends PureComponent<
                   source={require( '../../assets/images/icons/icon_restore.png' )}
                   style={styles.buttonImage}
                 />
-                <View>
-                  {uploadingSmShare ? (
-                    <ActivityIndicator size="small" />
-                  ) : (
-                    <Text style={[ styles.buttonText, {
-                      marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
-                    } ]}>Show Secondary Key</Text>
-                  )}
-                </View>
+                <Text style={[ styles.buttonText, {
+                  marginLeft: 0, marginRight: 0, width: wp( '30%' ), textAlign: 'center'
+                } ]}>Show Secondary Key</Text>
               </TouchableOpacity>
 
               {encryptedExitKey ? (
@@ -1236,8 +1218,6 @@ class ContactDetails extends PureComponent<
 }
 const mapStateToProps = ( state ) => {
   return {
-    uploading: idx( state, ( _ ) => _.sss.loading.uploadRequestedShare ),
-    uploadingSmShare: idx( state, ( _ ) => _.health.loading.uploadRequestedShare ),
     errorSending: idx( state, ( _ ) => _.sss.errorSending ),
     uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
@@ -1252,7 +1232,6 @@ const mapStateToProps = ( state ) => {
       ( _ ) => _.storage.database.DECENTRALIZED_BACKUP
     ),
     WALLET_SETUP: idx( state, ( _ ) => _.storage.database.WALLET_SETUP ),
-    uploadMetaShare: idx( state, ( _ ) => _.sss.loading.uploadMetaShare ),
     updateEphemeralChannelLoader: idx(
       state,
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel
@@ -1270,10 +1249,8 @@ export default connect( mapStateToProps, {
   amountForRecipientUpdated,
   UploadSuccessfully,
   addNewSecondarySubAccount,
-  uploadRequestedShare,
   ErrorSending,
   removeTrustedContact,
-  uploadRequestedSMShare,
   UploadSMSuccessfully
 } )( ContactDetails )
 
