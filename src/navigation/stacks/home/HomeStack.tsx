@@ -95,7 +95,9 @@ const HomeStack = createStackNavigator(
         // tabBarVisibl
       },
     },
-    Launch,
+    Launch: {
+      screen: Launch,
+    },
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {
@@ -249,16 +251,15 @@ const HomeStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
+    // mode: 'modal',
     initialRouteName: 'Home',
     defaultNavigationOptions: {
       header: null
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
-      console.log( 'navigation.state.index>>>>>>>>', navigation.state.index )
 
-      if ( navigation.state.index === 0 ) {
+      if ( navigation.state.index === 0 && navigation.state.routes[ 0 ].routeName === 'Home' ) {
         tabBarVisible = true
       }
 

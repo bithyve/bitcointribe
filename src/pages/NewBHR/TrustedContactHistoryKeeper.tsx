@@ -1009,8 +1009,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
               onPressContinue:async ( selectedContacts ) => {
                 console.log( 'selectedContacts >>>>>', selectedContacts )
 
-                // Keyboard.dismiss()
-                // createGuardian( getContacts( selectedContacts ) )
+                Keyboard.dismiss()
+                createGuardian( getContacts( selectedContacts ) )
               }
             } )
           }}

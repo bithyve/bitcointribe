@@ -265,7 +265,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     contactsType: string;
   } ) => {
     return (
-      <View style={{
+      <TouchableOpacity style={{
         alignItems: 'center',
         flex: 1
       }}>
@@ -273,7 +273,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         <Text style={{
           textAlign: 'center', marginTop: hp ( 0.5 )
         }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
-      </View>
+      </TouchableOpacity>
     )
   };
   renderContactListItem = ( {

@@ -89,7 +89,7 @@ const AccountManagementStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
+    // mode: 'modal',
     defaultNavigationOptions: () => {
       return {
         ...defaultStackScreenNavigationOptions,

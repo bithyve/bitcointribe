@@ -169,7 +169,6 @@ interface HomeStateTypes {
   netBalance: number;
   bottomSheetState: BottomSheetState;
   currentBottomSheetKind: BottomSheetKind | null;
-  showModal: boolean;
   secondaryDeviceOtp: any;
   currencyCode: string;
   errorMessageHeader: string;
@@ -291,7 +290,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       netBalance: 0,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
-      showModal: false,
       secondaryDeviceOtp: {
       },
       currencyCode: 'USD',
@@ -1477,12 +1475,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
-    this.setState( {
-      showModal: false
-    } )
     switch ( menuItem.kind ) {
         case BuyMenuItemKind.FAST_BITCOINS:
           this.props.navigation.navigate( 'VoucherScanner' )
+          this.onBottomSheetClosed()
           break
         case BuyMenuItemKind.SWAN:
           this.props.clearSwanCache()
