@@ -253,24 +253,6 @@ export const getCurrencyImageByRegion = (
   }
 }
 
-export const getKeeperInfoFromShareId = ( levelHealthVar: LevelHealthInterface[], shareId: string ) : {
-  shareType: string;
-  updatedAt: number;
-  status: string;
-  shareId: string;
-  reshareVersion?: number;
-  name?: string;
-} =>{
-  let index
-  for ( let i = 0; i < levelHealthVar.length; i++ ) {
-    const element = levelHealthVar[ i ]
-    index = element.levelInfo.findIndex( value=>value.shareId == shareId )
-    if( index>-1 ){
-      return element.levelInfo[ index ]
-    }
-  }
-}
-
 export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLevel: number ) : LevelInfo[] =>{
   if ( levelHealthVar[ currentLevel ] ) {
     if( levelHealthVar[ 1 ] ){

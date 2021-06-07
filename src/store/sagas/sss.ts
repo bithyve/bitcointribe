@@ -85,7 +85,6 @@ import Toast from '../../components/Toast'
 import Mailer from 'react-native-mail'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import {
   remapAccountShells,
   restoredAccountShells,
@@ -221,10 +220,6 @@ function* uploadEncMetaShareWorker( { payload } ) {
     )
     console.log( 'trustedContacts', trustedContacts )
 
-    const keepersInfo: KeeperService = yield select(
-      ( state ) => state.keeper.service,
-    )
-    console.log( 'keepersInfo', keepersInfo )
     const regularService: RegularAccount = yield select(
       ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
     )
@@ -348,7 +343,6 @@ function* uploadEncMetaShareWorker( { payload } ) {
         REGULAR_ACCOUNT: JSON.stringify( regularService ),
         S3_SERVICE: JSON.stringify( s3Service ),
         TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-        KEEPERS_INFO: JSON.stringify( keepersInfo ),
       }
       console.log( 'updatedSERVICES', updatedSERVICES )
       const updatedBackup = {

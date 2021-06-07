@@ -184,7 +184,7 @@ function* updateHealthForCloudWorker( { payload } ) {
         levelHealthVar.updatedAt = moment( new Date() ).valueOf()
         levelHealthVar.status = 'accessible'
         levelHealthVar.reshareVersion = 0
-        levelHealthVar.name = 'Cloud'
+        levelHealthVar.name = Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
       }
       const shareObj = {
         walletId: s3Service.getWalletId().data.walletId,
@@ -193,6 +193,7 @@ function* updateHealthForCloudWorker( { payload } ) {
         updatedAt: moment( new Date() ).valueOf(),
         status: 'accessible',
         shareType: 'cloud',
+        name: levelHealthVar.name
       }
 
       yield put( updateMSharesHealth( shareObj ) )

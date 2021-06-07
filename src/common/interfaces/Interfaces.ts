@@ -47,7 +47,6 @@ export interface ServicesJSON {
   SECURE_ACCOUNT: string;
   S3_SERVICE: string;
   TRUSTED_CONTACTS: string;
-  KEEPERS_INFO?: string;
 }
 
 export interface Database {

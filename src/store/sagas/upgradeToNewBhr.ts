@@ -14,7 +14,7 @@ import {
   isUpgradeLevelInitializedStatus,
   CONFIRM_PDF_SHARED_UPGRADE,
 } from '../actions/upgradeToNewBhr'
-import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, onApprovalStatusChange, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
+import { checkMSharesHealth, healthCheckInitialized, isLevel2InitializedStatus, isLevel3InitializedStatus, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -385,11 +385,6 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
         status: 'accessible',
       }
       yield put( updateMSharesHealth( shareObj ) )
-      yield put( onApprovalStatusChange( {
-        status: false,
-        initiatedAt: 0,
-        shareId: '',
-      } ) )
       yield put( updateAvailableKeeperData( [ {
         type:'pdf'
       } ] ) )
