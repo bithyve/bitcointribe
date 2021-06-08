@@ -155,7 +155,7 @@ const AccountSendScreen: React.FC<Props> = ( {
         },
       } ] : [] ),
     ]
-  }, [] )
+  }, [ sendableContacts ] )
 
   return (
     <View style={styles.rootContainer}>

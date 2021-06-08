@@ -14,6 +14,5 @@ export default function useSendableTrustedContactRecipients(): ContactRecipientD
     } )
 
     return sendableTrustedContactRecipients
-    // return sampleContactRecipients
   }, [ trustedContactsState && trustedContactsState.trustedContactRecipients ] )
 }
