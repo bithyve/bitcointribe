@@ -11,11 +11,10 @@ import { ExternalServiceSubAccountDescribing } from '../../common/data/models/Su
 import { Contacts, DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { AccountRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { AccountRecipientDescribing, ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
@@ -73,10 +72,6 @@ function* processRecipients( accountShell: AccountShell ){
   const selectedRecipients: RecipientDescribing[] = yield select(
     ( state ) => state.sending.selectedRecipients
   )
-  const trustedContactsServices: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service
-  )
-  const testAccount: TestAccount = accountsState[ TEST_ACCOUNT ].service
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
 
@@ -111,23 +106,45 @@ function* processRecipients( accountShell: AccountShell ){
             accountKind = SUB_PRIMARY_ACCOUNT
           }
 
+          const sourceAccount = ( recipient as AccountRecipientDescribing ).sourceAccount
+          const subInstance =
+          sourceAccount === REGULAR_ACCOUNT
+            ? regularAccount.hdWallet
+            : secureAccount.secureHDWallet
+
+          let receivingAddress
+          if ( config.EJECTED_ACCOUNTS.includes( accountKind ) )
+            receivingAddress = subInstance.getReceivingAddress(
+              accountKind,
+              instanceNumber
+            )
+          else receivingAddress = subInstance.getReceivingAddress()
+
+
           recipients.push( {
             id: accountKind,
-            address: null,
+            address: receivingAddress,
             amount: recipient.amount,
-            type: ( recipient as AccountRecipientDescribing ).sourceAccount,
+            type: sourceAccount,
             accountNumber: instanceNumber,
           } )
           break
 
         case RecipientKind.CONTACT:
-          const contactName = `${recipient.displayedName}`
-            .toLowerCase()
-            .trim()
+          let paymentAddress
+          switch( accountShell.primarySubAccount.sourceKind ){
+              case SourceAccountKind.TEST_ACCOUNT:
+                paymentAddress = ( recipient as ContactRecipientDescribing ).paymentAddresses[ SubAccountKind.TEST_ACCOUNT ]
+                break
 
+              default:
+                paymentAddress = ( recipient as ContactRecipientDescribing ).paymentAddresses[ SubAccountKind.TRUSTED_CONTACTS ]
+          }
+
+          SubAccountKind.TRUSTED_CONTACTS
           recipients.push( {
-            id: contactName,
-            address: null,
+            id: recipient.id,
+            address: paymentAddress,
             amount: recipient.amount,
           } )
           break
@@ -135,105 +152,7 @@ function* processRecipients( accountShell: AccountShell ){
   } )
 
   if( !recipients.length ) throw new Error( 'Recipients missing' )
-
-  const addressedRecipients = []
-  for ( const recipient of recipients ) {
-    if ( recipient.address ) addressedRecipients.push( recipient )
-    // recipient kind: External address
-    else {
-      if (
-        recipient.id === REGULAR_ACCOUNT ||
-        recipient.id === SECURE_ACCOUNT ||
-        config.EJECTED_ACCOUNTS.includes( recipient.id )
-      ) {
-        // recipient kind: Hexa Account
-        const subInstance =
-          recipient.type === REGULAR_ACCOUNT
-            ? regularAccount.hdWallet
-            : secureAccount.secureHDWallet
-
-        let receivingAddress
-        if ( config.EJECTED_ACCOUNTS.includes( recipient.id ) )
-          receivingAddress = yield call( subInstance.getReceivingAddress,
-            recipient.id,
-            recipient.accountNumber
-          )
-        else receivingAddress = yield call( subInstance.getReceivingAddress )
-
-        if ( !receivingAddress )
-          throw new Error(
-            `Failed to generate receiving address for recipient: ${recipient.id}`
-          )
-
-        recipient.address = receivingAddress
-        addressedRecipients.push( recipient )
-      } else {
-        // recipient kind: Trusted Contact
-        const contactName = recipient.id
-        let res
-        const accountNumber =
-          regularAccount.hdWallet.trustedContactToDA[
-            contactName.toLowerCase().trim()
-          ]
-        if ( accountNumber ) {
-          const { contactDetails } = regularAccount.hdWallet.derivativeAccounts[
-            TRUSTED_CONTACTS
-          ][ accountNumber ] as TrustedContactDerivativeAccountElements
-
-          if ( accountShell.primarySubAccount.sourceKind !== TEST_ACCOUNT ) {
-            if ( contactDetails && contactDetails.xpub ) res = yield call( regularAccount.getDerivativeAccAddress, TRUSTED_CONTACTS, null, contactName )
-            else {
-              const { trustedAddress, } = trustedContactsServices.tc.trustedContacts[
-                contactName.toLowerCase().trim()
-              ]
-              if ( trustedAddress )
-                res = {
-                  status: 200, data: {
-                    address: trustedAddress
-                  }
-                }
-              else
-                throw new Error( 'Failed fetch contact address, xpub missing' )
-            }
-          } else {
-            if ( contactDetails && contactDetails.tpub ) res = yield call( testAccount.deriveReceivingAddress, contactDetails.tpub )
-            else {
-              const { trustedTestAddress } = trustedContactsServices.tc.trustedContacts[
-                contactName.toLowerCase().trim()
-              ]
-              if ( trustedTestAddress )
-                res = {
-                  status: 200, data: {
-                    address: trustedTestAddress
-                  }
-                }
-              else
-                throw new Error(
-                  'Failed fetch contact testnet address, tpub missing'
-                )
-            }
-          }
-        } else {
-          throw new Error(
-            'Failed fetch testnet address, accountNumber missing'
-          )
-        }
-
-        // console.log( { res } )
-        if ( res.status === 200 ) {
-          const receivingAddress = res.data.address
-          recipient.address = receivingAddress
-          addressedRecipients.push( recipient )
-        } else {
-          throw new Error(
-            `Failed to generate receiving address for recipient: ${recipient.id}`
-          )
-        }
-      }
-    }
-  }
-
-  return addressedRecipients
+  return recipients
 }
 
 
