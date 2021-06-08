@@ -283,5 +283,41 @@ export default class RelayServices {
       }
     }
   };
-}
 
+  public static walletCheckIn = async (
+    walletId: string,
+    currencyCode?: any,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          exchangeRates: { [currency: string]: number };
+          averageTxFees;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.walletCheckIn(
+          walletId,
+          currencyCode
+        ),
+      }
+    } catch ( err ) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to sync last seens',
+      }
+    }
+  };
+}

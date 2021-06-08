@@ -253,5 +253,31 @@ export default class Relay {
     } catch ( err ) {
       throw new Error( 'Failed to fetch GetBittr Details' )
     }
+  }
+
+  public static walletCheckIn = async (
+    walletId: string,
+    currencyCode?: any,
+  ): Promise<{
+    exchangeRates: { [currency: string]: number };
+    averageTxFees: any;
+  }> => {
+    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
+      HEXA_ID,
+      walletID: walletId,
+      ...currencyCode && {
+        currencyCode
+      },
+    } )
+
+    const {
+      exchangeRates,
+      averageTxFees,
+    } = res.data
+
+    return {
+      exchangeRates,
+      averageTxFees,
+    }
   };
 }
