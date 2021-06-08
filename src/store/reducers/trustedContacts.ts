@@ -97,12 +97,13 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
       }
 
       const contactsWalletId = currentContact.walletID
-      let walletName, lastSeenActive
+      let walletName, lastSeenActive, paymentAddresses
       if( contactsWalletId ) {
         const instreamId = TrustedContacts.getStreamId( contactsWalletId )
         const instream = idx( currentContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
         walletName = idx( instream, ( _ ) => _.primaryData.walletName )
         lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
+        paymentAddresses = idx( instream, ( _ ) => _.primaryData.paymentAddresses )
       }
 
       let displayedName
@@ -128,6 +129,7 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
         walletName,
         avatarImageSource,
         lastSeenActive,
+        paymentAddresses,
       }
 
       return [

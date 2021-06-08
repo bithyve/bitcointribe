@@ -9,8 +9,8 @@ export default function useSendableTrustedContactRecipients(): ContactRecipientD
   return useMemo( () => {
     const sendableTrustedContactRecipients = []
     trustedContactsState && trustedContactsState.trustedContactRecipients && trustedContactsState.trustedContactRecipients.forEach( ( tcRecipient )=>{
-      const { hasTrustedChannelWithUser, hasTrustedAddress } = tcRecipient
-      if( hasTrustedChannelWithUser|| hasTrustedAddress ) sendableTrustedContactRecipients.push( tcRecipient )
+      const { paymentAddresses } = tcRecipient
+      if( paymentAddresses ) sendableTrustedContactRecipients.push( tcRecipient )
     } )
 
     return sendableTrustedContactRecipients
