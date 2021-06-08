@@ -168,9 +168,6 @@ export default function ManageBackup( props ) {
 
   const [ overallHealth, setOverallHealth ] = useState( null )
   const health = useSelector( ( state ) => state.sss.overallHealth )
-  const healthLoading = useSelector(
-    ( state ) => state.trustedContacts.loading.walletCheckIn
-  )
 
   function getImageByType( item ) {
     const type = item.type
@@ -797,11 +794,6 @@ export default function ManageBackup( props ) {
   useEffect( () => {
     setContactsFromAsync()
   }, [ trustedContactsInfo ] )
-
-  useEffect( () => {
-    if ( healthLoading ) setShowLoader( true )
-    else setShowLoader( false )
-  }, [ healthLoading ] )
 
   const setAutoHighlightFlagsFromAsync = async () => {
     const highlightFlags = await AsyncStorage.getItem( 'AutoHighlightFlags' )
@@ -1725,15 +1717,14 @@ export default function ManageBackup( props ) {
           }}
         >
           <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={healthLoading}
-                onRefresh={() => {
-                  const synchingContacts = true
-                  dispatch( walletCheckIn( synchingContacts ) )
-                }}
-              />
-            }
+            // refreshControl={
+            //   <RefreshControl
+            //     refreshing={healthLoading}
+            //     onRefresh={() => {
+            //       dispatch( walletCheckIn() )
+            //     }}
+            //   />
+            // }
           >
             <View style={styles.topHealthView}>
               <ImageBackground

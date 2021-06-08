@@ -19,10 +19,12 @@ export enum PermanentChannelsSyncKind {
 
 export const syncPermanentChannels = (
   {
-    permanentChannelsSyncKind,
-    channelUpdates,
-    updatedSERVICES,
-    shouldNotUpdateSERVICES
+    permanentChannelsSyncKind, // kind of channel sync
+    channelUpdates, // out-stream updates for the channels
+    metaSync,   // sync only meta-data for the channels
+    hardSync, // sync channel irrespective of the new-data flag status
+    updatedSERVICES, // service(db)-component to be jointly inserted into database
+    shouldNotUpdateSERVICES, // skip database update
   }:
   {
     permanentChannelsSyncKind: PermanentChannelsSyncKind,
@@ -30,6 +32,8 @@ export const syncPermanentChannels = (
     contactInfo: ContactInfo,
     streamUpdates?: UnecryptedStreamData,
   }[],
+  metaSync?: boolean,
+  hardSync?: boolean,
   updatedSERVICES?: ServicesJSON,
   shouldNotUpdateSERVICES?: boolean
 }
@@ -39,6 +43,8 @@ export const syncPermanentChannels = (
     payload: {
       permanentChannelsSyncKind,
       channelUpdates,
+      metaSync,
+      hardSync,
       updatedSERVICES,
       shouldNotUpdateSERVICES
     },
@@ -99,11 +105,10 @@ export const removeTrustedContact = ( { channelKey } : {channelKey: string} ) =>
   }
 }
 
-export const walletCheckIn = ( synchingContacts?: Boolean, currencyCode?: string ) => {
+export const walletCheckIn = ( currencyCode?: string ) => {
   return {
     type: WALLET_CHECK_IN,
     payload: {
-      synchingContacts,
       currencyCode
     },
   }

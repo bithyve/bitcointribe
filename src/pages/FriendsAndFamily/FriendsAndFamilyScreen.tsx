@@ -377,6 +377,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                 onRefresh={() => {
                   syncPermanentChannels( {
                     permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+                    metaSync: true,
                   } )
                 }}
               />

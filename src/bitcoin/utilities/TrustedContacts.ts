@@ -165,17 +165,31 @@ export default class TrustedContacts {
   public cacheInstream = (
     contact: TrustedContact,
     channelKey: string,
-    inStream: StreamData,
+    instreamUpdates: StreamData,
   ) => {
-    const unencryptedInstream: UnecryptedStreamData = {
-      streamId: inStream.streamId,
-      primaryData: this.decryptData( channelKey, inStream.primaryEncryptedData ).data,
-      metaData: inStream.metaData,
+    let encryptedInstream = contact.permanentChannel[ instreamUpdates.streamId ] || {
     }
-    contact.unencryptedPermanentChannel[ inStream.streamId ] = unencryptedInstream
-    contact.permanentChannel[ inStream.streamId ] = inStream
-    contact.isActive = idx( unencryptedInstream.metaData, ( _ ) => _.flags.active )
-    contact.walletID = idx( unencryptedInstream.primaryData, ( _ ) => _.walletID )
+    let unencryptedInstream = contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] || {
+    }
+
+    encryptedInstream = {
+      ...encryptedInstream,
+      ...instreamUpdates,
+    }
+
+    unencryptedInstream = {
+      ...unencryptedInstream,
+      streamId: instreamUpdates.streamId,
+      primaryData: instreamUpdates.primaryEncryptedData? this.decryptData( channelKey, instreamUpdates.primaryEncryptedData ).data: ( unencryptedInstream as UnecryptedStreamData ).primaryData,
+      metaData: instreamUpdates.metaData? instreamUpdates.metaData: ( unencryptedInstream as UnecryptedStreamData ).metaData,
+    }
+
+    contact.permanentChannel[ instreamUpdates.streamId ] = ( encryptedInstream as StreamData )
+    contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] = ( unencryptedInstream as UnecryptedStreamData )
+    contact.isActive = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.active )
+    contact.hasNewData = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.newData )
+    if( !contact.walletID )
+      contact.walletID = idx( ( unencryptedInstream as UnecryptedStreamData ).primaryData, ( _ ) => _.walletID )
   };
 
   public syncPermanentChannels = async (
@@ -186,7 +200,8 @@ export default class TrustedContacts {
     contactDetails?: ContactDetails,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-    contactsSecondaryChannelKey?: string
+    contactsSecondaryChannelKey?: string,
+    metaSync?: boolean,
   }[]
   ): Promise<{
     updated: boolean;
@@ -196,7 +211,7 @@ export default class TrustedContacts {
       }
       const channelOutstreams = {
       }
-      for ( const { channelKey, streamId, contactDetails, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey } of channelSyncDetails ){
+      for ( const { channelKey, streamId, contactDetails, secondaryChannelKey, unEncryptedOutstreamUpdates, contactsSecondaryChannelKey, metaSync } of channelSyncDetails ){
         let contact: TrustedContact = this.trustedContacts[ channelKey ]
 
         if ( !contact ) {
@@ -205,6 +220,7 @@ export default class TrustedContacts {
           const newContact: TrustedContact = {
             contactDetails,
             isActive: true,
+            hasNewData: true,
             permanentChannelAddress: crypto
               .createHash( 'sha256' )
               .update( channelKey )
@@ -232,7 +248,8 @@ export default class TrustedContacts {
         }
         channelOutstreams[ permanentChannelAddress ] = {
           streamId,
-          outstreamUpdates
+          metaSync,
+          outstreamUpdates,
         }
       }
 
@@ -322,124 +339,6 @@ export default class TrustedContacts {
       if ( err.response ) throw new Error( err.response.data.err )
       if ( err.code ) throw new Error( err.code )
       throw new Error( err.message )
-    }
-  };
-
-  public walletCheckIn = async (
-    walletId: string,
-    metaShares: MetaShare[],
-    healthCheckStatus,
-    metaSharesUnderCustody: MetaShare[],
-    currencyCode
-  ): Promise<{
-    updated: boolean;
-    healthCheckStatus;
-    updationInfo: Array<{
-      walletId: string;
-      shareId: string;
-      updated: boolean;
-      updatedAt?: number;
-      encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
-      err?: string;
-    }>;
-    exchangeRates: { [currency: string]: number };
-    averageTxFees: any;
-  }> => {
-    const updateChannelsLS = {
-    }
-    const channelAddressToKeyMapping = {
-    }
-    const outStreamId = TrustedContacts.getStreamId( walletId )
-    const currentTS = Date.now()
-
-    for ( const channelKey of Object.keys( this.trustedContacts ) ) {
-      const contact = this.trustedContacts[ channelKey ]
-      const { permanentChannelAddress, permanentChannel, isActive } = contact
-      if( isActive && Object.keys( permanentChannel ).length > 1 ){ // contact established(in-stream available)
-        contact.unencryptedPermanentChannel[ outStreamId ].metaData.flags.lastSeen = currentTS
-        contact.permanentChannel[ outStreamId ].metaData.flags.lastSeen = currentTS
-        updateChannelsLS[ permanentChannelAddress ] = {
-          lastSeen: currentTS
-        }
-        channelAddressToKeyMapping[ permanentChannelAddress ] = channelKey
-      }
-    }
-
-    const toUpdate = [] // healths to update(shares under custody)
-    for ( const share of metaSharesUnderCustody ) {
-      toUpdate.push( {
-        walletId: share.meta.walletId,
-        shareId: share.shareId,
-        reshareVersion: share.meta.reshareVersion,
-      } )
-    }
-
-    const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
-      HEXA_ID,
-      walletID: walletId,
-      shareIDs: metaShares
-        ? metaShares.map( ( metaShare ) => metaShare.shareId )
-        : null, // legacy HC
-      updateChannelsLS, // LS update
-      toUpdate, // share under-custody update
-      ...currencyCode && {
-        currencyCode
-      },
-    } )
-
-    const {
-      updated,
-      updatedLastSeens,
-      exchangeRates,
-      averageTxFees,
-    } = res.data // LS data & exchange rates
-    const { updationInfo } = res.data // share under-custody update info
-    const updates: Array<{
-      shareId: string;
-      updatedAt: number;
-      reshareVersion: number;
-    }> = res.data.lastUpdateds // legacy HC
-    // console.log({ updatedLastSeens, updates, updationInfo });
-
-    // synching health: legacy
-    if ( metaShares && updates.length ) {
-      for ( const { shareId, updatedAt, reshareVersion } of updates ) {
-        for ( let index = 0; index < metaShares.length; index++ ) {
-          if ( metaShares[ index ] && metaShares[ index ].shareId === shareId ) {
-            if ( healthCheckStatus[ index ] ) {
-              const currentReshareVersion =
-                healthCheckStatus[ index ].reshareVersion !== undefined
-                  ? healthCheckStatus[ index ].reshareVersion
-                  : 0
-
-              if ( reshareVersion < currentReshareVersion ) continue // skipping health updation from previous keeper(while the share is still not removed from keeper's device)
-            }
-
-            healthCheckStatus[ index ] = {
-              shareId,
-              updatedAt,
-              reshareVersion,
-            }
-          }
-        }
-      }
-    }
-
-    Object.keys( updatedLastSeens ).forEach( ( permanentChannelAddress ) => {
-      const { lastSeen, instreamId } = updatedLastSeens[ permanentChannelAddress ]
-      const channelKey = channelAddressToKeyMapping[ permanentChannelAddress ]
-
-      const contact = this.trustedContacts[ channelKey ]
-      contact.unencryptedPermanentChannel[ instreamId ].metaData.flags.lastSeen = lastSeen
-      contact.permanentChannel[ instreamId ].metaData.flags.lastSeen = lastSeen
-    } )
-
-    return {
-      updated,
-      healthCheckStatus,
-      updationInfo,
-      exchangeRates,
-      averageTxFees,
     }
   };
 }

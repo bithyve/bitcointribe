@@ -21,8 +21,6 @@ import {
   BackupStreamData,
   ContactInfo,
   ContactDetails,
-  KeeperInfoInterface,
-  MetaShare,
   TrustedContact,
   ChannelAssets
 } from '../../bitcoin/utilities/Interface'
@@ -36,7 +34,6 @@ import {
   REGULAR_ACCOUNT,
   TRUSTED_CONTACTS,
   TEST_ACCOUNT,
-  SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
@@ -50,14 +47,12 @@ import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountIn
 import AccountShell from '../../common/data/models/AccountShell'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import moment from 'moment'
-import semver from 'semver'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import idx from 'idx'
 import { ServicesJSON } from '../../common/interfaces/Interfaces'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import RelayServices from '../../bitcoin/services/RelayService'
 
 export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedContactsSubAccountInfo, parentShell: AccountShell, contactInfo: ContactInfo ) {
   const accountsState: AccountsState = yield select( state => state.accounts )
@@ -161,7 +156,7 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
   } ) )
 }
 
-function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates: UnecryptedStreamData }[], updatedSERVICES?: ServicesJSON, shouldNotUpdateSERVICES?: boolean }} ) {
+function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, updatedSERVICES?: ServicesJSON, shouldNotUpdateSERVICES?: boolean }} ) {
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
@@ -178,24 +173,31 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
     contactDetails?: ContactDetails,
     secondaryChannelKey?: string,
     unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-    contactsSecondaryChannelKey?: string
+    contactsSecondaryChannelKey?: string,
+    metaSync?: boolean,
   }[] = []
   let flowKind: InitTrustedContactFlowKind // todo
   let contactIdentifier: string
 
-  const { permanentChannelsSyncKind, channelUpdates } = payload
+  const { permanentChannelsSyncKind, channelUpdates, metaSync, hardSync } = payload
 
   switch( permanentChannelsSyncKind ){
       case PermanentChannelsSyncKind.SUPPLIED_CONTACTS:
         if( !channelUpdates.length ) throw new Error( 'Sync permanent channels failed: supplied channel updates missing' )
         for( const { contactInfo, streamUpdates } of channelUpdates ){
+          const contact = trustedContacts.tc.trustedContacts[ contactInfo.channelKey ]
+          if( contact )
+            if( !contact.hasNewData && !hardSync )
+              continue
+
           channelSyncUpdates.push( {
             contactDetails: contactInfo.contactDetails,
             channelKey: contactInfo.channelKey,
-            streamId: streamUpdates.streamId,
+            streamId: streamId,
             secondaryChannelKey: contactInfo.secondaryChannelKey,
             unEncryptedOutstreamUpdates: streamUpdates,
-            contactsSecondaryChannelKey: contactInfo.contactsSecondaryChannelKey
+            contactsSecondaryChannelKey: contactInfo.contactsSecondaryChannelKey,
+            metaSync
           } )
           flowKind = contactInfo.flowKind
           contactIdentifier = contactInfo.channelKey
@@ -212,11 +214,14 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
 
         Object.keys( existingContacts ).forEach( channelKey => {
           const contact: TrustedContact = existingContacts[ channelKey ]
-          if( contact.isActive )
-            channelSyncUpdates.push( {
-              channelKey: channelKey,
-              streamId
-            } )
+          if( contact.isActive ){
+            if( metaSync || contact.hasNewData || hardSync )
+              channelSyncUpdates.push( {
+                channelKey: channelKey,
+                streamId,
+                metaSync
+              } )
+          }
         } )
         break
 
@@ -476,22 +481,10 @@ export const removeTrustedContactWatcher = createWatcher(
 )
 
 function* walletCheckInWorker( { payload } ) {
-  // syncs last seen, health & exchange rates
-  const newBHRFlowStarted = yield select( ( state ) => state.health.newBHRFlowStarted )
-  let s3Service: S3Service
-  const trustedContacts: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
-  )
+  // syncs exchange and fee rates
   const accountsState: AccountsState = yield select( state => state.accounts )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const { walletId } = regularAccount.hdWallet.getWalletId()
-
-
-  if( newBHRFlowStarted === true ){
-    s3Service = yield select( ( state ) => state.health.service )
-  } else {
-    s3Service = yield select( ( state ) => state.sss.service )
-  }
 
   const storedExchangeRates = yield select(
     ( state ) => state.accounts.exchangeRates,
@@ -500,62 +493,16 @@ function* walletCheckInWorker( { payload } ) {
     ( state ) => state.accounts.averageTxFees,
   )
 
-  const DECENTRALIZED_BACKUP = yield select(
-    ( state ) => state.storage.database.DECENTRALIZED_BACKUP,
-  )
-  const underCustody = {
-    ...DECENTRALIZED_BACKUP.UNDER_CUSTODY
-  }
-  const metaSharesUnderCustody = Object.keys( underCustody ).map(
-    ( tag ) => underCustody[ tag ].META_SHARE,
-  )
-
   try{
-    console.log( 'Wallet Check-In in progress...' )
-
-    const { synchingContacts, currencyCode } = payload
-    if (
-      synchingContacts &&
-      !Object.keys( trustedContacts.tc.trustedContacts ).length
-    ) {
-      yield put( calculateOverallHealth( s3Service ) )
-      return // aborting checkIn if walletSync is specifically done in context of trusted-contacts
-    }
-
-    const preSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
-
-    const { metaShares, healthCheckStatus } = s3Service.sss
-    const preSyncHCStatus = JSON.stringify( {
-      healthCheckStatus
-    } )
-    const shareArray = [] // healths to update(shares under custody)
-    for ( const share of metaSharesUnderCustody ) {
-      if( semver.gte( share.meta.version, '1.5.0' ) ) {
-        shareArray.push( {
-          walletId: share.meta.walletId,
-          shareId: share.shareId,
-          reshareVersion: share.meta.reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-        } )
-      }
-    }
-    yield put( updateMSharesHealth( shareArray, true )  )
+    const { currencyCode } = payload
     const res = yield call(
-      trustedContacts.walletCheckIn,
+      RelayServices.walletCheckIn,
       walletId,
-      metaShares.length ? metaShares.slice( 0, 3 ) : null, // metaShares is null during wallet-setup
-      metaShares.length ? healthCheckStatus : {
-      },
-      metaSharesUnderCustody,
       currencyCode
     )
 
     if ( res.status === 200 ) {
       const { exchangeRates, averageTxFees } = res.data
-      console.log( {
-        exchangeRates
-      } )
       if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
       } ) )
       else {
@@ -568,46 +515,9 @@ function* walletCheckInWorker( { payload } ) {
         if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
           yield put( setAverageTxFee( averageTxFees ) )
       }
-
-
-      const postSyncTC = JSON.stringify( trustedContacts.tc.trustedContacts )
-      const { healthCheckStatus } = res.data
-      const postSyncHCStatus = JSON.stringify( {
-        healthCheckStatus
-      } )
-
-      if (
-        preSyncTC !== postSyncTC ||
-        preSyncHCStatus !== postSyncHCStatus
-      ) {
-        let dbPayload = {
-        }
-        const { SERVICES } = yield select( ( state ) => state.storage.database )
-        let updatedSERVICES = {
-          ...SERVICES,
-          TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-        }
-
-        if ( preSyncHCStatus !== postSyncHCStatus ) {
-          s3Service.sss.healthCheckStatus = healthCheckStatus
-          updatedSERVICES = {
-            ...updatedSERVICES,
-            S3_SERVICE: JSON.stringify( s3Service ),
-          }
-        }
-        dbPayload = {
-          SERVICES: updatedSERVICES,
-        }
-
-        yield call( insertDBWorker, {
-          payload: dbPayload,
-        } )
-      }
     } else {
       console.log( 'Check-In failed', res.err )
     }
-
-    if ( metaShares.length ) yield put( calculateOverallHealth( s3Service ) )
   } catch( err ){
     console.log( 'Wallet Check-In failed w/ the following err: ', err )
   }
