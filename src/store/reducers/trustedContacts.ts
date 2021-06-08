@@ -21,7 +21,6 @@ export type TrustedContactsState = {
   service: TrustedContactsService;
   loading: {
     existingPermanentChannelsSynching: boolean;
-    walletCheckIn: boolean;
   };
   trustedContactRecipients: ContactRecipientDescribing[];
 };
@@ -31,7 +30,6 @@ const initialState: TrustedContactsState = {
   service: null,
   loading: {
     existingPermanentChannelsSynching: false,
-    walletCheckIn: false,
   },
   trustedContactRecipients: [],
 }

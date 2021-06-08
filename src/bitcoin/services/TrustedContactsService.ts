@@ -120,58 +120,5 @@ export default class TrustedContactsService {
       }
     }
   };
-
-  public walletCheckIn = async (
-    walletId: string,
-    metaShares: MetaShare[],
-    healthCheckStatus,
-    metaSharesUnderCustody: MetaShare[],
-    currencyCode
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          updated: boolean;
-          healthCheckStatus: any;
-          updationInfo: Array<{
-            walletId: string;
-            shareId: string;
-            updated: boolean;
-            updatedAt?: number;
-            encryptedDynamicNonPMDD?: EncDynamicNonPMDD;
-            err?: string;
-          }>;
-          exchangeRates: { [currency: string]: number };
-          averageTxFees;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
-  > => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.tc.walletCheckIn(
-          walletId,
-          metaShares,
-          healthCheckStatus,
-          metaSharesUnderCustody,
-          currencyCode
-        ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to sync last seens',
-      }
-    }
-  };
 }
 
