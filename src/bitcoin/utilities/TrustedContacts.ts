@@ -186,6 +186,7 @@ export default class TrustedContacts {
 
     contact.permanentChannel[ instreamUpdates.streamId ] = ( encryptedInstream as StreamData )
     contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] = ( unencryptedInstream as UnecryptedStreamData )
+    contact.streamId = ( unencryptedInstream as UnecryptedStreamData ).streamId,
     contact.isActive = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.active )
     contact.hasNewData = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.newData )
     if( !contact.walletID )

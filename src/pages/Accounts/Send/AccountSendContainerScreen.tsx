@@ -9,7 +9,7 @@ import { clearTransfer } from '../../../store/actions/accounts'
 import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
-import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import KnowMoreButton from '../../../components/KnowMoreButton'
 import { BarCodeReadEvent } from 'react-native-camera'
@@ -24,15 +24,14 @@ import AccountSendScreen from './AccountSendScreen'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
 import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
-import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import idx from 'idx'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
-import ModalHeader from '../../../components/ModalHeader'
 import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
 import Colors from '../../../common/Colors'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 
 export type Props = {
   navigation: any;
@@ -51,6 +50,13 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
+
+  useEffect( ()=> {
+    dispatch( syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+      metaSync: true,
+    } ) )
+  }, [] )
 
   const { hasShownInitialKnowMoreSendSheet, } = usePreferencesState()
 
