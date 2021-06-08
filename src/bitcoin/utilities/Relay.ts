@@ -237,7 +237,7 @@ export default class Relay {
     try {
       let res: AxiosResponse
       try {
-        res = await BH_AXIOS.post( 'updateMessageStatus', {
+        res = await BH_AXIOS.post( 'updateMessages', {
           HEXA_ID,
           walletID,
           data,

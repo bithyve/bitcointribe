@@ -97,73 +97,21 @@ export function* getMessageWorker() {
     ( state ) => state.notifications.storeMessageTime,
   )
   console.log( 'messages getMessageWorker', typeof messages, messages,  )
-  /**
-   * Relay call of get Message once relay update remove code line 118 - 166 dummy data and uncomment below code
-   * testing is pending with Relay
-   */
 
-  // const res = yield call( RelayServices.getMessages, walletId, storeMessageTime )
-  // if ( res.status === 200 ) {
-  //   const { notifications } = res.data
-  //   const newMessageArray = messages.concat( notifications.filter( ( { notificationId } ) => !messages.find( f => f.notificationId == notificationId ) ) )
-  //   console.log( 'newMessageArray', newMessageArray )
+  const res = yield call( RelayServices.getMessages, walletId, storeMessageTime )
+  if ( res.status === 200 ) {
+    const { notifications } = res.data
+    const newMessageArray = messages.concat( notifications.filter( ( { notificationId } ) => !messages.find( f => f.notificationId == notificationId ) ) )
+    console.log( 'newMessageArray', newMessageArray )
 
-  //   yield put( messageFetched( newMessageArray ) )
-  //   yield put( storeMessagesTimeStamp() )
+    yield put( messageFetched( newMessageArray ) )
+    yield put( storeMessagesTimeStamp() )
 
-  //   yield put( fetchNotificationStarted( false ) )
-  // } else {
-  //   console.log( 'Failed to fetch notification' )
-  // }
-  const notifications = [ {
-    'type' : 'FNF_REQUEST',
-    'status': 'read',
-    'title': 'F&F request',
-    'info': 'F&F request awaiting',
-    'timeStamp': moment( new Date() ),
-    'notificationId': 1,
-    'AdditionalInfo': {
-    }
-  },
-  {
-    'type' : 'FNF_KEEPER_REQUEST',
-    'status': 'unread',
-    'title': 'F&F Keeper request',
-    'info': 'F&F Keeper request awaiting',
-    'timeStamp': moment( new Date() ),
-    'notificationId': 2,
-    'AdditionalInfo': {
-    }
-  },
-  {
-    'type' : 'FNF_TRANSACTION',
-    'status': 'unread',
-    'title': 'Transaction',
-    'info': '',
-    'timeStamp': moment( new Date() ),
-    'notificationId': 3,
-    'AdditionalInfo': {
-    }
-  },
-  {
-    'type' : 'RELEASE',
-    'status': 'unread',
-    'title': 'We’re better than ever\nTime to update',
-    'info': 'New Release',
-    'timeStamp': new Date(),
-    'notificationId': 4,
-    'AdditionalInfo': {
-    }
-  },
-  ]
+    yield put( fetchNotificationStarted( false ) )
+  } else {
+    console.log( 'Failed to fetch notification' )
+  }
 
-  const newMessageArray = messages.concat( notifications.filter( ( { notificationId } ) => !messages.find( f => f.notificationId == notificationId ) ) )
-  console.log( 'newMessageArray', newMessageArray )
-
-  yield put( messageFetched( newMessageArray ) )
-  yield put( storeMessagesTimeStamp() )
-
-  yield put( fetchNotificationStarted( false ) )
 }
 
 export const getMessageWatcher = createWatcher(
