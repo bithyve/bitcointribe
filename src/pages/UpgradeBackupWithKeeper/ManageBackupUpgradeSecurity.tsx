@@ -1351,15 +1351,14 @@ class ManageBackupUpgradeSecurity extends Component<
           </TouchableOpacity>*/}
         </View>
         <ScrollView
-          refreshControl={
-            <RefreshControl
-              refreshing={healthLoading}
-              onRefresh={() => {
-                const synchingContacts = true
-                walletCheckIn( synchingContacts )
-              }}
-            />
-          }
+          // refreshControl={
+          //   <RefreshControl
+          //     refreshing={healthLoading}
+          //     onRefresh={() => {
+          //       walletCheckIn( )
+          //     }}
+          //   />
+          // }
           style={{
             flex: 1
           }}

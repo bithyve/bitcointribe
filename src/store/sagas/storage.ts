@@ -69,7 +69,7 @@ function* fetchDBWorker() {
         const { currencyCode } = yield select( ( state ) => state.preferences )
 
         // sync the wallet w/ Relay
-        yield put( walletCheckIn( false, currencyCode || 'USD' ) )
+        yield put( walletCheckIn( currencyCode || 'USD' ) )
 
         // reset the sync status for all account shells
         yield put( clearAccountSyncCache() )

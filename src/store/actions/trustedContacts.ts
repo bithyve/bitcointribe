@@ -105,11 +105,10 @@ export const removeTrustedContact = ( { channelKey } : {channelKey: string} ) =>
   }
 }
 
-export const walletCheckIn = ( synchingContacts?: Boolean, currencyCode?: string ) => {
+export const walletCheckIn = ( currencyCode?: string ) => {
   return {
     type: WALLET_CHECK_IN,
     payload: {
-      synchingContacts,
       currencyCode
     },
   }
