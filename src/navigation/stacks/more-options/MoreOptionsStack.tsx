@@ -90,13 +90,13 @@ const MoreOptionsStack = createStackNavigator(
   },
   {
     initialRouteName: 'Home',
-    // defaultNavigationOptions: {
-    //   header: null
-    // },
+    defaultNavigationOptions: {
+      header: null
+    },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
 
-      if ( navigation.state.index === 0 && navigation.state.routes[ 0 ].routeName === 'Home' ) {
+      if ( navigation.state.routes[ 0 ].routeName === 'Home' ) {
         tabBarVisible = true
       }
 

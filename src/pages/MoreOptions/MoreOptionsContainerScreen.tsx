@@ -137,7 +137,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       }}
     >
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      <Header />
+      {/* <Header /> */}
       <View style={styles.accountCardsSectionContainer}>
         <ScrollView>
           <Text style={{

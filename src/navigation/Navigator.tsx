@@ -334,7 +334,7 @@ const Bottomtab = createMaterialBottomTabNavigator(
   },
   {
     initialRouteName: 'Home',
-    // lazy: false,
+    lazy: false,
     labeled: false,
     activeColor: 'red',
     inactiveColor: 'white',

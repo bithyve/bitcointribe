@@ -892,7 +892,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       'change',
       this.onAppStateChange
     )
-    InteractionManager.runAfterInteractions( () => {
+    requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
       // Keeping autoSynn disabled
@@ -2117,7 +2117,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header />
+        {/* <Header /> */}
         {/* <View
           style={{
             flex: 3.8,

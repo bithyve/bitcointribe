@@ -11,7 +11,9 @@ import {
   Platform,
   ImageBackground,
   StatusBar,
-  Modal
+  Modal,
+  InteractionManager,
+  ActivityIndicator
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -82,6 +84,7 @@ interface FriendsAndFamilyStateTypes {
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
   showLoader: boolean;
+  showIndicator: boolean
 }
 
 class FriendsAndFamilyScreen extends PureComponent<
@@ -110,17 +113,22 @@ class FriendsAndFamilyScreen extends PureComponent<
       ImKeeping: [],
       otherContacts: [],
       isShowingKnowMoreSheet: false,
-      showLoader: false
+      showLoader: false,
+      showIndicator: false,
     }
   }
 
   componentDidMount() {
-    console.log( '>>>>>>>>>. componentDidMount F&F >>>>>>>>' )
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
       // this.props.syncPermanentChannels( {
       //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
       // } )
-      this.updateAddressBook()
+      requestAnimationFrame( async() => {
+        this.setState( {
+          showIndicator: true
+        } )
+        this.updateAddressBook()
+      } )
     } )
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
@@ -161,6 +169,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   updateAddressBook = async () => {
+    // InteractionManager.runAfterInteractions( () => {
     const { trustedContactsService, regularAccount } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
     const { walletId } = regularAccount.hdWallet.getWalletId()
@@ -210,12 +219,15 @@ class FriendsAndFamilyScreen extends PureComponent<
       }
     }
 
+
     this.setState( {
       myKeepers,
       ImKeeping,
-      otherContacts
+      otherContacts,
+      showIndicator: false
     }
     )
+    // } )
   };
 
   renderHelpHeader = () => {
@@ -353,7 +365,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       ImKeeping,
       otherContacts,
       showLoader,
-      showModal
+      showIndicator
     } = this.state
     return (
       <ImageBackground
@@ -368,8 +380,16 @@ class FriendsAndFamilyScreen extends PureComponent<
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header />
+        {/* <Header /> */}
+
         <View style={styles.accountCardsSectionContainer}>
+          {showIndicator &&
+          <View style={[ styles.container, styles.horizontal ]}>
+            <ActivityIndicator color="#0000ff" size="large" animating={showIndicator} style={{
+              opacity:1
+            }} />
+          </View>
+          }
           <ScrollView
             refreshControl={
               <RefreshControl
@@ -668,6 +688,15 @@ export default connect( mapStateToProps, {
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {
+  container: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  horizontal: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10
+  },
   avatarImage: {
     ...ImageStyles.thumbnailImageMedium,
     borderRadius: wp( 12 )/2,

@@ -11,7 +11,8 @@ import {
   ImageBackground,
   Platform,
   Switch,
-  Image
+  Image,
+  // InteractionManager
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
@@ -219,7 +220,9 @@ class ManageBackupNewBHR extends Component<
   }
 
   componentDidMount = async () => {
+
     this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
+
     await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
       if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
         this.setState( {
@@ -237,7 +240,9 @@ class ManageBackupNewBHR extends Component<
       // }
     } )
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.updateAddressBook()
+      requestAnimationFrame( async() => {
+        this.updateAddressBook()
+      } )
     } )
   };
   updateAddressBook = async () => {
@@ -817,7 +822,7 @@ class ManageBackupNewBHR extends Component<
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header />
+        {/* <Header /> */}
         <View style={styles.accountCardsSectionContainer}>
           {/* <View style={{
         flex: 1, backgroundColor: 'white'
