@@ -14,6 +14,7 @@ import AccountArchiveModal from './AccountArchiveModal'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
@@ -43,6 +44,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
   const dispatch = useDispatch()
 
+  const [ showRescanning, setShowRescanning ] = useState( false )
+  const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
+
   const accountShell = useAccountShellForID( accountShellID )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
@@ -58,7 +62,9 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
 
   useEffect( () => {
     return () => {
-      dismissBottomSheet()
+      // dismissBottomSheet()
+      setShowRescanningPrompt( false )
+      setShowRescanning( false )
     }
   }, [ navigation ] )
 
@@ -186,7 +192,8 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
 
   function handleRescanListItemSelection() {
-    showRescanningPromptBottomSheet()
+    // showRescanningPromptBottomSheet()
+    setShowRescanningPrompt( true )
   }
 
   function handleAccountArchive() {
@@ -224,59 +231,60 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
-    dismissBottomSheet()
-
+    // dismissBottomSheet()
+    setShowRescanning( false )
     navigation.navigate( 'TransactionDetails', {
       transaction: transactionData.details,
       accountShellID: accountShell.id,
     } )
   }
 
-  const showRescanningPromptBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  const showRescanningPromptBottomSheet = () => {
+    return (
       <AccountShellRescanningPromptBottomSheet
         onContinue={() => {
-          dismissBottomSheet()
+          setShowRescanningPrompt( false )
           setTimeout( () => {
-            showRescanningBottomSheet()
+            // showRescanningBottomSheet()
+            setShowRescanning( true )
           }, 800 )
         }}
-        onDismiss={dismissBottomSheet}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '33%' ],
-      },
+        onDismiss={() => setShowRescanning( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
 
-  const showRescanningBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  const showRescanningBottomSheet = () => {
+    return (
       <AccountShellRescanningBottomSheet
         accountShell={accountShell}
         onDismiss={dismissBottomSheet}
         onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
 
   return (
-    <FlatList
-      style={styles.rootContainer}
-      contentContainerStyle={{
-        paddingHorizontal: 14
-      }}
-      extraData={accountShell}
-      data={listItems}
-      keyExtractor={listItemKeyExtractor}
-      renderItem={renderItem}
-    />
+    <>
+      <FlatList
+        style={styles.rootContainer}
+        contentContainerStyle={{
+          paddingHorizontal: 14
+        }}
+        extraData={accountShell}
+        data={listItems}
+        keyExtractor={listItemKeyExtractor}
+        renderItem={renderItem}
+      />
+      <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
+        {showRescanningPromptBottomSheet()}
+      </ModalContainer>
+      <ModalContainer visible={showRescanning} closeBottomSheet={() => {}}>
+        {showRescanningBottomSheet()}
+      </ModalContainer>
+    </>
   )
 }
 

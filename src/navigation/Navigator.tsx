@@ -277,7 +277,7 @@ const HomeNavigator = createStackNavigator(
 //   Settings: AccountDetailsStack,
 // } )
 
-const Bottomtab = createBottomTabNavigator(
+const Bottomtab = createMaterialBottomTabNavigator(
   {
     Home: {
       screen: HomeStack,
@@ -332,9 +332,9 @@ const Bottomtab = createBottomTabNavigator(
       },
     },
   },
-
   {
-    lazy: true,
+    initialRouteName: 'Home',
+    // lazy: false,
     labeled: false,
     activeColor: 'red',
     inactiveColor: 'white',

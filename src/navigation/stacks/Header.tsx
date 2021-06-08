@@ -879,10 +879,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       newBHRFlowStarted,
       credsAuthenticated
     } = this.props
-    this.appStateListener = AppState.addEventListener(
-      'change',
-      this.onAppStateChange
-    )
+
     InteractionManager.runAfterInteractions( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
