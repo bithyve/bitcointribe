@@ -572,6 +572,7 @@ export interface TrustedContact {
   permanentChannel?: Streams, // encrypted and uploaded to Relay
   unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
   secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
+  streamId?: string, // contact's streamId
   walletID?: string, // contact's walletId
   contactsSecondaryChannelKey?: string, // contacts secondaryKey(stored locally)
 }

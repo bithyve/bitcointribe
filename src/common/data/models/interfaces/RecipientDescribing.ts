@@ -17,9 +17,11 @@ export interface RecipientDescribing {
 export type AddressRecipientDescribing = RecipientDescribing
 
 export interface ContactRecipientDescribing extends RecipientDescribing {
+  isActive: boolean,
   lastSeenActive: number | null;
   walletName: string | null;
   trustKind: ContactTrustKind;
+  paymentAddresses: { [accountType: string]: string},
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {
