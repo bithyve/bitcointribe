@@ -24,10 +24,6 @@ import {
   TrustedContact,
   ChannelAssets
 } from '../../bitcoin/utilities/Interface'
-import {
-  calculateOverallHealth,
-} from '../actions/sss'
-import { updateMSharesHealth } from '../actions/health'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
@@ -39,7 +35,6 @@ import { insertDBWorker } from './storage'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import Toast from '../../components/Toast'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import DeviceInfo from 'react-native-device-info'
 import { addNewSecondarySubAccount, exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
@@ -187,7 +182,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         for( const { contactInfo, streamUpdates } of channelUpdates ){
           const contact = trustedContacts.tc.trustedContacts[ contactInfo.channelKey ]
           if( contact )
-            if( !contact.hasNewData && !hardSync )
+            if( !contact.isActive || ( !streamUpdates && !contact.hasNewData && !hardSync ) )
               continue
 
           channelSyncUpdates.push( {
@@ -243,6 +238,11 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
             } )
         } )
         break
+  }
+
+  if( !channelSyncUpdates.length ) {
+    console.log( 'Exiting sync: no channels to update' )
+    return
   }
 
   const res = yield call(
