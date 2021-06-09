@@ -104,9 +104,10 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      // this.props.syncPermanentChannels( {
-      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      // } )
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
+      } )
       this.updateAddressBook()
     } )
     this.props.navigation.setParams( {
@@ -322,7 +323,6 @@ class FriendsAndFamilyScreen extends PureComponent<
               onRefresh={() => {
                 syncPermanentChannels( {
                   permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-                  metaSync: true,
                 } )
               }}
             />
