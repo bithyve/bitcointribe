@@ -81,6 +81,7 @@ import {
 } from '../../common/constants/wallet-service-types'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import ModalContainer from '../../components/home/ModalContainer'
+import { ActivityIndicator } from 'react-native-paper'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -108,6 +109,7 @@ interface ManageBackupNewBHRStateTypes {
   ImKeeping: any[];
   listModal: boolean;
   errorModal: boolean;
+  showIndicator: boolean
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -216,6 +218,7 @@ class ManageBackupNewBHR extends Component<
       ImKeeping: [],
       listModal: false,
       errorModal: false,
+      showIndicator: false,
     }
   }
 
@@ -240,6 +243,9 @@ class ManageBackupNewBHR extends Component<
       // }
     } )
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+      this.setState( {
+        showIndicator: true
+      } )
       requestAnimationFrame( async() => {
         this.updateAddressBook()
       } )
@@ -279,6 +285,7 @@ class ManageBackupNewBHR extends Component<
 
     this.setState( {
       ImKeeping,
+      showIndicator: false
     }
     )
   };
@@ -806,7 +813,8 @@ class ManageBackupNewBHR extends Component<
       selectedKeeperName,
       selectedKeeperType,
       listModal,
-      errorModal
+      errorModal,
+      showIndicator
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -823,6 +831,11 @@ class ManageBackupNewBHR extends Component<
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         {/* <Header /> */}
+        {showIndicator &&
+            <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
+              <ActivityIndicator color={Colors.white} size='large'/>
+            </ModalContainer>
+        }
         <View style={styles.accountCardsSectionContainer}>
           {/* <View style={{
         flex: 1, backgroundColor: 'white'

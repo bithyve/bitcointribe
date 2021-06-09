@@ -880,7 +880,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       credsAuthenticated
     } = this.props
 
-    InteractionManager.runAfterInteractions( () => {
+    requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
       // Keeping autoSynn disabled

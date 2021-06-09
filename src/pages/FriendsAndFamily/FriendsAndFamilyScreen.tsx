@@ -120,13 +120,13 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      // this.props.syncPermanentChannels( {
-      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      // } )
-      requestAnimationFrame( async() => {
+      requestAnimationFrame( () => {
         this.setState( {
           showIndicator: true
         } )
+        // this.props.syncPermanentChannels( {
+        //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+        // } )
         this.updateAddressBook()
       } )
     } )
@@ -169,27 +169,27 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   updateAddressBook = async () => {
+    // console.log( '111111111' )
     // InteractionManager.runAfterInteractions( () => {
     const { trustedContactsService, regularAccount } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
     const { walletId } = regularAccount.hdWallet.getWalletId()
-
     const myKeepers = []
     const ImKeeping = []
     const otherContacts = []
-
+    // console.log( '222222222' )
     let skippedContactsCounter = 1
     for( const channelKey of Object.keys( contacts ) ){
       const contact = contacts[ channelKey ]
       const { contactDetails, relationType } = contact
       const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
-
+      // console.log( '33333333333' )
       let contactName = contactDetails.contactName
       if( contactName === SKIPPED_CONTACT_NAME ){ // skipped contacts instance count append
         contactName = `${SKIPPED_CONTACT_NAME} ${skippedContactsCounter}`
         skippedContactsCounter++
       }
-
+      // console.log( '444444444' )
       const fnf = {
         id: contactDetails.id,
         isActive: contact.isActive,
@@ -208,7 +208,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         isFinalized: stream? true: false,
       }
       //  feature/2.0
-
+      // console.log( '555555555' )
       if( fnf.isActive ){
         if( fnf.isGuardian || fnf.isWard ){
           if( fnf.isGuardian ) myKeepers.push( fnf )
@@ -219,7 +219,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       }
     }
 
-
+    // console.log( '666666666' )
     this.setState( {
       myKeepers,
       ImKeeping,
@@ -227,6 +227,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       showIndicator: false
     }
     )
+    // console.log( '7777777777' )
     // } )
   };
 
@@ -280,7 +281,9 @@ class FriendsAndFamilyScreen extends PureComponent<
       <TouchableOpacity style={{
         alignItems: 'center',
         flex: 1
-      }}>
+      }}
+      key={index}
+      >
         <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
         <Text style={{
           textAlign: 'center', marginTop: hp ( 0.5 )
@@ -384,11 +387,9 @@ class FriendsAndFamilyScreen extends PureComponent<
 
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
-          <View style={[ styles.container, styles.horizontal ]}>
-            <ActivityIndicator color="#0000ff" size="large" animating={showIndicator} style={{
-              opacity:1
-            }} />
-          </View>
+            <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
+              <ActivityIndicator color={Colors.white} size='large'/>
+            </ModalContainer>
           }
           <ScrollView
             refreshControl={

@@ -277,7 +277,7 @@ const HomeNavigator = createStackNavigator(
 //   Settings: AccountDetailsStack,
 // } )
 
-const Bottomtab = createMaterialBottomTabNavigator(
+const Bottomtab = createBottomTabNavigator(
   {
     Home: {
       screen: HomeStack,
@@ -334,19 +334,27 @@ const Bottomtab = createMaterialBottomTabNavigator(
   },
   {
     initialRouteName: 'Home',
+    // swipeEnabled: false,
+    // animationEnabled: false,
     lazy: false,
-    labeled: false,
-    activeColor: 'red',
-    inactiveColor: 'white',
-    barStyle: {
-      // flex: 1,
-      overflow:'hidden',
-      backgroundColor: Colors.blue,
-      borderRadius: 45,
-      margin: 15,
-      alignItems: 'center',
-      height: 70
-    },
+    // transitionConfig: () => ( {
+    //   transitionSpec: {
+    //     duration: 0,
+    //   },
+    // } ),
+    // lazy: false,
+    // labeled: false,
+    // activeColor: 'red',
+    // inactiveColor: 'white',
+    // barStyle: {
+    //   // flex: 1,
+    //   overflow:'hidden',
+    //   backgroundColor: Colors.blue,
+    //   borderRadius: 45,
+    //   margin: 15,
+    //   alignItems: 'center',
+    //   height: 70
+    // },
   },
 )
 
