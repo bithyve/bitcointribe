@@ -55,7 +55,7 @@ import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 
 export type AccountVars = {
-  service: RegularAccount | TestAccount | SecureAccount;
+  service: any;
 }
 
 // TODO: Remove this in favor of using the generalized `SubAccountDescribing` interface.
