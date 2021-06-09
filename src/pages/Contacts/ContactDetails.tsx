@@ -49,7 +49,6 @@ import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelec
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 
@@ -152,7 +151,6 @@ class ContactDetails extends PureComponent<
   Contact: any;
   contactsType: any;
   setIsSendDisabledListener: any;
-  ContactName: any;
 
   constructor( props ) {
     super( props )
@@ -213,11 +211,6 @@ class ContactDetails extends PureComponent<
 
     this.Contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
-    this.ContactName = `${this.Contact.firstName} ${
-      this.Contact.lastName ? this.Contact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
   }
 
   componentDidMount() {
@@ -320,14 +313,11 @@ class ContactDetails extends PureComponent<
   onPressSend = () => {
     const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.Contact.id )
     this.props.sourceAccountSelectedForSending(
-      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
+      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT )
     )
     this.props.addRecipientForSending( recipient )
     this.props.recipientSelectedForAmountSetting( recipient )
-    this.props.amountForRecipientUpdated( {
-      recipient,
-      amount: 0
-    } )
+
 
     this.props.navigation.dispatch(
       resetStackToSend( {
