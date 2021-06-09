@@ -65,6 +65,8 @@ export const MODIFY_LEVELDATA = 'MODIFY_LEVELDATA'
 export const SET_CHANNEL_ASSETS = 'SET_CHANNEL_ASSETS'
 export const CREATE_CHANNEL_ASSETS = 'CREATE_CHANNEL_ASSETS'
 export const APPROVAL_STATUS = 'APPROVAL_STATUS'
+export const DOWNLOAD_SM_SHARE = 'DOWNLOAD_SM_SHARE'
+export const CREATE_OR_CHANGE_GUARDIAN = 'CREATE_OR_CHANGE_GUARDIAN'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -552,10 +554,10 @@ export const setChannelAssets = ( channelAssets ) => {
   }
 }
 
-export const createChannelAssets = ( shareId, scannedData? ) => {
+export const createChannelAssets = ( shareId ) => {
   return {
     type: CREATE_CHANNEL_ASSETS, payload: {
-      shareId, scannedData
+      shareId
     }
   }
 }
@@ -564,6 +566,22 @@ export const setApprovalStatus = ( flag ) => {
   return {
     type: APPROVAL_STATUS, payload: {
       flag
+    }
+  }
+}
+
+export const downloadSMShare = ( scannedData ) => {
+  return {
+    type: DOWNLOAD_SM_SHARE, payload: {
+      scannedData
+    }
+  }
+}
+
+export const createOrChangeGuardian = ( channelKey, shareId, contact, index, isChange?, oldChannelKey? ) => {
+  return {
+    type: CREATE_OR_CHANGE_GUARDIAN, payload: {
+      channelKey, shareId, contact, index, isChange, oldChannelKey
     }
   }
 }
