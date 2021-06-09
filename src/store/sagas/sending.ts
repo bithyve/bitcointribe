@@ -8,7 +8,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { Contacts, DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements } from '../../bitcoin/utilities/Interface'
+import { DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -608,19 +608,19 @@ function* sendTxNotificationWorker() {
   )
 
   const { selectedRecipients } = sendingState
-  const contacts: Contacts = trustedContacts.tc.trustedContacts
+  const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
 
   const notifReceivers = []
   const selectedContacts = []
   selectedRecipients.forEach( ( recipient ) => {
-    if ( recipient.displayedName ) { // send notification to TC
-      const contactName = recipient.displayedName.toLowerCase().trim()
-      const contact = contacts[ contactName ]
+    if ( recipient.kind === RecipientKind.CONTACT ) { // send notification to TC
+      const channelKey = ( recipient as ContactRecipientDescribing ).channelKey
+      const contact = contacts[ channelKey ]
       if ( contact && contact.walletID ){
         selectedContacts.push( contact )
         notifReceivers.push( {
           walletId: contact.walletID,
-          FCMs: contact.FCMs,
+          FCMs: [ idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.FCM ) ],
         } )
       }
     }
