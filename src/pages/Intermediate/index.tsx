@@ -1,22 +1,22 @@
 import idx from 'idx'
 import React, { Component } from 'react'
-import { ImageBackground, View, StyleSheet, AppState, Platform } from 'react-native'
+import { ImageBackground, View, StyleSheet, AppState, Platform, Linking } from 'react-native'
 import { withNavigationFocus } from 'react-navigation'
 import Loader from '../../components/loader'
 import { connect } from 'react-redux'
-import { updateLastSeen } from '../../store/actions/preferences'
-// imageBackground has been replaced with a white image as this
-// could be identified as actually being used in the app
-const imageBackground = require( '../../assets/images/intermediate-bg.png' )
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import {
+  getMessages,
+} from '../../store/actions/notifications'
+import { processDL } from '../../common/CommonFunctions'
 
 interface IntermediatePropsTypes {
-    navigation: any
-    isFocused: boolean,
-    applicationStatus: any,
-    lastSeen: any,
-    updateLastSeen: any
+  initializeDB: any;
+  navigation: any;
+  lastSeen: any;
+  databaseInitialized: Boolean;
+  getMessages: any;
+  walletId: any;
 }
 
 interface IntermediateStateTypes {
@@ -26,6 +26,7 @@ interface IntermediateStateTypes {
 
 
 class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTypes> {
+  url: any;
   constructor( props ) {
     super( props )
     this.state = {
@@ -36,65 +37,154 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
 
     componentDidMount = () => {
       AppState.addEventListener( 'change', this.handleAppStateChange )
-      // this.handleLockCheck()
-      this.props.updateLastSeen()
+      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
+        url
+      } ) )
+      setTimeout( () => {
+        this.postSplashScreenActions()
+      }, 2 )
+
+      // AppState.addEventListener( 'change', this.handleAppStateChange )
+      // // this.handleLockCheck()
+      // this.props.updateLastSeen()
     };
 
+    handleAppStateChange = async ( nextAppState ) => {
+      // no need to trigger login screen if accounts are not synced yet
+      // which means user hasn't logged in yet
+      const walletExists = await AsyncStorage.getItem( 'walletExists' )
+      //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
+      if ( !walletExists ) {
+        return
+      }
+    };
 
-
-    handleLockCheck = () => {
-      const interval = setInterval( () => {
-        // check if it should be rendered
-        const TIME_OUT = 15000
-        const now: any = new Date()
-        const diff = Math.abs( now - this.props.lastSeen )
-        const { canLock } = this.state
-        if ( diff > TIME_OUT ) {
-          if ( canLock ) {
-            this.setState( {
-              canLock: false
-            }, () => {
-              this.props.navigation.push( 'ReLogin' )
-              clearInterval( interval )
-            } )
-          }
-        } else {
-          this.props.navigation.pop()
-          this.props.updateLastSeen()
-        }
-      }, 3000 )
+    handleDeepLinkEvent = async ( { url } ) => {
+      this.handleDeepLinking( url )
     }
 
+    handleDeepLinking = async ( url: string | null ) => {
+      //console.log( 'Launch::handleDeepLinkEvent::URL: ', url )
+      if ( url == null ) {
+        return
+      }
+      this.url=url
+    }
 
-    handleAppStateChange = async ( nextAppState ) => {
-      const TIME_OUT = 15000
-      if ( ( Platform.OS === 'ios' && nextAppState === 'active' ) || ( Platform.OS === 'android' && nextAppState === 'background' ) ) {
-        const now: any = new Date()
-        const diff = Math.abs( now - this.props.lastSeen )
-        const { canLock } = this.state
-        if ( diff > TIME_OUT ) {
-          if ( canLock ) {
-            this.setState( {
-              canLock: false
-            }, () => this.props.navigation.push( 'ReLogin' ) )
-          }
-        } else {
-          this.props.navigation.pop()
-          this.props.updateLastSeen( new Date() )
+    postSplashScreenActions = async () => {
+      try {
+        console.log( 'walletId', this.props.walletId )
+        if( this.props.walletId ){
+          this.props.getMessages()
         }
+        const url = await Linking.getInitialURL()
+        //console.log( 'url', url )
+
+        const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
+
+        // initiates the SQL DB
+        if( !this.props.databaseInitialized ) this.props.initializeDB()
+
+        // scenario based navigation
+        if ( hasCreds ) {
+          const now: any = new Date()
+          const diff = Math.abs( now - this.props.lastSeen )
+          const isHomePageOpen = Number( diff ) < Number( 20000 )
+          console.log( 'diff', diff, isHomePageOpen )
+          if( isHomePageOpen ){
+            if ( !this.url ){
+              this.props.navigation.replace( 'Home', {
+                screen: 'Home',
+              } )
+            } else {
+              const requestName = await processDL( this.url )
+              this.props.navigation.replace( 'Home', {
+                screen: 'Home',
+                params: {
+                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+                  trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
+                  swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+                }
+              } )
+            }
+          } else if ( !this.url ){
+            this.props.navigation.replace( 'Login' )
+          } else {
+            const requestName = await processDL( this.url )
+            this.props.navigation.replace( 'Login', {
+              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+              trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+              userKey: requestName && requestName.userKey ? requestName.userKey : null,
+              swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+            } )
+          }
+
+        } else {
+          this.props.navigation.replace( 'PasscodeConfirm' )
+        }
+
+      } catch ( err ) {
+        console.log( 'err', err )
       }
     };
 
 
+    // handleLockCheck = () => {
+    //   const interval = setInterval( () => {
+    //     // check if it should be rendered
+    //     const TIME_OUT = 15000
+    //     const now: any = new Date()
+    //     const diff = Math.abs( now - this.props.lastSeen )
+    //     const { canLock } = this.state
+    //     if ( diff > TIME_OUT ) {
+    //       if ( canLock ) {
+    //         this.setState( {
+    //           canLock: false
+    //         }, () => {
+    //           this.props.navigation.push( 'ReLogin' )
+    //           clearInterval( interval )
+    //         } )
+    //       }
+    //     } else {
+    //       this.props.navigation.pop()
+    //       this.props.updateLastSeen()
+    //     }
+    //   }, 3000 )
+    // }
+
+
+    // handleAppStateChange = async ( nextAppState ) => {
+    //   const TIME_OUT = 15000
+    //   if ( ( Platform.OS === 'ios' && nextAppState === 'active' ) || ( Platform.OS === 'android' && nextAppState === 'background' ) ) {
+    //     const now: any = new Date()
+    //     const diff = Math.abs( now - this.props.lastSeen )
+    //     const { canLock } = this.state
+    //     if ( diff > TIME_OUT ) {
+    //       if ( canLock ) {
+    //         this.setState( {
+    //           canLock: false
+    //         }, () => this.props.navigation.push( 'ReLogin' ) )
+    //       }
+    //     } else {
+    //       this.props.navigation.pop()
+    //       this.props.updateLastSeen( new Date() )
+    //     }
+    //   }
+    // };
+
+
     componentWillUnmount() {
-      AppState.removeEventListener( 'change', this.handleAppStateChange )
+      // AppState.removeEventListener( 'change', this.handleAppStateChange )
     }
 
 
     render() {
       return (
-        <ImageBackground source={imageBackground} style={styles.wrapper}>
-          <Loader isLoading={true}/>
+        <ImageBackground source={require( '../../assets/images/intermediate-bg.png' )} style={styles.wrapper}>
         </ImageBackground>
       )
     }
@@ -115,10 +205,12 @@ const styles = StyleSheet.create( {
 
 const mapStateToProps = ( state ) => {
   return {
-    applicationStatus: state.preferences.applicationStatus, lastSeen: state.preferences.lastSeen
+    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
+    lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
+    walletId: idx( state, ( _ ) => _.preferences.walletId )
   }
 }
 
 export default connect( mapStateToProps, {
-  updateLastSeen
+  getMessages
 } )( withNavigationFocus( Intermediate ) )

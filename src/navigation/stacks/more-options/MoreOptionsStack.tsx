@@ -18,6 +18,7 @@ import Fonts from '../../../common/Fonts'
 import Launch from '../../../pages/Launch'
 import ReLogin from '../../../pages/ReLogin'
 import Login from '../../../pages/Login'
+import Intermediate from '../../../pages/Intermediate'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -30,6 +31,7 @@ const MoreOptionsStack = createStackNavigator(
     },
     Launch,
     Login,
+    Intermediate,
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {

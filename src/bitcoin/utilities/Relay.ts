@@ -200,6 +200,61 @@ export default class Relay {
     }
   };
 
+
+  public static getMessages = async (
+    walletID: string,
+    storeMessageTime?: string
+  ): Promise<{
+    notifications:[];
+  }> => {
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'getMessages', {
+        HEXA_ID,
+        walletID,
+        storeMessageTime
+      } )
+    } catch ( err ) {
+      console.log( {
+        err
+      } )
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { notifications } = res.data
+    return {
+      notifications
+    }
+  };
+
+  public static updateMessageStatus = async (
+    walletID: string,
+    data: []
+  ): Promise<{
+    updated: boolean;
+  }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'updateMessages', {
+          HEXA_ID,
+          walletID,
+          data,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { updated } = res.data
+      return {
+        updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch GetBittr Details' )
+    }
+  }
+
   public static walletCheckIn = async (
     walletId: string,
     currencyCode?: any,

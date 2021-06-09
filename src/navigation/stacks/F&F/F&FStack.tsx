@@ -23,6 +23,7 @@ import RequestKeyFromContact from '../../../components/RequestKeyFromContact'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import ReLogin from '../../../pages/ReLogin'
+import Intermediate from '../../../pages/Intermediate'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -44,6 +45,7 @@ const FriendsAndFamily = createStackNavigator(
     },
     Login,
     Launch,
+    Intermediate,
     ReLogin: {
       screen: ReLogin,
       navigationOptions: {

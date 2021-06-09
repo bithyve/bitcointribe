@@ -289,7 +289,7 @@ const HomeHeader = ( {
             }}
             resizeMode={'contain'}
           >
-            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+            {notificationData.findIndex( ( value ) => value.status === 'unread' ) > -1 ? (
               <View
                 style={{
                   backgroundColor: Colors.red,
