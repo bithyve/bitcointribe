@@ -12,7 +12,7 @@ import { Contacts, DerivativeAccountTypes, INotification, notificationTag, notif
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT, TEST_ACCOUNT, TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
+import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { AccountRecipientDescribing, ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
@@ -74,6 +74,9 @@ function* processRecipients( accountShell: AccountShell ){
   )
   const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
   const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+  const trustedContacts: TrustedContactsService = yield select(
+    ( state ) => state.trustedContacts.service,
+  )
 
   const recipients: [
     {
@@ -85,7 +88,7 @@ function* processRecipients( accountShell: AccountShell ){
     }?
   ]  = []
 
-  selectedRecipients.forEach( ( recipient )=>{
+  for( const recipient of selectedRecipients ){
     switch( recipient.kind ){
         case RecipientKind.ADDRESS:
           recipients.push( {
@@ -95,7 +98,7 @@ function* processRecipients( accountShell: AccountShell ){
           } )
           break
 
-        // TODO: RecipientDescribing should have type and instance/acc number properties
+          // TODO: RecipientDescribing should have type and instance/acc number properties
         case RecipientKind.ACCOUNT_SHELL:
           const instanceNumber = ( recipient as AccountRecipientDescribing ).instanceNumber
           let accountKind =  ( ( recipient as AccountRecipientDescribing ).type as string )
@@ -108,9 +111,9 @@ function* processRecipients( accountShell: AccountShell ){
 
           const sourceAccount = ( recipient as AccountRecipientDescribing ).sourceAccount
           const subInstance =
-          sourceAccount === REGULAR_ACCOUNT
-            ? regularAccount.hdWallet
-            : secureAccount.secureHDWallet
+        sourceAccount === REGULAR_ACCOUNT
+          ? regularAccount.hdWallet
+          : secureAccount.secureHDWallet
 
           let receivingAddress
           if ( config.EJECTED_ACCOUNTS.includes( accountKind ) )
@@ -131,15 +134,20 @@ function* processRecipients( accountShell: AccountShell ){
           break
 
         case RecipientKind.CONTACT:
+          const contact = trustedContacts.tc.trustedContacts[ ( recipient as ContactRecipientDescribing ).channelKey ]
+          const paymentAddresses = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.paymentAddresses )
+          if( !paymentAddresses ) throw new Error( `Payment addresses missing for: ${recipient.displayedName}` )
+
           let paymentAddress
           switch( accountShell.primarySubAccount.sourceKind ){
               case SourceAccountKind.TEST_ACCOUNT:
-                paymentAddress = ( recipient as ContactRecipientDescribing ).paymentAddresses[ SubAccountKind.TEST_ACCOUNT ]
+                paymentAddress = paymentAddresses[ SubAccountKind.TEST_ACCOUNT ]
                 break
 
               default:
-                paymentAddress = ( recipient as ContactRecipientDescribing ).paymentAddresses[ SubAccountKind.TRUSTED_CONTACTS ]
+                paymentAddress = paymentAddresses[ SubAccountKind.TRUSTED_CONTACTS ]
           }
+          if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
           SubAccountKind.TRUSTED_CONTACTS
           recipients.push( {
@@ -149,7 +157,7 @@ function* processRecipients( accountShell: AccountShell ){
           } )
           break
     }
-  } )
+  }
 
   if( !recipients.length ) throw new Error( 'Recipients missing' )
   return recipients
