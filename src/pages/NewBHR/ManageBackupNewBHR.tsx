@@ -225,36 +225,38 @@ class ManageBackupNewBHR extends Component<
   componentDidMount = async () => {
 
     this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
-
-    await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
-      if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
-        this.setState( {
-          showLoader: true
-        } )
-        this.props.setLevelToNotSetupStatus()
-        this.props.modifyLevelData()
-      } else {
-        await this.onRefresh()
-        this.props.modifyLevelData()
-      }
+    requestAnimationFrame( async() => {
+      const { regularAccount } = this.props
+      const { walletId } = regularAccount.hdWallet.getWalletId()
+      await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
+        if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
+          this.setState( {
+            showLoader: true
+          } )
+          this.props.setLevelToNotSetupStatus()
+          this.props.modifyLevelData()
+        } else {
+          await this.onRefresh()
+          this.props.modifyLevelData()
+        }
       // updates the new FCM token to channels post recovery
       // if ( JSON.parse( recovered ) && !this.props.isNewFCMUpdated ) {
       //   this.props.updateNewFcm()
       // }
-    } )
-    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.setState( {
-        showIndicator: true
       } )
-      requestAnimationFrame( async() => {
-        this.updateAddressBook()
+      this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+        this.setState( {
+          showIndicator: true
+        } )
+
+        this.updateAddressBook( walletId )
       } )
     } )
   };
-  updateAddressBook = async () => {
-    const { trustedContactsService, regularAccount } = this.props
+
+  updateAddressBook = async ( walletId ) => {
+    const { trustedContactsService } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
-    const { walletId } = regularAccount.hdWallet.getWalletId()
     const ImKeeping = []
     const otherContacts = []
     for( const contact of Object.values( contacts ) ){
@@ -374,7 +376,13 @@ class ManageBackupNewBHR extends Component<
 
     if (
       prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
-    ) this.updateAddressBook()
+    ) {
+      requestAnimationFrame( () => {
+        const { regularAccount } = this.props
+        const { walletId } = regularAccount.hdWallet.getWalletId()
+        this.updateAddressBook( walletId )
+      } )
+    }
     if (
       prevProps.healthLoading !== this.props.healthLoading ||
       prevProps.cloudBackupStatus !==
@@ -771,35 +779,36 @@ class ManageBackupNewBHR extends Component<
 
   onKeeperButtonPress = ( value, keeperNumber ) =>{
     const { selectedKeeper } = this.state
-    if( value.id == 1 && keeperNumber == 1 ){
-      if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+    requestAnimationFrame( () => {
+      if( value.id == 1 && keeperNumber == 1 ){
+        if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
+          this.props.navigation.navigate(
+            'CloudBackupHistory',
+            {
+              selectedTime: selectedKeeper.updatedAt
+                ? getTime( selectedKeeper.updatedAt )
+                : 'never',
+            }
+          )
+        }
+      } else if( value.id == 1 && keeperNumber == 2 ) {
         this.props.navigation.navigate(
-          'CloudBackupHistory',
+          'SecurityQuestionHistoryNewBHR',
           {
             selectedTime: selectedKeeper.updatedAt
               ? getTime( selectedKeeper.updatedAt )
               : 'never',
           }
         )
-      }
-    } else if( value.id == 1 && keeperNumber == 2 ) {
-      this.props.navigation.navigate(
-        'SecurityQuestionHistoryNewBHR',
-        {
-          selectedTime: selectedKeeper.updatedAt
-            ? getTime( selectedKeeper.updatedAt )
-            : 'never',
-        }
-      )
-    } else {
-      this.setState( {
-        showLoader: true,
-        selectedKeeper: keeperNumber == 1 ? value.keeper1 : value.keeper2
-      } )
-      requestAnimationFrame( () => {
+      } else {
+        this.setState( {
+          showLoader: true,
+          selectedKeeper: keeperNumber == 1 ? value.keeper1 : value.keeper2
+        } )
+
         this.onPressKeeperButton( value, keeperNumber )
-      } )
-    }
+      }
+    } )
   }
 
   render() {
@@ -830,7 +839,7 @@ class ManageBackupNewBHR extends Component<
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        {/* <Header /> */}
+        <Header />
         {showIndicator &&
             <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
               <ActivityIndicator color={Colors.white} size='large'/>

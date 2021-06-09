@@ -901,13 +901,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   componentDidUpdate = ( prevProps, prevState ) => {
-    if (
-      prevProps.accountsState.accountShells !==
-      this.props.accountsState.accountShells
-    ) {
-      this.calculateNetBalance()
-      // this.getNewTransactionNotifications()
-    }
+    // if (
+    //   prevProps.accountsState.accountShells !==
+    //   this.props.accountsState.accountShells
+    // ) {
+    //   this.calculateNetBalance()
+    //   // this.getNewTransactionNotifications()
+    // }
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1209,7 +1209,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
-      // this.notificationCheck()
+      this.notificationCheck()
       this.setState( {
         lastActiveTime: moment().toISOString(),
       } )
@@ -1804,7 +1804,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        {/* <Header /> */}
+        <Header />
         {/* <View
           style={{
             flex: 3.8,

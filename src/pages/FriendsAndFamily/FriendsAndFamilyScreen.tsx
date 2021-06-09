@@ -118,41 +118,57 @@ class FriendsAndFamilyScreen extends PureComponent<
     }
   }
 
-  componentDidMount() {
-    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      requestAnimationFrame( () => {
-        this.setState( {
-          showIndicator: true
-        } )
-        // this.props.syncPermanentChannels( {
-        //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-        // } )
-        this.updateAddressBook()
-      } )
-    } )
-    this.props.navigation.setParams( {
-      toggleKnowMoreSheet: this.toggleKnowMoreSheet,
+  componentDidMount = async() => {
+    const { regularAccount } = this.props
+    const { walletId } = regularAccount.hdWallet.getWalletId()
+    requestAnimationFrame( () => {
+      this.setUpFocusListener( walletId )
+
     } )
   }
 
   componentDidUpdate( prevProps, prevState ) {
     if (
       prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
-    ) this.updateAddressBook()
+    ) {
+      requestAnimationFrame( () => {
+        const { regularAccount } = this.props
+        const { walletId } = regularAccount.hdWallet.getWalletId()
+        this.updateAddressBook( walletId )
+      } )
+    }
 
     if (
       prevProps.existingPermanentChannelsSynching !==
-      this.props.existingPermanentChannelsSynching
+        this.props.existingPermanentChannelsSynching
     )
       this.setState( {
         showLoader: this.props.existingPermanentChannelsSynching,
       } )
+    // } )
+
 
   }
 
   componentWillUnmount() {
     this.focusListener.remove()
   }
+
+  setUpFocusListener = ( walletId ) => {
+    this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
+
+      this.setState( {
+        showIndicator: true
+      } )
+      // this.props.syncPermanentChannels( {
+      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+      // } )
+      this.updateAddressBook( walletId )
+    } )
+    this.props.navigation.setParams( {
+      toggleKnowMoreSheet: this.toggleKnowMoreSheet,
+    } )
+  };
 
   toggleKnowMoreSheet = () => {
     const shouldShow = !this.state.isShowingKnowMoreSheet
@@ -168,12 +184,12 @@ class FriendsAndFamilyScreen extends PureComponent<
     } )
   };
 
-  updateAddressBook = async () => {
+  updateAddressBook = async ( walletId ) => {
     // console.log( '111111111' )
     // InteractionManager.runAfterInteractions( () => {
-    const { trustedContactsService, regularAccount } = this.props
+    const { trustedContactsService } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
-    const { walletId } = regularAccount.hdWallet.getWalletId()
+
     const myKeepers = []
     const ImKeeping = []
     const otherContacts = []
@@ -383,7 +399,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        {/* <Header /> */}
+        <Header />
 
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
