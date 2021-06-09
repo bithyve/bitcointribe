@@ -182,7 +182,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         for( const { contactInfo, streamUpdates } of channelUpdates ){
           const contact = trustedContacts.tc.trustedContacts[ contactInfo.channelKey ]
           if( contact )
-            if( !contact.isActive || !contact.hasNewData && !hardSync )
+            if( !contact.isActive || ( !streamUpdates && !contact.hasNewData && !hardSync ) )
               continue
 
           channelSyncUpdates.push( {
@@ -240,7 +240,10 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         break
   }
 
-  if( !channelSyncUpdates.length ) return
+  if( !channelSyncUpdates.length ) {
+    console.log( 'Exiting sync: no channels to update' )
+    return
+  }
 
   const res = yield call(
     trustedContacts.syncPermanentChannels,

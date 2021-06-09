@@ -104,14 +104,14 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-        metaSync: true,
-      } )
       this.updateAddressBook()
     } )
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
+    } )
+    this.props.syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+      metaSync: true,
     } )
   }
 
