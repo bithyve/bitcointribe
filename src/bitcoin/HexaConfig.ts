@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import {
   DerivativeAccount,
@@ -37,10 +36,8 @@ class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
-  public BITCOIN_NODE: Client;
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
-  public TOKEN = 'notUsed';
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
   public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
@@ -153,17 +150,6 @@ class HexaConfig {
   public SIGNING_SERVER: string;
   public APP_STAGE: string;
 
-  public API_URLS = {
-    TESTNET: {
-      BASE: 'notUsed',
-      UNSPENT_OUTPUTS: 'notUsed'
-    },
-    MAINNET: {
-      BASE: 'notUsed',
-      UNSPENT_OUTPUTS: 'notUsed'
-    }
-  };
-
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
     series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
     instance: {
@@ -247,15 +233,6 @@ class HexaConfig {
 
     this.setNetwork()
 
-    // TODO:: Refactor Bitcoin folder to remove Client
-    this.BITCOIN_NODE = new Client( {
-      network:
-        this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
-      timeout: 10000,
-      username: 'notUsed',
-      password: 'noUsed',
-      host: 'notUsed',
-    } )
     const BIT_SERVER_MODE = Config.BIT_SERVER_MODE ? Config.BIT_SERVER_MODE.trim() : 'PROD'
     if ( BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV' ) {
       this.APP_STAGE = 'dev'
