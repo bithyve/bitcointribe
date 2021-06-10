@@ -86,6 +86,8 @@ const FriendsAndFamily = createStackNavigator(
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
+      console.log( 'navigation.state.index', navigation.state.index )
+      console.log( navigation.state.routes[ 0 ].routeName )
       if ( navigation.state.index === 0 && navigation.state.routes[ 0 ].routeName === 'Home' ) {
         tabBarVisible = true
       }

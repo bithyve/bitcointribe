@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, lazy, Suspense } from 'react'
 import {
   View,
   Text,
@@ -162,6 +162,7 @@ interface ManageBackupNewBHRPropsTypes {
   approvalStatus: boolean;
 }
 
+// const HeaderComponent = React.lazy( () => import( '../../navigation/stacks/Header' ) )
 class ManageBackupNewBHR extends Component<
   ManageBackupNewBHRPropsTypes,
   ManageBackupNewBHRStateTypes
@@ -839,6 +840,11 @@ class ManageBackupNewBHR extends Component<
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        {/* <Suspense fallback={
+          <ActivityIndicator color={Colors.white} size='large'/>
+        }>
+          <HeaderComponent />
+        </Suspense> */}
         <Header />
         {showIndicator &&
             <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
