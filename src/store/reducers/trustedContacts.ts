@@ -75,10 +75,11 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
   trustedContacts: Trusted_Contacts;
 } ): ContactRecipientDescribing[] {
   if( trustedContacts && Object.keys( trustedContacts ).length ){
-    return Object.values( trustedContacts ).reduce( (
+    return Object.keys( trustedContacts ).reduce( (
       accumulatedRecipients: ContactRecipientDescribing[],
-      currentContact: TrustedContact | null,
+      channelKey: string,
     ): ContactRecipientDescribing[] => {
+      const currentContact = trustedContacts[ channelKey ]
       if ( !currentContact ) { return accumulatedRecipients }
 
       const { contactDetails, relationType } = currentContact
@@ -96,12 +97,11 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
       }
 
       const instreamId = currentContact.streamId
-      let walletName, lastSeenActive, paymentAddresses
+      let walletName, lastSeenActive
       if( instreamId ) {
         const instream = idx( currentContact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
         lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
         walletName = idx( instream, ( _ ) => _.primaryData.walletName )
-        paymentAddresses = idx( instream, ( _ ) => _.primaryData.paymentAddresses )
       }
 
       let displayedName
@@ -121,6 +121,7 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
       const avatarImageSource = contactDetails.image
       const contactRecipient: ContactRecipientDescribing = {
         id: contactDetails.id,
+        channelKey,
         isActive: currentContact.isActive,
         kind: recipientKind,
         trustKind,
@@ -128,7 +129,6 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
         walletName,
         avatarImageSource,
         lastSeenActive,
-        paymentAddresses,
       }
 
       return [

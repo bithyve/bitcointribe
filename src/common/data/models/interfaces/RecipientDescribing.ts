@@ -18,10 +18,10 @@ export type AddressRecipientDescribing = RecipientDescribing
 
 export interface ContactRecipientDescribing extends RecipientDescribing {
   isActive: boolean,
+  channelKey: string,
   lastSeenActive: number | null;
   walletName: string | null;
   trustKind: ContactTrustKind;
-  paymentAddresses: { [accountType: string]: string},
 }
 
 export interface AccountRecipientDescribing extends RecipientDescribing {

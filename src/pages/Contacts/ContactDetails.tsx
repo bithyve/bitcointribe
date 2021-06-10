@@ -26,9 +26,6 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { nameToInitials, isEmpty } from '../../common/CommonFunctions'
 import _ from 'underscore'
 import moment from 'moment'
-import {
-  clearTransfer,
-} from '../../store/actions/accounts'
 import BottomSheet from 'reanimated-bottom-sheet'
 import SendViaLink from '../../components/SendViaLink'
 import ModalHeader from '../../components/ModalHeader'
@@ -53,6 +50,8 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 
 const getImageIcon = ( item ) => {
   if ( Object.keys( item ).length ) {
@@ -110,7 +109,6 @@ interface ContactDetailsPropTypes {
   WALLET_SETUP: any;
   updateEphemeralChannelLoader: any;
   ErrorSending: any;
-  clearTransfer: any;
   sourceAccountSelectedForSending: any;
   addRecipientForSending: any;
   recipientSelectedForAmountSetting: any;
@@ -156,7 +154,6 @@ class ContactDetails extends PureComponent<
   Contact: any;
   contactsType: any;
   setIsSendDisabledListener: any;
-  ContactName: any;
 
   constructor( props ) {
     super( props )
@@ -219,11 +216,6 @@ class ContactDetails extends PureComponent<
 
     this.Contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
-    this.ContactName = `${this.Contact.firstName} ${
-      this.Contact.lastName ? this.Contact.lastName : ''
-    }`
-      .toLowerCase()
-      .trim()
   }
 
   componentDidMount() {
@@ -324,32 +316,19 @@ class ContactDetails extends PureComponent<
   // };
 
   onPressSend = () => {
-    // this.props.clearTransfer( REGULAR_ACCOUNT )
+    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.Contact.id )
+    this.props.sourceAccountSelectedForSending(
+      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT )
+    )
+    this.props.addRecipientForSending( recipient )
+    this.props.recipientSelectedForAmountSetting( recipient )
 
-    // // if ( this.contactsType == 'My Keepers' ) {
-    // //   this.saveInTransitHistory( 'isSent' )
-    // // }
 
-    // const contactName = `${this.Contact.firstName} ${this.Contact.lastName ? this.Contact.lastName : ''
-    // }`
-
-    // const recipient = this.props.trustedContactRecipients.find( recipient => recipient.displayedName ===  contactName )
-
-    // this.props.sourceAccountSelectedForSending(
-    //   this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
-    // )
-    // this.props.addRecipientForSending( recipient )
-    // this.props.recipientSelectedForAmountSetting( recipient )
-    // this.props.amountForRecipientUpdated( {
-    //   recipient,
-    //   amount: 0
-    // } )
-
-    // this.props.navigation.dispatch(
-    //   resetStackToSend( {
-    //     selectedRecipientID: recipient.id,
-    //   } )
-    // )
+    this.props.navigation.dispatch(
+      resetStackToSend( {
+        selectedRecipientID: recipient.id,
+      } )
+    )
   };
 
   onPressResendRequest = () => {
@@ -852,7 +831,7 @@ class ContactDetails extends PureComponent<
                     isSendDisabled: true,
                   } )
 
-                  this.Contact.isFinalized
+                  this.Contact.lastSeen
                     ? this.onPressSend()
                     : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.Contact.contactName )
                       ? this.onPressResendRequest()
@@ -860,14 +839,14 @@ class ContactDetails extends PureComponent<
                 }}
                 style={styles.resendContainer}
               >
-                {this.Contact.isFinalized ? (
+                {this.Contact.lastSeen ? (
                   <Image
                     source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                     style={styles.bitcoinIconStyle}
                   />
                 ) : null}
                 <Text style={styles.sendTextStyle}>
-                  {this.Contact.isFinalized
+                  {this.Contact.lastSeen
                     ? 'Send'
                     : this.Contact.isGuardian
                       ? 'Reshare'
@@ -1257,7 +1236,6 @@ const mapStateToProps = ( state ) => {
   }
 }
 export default connect( mapStateToProps, {
-  clearTransfer,
   sourceAccountSelectedForSending,
   addRecipientForSending,
   recipientSelectedForAmountSetting,

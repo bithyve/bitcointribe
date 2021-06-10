@@ -125,6 +125,10 @@ class FriendsAndFamilyScreen extends PureComponent<
       this.setUpFocusListener( walletId )
 
     } )
+    this.props.syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+      metaSync: true,
+    } )
   }
 
   componentDidUpdate( prevProps, prevState ) {
@@ -221,7 +225,6 @@ class FriendsAndFamilyScreen extends PureComponent<
         isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
         contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
         lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
-        isFinalized: stream? true: false,
       }
       //  feature/2.0
       // console.log( '555555555' )
@@ -414,7 +417,6 @@ class FriendsAndFamilyScreen extends PureComponent<
                 onRefresh={() => {
                   syncPermanentChannels( {
                     permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-                    metaSync: true,
                   } )
                 }}
               />
