@@ -12,7 +12,7 @@ import {
   UPDATE_APPLICATION_STATUS,
   UPDATE_LAST_SEEN,
   CARD_DATA,
-  IS_BACKUP_PROCESSING,
+  SET_WALLET_ID,
   INITIAL_KNOW_MORE_SEND_SHEET_SHOWN,
   IS_PERMISSION_SET,
 } from '../actions/preferences'
@@ -41,10 +41,12 @@ const initialState = ip.freeze( {
   lastSeen: null,
   cardData: null,
   isBackupProcessing: false,
-  isPermissionSet: false
+  isPermissionSet: false,
+  walletId: null
 } )
 
 export default ( state = initialState, { type, payload } ) => {
+
   switch ( type ) {
       case UPDATE_APP_PREFERENCE:
         return chain( state ).setIn( [ payload.key ], payload.value ).value()
@@ -136,6 +138,12 @@ export default ( state = initialState, { type, payload } ) => {
         return {
           ...state,
           isPermissionSet: payload.isPermissionSet,
+        }
+
+      case SET_WALLET_ID:
+        return {
+          ...state,
+          walletId: payload.walletId,
         }
       default:
         return state
