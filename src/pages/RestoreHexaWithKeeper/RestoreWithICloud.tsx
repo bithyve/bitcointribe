@@ -78,6 +78,7 @@ import { setVersion } from '../../store/actions/versionHistory'
 import QuestionList from '../../common/QuestionList'
 import SecurityQuestion from './SecurityQuestion'
 import { initializeRecovery } from '../../store/actions/setupAndAuth'
+import ModalContainer from '../../components/home/ModalContainer'
 
 
 
@@ -143,6 +144,16 @@ interface RestoreWithICloudStateTypes {
   walletName: string;
   question: string;
   answer: string;
+  restoreModal: boolean;
+  securityQuestionModal: boolean;
+  errorModal: boolean;
+  sendViaLinkModal: boolean;
+  loaderModal: boolean;
+  shareOTPModal: boolean;
+  restoreWallet: boolean;
+  contactListModal: boolean;
+  backupModal: boolean;
+  restoreSuccess: boolean;
 }
 
 interface RestoreWithICloudPropsTypes {
@@ -236,7 +247,16 @@ class RestoreWithICloud extends Component<
           heading:'Creating your wallet', text: 'This may take some time while Hexa is using the Recovery Keys to recreate your wallet'
         },
         question: '',
-        answer: ''
+        answer: '',
+        restoreModal: false,
+        securityQuestionModal: false,
+        errorModal: false,
+        sendViaLinkModal: false,
+        loaderModal: false,
+        shareOTPModal: false,
+        restoreWallet: false,
+        contactListModal: false,
+        restoreSuccess: false
       }
     }
 
@@ -272,8 +292,11 @@ class RestoreWithICloud extends Component<
       this.setState( ( state ) => ( {
         showLoader: false,
       } ) )
-      this.props.setCloudBackupStatus( CloudBackupStatus.PENDING );
-      ( this.BackupNotFound as any ).current.snapTo( 1 )
+      this.props.setCloudBackupStatus( CloudBackupStatus.PENDING )
+      // ( this.BackupNotFound as any ).current.snapTo( 1 )
+      this.setState( {
+        backupModal: true
+      } )
     }
 
     if ( SERVICES && prevProps.walletImageChecked !== walletImageChecked ) {
@@ -283,8 +306,11 @@ class RestoreWithICloud extends Component<
       initNewBHRFlow( true )
       checkMSharesHealth()
       walletCheckIn()
-      if ( this.loaderBottomSheet as any )
-        ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      // if ( this.loaderBottomSheet as any )
+      //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      this.setState( {
+        loaderModal: false
+      } )
       this.props.navigation.navigate( 'HomeNav' )
     }
 
@@ -299,17 +325,26 @@ class RestoreWithICloud extends Component<
     }
 
     if ( prevProps.walletRecoveryFailed !== walletRecoveryFailed ) {
-      if ( this.loaderBottomSheet as any )
-        ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      // if ( this.loaderBottomSheet as any )
+      //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      this.setState( {
+        loaderModal: false
+      } )
     }
 
     if( prevProps.errorReceiving !== this.props.errorReceiving && this.props.errorReceiving === true ){
       this.setState( {
         showLoader: false
-      } );
-      ( this.BackupNotFound as any ).current.snapTo( 1 )
-      if ( this.loaderBottomSheet as any )
-        ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      } )
+      // ( this.BackupNotFound as any ).current.snapTo( 1 )
+      this.setState( {
+        backupModal: true
+      } )
+      // if ( this.loaderBottomSheet as any )
+      //   ( this.loaderBottomSheet as any ).current.snapTo( 0 )
+      this.setState( {
+        loaderModal: false
+      } )
     }
 
     if (
@@ -429,13 +464,19 @@ class RestoreWithICloud extends Component<
         selectedBackup: newArray[ 0 ],
         walletsArray: newArray,
         showLoader: false,
-      } ) );
-      ( this.RestoreFromICloud as any ).current.snapTo( 1 )
+      } ) )
+      // ( this.RestoreFromICloud as any ).current.snapTo( 1 )
+      this.setState( {
+        restoreModal: true
+      } )
     } else {
       this.setState( ( state ) => ( {
         showLoader: false,
-      } ) );
-      ( this.BackupNotFound as any ).current.snapTo( 1 )
+      } ) )
+      // ( this.BackupNotFound as any ).current.snapTo( 1 )
+      this.setState( {
+        backupModal: true
+      } )
     }
   };
 
@@ -467,7 +508,10 @@ class RestoreWithICloud extends Component<
         question: question1
       } )
     }
-    ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+    // ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+    this.setState( {
+      securityQuestionModal: true
+    } )
   }
 
   setSecurityQuestionAndName = async () =>{
@@ -534,14 +578,20 @@ class RestoreWithICloud extends Component<
         } )
         this.setState( {
           listData: listDataArray
-        } );
+        } )
         // if(selectedBackup.type == "device"){
-        ( this.RestoreFromICloud as any ).current.snapTo( 0 )
+        // ( this.RestoreFromICloud as any ).current.snapTo( 0 )
+        this.setState( {
+          restoreModal: false
+        } )
       } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
         this.showLoaderModal()
         recoverWalletUsingIcloud( decryptedCloudDataJson )
       } else {
-        ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
+        // ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
+        this.setState( {
+          errorModal: true
+        } )
       }
     }
     catch ( error ) {
@@ -786,12 +836,63 @@ class RestoreWithICloud extends Component<
   }
 
   showLoaderModal = () => {
-    this.loaderBottomSheet.current.snapTo( 1 )
+    // this.loaderBottomSheet.current.snapTo( 1 )
+    this.setState( {
+      loaderModal: true
+    } )
     this.setLoaderMessages()
   }
   getNextMessage = () => {
     if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
     return loaderMessages[ messageIndex++ ]
+  }
+
+  renderContent = () => {
+    const { selectedBackup, hideShow } = this.state
+    const { navigation, database } = this.props
+    let name
+    if ( Platform.OS == 'ios' ) name = 'iCloud'
+    else name = 'GDrive'
+    return (
+      <RestoreFromICloud
+        title={'Restore from ' + name}
+        subText={
+          'Clicking on Restore would source your Recovery Key from iCloud'
+        }
+        cardInfo={'Restoring Wallet from'}
+        cardTitle={selectedBackup.walletName}
+        levelStatus={
+          selectedBackup.levelStatus
+            ? name + ' backup at Level ' + selectedBackup.levelStatus
+            : ''
+        }
+        proceedButtonText={'Restore'}
+        backButtonText={'Back'}
+        modalRef={this.RestoreFromICloud}
+        onPressProceed={() => {
+          //(this.RestoreFromICloud as any).current.snapTo(0);
+          this.setState( {
+            restoreModal: false
+          } )
+          this.restoreWallet()
+        }}
+        onPressBack={() => {
+          this.props.clearCloudCache()
+          // ( this.RestoreFromICloud as any ).current.snapTo( 0 )
+          this.setState( {
+            restoreModal: false
+          } )
+          navigation.navigate( 'WalletInitialization' )
+
+        }}
+        onPressCard={() => {
+          console.log( 'ajfjkh asd', hideShow )
+          this.setState( {
+            hideShow: !hideShow
+          } )
+        }}
+      />
+    )
   }
 
   render() {
@@ -809,6 +910,15 @@ class RestoreWithICloud extends Component<
       renderTimer,
       otp,
       isOtpType,
+      restoreModal,
+      securityQuestionModal,
+      errorModal,
+      sendViaLinkModal,
+      loaderModal,
+      shareOTPModal,
+      restoreWallet,
+      contactListModal,
+      backupModal
     } = this.state
     const { navigation, database } = this.props
     let name
@@ -1019,7 +1129,10 @@ class RestoreWithICloud extends Component<
           <TouchableOpacity
             onPress={() => {
               // alert("test");
-              ( this.ContactListForRestore as any ).current.snapTo( 1 )
+              // ( this.ContactListForRestore as any ).current.snapTo( 1 )
+              this.setState( {
+                contactListModal: true
+              } )
               // this.onCreatLink();
             }}
             style={styles.buttonInnerView}
@@ -1146,180 +1259,92 @@ class RestoreWithICloud extends Component<
             </TouchableOpacity>
           </Modal>
         ) : null}
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.RestoreFromICloud}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '50%' )
-              : hp( '60%' ),
-          ]}
-          renderContent={() => {
-            let name
-            if ( Platform.OS == 'ios' ) name = 'iCloud'
-            else name = 'GDrive'
-            return (
-              <RestoreFromICloud
-                title={'Restore from ' + name}
-                subText={
-                  'Clicking on Restore would source your Recovery Key from iCloud'
-                }
-                cardInfo={'Restoring Wallet from'}
-                cardTitle={selectedBackup.walletName}
-                levelStatus={
-                  selectedBackup.levelStatus
-                    ? name + ' backup at Level ' + selectedBackup.levelStatus
-                    : ''
-                }
-                proceedButtonText={'Restore'}
-                backButtonText={'Back'}
-                modalRef={this.RestoreFromICloud}
-                onPressProceed={() => {
-                  //(this.RestoreFromICloud as any).current.snapTo(0);
-                  this.restoreWallet()
-                }}
-                onPressBack={() => {
-                  this.props.clearCloudCache();
-                  ( this.RestoreFromICloud as any ).current.snapTo( 0 )
-                  navigation.navigate( 'WalletInitialization' )
+        <ModalContainer visible={restoreModal} closeBottomSheet={() => {this.setState( {
+          restoreModal: false
+        } )}} >
+          {this.renderContent()}
+        </ModalContainer>
+        <ModalContainer visible={contactListModal} closeBottomSheet={() => {}} >
+          <ContactListForRestore
+            title={'Select Contact'}
+            subText={
+              'Select contact to send a Wallet Restore request link'
+            }
+            contactList={contactList}
+            modalRef={this.ContactListForRestore}
+            onPressCard={( contact, index ) => {
+              this.setState( {
+                selectedContact: contact,
+                contactListModal: false
+              }, () => {
+                this.setState( {
+                  sendViaLinkModal: true
+                } )
+              } )
+              // ( this.ContactListForRestore as any ).current.snapTo( 0 )
+              // ( this.SendViaLinkBottomSheet as any ).current.snapTo( 1 )
 
-                }}
-                onPressCard={() => {
-                  console.log( 'ajfjkh asd', hideShow )
-                  this.setState( {
-                    hideShow: !hideShow
-                  } )
-                }}
-              />
-            )
-          }}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() =>
-                ( this.RestoreFromICloud as any ).current.snapTo( 0 )
-              }
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={this.ContactListForRestore}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '50%' )
-              : hp( '60%' ),
-          ]}
-          renderContent={() => {
-            return (
-              <ContactListForRestore
-                title={'Select Contact'}
-                subText={
-                  'Select contact to send a Wallet Restore request link'
-                }
-                contactList={contactList}
-                modalRef={this.ContactListForRestore}
-                onPressCard={( contact, index ) => {
-                  this.setState( {
-                    selectedContact: contact
-                  } );
-                  ( this.ContactListForRestore as any ).current.snapTo( 0 );
-                  ( this.SendViaLinkBottomSheet as any ).current.snapTo( 1 )
-                  this.createLink( contact, index )
-                }}
-              />
-            )
-          }}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() =>
-                ( this.ContactListForRestore as any ).current.snapTo( 0 )
-              }
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={this.RestoreSuccess}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '50%' )
-              : hp( '60%' ),
-          ]}
-          renderContent={() => (
-            <RestoreSuccess
-              modalRef={this.RestoreSuccess}
-              onPressProceed={() => {
-                ( this.RestoreSuccess as any ).current.snapTo( 0 )
-              }}
-              onPressBack={() => {
-                ( this.RestoreSuccess as any ).current.snapTo( 0 )
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => ( this.RestoreSuccess as any ).current.snapTo( 0 )}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={this.BackupNotFound}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '40%' )
-              : hp( '50%' ),
-          ]}
-          renderContent={() => (
-            <ICloudBackupNotFound
-              modalRef={this.BackupNotFound}
-              onPressProceed={() => {
-                ( this.BackupNotFound as any ).current.snapTo( 0 )
-                // navigation.replace( 'WalletNameRecovery' )
-              }}
-              onPressBack={() => {
-                ( this.BackupNotFound as any ).current.snapTo( 0 )
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => ( this.BackupNotFound as any ).current.snapTo( 0 )}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={this.RestoreWallet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '60%' )
-              : hp( '70%' ),
-          ]}
-          renderContent={() => (
-            <RestoreWallet
-              modalRef={this.RestoreWallet}
-              onPressProceed={() => {
-                ( this.RestoreWallet as any ).current.snapTo( 0 )
-              }}
-              onPressBack={() => {
-                ( this.RestoreWallet as any ).current.snapTo( 0 )
-              }}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => ( this.RestoreWallet as any ).current.snapTo( 0 )}
-            />
-          )}
-        />
-        <BottomSheet
+              this.createLink( contact, index )
+            }}
+          />
+        </ModalContainer>
+        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+          <RestoreSuccess
+            modalRef={this.RestoreSuccess}
+            onPressProceed={() => {
+              // ( this.RestoreSuccess as any ).current.snapTo( 0 )
+              this.setState( {
+                restoreSuccess: false
+              } )
+
+            }}
+            onPressBack={() => {
+              // ( this.RestoreSuccess as any ).current.snapTo( 0 )
+              this.setState( {
+                restoreSuccess: false
+              } )
+            }}
+          />
+        </ModalContainer>
+        <ModalContainer visible={backupModal} closeBottomSheet={() => {}} >
+          <ICloudBackupNotFound
+            modalRef={this.BackupNotFound}
+            onPressProceed={() => {
+              // ( this.BackupNotFound as any ).current.snapTo( 0 )
+              // navigation.replace( 'WalletNameRecovery' )
+              this.setState( {
+                backupModal: false
+              } )
+            }}
+            onPressBack={() => {
+              // ( this.BackupNotFound as any ).current.snapTo( 0 )
+              this.setState( {
+                backupModal: false
+              } )
+            }}
+          />
+        </ModalContainer>
+        <ModalContainer visible={restoreWallet} closeBottomSheet={() => {}} >
+          <RestoreWallet
+            modalRef={this.RestoreWallet}
+            onPressProceed={() => {
+              // ( this.RestoreWallet as any ).current.snapTo( 0 )
+              this.setState( {
+                restoreWallet: false
+              } )
+            }}
+            onPressBack={() => {
+              // ( this.RestoreWallet as any ).current.snapTo( 0 )
+              this.setState( {
+                restoreWallet: false
+              } )
+            }}
+          />
+        </ModalContainer>
+        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+          <LoaderModal headerText={this.state.loaderMessage.heading} messageText={this.state.loaderMessage.text} />
+        </ModalContainer>
+        {/* <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={this.loaderBottomSheet}
@@ -1330,7 +1355,6 @@ class RestoreWithICloud extends Component<
               : hp( '100%' ),
           ]}
           renderContent={() => (
-            <LoaderModal headerText={this.state.loaderMessage.heading} messageText={this.state.loaderMessage.text} />
           )}
           renderHeader={() => (
             <View
@@ -1345,85 +1369,62 @@ class RestoreWithICloud extends Component<
               }}
             />
           )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          ref={this.SecurityQuestionBottomSheet}
-          snapPoints={[ -30, hp( '80%' ) ]}
-          renderContent={()=>(
-            <SecurityQuestion
-              question={this.state.question}
-              // onFocus={() => {
-              //   if ( Platform.OS == 'ios' ){
-              //     if( this.SecurityQuestionBottomSheet as any )
-              //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 2 )}
-              // }}
-              // onBlur={() => {
-              //   if ( Platform.OS == 'ios' ){
-              //     if( this.SecurityQuestionBottomSheet as any )
-              //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )}
-              // }}
-              onPressConfirm={( answer ) => {
-                Keyboard.dismiss()
-                if( this.SecurityQuestionBottomSheet as any )
-                  ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
-                this.setState( ( state ) => ( {
-                  answer: answer
-                } ) )
-                this.decryptCloudJson()
-              }}
-            /> )
-          }
+        /> */}
+        <ModalContainer visible={securityQuestionModal} closeBottomSheet={() => {}} >
+          <SecurityQuestion
+            question={this.state.question}
+            // onFocus={() => {
+            //   if ( Platform.OS == 'ios' ){
+            //     if( this.SecurityQuestionBottomSheet as any )
+            //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 2 )}
+            // }}
+            // onBlur={() => {
+            //   if ( Platform.OS == 'ios' ){
+            //     if( this.SecurityQuestionBottomSheet as any )
+            //       ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 1 )}
+            // }}
+            onPressConfirm={( answer ) => {
+              Keyboard.dismiss()
+              // if( this.SecurityQuestionBottomSheet as any )
+              //   ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                securityQuestionModal: false
+              } )
+              this.setState( ( state ) => ( {
+                answer: answer
+              } ) )
+              this.decryptCloudJson()
+            }}
+          />
+          {/* )
+         }
           renderHeader={()=>( <ModalHeader
             onPressHeader={() => {
               ( this.SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
             }}
           /> )}
-        />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.ErrorBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '35%' )
-              : hp( '40%' ),
-          ]}
-          renderContent={() => (
-            <ErrorModalContents
-              modalRef={this.ErrorBottomSheet}
-              title={'Error receiving Recovery Key'}
-              info={
-                'There was an error while receiving your Recovery Key, please try again'
-              }
-              proceedButtonText={'Try again'}
-              onPressProceed={() => {
-                ( this.ErrorBottomSheet as any ).current.snapTo( 0 )
-              }}
-              isBottomImage={true}
-              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-            // onPressHeader={() => {
-            //   (this.ErrorBottomSheet as any).current.snapTo(0);
-            // }}
-            />
-          )}
-        />
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={this.SendViaLinkBottomSheet}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '83%' )
-              : hp( '85%' ),
-          ]}
-          renderContent={() => ( selectedContact.data && <SendViaLink
+        /> */}
+        </ModalContainer>
+        <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+          <ErrorModalContents
+            modalRef={this.ErrorBottomSheet}
+            title={'Error receiving Recovery Key'}
+            info={
+              'There was an error while receiving your Recovery Key, please try again'
+            }
+            proceedButtonText={'Try again'}
+            onPressProceed={() => {
+              // ( this.ErrorBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                errorModal: false
+              } )
+            }}
+            isBottomImage={true}
+            bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+          />
+        </ModalContainer>
+        <ModalContainer visible={sendViaLinkModal} closeBottomSheet={() => {}} >
+          {selectedContact.data && <SendViaLink
             headerText={'Send Request'}
             subHeaderText={'Send a recovery request link'}
             contactText={'Requesting for recovery:'}
@@ -1434,62 +1435,62 @@ class RestoreWithICloud extends Component<
             } hours`}
             link={linkToRequest}
             onPressBack={() => {
-              if ( this.SendViaLinkBottomSheet )
-                ( this.SendViaLinkBottomSheet as any ).current.snapTo( 0 )
+              // if ( this.SendViaLinkBottomSheet )
+              //   ( this.SendViaLinkBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                sendViaLinkModal: false
+              } )
             }}
+
             onPressDone={() => {
               if ( isOtpType ) {
                 this.setState( {
-                  renderTimer: true
-                } );
-                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
+                  renderTimer: true,
+                  sendViaLinkModal: false
+
+                }, () => {
+                  this.setState( {
+                    shareOTPModal: true
+                  } )
+                } )
+                // ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
+                // this.setState( {
+                //   shareOTPModal: false
+                // } )
+              } else {
+                this.setState( {
+                  sendViaLinkModal: false
+                } )
               }
-              ( this.SendViaLinkBottomSheet as any ).current.snapTo( 0 )
+              // ( this.SendViaLinkBottomSheet as any ).current.snapTo( 0 )
+
             }}
+          />}
+        </ModalContainer>
+        <ModalContainer visible={shareOTPModal} closeBottomSheet={() => {} } >
+          <ShareOtpWithTrustedContact
+            renderTimer={renderTimer}
+            onPressOk={() => {
+              this.setState( {
+                renderTimer: false,
+                shareOTPModal: false
+              } )
+              // ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
+              //   0
+              // )
+            }}
+            onPressBack={() => {
+              this.setState( {
+                renderTimer: false,
+                shareOTPModal: false
+              } )
+              // ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
+              //   0
+              // )
+            }}
+            OTP={otp}
           />
-          )}
-          renderHeader={() => <ModalHeader />}
-        />
-        <BottomSheet
-          onCloseEnd={() => { }}
-          enabledInnerScrolling={true}
-          ref={this.shareOtpWithTrustedContactBottomSheet}
-          snapPoints={[ -50, hp( '65%' ) ]}
-          renderContent={() => (
-            <ShareOtpWithTrustedContact
-              renderTimer={renderTimer}
-              onPressOk={() => {
-                this.setState( {
-                  renderTimer: false
-                } );
-                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
-                  0
-                )
-              }}
-              onPressBack={() => {
-                this.setState( {
-                  renderTimer: false
-                } );
-                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
-                  0
-                )
-              }}
-              OTP={otp}
-            />
-          )}
-          renderHeader={() => (
-            <ModalHeader
-              onPressHeader={() => {
-                this.setState( {
-                  renderTimer: false
-                } );
-                ( this.shareOtpWithTrustedContactBottomSheet as any ).current.snapTo(
-                  0
-                )
-              }}
-            />
-          )}
-        />
+        </ModalContainer>
       </View>
     )
   }

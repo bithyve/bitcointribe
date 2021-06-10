@@ -697,7 +697,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',

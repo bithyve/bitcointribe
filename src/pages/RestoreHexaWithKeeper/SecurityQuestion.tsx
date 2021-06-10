@@ -41,7 +41,7 @@ function SecurityQuestion( props ) {
 
   return (
     <View style={{
-      ...styles.modalContentContainer, height: '100%'
+      ...styles.modalContentContainer
     }}>
       <View style={styles.modalContentContainer}>
         <View>
@@ -177,7 +177,7 @@ export default withNavigation( SecurityQuestion )
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   modalTitleText: {
