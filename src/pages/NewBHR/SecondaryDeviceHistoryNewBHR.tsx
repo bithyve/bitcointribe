@@ -68,7 +68,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
-  const [ secondaryQR, setSecondaryQR ] = useState( '' )
+  const [ keeperQR, setKeeperQR ] = useState( '' )
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
@@ -78,7 +78,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
 
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
+  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.health.keeperInfo )
   const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
   const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
@@ -139,10 +139,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const createGuardian = useCallback(
-    async ( ) => {
-      if( ( secondaryQR || isReshare ) && !isChange ) return
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      setChannelKey( channelKey ? channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength ) )
+      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKey )
+
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
@@ -154,8 +157,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         data: {
           ...Contact, index
         },
-        channelKey: channelKey ? channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+        channelKey: channelKey
       }
+
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
@@ -163,8 +167,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   )
 
   useEffect( ()=> {
-    if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
-      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( createOrChangeGuardian( channelKey, selectedKeeper.shareId, Contact, index, isChange, oldChannelKey ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
@@ -175,7 +178,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
-
     if( contacts )
       for( const ck of Object.keys( contacts ) ){
         if ( contacts[ ck ].contactDetails.id === Contact.id ){
@@ -189,7 +191,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
 
-      setSecondaryQR(
+      setKeeperQR(
         JSON.stringify( {
           type: QRCodeTypes.KEEPER_REQUEST,
           channelKey,
@@ -207,7 +209,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           status: 'notAccessible',
           name: Contact && Contact.name ? Contact.name : ''
         }
-        dispatch( updateMSharesHealth( shareObj, false ) )
+        dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
         } ) )
       }
@@ -216,15 +218,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
-      // if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
-      //   ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-      //   createGuardian()
-      // }
-      // blocking keeper reshare till 100% health
-      const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
-      if ( blockPCShare ) {
-        setBlockReshare( blockPCShare )
-      }
       const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
       const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
       const trustedData = trustedContactsInfo[ contactName ]
@@ -243,20 +236,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
 
-      console.log( 'trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel', trustedContacts.tc.trustedContacts, props.navigation.getParam( 'selectedKeeper' ) )
-      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
-      //   AsyncStorage.setItem('blockPCShare', 'true');
-      //   setBlockReshare(blockPCShare);
-      // }
     } )()
   }, [] )
 
 
   const renderSecondaryDeviceContents = useCallback( () => {
-    console.log( secondaryQR )
+    console.log( keeperQR )
     return (
       <SecondaryDevice
-        secondaryQR={secondaryQR}
+        secondaryQR={keeperQR}
         onPressOk={async () => {
           saveInTransitHistory();
           // dispatch(checkMSharesHealth());
@@ -273,7 +261,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }}
       />
     )
-  }, [ secondaryQR ] )
+  }, [ keeperQR ] )
 
   const renderSecondaryDeviceHeader = useCallback( () => {
     return (
@@ -471,15 +459,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
+          setIsChange( true )
+          setKeeperQR( '' )
+          setIsReshare( false );
+          ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 );
           ( ChangeBottomSheet as any ).current.snapTo( 0 )
-
-          if ( blockReshare ) {
-            ( QrBottomSheet.current as any ).snapTo( 1 )
-          } else {
-            const changeKeeper = true;
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-            createGuardian( )
-          }
+          createGuardian( {
+            isChangeTemp: true
+          } )
         }}
         onPressIgnore={() => {
           ( ChangeBottomSheet as any ).current.snapTo( 0 )
@@ -548,7 +535,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"wfewf","channelId":"a337c486c67add6d9cf45efecd94a31734296217b4c8f22fe2c8421b5054f9bd","streamId":"be91dcfa8","secondaryChannelKey":"iYpMjQbvjYZk7hImD1nyOvyY","version":"1.7.5"}'
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Fsf","channelId":"fa6be1d1faa28e145642ec5859e2a35029a22b32d87ada9457ee2e3c69498536","streamId":"34574a2f6","secondaryChannelKey":"fAmXbYCcp94cHp4IYT2rOjKz","version":"1.7.5"}'
           try {
             if ( qrScannedData ) {
               dispatch( setApprovalStatus( false ) )
@@ -577,25 +564,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const onPressChangeKeeperType = ( type, name ) => {
-    let levelhealth: LevelHealthInterface[] = []
-    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( currentLevel == 3 && levelHealth[ 2 ] )
-      levelhealth = [ levelHealth[ 2 ] ]
     let changeIndex = 1
     let contactCount = 0
     let deviceCount = 0
-    for ( let i = 0; i < levelhealth.length; i++ ) {
-      const element = levelhealth[ i ]
+    for ( let i = 0; i < levelHealth.length; i++ ) {
+      const element = levelHealth[ i ]
       for ( let j = 2; j < element.levelInfo.length; j++ ) {
         const element2 = element.levelInfo[ j ]
         if (
           element2.shareType == 'contact' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
+          levelHealth[ i ]
         ) {
           contactCount++
         }
@@ -603,13 +583,12 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           element2.shareType == 'device' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
+          levelHealth[ i ]
         ) {
           deviceCount++
         }
-        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
         if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
+          if ( keeperInfo.find( ( value ) => value.shareId == element2.shareId && value.type == 'contact' ) && keeperInfo.find( ( value ) => value.shareId == element2.shareId && value.type == 'contact' ).data.index == 1 ) {
             changeIndex = 2
           } else changeIndex = 1
         }
@@ -631,6 +610,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       } )
     }
     if ( type == 'device' ) {
+      setTimeout( () => {
+        setIsChange( true )
+        setKeeperQR( '' )
+        setIsReshare( false )
+      }, 2 );
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
     if ( type == 'pdf' ) {

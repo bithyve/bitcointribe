@@ -1605,6 +1605,7 @@ function* updatedKeeperInfoWorker( { payload } ) {
           keeperInfo[ i ].type = keeperData.type
           keeperInfo[ i ].data = keeperData.data
           keeperInfo[ i ].sharePosition = keeperData.sharePosition
+          keeperInfo[ i ].channelKey = keeperData.channelKey
           break
         } else flag = true
       }
@@ -2117,10 +2118,10 @@ function* createChannelAssetsWorker( { payload } ) {
         bhXpub: secureAccount.secureHDWallet.xpubs.bh,
         shareId
       }
-      // console.log( 'channelAssets', JSON.stringify( channelAssets ) )
+      console.log( 'channelAssets', JSON.stringify( channelAssets ) )
       yield put( setChannelAssets( channelAssets ) )
       yield put( setApprovalStatus( false ) )
-      yield put( downloadSMShare( null ) )
+      yield put( secondaryShareDownloaded( null ) )
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     }
   } catch ( error ) {
@@ -2202,9 +2203,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
         const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
         const { SERVICES } = yield select( ( state ) => state.storage.database )
         const contactInfo = {
-          isKeeper: false,
           channelKey: oldChannelKey,
-          channelAssets: null,
         }
         const primaryData: PrimaryStreamData = {
           walletID: walletId,
@@ -2250,7 +2249,6 @@ export const createOrChangeGuardianWatcher = createWatcher(
 
 function* modifyLevelDataWorker( ) {
   try {
-    // console.log( 'sdfsdf' )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
@@ -2263,7 +2261,6 @@ function* modifyLevelDataWorker( ) {
     let isError = false
     const abc = JSON.stringify( levelHealth )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ) ) ]
-    // console.log( 'levelHealthVar', levelHealthVar )
     for ( let i = 0; i < levelHealthVar.length; i++ ) {
       const levelInfo = levelHealthVar[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
@@ -2271,7 +2268,6 @@ function* modifyLevelDataWorker( ) {
         const currentContact: TrustedContact = contacts[ element.channelKey ]
         if ( currentContact ) {
           const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
-          // console.log( 'instream', instream )
           if( instream ){
             levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'accessible' : levelInfo[ j ].status
             levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
@@ -2283,7 +2279,6 @@ function* modifyLevelDataWorker( ) {
     if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
-    // console.log( 'levelData', levelData )
     yield put( updateHealth( levelHealthVar, currentLevel ) )
     const levelDataUpdated = getLevelInfoStatus( levelData )
     yield put ( updateLevelData( levelDataUpdated, isError ) )

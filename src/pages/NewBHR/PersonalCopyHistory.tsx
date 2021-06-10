@@ -436,14 +436,17 @@ const PersonalCopyHistory = ( props ) => {
   }, [] )
 
   const createGuardian = useCallback(
-    async ( ) => {
-      if( ( selectedKeeper.channelKey || isReshare ) && !isChange ) return
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      setChannelKey( channelKey ? channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength ) )
+      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKey )
+
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
-        type: 'device',
+        type: 'pdf',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
@@ -451,8 +454,9 @@ const PersonalCopyHistory = ( props ) => {
         data: {
           ...Contact, index
         },
-        channelKey: channelKey ? channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+        channelKey: channelKey
       }
+
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
@@ -460,8 +464,7 @@ const PersonalCopyHistory = ( props ) => {
   )
 
   useEffect( ()=> {
-    if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
-      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( createOrChangeGuardian( channelKey, selectedKeeper.shareId, Contact, index, isChange, oldChannelKey ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
@@ -482,8 +485,6 @@ const PersonalCopyHistory = ( props ) => {
 
     if ( channelKey ) {
       dispatch( getPDFData( selectedKeeper.shareId, Contact, channelKey, isChange ) )
-      const appVersion = DeviceInfo.getVersion()
-      console.log( 'setSecondaryQR Contact', Contact )
     }
   }, [ Contact, trustedContacts ] )
 

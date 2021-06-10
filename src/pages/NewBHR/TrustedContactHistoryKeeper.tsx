@@ -122,8 +122,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const trustedContacts: TrustedContactsService = useSelector( ( state ) => state.trustedContacts.service )
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector( ( state ) => state.storage.database )
-  const { SHARES_TRANSFER_DETAILS } = DECENTRALIZED_BACKUP
+  const { WALLET_SETUP } = useSelector( ( state ) => state.storage.database )
   const index = props.navigation.getParam( 'index' )
   const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
   const dispatch = useDispatch()
@@ -183,18 +182,16 @@ const TrustedContactHistoryKeeper = ( props ) => {
     ( selectedContacts ) => {
       setTimeout( () => {
         if ( selectedContacts[ 0 ] ) {
+          setChosenContact( selectedContacts[ 0 ] )
           setSelectedTitle(
             selectedContacts[ 0 ].firstName && selectedContacts[ 0 ].lastName
-              ? selectedContacts[ 0 ].firstName +
-                  ' ' +
-                  selectedContacts[ 0 ].lastName
+              ? selectedContacts[ 0 ].firstName + ' ' + selectedContacts[ 0 ].lastName
               : selectedContacts[ 0 ].firstName && !selectedContacts[ 0 ].lastName
                 ? selectedContacts[ 0 ].firstName
                 : !selectedContacts[ 0 ].firstName && selectedContacts[ 0 ].lastName
                   ? selectedContacts[ 0 ].lastName
                   : 'Friends and Family',
           )
-          setChosenContact( selectedContacts[ 0 ] )
         }
       }, 2 );
       ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
@@ -213,7 +210,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }}
         onPressContinue={async ( selectedContacts ) => {
           Keyboard.dismiss()
-          createGuardian( getContacts( selectedContacts ) )
+          if ( selectedContacts[ 0 ] ) {
+            setChosenContact( selectedContacts[ 0 ] )
+          }
+          createGuardian( {
+            chosenContactTmp: getContacts( selectedContacts )
+          } )
         }}
       />
     )
@@ -352,7 +354,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const onPressReshare = useCallback( async () => {
     ( shareBottomSheet as any ).current.snapTo( 1 );
     ( ReshareBottomSheet as any ).current.snapTo( 0 )
-    createGuardian( getContacts( chosenContact ) )
+    createGuardian( {
+      chosenContactTmp: getContacts( chosenContact )
+    } )
   }, [ selectedTitle, chosenContact, getContacts ] )
 
   const renderReshareContent = useCallback( () => {
@@ -470,18 +474,19 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const createGuardian = useCallback(
-    async ( chosenContactTmp ) => {
-      if( ( trustedQR || isReshare ) && !isChange ) return
-      let Contact = chosenContact
-      const channelKey: string = !isChange && selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
-
-      if ( ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ) Contact = chosenContactTmp
+    async ( payload: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const { chosenContactTmp } = payload
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      const Contact = ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? chosenContactTmp : chosenContact
+      if( ( trustedQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      setChannelKey( channelKey ? channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength ) )
+      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKey )
+
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
-        type: 'device',
+        type: 'contact',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
         currentLevel: currentLevel,
         createdAt: moment( new Date() ).valueOf(),
@@ -489,7 +494,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         data: {
           ...Contact, index
         },
-        channelKey: channelKey ? channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+        channelKey: channelKey
       }
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
@@ -498,8 +503,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
 
   useEffect( ()=> {
-    if( !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
-      const channelKey: string = selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( createOrChangeGuardian( channelKey, selectedKeeper.shareId, chosenContact, index, isChange, oldChannelKey ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
@@ -510,7 +514,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
-
     if( contacts )
       for( const ck of Object.keys( contacts ) ){
         if ( contacts[ ck ].contactDetails.id === chosenContact.id ){
@@ -519,7 +522,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           break
         }
       }
-
     if ( currentContact ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
@@ -557,7 +559,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           status: 'notAccessible',
           name: chosenContact && chosenContact.name ? chosenContact.name : ''
         }
-        dispatch( updateMSharesHealth( shareObj, false ) )
+        dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
         } ) )
         saveInTransitHistory()
@@ -774,7 +776,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
           try {
             dispatch( setApprovalStatus( false ) )
             dispatch( downloadSMShare( qrScannedData ) )
