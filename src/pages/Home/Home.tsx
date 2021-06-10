@@ -201,6 +201,7 @@ interface HomeStateTypes {
   notificationIgnoreText: string | null;
   isIgnoreButton: boolean;
   currentMessage: any;
+  releaseNotes: string,
 }
 
 interface HomePropsTypes {
@@ -340,6 +341,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationIgnoreText:null,
       isIgnoreButton: false,
       currentMessage: null,
+      releaseNotes: '',
     }
   }
 
@@ -822,7 +824,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleNotificationBottomSheetSelection = ( message ) => {
-    console.log( 'handleNotificationBottomSheetSelection', message )
     const storeName = Platform.OS == 'ios' ? 'App Store' : 'Play Store'
     this.setState( {
       currentMessage: message
@@ -832,7 +833,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       status : 'read'
     } ]
     this.props.updateMessageStatus( statusValue )
-
     this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
         case NotificationType.FNF_REQUEST || NotificationType.FNF_REQUEST_ACCEPTED || NotificationType.FNF_REQUEST_REJECTED || NotificationType.FNF_KEEPER_REQUEST || NotificationType.FNF_KEEPER_REQUEST_ACCEPTED || NotificationType.FNF_KEEPER_REQUEST_REJECTED:
@@ -862,17 +862,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case NotificationType.RELEASE:
-          this.setState( {
-            notificationTitle: message.title,
-            notificationInfo: message.info,
-            notificationNote: 'For updating you will be taken to the ' + storeName,
-            notificationAdditionalInfo: message.AdditionalInfo,
-            notificationProceedText: 'Upgrade',
-            notificationIgnoreText: 'Remind me later',
-            isIgnoreButton: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
-          } )
+          const current = DeviceInfo.getBuildNumber()
+          const { build, mandatoryFor } = message.additionalInfo
+          if( Number( current ) <= Number( mandatoryFor ) || Number( current ) <  Number( build ) ) {
+            this.setState( {
+              notificationTitle: message.title,
+              notificationInfo: message.info,
+              notificationNote: 'For updating you will be taken to the ' + storeName,
+              notificationAdditionalInfo: message.AdditionalInfo,
+              notificationProceedText: 'Upgrade',
+              notificationIgnoreText: Number( current ) <= Number( mandatoryFor ) ? '' : 'Remind me later',
+              isIgnoreButton: true,
+              releaseNotes: Platform.OS === 'android' ?  message.additionalInfo.notes.android : message.additionalInfo.notes.ios,
+            }, () => {
+              this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+            } )
+          }
           break
     }
   };
@@ -1517,9 +1522,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   }
 
+  upgradeNow () {
+    const url =
+      Platform.OS == 'ios'
+        ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en'
+    Linking.canOpenURL( url ).then( ( supported ) => {
+      if ( supported ) {
+        Linking.openURL( url )
+      } else {
+        // console.log("Don't know how to open URI: " + url);
+      }
+    } )
+  }
+
   renderBottomSheetContent() {
     const { UNDER_CUSTODY, navigation } = this.props
-    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData } = this.state
+    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
     console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.TAB_BAR_BUY_MENU:
@@ -1730,10 +1749,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               info={notificationInfo ? notificationInfo : null}
               additionalInfo={notificationAdditionalInfo}
               onPressProceed={()=>{
-
+                this.closeBottomSheet()
+                this.upgradeNow()
               }}
               onPressIgnore={()=> {
-
+                this.closeBottomSheet()
               }}
               onPressClose={()=>{
                 this.closeBottomSheet()
@@ -1743,6 +1763,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               isIgnoreButton={isIgnoreButton}
               note={notificationNote}
               bottomSheetRef={this.bottomSheetRef}
+              releaseNotes={releaseNotes}
             />
           )
 
