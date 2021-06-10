@@ -104,13 +104,14 @@ class FriendsAndFamilyScreen extends PureComponent<
 
   componentDidMount() {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-      // this.props.syncPermanentChannels( {
-      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      // } )
       this.updateAddressBook()
     } )
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
+    } )
+    this.props.syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+      metaSync: true,
     } )
   }
 
@@ -183,7 +184,6 @@ class FriendsAndFamilyScreen extends PureComponent<
         isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
         contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
         lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
-        isFinalized: stream? true: false,
       }
 
       if( fnf.isActive ){
@@ -322,7 +322,6 @@ class FriendsAndFamilyScreen extends PureComponent<
               onRefresh={() => {
                 syncPermanentChannels( {
                   permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-                  metaSync: true,
                 } )
               }}
             />
