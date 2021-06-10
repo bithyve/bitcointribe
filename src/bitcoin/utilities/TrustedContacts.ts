@@ -10,7 +10,8 @@ import {
   ContactDetails,
   SecondaryStreamData,
   BackupStreamData,
-  PrimaryStreamData
+  PrimaryStreamData,
+  TrustedContactRelationTypes
 } from './Interface'
 import crypto from 'crypto'
 import config from '../HexaConfig'
@@ -135,6 +136,7 @@ export default class TrustedContacts {
         const primaryEncryptedData = this.encryptData( channelKey, unencryptedOutstream.primaryData ).encryptedData
         outstream.primaryEncryptedData = primaryEncryptedData
         outstreamUpdates.primaryEncryptedData = primaryEncryptedData
+        contact.relationType = idx( primaryData, ( _ ) => _.relationType )
       }
 
       if( secondaryData && secondaryChannelKey )
@@ -186,11 +188,18 @@ export default class TrustedContacts {
 
     contact.permanentChannel[ instreamUpdates.streamId ] = ( encryptedInstream as StreamData )
     contact.unencryptedPermanentChannel[ instreamUpdates.streamId ] = ( unencryptedInstream as UnecryptedStreamData )
+
     contact.streamId = ( unencryptedInstream as UnecryptedStreamData ).streamId,
     contact.isActive = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.active )
     contact.hasNewData = idx( ( unencryptedInstream as UnecryptedStreamData ).metaData, ( _ ) => _.flags.newData )
     if( !contact.walletID )
       contact.walletID = idx( ( unencryptedInstream as UnecryptedStreamData ).primaryData, ( _ ) => _.walletID )
+
+    const relationshipType = idx( ( unencryptedInstream as UnecryptedStreamData ).primaryData, ( _ ) => _.relationType )
+    if( [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType ) && [ TrustedContactRelationTypes.CONTACT ].includes( relationshipType ) ) delete contact.contactsSecondaryChannelKey
+    if( relationshipType === TrustedContactRelationTypes.KEEPER ) contact.relationType = TrustedContactRelationTypes.WARD
+    else if( relationshipType === TrustedContactRelationTypes.WARD ) contact.relationType = TrustedContactRelationTypes.KEEPER
+    else contact.relationType = relationshipType
   };
 
   public syncPermanentChannels = async (
