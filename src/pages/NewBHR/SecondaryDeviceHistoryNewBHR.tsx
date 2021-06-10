@@ -11,8 +11,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
-import { createChannelAssets, ErrorSending, setApprovalStatus, setChannelAssets } from '../../store/actions/health'
-import { updatedKeeperInfo, updateMSharesHealth } from '../../store/actions/health'
+import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/health'
+import { updateMSharesHealth } from '../../store/actions/health'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalHeader from '../../components/ModalHeader'
@@ -42,123 +42,71 @@ import KeeperTypeModalContents from './KeeperTypeModalContent'
 import ApproveSetup from './ApproveSetup'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
 import semver from 'semver'
-import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { historyArray } from '../../common/CommonVars/commonVars'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
-  const [ ErrorBottomSheet ] = useState( React.createRef() )
-  const [ HelpBottomSheet ] = useState( React.createRef() )
+  const [ ErrorBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ HelpBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ keeperTypeBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ ApprovePrimaryKeeperBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ ChangeBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ secondaryDeviceBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ secondaryDeviceMessageBottomSheet ] = useState( React.createRef<BottomSheet>() )
+
+  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
-  const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
-  const [ QrBottomSheet ] = useState( React.createRef() )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ blockReshare, setBlockReshare ] = useState( '' )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
-  const [ keeperTypeBottomSheet, setkeeperTypeBottomSheet ] = useState( React.createRef() )
-  const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
-  const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
-  const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
-
-  const [ index, setIndex ] = useState( props.navigation.getParam( 'index' ) )
-  const [ isPrimaryKeeper, setIsPrimaryKeeper ] = useState( props.navigation.getParam( 'isPrimaryKeeper' ) )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
-
-  const SHARES_TRANSFER_DETAILS = useSelector(
-    ( state ) =>
-      state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
-  )
-  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
-
-  const WALLET_SETUP = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
-  )
-
-  const dispatch = useDispatch()
-  const [ secondaryQR, setSecondaryQR ] = useState( '' )
-
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
-  )
-
-  const [ ReshareBottomSheet ] = useState(
-    React.createRef(),
-  )
-  const [ ChangeBottomSheet ] = useState( React.createRef() )
-
-  const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( [
-    {
-      id: 1,
-      title: 'Recovery Key created',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 2,
-      title: 'Recovery Key in-transit',
-      date: null,
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 3,
-      title: 'Recovery Key accessible',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 4,
-      title: 'Recovery Key not accessible',
-      date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-  ] )
-  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
+  const [ keeperQR, setKeeperQR ] = useState( '' )
+  const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
-  const [ isReshare, setIsReshare ] = useState(
-    props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
-  )
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
     : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
+
+  const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.health.keeperInfo )
+  const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
+  const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
+  const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
+  const WALLET_SETUP = useSelector( ( state ) => state.storage.database.WALLET_SETUP )
+  const trustedContacts: TrustedContactsService = useSelector( ( state ) => state.trustedContacts.service )
+  const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
+  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
+  const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
+  const MetaShares: MetaShare[] = useSelector( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
+  const dispatch = useDispatch()
+
+  const index = props.navigation.getParam( 'index' )
+  const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
+  const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare(
-      props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
-    )
+    setIsReshare( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
         ? props.navigation.getParam( 'isChangeKeeperType' )
         : false
     )
-    setIndex( props.navigation.getParam( 'index' ) )
-    if( !channelAssets.shareId || ( channelAssets.shareId && channelAssets.shareId != props.navigation.getParam( 'selectedKeeper' ).shareId ) ){
-      dispatch( createChannelAssets( props.navigation.getParam( 'selectedKeeper' ).shareId ) )
-    }
-  }, [
-    props.navigation.state.params,
-  ] )
-  const [ secondaryDeviceBottomSheet ] = useState(
-    React.createRef(),
-  )
-  const [
-    secondaryDeviceMessageBottomSheet,
-  ] = useState( React.createRef() )
-  const MetaShares: MetaShare[] = useSelector(
-    ( state ) => state.health.service.levelhealth.metaSharesKeeper,
-  )
-  const next = props.navigation.getParam( 'next' )
+    setChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+    setOldChannelKey( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  }, [ props.navigation.state.params ] )
 
   useEffect( ()=>{
     const firstName = 'Personal'
@@ -191,10 +139,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const createGuardian = useCallback(
-    async ( ) => {
-      if( secondaryQR || isReshare ) return
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const channelKey: string = !isChange && selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKey )
+
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
         name: Contact && Contact.name ? Contact.name : '',
@@ -206,19 +157,20 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         data: {
           ...Contact, index
         },
-        channelKey
+        channelKey: channelKey
       }
+
       dispatch( updatedKeeperInfo( obj ) )
-      dispatch( initializeTrustedContact( {
-        contact: Contact,
-        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-        isKeeper: true,
-        channelKey,
-        shareId: selectedKeeper.shareId
-      } ) )
+      dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
-    [ SHARES_TRANSFER_DETAILS, trustedContacts, Contact ],
+    [ trustedContacts, Contact ],
   )
+
+  useEffect( ()=> {
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( createOrChangeGuardian( channelKey, selectedKeeper.shareId, Contact, index, isChange, oldChannelKey ) )
+    }
+  }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
     if( !Contact ) return
@@ -226,7 +178,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
-
     if( contacts )
       for( const ck of Object.keys( contacts ) ){
         if ( contacts[ ck ].contactDetails.id === Contact.id ){
@@ -240,16 +191,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
 
-      // const numberDL =
-      //   `https://hexawallet.io/${config.APP_STAGE}/${
-      //     'tcg'
-      //   }` +
-      //   `/${channelKey}` +
-      //   `${secondaryChannelKey? `/${secondaryChannelKey}`: ''}` +
-      //   `/v${appVersion}`
-      // setTrustedLink( numberDL )
-
-      setSecondaryQR(
+      setKeeperQR(
         JSON.stringify( {
           type: QRCodeTypes.KEEPER_REQUEST,
           channelKey,
@@ -267,7 +209,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           status: 'notAccessible',
           name: Contact && Contact.name ? Contact.name : ''
         }
-        dispatch( updateMSharesHealth( shareObj, false ) )
+        dispatch( updateMSharesHealth( shareObj, isChange ) )
         dispatch( setChannelAssets( {
         } ) )
       }
@@ -276,15 +218,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
-      // if( props.navigation.getParam( 'selectedKeeper' ).updatedAt === 0 ) {
-      //   ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-      //   createGuardian()
-      // }
-      // blocking keeper reshare till 100% health
-      const blockPCShare = await AsyncStorage.getItem( 'blockPCShare' )
-      if ( blockPCShare ) {
-        setBlockReshare( blockPCShare )
-      }
       const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
       const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
       const trustedData = trustedContactsInfo[ contactName ]
@@ -303,20 +236,15 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
 
-      console.log( 'trustedContacts.tc.trustedContacts[ contactName ].ephemeralChannel', trustedContacts.tc.trustedContacts, props.navigation.getParam( 'selectedKeeper' ) )
-      // else if (!secureAccount.secureHDWallet.secondaryMnemonic) {
-      //   AsyncStorage.setItem('blockPCShare', 'true');
-      //   setBlockReshare(blockPCShare);
-      // }
     } )()
   }, [] )
 
 
   const renderSecondaryDeviceContents = useCallback( () => {
-    console.log( secondaryQR )
+    console.log( keeperQR )
     return (
       <SecondaryDevice
-        secondaryQR={secondaryQR}
+        secondaryQR={keeperQR}
         onPressOk={async () => {
           saveInTransitHistory();
           // dispatch(checkMSharesHealth());
@@ -333,7 +261,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }}
       />
     )
-  }, [ secondaryQR ] )
+  }, [ keeperQR ] )
 
   const renderSecondaryDeviceHeader = useCallback( () => {
     return (
@@ -531,15 +459,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
+          setIsChange( true )
+          setKeeperQR( '' )
+          setIsReshare( false );
+          ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 );
           ( ChangeBottomSheet as any ).current.snapTo( 0 )
-
-          if ( blockReshare ) {
-            ( QrBottomSheet.current as any ).snapTo( 1 )
-          } else {
-            const changeKeeper = true;
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-            createGuardian( )
-          }
+          createGuardian( {
+            isChangeTemp: true
+          } )
         }}
         onPressIgnore={() => {
           ( ChangeBottomSheet as any ).current.snapTo( 0 )
@@ -599,7 +526,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
         onBackPress={() => {
@@ -607,17 +535,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          // const qrScannedData = '{"requester":"Sdfs","publicKey":"y2O52oer00WwcBWTLRD3iWm2","uploadedAt":1616566080753,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          // try {
-          //   if ( qrScannedData ) {
-          //     dispatch( createChannelAssets( selectedKeeper.shareId, qrScannedData ) )
-          //     setQrBottomSheetsFlag( false )
-          //   }
-          // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
-          // }
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Fsf","channelId":"fa6be1d1faa28e145642ec5859e2a35029a22b32d87ada9457ee2e3c69498536","streamId":"34574a2f6","secondaryChannelKey":"fAmXbYCcp94cHp4IYT2rOjKz","version":"1.7.5"}'
+          try {
+            if ( qrScannedData ) {
+              dispatch( setApprovalStatus( false ) )
+              dispatch( downloadSMShare( qrScannedData ) )
+              setQrBottomSheetsFlag( false )
+            }
+          } catch ( err ) {
+            console.log( {
+              err
+            } )
+          }
         }}
       />
     )
@@ -635,25 +564,18 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const onPressChangeKeeperType = ( type, name ) => {
-    let levelhealth: LevelHealthInterface[] = []
-    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( currentLevel == 3 && levelHealth[ 2 ] )
-      levelhealth = [ levelHealth[ 2 ] ]
     let changeIndex = 1
     let contactCount = 0
     let deviceCount = 0
-    for ( let i = 0; i < levelhealth.length; i++ ) {
-      const element = levelhealth[ i ]
+    for ( let i = 0; i < levelHealth.length; i++ ) {
+      const element = levelHealth[ i ]
       for ( let j = 2; j < element.levelInfo.length; j++ ) {
         const element2 = element.levelInfo[ j ]
         if (
           element2.shareType == 'contact' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
+          levelHealth[ i ]
         ) {
           contactCount++
         }
@@ -661,13 +583,12 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           element2.shareType == 'device' &&
           selectedKeeper &&
           selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
+          levelHealth[ i ]
         ) {
           deviceCount++
         }
-        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
         if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
+          if ( keeperInfo.find( ( value ) => value.shareId == element2.shareId && value.type == 'contact' ) && keeperInfo.find( ( value ) => value.shareId == element2.shareId && value.type == 'contact' ).data.index == 1 ) {
             changeIndex = 2
           } else changeIndex = 1
         }
@@ -680,7 +601,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         }
       }
     }
-    dispatch( setApprovalStatus( false ) )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -690,6 +610,11 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       } )
     }
     if ( type == 'device' ) {
+      setTimeout( () => {
+        setIsChange( true )
+        setKeeperQR( '' )
+        setIsReshare( false )
+      }, 2 );
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
     if ( type == 'pdf' ) {
@@ -702,18 +627,17 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+    if( approvalStatus ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
   }, [ approvalStatus ] )
 
-  useEffect( ()=>{
+  useEffect( ()=> {
     if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( setApprovalStatus( true ) )
     }
   }, [ channelAssets ] )
-
 
   return (
     <View style={{
@@ -751,16 +675,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           changeButtonText={'Change'}
           isChangeKeeperAllow={isChangeKeeperAllow}
           isVersionMismatch={isVersionMismatch}
-          onPressChange={() => {
-            if( isPrimaryKeeper ){
-              setSelectedKeeperType( 'device' )
-              setSelectedKeeperName( 'Personal Device1' )
-              sendApprovalRequestToPK( )
-            } else{
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
-            }
-            // (ChangeBottomSheet as any).current.snapTo(1);
-          }}
+          onPressChange={() => { ( keeperTypeBottomSheet as any ).current.snapTo( 1 ) }}
         />
       </View>
       <BottomSheet
