@@ -42,7 +42,7 @@ import {
   setHealthStatus,
   modifyLevelData,
   setApprovalStatus,
-  downloadSMShare
+  downloadSMShare,
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -366,6 +366,17 @@ class ManageBackupNewBHR extends Component<
     if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ) {
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
       ( this.QrBottomSheet as any ).snapTo( 0 )
+    }
+
+    if( prevProps.levelHealth != this.props.levelHealth ){
+      if (
+        this.props.currentLevel == 2 &&
+        levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 4 ] && levelHealth[ 1 ].levelInfo[ 5 ] &&
+        levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0
+      ) {
+        this.props.autoShareToLevel2Keepers()
+      }
     }
   };
 
