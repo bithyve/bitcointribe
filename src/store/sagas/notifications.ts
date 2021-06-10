@@ -89,19 +89,21 @@ export const fetchNotificationsWatcher = createWatcher(
 
 export function* getMessageWorker() {
   yield put( fetchNotificationStarted( true ) )
-  const messages = yield select(
+  const storedMessages = yield select(
     ( state ) => state.notifications.messages,
   )
   const walletId = yield select( ( state ) => state.preferences.walletId, )
-  const storeMessageTime = yield select(
-    ( state ) => state.notifications.storeMessageTime,
+  const timeStamp = yield select(
+    ( state ) => state.notifications.timeStamp,
   )
-  console.log( 'messages getMessageWorker', typeof messages, messages,  )
+  console.log( 'messages timeStamp', timeStamp )
 
-  const res = yield call( RelayServices.getMessages, walletId, storeMessageTime )
+  const res = yield call( RelayServices.getMessages, walletId, timeStamp )
+  console.log( 'res', res )
   if ( res.status === 200 ) {
-    const { notifications } = res.data
-    const newMessageArray = messages.concat( notifications.filter( ( { notificationId } ) => !messages.find( f => f.notificationId == notificationId ) ) )
+    const { messages } = res.data
+    if( !storedMessages ) return
+    const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
     console.log( 'newMessageArray', newMessageArray )
 
     yield put( messageFetched( newMessageArray ) )
