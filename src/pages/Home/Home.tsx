@@ -654,7 +654,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       onNotification: ( notification ) => {
-        console.log( 'NOTIFICATION:', notification )
+        console.log( 'NOTIFICATION onNotification:', notification )
         // process the notification
         if ( notification.data ) {
           this.onNotificationOpen( notification )
@@ -665,8 +665,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
       onAction: ( notification ) => {
-        console.log( 'ACTION:', notification.action )
-        console.log( 'NOTIFICATION:', notification )
+        console.log( 'ACTION onAction:', notification.action )
+        console.log( 'NOTIFICATION onAction:', notification )
 
         // process the action
       },
@@ -835,7 +835,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
-        case NotificationType.FNF_REQUEST:
+        case NotificationType.FNF_REQUEST || NotificationType.FNF_REQUEST_ACCEPTED || NotificationType.FNF_REQUEST_REJECTED || NotificationType.FNF_KEEPER_REQUEST || NotificationType.FNF_KEEPER_REQUEST_ACCEPTED || NotificationType.FNF_KEEPER_REQUEST_REJECTED:
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -844,19 +844,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationProceedText: 'Okay',
             notificationIgnoreText: '',
             isIgnoreButton: false
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
-          } )
-          break
-        case NotificationType.FNF_KEEPER_REQUEST:
-          this.setState( {
-            notificationTitle: message.title,
-            notificationInfo: message.info,
-            notificationNote: '',
-            notificationAdditionalInfo: message.AdditionalInfo,
-            notificationProceedText: 'Accept',
-            notificationIgnoreText: 'Reject',
-            isIgnoreButton: true
           }, () => {
             this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
           } )
