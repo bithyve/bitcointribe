@@ -159,7 +159,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
         <ScrollView>
 
           <View style={{
-            ...NavStyles.modalHeaderTitleView, paddingHorizontal: 0
+            ...NavStyles.modalHeaderTitleView, paddingHorizontal: 0, justifyContent: 'space-between'
           }}>
             <View style={{
               flexDirection: 'row', alignItems: 'center'
