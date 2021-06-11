@@ -471,9 +471,8 @@ export interface Contacts {
 }
 
 export interface ContactDetails {
-  contactName: string,
-  info: string, // phone-number/email-address
   id: string,
+  contactName?: string,
   image?: ImageSourcePropType | null,
 }
 
@@ -517,6 +516,7 @@ export interface SecondaryStreamData {
 export interface BackupStreamData {
   primaryMnemonicShard: any,
   keeperInfo: any,
+  contactDetails: ContactDetails
 }
 
 export interface UnecryptedStreamData {
