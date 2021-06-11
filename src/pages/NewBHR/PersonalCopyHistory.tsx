@@ -34,6 +34,7 @@ import {
   updateMSharesHealth,
   createChannelAssets,
   setApprovalStatus,
+  createOrChangeGuardian,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -54,6 +55,7 @@ import config from '../../bitcoin/HexaConfig'
 import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
+import { historyArray } from '../../common/CommonVars/commonVars'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -73,33 +75,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ blockReshare, setBlockReshare ] = useState( '' )
   const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
-  const [ personalCopyHistory, setPersonalCopyHistory ] = useState( [
-    {
-      id: 1,
-      title: 'Recovery Key created',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 2,
-      title: 'Recovery Key in-transit',
-      date: null,
-      info:
-        'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-    {
-      id: 3,
-      title: 'Recovery Key accessible',
-      date: null,
-      info: 'Lorem ipsum dolor Lorem dolor sit amet, consectetur dolor sit',
-    },
-    {
-      id: 4,
-      title: 'Recovery Key not accessible',
-      date: null,
-      info: 'Lorem ipsum Lorem ipsum dolor sit amet, consectetur sit amet',
-    },
-  ] )
+  const [ personalCopyHistory, setPersonalCopyHistory ] = useState( historyArray )
   const [
     PersonalCopyShareBottomSheet,
     setPersonalCopyShareBottomSheet,
@@ -107,6 +83,8 @@ const PersonalCopyHistory = ( props ) => {
   const selectedPersonalCopy = props.navigation.getParam(
     'selectedPersonalCopy'
   )
+  const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
+  const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ personalCopyDetails, setPersonalCopyDetails ] = useState( null )
   const [ selectedLevelId, setSelectedLevelId ] = useState(
     props.navigation.state.params.selectedLevelId
@@ -139,6 +117,8 @@ const PersonalCopyHistory = ( props ) => {
   const index = 5
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
   const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
+  const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
+  const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -200,7 +180,7 @@ const PersonalCopyHistory = ( props ) => {
   // };
 
   const generatePDF = async() => {
-    createGuardian( Contact )
+    createGuardian( )
     const shareHistory = JSON.parse(
       await AsyncStorage.getItem( 'shareHistory' )
     )
@@ -456,9 +436,12 @@ const PersonalCopyHistory = ( props ) => {
   }, [] )
 
   const createGuardian = useCallback(
-    async ( Contact ) => {
-      if( selectedKeeper.channelKey ) return
-      const channelKey: string = !isChange && selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
+      const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
+      if( ( selectedKeeper.channelKey || isReshare ) && !isChangeKeeper ) return
+      setIsGuardianCreationClicked( true )
+      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKey )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
@@ -469,21 +452,22 @@ const PersonalCopyHistory = ( props ) => {
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ),
         data: {
-          ...Contact, index: 5
+          ...Contact, index
         },
-        channelKey
+        channelKey: channelKey
       }
+
       dispatch( updatedKeeperInfo( obj ) )
-      dispatch( initializeTrustedContact( {
-        contact: Contact,
-        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-        isKeeper: true,
-        channelKey,
-        shareId: selectedKeeper.shareId
-      } ) )
+      dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
-    [ trustedContacts ],
+    [ trustedContacts, Contact ],
   )
+
+  useEffect( ()=> {
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+      dispatch( createOrChangeGuardian( channelKey, selectedKeeper.shareId, Contact, index, isChange, oldChannelKey ) )
+    }
+  }, [ createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
     if( !Contact ) return
@@ -501,8 +485,6 @@ const PersonalCopyHistory = ( props ) => {
 
     if ( channelKey ) {
       dispatch( getPDFData( selectedKeeper.shareId, Contact, channelKey, isChange ) )
-      const appVersion = DeviceInfo.getVersion()
-      console.log( 'setSecondaryQR Contact', Contact )
     }
   }, [ Contact, trustedContacts ] )
 

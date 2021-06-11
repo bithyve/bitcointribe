@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Image, Text, StyleSheet } from 'react-native'
+import { View, Image, Text, StyleSheet, } from 'react-native'
 import Colors from '../common/Colors'
 import Fonts from '../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -8,16 +8,14 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
-import Octicons from 'react-native-vector-icons/Octicons'
 
 export default function NotificationInfoContents( props ) {
-  console.log( 'props.info', props.info )
+
   return (
     <View style={{
-      ...styles.modalContentContainer, height: '100%'
+      ...styles.modalContentContainer
     }}>
       <View style={{
-        height: '100%'
       }}>
         <View style={styles.successModalHeaderView}>
           <Text
@@ -31,49 +29,52 @@ export default function NotificationInfoContents( props ) {
           >
             {props.title}
           </Text>
-          {!props.additionalInfo.isUpdateMandotary && !props.additionalInfo.isUpdateInValid ? (
-            <AppBottomSheetTouchableWrapper
-              style={{
-                height: wp( '8%' ),
-                width: wp( '20%' ),
-                backgroundColor: Colors.lightBlue,
-                borderWidth: 1,
-                borderColor: Colors.borderColor,
-                borderRadius: 7,
-                marginLeft: 'auto',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'row',
-              }}
-              onPress={() => {
-                props.onPressClose()
-              }
-              }
-            >
-              <Text
+          {
+            props.cancelButtonText !== '' && (
+              <AppBottomSheetTouchableWrapper
+                style={{
+                  height: wp( '8%' ),
+                  width: wp( '20%' ),
+                  backgroundColor: Colors.lightBlue,
+                  borderWidth: 1,
+                  borderColor: Colors.borderColor,
+                  borderRadius: 7,
+                  marginLeft: 'auto',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                }}
                 onPress={() => {
                   props.onPressClose()
                 }
                 }
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
               >
-                  Close
-              </Text>
-              <Image
-                style={{
-                  width: 12,
-                  height: 12,
-                  resizeMode: 'contain',
-                  marginLeft: 5,
-                }}
-                source={require( '../assets/images/icons/icon_remove.png' )}
-              />
-            </AppBottomSheetTouchableWrapper>
-          ) : null}
+                <Text
+                  onPress={() => {
+                    props.onPressClose()
+                  }
+                  }
+                  style={{
+                    color: Colors.white,
+                    fontSize: RFValue( 12 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                  }}
+                >
+                    Close
+                </Text>
+                <Image
+                  style={{
+                    width: 12,
+                    height: 12,
+                    resizeMode: 'contain',
+                    marginLeft: 5,
+                  }}
+                  source={require( '../assets/images/icons/icon_remove.png' )}
+                />
+              </AppBottomSheetTouchableWrapper>
+            )
+          }
+
         </View>
 
         {props.info &&
@@ -87,7 +88,7 @@ export default function NotificationInfoContents( props ) {
               <Text
                 style={{
                   marginLeft: wp( '2%' ),
-                  color: Colors.blue,
+                  color: Colors.greyTextColor,
                   fontSize: RFValue( 13 ),
                   fontFamily: Fonts.FiraSansRegular,
                 }}
@@ -96,6 +97,24 @@ export default function NotificationInfoContents( props ) {
               </Text>
             </View>
         }
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: wp( '8%' ),
+          }}
+        >
+          <Text
+            style={{
+              marginLeft: wp( '2%' ),
+              color: Colors.blue,
+              fontSize: RFValue( 13 ),
+              fontFamily: Fonts.FiraSansRegular,
+            }}
+          >
+            {props.releaseNotes}
+          </Text>
+        </View>
         {/* {props.info && props.info.map( ( value, index ) => {
           return (
             <View
@@ -145,51 +164,52 @@ export default function NotificationInfoContents( props ) {
               alignItems: 'center',
             }}
           >
-            {!props.additionalInfo.isUpdateInValid ? (
-              <AppBottomSheetTouchableWrapper
-                disabled={false}
-                onPress={() => {
-                  props.onPressProceed
-                }}
-                style={{
-                  ...styles.successModalButtonView
-                }}
-              >
-                <Text style={styles.proceedButtonText}>
-                  {props.proceedButtonText}</Text>
-              </AppBottomSheetTouchableWrapper> ) : null}
+            <AppBottomSheetTouchableWrapper
+              disabled={false}
+              onPress={props.onPressProceed}
+              style={{
+                ...styles.successModalButtonView
+              }}
+            >
+              <Text style={styles.proceedButtonText}>
+                {props.proceedButtonText}</Text>
+            </AppBottomSheetTouchableWrapper>
 
-            {props.isIgnoreButton && !props.additionalInfo.isUpdateMandotary && !props.additionalInfo.isUpdateInValid ? (
-              <AppBottomSheetTouchableWrapper
-                onPress={() => {
-                  props.onPressIgnore()
+
+            {
+              props.cancelButtonText !== '' && (
+                <AppBottomSheetTouchableWrapper
+                  onPress={() => {
+                    props.onPressIgnore()
                   // if ( isOpenFromNotificationList ) props.navigation.goBack()
                   // else
                   //   onClick( false, true )
-                }}
-                style={{
-                  height: wp( '13%' ),
-                  width: wp( '35%' ),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginLeft: 15,
-                }}
-              >
-                <Text
-                  onPress={() => {
-                    props.onPressIgnore()
+                  }}
+                  style={{
+                    height: wp( '13%' ),
+                    width: wp( '35%' ),
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    marginLeft: 15,
+                  }}
+                >
+                  <Text
+                    onPress={() => {
+                      props.onPressIgnore()
                     // if ( isOpenFromNotificationList ) props.navigation.goBack()
                     // else
                     //   onClick( false, true )
-                  }}
-                  style={{
-                    ...styles.proceedButtonText, color: Colors.blue
-                  }}
-                >
-                  {props.cancelButtonText}
-                </Text>
-              </AppBottomSheetTouchableWrapper>
-            ) : null}
+                    }}
+                    style={{
+                      ...styles.proceedButtonText, color: Colors.blue
+                    }}
+                  >
+                    {props.cancelButtonText}
+                  </Text>
+                </AppBottomSheetTouchableWrapper>
+              )
+            }
+
           </View>
         </View>
       </View>
@@ -199,7 +219,6 @@ export default function NotificationInfoContents( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {

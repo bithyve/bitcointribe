@@ -44,8 +44,8 @@ import {
   setLevelToNotSetupStatus,
   setHealthStatus,
   modifyLevelData,
-  createChannelAssets,
-  setApprovalStatus
+  setApprovalStatus,
+  downloadSMShare,
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -160,6 +160,7 @@ interface ManageBackupNewBHRPropsTypes {
   createChannelAssets: any;
   setApprovalStatus: any;
   approvalStatus: boolean;
+  downloadSMShare: any;
 }
 
 // const HeaderComponent = React.lazy( () => import( '../../navigation/stacks/Header' ) )
@@ -563,9 +564,20 @@ class ManageBackupNewBHR extends Component<
       } )
     }
 
-    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ){
+    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ) {
       ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
       ( this.QrBottomSheet as any ).snapTo( 0 )
+    }
+
+    if( prevProps.levelHealth != this.props.levelHealth ){
+      if (
+        this.props.currentLevel == 2 &&
+        levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 4 ] && levelHealth[ 1 ].levelInfo[ 5 ] &&
+        levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0
+      ) {
+        this.props.autoShareToLevel2Keepers()
+      }
     }
   };
 
@@ -616,7 +628,6 @@ class ManageBackupNewBHR extends Component<
     } );
     ( this.QrBottomSheet as any ).snapTo( 0 );
     ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
-    this.props.setApprovalStatus( false )
     if ( selectedKeeper.shareType == 'device' ) {
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
@@ -687,7 +698,7 @@ class ManageBackupNewBHR extends Component<
         isOpenedFlag={this.state.QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
           this.props.setApprovalStatus( false )
-          this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
+          this.props.downloadSMShare( qrScannedData )
           this.setState( {
             QrBottomSheetsFlag: false
           } )
@@ -702,7 +713,7 @@ class ManageBackupNewBHR extends Component<
           // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
-          //     this.props.createChannelAssets( this.state.selectedKeeper.shareId, qrScannedData )
+          //     this.props.downloadSMShare( qrScannedData )
           //     this.setState( {
           //       QrBottomSheetsFlag: false
           //     } )
@@ -1356,8 +1367,8 @@ export default withNavigationFocus(
     setIsKeeperTypeBottomSheetOpen,
     updateCloudData,
     modifyLevelData,
-    createChannelAssets,
-    setApprovalStatus
+    setApprovalStatus,
+    downloadSMShare
   } )( ManageBackupNewBHR )
 )
 

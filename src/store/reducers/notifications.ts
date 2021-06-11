@@ -6,14 +6,14 @@ const initialState: {
   notificationListNew: any;
   updatedNotificationList: [];
   fetchStarted: boolean;
-  storeMessageTime: any;
+  timeStamp: any;
   messages: [];
 } = {
   notifications: [],
   notificationListNew: null,
   updatedNotificationList: [],
   fetchStarted: false,
-  storeMessageTime: null,
+  timeStamp: null,
   messages: []
 }
 
@@ -43,10 +43,9 @@ export default ( state = initialState, action ) => {
       case STORE_MESSAGE_TIMESTAMP:
         return {
           ...state,
-          storeMessageTime: Date.now()
+          timeStamp: Date.now()
         }
       case MESSAGES_FETCHED:
-        console.log( 'action.payload.notifications', action.payload.messages )
         return {
           ...state,
           messages: action.payload.messages,

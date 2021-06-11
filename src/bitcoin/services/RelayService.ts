@@ -220,12 +220,12 @@ export default class RelayServices {
 
   public static getMessages = async (
     walletID: string,
-    storeMessageTime?: string
+    timeStamp: Date
   ): Promise<
     | {
         status: number;
         data: {
-          notifications: [];
+          messages: [];
         };
         err?: undefined;
         message?: undefined;
@@ -240,7 +240,7 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.getMessages( walletID, storeMessageTime ),
+        data: await Relay.getMessages( walletID, timeStamp ),
       }
     } catch ( err ) {
       return {

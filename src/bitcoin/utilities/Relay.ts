@@ -126,7 +126,9 @@ export default class Relay {
           receivers,
           notification,
         } )
-        // console.log({ res });
+        console.log( 'sendNotifications', {
+          res
+        } )
       } catch ( err ) {
         // console.log({ err });
         if ( err.response ) throw new Error( err.response.data.err )
@@ -203,16 +205,16 @@ export default class Relay {
 
   public static getMessages = async (
     walletID: string,
-    storeMessageTime?: string
+    timeStamp: Date
   ): Promise<{
-    notifications:[];
+    messages:[];
   }> => {
     let res: AxiosResponse
     try {
       res = await BH_AXIOS.post( 'getMessages', {
         HEXA_ID,
         walletID,
-        storeMessageTime
+        timeStamp
       } )
     } catch ( err ) {
       console.log( {
@@ -222,9 +224,9 @@ export default class Relay {
       if ( err.code ) throw new Error( err.code )
     }
 
-    const { notifications } = res.data
+    const { messages } = res.data
     return {
-      notifications
+      messages
     }
   };
 

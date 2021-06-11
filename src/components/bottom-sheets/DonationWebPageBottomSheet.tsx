@@ -26,7 +26,7 @@ export default function DonationWebPageBottomSheet( props ) {
         }}>
           <View
             style={{
-              ...styles.successModalHeaderView, flexDirection: 'row',
+              ...styles.successModalHeaderView, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'
             }}
           >
             <View>
@@ -54,6 +54,7 @@ export default function DonationWebPageBottomSheet( props ) {
                 marginLeft: 'auto',
                 alignItems: 'center',
                 justifyContent: 'center',
+                marginTop: wp( '1.5%' ),
               }}
               onPress={() => {
                 props.onClickSetting()
