@@ -47,8 +47,6 @@ import {
 import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { v4 as uuid } from 'uuid'
 
 interface FriendsAndFamilyPropTypes {
@@ -64,9 +62,9 @@ interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   selectedContact: any[];
   loading: boolean;
-  myKeepers: any[];
-  ImKeeping: any[];
-  otherContacts: any[];
+  keepers: ContactRecipientDescribing[];
+  keeping: ContactRecipientDescribing[];
+  otherContacts: ContactRecipientDescribing[];
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
   showLoader: boolean;
@@ -94,8 +92,8 @@ class FriendsAndFamilyScreen extends PureComponent<
       isLoadContacts: false,
       selectedContact: [],
       loading: true,
-      myKeepers: [],
-      ImKeeping: [],
+      keepers: [],
+      keeping: [],
       otherContacts: [],
       isShowingKnowMoreSheet: false,
       showLoader: false
@@ -149,56 +147,43 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   updateAddressBook = async () => {
-    const { trustedContactsService, regularAccount } = this.props
+    const { trustedContactsService } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
-    const { walletId } = regularAccount.hdWallet.getWalletId()
 
-    const myKeepers = []
-    const ImKeeping = []
+    const keepers = []
+    const keeping = []
     const otherContacts = []
 
-    let skippedContactsCounter = 1
     for( const channelKey of Object.keys( contacts ) ){
       const contact = contacts[ channelKey ]
-      const { contactDetails, relationType } = contact
-      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
+      const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
 
-      let contactName = contactDetails.contactName
-      if( contactName === SKIPPED_CONTACT_NAME ){ // skipped contacts instance count append
-        contactName = `${SKIPPED_CONTACT_NAME} ${skippedContactsCounter}`
-        skippedContactsCounter++
-      }
-
-      const fnf = {
-        id: contactDetails.id,
-        isActive: contact.isActive,
-        channelKey,
-        contactName,
-        connectedVia: contactDetails.info,
-        image: contactDetails.image,
-        // usesOTP,
-        // hasXpub,
-        // hasTrustedAddress,
-        relationType,
-        isGuardian: [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
-        isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
-        contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
-        lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
-      }
-
-      if( fnf.isActive ){
-        if( fnf.isGuardian || fnf.isWard ){
-          if( fnf.isGuardian ) myKeepers.push( fnf )
-          if( fnf.isWard ) ImKeeping.push( fnf )
-        } else otherContacts.push( fnf )
+      if( contact.isActive ){
+        if( isGuardian || isWard ){
+          if( isGuardian ) keepers.push(  makeContactRecipientDescription(
+            channelKey,
+            contact,
+            ContactTrustKind.KEEPER_OF_USER,
+          ) )
+          if( isWard ) keeping.push( makeContactRecipientDescription(
+            channelKey,
+            contact,
+            ContactTrustKind.USER_IS_KEEPING,
+          ) )
+        } else otherContacts.push( makeContactRecipientDescription(
+          channelKey,
+          contact,
+          ContactTrustKind.OTHER,
+        ) )
       } else {
         // TODO: inject in expired contacts list
       }
     }
 
     this.setState( {
-      myKeepers,
-      ImKeeping,
+      keepers,
+      keeping,
       otherContacts
     }
     )
@@ -227,24 +212,22 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   handleContactSelection(
-    backendContactInfo: unknown,
+    contactDescription: ContactRecipientDescribing,
     index: number,
     contactType: string,
   ) {
     this.props.navigation.navigate( 'ContactDetails', {
-      contact: backendContactInfo,
+      contact: contactDescription,
       index,
       contactsType: contactType,
     } )
   }
 
   renderContactListItem = ( {
-    backendContactInfo,
     contactDescription,
     index,
     contactsType,
   }: {
-    backendContactInfo: unknown;
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
@@ -254,7 +237,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         key={String( index )}
         bottomDivider
         onPress={() =>
-          this.handleContactSelection( backendContactInfo, index, contactsType )
+          this.handleContactSelection( contactDescription, index, contactsType )
         }
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
@@ -289,7 +272,6 @@ class FriendsAndFamilyScreen extends PureComponent<
         onSkipContinue={() => {
           const contactDummy = {
             id: uuid(),
-            name: SKIPPED_CONTACT_NAME,
           }
           navigation.navigate( 'AddContactSendRequest', {
             SelectedContact: [ contactDummy ],
@@ -308,8 +290,8 @@ class FriendsAndFamilyScreen extends PureComponent<
     const { syncPermanentChannels } = this.props
 
     const {
-      myKeepers,
-      ImKeeping,
+      keepers,
+      keeping,
       otherContacts,
       showLoader
     } = this.state
@@ -344,13 +326,9 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( myKeepers.length && myKeepers.map( ( item, index ) => {
+                {( keepers.length && keepers.map( ( item, index ) => {
                   return this.renderContactListItem( {
-                    backendContactInfo: item,
-                    contactDescription: makeContactRecipientDescription(
-                      item,
-                      ContactTrustKind.KEEPER_OF_USER,
-                    ),
+                    contactDescription: item,
                     index,
                     contactsType: 'My Keepers',
                   } )
@@ -375,13 +353,9 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( ImKeeping.length && ImKeeping.map( ( item, index ) => {
+                {( keeping.length && keeping.map( ( item, index ) => {
                   return this.renderContactListItem( {
-                    backendContactInfo: item,
-                    contactDescription: makeContactRecipientDescription(
-                      item,
-                      ContactTrustKind.USER_IS_KEEPING,
-                    ),
+                    contactDescription: item,
                     index,
                     contactsType: 'I\'m Keeper of',
                   } )
@@ -408,11 +382,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               }}>
                 {( otherContacts.length && otherContacts.map( ( item, index ) => {
                   return this.renderContactListItem( {
-                    backendContactInfo: item,
-                    contactDescription: makeContactRecipientDescription(
-                      item,
-                      ContactTrustKind.OTHER,
-                    ),
+                    contactDescription: item,
                     index,
                     contactsType: 'Other Contacts',
                   } )
@@ -446,8 +416,8 @@ class FriendsAndFamilyScreen extends PureComponent<
             </View>
           </View>
           {
-            myKeepers.length == 0 &&
-            ImKeeping.length == 0 &&
+            keepers.length == 0 &&
+            keeping.length == 0 &&
             otherContacts.length == 0 && (
               <BottomInfoBox
                 title={'Note'}

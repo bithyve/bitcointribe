@@ -162,9 +162,9 @@ export default function CopyThisText( props ) {
                 {props.contactText}
               </Text>
             ) : null}
-            {( props.Contact.contactName || props.Contact.name ) && props.fromScreen !== 'TimerModalContents' ? (
+            {( props.Contact.contactName || props.Contact.name || props.Contact.displayedName ) && props.fromScreen !== 'TimerModalContents' ? (
               <Text style={props.titleStyle}>
-                {props.Contact.contactName || props.Contact.name}
+                {props.Contact.contactName || props.Contact.name || props.Contact.displayedName}
               </Text>
             ) : null}
             {props.Contact &&
@@ -191,12 +191,12 @@ export default function CopyThisText( props ) {
                 ) : null}
           </View>
         </View>
-        {props.Contact.image ? (
+        {props.Contact.image || props.Contact.avatarImageSource ? (
           <View
             style={styles.imageView}
           >
             <Image
-              source={props.Contact.image}
+              source={props.Contact.image || props.Contact.avatarImageSource}
               style={{
                 ...styles.contactProfileImage
               }}
@@ -211,7 +211,7 @@ export default function CopyThisText( props ) {
             <Text
               style={styles.initialsText}
             >
-              {nameToInitials( props.Contact.contactName || props.Contact.name )}
+              {nameToInitials( props.Contact.contactName || props.Contact.name || props.Contact.displayedName )}
             </Text>
           </View>
         )}

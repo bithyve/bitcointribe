@@ -138,14 +138,13 @@ import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
 import { NotificationType } from '../../components/home/NotificationType'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
+
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
   Closed,
   Open,
 }
-
 export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
   CUSTODIAN_REQUEST,
@@ -1697,7 +1696,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 this.closeBottomSheet()
                 const contactDummy = {
                   id: uuid(),
-                  name: SKIPPED_CONTACT_NAME,
                 }
                 navigation.navigate( 'AddContactSendRequest', {
                   SelectedContact: [ contactDummy ],
