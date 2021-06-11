@@ -859,7 +859,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.APPROVE_KEEPER:
         case NotificationType.UPLOAD_SEC_SHARE:
         case NotificationType.RESHARE:
-        case NotificationType.RESAHRE_RESPONSE:
+        case NotificationType.RESHARE_RESPONSE:
         case NotificationType.SM_UPLOADED_FOR_PK:
         case NotificationType.NEW_KEEPER_INFO:
           this.setState( {

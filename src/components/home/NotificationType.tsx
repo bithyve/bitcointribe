@@ -13,7 +13,7 @@ export enum NotificationType {
   APPROVE_KEEPER = 'approveKeeper',
   UPLOAD_SEC_SHARE = 'uploadSecondaryShare',
   RESHARE= 'reShare',
-  RESAHRE_RESPONSE = 'reShareResponse',
+  RESHARE_RESPONSE = 'reShareResponse',
   SM_UPLOADED_FOR_PK = 'smUploadedForPK',
   NEW_KEEPER_INFO = 'newKeeperInfo'
   }
