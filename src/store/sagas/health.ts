@@ -2024,11 +2024,11 @@ function* createChannelAssetsWorker( { payload } ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
       // console.log( 'keeperInfo', JSON.stringify( keeperInfo ) )
-      const secondaryShareDownloaded = yield select( ( state ) => state.health.secondaryShareDownloaded )
+      const secondaryShareDownloadedVar = yield select( ( state ) => state.health.secondaryShareDownloaded )
       const secureAccount: SecureAccount = yield select( ( state ) => state.accounts[ SECURE_ACCOUNT ].service )
       let secondaryShare: string = MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare
-      if( secondaryShareDownloaded ) {
-        secondaryShare = secondaryShareDownloaded
+      if( secondaryShareDownloadedVar ) {
+        secondaryShare = secondaryShareDownloadedVar
       }
       // console.log( 'secondaryShare', secondaryShare )
       const channelAssets: ChannelAssets = {
