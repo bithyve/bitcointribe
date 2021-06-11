@@ -164,7 +164,7 @@ class FriendsAndFamilyScreen extends PureComponent<
       const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
       let contactName = contactDetails.contactName
-      if( contactName === SKIPPED_CONTACT_NAME ){ // skipped contacts instance count append
+      if( !contactName ){ // skipped contacts instance count append
         contactName = `${SKIPPED_CONTACT_NAME} ${skippedContactsCounter}`
         skippedContactsCounter++
       }
@@ -289,7 +289,6 @@ class FriendsAndFamilyScreen extends PureComponent<
         onSkipContinue={() => {
           const contactDummy = {
             id: uuid(),
-            name: SKIPPED_CONTACT_NAME,
           }
           navigation.navigate( 'AddContactSendRequest', {
             SelectedContact: [ contactDummy ],

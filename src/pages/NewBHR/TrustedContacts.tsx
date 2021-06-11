@@ -10,7 +10,6 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { v4 as uuid } from 'uuid'
 
 const TrustedContacts = ( props ) => {
@@ -26,7 +25,6 @@ const TrustedContacts = ( props ) => {
   const onPressSkip = () => {
     const contactDummy = {
       id: uuid(),
-      name: SKIPPED_CONTACT_NAME,
     }
     props.onPressContinue( [ contactDummy ] )
   }
