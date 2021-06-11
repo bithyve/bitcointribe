@@ -8,4 +8,12 @@ export enum NotificationType {
   FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
   FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
   FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
+  CONTACT = 'contact',
+  SECURE_XPUB = 'secureXpub',
+  APPROVE_KEEPER = 'approveKeeper',
+  UPLOAD_SEC_SHARE = 'uploadSecondaryShare',
+  RESHARE= 'reShare',
+  RESAHRE_RESPONSE = 'reShareResponse',
+  SM_UPLOADED_FOR_PK = 'smUploadedForPK',
+  NEW_KEEPER_INFO = 'newKeeperInfo'
   }

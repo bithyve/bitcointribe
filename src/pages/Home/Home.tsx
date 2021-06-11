@@ -835,7 +835,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.updateMessageStatus( statusValue )
     this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
-        case NotificationType.FNF_REQUEST || NotificationType.FNF_REQUEST_ACCEPTED || NotificationType.FNF_REQUEST_REJECTED || NotificationType.FNF_KEEPER_REQUEST || NotificationType.FNF_KEEPER_REQUEST_ACCEPTED || NotificationType.FNF_KEEPER_REQUEST_REJECTED:
+        case NotificationType.FNF_REQUEST:
+        case NotificationType.FNF_REQUEST_ACCEPTED:
+        case NotificationType.FNF_REQUEST_REJECTED:
+        case NotificationType.FNF_KEEPER_REQUEST:
+        case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
+        case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
+        case NotificationType.CONTACT:
+        case NotificationType.SECURE_XPUB:
+        case NotificationType.APPROVE_KEEPER:
+        case NotificationType.UPLOAD_SEC_SHARE:
+        case NotificationType.RESHARE:
+        case NotificationType.RESAHRE_RESPONSE:
+        case NotificationType.SM_UPLOADED_FOR_PK:
+        case NotificationType.NEW_KEEPER_INFO:
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
