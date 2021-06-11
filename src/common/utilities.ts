@@ -207,3 +207,45 @@ export const arrayChunks = ( arr, size ) => {
     arr.slice( i * size, i * size + size )
   )
 }
+
+export const getIndex = ( levelHealth, type, selectedKeeper, keeperInfo ) => {
+  let changeIndex = 1
+  let contactCount = 0
+  let deviceCount = 0
+  for ( let i = 0; i < levelHealth.length; i++ ) {
+    const element = levelHealth[ i ]
+    for ( let j = 2; j < element.levelInfo.length; j++ ) {
+      const element2 = element.levelInfo[ j ]
+      if (
+        element2.shareType == 'contact' &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelHealth[ i ]
+      ) {
+        contactCount++
+      }
+      if (
+        element2.shareType == 'device' &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelHealth[ i ]
+      ) {
+        deviceCount++
+      }
+      const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
+      if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
+        if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
+          changeIndex = 2
+        } else changeIndex = 1
+      }
+      if( type == 'device' ){
+        if ( element2.shareType == 'device' && deviceCount == 1 ) {
+          changeIndex = 3
+        } else if( element2.shareType == 'device' && deviceCount == 2 ){
+          changeIndex = 4
+        }
+      }
+    }
+  }
+  return changeIndex
+}

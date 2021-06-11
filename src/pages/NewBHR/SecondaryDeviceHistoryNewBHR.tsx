@@ -46,6 +46,7 @@ import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
+import { getIndex } from '../../common/utilities'
 
 const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -438,11 +439,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const renderReshareHeader = useCallback( () => {
     return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ReshareBottomSheet as any).current.snapTo(0);
-      // }}
-      />
+      <ModalHeader />
     )
   }, [] )
 
@@ -535,18 +532,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Fsf","channelId":"fa6be1d1faa28e145642ec5859e2a35029a22b32d87ada9457ee2e3c69498536","streamId":"34574a2f6","secondaryChannelKey":"fAmXbYCcp94cHp4IYT2rOjKz","version":"1.7.5"}'
-          try {
-            if ( qrScannedData ) {
-              dispatch( setApprovalStatus( false ) )
-              dispatch( downloadSMShare( qrScannedData ) )
-              setQrBottomSheetsFlag( false )
-            }
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
+          setQrBottomSheetsFlag( false )
         }}
       />
     )
@@ -564,43 +553,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   const onPressChangeKeeperType = ( type, name ) => {
-    let changeIndex = 1
-    let contactCount = 0
-    let deviceCount = 0
-    for ( let i = 0; i < levelHealth.length; i++ ) {
-      const element = levelHealth[ i ]
-      for ( let j = 2; j < element.levelInfo.length; j++ ) {
-        const element2 = element.levelInfo[ j ]
-        if (
-          element2.shareType == 'contact' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelHealth[ i ]
-        ) {
-          contactCount++
-        }
-        if (
-          element2.shareType == 'device' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelHealth[ i ]
-        ) {
-          deviceCount++
-        }
-        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( keeperInfo.find( ( value ) => value.shareId == element2.shareId && value.type == 'contact' ) && keeperInfo.find( ( value ) => value.shareId == element2.shareId && value.type == 'contact' ).data.index == 1 ) {
-            changeIndex = 2
-          } else changeIndex = 1
-        }
-        if( type == 'device' ){
-          if ( element2.shareType == 'device' && deviceCount == 1 ) {
-            changeIndex = 3
-          } else if( element2.shareType == 'device' && deviceCount == 2 ){
-            changeIndex = 4
-          }
-        }
-      }
-    }
+    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
