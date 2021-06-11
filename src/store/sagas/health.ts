@@ -143,6 +143,7 @@ function* initHealthWorker() {
       status: 'accessible',
       shareId: randomIdForSecurityQ,
       reshareVersion: 0,
+      name: 'Security Question',
     },
   ]
   const obj: KeeperInfoInterface = {
@@ -387,6 +388,7 @@ function* updateHealthLevel2Worker( { payload } ) {
         status: 'accessible',
         shareId: randomIdForSecurityQ,
         reshareVersion: 0,
+        name: 'Security Question',
       }
     }
     const levelInfo = []
