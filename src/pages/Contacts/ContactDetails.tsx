@@ -51,47 +51,30 @@ import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
+import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
-const getImageIcon = ( item ) => {
+const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
-    if ( item.image ) {
+    if ( item.avatarImageSource ) {
       return (
         <View style={styles.headerImageView}>
-          <Image source={item.image} style={styles.headerImage} />
+          <Image source={item.avatarImageSource} style={styles.headerImage} />
         </View>
       )
     } else {
-      if (
-        item.firstName === 'F&F request' &&
-        item.contactsWalletName !== undefined &&
-        item.contactsWalletName !== ''
-      ) {
-        return (
-          <View style={styles.headerImageView}>
-            <View style={styles.headerImageInitials}>
-              <Text style={styles.headerImageInitialsText}>
-                {item
-                  ? nameToInitials( `${item.contactsWalletName}'s Wallet` )
-                  : ''}
-              </Text>
-            </View>
+      return (
+        <View style={styles.headerImageView}>
+          <View style={styles.headerImageInitials}>
+            <Text style={styles.headerImageInitialsText}>
+              {item.displayedName
+                ? nameToInitials(
+                  item.displayedName
+                )
+                : ''}
+            </Text>
           </View>
-        )
-      } else {
-        return (
-          <View style={styles.headerImageView}>
-            <View style={styles.headerImageInitials}>
-              <Text style={styles.headerImageInitialsText}>
-                {item.contactName
-                  ? nameToInitials(
-                    item.contactName
-                  )
-                  : ''}
-              </Text>
-            </View>
-          </View>
-        )
-      }
+        </View>
+      )
     }
   }
 }
@@ -124,7 +107,6 @@ interface ContactDetailsPropTypes {
 interface ContactDetailsStateTypes {
   isSendDisabled: boolean;
   Loading: boolean;
-  contact: any;
   SelectedOption: number;
   errorMessage: string;
   buttonText: string;
@@ -148,7 +130,7 @@ class ContactDetails extends PureComponent<
   SendViaQRBottomSheet: any;
   ExitKeyQRBottomSheet: any;
   ErrorBottomSheet: any;
-  Contact: any;
+  contact: ContactRecipientDescribing;
   contactsType: any;
   setIsSendDisabledListener: any;
 
@@ -164,8 +146,6 @@ class ContactDetails extends PureComponent<
       Loading: true,
       key: '',
       isSendDisabled: false,
-      contact: {
-      },
       SelectedOption: 0,
       errorMessage: '',
       buttonText: 'Try again',
@@ -209,7 +189,7 @@ class ContactDetails extends PureComponent<
       qrModalTitle: '',
     }
 
-    this.Contact = this.props.navigation.state.params.contact
+    this.contact = this.props.navigation.state.params.contact
     this.contactsType = this.props.navigation.state.params.contactsType
   }
 
@@ -230,10 +210,6 @@ class ContactDetails extends PureComponent<
     } else {
       this.getHistoryForTrustedContacts()
     }
-    this.setState( {
-      contact: this.Contact ? this.Contact : {
-      },
-    } )
 
     this.syncContact()
   }
@@ -311,7 +287,7 @@ class ContactDetails extends PureComponent<
   // };
 
   onPressSend = () => {
-    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.Contact.id )
+    const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.contact.id )
     this.props.sourceAccountSelectedForSending(
       this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT )
     )
@@ -327,23 +303,22 @@ class ContactDetails extends PureComponent<
   };
 
   onPressResendRequest = () => {
-    if ( this.Contact.isGuardian ) {
-      this.createDeepLink( this.Contact )
+    if ( this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER ) {
+      this.createDeepLink( this.contact )
       setTimeout( () => {
         ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
       }, 2 )
     } else {
       this.props.navigation.navigate( 'AddContactSendRequest', {
-        SelectedContact: [ this.Contact ],
+        SelectedContact: [ this.contact ],
       } )
     }
   };
 
   syncContact = ( hardSync?: boolean ) => {
-    const { contact } = this.state
-    if( contact ){
+    if( this.contact ){
       const contactInfo = {
-        channelKey: this.Contact.channelKey,
+        channelKey: this.contact.channelKey,
       }
       const channelUpdate =  {
         contactInfo
@@ -390,7 +365,7 @@ class ContactDetails extends PureComponent<
         const element = history[ i ]
         if (
           element.selectedContactInfo &&
-          element.selectedContactInfo.selectedContact.id === this.Contact.id
+          element.selectedContactInfo.selectedContact.id === this.contact.id
         ) {
           array.push( element )
         }
@@ -472,10 +447,10 @@ class ContactDetails extends PureComponent<
   generateQR = ( type ) => {
     const appVersion = DeviceInfo.getVersion()
     const { trustedContacts } = this.props
-    const contacts: TrustedContact = trustedContacts.tc.trustedContacts[ this.Contact.channelKey ]
+    const contacts: TrustedContact = trustedContacts.tc.trustedContacts[ this.contact.channelKey ]
     const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
-    if ( !this.Contact ) {
-      Alert.alert( 'Contact details missing' )
+    if ( !this.contact ) {
+      Alert.alert( 'contact details missing' )
       return
     }
 
@@ -497,7 +472,7 @@ class ContactDetails extends PureComponent<
         walletName: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletName,
         channelId: contacts.permanentChannelAddress,
         streamId: instream.streamId,
-        channelKey: this.Contact.channelKey,
+        channelKey: this.contact.channelKey,
         secondaryChannelKey: contacts.contactsSecondaryChannelKey,
         version: appVersion
       } )
@@ -549,14 +524,14 @@ class ContactDetails extends PureComponent<
   }
 
   SendShareModalFunction = () => {
-    if ( !isEmpty( this.Contact ) ) {
+    if ( !isEmpty( this.contact ) ) {
       return (
         <RequestKeyFromContact
           isModal={true}
           headerText={`Send Recovery Key${'\n'}to contact`}
           subHeaderText={'Send Key to Keeper, you can change your Keeper, or their primary mode of contact'}
           contactText={'Sharing Recovery Key with'}
-          contact={this.Contact ? this.Contact : null}
+          contact={this.contact ? this.contact : null}
           QR={this.state.trustedQR}
           link={this.state.trustedLink}
           contactEmail={''}
@@ -591,7 +566,7 @@ class ContactDetails extends PureComponent<
     return (
       <SendViaLink
         contactText={'Send Recovery Secret'}
-        contact={this.Contact}
+        contact={this.contact}
         link={this.state.trustedLink}
         contactEmail={''}
         onPressBack={() => {
@@ -621,7 +596,7 @@ class ContactDetails extends PureComponent<
         headerText={this.state.qrModalTitle}
         subHeaderText={'You should scan the QR to restore'}
         contactText={''}
-        contact={this.Contact}
+        contact={this.contact}
         QR={this.state.trustedQR}
         contactEmail={''}
         onPressBack={() => {
@@ -652,7 +627,7 @@ class ContactDetails extends PureComponent<
         headerText={'Encrypted Exit Key'}
         subHeaderText={'You should scan the QR to restore Personal Copy'}
         contactText={''}
-        contact={this.Contact}
+        contact={this.contact}
         QR={this.state.encryptedExitKey}
         contactEmail={''}
         onPressBack={() => {
@@ -733,7 +708,6 @@ class ContactDetails extends PureComponent<
   render() {
     const { navigation } = this.props
     const {
-      contact,
       Loading,
       SelectedOption,
       encryptedExitKey,
@@ -766,7 +740,7 @@ class ContactDetails extends PureComponent<
                   size={17}
                 />
               </TouchableOpacity>
-              {getImageIcon( contact )}
+              {getImageIcon( this.contact )}
               <View style={{
                 flex: 1, marginRight: 5
               }}>
@@ -776,21 +750,17 @@ class ContactDetails extends PureComponent<
                   ellipsizeMode="clip"
                   numberOfLines={1}
                 >
-                  {this.Contact.firstName === 'F&F request' &&
-                  this.Contact.contactsWalletName !== undefined &&
-                  this.Contact.contactsWalletName !== ''
-                    ? `${this.Contact.contactsWalletName}'s Wallet`
-                    : contact.contactName}
+                  {this.contact.displayedName}
                 </Text>
-                {contact.connectedVia ? (
+                {/* {this.contact.connectedVia ? (
                   <Text style={styles.phoneText}>
-                    {contact.usesOTP
+                    {this.contact.usesOTP
                       ? !contact.hasTrustedChannel
                         ? 'OTP: ' + contact.connectedVia
                         : ''
-                      : contact.connectedVia}
+                      : this.contact.connectedVia}
                   </Text>
-                ) : null}
+                ) : null} */}
               </View>
               <TouchableOpacity
                 disabled={isSendDisabled}
@@ -799,24 +769,24 @@ class ContactDetails extends PureComponent<
                     isSendDisabled: true,
                   } )
 
-                  this.Contact.lastSeen
+                  this.contact.lastSeenActive
                     ? this.onPressSend()
-                    : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.Contact.contactName )
+                    : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName )
                       ? this.onPressResendRequest()
                       : null
                 }}
                 style={styles.resendContainer}
               >
-                {this.Contact.lastSeen ? (
+                {this.contact.lastSeenActive ? (
                   <Image
                     source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                     style={styles.bitcoinIconStyle}
                   />
                 ) : null}
                 <Text style={styles.sendTextStyle}>
-                  {this.Contact.lastSeen
+                  {this.contact.lastSeenActive
                     ? 'Send'
-                    : this.Contact.isGuardian
+                    : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
                       ? 'Reshare'
                       : 'Resend Request'}
                 </Text>
@@ -951,10 +921,10 @@ class ContactDetails extends PureComponent<
           {this.contactsType == 'I\'m Keeper of' && (
             <View style={styles.keeperViewStyle}>
               <TouchableOpacity
-                disabled={!this.Contact.isWard}
+                disabled={!( this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ) }
                 style={{
                   ...styles.bottomButton,
-                  opacity: this.Contact.isWard ? 1 : 0.5,
+                  opacity: this.contact.trustKind === ContactTrustKind.USER_IS_KEEPING ? 1 : 0.5,
                 }}
                 onPress={()=>
                 {
@@ -1030,7 +1000,7 @@ class ContactDetails extends PureComponent<
                     text: 'Yes',
                     onPress: () => {
                       this.props.removeTrustedContact( {
-                        channelKey: this.Contact.channelKey
+                        channelKey: this.contact.channelKey
                       } )
                       this.props.navigation.goBack()
                     },
