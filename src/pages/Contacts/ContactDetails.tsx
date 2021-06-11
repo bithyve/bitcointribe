@@ -987,40 +987,45 @@ class ContactDetails extends PureComponent<
               ) : null}
             </View>
           )}
-          <TouchableOpacity
-            style={{
-              ...styles.bottomButton,
-            }}
-            onPress={() => {
-              Alert.alert(
-                'Remove Contact',
-                'Are you sure about removing the contact?',
-                [
-                  {
-                    text: 'Yes',
-                    onPress: () => {
-                      this.props.removeTrustedContact( {
-                        channelKey: this.contact.channelKey
-                      } )
-                      this.props.navigation.goBack()
-                    },
-                  },
-                  {
-                    text: 'Cancel',
-                    onPress: () => {},
-                    style: 'cancel',
-                  },
-                ],
-                {
-                  cancelable: false
-                }
-              )
-            }}
-          >
-            <View>
-              <Text style={styles.buttonText} numberOfLines={1}>Remove</Text>
-            </View>
-          </TouchableOpacity>
+          {
+            this.contact.trustKind !== ContactTrustKind.OTHER && this.contact.lastSeenActive ? null: (
+              <TouchableOpacity
+                style={{
+                  ...styles.bottomButton,
+                }}
+                onPress={() => {
+                  Alert.alert(
+                    'Remove Contact',
+                    'Are you sure about removing the contact?',
+                    [
+                      {
+                        text: 'Yes',
+                        onPress: () => {
+                          this.props.removeTrustedContact( {
+                            channelKey: this.contact.channelKey
+                          } )
+                          this.props.navigation.goBack()
+                        },
+                      },
+                      {
+                        text: 'Cancel',
+                        onPress: () => {},
+                        style: 'cancel',
+                      },
+                    ],
+                    {
+                      cancelable: false
+                    }
+                  )
+                }}
+              >
+                <View>
+                  <Text style={styles.buttonText} numberOfLines={1}>Remove</Text>
+                </View>
+              </TouchableOpacity>
+            )
+          }
+
         </View>
         <BottomSheet
           enabledInnerScrolling={true}
