@@ -104,7 +104,8 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     walletName,
     relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : contactInfo.contactsSecondaryChannelKey ? TrustedContactRelationTypes.WARD : TrustedContactRelationTypes.CONTACT,
     FCM,
-    paymentAddresses
+    paymentAddresses,
+    contactDetails: contactInfo.contactDetails
   }
 
   let secondaryData: SecondaryStreamData
@@ -115,7 +116,6 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     backupData = {
       primaryMnemonicShard,
       keeperInfo,
-      contactDetails: contactInfo.contactDetails
     }
     secondaryData = {
       secondaryMnemonicShard,
@@ -328,7 +328,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const contactDetails: ContactDetails = {
     id: contact.id,
     contactName: contact.name,
-    image: contact.imageAvailable? contact.image: null
+    image: contact.image
   }
 
   const contactInfo: ContactInfo = {

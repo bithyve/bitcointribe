@@ -174,7 +174,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         isActive: contact.isActive,
         channelKey,
         contactName,
-        connectedVia: contactDetails.info,
+        connectedVia: '',
         image: contactDetails.image,
         // usesOTP,
         // hasXpub,

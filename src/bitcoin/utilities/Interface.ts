@@ -506,6 +506,7 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
+  contactDetails: ContactDetails
 }
 
 export interface SecondaryStreamData {
@@ -516,7 +517,6 @@ export interface SecondaryStreamData {
 export interface BackupStreamData {
   primaryMnemonicShard: any,
   keeperInfo: any,
-  contactDetails: ContactDetails
 }
 
 export interface UnecryptedStreamData {
