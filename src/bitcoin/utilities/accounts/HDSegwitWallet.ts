@@ -4,7 +4,6 @@ import * as bitcoinJS from 'bitcoinjs-lib'
 import coinselect from 'coinselect'
 import crypto from 'crypto'
 import config from '../../HexaConfig'
-import * as accountUtils from './accountUtils'
 import {
   Transactions,
   DerivativeAccounts,
@@ -40,6 +39,7 @@ import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import _ from 'lodash'
 import SSS from '../sss/SSS'
+import AccountUtilities from './AccountUtilities'
 const { HEXA_ID } = config
 
 export default class HDSegwitWallet {
@@ -351,7 +351,7 @@ export default class HDSegwitWallet {
           account.xpubDetails.xpub,
         )
 
-        const txCounts = await accountUtils.getTxCounts( [ address ], this.network )
+        const txCounts = await AccountUtilities.getTxCounts( [ address ], this.network )
         if ( txCounts[ address ] === 0 ) {
           availableAddress = address
           account.xpubDetails.nextFreeAddressIndex += itr
@@ -404,7 +404,7 @@ export default class HDSegwitWallet {
       xpub,
     )
 
-    const txCounts = await accountUtils.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.derivativeAccounts[ accountType ][
@@ -643,7 +643,7 @@ export default class HDSegwitWallet {
       }
     }
 
-    const { synchedAccounts } = await accountUtils.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
 
     const txsFound: TransactionDetails[] = []
     for( let { accountType, accountNumber, contactName } of accountsInfo ){
@@ -1164,7 +1164,7 @@ export default class HDSegwitWallet {
       let itr
       for ( itr = 0; itr < this.gapLimit + 1; itr++ ) {
         const address = this.getAddress( false, itr, xpub )
-        const txCounts = await accountUtils.getTxCounts( [ address ], this.network )
+        const txCounts = await AccountUtilities.getTxCounts( [ address ], this.network )
         if ( txCounts[ address ] === 0 ) {
           availableAddress = address
           break
@@ -1224,7 +1224,7 @@ export default class HDSegwitWallet {
       this.nextFreeChangeAddressIndex + hardGapLimit - 1,
     )
 
-    const txCounts = await accountUtils.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.nextFreeAddressIndex += this.gapLimit
@@ -1393,7 +1393,7 @@ export default class HDSegwitWallet {
         accountName: this.accountName,
       }
     }
-    const { synchedAccounts } = await accountUtils.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
 
     const  {
       UTXOs,
@@ -1751,7 +1751,7 @@ export default class HDSegwitWallet {
       // console.log('------ Transaction Signing ----------');
       let vin = 0
       for ( const input of inputs ) {
-        const keyPair = accountUtils.getKeyPair(
+        const keyPair = AccountUtilities.getKeyPair(
           this.addressToPrivateKey( input.address ),
           this.network
         )
@@ -1759,7 +1759,7 @@ export default class HDSegwitWallet {
         txb.sign(
           vin,
           keyPair,
-          accountUtils.getP2SH( keyPair, this.network ).redeem.output,
+          AccountUtilities.getP2SH( keyPair, this.network ).redeem.output,
           null,
           input.value,
           witnessScript,
@@ -2061,7 +2061,7 @@ export default class HDSegwitWallet {
       derivativeXpub ? derivativeXpub : this.getXpub(),
       this.network,
     )
-    return accountUtils.deriveAddress(
+    return AccountUtilities.deriveAddress(
       node.derive( internal ? 1 : 0 ).derive( index ),
       this.purpose,
       this.network

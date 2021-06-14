@@ -1,5 +1,5 @@
 import config from '../../HexaConfig'
-import * as accountUtils from '../../utilities/accounts/accountUtils'
+import AccountUtilities from '../../utilities/accounts/AccountUtilities'
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
 import { ErrMap } from '../../utilities/ErrMap'
 import {
@@ -440,13 +440,13 @@ export default class SecureAccount {
     },
   ): {
     paymentURI: string;
-  } => accountUtils.generatePaymentURI( address, options );
+  } => AccountUtilities.generatePaymentURI( address, options );
 
   public addressDiff = (
     scannedStr: string,
   ): {
       type: ScannedAddressKind | null
-  } => accountUtils.addressDiff( scannedStr, this.secureHDWallet.network );
+  } => AccountUtilities.addressDiff( scannedStr, this.secureHDWallet.network );
 
   public decodePaymentURI = (
     paymentURI: string,
@@ -457,10 +457,10 @@ export default class SecureAccount {
       label?: string;
       message?: string;
     };
-  } => accountUtils.decodePaymentURI( paymentURI );
+  } => AccountUtilities.decodePaymentURI( paymentURI );
 
   public isValidAddress = ( recipientAddress: string ): boolean =>
-    accountUtils.isValidAddress( recipientAddress, this.secureHDWallet.network );
+    AccountUtilities.isValidAddress( recipientAddress, this.secureHDWallet.network );
 
   public getReceivingAddress = (
     derivativeAccountType?: string,
@@ -1055,7 +1055,7 @@ export default class SecureAccount {
 
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
-      const { txid } = await accountUtils.broadcastTransaction( txHex, this.secureHDWallet.network )
+      const { txid } = await AccountUtilities.broadcastTransaction( txHex, this.secureHDWallet.network )
       if( txid ){
         // chip consumed utxos
         this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )

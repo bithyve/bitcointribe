@@ -21,7 +21,6 @@ import {
   WyreDerivativeAccountElements,
   RampDerivativeAccountElements,
 } from '../Interface'
-import * as accountUtils from './accountUtils'
 import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
@@ -34,6 +33,7 @@ import {
 } from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
+import AccountUtilities from './AccountUtilities'
 const {  HEXA_ID } = config
 
 
@@ -426,7 +426,7 @@ export default class SecureHDWallet {
     const externalAddress = this.createSecureMultiSig( this.nextFreeAddressIndex + hardGapLimit - 1 ).address
 
     const internalAddress = this.createSecureMultiSig( this.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
-    const txCounts = await accountUtils.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.nextFreeAddressIndex += this.gapLimit
@@ -595,7 +595,7 @@ export default class SecureHDWallet {
         accountName: this.accountName,
       }
     }
-    const { synchedAccounts } = await accountUtils.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
 
     const  {
       UTXOs,
@@ -710,7 +710,7 @@ export default class SecureHDWallet {
       xpub,
     ).address
 
-    const txCounts = await accountUtils.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.derivativeAccounts[ accountType ][
@@ -931,7 +931,7 @@ export default class SecureHDWallet {
       }
     }
 
-    const { synchedAccounts } = await accountUtils.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
 
     const txsFound: TransactionDetails[] = []
     for( const { accountType, accountNumber } of accountsInfo ){
@@ -2169,7 +2169,7 @@ export default class SecureHDWallet {
       // console.log({ txHex: res.data.txHex });
       // console.log('------ Broadcasting Transaction --------');
 
-      const { txid } = await accountUtils.broadcastTransaction( res.data.txHex, this.network )
+      const { txid } = await AccountUtilities.broadcastTransaction( res.data.txHex, this.network )
       // console.log({ txid });
 
       return {
@@ -2528,7 +2528,7 @@ export default class SecureHDWallet {
       // for generating ga_recovery based recoverable multiSigs
       const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ]
       // // console.log({ pubs });
-      const multiSig = accountUtils.generateMultiSig( 2, pubs, this.network )
+      const multiSig = AccountUtilities.generateMultiSig( 2, pubs, this.network )
 
       const construct = {
         scripts: {

@@ -3,7 +3,6 @@ import { Network } from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import { ErrMap } from '../ErrMap'
 import HDSegwitWallet from './HDSegwitWallet'
-import * as accountUtils from './accountUtils'
 import {
   Transactions,
   DerivativeAccounts,
@@ -14,6 +13,7 @@ import {
   TransactionPrerequisiteElements,
   ContactDetails,
 } from '../Interface'
+import AccountUtilities from './AccountUtilities'
 
 export default class BaseAccount {
   public hdWallet: HDSegwitWallet;
@@ -137,7 +137,7 @@ export default class BaseAccount {
     },
   ): {
     paymentURI: string;
-  } => accountUtils.generatePaymentURI( address, options );
+  } => AccountUtilities.generatePaymentURI( address, options );
 
   public decodePaymentURI = (
     paymentURI: string,
@@ -148,13 +148,13 @@ export default class BaseAccount {
       label?: string;
       message?: string;
     };
-  } => accountUtils.decodePaymentURI( paymentURI );
+  } => AccountUtilities.decodePaymentURI( paymentURI );
 
   public addressDiff = (
     scannedStr: string,
   ): {
       type: ScannedAddressKind | null;
-  } => accountUtils.addressDiff( scannedStr, this.hdWallet.network );
+  } => AccountUtilities.addressDiff( scannedStr, this.hdWallet.network );
 
   public getReceivingAddress = (
     derivativeAccountType?: string,
@@ -513,7 +513,7 @@ export default class BaseAccount {
   };
 
   public isValidAddress = ( recipientAddress: string ): boolean =>
-    accountUtils.isValidAddress( recipientAddress, this.hdWallet.network );
+    AccountUtilities.isValidAddress( recipientAddress, this.hdWallet.network );
 
   public getBalanceTransactions = async ( hardRefresh?: boolean, blindRefresh?: boolean ): Promise<
     | {
@@ -747,7 +747,7 @@ export default class BaseAccount {
 
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
-      const { txid } = await accountUtils.broadcastTransaction( txHex, this.hdWallet.network )
+      const { txid } = await AccountUtilities.broadcastTransaction( txHex, this.hdWallet.network )
       if( txid ){
         // chip consumed utxos
         this.hdWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
