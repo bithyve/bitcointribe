@@ -55,13 +55,8 @@ import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 import Loader from '../../components/loader'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import RecipientAvatar from '../../components/RecipientAvatar'
-import HomeHeader from '../../components/home/home-header_update'
 import Header from '../../navigation/stacks/Header'
-// import { SafeAreaView } from 'react-native-safe-area-context'
-import useStreamFromPermanentChannel from '../../utils/hooks/trusted-contacts/UseStreamFromPermanentChannel'
 import ModalContainer from '../../components/home/ModalContainer'
-import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { v4 as uuid } from 'uuid'
 
 interface FriendsAndFamilyPropTypes {
@@ -78,9 +73,9 @@ interface FriendsAndFamilyStateTypes {
   isLoadContacts: boolean;
   showModal: boolean;
   loading: boolean;
-  myKeepers: any[];
-  ImKeeping: any[];
-  otherContacts: any[];
+  keepers: ContactRecipientDescribing[];
+  keeping: ContactRecipientDescribing[];
+  otherContacts: ContactRecipientDescribing[];
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
   showLoader: boolean;
@@ -109,8 +104,8 @@ class FriendsAndFamilyScreen extends PureComponent<
       isLoadContacts: false,
       showModal: false,
       loading: true,
-      myKeepers: [],
-      ImKeeping: [],
+      keepers: [],
+      keeping: [],
       otherContacts: [],
       isShowingKnowMoreSheet: false,
       showLoader: false,
@@ -188,51 +183,36 @@ class FriendsAndFamilyScreen extends PureComponent<
     } )
   };
 
-  updateAddressBook = async ( walletId ) => {
-    // console.log( '111111111' )
-    // InteractionManager.runAfterInteractions( () => {
+  updateAddressBook = async () => {
     const { trustedContactsService } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
 
-    const myKeepers = []
-    const ImKeeping = []
+    const keepers = []
+    const keeping = []
     const otherContacts = []
-    // console.log( '222222222' )
-    let skippedContactsCounter = 1
+
     for( const channelKey of Object.keys( contacts ) ){
       const contact = contacts[ channelKey ]
-      const { contactDetails, relationType } = contact
-      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
-      // console.log( '33333333333' )
-      let contactName = contactDetails.contactName
-      if( contactName === SKIPPED_CONTACT_NAME ){ // skipped contacts instance count append
-        contactName = `${SKIPPED_CONTACT_NAME} ${skippedContactsCounter}`
-        skippedContactsCounter++
-      }
-      // console.log( '444444444' )
-      const fnf = {
-        id: contactDetails.id,
-        isActive: contact.isActive,
-        channelKey,
-        contactName,
-        connectedVia: contactDetails.info,
-        image: contactDetails.image,
-        // usesOTP,
-        // hasXpub,
-        // hasTrustedAddress,
-        relationType,
-        isGuardian: [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
-        isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
-        contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
-        lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
-      }
-      //  feature/2.0
-      // console.log( '555555555' )
-      if( fnf.isActive ){
-        if( fnf.isGuardian || fnf.isWard ){
-          if( fnf.isGuardian ) myKeepers.push( fnf )
-          if( fnf.isWard ) ImKeeping.push( fnf )
-        } else otherContacts.push( fnf )
+      const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+
+      if( contact.isActive ){
+        if( isGuardian || isWard ){
+          if( isGuardian ) keepers.push(  makeContactRecipientDescription(
+            channelKey,
+            contact,
+            ContactTrustKind.KEEPER_OF_USER,
+          ) )
+          if( isWard ) keeping.push( makeContactRecipientDescription(
+            channelKey,
+            contact,
+            ContactTrustKind.USER_IS_KEEPING,
+          ) )
+        } else otherContacts.push( makeContactRecipientDescription(
+          channelKey,
+          contact,
+          ContactTrustKind.OTHER,
+        ) )
       } else {
         // TODO: inject in expired contacts list
       }
@@ -240,8 +220,8 @@ class FriendsAndFamilyScreen extends PureComponent<
 
     // console.log( '666666666' )
     this.setState( {
-      myKeepers,
-      ImKeeping,
+      keepers,
+      keeping,
       otherContacts,
       showIndicator: false
     }
@@ -273,12 +253,12 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   handleContactSelection(
-    backendContactInfo: unknown,
+    contactDescription: ContactRecipientDescribing,
     index: number,
     contactType: string,
   ) {
     this.props.navigation.navigate( 'ContactDetails', {
-      contact: backendContactInfo,
+      contact: contactDescription,
       index,
       contactsType: contactType,
     } )
@@ -286,12 +266,10 @@ class FriendsAndFamilyScreen extends PureComponent<
 
 
   renderContactItem = ( {
-    backendContactInfo,
     contactDescription,
     index,
     contactsType,
   }: {
-    backendContactInfo: unknown;
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
@@ -311,12 +289,10 @@ class FriendsAndFamilyScreen extends PureComponent<
     )
   };
   renderContactListItem = ( {
-    backendContactInfo,
     contactDescription,
     index,
     contactsType,
   }: {
-    backendContactInfo: unknown;
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
@@ -326,7 +302,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         key={String( index )}
         bottomDivider
         onPress={() =>
-          this.handleContactSelection( backendContactInfo, index, contactsType )
+          this.handleContactSelection( contactDescription, index, contactsType )
         }
         containerStyle={{
           backgroundColor: Colors.backgroundColor
@@ -364,7 +340,6 @@ class FriendsAndFamilyScreen extends PureComponent<
         onSkipContinue={() => {
           const contactDummy = {
             id: uuid(),
-            name: SKIPPED_CONTACT_NAME,
           }
           navigation.navigate( 'AddContactSendRequest', {
             SelectedContact: [ contactDummy ],
@@ -383,8 +358,8 @@ class FriendsAndFamilyScreen extends PureComponent<
     const { syncPermanentChannels, navigation } = this.props
     const { isLoadContacts } = this.state
     const {
-      myKeepers,
-      ImKeeping,
+      keepers,
+      keeping,
       otherContacts,
       showLoader,
       showIndicator
@@ -468,13 +443,9 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 height: 'auto'
               }}>
-                {( myKeepers.length && myKeepers.map( ( item, index ) => {
+                {( keepers.length && keepers.map( ( item, index ) => {
                   return this.renderContactListItem( {
-                    backendContactInfo: item,
-                    contactDescription: makeContactRecipientDescription(
-                      item,
-                      ContactTrustKind.KEEPER_OF_USER,
-                    ),
+                    contactDescription: item,
                     index,
                     contactsType: 'My Keepers',
                   } )
@@ -511,52 +482,16 @@ class FriendsAndFamilyScreen extends PureComponent<
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   {otherContacts.map( ( item, index ) => {
                     return this.renderContactItem( {
-                      backendContactInfo: item,
-                      contactDescription: makeContactRecipientDescription(
-                        item,
-                        ContactTrustKind.OTHER,
-                      ),
+                      contactDescription: item,
                       index,
                       contactsType: 'Other Contacts',
                     } )
-                  } ) || <View style={{
-                    height: wp( '22%' ) + 30
-                  }} />}
+                  } )}
                 </ScrollView>
 
               </View>
             </View>
             }
-            {/* <View style={{
-            marginTop: wp( '5%' )
-          }}>
-            <Text style={styles.pageTitle}>I am the Keeper of</Text>
-            <Text style={styles.pageInfoText}>
-              Contacts whose wallets I can help restore
-            </Text>
-
-            <View style={{
-              marginBottom: 15
-            }}>
-              <View style={{
-                height: 'auto'
-              }}>
-                {( ImKeeping.length && ImKeeping.map( ( item, index ) => {
-                  return this.renderContactListItem( {
-                    backendContactInfo: item,
-                    contactDescription: makeContactRecipientDescription(
-                      item,
-                      ContactTrustKind.USER_IS_KEEPING,
-                    ),
-                    index,
-                    contactsType: 'I\'m Keeper of',
-                  } )
-                } ) ) || <View style={{
-                  height: wp( '22%' ) + 30
-                }} />}
-              </View>
-            </View>
-          </View> */}
 
             <View style={{
               marginTop: wp( '5%' )
@@ -564,87 +499,44 @@ class FriendsAndFamilyScreen extends PureComponent<
               <View style={{
                 marginBottom: 15
               }}>
-                <View style={{
-                  height: 'auto'
-                }}>
-
-                  {myKeepers.length > 0 &&
+                {keepers.length > 0 &&
                   <>
-                    {myKeepers.map( ( item, index ) => {
+                    {keepers.length && keepers.map( ( item, index ) => {
                       return this.renderContactListItem( {
-                        backendContactInfo: item,
-                        contactDescription: makeContactRecipientDescription(
-                          item,
-                          ContactTrustKind.KEEPER_OF_USER,
-                        ),
+                        contactDescription: item,
                         index,
                         contactsType: 'My Keepers',
                       } )
-                    } )}
+                    } ) }
                   </>
-                  }
-                  {ImKeeping.length > 0 &&
+                }
+                {keeping.length > 0 &&
                   <>
-                    {ImKeeping.map( ( item, index ) => {
+                    {keeping.length && keeping.map( ( item, index ) => {
                       return this.renderContactListItem( {
-                        backendContactInfo: item,
-                        contactDescription: makeContactRecipientDescription(
-                          item,
-                          ContactTrustKind.USER_IS_KEEPING,
-                        ),
+                        contactDescription: item,
                         index,
                         contactsType: 'I\'m Keeper of',
                       } )
-                    } )}
+                    } ) }
                   </>
-                  }
-                  {otherContacts.length > 0 &&
+                }
+                {otherContacts.length > 0 &&
                   <>
-                    {otherContacts.map( ( item, index ) => {
+                    {otherContacts.length && otherContacts.map( ( item, index ) => {
                       return this.renderContactListItem( {
-                        backendContactInfo: item,
-                        contactDescription: makeContactRecipientDescription(
-                          item,
-                          ContactTrustKind.OTHER,
-                        ),
+                        contactDescription: item,
                         index,
                         contactsType: 'Other Contacts',
                       } )
-                    } )}
+                    } ) }
                   </>
-                  }
-                  {/* <TouchableOpacity
-                    onPress={() => {
-                      this.setState( {
-                        isLoadContacts: true,
-                      } )
-                      this.addContactAddressBookBottomSheetRef.current.snapTo( 1 )
-                    }}
-                    style={{
-                      ...styles.selectedContactsView,
-                      paddingBottom: 7,
-                      paddingTop: 7,
-                      marginTop: 0,
-                    }}
-                  >
-                    <Image
-                      style={styles.addGrayImage}
-                      source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                    />
-                    <View>
-                      <Text style={styles.contactText}>Add a Contact</Text>
-                    </View>
-                  </TouchableOpacity> */}
-                </View>
+                }
               </View>
             </View>
-            {/* <View style={{
-              flex: 1,
-              // alignSelf: 'flex-end'
-            }}> */}
             {
-              myKeepers.length == 0 &&
-            ImKeeping.length == 0 &&
+              keepers.length == 0 &&
+            keeping.length == 0 &&
             otherContacts.length == 0 && (
                 // feature/2.0
                 <BottomInfoBox

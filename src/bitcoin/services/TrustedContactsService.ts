@@ -1,8 +1,6 @@
 import TrustedContacts from '../utilities/TrustedContacts'
 import config from '../HexaConfig'
 import {
-  MetaShare,
-  EncDynamicNonPMDD,
   UnecryptedStreamData,
   ContactDetails,
   Trusted_Contacts,

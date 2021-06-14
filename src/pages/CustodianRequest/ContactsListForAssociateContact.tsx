@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -9,27 +9,21 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import ContactList from '../../components/ContactList'
-import Toast from '../../components/Toast'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Loader from '../../components/loader'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import { v4 as uuid } from 'uuid'
 
 const ContactsListForAssociateContact = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
   const postAssociation = props.navigation.getParam( 'postAssociation' )
-  const [ approvingContact, setApprovingContact ] = useState( '' )
-  const isGuardian = props.navigation.getParam( 'isGuardian' )
-  const dispatch = useDispatch()
   const { approvingTrustedContact } = useSelector(
     ( state ) => state.trustedContacts.loading,
   )
@@ -37,86 +31,6 @@ const ContactsListForAssociateContact = ( props ) => {
   function selectedContactsList( list ) {
     if ( list.length > 0 ) setContacts( [ ...list ] )
   }
-
-  // const updateTrustedContactsInfo = async ( contact? ) => {
-  //   const associatedContact = contact ? contact : contacts[ 0 ]
-  //   setShowLoader( true )
-  //   const selectedContactName = `${associatedContact.firstName} ${
-  //     associatedContact.lastName ? associatedContact.lastName : ''
-  //   }`
-  //     .toLowerCase()
-  //     .trim()
-  //   setApprovingContact( selectedContactName )
-
-  //   const tcInfo = trustedContactsInfo
-  //   if ( tcInfo.length ) {
-  //     if (
-  //       tcInfo.findIndex( ( trustedContact ) => {
-  //         if ( !trustedContact ) return false
-
-  //         const presentContactName = `${trustedContact.firstName} ${
-  //           trustedContact.lastName ? trustedContact.lastName : ''
-  //         }`
-  //           .toLowerCase()
-  //           .trim()
-
-  //         return presentContactName == selectedContactName
-  //       } ) == -1
-  //     ) {
-  //       tcInfo.push( associatedContact )
-  //       console.log( {
-  //         con: associatedContact
-  //       } )
-  //       postAssociation( associatedContact )
-  //     } else {
-  //       setShowLoader( false )
-  //       Toast( 'Contact already exists' )
-  //       return
-  //     }
-  //   } else {
-  //     tcInfo[ 3 ] = associatedContact
-  //     postAssociation( associatedContact )
-  //   }
-
-  //   dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-  // }
-
-  const { approvedTrustedContacts } = useSelector(
-    ( state ) => state.trustedContacts,
-  )
-
-  // useEffect( () => {
-  //   if (
-  //     approvingContact &&
-  //     approvedTrustedContacts &&
-  //     approvedTrustedContacts[ approvingContact ]
-  //   )
-  //   //     setShowLoader(false);
-  //     props.navigation.navigate( 'Home' )
-  // }, [ approvedTrustedContacts, approvingContact ] )
-
-  // const continueNProceed = async () => {
-  //   let AssociatedContact = JSON.parse(
-  //     await AsyncStorage.getItem('AssociatedContacts'),
-  //   );
-  //   // console.log("AssociatedContact", AssociatedContact);
-  //   if (!AssociatedContact) {
-  //     AssociatedContact = [];
-  //   }
-  //   if (
-  //     AssociatedContact.findIndex((value) => value.id == contacts[0].id) == -1
-  //   ) {
-  //     AssociatedContact.push(contacts[0]);
-  //     Toast('Contact associated successfully');
-  //     props.navigation.navigate('Home');
-  //   } else {
-  //     Toast('Contact already Associated.');
-  //   }
-  //   await AsyncStorage.setItem(
-  //     'AssociatedContacts',
-  //     JSON.stringify(AssociatedContact),
-  //   );
-  // };
 
   return (
     <View style={{
@@ -155,7 +69,6 @@ const ContactsListForAssociateContact = ( props ) => {
               setShowLoader( true )
               const contactDummy = {
                 id: uuid(),
-                name: SKIPPED_CONTACT_NAME,
               }
               postAssociation( contactDummy )
             }}
@@ -205,7 +118,6 @@ const ContactsListForAssociateContact = ( props ) => {
         onPressSkip={() => {
           const contactDummy = {
             id: uuid(),
-            name: SKIPPED_CONTACT_NAME,
           }
           postAssociation( contactDummy )
         }}

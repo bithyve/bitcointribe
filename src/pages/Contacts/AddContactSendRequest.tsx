@@ -7,9 +7,7 @@ import {
   StatusBar,
   TouchableOpacity,
   Platform,
-  Alert
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   widthPercentageToDP as wp,
@@ -29,7 +27,6 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
-import AccountShell from '../../common/data/models/AccountShell'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
@@ -57,12 +54,6 @@ export default function AddContactSendRequest( props ) {
 
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
-  const trustedContactsInfo = useSelector(
-    ( state ) => state.trustedContacts.trustedContactsInfo,
-  )
-  const accountShells: AccountShell[] = useSelector(
-    ( state ) => state.accounts.accountShells,
-  )
 
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
