@@ -96,6 +96,10 @@ import { createMaterialBottomTabNavigator } from 'react-navigation-material-bott
 // import { BottomTab } from '../components/home/custom-bottom-tabs'
 import Boottomtab from './Bottomtab'
 import { Text, View, Image } from 'react-native'
+import {
+  heightPercentageToDP as hp,
+  widthPercentageToDP as dp,
+} from 'react-native-responsive-screen'
 
 import MoreOptionsStack from './stacks/more-options/MoreOptionsStack'
 import SecurityStack from './stacks/security/Security&Privacy'
@@ -284,10 +288,14 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return(
-            <Image source={focused ? require( '../assets/images/tabs/home_inactive.png' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
-              width: 30, height: 30
+            <View style={{
+              // marginVertical: hp( '2%' )
+            }}>
+              <Image source={focused ? require( '../assets/images/tabs/home_inactive.png' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
+                width: 30, height: 30, alignSelf: 'center'
 
-            }} />
+              }} />
+            </View>
           )}
       }
     },
@@ -296,9 +304,13 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return(
-            <Image source={focused ? require( '../assets/images/tabs/fnf_active.png' ) : require( '../assets/images/tabs/f&f.png' )} style={{
-              width: 30, height: 30
-            }} />
+            <View style={{
+              // marginVertical: hp( '2%' )
+            }}>
+              <Image source={focused ? require( '../assets/images/tabs/fnf_active.png' ) : require( '../assets/images/tabs/f&f.png' )} style={{
+                width: 30, height: 30, alignSelf: 'center'
+              }} />
+            </View>
           )}
       },
     },
@@ -307,10 +319,14 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return(
-            <Image source={focused ? require( '../assets/images/tabs/security.png' ) : require( '../assets/images/tabs/security_inactive.png' )} style={{
-              width: 30, height: 30,
+            <View style={{
+              // marginVertical: hp( '2%' )
+            }}>
+              <Image source={focused ? require( '../assets/images/tabs/security.png' ) : require( '../assets/images/tabs/security_inactive.png' )} style={{
+                width: 30, height: 30, alignSelf: 'center'
               // backgroundColor: focused ? 'white': 'gray'
-            }} />
+              }} />
+            </View>
           )}
       },
     },
@@ -320,7 +336,6 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return(
             <View style={{
-
             }}>
 
               <Image source={require( '../assets/images/tabs/settings.png' )} style={{
@@ -342,15 +357,29 @@ const Bottomtab = createBottomTabNavigator(
     tabBarOptions: {
       showLabel: false,
       style: {
-        backgroundColor: Colors.blue,
-        borderRadius: 45,
-        overflow:'hidden',
-        marginVertical: 18,
-        marginHorizontal: 9,
-        alignItems: 'center',
-        // height: 40,
-        alignContent:'center'
+        backgroundColor: Colors.blue
       }
+
+      //   // flex: 1,
+      //   width: '90%',
+      //   // height: '20%',
+      //   borderRadius: 45,
+      //   overflow:'hidden',
+      //   // marginVertical: 9,
+      //   // marginHorizontal: 9,
+      //   // height: 45,
+      //   // marginBottom: hp( '1' ),
+      //   alignContent:'center',
+      //   alignSelf: 'center',
+      //   alignItems: 'center'
+      // },
+      // tabStyle:{
+      //   // margin: 15
+      //   // flex: 1,
+      //   padding: hp( 1 ),
+      //   backgroundColor: Colors.blue,
+      //   alignSelf: 'center'
+      // }
     }
     // transitionConfig: () => ( {
     //   transitionSpec: {

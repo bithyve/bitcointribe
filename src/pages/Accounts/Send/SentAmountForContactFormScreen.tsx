@@ -19,7 +19,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import BalanceEntryFormGroup from './BalanceEntryFormGroup'
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { TouchableOpacity, useBottomSheetModal } from '@gorhom/bottom-sheet'
+import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import { calculateSendMaxFee, executeSendStage1, amountForRecipientUpdated, recipientRemovedFromSending } from '../../../store/actions/sending'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import useAccountSendST1CompletionEffect from '../../../utils/sending/UseAccountSendST1CompletionEffect'
@@ -33,6 +33,7 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import idx from 'idx'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 import RecipientKind from '../../../common/data/enums/RecipientKind'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 export type NavigationParams = {
 };
@@ -48,10 +49,8 @@ export type Props = {
 const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
 
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
+  const [ sendFailureModal, setFailure ] = useState( false )
+  const [ errorMessage, setError ] = useState( '' )
 
   const selectedRecipients = useSelectedRecipientsForSending()
   const currentRecipient = useSelectedRecipientForSendingByID( navigation.getParam( 'selectedRecipientID' ) )
@@ -83,7 +82,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   useEffect( () => {
     return () => {
-      dismissBottomSheet()
+      setFailure( false )
     }
   }, [ navigation ] )
 
@@ -133,8 +132,8 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
     } ) )
   }
 
-  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
-    presentBottomSheet(
+  const showSendFailureBottomSheet = useCallback( () => {
+    return(
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={String( errorMessage )}
@@ -143,10 +142,10 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={dismissBottomSheet}
+        onPressOk={() => setFailure( false )}
         onPressCancel={() => {
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
-          dismissBottomSheet()
+          setFailure( false )
 
           navigation.dispatch(
             resetStackToAccountDetails( {
@@ -156,21 +155,21 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-      },
+      />
     )
-  },
-  [ presentBottomSheet, dismissBottomSheet ] )
+  }, [ errorMessage ] )
 
 
   useAccountSendST1CompletionEffect( {
     onSuccess: () => {
       navigation.navigate( 'SendConfirmation' )
     },
-    onFailure: showSendFailureBottomSheet,
+    onFailure: ( error ) => {
+      setError( error )
+      setTimeout( () => {
+        setFailure( true )
+      }, 200 )
+    },
   } )
 
   useEffect( ()=> {
@@ -182,7 +181,9 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   return (
     <View style={styles.rootContainer}>
-
+      <ModalContainer visible={sendFailureModal} closeBottomSheet={() => {}} >
+        {showSendFailureBottomSheet()}
+      </ModalContainer>
       <View style={styles.headerSection}>
         <SelectedRecipientsCarousel
           recipients={orderedRecipients}

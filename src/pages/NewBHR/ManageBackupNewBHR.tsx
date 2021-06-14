@@ -82,6 +82,8 @@ import {
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import ModalContainer from '../../components/home/ModalContainer'
 import { ActivityIndicator } from 'react-native-paper'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import ImageStyles from '../../common/Styles/ImageStyles'
 
 interface ManageBackupNewBHRStateTypes {
   selectedId: any;
@@ -283,7 +285,7 @@ class ManageBackupNewBHR extends Component<
     )
   };
 
-  renderContactListItem = ( {
+  renderContactItem = ( {
     contactDescription,
     index,
     contactsType,
@@ -293,39 +295,23 @@ class ManageBackupNewBHR extends Component<
     contactsType: string;
   } ) => {
     return (
-      <ListItem
-        key={String( index )}
-        bottomDivider
-        onPress={() =>
-          this.handleContactSelection( backendContactInfo, index, contactsType )
-        }
-        containerStyle={{
-          backgroundColor: Colors.backgroundColor
-        }}
+      <TouchableOpacity style={{
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}
+      key={index}
       >
-        <FriendsAndFamilyContactListItemContent contact={contactDescription} />
-      </ListItem>
+        <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
+        <Text style={{
+          textAlign: 'center', marginTop: hp ( 0.5 ), alignSelf: 'center'
+        }}>{contactDescription.displayedName.split( ' ' )[ 0 ] + ' '} </Text>
+      </TouchableOpacity>
     )
   };
 
   toggleSwitch = () => this.setState( {
     isEnabled: !this.state.isEnabled
   } );
-
-  handleContactSelection(
-    backendContactInfo: unknown,
-    index: number,
-    contactType: string,
-  ) {
-    this.props.navigation.navigate( 'ContactDetails', {
-      contact: backendContactInfo,
-      index,
-      contactsType: contactType,
-
-      // TODO: Figure out what this is
-      shareIndex: backendContactInfo.shareIndex,
-    } )
-  }
 
   // modifyLevelData = () => {
   //   const { levelHealth, currentLevel, keeperInfo } = this.props
@@ -344,17 +330,17 @@ class ManageBackupNewBHR extends Component<
   //   //this.setSelectedCards()
   // };
 
-  setSelectedCards = () => {
-    const { levelData } = this.state
-    for ( let a = 0; a < levelData.length; a++ ) {
-      if ( levelData[ a ].status == 'notSetup' ) {
-        this.setState( {
-          selectedId: levelData[ a ].id
-        } )
-        break
-      }
-    }
-  };
+  // setSelectedCards = () => {
+  //   const { levelData } = this.state
+  //   for ( let a = 0; a < levelData.length; a++ ) {
+  //     if ( levelData[ a ].status == 'notSetup' ) {
+  //       this.setState( {
+  //         selectedId: levelData[ a ].id
+  //       } )
+  //       break
+  //     }
+  //   }
+  // };
 
   componentDidUpdate = ( prevProps, prevState ) => {
     const {
@@ -1100,21 +1086,19 @@ Wallet Backup
               <View style={{
                 marginBottom: 15
               }}>
-                <View style={{
-                  height: 'auto'
-                }}>
-                  {keeping.length > 0 &&
-                  <>
+                {keeping.length > 0 &&
+                  <View style={{
+                    height: 'auto', alignItems: 'flex-start'
+                  }}>
                     {keeping.length && keeping.map( ( item, index ) => {
-                      return this.renderContactListItem( {
+                      return this.renderContactItem( {
                         contactDescription: item,
                         index,
                         contactsType: 'I\'m Keeper of',
                       } )
                     } ) }
-                  </>
-                  }
-                </View>
+                  </View>
+                }
               </View>
             </View>
           </ScrollView>
@@ -1354,6 +1338,11 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  avatarImage: {
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: wp( 12 )/2,
+    marginHorizontal: wp ( 1 )
+  },
   moreImage: {
     width: wp( '10%' ),
     height: wp( '10%' ),

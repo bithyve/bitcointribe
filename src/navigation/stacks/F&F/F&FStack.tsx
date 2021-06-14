@@ -24,6 +24,7 @@ import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import ReLogin from '../../../pages/ReLogin'
 import Intermediate from '../../../pages/Intermediate'
+import AccountDetailsStack from '../accounts/AccountDetailsStack'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -62,6 +63,13 @@ const FriendsAndFamily = createStackNavigator(
       screen: AddContactSendRequest,
       navigationOptions: {
         header: null,
+      },
+    },
+    AccountDetails: {
+      screen: AccountDetailsStack,
+      navigationOptions: {
+        header: null,
+        // tabBarVisibl
       },
     },
     QRScanner: {
