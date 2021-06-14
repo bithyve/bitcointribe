@@ -6,8 +6,6 @@ import {
   Alert,
   AppState,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,
   // widthPercentageToDP,
@@ -15,26 +13,10 @@ import {
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
-import Colors from '../../common/Colors'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
-  SECURE_ACCOUNT,
-  FAST_BITCOINS,
 } from '../../common/constants/wallet-service-types'
-import {
-  downloadMShare,
-} from '../../store/actions/sss'
-import {
-  initializeHealthSetup,
-  updateCloudPermission,
-} from '../../store/actions/health'
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   initializeTrustedContact,
@@ -44,41 +26,25 @@ import {
 import {
   updateFCMTokens,
   notificationsUpdated,
-  setupNotificationList,
   updateNotificationList,
   updateMessageStatusInApp,
   updateMessageStatus
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
-  setCardData,
-  setIsPermissionGiven,
-  updateLastSeen
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
 } from '../../common/CommonFunctions/index'
-import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
-import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import RelayServices from '../../bitcoin/services/RelayService'
 // import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import config from '../../bitcoin/HexaConfig'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
-import { v4 as uuid } from 'uuid'
-import CustomBottomTabs, {
-  BottomTab,
-  TAB_BAR_HEIGHT,
-} from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
-  autoSyncShells,
-  addNewAccountShell,
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
@@ -87,59 +53,21 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
-import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
-import {
-  updatePreference,
-  setFCMToken,
-  setSecondaryDeviceAddress,
-  setWalletId
-} from '../../store/actions/preferences'
-import S3Service from '../../bitcoin/services/sss/S3Service'
+import { withNavigationFocus } from 'react-navigation'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from '../../pages/Home/TrustedContactRequestContent'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
-import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import { Button } from 'react-native-elements'
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
-import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import BottomSheet from '@gorhom/bottom-sheet'
-import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { getEnvReleaseTopic } from '../../utils/geEnvSpecificParams'
 import { AccountsState } from '../../store/reducers/accounts'
-import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
-import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
-import messaging from '@react-native-firebase/messaging'
-import firebase from '@react-native-firebase/app'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
-import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
-import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
-import { setVersion } from '../../store/actions/versionHistory'
-import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
-import { clearRampCache } from '../../store/actions/RampIntegration'
-import { clearWyreCache } from '../../store/actions/WyreIntegration'
-import { setCloudData } from '../../store/actions/cloud'
-import { credsAuthenticated } from '../../store/actions/setupAndAuth'
-import { setShowAllAccount } from '../../store/actions/accounts'
 import { NotificationType } from '../../components/home/NotificationType'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 import ModalContainer from '../../components/home/ModalContainer'
-import NotificationInfoContents from '../../components/NotificationInfoContents'
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
-export enum BottomSheetState {
-  Closed,
-  Open,
-}
+
 
 export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
@@ -161,15 +89,10 @@ interface HomeStateTypes {
   notificationData: any[];
   CurrencyCode: string;
   netBalance: number;
-  selectedBottomTab: BottomTab | null;
-
-  bottomSheetState: BottomSheetState;
   currentBottomSheetKind: BottomSheetKind | null;
 
   secondaryDeviceOtp: any;
   currencyCode: string;
-  errorMessageHeader: string;
-  errorMessage: string;
   selectedContact: any[];
   notificationDataChange: boolean;
   appState: string;
@@ -182,12 +105,6 @@ interface HomeStateTypes {
   isBalanceLoading: boolean;
   addContactModalOpened: boolean;
   encryptedCloudDataJson: any;
-  wyreDeepLinkContent: string | null;
-  rampDeepLinkContent: string | null;
-  rampFromBuyMenu: boolean | null;
-  rampFromDeepLink: boolean | null;
-  wyreFromBuyMenu: boolean | null;
-  wyreFromDeepLink: boolean | null;
   notificationTitle: string | null;
   notificationInfo: string | null;
   notificationNote: string | null;
@@ -204,31 +121,14 @@ interface HomePropsTypes {
   exchangeRates?: any[];
 
   accountsState: AccountsState;
-  cloudPermissionGranted: any;
-
-  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-  currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
   walletName: string;
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
-  downloadMShare: any;
   initializeTrustedContact: any;
   rejectTrustedContact: any;
-  s3Service: S3Service;
-  initializeHealthSetup: any;
-  overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
-  keeperInfo: any[];
-  autoSyncShells: any;
-  clearWyreCache: any;
-  clearRampCache: any;
-  clearSwanCache: any;
-  updateSwanStatus: any;
-  addNewAccountShell: any;
   fetchFeeAndExchangeRates: any;
-  createTempSwanAccountInfo: any;
   addTransferDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
@@ -236,47 +136,17 @@ interface HomePropsTypes {
   notificationsUpdated: any;
   setCurrencyCode: any;
   currencyCode: any;
-  updatePreference: any;
-  fcmTokenValue: any;
-  setFCMToken: any;
   setSecondaryDeviceAddress: any;
-  secondaryDeviceAddressValue: any;
-  releaseCasesValue: any;
   swanDeepLinkContent: string | null;
   regularAccount: RegularAccount;
   database: any;
-  setCardData: any;
-  cardDataProps: any;
-  secureAccount: any;
   accountShells: AccountShell[];
-  setVersion: any;
-  wyreDeepLinkContent: string | null;
-  rampDeepLinkContent: string | null;
-  rampFromBuyMenu: boolean | null;
-  rampFromDeepLink: boolean | null;
-  wyreFromBuyMenu: boolean | null;
-  wyreFromDeepLink: boolean | null;
-  setCloudData: any;
-  newBHRFlowStarted: any;
-  cloudBackupStatus: CloudBackupStatus;
-  updateCloudPermission: any;
   credsAuthenticated: any;
-  setShowAllAccount: any;
-  setIsPermissionGiven: any;
-  isPermissionSet: any;
-  updateLastSeen: any;
-  isAuthenticated: any;
-  setupNotificationList: any;
-  asyncNotificationList: any;
   updateNotificationList: any;
-  fetchStarted: any;
   messages: any;
-  setWalletId: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
 }
-
-const releaseNotificationTopic = getEnvReleaseTopic()
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
@@ -291,7 +161,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-    this.props.setShowAllAccount( false )
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
@@ -300,13 +169,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       notificationData: [],
       CurrencyCode: 'USD',
       netBalance: 0,
-      bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
       secondaryDeviceOtp: {
       },
       currencyCode: 'USD',
-      errorMessageHeader: '',
-      errorMessage: '',
       selectedContact: [],
       notificationDataChange: false,
       appState: '',
@@ -320,12 +186,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isBalanceLoading: true,
       addContactModalOpened: false,
       encryptedCloudDataJson: [],
-      wyreDeepLinkContent: null,
-      rampDeepLinkContent: null,
-      rampFromBuyMenu: null,
-      rampFromDeepLink: null,
-      wyreFromBuyMenu: null,
-      wyreFromDeepLink: null,
       notificationTitle: null,
       notificationInfo: null,
       notificationNote: null,
@@ -617,185 +477,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  localNotification = async ( notificationDetails ) => {
-    const channelIdRandom = moment().valueOf()
-    PushNotification.createChannel(
-      {
-        channelId: `${channelIdRandom}`,
-        channelName: 'reminder',
-        channelDescription: 'A channel to categorise your notifications',
-        playSound: false,
-        soundName: 'default',
-        importance: 4, // (optional) default: 4. Int value of the Android notification importance
-        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
-      },
-      ( created ) =>
-        console.log( `createChannel localNotification returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
-    )
-
-    PushNotification.localNotification( {
-      /* Android Only Properties */
-      channelId: `${channelIdRandom}`,
-      showWhen: true, // (optional) default: true
-      autoCancel: true, // (optional) default: true
-      vibrate: true, // (optional) default: true
-      vibration: 300, // vibration length in milliseconds, ignored if vibrate=false, default: 1000
-      priority: 'high', // (optional) set notification priority, default: high
-
-      /* iOS and Android properties */
-      id: notificationDetails.id,
-      title: notificationDetails.title,
-      message: notificationDetails.body,
-      soundName: 'default',
-    } )
-  };
-
-  createNotificationListeners = async () => {
-    this.props.setIsPermissionGiven( true )
-    PushNotification.configure( {
-      onNotification: ( notification ) => {
-        console.log( 'NOTIFICATION:', notification )
-        // process the notification
-        if ( notification.data ) {
-          this.onNotificationOpen( notification )
-          // (required) Called when a remote is received or opened, or local notification is opened
-          notification.finish( PushNotificationIOS.FetchResult.NoData )
-        }
-      },
-
-      // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
-      onAction: ( notification ) => {
-        console.log( 'ACTION:', notification.action )
-        console.log( 'NOTIFICATION:', notification )
-
-        // process the action
-      },
-
-      // (optional) Called when the user fails to register for remote notifications. Typically occurs when APNS is having issues, or the device is a simulator. (iOS)
-      onRegistrationError: ( err ) => {
-        console.error( err.message, err )
-      },
-
-      // IOS ONLY (optional): default: all - Permissions to register.
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true,
-      },
-
-      // Should the initial notification be popped automatically
-      // default: true
-      popInitialNotification: true,
-
-      /**
-       * (optional) default: true
-       * - Specified if permissions (ios) and token (android and ios) will requested or not,
-       * - if not, you must call PushNotificationsHandler.requestPermissions() later
-       * - if you are not using remote notification or do not have Firebase installed, use this:
-       *     requestPermissions: Platform.OS === 'ios'
-       */
-      requestPermissions: true,
-    } )
-  };
-
-  onNotificationOpen = async ( item ) => {
-    console.log( 'item', item )
-  };
-
-  onAppStateChange = async ( nextAppState ) => {
-    const { appState } = this.state
-    const { isPermissionSet, setIsPermissionGiven } = this.props
-    try {
-      // TODO: Will this function ever be called if the state wasn't different? If not,
-      // I don't think we need to be holding on to `appState` in this component's state.
-      if ( appState === nextAppState ) return
-      if ( isPermissionSet ) {
-        setIsPermissionGiven( false )
-        return
-      }
-      this.setState(
-        {
-          appState: nextAppState,
-        },
-        async () => {
-          if ( nextAppState === 'active' ) {
-          //this.scheduleNotification()
-          }
-          if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
-            console.log( 'inside if nextAppState', nextAppState )
-            this.props.updatePreference( {
-              key: 'hasShownNoInternetWarning',
-              value: false,
-            } )
-            this.props.updateLastSeen( new Date() )
-            this.props.navigation.dispatch( StackActions.reset( {
-              index: 0,
-              actions: [ NavigationActions.navigate( {
-                routeName: 'Intermediate'
-              } ) ],
-            } ) )
-          }
-        }
-      )
-    } catch ( error ) {
-      // do nothing
-    }
-  };
 
   componentDidMount = async() => {
-    const {
-      navigation,
-      s3Service,
-      initializeHealthSetup,
-      newBHRFlowStarted,
-      credsAuthenticated,
-      regularAccount,
-      setWalletId
-    } = this.props
-    const { data } = await regularAccount.getWalletId()
-
     requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
-      // this.props.autoSyncShells()
       // Keeping autoSynn disabled
-      setWalletId( data.walletId )
-      credsAuthenticated( false )
-      console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
       this.closeBottomSheet()
       // if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
       //   this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
       // }
       this.calculateNetBalance()
-
-      if( newBHRFlowStarted === true )
-      {
-        const { healthCheckInitializedKeeper } = s3Service.levelhealth
-        if ( healthCheckInitializedKeeper === false ) {
-          initializeHealthSetup()
-        }
-      }
-
-      // this.bootStrapNotifications()
-      this.createNotificationListeners()
       this.setUpFocusListener()
-      //this.getNewTransactionNotifications()
-
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( this.handleDeepLinking )
-
-      // call this once deeplink is detected aswell
-      // this.handleDeepLinkModal()
-
-      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
-
-      if ( unhandledDeepLinkURL ) {
-        navigation.setParams( {
-          unhandledDeepLinkURL: null,
-        } )
-        this.handleDeepLinking( unhandledDeepLinkURL )
-      }
-      // this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
@@ -818,7 +511,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleNotificationBottomSheetSelection = ( message ) => {
-    console.log( 'handleNotificationBottomSheetSelection', message )
     const storeName = Platform.OS == 'ios' ? 'App Store' : 'Play Store'
     this.setState( {
       currentMessage: message
@@ -828,10 +520,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       status : 'read'
     } ]
     this.props.updateMessageStatus( statusValue )
-
     this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
-        case NotificationType.FNF_REQUEST:
+        case NotificationType.FNF_REQUEST || NotificationType.FNF_REQUEST_ACCEPTED || NotificationType.FNF_REQUEST_REJECTED || NotificationType.FNF_KEEPER_REQUEST || NotificationType.FNF_KEEPER_REQUEST_ACCEPTED || NotificationType.FNF_KEEPER_REQUEST_REJECTED:
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -840,19 +531,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             notificationProceedText: 'Okay',
             notificationIgnoreText: '',
             isIgnoreButton: false
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
-          } )
-          break
-        case NotificationType.FNF_KEEPER_REQUEST:
-          this.setState( {
-            notificationTitle: message.title,
-            notificationInfo: message.info,
-            notificationNote: '',
-            notificationAdditionalInfo: message.AdditionalInfo,
-            notificationProceedText: 'Accept',
-            notificationIgnoreText: 'Reject',
-            isIgnoreButton: true
           }, () => {
             this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
           } )
@@ -871,17 +549,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case NotificationType.RELEASE:
-          this.setState( {
-            notificationTitle: message.title,
-            notificationInfo: message.info,
-            notificationNote: 'For updating you will be taken to the ' + storeName,
-            notificationAdditionalInfo: message.AdditionalInfo,
-            notificationProceedText: 'Upgrade',
-            notificationIgnoreText: 'Remind me later',
-            isIgnoreButton: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
-          } )
+          const current = DeviceInfo.getBuildNumber()
+          const { build, mandatoryFor } = message.additionalInfo
+          if( Number( current ) <= Number( mandatoryFor ) || Number( current ) <  Number( build ) ) {
+            this.setState( {
+              notificationTitle: message.title,
+              notificationInfo: message.info,
+              notificationNote: 'For updating you will be taken to the ' + storeName,
+              notificationAdditionalInfo: message.AdditionalInfo,
+              notificationProceedText: 'Upgrade',
+              notificationIgnoreText: Number( current ) <= Number( mandatoryFor ) ? '' : 'Remind me later',
+              isIgnoreButton: true,
+            }, () => {
+              this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+            } )
+          }
           break
     }
   };
@@ -894,13 +576,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.calculateNetBalance()
       // this.getNewTransactionNotifications()
-    }
-
-    if (
-      prevProps.secondaryDeviceAddressValue !==
-      this.props.secondaryDeviceAddressValue
-    ) {
-      this.setSecondaryDeviceAddresses()
     }
 
   };
@@ -916,7 +591,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       AppState.removeEventListener( 'change', this.appStateListener )
     }
 
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()
@@ -936,214 +610,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY )
   }
 
-  handleDeepLinkEvent = async ( { url } ) => {
-    console.log( 'Home::handleDeepLinkEvent::URL: ', url )
-
-    const { navigation, isFocused } = this.props
-
-    // If the user is on one of Home's nested routes, and a
-    // deep link is opened, we will navigate back to Home first.
-    if ( !isFocused ) {
-      navigation.dispatch(
-        resetToHomeAction( {
-          unhandledDeepLinkURL: url,
-        } )
-      )
-    } else {
-      this.handleDeepLinking( url )
-    }
-
-  };
-
-  handleDeepLinking = async ( url: string | null ) => {
-    if ( url == null ) {
-      return
-    }
-
-    console.log( 'handleDeepLinking: ' + url )
-
-    const splits = url.split( '/' )
-    if ( splits.includes( 'swan' ) ) {
-      this.setState( {
-        swanDeepLinkContent:url,
-      }, () => {
-        this.props.currentSwanSubAccount
-          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
-          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
-        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
-      } )
-
-    }
-
-    if ( splits.includes( 'wyre' ) ) {
-      this.props.clearWyreCache()
-      this.setState( {
-        wyreDeepLinkContent:url,
-        wyreFromBuyMenu: false,
-        wyreFromDeepLink: true
-      }, () => {
-        this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-      } )
-    }
-    if ( splits.includes( 'ramp' ) ) {
-      this.props.clearRampCache()
-      this.setState( {
-        rampDeepLinkContent:url,
-        rampFromBuyMenu: false,
-        rampFromDeepLink: true
-      }, () => {
-        this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
-      } )
-    }
-    if ( splits[ 5 ] === 'sss' ) {
-      const requester = splits[ 4 ]
-
-      if ( splits[ 6 ] === 'ek' ) {
-        const custodyRequest = {
-          requester,
-          ek: splits[ 7 ],
-          uploadedAt: splits[ 8 ],
-        }
-
-        this.setState(
-          {
-            custodyRequest,
-          },
-          () => {
-            this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-          }
-        )
-      } else if ( splits[ 6 ] === 'rk' ) {
-        const recoveryRequest = {
-          requester,
-          rk: splits[ 7 ],
-        }
-
-        this.setState(
-          {
-            recoveryRequest,
-            trustedContactRequest: null,
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
-          }
-        )
-      }
-    } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
-      if ( splits[ 3 ] !== config.APP_STAGE ) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
-          }`
-        )
-      } else {
-        const version = splits.pop().slice( 1 )
-
-        if ( version ) {
-          const isAppVersionCompatible = await checkAppVersionCompatibility( {
-            relayCheckMethod: splits[ 4 ],
-            version,
-          } )
-
-          if ( !isAppVersionCompatible ) {
-            return
-          }
-        }
-        let hint = splits[ 8 ]
-        let isFromKeeper = false
-        if ( splits[ 8 ].includes( '_' ) ) {
-          const hintStr = splits[ 8 ].split( '_' )
-          hint = hintStr[ 0 ]
-          isFromKeeper = hintStr[ 1 ] == 'keeper' ? true : false
-        }
-
-        const trustedContactRequest = {
-          isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-          approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-          isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-          requester: splits[ 5 ],
-          encryptedKey: splits[ 6 ],
-          hintType: splits[ 7 ],
-          hint,
-          uploadedAt: splits[ 9 ],
-          version,
-          isFromKeeper,
-        }
-
-        this.setState(
-          {
-            trustedContactRequest,
-            recoveryRequest: null,
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
-          }
-        )
-      }
-    } else if ( splits[ 4 ] === 'rk' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-      }
-
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest: null,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( splits[ 4 ] === 'scns' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-        isPrimaryKeeperRecovery: true,
-      }
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest: null,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( splits[ 4 ] === 'rrk' ) {
-      Alert.alert(
-        'Restoration link Identified',
-        'Restoration links only works during restoration mode'
-      )
-    }
-
-    if ( url && url.includes( 'fastbitcoins' ) ) {
-      const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-      this.props.navigation.navigate( 'VoucherScanner', {
-        userKey
-      } )
-    }
-  };
-
   setUpFocusListener = () => {
     const t0 = performance.now()
     const { navigation } = this.props
@@ -1160,26 +626,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
-  setSecondaryDeviceAddresses = async () => {
-    let secondaryDeviceOtpTemp = this.props.secondaryDeviceAddressValue
 
-    if ( !secondaryDeviceOtpTemp ) {
-      secondaryDeviceOtpTemp = []
-    }
-    if (
-      secondaryDeviceOtpTemp.findIndex(
-        ( value ) => value.otp == ( this.state.secondaryDeviceOtp as any ).otp
-      ) == -1
-    ) {
-      secondaryDeviceOtpTemp.push( this.state.secondaryDeviceOtp )
-      this.props.setSecondaryDeviceAddress( secondaryDeviceOtpTemp )
-    }
-  };
-
-  getAssociatedContact = async () => {
-    // TODO -- need to check this
-    this.setSecondaryDeviceAddresses()
-  };
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
@@ -1212,76 +659,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
-    switch ( menuItem.kind ) {
-        case BuyMenuItemKind.FAST_BITCOINS:
-          this.props.navigation.navigate( 'VoucherScanner' )
-          break
-        case BuyMenuItemKind.SWAN:
-          this.props.clearSwanCache()
-          if ( !this.props.currentSwanSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Swan Account',
-              defaultDescription: 'Sats purchased from Swan',
-              serviceAccountKind: ServiceAccountKind.SWAN,
-            } )
-            this.props.createTempSwanAccountInfo( newSubAccount )
-            this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
-          }
-          else {
-            this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
-          }
-          this.setState( {
-            swanDeepLinkContent: null
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
-          } )
-          break
-        case BuyMenuItemKind.RAMP:
-          if ( !this.props.currentRampSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Ramp Account',
-              defaultDescription: 'Sats purchased from Ramp',
-              serviceAccountKind: ServiceAccountKind.RAMP,
-            } )
-
-            this.props.addNewAccountShell( newSubAccount )
-          }
-          this.props.clearRampCache()
-          this.setState( {
-            rampDeepLinkContent: null,
-            rampFromDeepLink: false,
-            rampFromBuyMenu: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
-          } )
-          break
-        case BuyMenuItemKind.WYRE:
-          if ( !this.props.currentWyreSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Wyre Account',
-              defaultDescription: 'Sats purchased from Wyre',
-              serviceAccountKind: ServiceAccountKind.WYRE,
-            } )
-            this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
-          }
-          this.props.clearWyreCache()
-          this.setState( {
-            wyreDeepLinkContent: null,
-            wyreFromDeepLink: false,
-            wyreFromBuyMenu: true
-          }, () => {
-            this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-          } )
-          break
-    }
-  };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
     this.props.navigation.navigate( 'AccountDetails', {
@@ -1304,7 +681,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     this.setState(
       {
-        bottomSheetState: BottomSheetState.Open,
         currentBottomSheetKind: kind,
       },
       () => {
@@ -1319,7 +695,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onBottomSheetClosed() {
     this.setState( {
-      bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
     } )
   }
@@ -1368,69 +743,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  getBottomSheetSnapPoints(): any[] {
-    switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.SWAN_STATUS_INFO:
-          return [
-            -50,
-            heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
-            ),
-            heightPercentageToDP( 71 ),
-          ]
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return ( this.state.wyreFromDeepLink )
-            ? [ 0, '67%' ]
-            : Platform.OS == 'ios' ? [ 0, '67%' ] : [ 0, '65%' ]
-        case BottomSheetKind.RAMP_STATUS_INFO:
-          return ( this.state.rampFromDeepLink )
-            ? [ 0, '67%' ]
-            : Platform.OS == 'ios' ? [ 0, '67%' ] : [ 0, '65%' ]
-        case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return Platform.OS == 'ios' ? [ 0, '65%' ] : [ 0, '70%' ]
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-        case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
-          return defaultBottomSheetConfigs.snapPoints
-
-        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          return [
-            -50,
-            heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
-            ),
-            heightPercentageToDP( 95 ),
-          ]
-
-        case BottomSheetKind.ERROR:
-          return [
-            -50,
-            heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 50,
-            ),
-          ]
-
-        case BottomSheetKind.CLOUD_ERROR:
-          return [
-            -50,
-            heightPercentageToDP(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 45 : 50,
-            ),
-          ]
-
-        case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
-        case BottomSheetKind.NOTIFICATIONS_LIST:
-          return [ -50, heightPercentageToDP( 82 ) ]
-        // case BottomSheetKind.NOTIFICATION_INFO:
-        //   return [
-        //     -50,
-        //     heightPercentageToDP(
-        //       Platform.OS == 'ios' && DeviceInfo.hasNotch ? 75 : 80,
-        //     ),
-        //   ]
-        default:
-          return defaultBottomSheetConfigs.snapPoints
-    }
-  }
 
 
   onTrustedContactRequestAccepted = ( key ) => {
@@ -1461,8 +773,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onPhoneNumberChange = () => {};
+
   renderBottomSheetContent() {
-    const { UNDER_CUSTODY, navigation } = this.props
     const { custodyRequest } = this.state
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.NOTIFICATIONS_LIST:
@@ -1476,47 +788,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-          return (
-            <>
-              <CustodianRequestModalContents
-                userName={custodyRequest.requester}
-                onPressAcceptSecret={() => {
-                  this.closeBottomSheet()
-
-                  if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
-                    Alert.alert(
-                      'Request expired!',
-                      'Please ask the sender to initiate a new request',
-                    )
-                  } else {
-                    if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
-                      Alert.alert(
-                        'Failed to store',
-                        'You cannot custody multiple shares of the same user.',
-                      )
-                    } else {
-                      if ( custodyRequest.isQR ) {
-                        downloadMShare( custodyRequest.ek, custodyRequest.otp )
-                      } else {
-                        navigation.navigate( 'CustodianRequestOTP', {
-                          custodyRequest,
-                        } )
-                      }
-                    }
-                  }
-                }}
-                onPressRejectSecret={() => {
-                  this.closeBottomSheet()
-                  this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
-                }}
-              />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-              />
-            </>
-          )
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return (
             <CustodianRequestRejectedModalContents
@@ -1537,108 +808,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               bottomSheetRef={this.bottomSheetRef}
             />
           )
-
-          // case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
-          //   const { isLoadContacts, selectedContact } = this.state
-
-          //   return (
-          //     <AddContactAddressBook
-          //       isLoadContacts={isLoadContacts}
-          //       proceedButtonText={'Confirm & Proceed'}
-          //       onPressContinue={() => {
-          //         if ( selectedContact && selectedContact.length ) {
-          //           this.closeBottomSheet()
-
-          //           navigation.navigate( 'AddContactSendRequest', {
-          //             SelectedContact: selectedContact,
-          //             headerText:'Add a contact  ',
-          //             subHeaderText:'Send a Friends and Family request',
-          //             contactText:'Adding to Friends and Family:',
-          //             showDone:true,
-          //           } )
-          //         }
-          //       }}
-          //       onSelectContact={( selectedContact ) => {
-          //         this.setState( {
-          //           selectedContact,
-          //         } )
-          //       }}
-          //       onPressBack={this.closeBottomSheet}
-          //       onSkipContinue={() => {
-          //         this.closeBottomSheet()
-          //         const contactDummy = {
-          //           id: uuid(),
-          //           name: SKIPPED_CONTACT_NAME,
-          //         }
-          //         navigation.navigate( 'AddContactSendRequest', {
-          //           SelectedContact: [ contactDummy ],
-          //           headerText:'Add a contact  ',
-          //           subHeaderText:'Send a Friends and Family request',
-          //           contactText:'Adding to Friends and Family:',
-          //           showDone:true,
-          //         } )
-          //       }}
-          //     />
-          //   )
-
-          // case BottomSheetKind.ERROR:
-          //   const { errorMessageHeader, errorMessage } = this.state
-
-          //   return (
-          //     <ErrorModalContents
-          //       title={errorMessageHeader}
-          //       info={errorMessage}
-          //       onPressProceed={this.closeBottomSheet}
-          //       isBottomImage={true}
-          //       bottomImage={require( '../../assets/images/icons/errorImage.png' )}
-          //     />
-          //   )
-
-          // case BottomSheetKind.CLOUD_ERROR:
-          //   return (
-          //     <ErrorModalContents
-          //       title={'Automated Cloud Backup Error'}
-          //       info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
-          //       note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
-          //       onPressProceed={()=>{
-          //         this.props.setCloudData()
-          //         this.closeBottomSheet()
-          //       }}
-          //       onPressIgnore={()=> {
-          //         this.props.updateCloudPermission( false )
-          //         this.closeBottomSheet()
-          //       }}
-          //       proceedButtonText={'Try Again'}
-          //       cancelButtonText={'Skip'}
-          //       isIgnoreButton={true}
-          //       isBottomImage={true}
-          //       isBottomImageStyle={styles.cloudErrorModalImage}
-          //       bottomImage={require( '../../assets/images/icons/cloud_ilustration.png' )}
-          //     />
-          //   )
-
-          // case BottomSheetKind.NOTIFICATION_INFO:
-          //   return (
-          //     <NotificationInfoContents
-          //       title={notificationTitle}
-          //       info={notificationInfo ? notificationInfo : null}
-          //       additionalInfo={notificationAdditionalInfo}
-          //       onPressProceed={()=>{
-
-          //       }}
-          //       onPressIgnore={()=> {
-
-          //       }}
-          //       onPressClose={()=>{
-          //         this.closeBottomSheet()
-          //       }}
-          //       proceedButtonText={notificationProceedText}
-          //       cancelButtonText={notificationIgnoreText}
-          //       isIgnoreButton={isIgnoreButton}
-          //       note={notificationNote}
-          //       bottomSheetRef={this.bottomSheetRef}
-          //     />
-          //   )
 
         default:
           break
@@ -1696,43 +865,17 @@ const mapStateToProps = ( state ) => {
   return {
     notificationList: state.notifications.notifications,
     accountsState: state.accounts,
-    cloudPermissionGranted: state.health.cloudPermissionGranted,
-    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
-    currentRampSubAccount: state.accounts.currentRampSubAccount,
-    currentSwanSubAccount: state.accounts.currentSwanSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
       idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
-    UNDER_CUSTODY: idx(
-      state,
-      ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
-    ),
-    cardDataProps: idx( state, ( _ ) => _.preferences.cardData ),
-    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
-    overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
-    secondaryDeviceAddressValue: idx(
-      state,
-      ( _ ) => _.preferences.secondaryDeviceAddressValue
-    ),
-    releaseCasesValue: idx( state, ( _ ) => _.preferences.releaseCasesValue ),
-    regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     database: idx( state, ( _ ) => _.storage.database ) || {
     },
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
-    keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
-    newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
-    cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
-    isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
-    isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
-    asyncNotificationList: idx( state, ( _ ) => _.notifications.updatedNotificationList ),
-    fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
     messages: state.notifications.messages,
 
   }
@@ -1741,35 +884,13 @@ const mapStateToProps = ( state ) => {
 export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
-    downloadMShare,
     initializeTrustedContact,
     rejectTrustedContact,
-    initializeHealthSetup,
-    autoSyncShells,
-    clearWyreCache,
-    clearRampCache,
-    clearSwanCache,
-    updateSwanStatus,
-    addNewAccountShell,
     fetchFeeAndExchangeRates,
-    createTempSwanAccountInfo,
     addTransferDetails,
     notificationsUpdated,
     setCurrencyCode,
-    updatePreference,
-    setFCMToken,
-    setSecondaryDeviceAddress,
-    setCardData,
-    setVersion,
-    setCloudData,
-    updateCloudPermission,
-    credsAuthenticated,
-    setShowAllAccount,
-    setIsPermissionGiven,
-    updateLastSeen,
-    setupNotificationList,
     updateNotificationList,
-    setWalletId,
     updateMessageStatusInApp,
     updateMessageStatus
   } )( Home )

@@ -284,8 +284,9 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return(
-            <Image source={require( '../assets/images/HomePageIcons/icon_add.png' )} style={{
-              width: 30, height: 30, backgroundColor: focused ? 'white': 'gray'
+            <Image source={focused ? require( '../assets/images/tabs/home_inactive.png' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
+              width: 30, height: 30
+
             }} />
           )}
       }
@@ -295,8 +296,8 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return(
-            <Image source={require( '../assets/images/icons/setting.png' )} style={{
-              width: 30, height: 30, backgroundColor: focused ? 'white': 'gray'
+            <Image source={focused ? require( '../assets/images/tabs/fnf_active.png' ) : require( '../assets/images/tabs/f&f.png' )} style={{
+              width: 30, height: 30
             }} />
           )}
       },
@@ -306,8 +307,9 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return(
-            <Image source={require( '../assets/images/icons/secure.png' )} style={{
-              width: 30, height: 30, backgroundColor: focused ? 'white': 'gray'
+            <Image source={focused ? require( '../assets/images/tabs/security.png' ) : require( '../assets/images/tabs/security_inactive.png' )} style={{
+              width: 30, height: 30,
+              // backgroundColor: focused ? 'white': 'gray'
             }} />
           )}
       },
@@ -318,13 +320,13 @@ const Bottomtab = createBottomTabNavigator(
         tabBarIcon: ( { focused } ) => {
           return(
             <View style={{
-              height: '100%',
 
             }}>
 
-              <Image source={require( '../assets/images/icons/settings.png' )} style={{
+              <Image source={require( '../assets/images/tabs/settings.png' )} style={{
                 marginBottom: 'auto',
-                width: 30, height: 30, alignSelf: 'center', backgroundColor: focused ? 'white': 'gray'
+                width: 30, height: 30, alignSelf: 'center',
+                // backgroundColor: focused ? 'white': 'gray'
               }} />
             </View>
 
@@ -337,6 +339,19 @@ const Bottomtab = createBottomTabNavigator(
     // swipeEnabled: false,
     // animationEnabled: false,
     lazy: false,
+    tabBarOptions: {
+      showLabel: false,
+      style: {
+        backgroundColor: Colors.blue,
+        borderRadius: 45,
+        overflow:'hidden',
+        marginVertical: 18,
+        marginHorizontal: 9,
+        alignItems: 'center',
+        // height: 40,
+        alignContent:'center'
+      }
+    }
     // transitionConfig: () => ( {
     //   transitionSpec: {
     //     duration: 0,
