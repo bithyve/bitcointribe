@@ -23,12 +23,17 @@ import {
 import { connect } from 'react-redux'
 import idx from 'idx'
 import { processDL } from '../common/CommonFunctions'
+import {
+  getMessages,
+} from '../store/actions/notifications'
 
 type LaunchScreenProps = {
   initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
+  getMessages: any;
+  walletId: any;
 }
 
 type LaunchScreenState = { }
@@ -84,6 +89,10 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
   postSplashScreenActions = async () => {
     try {
+      console.log( 'walletId', this.props.walletId )
+      if( this.props.walletId ){
+        this.props.getMessages()
+      }
       const url = await Linking.getInitialURL()
       //console.log( 'url', url )
 
@@ -209,11 +218,12 @@ const styles = StyleSheet.create( {
 const mapStateToProps = ( state ) => {
   return {
     databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
-    lastSeen: idx( state, ( _ ) => _.preferences.lastSeen )
-
+    lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
+    walletId: idx( state, ( _ ) => _.preferences.walletId )
   }
 }
 
 export default connect( mapStateToProps, {
-  initializeDB
+  initializeDB,
+  getMessages
 } )( Launch )

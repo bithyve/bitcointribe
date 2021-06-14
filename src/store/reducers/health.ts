@@ -1,6 +1,7 @@
 import { Platform } from 'react-native'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
+import { LevelDataVar } from '../../common/CommonVars/commonVars'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
@@ -38,17 +39,7 @@ import {
 
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
-const obj = {
-  shareType: '',
-  updatedAt: 0,
-  status: 'notSetup',
-  shareId: '',
-  reshareVersion: 0,
-  name: '',
-  data: {
-  },
-  uuid: '',
-}
+
 const initialState: {
   mnemonic: string;
   service: S3Service;
@@ -65,6 +56,7 @@ const initialState: {
     healthExpiryStatus: boolean;
     setToBaseStatus: boolean;
     createChannelAssetsStatus: boolean;
+    downloadSMShareLoader: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -114,7 +106,8 @@ const initialState: {
     modifyLevelDataStatus: false,
     healthExpiryStatus: false,
     setToBaseStatus: false,
-    createChannelAssetsStatus: false
+    createChannelAssetsStatus: false,
+    downloadSMShareLoader: false
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -140,41 +133,7 @@ const initialState: {
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
   shieldHealth: false,
-  levelData: [
-    {
-      levelName: 'Level 1',
-      status: 'notSetup',
-      keeper1ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive',
-      keeper2ButtonText: 'Security Question',
-      keeper1: obj,
-      keeper2: obj,
-      note:'',
-      info:'Automated Cloud Backup',
-      id: 1,
-    },
-    {
-      levelName: 'Level 2',
-      status: 'notSetup',
-      keeper1ButtonText: 'Share Recovery Key 1',
-      keeper2ButtonText: 'Share Recovery Key 2',
-      keeper1: obj,
-      keeper2: obj,
-      note:'',
-      info:'Double Backup',
-      id: 2,
-    },
-    {
-      levelName: 'Level 3',
-      status: 'notSetup',
-      keeper1ButtonText: 'Share Recovery Key 1',
-      keeper2ButtonText: 'Share Recovery Key 2',
-      keeper1: obj,
-      keeper2: obj,
-      note:'',
-      info:'Multi Key Backup',
-      id: 3,
-    },
-  ],
+  levelData: LevelDataVar,
   keeperProcessStatus: '',
   pdfCreatedSuccessfully: false,
   isLevelToNotSetupStatus: false,

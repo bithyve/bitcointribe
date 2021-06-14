@@ -7,6 +7,8 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { TrustedContact } from '../../bitcoin/utilities/Interface'
+import idx from 'idx'
 
 type AddressRecipientFactoryProps = {
   address: string;
@@ -62,29 +64,37 @@ export function makeAccountRecipientDescription(
 
 
 export function makeContactRecipientDescription(
-  data: any,
+  channelKey: string,
+  contact: TrustedContact,
   trustKind: ContactTrustKind = ContactTrustKind.OTHER,
 ): ContactRecipientDescribing {
-  let recipientKind = RecipientKind.CONTACT
+  const { contactDetails } = contact
+  const contactName = contactDetails.contactName
 
-  let displayedName = data.contactName || data.displayedName
-  if ( displayedName.startsWith( SKIPPED_CONTACT_NAME ) )
-    displayedName = data.contactsWalletName || data.walletName || displayedName
-
-  // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
-  if ( !displayedName ) {
-    recipientKind = RecipientKind.ADDRESS
-    displayedName = data.id
+  const instreamId = contact.streamId
+  let walletName, lastSeenActive
+  if( instreamId ) {
+    const instream = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ instreamId ] )
+    lastSeenActive = idx( instream, ( _ ) => _.metaData.flags.lastSeen )
+    walletName = idx( instream, ( _ ) => _.primaryData.walletName )
   }
 
-  return {
-    id: data.id,
-    kind: recipientKind,
-    displayedName: displayedName,
-    walletName: data.contactsWalletName || data.walletName,
-    avatarImageSource: data.avatarImageSource || data.image,
-    availableBalance: data.bitcoinAmount || data.amount || 0,
-    lastSeenActive: data.lastSeen || data.lastSeenActive,
+  let displayedName = contactName
+  if ( !displayedName && walletName ) displayedName = walletName
+  if ( !displayedName ) displayedName = SKIPPED_CONTACT_NAME
+
+  const avatarImageSource = contactDetails.image
+  const contactRecipient: ContactRecipientDescribing = {
+    id: contactDetails.id,
+    channelKey,
+    isActive: contact.isActive,
+    kind: RecipientKind.CONTACT,
     trustKind,
+    displayedName,
+    walletName,
+    avatarImageSource,
+    lastSeenActive,
   }
+
+  return contactRecipient
 }

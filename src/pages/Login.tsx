@@ -33,6 +33,15 @@ import { initMigration, updateLastSeen } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
 import { processDL } from '../common/CommonFunctions'
+import firebase from '@react-native-firebase/app'
+import {
+  setIsPermissionGiven,
+  setFCMToken
+} from '../store/actions/preferences'
+import messaging from '@react-native-firebase/messaging'
+import {
+  updateFCMTokens,
+} from '../store/actions/notifications'
 
 const LOADER_MESSAGE_TIME = 2
 const loaderMessages = [
@@ -95,6 +104,9 @@ export default function Login( props ) {
   )
   const releaseCasesValue = useSelector(
     ( state ) => state.preferences.releaseCasesValue,
+  )
+  const fcmTokenValue = useSelector(
+    ( state ) => state.preferences.fcmTokenValue,
   )
   const [ requestName, setRequestName ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
@@ -226,6 +238,8 @@ export default function Login( props ) {
         dispatch( initMigration() )
       }
 
+      bootStrapNotifications()
+
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
           setTimeout( () => {
@@ -259,6 +273,57 @@ export default function Login( props ) {
       } )
     }
   }, [ isAuthenticated, requestName ] )
+
+  const bootStrapNotifications = async () => {
+    dispatch( setIsPermissionGiven( true ) )
+    const t0 = performance.now()
+    if ( Platform.OS === 'ios' ) {
+      firebase
+        .messaging()
+        .hasPermission()
+        .then( ( enabled ) => {
+          if ( enabled ) {
+            storeFCMToken()
+            //this.createNotificationListeners()
+          } else {
+            firebase
+              .messaging()
+              .requestPermission( {
+                provisional: true,
+              } )
+              .then( () => {
+                storeFCMToken()
+                // this.createNotificationListeners()
+              } )
+              .catch( () => {
+                console.log( 'Permission rejected.' )
+              } )
+          }
+        } )
+        .catch()
+    } else {
+      storeFCMToken()
+      //this.createNotificationListeners()
+    }
+    const t1 = performance.now()
+    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
+  }
+
+  const storeFCMToken = async () => {
+    const fcmToken = await messaging().getToken()
+    console.log( 'TOKEN', fcmToken )
+    const fcmArray = [ fcmToken ]
+    const fcmTokenFromAsync = fcmTokenValue
+    console.log( 'fcmTokenFromAsync', fcmTokenFromAsync )
+
+    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
+      dispatch( setFCMToken( fcmToken ) )
+
+      await AsyncStorage.setItem( 'fcmToken', fcmToken )
+      dispatch( updateFCMTokens( fcmArray ) )
+
+    }
+  }
 
   const handleLoaderMessages = ( passcode ) => {
     setTimeout( () => {

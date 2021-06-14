@@ -104,11 +104,12 @@ export function* createTrustedContactSubAccount ( secondarySubAccount: TrustedCo
     walletName,
     relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : contactInfo.contactsSecondaryChannelKey ? TrustedContactRelationTypes.WARD : TrustedContactRelationTypes.CONTACT,
     FCM,
-    paymentAddresses
+    paymentAddresses,
+    contactDetails: contactInfo.contactDetails
   }
 
-  let secondaryData: SecondaryStreamData = null
-  let backupData: BackupStreamData = null
+  let secondaryData: SecondaryStreamData
+  let backupData: BackupStreamData
   const channelAssets = idx( contactInfo, ( _ ) => _.channelAssets )
   if( contactInfo.isKeeper && channelAssets ){
     const { primaryMnemonicShard, keeperInfo, secondaryMnemonicShard, bhXpub } = channelAssets
@@ -323,21 +324,11 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     ( state ) => state.accounts.accountShells,
   )
   const { contact, flowKind, isKeeper, channelKey, contactsSecondaryChannelKey, shareId } = payload
-  let info = ''
-  if ( contact && contact.phoneNumbers && contact.phoneNumbers.length ) {
-    const phoneNumber = contact.phoneNumbers[ 0 ].number
-    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-    number = number.slice( number.length - 10 ) // last 10 digits only
-    info = number
-  } else if ( contact && contact.emails && contact.emails.length ) {
-    info = contact.emails[ 0 ].email
-  }
 
   const contactDetails: ContactDetails = {
     id: contact.id,
     contactName: contact.name,
-    info: info? info.trim(): null,
-    image: contact.imageAvailable? contact.image: null
+    image: contact.image
   }
 
   const contactInfo: ContactInfo = {
@@ -396,9 +387,7 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
     }
   }
 
-  const contactDetails: ContactDetails = { // temp contact object
-    contactName: '',
-    info: '',
+  const contactDetails: ContactDetails = { // temp contact details
     id: ''
   }
 

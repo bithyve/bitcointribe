@@ -104,6 +104,9 @@ import {
 import {
   updateFCMTokensWatcher,
   fetchNotificationsWatcher,
+  getMessageWatcher,
+  updateMessageStatusWatcher,
+  updateMessageStatusInAppWatcher
 } from './sagas/notifications'
 
 import {
@@ -161,6 +164,8 @@ import {
   setHealthStatusWatcher,
   modifyLevelDataWatcher,
   createChannelAssetsWatcher,
+  downloadSMShareWatcher,
+  createOrChangeGuardianWatcher,
 } from './sagas/health'
 
 import {
@@ -266,6 +271,9 @@ const rootSaga = function* () {
     // Notifications
     updateFCMTokensWatcher,
     fetchNotificationsWatcher,
+    getMessageWatcher,
+    updateMessageStatusWatcher,
+    updateMessageStatusInAppWatcher,
 
     // Trusted Contacts
     initializeTrustedContactWatcher,
@@ -300,6 +308,8 @@ const rootSaga = function* () {
     setHealthStatusWatcher,
     modifyLevelDataWatcher,
     createChannelAssetsWatcher,
+    downloadSMShareWatcher,
+    createOrChangeGuardianWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

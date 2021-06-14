@@ -10,7 +10,6 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { v4 as uuid } from 'uuid'
-import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 
 const TrustedContacts = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
@@ -36,7 +35,6 @@ const TrustedContacts = ( props ) => {
   const onPressSkip = () => {
     const contactDummy = {
       id: uuid(),
-      name: SKIPPED_CONTACT_NAME,
     }
     props.onPressContinue( [ contactDummy ], index )
   }

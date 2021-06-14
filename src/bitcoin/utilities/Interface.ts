@@ -471,9 +471,8 @@ export interface Contacts {
 }
 
 export interface ContactDetails {
-  contactName: string,
-  info: string, // phone-number/email-address
   id: string,
+  contactName?: string,
   image?: ImageSourcePropType | null,
 }
 
@@ -507,6 +506,7 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
+  contactDetails: ContactDetails
 }
 
 export interface SecondaryStreamData {
