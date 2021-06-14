@@ -131,9 +131,9 @@ class FriendsAndFamilyScreen extends PureComponent<
       prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
     ) {
       requestAnimationFrame( () => {
-        const { regularAccount } = this.props
-        const { walletId } = regularAccount.hdWallet.getWalletId()
-        this.updateAddressBook( walletId )
+        // const { regularAccount } = this.props
+        // const { walletId } = regularAccount.hdWallet.getWalletId()
+        this.updateAddressBook()
       } )
     }
 

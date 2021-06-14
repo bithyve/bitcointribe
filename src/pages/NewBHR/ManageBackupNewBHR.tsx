@@ -106,7 +106,7 @@ interface ManageBackupNewBHRStateTypes {
   QrBottomSheetsFlag: boolean;
   showLoader: boolean;
   knowMoreType: string;
-  ImKeeping: any[];
+  keeping: any[];
   listModal: boolean;
   errorModal: boolean;
   showIndicator: boolean
@@ -217,7 +217,7 @@ class ManageBackupNewBHR extends Component<
       QrBottomSheetsFlag: false,
       showLoader: false,
       knowMoreType: 'manageBackup',
-      ImKeeping: [],
+      keeping: [],
       listModal: false,
       errorModal: false,
       showIndicator: false,
@@ -228,8 +228,6 @@ class ManageBackupNewBHR extends Component<
 
     this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
     requestAnimationFrame( async() => {
-      const { regularAccount } = this.props
-      const { walletId } = regularAccount.hdWallet.getWalletId()
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           this.setState( {
@@ -251,56 +249,45 @@ class ManageBackupNewBHR extends Component<
           showIndicator: true
         } )
 
-        this.updateAddressBook( walletId )
+        this.updateAddressBook( )
       } )
     } )
   };
 
-  updateAddressBook = async ( walletId ) => {
+  updateAddressBook = async ( ) => {
     const { trustedContactsService } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
-    const ImKeeping = []
-    const otherContacts = []
-    for( const contact of Object.values( contacts ) ){
-      const { contactDetails, relationType } = contact
-      const stream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
 
-      const fnf = {
-        id: contactDetails.id,
-        contactName: contactDetails.contactName,
-        connectedVia: contactDetails.info,
-        image: contactDetails.image,
-        // usesOTP,
-        // hasXpub,
-        // hasTrustedAddress,
-        relationType,
-        isGuardian: [ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
-        isWard: [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( relationType ),
-        contactsWalletName: idx( stream, ( _ ) => _.primaryData.walletName ),
-        lastSeen: idx( stream, ( _ ) => _.metaData.flags.lastSeen ),
-        isFinalized: stream? true: false,
+    const keeping = []
+    for( const channelKey of Object.keys( contacts ) ){
+      const contact = contacts[ channelKey ]
+      const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
+
+      if( contact.isActive ){
+        if( isWard ){
+          if( isWard ) keeping.push( makeContactRecipientDescription(
+            channelKey,
+            contact,
+            ContactTrustKind.USER_IS_KEEPING,
+          ) )
+        }
+      } else {
+        // TODO: inject in expired contacts list
       }
-      //  feature/2.0
-
-      if( fnf.isGuardian || fnf.isWard ){
-        if( fnf.isWard ) ImKeeping.push( fnf )
-      } else otherContacts.push( fnf )
     }
 
     this.setState( {
-      ImKeeping,
+      keeping,
       showIndicator: false
     }
     )
   };
 
   renderContactListItem = ( {
-    backendContactInfo,
     contactDescription,
     index,
     contactsType,
   }: {
-    backendContactInfo: unknown;
     contactDescription: ContactRecipientDescribing;
     index: number;
     contactsType: string;
@@ -380,9 +367,7 @@ class ManageBackupNewBHR extends Component<
       prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
     ) {
       requestAnimationFrame( () => {
-        const { regularAccount } = this.props
-        const { walletId } = regularAccount.hdWallet.getWalletId()
-        this.updateAddressBook( walletId )
+        this.updateAddressBook()
       } )
     }
     if (
@@ -830,7 +815,7 @@ class ManageBackupNewBHR extends Component<
       selectedKeeper,
       isEnabled,
       contactsKeptByUser,
-      ImKeeping,
+      keeping,
       selectedKeeperName,
       selectedKeeperType,
       listModal,
@@ -1118,19 +1103,15 @@ Wallet Backup
                 <View style={{
                   height: 'auto'
                 }}>
-                  {ImKeeping.length > 0 &&
+                  {keeping.length > 0 &&
                   <>
-                    {ImKeeping.map( ( item, index ) => {
+                    {keeping.length && keeping.map( ( item, index ) => {
                       return this.renderContactListItem( {
-                        backendContactInfo: item,
-                        contactDescription: makeContactRecipientDescription(
-                          item,
-                          ContactTrustKind.USER_IS_KEEPING,
-                        ),
+                        contactDescription: item,
                         index,
                         contactsType: 'I\'m Keeper of',
                       } )
-                    } )}
+                    } ) }
                   </>
                   }
                 </View>
