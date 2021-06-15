@@ -7,7 +7,6 @@ import {
   PermanentChannelsSyncKind
 } from '../actions/trustedContacts'
 import {
-  TrustedContact,
   TrustedContactRelationTypes,
   Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
@@ -104,26 +103,16 @@ function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
         walletName = idx( instream, ( _ ) => _.primaryData.walletName )
       }
 
-      let displayedName
-      if ( contactName.startsWith( SKIPPED_CONTACT_NAME )  && walletName ) {
-        displayedName = walletName
-      } else {
-        displayedName = contactName
-      }
-
-      let recipientKind = RecipientKind.CONTACT
-      // If name information still can't be found, assume it's an address (https://bithyve-workspace.slack.com/archives/CEBLWDEKH/p1605726329349400?thread_ts=1605725360.348800&cid=CEBLWDEKH)
-      if ( !displayedName ) {
-        recipientKind = RecipientKind.ADDRESS
-        displayedName = `${contactDetails.id || '@'}`
-      }
+      let displayedName = contactName
+      if ( !displayedName && walletName ) displayedName = walletName
+      if ( !displayedName ) displayedName = SKIPPED_CONTACT_NAME
 
       const avatarImageSource = contactDetails.image
       const contactRecipient: ContactRecipientDescribing = {
         id: contactDetails.id,
         channelKey,
         isActive: currentContact.isActive,
-        kind: recipientKind,
+        kind: RecipientKind.CONTACT,
         trustKind,
         displayedName,
         walletName,

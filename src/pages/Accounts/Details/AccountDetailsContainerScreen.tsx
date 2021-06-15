@@ -43,6 +43,7 @@ import SyncStatus from '../../../common/data/enums/SyncStatus'
 import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import idx from 'idx'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export type Props = {
   navigation: any;
@@ -388,7 +389,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <View style={styles.rootContainer}>
+    <ScrollView style={styles.rootContainer}>
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
@@ -403,7 +404,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         stickySectionHeadersEnabled={false}
         keyExtractor={sectionListItemKeyExtractor}
       />
-    </View>
+    </ScrollView>
   )
 }
 

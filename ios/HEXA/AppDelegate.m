@@ -9,6 +9,7 @@
 #import <UMCore/UMModuleRegistry.h>
 #import <UMReactNativeAdapter/UMNativeModulesProxy.h>
 #import <UMReactNativeAdapter/UMModuleRegistryAdapter.h>
+#import "RecentViewController.h"
 
 // react-native-push-notification-ios
 #import <Firebase.h>
@@ -139,9 +140,11 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     // application requires a password unlock when it retuns to the
     // foreground, present your lock screen or authentication view controller here.
  
-    UIViewController *blankViewController = [UIViewController new];
-    blankViewController.view.backgroundColor = [UIColor whiteColor];
- 
+    //UIViewController *blankViewController = [UIViewController new];
+    //blankViewController.view.backgroundColor = [UIColor redColor];
+  RecentViewController *blankViewController = [RecentViewController new];
+  //blankViewController.view.backgroundColor = [UIColor blueColor];
+
     // Pass NO for the animated parameter. Any animation will not complete
     // before the snapshot is taken.
     [self.window.rootViewController presentViewController:blankViewController animated:NO completion:NULL];
