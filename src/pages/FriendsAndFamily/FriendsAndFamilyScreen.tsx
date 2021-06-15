@@ -118,33 +118,34 @@ class FriendsAndFamilyScreen extends PureComponent<
     const { walletId } = regularAccount.hdWallet.getWalletId()
     requestAnimationFrame( () => {
       this.setUpFocusListener( walletId )
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
+      } )
 
     } )
-    this.props.syncPermanentChannels( {
-      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-      metaSync: true,
-    } )
+
   }
 
   componentDidUpdate( prevProps, prevState ) {
-    if (
-      prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
-    ) {
-      requestAnimationFrame( () => {
+    requestAnimationFrame( () => {
+      if (
+        prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
+      ) {
+
         // const { regularAccount } = this.props
         // const { walletId } = regularAccount.hdWallet.getWalletId()
         this.updateAddressBook()
-      } )
-    }
+      }
 
-    if (
-      prevProps.existingPermanentChannelsSynching !==
+      if (
+        prevProps.existingPermanentChannelsSynching !==
         this.props.existingPermanentChannelsSynching
-    )
-      this.setState( {
-        showLoader: this.props.existingPermanentChannelsSynching,
-      } )
-    // } )
+      )
+        this.setState( {
+          showLoader: this.props.existingPermanentChannelsSynching,
+        } )
+    } )
 
 
   }
