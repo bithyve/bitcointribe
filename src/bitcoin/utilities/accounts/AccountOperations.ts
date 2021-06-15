@@ -1,48 +1,15 @@
-import * as bip32 from 'bip32'
-import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import coinselect from 'coinselect'
 import crypto from 'crypto'
-import config from '../../HexaConfig'
 import {
-  Transactions,
-  DerivativeAccounts,
-  TransactionDetails,
+  Transaction,
   TransactionPrerequisite,
-  TrustedContactDerivativeAccount,
-  TrustedContactDerivativeAccountElements,
-  DonationDerivativeAccount,
-  DonationDerivativeAccountElements,
-  SubPrimaryDerivativeAccountElements,
-  WyreDerivativeAccountElements,
-  RampDerivativeAccountElements,
-  DerivativeAccount,
-  DerivativeAccountElements,
   InputUTXOs,
   AverageTxFees,
   TransactionPrerequisiteElements,
-  ContactDetails,
   Account,
 } from '../Interface'
-import { AxiosResponse } from 'axios'
-import {
-  TRUSTED_CONTACTS,
-  DONATION_ACCOUNT,
-  SUB_PRIMARY_ACCOUNT,
-  REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-  WYRE,
-  RAMP,
-  FAST_BITCOINS,
-  SWAN,
-} from '../../../common/constants/wallet-service-types'
-import { BH_AXIOS } from '../../../services/api'
-import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import _ from 'lodash'
-import SSS from '../sss/SSS'
 import AccountUtilities from './AccountUtilities'
-const { HEXA_ID } = config
-
 export default class AccountOperations {
 
   static syncGapLimit = async ( account: Account ) => {
@@ -80,38 +47,6 @@ export default class AccountOperations {
       )
     }
   };
-
-  static findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
-    // return new/found transactions(delta b/w hard and soft refresh)
-    const txsFound: TransactionDetails[] = []
-    const newTxIds: string[] = _.difference( Object.keys( currentTxIdMap ),  Object.keys( previousTxidMap ) )
-    const newTxIdMap = {
-    }
-    newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
-
-    if( newTxIds.length ){
-      transactions.transactionDetails.forEach( tx => {
-        if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
-      } )
-    }
-
-    return txsFound
-  }
-
-    static setNewTransactions = ( account: Account ) => {
-      const lastSynced = account.lastSynched
-      let latestSync = lastSynced
-      const transactions = account.transactions
-      const newTransactions = [] // delta transactions
-      for ( const tx of transactions.transactionDetails ) {
-        if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
-          if ( tx.blockTime > lastSynced ) newTransactions.push( tx )
-          if ( tx.blockTime > latestSync ) latestSync = tx.blockTime
-        }
-      }
-      account.lastSynched = latestSync
-      account.newTransactions = newTransactions
-    };
 
     static updateQueryList = ( account: Account, consumedUTXOs: {[txid: string]: InputUTXOs} ) => {
       const softGapLimit = 5
@@ -417,6 +352,147 @@ export default class AccountOperations {
         return txb
       } catch ( err ) {
         throw new Error( `Transaction signing failed: ${err.message}` )
+      }
+    };
+
+    static fetchBalanceTransaction = async ( account: Account, hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
+      account: Account,
+      txsFound: Transaction[]
+    }> => {
+      const ownedAddresses = [] // owned address mapping
+      // owned addresses are used for apt tx categorization and transfer amount calculation
+
+      if( blindRefresh ) await AccountOperations.syncGapLimit( account )
+
+      // init refresh dependent params
+      let startingExtIndex: number, closingExtIndex: number, startingIntIndex: number, closingIntIndex: number
+      if( hardRefresh ){
+        const hardGapLimit  = 10
+        startingExtIndex = 0
+        closingExtIndex = account.nextFreeAddressIndex + hardGapLimit
+        startingIntIndex = 0
+        closingIntIndex = account.nextFreeChangeAddressIndex + hardGapLimit
+      }
+      else {
+        const softGapLimit = 5
+        startingExtIndex = account.nextFreeAddressIndex - softGapLimit >= 0? account.nextFreeAddressIndex - softGapLimit : 0
+        closingExtIndex = account.nextFreeAddressIndex + softGapLimit
+        startingIntIndex = account.nextFreeChangeAddressIndex - softGapLimit >= 0? account.nextFreeChangeAddressIndex - softGapLimit : 0
+        closingIntIndex = account.nextFreeChangeAddressIndex + softGapLimit
+      }
+
+      const externalAddresses :{[address: string]: number}  = {
+      }// all external addresses(till closingExtIndex)
+      const externalAddressSet:{[address: string]: number}= {
+      } // external address range set w/ query list
+      for ( let itr = 0; itr < closingExtIndex; itr++ ) {
+        const address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, account.network )
+        externalAddresses[ address ] = itr
+        ownedAddresses.push( address )
+        if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
+      }
+
+      const internalAddresses :{[address: string]: number}  = {
+      }// all internal addresses(till closingIntIndex)
+      const internalAddressSet :{[address: string]: number}= {
+      } // internal address range set
+      for ( let itr = 0; itr < closingIntIndex; itr++ ) {
+        const address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, account.network )
+        internalAddresses[ address ] = itr
+        ownedAddresses.push( address )
+        if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
+      }
+
+      // garner cached params for bal-tx sync
+      let cachedUTXOs =  [ ...account.confirmedUTXOs, ...account.unconfirmedUTXOs ]
+      let cachedTxIdMap = account.txIdMap
+      let cachedTxs = account.transactions
+      let cachedAQL = account.addressQueryList
+      if( hardRefresh ){
+        cachedUTXOs = []
+        cachedTxIdMap = {
+        }
+        cachedTxs = []
+        cachedAQL = {
+          external: {
+          }, internal: {
+          }
+        }
+      }
+
+      const xpubId = crypto.createHash( 'sha256' ).update( account.xpub ).digest( 'hex' )
+      const accounts = {
+        [ xpubId ]: {
+          externalAddressSet,
+          internalAddressSet,
+          externalAddresses,
+          internalAddresses,
+          ownedAddresses,
+          cachedUTXOs,
+          cachedTxs,
+          cachedTxIdMap,
+          cachedAQL,
+          lastUsedAddressIndex: account.nextFreeAddressIndex - 1,
+          lastUsedChangeAddressIndex: account.nextFreeChangeAddressIndex - 1,
+          accountType: account.network === bitcoinJS.networks.testnet ? 'Test Account' : 'Checking Account',
+          accountName: account.accountName,
+        }
+      }
+      const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, account.network )
+
+      const  {
+        UTXOs,
+        balances,
+        transactions,
+        txIdMap,
+        addressQueryList,
+        nextFreeAddressIndex,
+        nextFreeChangeAddressIndex,
+      } = synchedAccounts[ xpubId ]
+
+      // update utxo sets
+      const confirmedUTXOs = []
+      const unconfirmedUTXOs = []
+      for ( const utxo of UTXOs ) {
+        if ( utxo.status ) {
+          if ( account.network === bitcoinJS.networks.testnet && utxo.address === AccountUtilities.getAddressByIndex( account.xpub, false, 0, account.network ) ) {
+            confirmedUTXOs.push( utxo ) // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            continue
+          }
+
+          if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
+          else {
+            if ( internalAddressSet[ utxo.address ] !== undefined ) {
+              // defaulting utxo's on the change branch to confirmed
+              confirmedUTXOs.push( utxo )
+            }
+            else unconfirmedUTXOs.push( utxo )
+          }
+        } else {
+          // utxo's from fallback won't contain status var (defaulting them as confirmed)
+          confirmedUTXOs.push( utxo )
+        }
+      }
+
+      account.unconfirmedUTXOs = unconfirmedUTXOs
+      account.confirmedUTXOs = confirmedUTXOs
+      account.balances = balances
+      account.addressQueryList = addressQueryList
+      account.nextFreeAddressIndex = nextFreeAddressIndex
+      account.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
+      account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, account.network )
+
+      const txsFound: Transaction[] = hardRefresh? AccountUtilities.findTxDelta( account.txIdMap, txIdMap, transactions ) : []
+      const { newTransactions, lastSynched } = AccountUtilities.setNewTransactions( transactions, account.lastSynched )
+
+      account.transactions = transactions
+      account.txIdMap = txIdMap
+      account.newTransactions = newTransactions
+      account.lastSynched = lastSynched
+
+      return {
+        account,
+        txsFound
       }
     };
 }

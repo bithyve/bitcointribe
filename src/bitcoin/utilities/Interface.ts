@@ -3,6 +3,7 @@ import {
   DecentralizedBackup,
   ServicesJSON,
 } from '../../common/interfaces/Interfaces'
+import { networks } from 'bitcoinjs-lib'
 import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 
 export interface InputUTXOs {
@@ -28,7 +29,7 @@ export interface TransactionPrerequisite {
   [txnPriority: string]: TransactionPrerequisiteElements
 }
 
-export interface TransactionDetails {
+export interface Transaction {
   txid: string;
   status: string;
   confirmations: number;
@@ -105,7 +106,7 @@ export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
   unconfirmedTransactions: number;
-  transactionDetails: Array<TransactionDetails>;
+  transactionDetails: Array<Transaction>;
 }
 
 export interface MetaShare {
@@ -183,11 +184,11 @@ export interface DerivativeAccountElements {
     balance: number;
     unconfirmedBalance: number;
   };
-  transactions?: Transactions;
+  transactions?: Transaction[];
   txIdMap?: {[txid: string]: string[]};
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
-  newTransactions?: TransactionDetails[];
+  newTransactions?: Transaction[];
   blindGeneration?: boolean // temporarily generated during blind refresh
 }
 
@@ -731,4 +732,36 @@ export enum QRCodeTypes {
   CONTACT_REQUEST = 'CONTACT_REQUEST',
   KEEPER_REQUEST = 'KEEPER_REQUEST',
   RECOVERY_REQUEST = 'RECOVERY_REQUEST'
+}
+
+export interface UTXO {
+  txId: string;
+  vout: number;
+  value: number;
+  address: string;
+  status?: any;
+}
+
+export interface Account {
+  id: string,
+  accountName: string,
+  accountDescription: string,
+  walletId: string,
+  xpub: string,
+  network: networks.Network,
+  activeAddresses: string[],
+  receivingAddress: string,
+  nextFreeAddressIndex: number;
+  nextFreeChangeAddressIndex: number;
+  confirmedUTXOs: UTXO[];
+  unconfirmedUTXOs: UTXO[];
+  balances: {
+    balance: number;
+    unconfirmedBalance: number;
+  };
+  transactions: Transaction[];
+  lastSynched: number;
+  newTransactions?: Transaction[];
+  txIdMap?: {[txid: string]: string[]};
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
 }
