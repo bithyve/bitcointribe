@@ -5,7 +5,8 @@ import * as bip39 from 'bip39'
 import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
-import { TransactionDetails, Transactions, ScannedAddressKind, InputUTXOs, UTXO } from '../Interface'
+import _ from 'lodash'
+import { Transaction, ScannedAddressKind } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -299,7 +300,7 @@ export default class AccountUtilities {
       address: string;
       status?: any;
     }>,
-    cachedTxs: Transactions,
+    cachedTxs: Transaction[],
     cachedTxIdMap: {[txid: string]: string[]},
     cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
@@ -323,7 +324,7 @@ export default class AccountUtilities {
       }>;
       balances: { balance: number; unconfirmedBalance: number };
       txIdMap:  {[txid: string]: string[]},
-      transactions: Transactions;
+      transactions: Transaction[];
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
@@ -336,20 +337,20 @@ export default class AccountUtilities {
         }
         const accountsTemp: {
         [accountId: string]: {
-          upToDateTxs?: TransactionDetails[];
-          txsToUpdate?: TransactionDetails[];
-          newTxs? : TransactionDetails[]
+          upToDateTxs?: Transaction[];
+          txsToUpdate?: Transaction[];
+          newTxs? : Transaction[]
         }
       } = {
       }
         for( const accountId of Object.keys( accounts ) ){
           const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
-          const upToDateTxs: TransactionDetails[] = []
-          const txsToUpdate: TransactionDetails[] = []
-          const newTxs : TransactionDetails[] = []
+          const upToDateTxs: Transaction[] = []
+          const txsToUpdate: Transaction[] = []
+          const newTxs : Transaction[] = []
 
           // hydrate AQL & split txs(conf & unconf(<=6))
-          cachedTxs.transactionDetails.forEach( ( tx ) => {
+          cachedTxs.forEach( ( tx ) => {
             if( tx.confirmations <= 6 ){
               txsToUpdate.push( tx )
               if( tx.address ){
@@ -548,7 +549,7 @@ export default class AccountUtilities {
                       ...[ outgoingTx, incomingTx ],
                     )
                   } else {
-                    const transaction : TransactionDetails = {
+                    const transaction : Transaction = {
                       txid: tx.txid,
                       confirmations: tx.NumberofConfirmations,
                       status: tx.Status.confirmed ? 'Confirmed' : 'Unconfirmed',
@@ -594,12 +595,7 @@ export default class AccountUtilities {
               }
             }
 
-          const transactions: Transactions = {
-            totalTransactions: 0,
-            confirmedTransactions: 0,
-            unconfirmedTransactions: 0,
-            transactionDetails: [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
-          }
+          const transactions: Transaction[] = [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
 
           // pop addresses from the query list if tx-conf > 6
           txsToUpdate.forEach( tx => {
@@ -613,7 +609,7 @@ export default class AccountUtilities {
           } )
 
           // sort transactions(lastest first)
-          transactions.transactionDetails.sort( ( tx1, tx2 ) => {
+          transactions.sort( ( tx1, tx2 ) => {
             return tx2.blockTime - tx1.blockTime
           } )
 
@@ -678,6 +674,39 @@ export default class AccountUtilities {
         throw new Error( 'Transaction count fetching failed' )
       }
     }
+
+    static findTxDelta = ( previousTxidMap, currentTxIdMap, transactions ) => {
+    // return new/found transactions(delta b/w hard and soft refresh)
+      const txsFound: Transaction[] = []
+      const newTxIds: string[] = _.difference( Object.keys( currentTxIdMap ),  Object.keys( previousTxidMap ) )
+      const newTxIdMap = {
+      }
+      newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
+
+      if( newTxIds.length ){
+        transactions.transactionDetails.forEach( tx => {
+          if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
+        } )
+      }
+
+      return txsFound
+    }
+
+    static setNewTransactions = ( transactions: Transaction[], lastSynched: number ) => {
+      const lastSynced = lastSynched
+      let latestSync = lastSynced
+      const newTransactions = [] // delta transactions
+      for ( const tx of transactions ) {
+        if ( tx.status === 'Confirmed' && tx.transactionType === 'Received' ) {
+          if ( tx.blockTime > lastSynced ) newTransactions.push( tx )
+          if ( tx.blockTime > latestSync ) latestSync = tx.blockTime
+        }
+      }
+
+      return {
+        newTransactions, lastSynched: latestSync
+      }
+    };
 
     static broadcastTransaction = async (
       txHex: string,
