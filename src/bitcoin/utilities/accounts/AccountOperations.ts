@@ -356,7 +356,7 @@ export default class AccountOperations {
     };
 
     static fetchBalanceTransaction = async ( account: Account, hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
-      account: Account,
+      synchedAccount: Account,
       txsFound: Transaction[]
     }> => {
       const ownedAddresses = [] // owned address mapping
@@ -491,7 +491,7 @@ export default class AccountOperations {
       account.lastSynched = lastSynched
 
       return {
-        account,
+        synchedAccount: account,
         txsFound
       }
     };

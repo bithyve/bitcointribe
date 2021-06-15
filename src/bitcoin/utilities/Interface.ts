@@ -97,6 +97,8 @@ export interface Transaction {
   address?: string
 }
 
+export type TransactionDetails = Transaction
+
 export interface Balances {
   confirmed: number;
   unconfirmed: number;
