@@ -5,7 +5,7 @@ import * as bip39 from 'bip39'
 import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
-import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interface'
+import { TransactionDetails, Transactions, ScannedAddressKind, InputUTXOs, UTXO } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -138,6 +138,24 @@ export default class AccountUtilities {
       return bs58check.encode( data )
     }
 
+    static addressToPrivateKey = ( address: string, xpub: string, nextFreeAddressIndex: number, nextFreeChangeAddressIndex: number, network: bitcoinJS.networks.Network ): string => {
+      for (
+        let itr = 0;
+        itr <= nextFreeChangeAddressIndex + config.GAP_LIMIT;
+        itr++
+      ) {
+        if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
+          return AccountUtilities.getPrivateKeyByIndex( xpub, true, itr, network )
+      }
+
+      for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+        if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
+          return AccountUtilities.getPrivateKeyByIndex( xpub, false, itr, network )
+      }
+
+      throw new Error( 'Could not find private key for: ' + address )
+    };
+
     static generateMultiSig = (
       required: number,
       pubKeys: any[],
@@ -226,6 +244,46 @@ export default class AccountUtilities {
         type: null
       }
     }
+
+    static sortOutputs = async (
+      xpub: string,
+      outputs: Array<{
+      address: string;
+      value: number;
+    }>,
+      nextFreeChangeAddressIndex: number,
+      network: bitcoinJS.networks.Network,
+    ): Promise<
+    Array<{
+      address: string;
+      value: number;
+    }>
+  > => {
+      for ( const output of outputs ) {
+        if ( !output.address ) {
+          const changeAddress = AccountUtilities.getAddressByIndex(
+            xpub,
+            true,
+            nextFreeChangeAddressIndex,
+            network
+          )
+          output.address = changeAddress
+        // console.log(`adding the change address: ${output.address}`);
+        }
+      }
+
+      outputs.sort( ( out1, out2 ) => {
+        if ( out1.address < out2.address ) {
+          return -1
+        }
+        if ( out1.address > out2.address ) {
+          return 1
+        }
+        return 0
+      } )
+
+      return outputs
+    };
 
     static fetchBalanceTransactionsByAddresses = async (
       accounts: {[xpubId: string]: {
@@ -720,62 +778,4 @@ export default class AccountUtilities {
         if ( err.code ) throw new Error( err.code )
       }
     }
-
-  static sortOutputs = async (
-    xpub: string,
-    outputs: Array<{
-      address: string;
-      value: number;
-    }>,
-    nextFreeChangeAddressIndex: number,
-    network: bitcoinJS.networks.Network,
-  ): Promise<
-    Array<{
-      address: string;
-      value: number;
-    }>
-  > => {
-    for ( const output of outputs ) {
-      if ( !output.address ) {
-        const changeAddress = AccountUtilities.getAddressByIndex(
-          xpub,
-          true,
-          nextFreeChangeAddressIndex,
-          network
-        )
-        output.address = changeAddress
-        // console.log(`adding the change address: ${output.address}`);
-      }
-    }
-
-    outputs.sort( ( out1, out2 ) => {
-      if ( out1.address < out2.address ) {
-        return -1
-      }
-      if ( out1.address > out2.address ) {
-        return 1
-      }
-      return 0
-    } )
-
-    return outputs
-  };
-
-  static addressToPrivateKey = ( address: string, xpub: string, nextFreeAddressIndex: number, nextFreeChangeAddressIndex: number, network: bitcoinJS.networks.Network ): string => {
-    for (
-      let itr = 0;
-      itr <= nextFreeChangeAddressIndex + config.GAP_LIMIT;
-      itr++
-    ) {
-      if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
-        return AccountUtilities.getPrivateKeyByIndex( xpub, true, itr, network )
-    }
-
-    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
-        return AccountUtilities.getPrivateKeyByIndex( xpub, false, itr, network )
-    }
-
-    throw new Error( 'Could not find private key for: ' + address )
-  };
 }
