@@ -500,18 +500,11 @@ class ManageBackupNewBHR extends Component<
         }}
         onPressContinue={async() => {
           // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          // try {
-          //   if ( qrScannedData ) {
-          //     this.props.downloadSMShare( qrScannedData )
-          //     this.setState( {
-          //       QrBottomSheetsFlag: false
-          //     } )
-          //   }
-          // } catch ( err ) {
-          //   console.log( {
-          //     err
-          //   } )
-          // }
+          // this.props.setApprovalStatus( false )
+          // this.props.downloadSMShare( qrScannedData )
+          // this.setState( {
+          //   QrBottomSheetsFlag: false
+          // } )
         }}
       />
     )

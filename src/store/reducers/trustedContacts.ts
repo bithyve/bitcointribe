@@ -68,7 +68,7 @@ export default ( state: TrustedContactsState = initialState, action ): TrustedCo
   return state
 }
 
-export const SKIPPED_CONTACT_NAME = 'F&F request awaiting'
+export const SKIPPED_CONTACT_NAME = 'Awaiting acceptance'
 
 function reduceTCInfoIntoRecipientDescriptions( { trustedContacts, }: {
   trustedContacts: Trusted_Contacts;
