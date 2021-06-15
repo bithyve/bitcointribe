@@ -1,10 +1,11 @@
 import { Action } from 'redux'
-import { ContactInfo } from '../../bitcoin/utilities/Interface'
+import { Account, ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
+export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
 export const GET_TESTCOINS = 'GET_TESTCOINS'
 export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
@@ -74,9 +75,6 @@ export const setAllAccountsData = ( accounts ) => {
 export const fetchBalanceTx = (
   serviceType: string,
   options: {
-    service?;
-    loader?: boolean;
-    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
     blindRefresh?: boolean;
     shouldNotInsert?: boolean;
@@ -87,6 +85,22 @@ export const fetchBalanceTx = (
   return {
     type: FETCH_BALANCE_TX, payload: {
       serviceType, options
+    }
+  }
+}
+
+
+export const syncAccounts = (
+  accounts: Account[],
+  options: {
+    hardRefresh?: boolean;
+    blindRefresh?: boolean;
+  } = {
+  }
+) => {
+  return {
+    type: SYNC_ACCOUNTS, payload: {
+      accounts, options
     }
   }
 }

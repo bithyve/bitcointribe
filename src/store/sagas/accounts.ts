@@ -49,6 +49,7 @@ import {
   CREATE_SM_N_RESETTFA_OR_XPRIV,
   resetTwoFA,
   generateSecondaryXpriv,
+  SYNC_ACCOUNTS,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -57,6 +58,7 @@ import {
   DONATION_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
+  Account,
   ContactInfo,
   DerivativeAccountTypes,
   TrustedContact,
@@ -85,10 +87,13 @@ import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { recreatePrimarySubAccounts } from '../utils/accountShellMapping'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -200,6 +205,46 @@ function* fetchBalanceTxWorker( { payload }: {payload: {
 export const fetchBalanceTxWatcher = createWatcher(
   fetchBalanceTxWorker,
   FETCH_BALANCE_TX
+)
+
+function* syncAccountsWorker( { payload }: {payload: {
+  accounts: Account[],
+  options: {
+    hardRefresh?: boolean;
+    blindRefresh?: boolean;
+  }}} ) {
+  const { options } = payload
+  const account: Account = generateAccount( {
+    walletId: 'zyx',
+    xpub: 'tpubDCSE6S93MaNAEx5DCMpKu4Np1gNKKwH9nozBcKgiWHdNwVAKx6aS3AQsBqwLukGkAVbrZfHjr67Hxu9QCGxLuYgELmjMGGSJsvs4hnQwGjP',
+    accountName: 'Checkinig',
+    accountDescription: 'checking Description',
+    network: bitcoinJS.networks.testnet,
+  } )
+
+  const account2: Account = generateAccount( {
+    walletId: 'zyx',
+    xpub: 'tpubDDXWJsiz1pUPfzfeUuL7nkYNdz8EC8emx9ZBCMydW1pTdcK5B6dQ3JxacaSM3huQ4ZhX46mNTvBZ1J1jU5AXrdot8TQAE1JCGtNFTrXqjWx',
+    accountName: 'Test',
+    accountDescription: 'test Description',
+    network: bitcoinJS.networks.testnet,
+  } )
+  // TODO: pick accounts from reducer
+  const accounts = [ account, account2 ]
+  const network = accounts[ 0 ].network // n/w reference: first account's n/w
+  const { synchedAccounts, txsFound } = yield call(
+    AccountOperations.syncAccounts,
+    accounts,
+    network,
+    options.hardRefresh,
+    options.blindRefresh )
+
+  // TODO: update reducer and insert into database
+}
+
+export const syncAccountsWatcher = createWatcher(
+  syncAccountsWorker,
+  SYNC_ACCOUNTS
 )
 
 function* fetchDerivativeAccBalanceTxWorker( { payload } ) {
@@ -753,6 +798,18 @@ function* refreshAccountShellWorker( { payload } ) {
     const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
+
+    // yield call( syncAccountsWorker, {
+    //   payload: {
+    //     accounts:[],
+    //     options: {
+    //       hardRefresh: false,
+    //       blindRefresh: false,
+    //     }
+    //   }
+    // } )
+
+
 
     const rescanTxs: RescannedTransactionData[] = []
     deltaTxs.forEach( ( deltaTx ) => {

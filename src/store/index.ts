@@ -50,6 +50,7 @@ import {
   testcoinsWatcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
+  syncAccountsWatcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccBalanceTxWatcher,
@@ -213,6 +214,7 @@ const rootSaga = function* () {
 
     // accounts watchers
     fetchBalanceTxWatcher,
+    syncAccountsWatcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
