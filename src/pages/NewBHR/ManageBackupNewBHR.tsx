@@ -285,6 +285,18 @@ class ManageBackupNewBHR extends Component<
     )
   };
 
+  handleContactSelection(
+    contactDescription: ContactRecipientDescribing,
+    index: number,
+    contactType: string,
+  ) {
+    this.props.navigation.navigate( 'ContactDetails', {
+      contact: contactDescription,
+      index,
+      contactsType: contactType,
+    } )
+  }
+
   renderContactItem = ( {
     contactDescription,
     index,
@@ -295,11 +307,15 @@ class ManageBackupNewBHR extends Component<
     contactsType: string;
   } ) => {
     return (
-      <TouchableOpacity style={{
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-      key={index}
+      <TouchableOpacity
+        onPress={() =>
+          this.handleContactSelection( contactDescription, index, contactsType )
+        }
+        style={{
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+        key={index}
       >
         <RecipientAvatar recipient={contactDescription} contentContainerStyle={styles.avatarImage} />
         <Text style={{
@@ -1088,7 +1104,7 @@ Wallet Backup
               }}>
                 {keeping.length > 0 &&
                   <View style={{
-                    height: 'auto', alignItems: 'flex-start'
+                    height: 'auto', alignItems: 'flex-start', flexDirection: 'row'
                   }}>
                     {keeping.length && keeping.map( ( item, index ) => {
                       return this.renderContactItem( {

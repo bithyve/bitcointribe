@@ -72,6 +72,7 @@ import TrustedContactNewBHR from '../../../pages/NewBHR/TrustedContacts'
 import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import Header from '../Header'
+import QRStack from '../home/QRStack'
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
@@ -103,6 +104,12 @@ const SecurityStack = createStackNavigator(
     Intermediate,
     AccountDetails: {
       screen: AccountDetailsStack,
+    },
+    QRScanner: {
+      screen: QRStack,
+      navigationOptions: {
+        header: null,
+      },
     },
     ManageBackup,
     SecondaryDevice,
