@@ -258,7 +258,8 @@ const HomeStack = createStackNavigator(
     },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
-
+      console.log( navigation.state.index )
+      console.log( 'navigation.state >>> home', navigation.state )
       if ( navigation.state.index === 0 && navigation.state.routes[ 0 ].routeName === 'Home' ) {
         tabBarVisible = true
       }
@@ -273,22 +274,22 @@ const HomeStack = createStackNavigator(
     //     },
     //   }
     },
-    transitionConfig: ( transitionProps, prevTransitionProps ) => {
-      const previousRouteName = prevTransitionProps?.scene.route.routeName
-      const newRouteName = transitionProps.scene.route.routeName
+    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
+    //   const previousRouteName = prevTransitionProps?.scene.route.routeName
+    //   const newRouteName = transitionProps.scene.route.routeName
 
-      // 📝 Override the default presentation mode for screens that we
-      // want to present modally
-      const isModal = MODAL_ROUTES.some(
-        ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
-      )
+    //   // 📝 Override the default presentation mode for screens that we
+    //   // want to present modally
+    //   const isModal = MODAL_ROUTES.some(
+    //     ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
+    //   )
 
-      return StackViewTransitionConfigs.defaultTransitionConfig(
-        transitionProps,
-        prevTransitionProps,
-        isModal,
-      )
-    },
+    //   return StackViewTransitionConfigs.defaultTransitionConfig(
+    //     transitionProps,
+    //     prevTransitionProps,
+    //     isModal,
+    //   )
+    // },
   },
 )
 

@@ -92,12 +92,13 @@ const MoreOptionsStack = createStackNavigator(
   },
   {
     initialRouteName: 'Home',
-    defaultNavigationOptions: {
-      header: null
-    },
+    // defaultNavigationOptions: {
+    //   header: null
+    // },
     navigationOptions: ( { navigation } ) => {
       let tabBarVisible = false
-
+      console.log( navigation.state.index )
+      console.log( 'navigation.state >>> more', navigation.state )
       if ( navigation.state.index === 0 && navigation.state.routes[ 0 ].routeName === 'Home' ) {
         tabBarVisible = true
       }

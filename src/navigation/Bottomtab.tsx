@@ -75,7 +75,7 @@ const HomeStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
+    // mode: 'modal',
     initialRouteName: 'HomeRoot',
     // defaultNavigationOptions: ( { navigation } ) => {
     //   return {
