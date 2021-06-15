@@ -286,8 +286,8 @@ export default class AccountUtilities {
       return outputs
     };
 
-    static fetchBalanceTransactionsByAddresses = async (
-      accounts: {[xpubId: string]: {
+    static fetchBalanceTransactionsByAccounts = async (
+      accounts: {[id: string]: {
     externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
     internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
     externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
@@ -314,7 +314,7 @@ export default class AccountUtilities {
     ): Promise<
   {
     synchedAccounts: {
-    [xpubId: string] : {
+    [id: string] : {
       UTXOs: Array<{
         txId: string;
         vout: number;
