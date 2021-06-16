@@ -746,11 +746,17 @@ export interface UTXO {
 
 export interface Account {
   id: string,
+  walletId: string,
+  network: networks.Network,
+  is2FA?: boolean,
+  xpub?: string,
+  xpubs?: {
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  },
   accountName: string,
   accountDescription: string,
-  walletId: string,
-  xpub: string,
-  network: networks.Network,
   activeAddresses: string[],
   receivingAddress: string,
   nextFreeAddressIndex: number;

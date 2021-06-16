@@ -157,16 +157,24 @@ export default class AccountUtilities {
     throw new Error( 'Could not find private key for: ' + address )
   };
 
-  static generateMultiSig = (
+  static createMultiSig = (
+    xpubs: string[],
     required: number,
-    pubKeys: any[],
-    network: bitcoinJS.Network
+    network: bitcoinJS.Network,
+    childIndex: number,
+    internal: boolean,
   ): {
     p2wsh: bitcoinJS.Payment;
     p2sh: bitcoinJS.Payment;
     address: string;
   } => {
-    const pubkeys = pubKeys.map( ( hex ) => Buffer.from( hex, 'hex' ) )
+
+    const pubkeys = xpubs.map( ( xpub ) => {
+      const xKey = bip32.fromBase58( xpub, network )
+      const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
+      const pub = childXKey.toBase58()
+      return Buffer.from( pub, 'hex' )
+    } )
 
     const p2ms = bitcoinJS.payments.p2ms( {
       m: required,
@@ -188,8 +196,6 @@ export default class AccountUtilities {
       address: p2sh.address,
     }
   }
-
-  static isPaymentURI = ( paymentURI: string ): boolean => paymentURI.slice( 0, 8 ) === 'bitcoin:'
 
   static generatePaymentURI = (
     address: string,
@@ -217,6 +223,7 @@ export default class AccountUtilities {
     };
    } => bip21.decode( paymentURI )
 
+  static isPaymentURI = ( paymentURI: string ): boolean => paymentURI.slice( 0, 8 ) === 'bitcoin:'
 
   static addressDiff = (
     scannedStr: string,
