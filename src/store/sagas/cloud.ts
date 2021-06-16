@@ -7,7 +7,8 @@ import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLO
 import { updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { KeeperInfoInterface, LevelHealthInterface } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
+import S3Service from '../../bitcoin/services/sss/S3Service'
 
 const GoogleDrive = NativeModules.GoogleDrive
 const iCloud = NativeModules.iCloud
@@ -32,16 +33,19 @@ function* cloudWorker( { payload } ) {
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
     if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
       const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+      const currentLevel = yield select( ( state ) => state.health.currentLevel )
+      const s3Service: S3Service = yield select( ( state ) => state.health.service )
+      const MetaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
-      const { kpInfo, level, share } = payload
+      const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 0 ].shareId,
-        name: 'Cloud',
-        type: share ? share.type : levelHealth[ 0 ].levelInfo[ 0 ].shareType,
-        scheme: '1of1',
-        currentLevel: 1,
+        name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
+        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 0 ].shareType,
+        scheme: MetaShares && MetaShares.length && MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ).meta.scheme ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ).meta.scheme : '1of1',
+        currentLevel,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: 0,
+        sharePosition: MetaShares && MetaShares.length && MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ) ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ) : -1,
         data: {
         }
       }
