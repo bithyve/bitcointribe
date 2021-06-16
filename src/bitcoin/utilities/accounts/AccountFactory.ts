@@ -1,5 +1,5 @@
 import { networks } from 'bitcoinjs-lib'
-import { Account } from '../Interface'
+import { Account, MultiSigAccount } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 
@@ -36,8 +36,8 @@ export function generateAccount(
     confirmedUTXOs: [],
     unconfirmedUTXOs: [],
     balances: {
-      balance: 0,
-      unconfirmedBalance: 0,
+      confirmed: 0,
+      unconfirmed: 0,
     },
     transactions: [],
     lastSynched: 0,
@@ -59,6 +59,7 @@ export function generateTwoFAAccount(
     accountName,
     accountDescription,
     xpubs,
+    xprivs,
     network
   }: {
     accountName: string,
@@ -69,19 +70,25 @@ export function generateTwoFAAccount(
       secondary: string,
       bithyve: string,
     },
+    xprivs: {
+      primary: string,
+      secondary?: string,
+    },
     network: networks.Network,
   }
-): Account {
+): MultiSigAccount {
 
   const id = crypto.createHash( 'sha256' ).update( xpubs.secondary ).digest( 'hex' )
   const initialRecevingAddress = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, network, 0, false ).address
 
-  const account: Account = {
+  const account: MultiSigAccount = {
     id,
     walletId,
     network,
     is2FA: true,
+    xpub: null,
     xpubs,
+    xprivs,
     accountName,
     accountDescription,
     activeAddresses: [],
@@ -91,8 +98,8 @@ export function generateTwoFAAccount(
     confirmedUTXOs: [],
     unconfirmedUTXOs: [],
     balances: {
-      balance: 0,
-      unconfirmedBalance: 0,
+      confirmed: 0,
+      unconfirmed: 0,
     },
     transactions: [],
     lastSynched: 0,

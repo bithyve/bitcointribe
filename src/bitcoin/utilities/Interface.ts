@@ -104,6 +104,12 @@ export interface Balances {
   unconfirmed: number;
 }
 
+export enum TxPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high'
+}
+
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
@@ -748,13 +754,7 @@ export interface Account {
   id: string,
   walletId: string,
   network: networks.Network,
-  is2FA?: boolean,
-  xpub?: string,
-  xpubs?: {
-    primary: string,
-    secondary: string,
-    bithyve: string,
-  },
+  xpub: string | null, // null for multi-sig accounts
   accountName: string,
   accountDescription: string,
   activeAddresses: string[],
@@ -763,13 +763,23 @@ export interface Account {
   nextFreeChangeAddressIndex: number;
   confirmedUTXOs: UTXO[];
   unconfirmedUTXOs: UTXO[];
-  balances: {
-    balance: number;
-    unconfirmedBalance: number;
-  };
+  balances: Balances;
   transactions: Transaction[];
   lastSynched: number;
   newTransactions?: Transaction[];
   txIdMap?: {[txid: string]: string[]};
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
+}
+
+export interface MultiSigAccount extends Account {
+  is2FA: boolean,
+  xpubs: {
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  }
+  xprivs: {
+    primary: string,
+    secondary?: string,
+  }
 }
