@@ -51,6 +51,15 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
       ? NetworkKind.TESTNET : NetworkKind.MAINNET
   }, [ sourceSubAccount.sourceKind, config ] )
 
+  const TextValue = ( { amt, unit } ) => {
+    return (
+      <Text style={{
+        ...styles.priorityTableText,
+        flex: 1,
+      }}>{`${useFormattedAmountText( amt )} ${useFormattedUnitText( unit )}`}</Text>
+    )
+  }
+
   const showCustomPriorityBottomSheet = useCallback( () => {
     presentBottomSheet(
       <CustomPriorityContent
@@ -166,14 +175,18 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                 )}
               </Text>
 
-              <Text style={{
+              <TextValue amt={transactionFeeInfo[ priority ].amount} unit={{
+                bitcoinUnit: BitcoinUnit.SATS,
+              }}/>
+
+              {/* <Text style={{
                 ...styles.priorityTableText,
                 flex: 1,
               }}>
                 {useFormattedAmountText( transactionFeeInfo[ priority ].amount )} {useFormattedUnitText( {
                   bitcoinUnit: BitcoinUnit.SATS,
                 } )}
-              </Text>
+              </Text> */}
             </View>
           )
         } )}
