@@ -319,7 +319,7 @@ function* updateSharesHealthWorker( { payload } ) {
     const levelHealthForCurrentLevel = []
     levelHealthForCurrentLevel[ 0 ] = levelHealth[ 0 ]
     if( levelHealth[ 0 ] && levelHealth[ 1 ] ) {
-      if( levelHealth[ 1 ].level == currentLevel ) {
+      if( levelHealth[ 1 ].levelInfo.findIndex( value=>value.updatedAt == 0 ) == -1 ) {
         tempLevelHealth[ 0 ] = levelHealth[ 1 ]
         levelHealthForCurrentLevel[ 0 ] = levelHealth[ 1 ]
       }
@@ -329,6 +329,7 @@ function* updateSharesHealthWorker( { payload } ) {
       else if( levelHealthForCurrentLevel[ 0 ].levelInfo.length == 4 ) currentLevel = 2
       else currentLevel = 1
     }
+    console.log( 'UPDATE_SHARES_HEALTH currentLevel', currentLevel )
 
     yield put(
       updateHealth(
@@ -1355,6 +1356,7 @@ function* getPDFDataWorker( { payload } ) {
         JSON.stringify( recoveryData ),
         JSON.stringify( secondaryData ),
       ]
+      console.log( 'PDF recoveryData', JSON.stringify( recoveryData ) )
       const pdfData = {
         qrData: qrData,
       }

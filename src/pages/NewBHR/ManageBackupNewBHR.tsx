@@ -233,39 +233,20 @@ class ManageBackupNewBHR extends Component<
 
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
+      console.log( 'IF SS' )
       this.props.modifyLevelData( )
-      if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
-        levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
-      ) {
-        this.loaderBottomSheet.snapTo( 1 )
-      }
+      this.autoCloudUpload()
       if (
         this.props.levelHealth.length > 0 &&
         this.props.levelHealth.length == 1 &&
-        prevProps.levelHealth.length == 0 && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && this.props.cloudPermissionGranted === true
+        prevProps.levelHealth.length == 0 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+        this.props.cloudPermissionGranted === true
       ) {
         this.props.setCloudData( )
-      } else if(
-        ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
-          levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
-          levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 )
-      ) {
-        this.props.deletePrivateData()
-      }
-      else if(
-        ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 2 ].levelInfo[ 2 ].updatedAt > 0 &&
-        levelHealth[ 2 ].levelInfo[ 3 ].updatedAt > 0 &&
-        levelHealth[ 2 ].levelInfo[ 4 ].updatedAt > 0 &&
-        levelHealth[ 2 ].levelInfo[ 5 ].updatedAt > 0 )
-      ) {
-        this.props.updateCloudData()
       }
     }
 
-    if( this.props.s3Service.levelhealth.SMMetaSharesKeeper.length == 0 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&  levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-      this.props.updateCloudData()
-    }
 
     if( this.props.currentLevel == 3 ) {
       this.loaderBottomSheet.snapTo( 0 )
@@ -453,18 +434,37 @@ class ManageBackupNewBHR extends Component<
     this.props.modifyLevelData( )
     // this.props.checkMSharesHealth()
     this.props.setHealthStatus()
-    if (
-      this.props.levelHealth.findIndex(
-        ( value ) =>
-          value.levelInfo.findIndex( ( item ) => item.shareType == 'contact' || item.shareType == 'device' ) >
-          -1
-      ) > -1
-    ) {
-      this.props.syncPermanentChannels( {
-        permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      } )
-    }
+    this.props.syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+    } )
+    this.autoCloudUpload()
   };
+
+  autoCloudUpload = () =>{
+    const { levelHealth, cloudBackupStatus } = this.props
+    if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+      console.log( 'ELSE SS' )
+      if( levelHealth[ 1 ].levelInfo.length == 4 &&
+        levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
+        console.log( 'ELSE 4' )
+        this.props.deletePrivateData()
+        this.props.updateCloudData()
+      } else if( levelHealth[ 1 ].levelInfo.length == 6 &&
+        levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
+        cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
+        console.log( 'ELSE 6' )
+        this.props.updateCloudData()
+        this.loaderBottomSheet.snapTo( 1 )
+      }
+    }
+  }
 
   sendApprovalRequestToPK = ( ) => {
     this.setState( {
