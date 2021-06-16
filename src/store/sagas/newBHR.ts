@@ -59,6 +59,8 @@ function* onPressKeeperChannelWorker( { payload } ) {
           value.id == 2 && metaSharesKeeper.length != 3
         ) {
           yield put( generateMetaShare( value.id ) )
+        } else if( keeper.shareType == '' || keeper.status == 'notSetup' ){
+          yield put( setIsKeeperTypeBottomSheetOpen( true ) )
         } else {
           yield put( navigateToHistoryPage( obj ) )
         }

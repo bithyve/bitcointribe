@@ -812,7 +812,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   notificationCheck = () =>{
     const { messages } = this.props
     console.log( 'messages inside notificationCheck', messages )
-    if( messages.length ){
+    if( messages && messages.length ){
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
       } )
