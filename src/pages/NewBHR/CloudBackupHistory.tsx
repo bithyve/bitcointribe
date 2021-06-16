@@ -70,15 +70,11 @@ const CloudBackupHistory = ( props ) => {
     if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
     let share = levelHealth[ 0 ].levelInfo[ 0 ]
     if( levelHealth[ 0 ] && !levelHealth[ 1 ] ){
-      console.log( 'IF' )
       share = levelHealth[ 0 ].levelInfo[ 0 ]
     } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
-      console.log( 'ELSE' )
       if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
-        console.log( 'ELSE 4' )
         share = levelHealth[ 1 ].levelInfo[ 0 ]
       } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
-        console.log( 'ELSE 6' )
         share = levelHealth[ 1 ].levelInfo[ 0 ]
       }
     }

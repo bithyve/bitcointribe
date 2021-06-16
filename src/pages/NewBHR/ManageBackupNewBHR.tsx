@@ -233,7 +233,6 @@ class ManageBackupNewBHR extends Component<
 
     if ( JSON.stringify( prevProps.levelHealth ) !==
       JSON.stringify( this.props.levelHealth ) ) {
-      console.log( 'IF SS' )
       this.props.modifyLevelData( )
       this.autoCloudUpload()
       if (
@@ -246,7 +245,6 @@ class ManageBackupNewBHR extends Component<
         this.props.setCloudData( )
       }
     }
-
 
     if( this.props.currentLevel == 3 ) {
       this.loaderBottomSheet.snapTo( 0 )
@@ -352,9 +350,13 @@ class ManageBackupNewBHR extends Component<
     if( prevProps.levelHealth != this.props.levelHealth ){
       if (
         this.props.currentLevel == 2 &&
-        levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 4 ] && levelHealth[ 1 ].levelInfo[ 5 ] &&
+        levelHealth[ 1 ] &&
+        levelHealth[ 1 ].levelInfo[ 4 ] &&
+        levelHealth[ 1 ].levelInfo[ 5 ] &&
         levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
-        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0
+        levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
+        ( levelHealth[ 1 ].levelInfo[ 2 ].updatedAt == 0 ||
+        levelHealth[ 1 ].levelInfo[ 3 ].updatedAt == 0 )
       ) {
         this.props.autoShareToLevel2Keepers()
       }
@@ -443,13 +445,11 @@ class ManageBackupNewBHR extends Component<
   autoCloudUpload = () =>{
     const { levelHealth, cloudBackupStatus } = this.props
     if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
-      console.log( 'ELSE SS' )
       if( levelHealth[ 1 ].levelInfo.length == 4 &&
         levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
-        console.log( 'ELSE 4' )
         this.props.deletePrivateData()
         this.props.updateCloudData()
       } else if( levelHealth[ 1 ].levelInfo.length == 6 &&
@@ -459,7 +459,6 @@ class ManageBackupNewBHR extends Component<
         levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
-        console.log( 'ELSE 6' )
         this.props.updateCloudData()
         this.loaderBottomSheet.snapTo( 1 )
       }
@@ -477,7 +476,7 @@ class ManageBackupNewBHR extends Component<
   renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={false}
+        isFromKeeperDeviceHistory={true}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -499,12 +498,12 @@ class ManageBackupNewBHR extends Component<
           if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
-          // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
-          // this.props.setApprovalStatus( false )
-          // this.props.downloadSMShare( qrScannedData )
-          // this.setState( {
-          //   QrBottomSheetsFlag: false
-          // } )
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Aa","channelId":"235e93417c8c4fcc99f37c5f99a259a619db14d6019b9d1e5b62becb78de0740","streamId":"1763f468d","secondaryChannelKey":"TMxy31wVg8lVdFStOtoL70r6","version":"1.7.5"}'
+          this.props.setApprovalStatus( false )
+          this.props.downloadSMShare( qrScannedData )
+          this.setState( {
+            QrBottomSheetsFlag: false
+          } )
         }}
       />
     )
