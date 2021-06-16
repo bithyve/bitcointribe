@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios'
+import axios, { AxiosInstance, AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
 import * as bip39 from 'bip39'
@@ -6,13 +6,15 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, Account, MultiSigAccount } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import { BH_AXIOS } from '../../../services/api'
+import { SIGNING_AXIOS } from '../../../services/api'
+
+
 const { REQUEST_TIMEOUT } = config
-let bitcoinAxios = axios.create( {
+let accAxios: AxiosInstance = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 
@@ -126,6 +128,12 @@ export default class AccountUtilities {
     return xKey
   };
 
+  static generateKeyFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean ) => {
+    const xKey = bip32.fromBase58( extendedKey, network )
+    const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
+    return childXKey.toBase58()
+  }
+
   static generateYpub = ( xpub: string, network: bitcoinJS.Network ): string => {
     let data = bs58check.decode( xpub )
     data = data.slice( 4 )
@@ -164,15 +172,15 @@ export default class AccountUtilities {
     childIndex: number,
     internal: boolean,
   ): {
-    p2wsh: bitcoinJS.Payment;
-    p2sh: bitcoinJS.Payment;
+    scripts: {
+      redeem: string;
+      witness: string;
+    };
     address: string;
   } => {
 
     const pubkeys = xpubs.map( ( xpub ) => {
-      const xKey = bip32.fromBase58( xpub, network )
-      const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
-      const pub = childXKey.toBase58()
+      const pub = AccountUtilities.generateKeyFromExtendedKey( xpub, network, childIndex, internal )
       return Buffer.from( pub, 'hex' )
     } )
 
@@ -191,11 +199,47 @@ export default class AccountUtilities {
     } )
 
     return {
-      p2wsh,
-      p2sh,
+      scripts: {
+        redeem: p2sh.redeem.output.toString( 'hex' ),
+        witness: p2wsh.redeem.output.toString( 'hex' ),
+      },
       address: p2sh.address,
     }
   }
+
+  static signingEssentialsForMultiSig = ( account: MultiSigAccount, address: string ) => {
+    const { xpubs, xprivs, network } = account
+
+    for ( let itr = 0; itr <= account.nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+      const multiSig = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, account.network, itr, false )
+      if ( multiSig.address === address ) {
+        return {
+          multiSig,
+          primaryPriv: AccountUtilities.generateKeyFromExtendedKey( xprivs.primary, network, itr, false ),
+          secondaryPriv: xprivs.secondary
+            ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, false )
+            : null,
+          childIndex: itr,
+        }
+      }
+    }
+
+    for ( let itr = 0; itr <= account.nextFreeChangeAddressIndex + config.GAP_LIMIT; itr++ ) {
+      const multiSig = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, account.network, itr, true )
+      if ( multiSig.address === address ) {
+        return {
+          multiSig,
+          primaryPriv: AccountUtilities.generateKeyFromExtendedKey( xprivs.primary, network, itr, true ),
+          secondaryPriv: xprivs.secondary
+            ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, true )
+            : null,
+          childIndex: itr,
+        }
+      }
+    }
+
+    throw new Error( 'Could not find signing essentials for ' + address )
+  };
 
   static generatePaymentURI = (
     address: string,
@@ -324,7 +368,7 @@ export default class AccountUtilities {
         address: string;
         status?: any;
       }>;
-      balances: { balance: number; unconfirmedBalance: number };
+      balances: { confirmed: number; unconfirmed: number };
       txIdMap:  {[txid: string]: string[]},
       transactions: Transaction[];
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
@@ -385,17 +429,17 @@ export default class AccountUtilities {
       }
 
       let usedFallBack = false
-      bitcoinAxios = axios.create( {
+      accAxios = axios.create( {
         timeout: 7 * REQUEST_TIMEOUT // accounting for blind refresh
       } )
       try{
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await bitcoinAxios.post(
+          res = await accAxios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
         } else {
-          res = await bitcoinAxios.post(
+          res = await accAxios.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
@@ -411,12 +455,12 @@ export default class AccountUtilities {
 
         usedFallBack = true
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await bitcoinAxios.post(
+          res = await accAxios.post(
             config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
         } else {
-          res = await bitcoinAxios.post(
+          res = await accAxios.post(
             config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.NEWMULTIUTXOTXN,
             accountToAddressMapping,
           )
@@ -431,9 +475,9 @@ export default class AccountUtilities {
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
         const UTXOs = cachedUTXOs
-        const balances = {
-          balance: 0,
-          unconfirmedBalance: 0,
+        const balances: Balances = {
+          confirmed: 0,
+          unconfirmed: 0,
         }
 
         // (re)categorise UTXOs
@@ -471,16 +515,16 @@ export default class AccountUtilities {
             accountType === 'Test Account' &&
           externalAddresses[ utxo.address ] === 0
           ) {
-            balances.balance += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+            balances.confirmed += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
             continue
           }
 
-          if ( utxo.status && utxo.status.confirmed ) balances.balance += utxo.value
+          if ( utxo.status && utxo.status.confirmed ) balances.confirmed += utxo.value
           else if (
             internalAddressSet[ utxo.address ] !== undefined
           )
-            balances.balance += utxo.value
-          else balances.unconfirmedBalance += utxo.value
+            balances.confirmed += utxo.value
+          else balances.unconfirmed += utxo.value
         }
 
         // process txs
@@ -648,14 +692,14 @@ export default class AccountUtilities {
       let res: AxiosResponse
       try {
         if ( network === bitcoinJS.networks.testnet ) {
-          res = await bitcoinAxios.post(
+          res = await accAxios.post(
             config.ESPLORA_API_ENDPOINTS.TESTNET.MULTITXN,
             {
               addresses,
             },
           )
         } else {
-          res = await bitcoinAxios.post(
+          res = await accAxios.post(
             config.ESPLORA_API_ENDPOINTS.MAINNET.MULTITXN,
             {
               addresses,
@@ -719,7 +763,7 @@ export default class AccountUtilities {
     let res: AxiosResponse
     try {
       if ( network === bitcoinJS.networks.testnet ) {
-        res = await bitcoinAxios.post(
+        res = await accAxios.post(
           config.ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
           txHex,
           {
@@ -729,7 +773,7 @@ export default class AccountUtilities {
           },
         )
       } else {
-        res = await bitcoinAxios.post(
+        res = await accAxios.post(
           config.ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
           txHex,
           {
@@ -751,7 +795,7 @@ export default class AccountUtilities {
         console.log( 'using Hexa node as fallback(tx-broadcast)' )
         try {
           if ( network === bitcoinJS.networks.testnet ) {
-            res = await bitcoinAxios.post(
+            res = await accAxios.post(
               config.BITHYVE_ESPLORA_API_ENDPOINTS.TESTNET.BROADCAST_TX,
               txHex,
               {
@@ -761,7 +805,7 @@ export default class AccountUtilities {
               },
             )
           } else {
-            res = await bitcoinAxios.post(
+            res = await accAxios.post(
               config.BITHYVE_ESPLORA_API_ENDPOINTS.MAINNET.BROADCAST_TX,
               txHex,
               {
@@ -785,6 +829,7 @@ export default class AccountUtilities {
     }
   }
 
+  // test-account specific utilities
   static testnetFaucet = async ( recipientAddress: string, network: bitcoinJS.networks.Network ): Promise<{
     txid: any;
     funded: any;
@@ -794,7 +839,7 @@ export default class AccountUtilities {
     }
     const amount = 10000 / SATOSHIS_IN_BTC
     try {
-      const res = await BH_AXIOS.post( '/testnetFaucet', {
+      const res = await accAxios.post( `${config.RELAY}/testnetFaucet`, {
         HEXA_ID: config.HEXA_ID,
         recipientAddress,
         amount,
@@ -809,4 +854,31 @@ export default class AccountUtilities {
       if ( err.code ) throw new Error( err.code )
     }
   }
+
+  // 2FA-account specific utilities
+   public registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
+    setupData: {
+      qrData: string;
+      secret: string;
+      bhXpub: string;
+    };
+  }> => {
+     let res: AxiosResponse
+     try {
+       res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
+         HEXA_ID: config.HEXA_ID,
+         walletID,
+         secondaryID,
+       } )
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+     }
+
+     const { setupSuccessful, setupData } = res.data
+     if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
+     return {
+       setupData
+     }
+   };
 }
