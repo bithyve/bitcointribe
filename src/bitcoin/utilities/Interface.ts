@@ -107,7 +107,8 @@ export interface Balances {
 export enum TxPriority {
   LOW = 'low',
   MEDIUM = 'medium',
-  HIGH = 'high'
+  HIGH = 'high',
+  CUSTOM = 'custom'
 }
 
 export interface Transactions {

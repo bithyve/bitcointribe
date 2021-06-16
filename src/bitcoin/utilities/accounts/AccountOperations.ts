@@ -1,4 +1,5 @@
 import * as bitcoinJS from 'bitcoinjs-lib'
+import * as bip32 from 'bip32'
 import coinselect from 'coinselect'
 import {
   Transaction,
@@ -7,6 +8,8 @@ import {
   AverageTxFees,
   TransactionPrerequisiteElements,
   Account,
+  TxPriority,
+  MultiSigAccount,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 export default class AccountOperations {
@@ -289,9 +292,8 @@ export default class AccountOperations {
       if( include ) updatedUTXOSet.push( confirmedUTXO )
     } )
 
-    account.balances.balance -= consumedBalance
+    account.balances.confirmed -= consumedBalance
     account.confirmedUTXOs = updatedUTXOSet
-
 
     AccountOperations.updateQueryList( account, consumedUTXOs )
   }
@@ -335,7 +337,7 @@ export default class AccountOperations {
   };
 
   static prepareTransactionPrerequisites = (
-    account: Account,
+    account: Account | MultiSigAccount,
     recipients: {
       address: string;
       amount: number;
@@ -366,7 +368,7 @@ export default class AccountOperations {
       } )
     }
 
-    const defaultTxPriority = 'low' // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
+    const defaultTxPriority = TxPriority.LOW // doing base calculation with low fee (helps in sending the tx even if higher priority fee isn't possible)
     const defaultFeePerByte = averageTxFees[ defaultTxPriority ].feePerByte
     const defaultEstimatedBlocks =
       averageTxFees[ defaultTxPriority ].estimatedBlocks
@@ -390,7 +392,7 @@ export default class AccountOperations {
 
     const txPrerequisites: TransactionPrerequisite = {
     }
-    for ( const priority of [ 'low', 'medium', 'high' ] ) {
+    for ( const priority of Object.keys( TxPriority ) ) {
       if (
         priority === defaultTxPriority ||
         defaultDebitedAmount === confirmedBalance
@@ -411,10 +413,10 @@ export default class AccountOperations {
         const debitedAmount = netAmount + fee
         if ( !inputs || debitedAmount > confirmedBalance ) {
           // to previous priority assets
-          if ( priority === 'medium' )
-            txPrerequisites[ priority ] = txPrerequisites[ 'low' ]
-          if ( priority === 'high' )
-            txPrerequisites[ priority ] = txPrerequisites[ 'medium' ]
+          if ( priority === TxPriority.MEDIUM )
+            txPrerequisites[ priority ] = txPrerequisites[ TxPriority.LOW ]
+          if ( priority === TxPriority.HIGH )
+            txPrerequisites[ priority ] = txPrerequisites[ TxPriority.MEDIUM ]
         } else {
           txPrerequisites[ priority ] = {
             inputs,
@@ -432,7 +434,7 @@ export default class AccountOperations {
   };
 
   static prepareCustomTransactionPrerequisites = (
-    account: Account,
+    account: Account | MultiSigAccount,
     outputUTXOs: {
       address: string;
       value: number;
@@ -456,7 +458,7 @@ export default class AccountOperations {
   };
 
   static createTransaction = async (
-    account: Account,
+    account: Account | MultiSigAccount,
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
     network: bitcoinJS.networks.Network,
@@ -503,32 +505,66 @@ export default class AccountOperations {
   };
 
   static signTransaction = (
-    account: Account,
+    account: Account | MultiSigAccount,
     inputs: any,
     txb: bitcoinJS.TransactionBuilder,
     network: bitcoinJS.networks.Network,
     witnessScript?: any,
-  ): bitcoinJS.TransactionBuilder => {
+  ): {
+    signedTxb: bitcoinJS.TransactionBuilder;
+    childIndexArray: Array<{
+      childIndex: number;
+      inputIdentifier: {
+        txId: string;
+        vout: number;
+      };
+      internal: boolean,
+    }> | null;
+  } => {
     try {
       let vin = 0
-      for ( const input of inputs ) {
-        const privateKey = AccountUtilities.addressToPrivateKey(
-          input.address,
-          account.xpub,
-          account.nextFreeAddressIndex,
-          account.nextFreeChangeAddressIndex,
-          network
-        )
+      const childIndexArray = []
 
-        const keyPair = AccountUtilities.getKeyPair(
-          privateKey,
-          network
-        )
+      for ( const input of inputs ) {
+        let keyPair, redeemScript
+        if( ( account as MultiSigAccount ).is2FA ){
+          const { multiSig, primaryPriv, childIndex, internal } = AccountUtilities.signingEssentialsForMultiSig(
+            ( account as MultiSigAccount ),
+            input.address,
+          )
+
+          keyPair = bip32.fromBase58( primaryPriv, network )
+          redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
+          witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
+          childIndexArray.push( {
+            childIndex,
+            inputIdentifier: {
+              txId: input.txId,
+              vout: input.vout,
+              value: input.value,
+            },
+            internal
+          } )
+        } else {
+          const privateKey = AccountUtilities.addressToPrivateKey(
+            input.address,
+            account.xpub,
+            account.nextFreeAddressIndex,
+            account.nextFreeChangeAddressIndex,
+            network
+          )
+
+          keyPair = AccountUtilities.getKeyPair(
+            privateKey,
+            network
+          )
+          redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
+        }
 
         txb.sign(
           vin,
           keyPair,
-          AccountUtilities.getP2SH( keyPair, network ).redeem.output,
+          redeemScript,
           null,
           input.value,
           witnessScript,
@@ -536,14 +572,16 @@ export default class AccountOperations {
         vin++
       }
 
-      return txb
+      return {
+        signedTxb: txb, childIndexArray: childIndexArray.length? childIndexArray: null
+      }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )
     }
   };
 
   static transferST1 = async (
-    account: Account,
+    account: Account | MultiSigAccount,
     recipients: {
       address: string;
       amount: number;
@@ -554,14 +592,10 @@ export default class AccountOperations {
       txPrerequisites: TransactionPrerequisite;
       }
   > => {
+
     recipients = recipients.map( ( recipient ) => {
       recipient.amount = Math.round( recipient.amount )
       return recipient
-    } )
-
-    let netAmount = 0
-    recipients.forEach( ( recipient ) => {
-      netAmount += recipient.amount
     } )
 
     let {
@@ -574,13 +608,18 @@ export default class AccountOperations {
       averageTxFees,
     )
 
+    let netAmount = 0
+    recipients.forEach( ( recipient ) => {
+      netAmount += recipient.amount
+    } )
+
     if ( balance < netAmount + fee ) {
       // check w/ the lowest fee possible for this transaction
       const minTxFeePerByte = 1 // default minimum relay fee
       const minAvgTxFee = {
         ...averageTxFees
       }
-      minAvgTxFee[ 'low' ].feePerByte = minTxFeePerByte
+      minAvgTxFee[ TxPriority.LOW ].feePerByte = minTxFeePerByte
 
       const minTxPrerequisites  = AccountOperations.prepareTransactionPrerequisites(
         account,
@@ -605,18 +644,29 @@ export default class AccountOperations {
   };
 
   static transferST2 = async (
-    account: Account,
+    account: Account | MultiSigAccount,
     txPrerequisites: TransactionPrerequisite,
-    txnPriority: string,
+    txnPriority: TxPriority,
     network: bitcoinJS.networks.Network,
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
   ): Promise<
-     {
+     | {
       txid: string;
      }
+     | {
+      txHex: string;
+      childIndexArray: Array<{
+        childIndex: number;
+        inputIdentifier: {
+          txId: string;
+          vout: number;
+        };
+        internal: boolean
+      }>;
+      inputs: InputUTXOs[],
+     }
   > => {
-    txnPriority = txnPriority.toLowerCase()
     const { txb } = await AccountOperations.createTransaction(
       account,
       txPrerequisites,
@@ -627,18 +677,24 @@ export default class AccountOperations {
     )
 
     let inputs
-    if ( txnPriority === 'custom' && customTxPrerequisites ) inputs = customTxPrerequisites.inputs
-    else inputs = txPrerequisites[ txnPriority.toLowerCase() ].inputs
+    if ( txnPriority === TxPriority.CUSTOM && customTxPrerequisites ) inputs = customTxPrerequisites.inputs
+    else inputs = txPrerequisites[ txnPriority ].inputs
 
 
-    const signedTxb = AccountOperations.signTransaction( account, inputs, txb, network )
-    const txHex = signedTxb.build().toHex()
+    const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb, network )
 
-    const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-    if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs )  // chip consumed utxos
-
-    return {
-      txid
+    if( ( account as MultiSigAccount ).is2FA ){
+      const txHex = signedTxb.buildIncomplete().toHex()
+      return {
+        txHex, childIndexArray, inputs
+      }
+    } else {
+      const txHex = signedTxb.build().toHex()
+      const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
+      if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs )  // chip consumed utxos
+      return {
+        txid
+      }
     }
   };
 }

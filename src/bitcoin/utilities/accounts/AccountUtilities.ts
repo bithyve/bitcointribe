@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, Account, MultiSigAccount } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -234,6 +234,7 @@ export default class AccountUtilities {
             ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, true )
             : null,
           childIndex: itr,
+          internal: true
         }
       }
     }
