@@ -272,7 +272,7 @@ export default class AccountOperations {
     }
   }
 
-  static removeConsumedUTXOs= ( account: Account, inputs: InputUTXOs[] ) => {
+  static removeConsumedUTXOs= ( account: Account | MultiSigAccount, inputs: InputUTXOs[] ) => {
     const consumedUTXOs: {[txid: string]: InputUTXOs} = {
     }
     inputs.forEach( ( input ) => {
@@ -648,6 +648,7 @@ export default class AccountOperations {
     txPrerequisites: TransactionPrerequisite,
     txnPriority: TxPriority,
     network: bitcoinJS.networks.Network,
+    token?: number,
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
   ): Promise<
@@ -682,19 +683,25 @@ export default class AccountOperations {
 
 
     const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb, network )
-
+    let txHex
     if( ( account as MultiSigAccount ).is2FA ){
-      const txHex = signedTxb.buildIncomplete().toHex()
-      return {
-        txHex, childIndexArray, inputs
-      }
+      const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
+      const { signedTxHex } =  await AccountUtilities.getSecondSignature(
+        account.walletId,
+        token,
+        partiallySignedTxHex,
+        childIndexArray,
+      )
+      txHex = signedTxHex
     } else {
-      const txHex = signedTxb.build().toHex()
-      const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
-      if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs )  // chip consumed utxos
-      return {
-        txid
-      }
+      txHex = signedTxb.build().toHex()
+    }
+
+    const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
+    if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs )  // chip consumed utxos
+    else throw new Error( 'Failed to broadcast transaction, txid missing.' )
+    return {
+      txid
     }
   };
 }

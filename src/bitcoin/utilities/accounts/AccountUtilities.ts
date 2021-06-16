@@ -857,7 +857,7 @@ export default class AccountUtilities {
   }
 
   // 2FA-account specific utilities
-   public registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
+   static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
     setupData: {
       qrData: string;
       secret: string;
@@ -882,4 +882,38 @@ export default class AccountUtilities {
        setupData
      }
    };
+
+  static getSecondSignature = async (
+    walletId: string,
+    token: number,
+    partiallySignedTxHex: string,
+    childIndexArray: Array<{
+      childIndex: number;
+      inputIdentifier: {
+        txId: string;
+        vout: number;
+      };
+    }>,
+  ): Promise<{
+    signedTxHex: string;
+  }> => {
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'secureHDTransaction', {
+        HEXA_ID: config.HEXA_ID,
+        walletID: walletId,
+        token,
+        txHex: partiallySignedTxHex,
+        childIndexArray,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const signedTxHex = res.data.txHex
+    return {
+      signedTxHex
+    }
+  };
 }
