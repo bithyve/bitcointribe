@@ -461,7 +461,6 @@ export default class AccountOperations {
     account: Account | MultiSigAccount,
     txPrerequisites: TransactionPrerequisite,
     txnPriority: string,
-    network: bitcoinJS.networks.Network,
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
   ): Promise<{
@@ -478,7 +477,7 @@ export default class AccountOperations {
       }
       // console.log({ inputs, outputs });
       const txb: bitcoinJS.TransactionBuilder = new bitcoinJS.TransactionBuilder(
-        network,
+        account.network,
       )
 
       for ( const input of inputs ) {
@@ -489,7 +488,7 @@ export default class AccountOperations {
         account.xpub,
         outputs,
         account.nextFreeChangeAddressIndex,
-        network
+        account.network
       )
 
       for ( const output of sortedOuts ) {
@@ -508,7 +507,6 @@ export default class AccountOperations {
     account: Account | MultiSigAccount,
     inputs: any,
     txb: bitcoinJS.TransactionBuilder,
-    network: bitcoinJS.networks.Network,
     witnessScript?: any,
   ): {
     signedTxb: bitcoinJS.TransactionBuilder;
@@ -533,7 +531,7 @@ export default class AccountOperations {
             input.address,
           )
 
-          keyPair = bip32.fromBase58( primaryPriv, network )
+          keyPair = bip32.fromBase58( primaryPriv, account.network )
           redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
           witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
           childIndexArray.push( {
@@ -551,14 +549,14 @@ export default class AccountOperations {
             account.xpub,
             account.nextFreeAddressIndex,
             account.nextFreeChangeAddressIndex,
-            network
+            account.network
           )
 
           keyPair = AccountUtilities.getKeyPair(
             privateKey,
-            network
+            account.network
           )
-          redeemScript = AccountUtilities.getP2SH( keyPair, network ).redeem.output
+          redeemScript = AccountUtilities.getP2SH( keyPair, account.network ).redeem.output
         }
 
         txb.sign(
@@ -577,6 +575,45 @@ export default class AccountOperations {
       }
     } catch ( err ) {
       throw new Error( `Transaction signing failed: ${err.message}` )
+    }
+  };
+
+  static multiSignTransaction = (
+    account: MultiSigAccount,
+    inputs: any,
+    txb: bitcoinJS.TransactionBuilder,
+  ): {
+    signedTxb: bitcoinJS.TransactionBuilder;
+  } => {
+    let vin = 0
+
+    if( !account.xprivs.secondary ) throw new Error( 'Multi-sign transaction failed: secondary xpriv missing' )
+
+    inputs.forEach( ( input ) => {
+      const { multiSig, primaryPriv, secondaryPriv } = AccountUtilities.signingEssentialsForMultiSig(
+        account,
+        input.address,
+      )
+
+      for( const priv of [ primaryPriv, secondaryPriv ] ){
+        const keyPair = bip32.fromBase58( priv, account.network )
+        const redeemScript = Buffer.from( multiSig.scripts.redeem, 'hex' )
+        const witnessScript = Buffer.from( multiSig.scripts.witness, 'hex' )
+
+        txb.sign(
+          vin,
+          keyPair,
+          redeemScript,
+          null,
+          input.value,
+          witnessScript,
+        )
+      }
+      vin += 1
+    } )
+
+    return {
+      signedTxb: txb
     }
   };
 
@@ -652,27 +689,14 @@ export default class AccountOperations {
     customTxPrerequisites?: TransactionPrerequisiteElements,
     nSequence?: number,
   ): Promise<
-     | {
+     {
       txid: string;
-     }
-     | {
-      txHex: string;
-      childIndexArray: Array<{
-        childIndex: number;
-        inputIdentifier: {
-          txId: string;
-          vout: number;
-        };
-        internal: boolean
-      }>;
-      inputs: InputUTXOs[],
      }
   > => {
     const { txb } = await AccountOperations.createTransaction(
       account,
       txPrerequisites,
       txnPriority,
-      network,
       customTxPrerequisites,
       nSequence,
     )
@@ -682,24 +706,36 @@ export default class AccountOperations {
     else inputs = txPrerequisites[ txnPriority ].inputs
 
 
-    const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb, network )
+    const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb )
     let txHex
     if( ( account as MultiSigAccount ).is2FA ){
-      const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
-      const { signedTxHex } =  await AccountUtilities.getSecondSignature(
-        account.walletId,
-        token,
-        partiallySignedTxHex,
-        childIndexArray,
-      )
-      txHex = signedTxHex
+
+      if( token ){
+        const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
+        const { signedTxHex } =  await AccountUtilities.getSecondSignature(
+          account.walletId,
+          token,
+          partiallySignedTxHex,
+          childIndexArray,
+        )
+        txHex = signedTxHex
+      } else if( ( account as MultiSigAccount ).xprivs.secondary ){
+        const { signedTxb } = AccountOperations.multiSignTransaction(
+          ( account as MultiSigAccount ),
+          inputs,
+          txb,
+        )
+        txHex = signedTxb.build().toHex()
+        // TODO: remove secondary-xpriv via saga (X AccountUtilities.removeSecondaryXpriv())
+      } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
+
     } else {
       txHex = signedTxb.build().toHex()
     }
 
     const { txid } = await AccountUtilities.broadcastTransaction( txHex, network )
     if( txid ) AccountOperations.removeConsumedUTXOs( account, inputs )  // chip consumed utxos
-    else throw new Error( 'Failed to broadcast transaction, txid missing.' )
+    else throw new Error( 'Failed to broadcast transaction, txid missing' )
     return {
       txid
     }
