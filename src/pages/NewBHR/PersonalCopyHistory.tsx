@@ -56,6 +56,7 @@ import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../stor
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -67,6 +68,7 @@ const PersonalCopyHistory = ( props ) => {
   const storagePermissionBottomSheet = useRef<BottomSheet>()
   const [ hasStoragePermission, setHasStoragePermission ] = useState( false )
 
+  const [ storagePermissionModal, setStoragePermissionModal ] = useState( false )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
@@ -148,12 +150,13 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=>  {
     if( Platform.OS === 'ios' ) {
-      ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+      // ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+      setStoragePermissionModal( false )
       setHasStoragePermission( true )
     } else {
       hasStoragePermission
-        ? ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
-        : ( storagePermissionBottomSheet as any ).current.snapTo( 1 )
+        ? setStoragePermissionModal( false )
+        : setStoragePermissionModal( true )
     }
     if( hasStoragePermission ){
       generatePDF()
@@ -355,13 +358,15 @@ const PersonalCopyHistory = ( props ) => {
         setErrorMessage(
           'Cannot access files and storage. Permission denied.\nYou can enable files and storage from the phone settings page \n\n Settings > Hexa > Storage',
         )
-        setHasStoragePermission( false );
-        ( storagePermissionBottomSheet as any ).current.snapTo( 0 );
+        setHasStoragePermission( false )
+        // ( storagePermissionBottomSheet as any ).current.snapTo( 0 );
+        setStoragePermissionModal( false );
         ( ErrorBottomSheet as any ).current.snapTo( 1 )
         return
       }
       else {
-        ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+        // ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
+        setStoragePermissionModal( false )
         setHasStoragePermission( true )
       }
     }
@@ -487,16 +492,6 @@ const PersonalCopyHistory = ( props ) => {
       dispatch( getPDFData( selectedKeeper.shareId, Contact, channelKey, isChange ) )
     }
   }, [ Contact, trustedContacts ] )
-
-  const renderStoragePermissionModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( storagePermissionBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
 
   const onPressChangeKeeperType = ( type, name ) => {
     let levelhealth: LevelHealthInterface[] = []
@@ -787,7 +782,10 @@ const PersonalCopyHistory = ( props ) => {
           />
         )}
       />
-      <BottomSheet
+      <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
+        {renderStoragePermissionModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={storagePermissionBottomSheet as any}
         snapPoints={[
@@ -796,7 +794,7 @@ const PersonalCopyHistory = ( props ) => {
         ]}
         renderContent={renderStoragePermissionModalContent}
         renderHeader={renderStoragePermissionModalHeader}
-      />
+      /> */}
     </View>
   )
 }
