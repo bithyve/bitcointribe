@@ -327,7 +327,7 @@ const PersonalCopyHistory = ( props ) => {
     return (
       <ErrorModalContents
         modalRef={storagePermissionBottomSheet}
-        title={'Why do we need access to your files and storage?..'}
+        title={'Why do we need access to your files and storage?'}
         info={'File and Storage access will let Hexa save a pdf with your Recovery Keys. This will also let Hexa attach the pdf to emails, messages and to print in case you want to.\n\n'}
         otherText={'Don’t worry these are only sent to the email address you choose, in the next steps you will be able to choose how the pdf is shared.'}
         proceedButtonText={'Continue'}

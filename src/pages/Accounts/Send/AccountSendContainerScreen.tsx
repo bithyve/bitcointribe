@@ -162,13 +162,10 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [] )
 
   const toggleKnowMoreSheet = () => {
-    console.log( '<<<<<<>>>>>>' )
     showKnowMoreBottomSheet()
     const shouldShow = !isShowingKnowMoreSheet
     setIsShowingKnowMoreSheet( shouldShow )
     if ( shouldShow ) {
-      console.log( 'alaaal' )
-
       showKnowMoreBottomSheet()
     }
   }

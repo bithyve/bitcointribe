@@ -72,7 +72,7 @@ export default function Login( props ) {
       }}>
         <View style={{
         }}>
-          <Text style={styles.headerTitleText}>Welcome back....</Text>
+          <Text style={styles.headerTitleText}>Welcome back</Text>
           <View>
             <Text style={styles.headerInfoText}>
               Please enter your{' '}

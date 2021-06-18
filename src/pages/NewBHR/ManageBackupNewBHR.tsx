@@ -101,7 +101,6 @@ interface ManageBackupNewBHRStateTypes {
   selectedKeeperType: string;
   selectedKeeperName: string;
   isEnabled: boolean;
-  contactsKeptByUser: ContactRecipientDescribing[];
   errorTitle: string;
   errorInfo: string;
   refreshControlLoader: boolean;
@@ -111,7 +110,6 @@ interface ManageBackupNewBHRStateTypes {
   keeping: any[];
   listModal: boolean;
   errorModal: boolean;
-  showIndicator: boolean
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -212,7 +210,6 @@ class ManageBackupNewBHR extends Component<
       selectedKeeperType: '',
       selectedKeeperName: '',
       isEnabled: false,
-      contactsKeptByUser: idx( props, ( _ ) => _.addressBookData.contactsKeptByUser ) || [],
       errorTitle: '',
       errorInfo: '',
       refreshControlLoader: false,
@@ -222,7 +219,6 @@ class ManageBackupNewBHR extends Component<
       keeping: [],
       listModal: false,
       errorModal: false,
-      showIndicator: false,
     }
   }
 
@@ -247,10 +243,6 @@ class ManageBackupNewBHR extends Component<
       // }
       } )
       this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
-        this.setState( {
-          showIndicator: true
-        } )
-
         this.updateAddressBook( )
       } )
     } )
@@ -280,7 +272,6 @@ class ManageBackupNewBHR extends Component<
 
     this.setState( {
       keeping,
-      showIndicator: false
     }
     )
   };
@@ -498,13 +489,6 @@ class ManageBackupNewBHR extends Component<
       this.setState( {
         listModal: true
       } )
-      // <<<<<<< HEAD
-      //       // ( this.keeperTypeBottomSheet as any ).snapTo( 1 )
-      //       this.setState( {
-      //         listModal: true
-      //       } )
-      // =======
-      // >>>>>>> feature/2.0
       this.goToHistory( this.props.navigationObj )
     }
 
@@ -808,13 +792,11 @@ class ManageBackupNewBHR extends Component<
       refreshControlLoader,
       selectedKeeper,
       isEnabled,
-      contactsKeptByUser,
       keeping,
       selectedKeeperName,
       selectedKeeperType,
       listModal,
       errorModal,
-      showIndicator
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -836,11 +818,6 @@ class ManageBackupNewBHR extends Component<
           <HeaderComponent />
         </Suspense> */}
         <Header />
-        {showIndicator &&
-            <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
-              <ActivityIndicator color={Colors.white} size='large'/>
-            </ModalContainer>
-        }
         <View style={styles.accountCardsSectionContainer}>
           {/* <View style={{
         flex: 1, backgroundColor: 'white'
@@ -1070,7 +1047,6 @@ Wallet Backup
                 />
               </View>
             </View>
-            {/* {contactsKeptByUser.length > 0 && */}
             <View style={{
               marginTop: wp( '5%' ), backgroundColor: Colors.white, height: '100%',
               borderTopLeftRadius: wp( 4 ),

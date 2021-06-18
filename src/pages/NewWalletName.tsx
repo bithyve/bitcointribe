@@ -115,27 +115,6 @@ export default function NewWalletName( props ) {
     }
   }
 
-  const getBottomSheetSnapPoints = (): any[] => {
-    switch ( currentBottomSheetKind ) {
-        case BottomSheetKind.CLOUD_PERMISSION:
-          return [
-            -50,
-            hp(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
-            ),
-          ]
-
-        default:
-          return defaultBottomSheetConfigs.snapPoints
-    }
-  }
-
-  const handleBottomSheetPositionChange = ( newIndex: number ) => {
-    if ( newIndex === 0 ) {
-      onBottomSheetClosed()
-    }
-  }
-
   const onBottomSheetClosed =()=> {
     setBottomSheetState( BottomSheetState.Closed )
     setCurrentBottomSheetKind( null )
@@ -271,20 +250,6 @@ export default function NewWalletName( props ) {
       <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
       </ModalContainer>
-
-      {/* {currentBottomSheetKind != null && (
-        <BottomSheet
-          ref={bottomSheetRef}
-          snapPoints={getBottomSheetSnapPoints()}
-          initialSnapIndex={-1}
-          animationDuration={defaultBottomSheetConfigs.animationDuration}
-          animationEasing={Easing.out( Easing.back( 1 ) )}
-          handleComponent={defaultBottomSheetConfigs.handleComponent}
-          onChange={handleBottomSheetPositionChange}
-        >
-          <BottomSheetView>{renderBottomSheetContent()}</BottomSheetView>
-        </BottomSheet>
-      )} */}
     </SafeAreaView>
   )
 }

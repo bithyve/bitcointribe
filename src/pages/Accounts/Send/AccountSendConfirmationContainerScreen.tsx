@@ -80,7 +80,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     return(
       <SendConfirmationContent
         title={'Sent Successfully'}
-        info={'Transaction(s) successfully submitted ...'}
+        info={'Transaction(s) successfully submitted'}
         infoText={'t-sats successfully sent from your account'}
         recipients={sendingState.selectedRecipients}
         isFromContact={false}

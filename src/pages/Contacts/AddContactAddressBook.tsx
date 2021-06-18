@@ -75,33 +75,33 @@ export default function AddContactAddressBook( props ) {
   }
 
   useEffect( () => {
-    // if( props.isLoadContacts ){
-    getContactsAsync()
-    // }
+    if( props.isLoadContacts ){
+      getContactsAsync()
+    }
   }, [] )
 
 
   const getContact = () => {
-    // if ( props.isLoadContacts ) {
-    ExpoContacts.getContactsAsync().then( async ( { data } ) => {
-      if ( !data.length ) {
-        setErrorMessage(
-          'No contacts found. Please add contacts to your Address Book and try again',
-        )
-        setErrModal( true )
-      }
-      setContactData( data )
-      await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
-      const contactList = data.sort( function ( a, b ) {
-        if ( a.name && b.name ) {
-          if ( a.name.toLowerCase() < b.name.toLowerCase() ) return -1
-          if ( a.name.toLowerCase() > b.name.toLowerCase() ) return 1
+    if ( props.isLoadContacts ) {
+      ExpoContacts.getContactsAsync().then( async ( { data } ) => {
+        if ( !data.length ) {
+          setErrorMessage(
+            'No contacts found. Please add contacts to your Address Book and try again',
+          )
+          setErrModal( true )
         }
-        return 0
+        setContactData( data )
+        await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
+        const contactList = data.sort( function ( a, b ) {
+          if ( a.name && b.name ) {
+            if ( a.name.toLowerCase() < b.name.toLowerCase() ) return -1
+            if ( a.name.toLowerCase() > b.name.toLowerCase() ) return 1
+          }
+          return 0
+        } )
+        setFilterContactData( contactList )
       } )
-      setFilterContactData( contactList )
-    } )
-    // }
+    }
   }
 
   const getContactPermission = async () => {
@@ -123,7 +123,6 @@ export default function AddContactAddressBook( props ) {
         getContact()
       }
     } else if ( Platform.OS === 'ios' ) {
-      console.log( 'getContactPermission >>>' )
       const { status, expires, permissions } = await Permissions.askAsync(
         Permissions.CONTACTS,
       )
@@ -279,7 +278,6 @@ export default function AddContactAddressBook( props ) {
 
 
   const renderContactPermissionModalContent = useCallback( () => {
-    console.log( ' <<<<<<<< renderContactPermissionModalContent >>>>>>.',  permissionModal )
 
     return (
       <ErrorModalContents

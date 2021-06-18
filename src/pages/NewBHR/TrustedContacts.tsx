@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { View, Text, SafeAreaView, StatusBar } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import { useSelector } from 'react-redux'
 import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
 import Colors from '../../common/Colors'
@@ -13,13 +12,9 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { v4 as uuid } from 'uuid'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 
 const TrustedContacts = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
-  )
   const selectedContactsList = useCallback( ( list ) => {
     if ( list.length > 0 ) setContacts( [ ...list ] )
   }, [] )

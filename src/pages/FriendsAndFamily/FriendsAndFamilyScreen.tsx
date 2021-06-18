@@ -219,7 +219,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       }
     }
 
-    // console.log( '666666666' )
     this.setState( {
       keepers,
       keeping,
@@ -227,7 +226,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       showIndicator: false
     }
     )
-    // console.log( '7777777777' )
     // } )
   };
 

@@ -55,7 +55,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ keeperTypeBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ ApprovePrimaryKeeperBottomSheet ] = useState( React.createRef<BottomSheet>() )
-  const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  // const [ ReshareBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ reshareModal, setReshareModal ] = useState( false )
   const [ ChangeBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ secondaryDeviceBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ secondaryDeviceMessageBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -406,43 +407,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     )
   }
 
-  const renderReshareContent = useCallback( () => {
-    return (
-      <ErrorModalContents
-        modalRef={ReshareBottomSheet}
-        title={'Reshare with the same device?'}
-        info={
-          'Proceed if you want to reshare the link/ QR with the same device'
-        }
-        note={
-          'For a different device, please go back and choose ‘Change device'
-        }
-        proceedButtonText={'Reshare'}
-        cancelButtonText={'Back'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          ( ReshareBottomSheet as any ).current.snapTo( 0 )
-
-          if ( blockReshare ) {
-            ( QrBottomSheet.current as any ).snapTo( 1 )
-          } else {
-            ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
-            createGuardian()
-          }
-        }}
-        onPressIgnore={() => {
-          ( ReshareBottomSheet as any ).current.snapTo( 0 )
-        }}
-        isBottomImage={false}
-      />
-    )
-  }, [] )
-
-  const renderReshareHeader = useCallback( () => {
-    return (
-      <ModalHeader />
-    )
-  }, [] )
 
   const renderChangeContent = useCallback( () => {
     return (
@@ -622,7 +586,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
             ( secondaryDeviceBottomSheet as any ).current.snapTo( 1 )
             createGuardian()
           }}
-          reshareButtonText={'Reshare..'}
+          reshareButtonText={'Reshare'}
           onPressReshare={async () => {
             // ( ReshareBottomSheet as any ).current.snapTo( 1 )
             setReshareModal( true )
@@ -709,20 +673,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
       />
-      {/* <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ReshareBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '37%' ) : hp( '45%' ),
-        ]}
-        renderContent={renderReshareContent}
-        renderHeader={renderReshareHeader}
-      /> */}
       <ModalContainer visible={reshareModal} closeBottomSheet={() => setReshareModal( false )}>
         <ErrorModalContents
-          modalRef={ReshareBottomSheet}
+          // modalRef={ReshareBottomSheet}
           title={'Reshare with the same device?'}
           info={
             'Proceed if you want to reshare the link/ QR with the same device'

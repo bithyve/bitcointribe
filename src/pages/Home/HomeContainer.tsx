@@ -10,11 +10,8 @@ import {
   Alert,
   TouchableOpacity,
   AppState,
-  InteractionManager,
   Image,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,
   widthPercentageToDP,
@@ -22,7 +19,6 @@ import {
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
 import {
   widthPercentageToDP as wp,
@@ -74,14 +70,9 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import config from '../../bitcoin/HexaConfig'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
 import { v4 as uuid } from 'uuid'
-import CustomBottomTabs, {
-  BottomTab,
-  TAB_BAR_HEIGHT,
-} from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
   autoSyncShells,
@@ -345,12 +336,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   navigateToAddNewAccountScreen = () => {
     this.props.navigation.navigate( 'AddNewAccount' )
-  };
-
-  navigateToQRScreen = () => {
-    this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned: this.processQRData,
-    } )
   };
 
   onPressNotifications = async () => {

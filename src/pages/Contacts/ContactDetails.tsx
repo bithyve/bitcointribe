@@ -713,7 +713,7 @@ class ContactDetails extends PureComponent<
           // } )
           // this.props.navigation.navigate( 'RequestKeyFromContact' )
           this.props.navigation.navigate( 'AddContactSendRequest', {
-            SelectedContact: [ this.Contact ],
+            SelectedContact: [ this.contact ],
           } )
         }}
         onPressIgnore={() => {
@@ -723,15 +723,6 @@ class ContactDetails extends PureComponent<
           } )
         }}
         isBottomImage={false}
-      />
-    )
-  };
-  renderReshareHeader = () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (this.ReshareBottomSheet as any).current.snapTo(0);
-      // }}
       />
     )
   };
@@ -1098,19 +1089,6 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderExitKeyQRContents}
           renderHeader={this.renderExitKeyQRHeader}
         />
-        {/* <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.ReshareBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '37%' )
-              : hp( '45%' ),
-          ]}
-          renderContent={this.renderReshareContent}
-          renderHeader={this.renderReshareHeader}
-        /> */}
         <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
         } )}>
