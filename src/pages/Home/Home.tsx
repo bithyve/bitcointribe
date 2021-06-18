@@ -53,7 +53,8 @@ import {
   setupNotificationList,
   updateNotificationList,
   updateMessageStatusInApp,
-  updateMessageStatus
+  updateMessageStatus,
+  getMessages,
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -280,6 +281,7 @@ interface HomePropsTypes {
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
   initLoader: boolean;
+  getMessages: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -657,6 +659,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       onNotification: ( notification ) => {
+        this.props.getMessages()
         const { content } = notification.data
         const notificationId = JSON.parse( content ).notificationId
         this.currentNotificationId = notificationId
@@ -924,6 +927,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.secondaryDeviceAddressValue
     ) {
       this.setSecondaryDeviceAddresses()
+    }
+    if (
+      prevProps.messages !==
+      this.props.messages
+    ) {
+      this.notificationCheck()
     }
 
   };
@@ -2006,7 +2015,8 @@ export default withNavigationFocus(
     updateNotificationList,
     setWalletId,
     updateMessageStatusInApp,
-    updateMessageStatus
+    updateMessageStatus,
+    getMessages
   } )( Home )
 )
 

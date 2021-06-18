@@ -117,7 +117,12 @@ export default function CustomPriorityContent( props ) {
           returnKeyLabel="Done"
           returnKeyType="done"
           keyboardType={'numeric'}
-          onChangeText={( value ) => onCustomFeeChange( value )}
+          onChangeText={( value ) => {
+            const regEx = /^[0-9]+$/
+            if( regEx.test( value ) ) {
+              onCustomFeeChange( value )
+            }
+          }}
           placeholderTextColor={Colors.borderColor}
           autoCorrect={false}
           autoCompleteType="off"

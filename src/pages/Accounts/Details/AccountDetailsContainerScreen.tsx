@@ -389,22 +389,20 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <ScrollView style={styles.rootContainer}>
-      <SectionList
-        contentContainerStyle={styles.scrollViewContainer}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-        refreshControl={
-          <RefreshControl
-            onRefresh={performRefreshOnPullDown}
-            refreshing={isRefreshing}
-          />
-        }
-        sections={sections}
-        stickySectionHeadersEnabled={false}
-        keyExtractor={sectionListItemKeyExtractor}
-      />
-    </ScrollView>
+    <SectionList
+      contentContainerStyle={styles.scrollViewContainer}
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled
+      refreshControl={
+        <RefreshControl
+          onRefresh={performRefreshOnPullDown}
+          refreshing={isRefreshing}
+        />
+      }
+      sections={sections}
+      stickySectionHeadersEnabled={false}
+      keyExtractor={sectionListItemKeyExtractor}
+    />
   )
 }
 
