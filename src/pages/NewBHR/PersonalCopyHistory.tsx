@@ -62,11 +62,16 @@ import { getIndex } from '../../common/utilities'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
-  const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
+  // const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
+
+  const [ errorModal, setErrorModal ] = useState( false )
+
   const [ HelpBottomSheet, setHelpBottomSheet ] = useState( React.createRef() )
   const [ keeperTypeBottomSheet, setkeeperTypeBottomSheet ] = useState(
     React.createRef()
   )
+
+  const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const storagePermissionBottomSheet = useRef<BottomSheet>()
   const [ hasStoragePermission, setHasStoragePermission ] = useState( false )
 
@@ -76,14 +81,19 @@ const PersonalCopyHistory = ( props ) => {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ QrBottomSheet, setQrBottomSheet ] = useState( React.useRef() )
+
+  const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ blockReshare, setBlockReshare ] = useState( '' )
-  const [ ApprovePrimaryKeeperBottomSheet, setApprovePrimaryKeeperBottomSheet ] = useState( React.createRef() )
+  const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
+
   const [ personalCopyHistory, setPersonalCopyHistory ] = useState( historyArray )
-  const [
-    PersonalCopyShareBottomSheet,
-    setPersonalCopyShareBottomSheet,
-  ] = useState( React.createRef() )
+  // const [
+  //   PersonalCopyShareBottomSheet,
+  //   setPersonalCopyShareBottomSheet,
+  // ] = useState( React.createRef() )
+
+  const [ personalCopyShareModal, setPersonalCopyShareModal ] = useState( false )
   const selectedPersonalCopy = props.navigation.getParam(
     'selectedPersonalCopy'
   )
@@ -229,7 +239,8 @@ const PersonalCopyHistory = ( props ) => {
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
-        ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+        // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+        setPersonalCopyShareModal( true )
       }
     }
   }, [ pdfCreatedSuccessfully ] )
@@ -249,28 +260,19 @@ const PersonalCopyHistory = ( props ) => {
   const renderErrorModalContent = useCallback( () => {
     return (
       <ErrorModalContents
-        modalRef={ErrorBottomSheet}
+        // modalRef={ErrorBottomSheet}
         title={errorMessageHeader}
         info={errorMessage}
         proceedButtonText={'Try again'}
         onPressProceed={() => {
-          ( ErrorBottomSheet as any ).current.snapTo( 0 )
+          // ( ErrorBottomSheet as any ).current.snapTo( 0 )
+          setErrorModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/errorImage.png' )}
       />
     )
   }, [ errorMessage, errorMessageHeader ] )
-
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (ErrorBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
 
   const renderPersonalCopyShareModalContent = useCallback( () => {
     return (
@@ -279,7 +281,8 @@ const PersonalCopyHistory = ( props ) => {
         selectedPersonalCopy={selectedPersonalCopy}
         personalCopyDetails={personalCopyDetails}
         onPressBack={() => {
-          ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          setPersonalCopyShareModal( false )
         }}
         onPressShare={() => {
           const shareObj = {
@@ -294,8 +297,9 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressConfirm={() => {
           try {
-            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) );
-            ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+            dispatch( keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS ) )
+            // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+            setPersonalCopyShareModal( false )
             if (
               props.navigation.getParam( 'prevKeeperType' ) &&
               props.navigation.getParam( 'isChange' ) &&
@@ -318,16 +322,6 @@ const PersonalCopyHistory = ( props ) => {
       />
     )
   }, [ selectedPersonalCopy, personalCopyDetails ] )
-
-  const renderPersonalCopyShareModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
 
   const renderHelpHeader = () => {
     return (
@@ -363,8 +357,9 @@ const PersonalCopyHistory = ( props ) => {
         )
         setHasStoragePermission( false )
         // ( storagePermissionBottomSheet as any ).current.snapTo( 0 );
-        setStoragePermissionModal( false );
-        ( ErrorBottomSheet as any ).current.snapTo( 1 )
+        setStoragePermissionModal( false )
+        // ( ErrorBottomSheet as any ).current.snapTo( 1 )
+        setErrorModal( true )
         return
       }
       else {
@@ -515,14 +510,17 @@ const PersonalCopyHistory = ( props ) => {
       } )
     }
     if ( type == 'pdf' ) {
-      ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+      setPersonalCopyShareModal( true )
     }
   }
   const sendApprovalRequestToPK = ( ) => {
     setQrBottomSheetsFlag( true )
-    setIsConfirm( false );
-    ( QrBottomSheet as any ).current.snapTo( 1 );
-    ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+    setIsConfirm( false )
+    // ( QrBottomSheet as any ).current.snapTo( 1 )
+    setQRModal( true )
+    // ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+    setKeeperTypeModal( false )
   }
 
   const renderQrContent = () => {
@@ -539,8 +537,9 @@ const PersonalCopyHistory = ( props ) => {
         onQrScan={async( qrScannedData ) => {
           if( isConfirm ){
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-            setQrBottomSheetsFlag( false );
-            ( QrBottomSheet as any ).current.snapTo( 0 )
+            setQrBottomSheetsFlag( false )
+            // ( QrBottomSheet as any ).current.snapTo( 0 )
+            setQRModal( false )
             const popAction = StackActions.pop( {
               n: isChange ? 2 : 1
             } )
@@ -553,7 +552,8 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
-          if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
+          // if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
+          setQRModal( false )
         }}
         onPressContinue={async() => {
           if( isConfirm ){
@@ -571,21 +571,13 @@ const PersonalCopyHistory = ( props ) => {
     )
   }
 
-  const renderQrHeader = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }
 
   useEffect( ()=>{
     if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
-      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-      ( QrBottomSheet as any ).current.snapTo( 0 )
+      // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
+      setApprovePrimaryKeeperModal( true )
+      // ( QrBottomSheet as any ).current.snapTo( 0 )
+      setQRModal( false )
     }
   }, [ approvalStatus ] )
 
@@ -632,46 +624,34 @@ const PersonalCopyHistory = ( props ) => {
           data={sortedHistory( personalCopyHistory )}
           confirmDisable={confirmDisable}
           onConfirm={ isReshare && ( selectedKeeper.status == 'notSetup' || selectedKeeper.status == 'notAccessible' ) ? ()=>{
-            setIsConfirm( true );
-            ( QrBottomSheet as any ).current.snapTo( 1 )
+            setIsConfirm( true )
+            // ( QrBottomSheet as any ).current.snapTo( 1 )
+            setQRModal( true )
           } : null}
           confirmButtonText={'Share Now'}
           onPressConfirm={() => {
-            ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            setPersonalCopyShareModal( true )
           }}
           reshareButtonText={'Reshare'}
           onPressReshare={async () => {
-            console.log(
-              'onPressReshare PersonalCopyShareBottomSheet',
-              PersonalCopyShareBottomSheet
-            );
-            ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            setPersonalCopyShareModal( true )
           }}
           isChangeKeeperAllow={isChangeKeeperAllow}
           changeButtonText={'Change'}
           onPressChange={() => {
-            ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            // ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            setKeeperTypeModal( true )
           }}
         />
       </View>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={PersonalCopyShareBottomSheet as any}
-        snapPoints={[ -50, hp( '85%' ) ]}
-        renderContent={renderPersonalCopyShareModalContent}
-        renderHeader={renderPersonalCopyShareModalHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={ErrorBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '35%' ) : hp( '40%' ),
-        ]}
-        renderContent={renderErrorModalContent}
-        renderHeader={renderErrorModalHeader}
-      />
+      <ModalContainer visible={personalCopyShareModal} closeBottomSheet={() => {}} >
+        {renderPersonalCopyShareModalContent()}
+      </ModalContainer>
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+        {renderErrorModalContent()}
+      </ModalContainer>
 
       <BottomSheet
         enabledInnerScrolling={true}
@@ -683,79 +663,33 @@ const PersonalCopyHistory = ( props ) => {
         renderContent={renderHelpContent}
         renderHeader={renderHelpHeader}
       />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={keeperTypeBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '75%' ) : hp( '75%' ),
-        ]}
-        renderContent={() => (
-          <KeeperTypeModalContents
-            headerText={'Change backup method'}
-            subHeader={'Share your Recovery Key with a new contact or a different device'}
-            onPressSetup={async ( type, name ) => {
-              setSelectedKeeperType( type )
-              setSelectedKeeperName( name )
-              sendApprovalRequestToPK( )
-            }}
-            onPressBack={() => ( keeperTypeBottomSheet as any ).current.snapTo( 0 )}
-            selectedLevelId={selectedLevelId}
-            keeper={selectedKeeper}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() =>
-              ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
-            }
-          />
-        )}
-      />
-      <BottomSheet
-        onOpenEnd={() => {
-          setQrBottomSheetsFlag( true )
-        }}
-        onCloseEnd={() => {
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-        }}
-        onCloseStart={() => { }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={QrBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '92%' ) : hp( '91%' ),
-        ]}
-        renderContent={renderQrContent}
-        renderHeader={renderQrHeader}
-      />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            isContinueDisabled={false}
-            onPressContinue={() => {
-              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => {
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-      />
+      <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}} >
+        <KeeperTypeModalContents
+          headerText={'Change backup method'}
+          subHeader={'Share your Recovery Key with a new contact or a different device'}
+          onPressSetup={async ( type, name ) => {
+            setSelectedKeeperType( type )
+            setSelectedKeeperName( name )
+            sendApprovalRequestToPK( )
+          }}
+          onPressBack={() => setKeeperTypeModal( false )}
+          selectedLevelId={selectedLevelId}
+          keeper={selectedKeeper}
+        />
+      </ModalContainer>
+      <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
+        {renderQrContent()}
+      </ModalContainer>
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+        <ApproveSetup
+          isContinueDisabled={false}
+          onPressContinue={() => {
+            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
+            // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
+            setApprovePrimaryKeeperModal( false )
+          }}
+        />
+      </ModalContainer>
       <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>
