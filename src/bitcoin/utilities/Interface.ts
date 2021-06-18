@@ -752,34 +752,34 @@ export interface UTXO {
 }
 
 export interface Account {
-  id: string,
-  walletId: string,
-  network: networks.Network,
-  xpub: string | null, // null for multi-sig accounts
-  accountName: string,
-  accountDescription: string,
-  activeAddresses: string[],
-  receivingAddress: string,
-  nextFreeAddressIndex: number;
-  nextFreeChangeAddressIndex: number;
-  confirmedUTXOs: UTXO[];
-  unconfirmedUTXOs: UTXO[];
-  balances: Balances;
-  transactions: Transaction[];
-  lastSynched: number;
-  newTransactions?: Transaction[];
-  txIdMap?: {[txid: string]: string[]};
-  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
+  id: string,                           // account identifier(derived from xpub)
+  walletId: string,                     // wallet's id
+  network: networks.Network,            // testnet/mainnet
+  xpub: string | null,                  // account's xpub (null for multi-sig accounts)
+  accountName: string,                  // name of the account
+  accountDescription: string,           // description of the account
+  activeAddresses: string[],            // addresses used(to be synched during soft refresh)
+  receivingAddress: string,             // current external address
+  nextFreeAddressIndex: number;         // external-chain free address marker
+  nextFreeChangeAddressIndex: number;   // internal-chain free address marker
+  confirmedUTXOs: UTXO[];               // utxo set available for use
+  unconfirmedUTXOs: UTXO[];             // utxos to arrive
+  balances: Balances;                   // confirmed/unconfirmed balances
+  transactions: Transaction[];          // transactions belonging to this account
+  lastSynched: number;                  // account's last sync timestamp
+  newTransactions?: Transaction[];      // new transactions arrived during the current sync
+  txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
 }
 
 export interface MultiSigAccount extends Account {
-  is2FA: boolean,
-  xpubs: {
+  is2FA: boolean,                       // is2FA enabled
+  xpubs: {                              // xpub set for multi-sig
     primary: string,
     secondary: string,
     bithyve: string,
   }
-  xprivs: {
+  xprivs: {                             // xpirv set for multi-sig
     primary: string,
     secondary?: string,
   }
