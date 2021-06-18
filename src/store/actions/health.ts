@@ -8,7 +8,6 @@ export const HEALTH_CHECK_INITIALIZED_KEEPER = 'HEALTH_CHECK_INITIALIZED_KEEPER'
 export const HEALTH_CHECK_INITIALIZE = 'HEALTH_CHECK_INITIALIZE'
 export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK'
 export const S3_LOADING_STATUS = 'S3_LOADING_STATUS'
-export const INIT_LOADING_STATUS = 'INIT_LOADING_STATUS'
 export const PREPARE_MSHARES = 'PREPARE_MSHARES'
 export const UPDATE_HEALTH = 'UPDATE_HEALTH'
 export const GET_HEALTH_OBJECT = 'GET_HEALTH_OBJECT'
@@ -67,6 +66,9 @@ export const CREATE_CHANNEL_ASSETS = 'CREATE_CHANNEL_ASSETS'
 export const APPROVAL_STATUS = 'APPROVAL_STATUS'
 export const DOWNLOAD_SM_SHARE = 'DOWNLOAD_SM_SHARE'
 export const CREATE_OR_CHANGE_GUARDIAN = 'CREATE_OR_CHANGE_GUARDIAN'
+export const DOWNLOADED_BACKUP_DATA = 'DOWNLOADED_BACKUP_DATA'
+export const DOWNLOAD_BACKUP_DATA = 'DOWNLOAD_BACKUP_DATA'
+export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -128,14 +130,6 @@ export const walletRecoveryFailed = ( isFailed ) => {
   return {
     type: WALLET_RECOVERY_FAILED_HEALTH, payload: {
       isFailed
-    }
-  }
-}
-
-export const initLoader = ( beingLoaded ) => {
-  return {
-    type: INIT_LOADING_STATUS, payload: {
-      beingLoaded
     }
   }
 }
@@ -582,6 +576,30 @@ export const createOrChangeGuardian = ( channelKey, shareId, contact, index, isC
   return {
     type: CREATE_OR_CHANGE_GUARDIAN, payload: {
       channelKey, shareId, contact, index, isChange, oldChannelKey
+    }
+  }
+}
+
+export const setDownloadedBackupData = ( downloadedBackupData ) => {
+  return {
+    type: DOWNLOADED_BACKUP_DATA, payload: {
+      downloadedBackupData
+    }
+  }
+}
+
+export const downloadBackupData = ( scannedData ) => {
+  return {
+    type: DOWNLOAD_BACKUP_DATA, payload: {
+      scannedData
+    }
+  }
+}
+
+export const setupHealth = ( level ) => {
+  return {
+    type: SETUP_HEALTH_FOR_RESTORE, payload: {
+      level
     }
   }
 }

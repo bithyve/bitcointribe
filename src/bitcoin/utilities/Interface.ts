@@ -515,8 +515,8 @@ export interface SecondaryStreamData {
 }
 
 export interface BackupStreamData {
-  primaryMnemonicShard: any,
-  keeperInfo: any,
+  primaryMnemonicShard: MetaShare,
+  keeperInfo: KeeperInfoInterface[],
 }
 
 export interface UnecryptedStreamData {

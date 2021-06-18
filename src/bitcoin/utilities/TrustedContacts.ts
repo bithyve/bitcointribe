@@ -310,8 +310,10 @@ export default class TrustedContacts {
     secondaryData?: SecondaryStreamData,
   }> => {
     try {
-      const contact: TrustedContact = this.trustedContacts[ channelKey ]
-      const { permanentChannelAddress } = contact
+      const permanentChannelAddress = crypto
+        .createHash( 'sha256' )
+        .update( channelKey )
+        .digest( 'hex' )
       const streamId = TrustedContacts.getStreamId( walletId )
 
       const res: AxiosResponse = await BH_AXIOS.post( 'retrieveFromStream', {

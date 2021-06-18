@@ -59,13 +59,16 @@ import {
   secondaryShareDownloaded,
   downloadSMShare,
   CREATE_OR_CHANGE_GUARDIAN,
-  createChannelAssets
+  createChannelAssets,
+  setDownloadedBackupData,
+  DOWNLOAD_BACKUP_DATA,
+  SETUP_HEALTH_FOR_RESTORE,
+  setupHealth
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
 import {
   switchS3LoadingStatus,
-  initLoader,
   healthCheckInitialized,
   GENERATE_META_SHARE,
 } from '../actions/health'
@@ -89,6 +92,7 @@ import {
   MetaShare,
   PrimaryStreamData,
   QRCodeTypes,
+  SecondaryStreamData,
   StreamData,
   TrustedContact,
   TrustedContactRelationTypes,
@@ -127,7 +131,6 @@ function* initHealthWorker() {
 
   if ( levelHealth && levelHealth.length ) return
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
-  yield put( initLoader( true ) )
   const randomIdForSecurityQ = generateRandomString( 8 )
   const randomIdForCloud = generateRandomString( 8 )
   const levelInfo = [
@@ -627,38 +630,35 @@ export const downloadMetaShareHealthWatcher = createWatcher(
 
 function* recoverWalletWorker( { payload } ) {
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
-  const { keeperData, decryptedCloudDataJson } = payload
+  const { keeperData, decryptedCloudDataJson, level } = payload
   console.log( 'KEEPERDATA', keeperData )
   try {
-    const { WALLET_SETUP, DECENTRALIZED_BACKUP } = yield select(
+    const { WALLET_SETUP } = yield select(
       ( state ) => state.storage.database
     )
+    const downloadedBackupData: {
+      primaryData?: PrimaryStreamData;
+      backupData?: BackupStreamData;
+      secondaryData?: SecondaryStreamData;
+    }[] = yield select( ( state ) => state.health.downloadedBackupData )
 
     const { security } = WALLET_SETUP
-    const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
-    let encDynamicNonPMDD
     const mappedMetaShares: { [walletId: string]: MetaShare[] } = {
     }
-    Object.keys( RECOVERY_SHARES ).forEach( ( key ) => {
-      const { META_SHARE, ENC_DYNAMIC_NONPMDD } = RECOVERY_SHARES[ key ]
-      if ( META_SHARE ) {
-        // metaShares[key] = META_SHARE; //mapping metaShares according to their shareIndex so that they can be aptly used at ManageBackup
-        const shares = mappedMetaShares[ META_SHARE.meta.walletId ]
-          ? mappedMetaShares[ META_SHARE.meta.walletId ]
-          : []
-        let insert = true
-        shares.forEach( ( share ) => {
-          if ( share.shareId === META_SHARE.shareId ) insert = false
-        }, [] )
 
-        if ( insert ) {
-          shares.push( META_SHARE )
-          mappedMetaShares[ META_SHARE.meta.walletId ] = shares
-        }
+    const scheme = level == 2 ? '2of3' : '3of5'
+    for ( let i = 0; i < downloadedBackupData.length; i++ ) {
+      const element = downloadedBackupData[ i ]
+      const MetaShare = element.backupData.primaryMnemonicShard
+      const shares = mappedMetaShares[ MetaShare.meta.walletId ]
+        ? mappedMetaShares[ MetaShare.meta.walletId ]
+        : []
+      if( scheme == element.backupData.primaryMnemonicShard.meta.scheme ){
+        shares.push( MetaShare )
+        mappedMetaShares[ MetaShare.meta.walletId ] = shares
       }
-
-    } )
+    }
 
     console.log( {
       mappedMetaShares
@@ -677,7 +677,7 @@ function* recoverWalletWorker( { payload } ) {
     }
 
     const encryptedSecrets: string[] = restorationShares.map(
-      ( share ) => share.encryptedSecret
+      ( share ) => share.encryptedShare.pmShare
     )
 
     const res = yield call(
@@ -690,20 +690,7 @@ function* recoverWalletWorker( { payload } ) {
     if ( res.status === 200 ) {
       const { mnemonic } = res.data
       console.log( 'mnemonic', mnemonic )
-      // const {
-      //   regularAcc,
-      //   testAcc,
-      //   secureAcc,
-      //   s3Service,
-      //   trustedContacts,
-      //   keepersInfo,
-      // } = yield call(
-      //   serviceGenerator2,
-      //   security.answer,
-      //   mnemonic,
-      //   restorationShares,
-      //   decryptedCloudDataJson
-      // );
+
       const { s3Service, } = yield call(
         serviceGeneratorForNewBHR,
         mnemonic,
@@ -711,42 +698,7 @@ function* recoverWalletWorker( { payload } ) {
         decryptedCloudDataJson
       )
       console.log( 's3Service', s3Service )
-      // const UNDER_CUSTODY = {};
-      // let DYNAMIC_NONPMDD = {};
-      // if (encDynamicNonPMDD) {
-      //   // decentralized restoration of Wards
-      //   const res = s3Service.decryptDynamicNonPMDD(encDynamicNonPMDD);
 
-      //   if (res.status !== 200)
-      //     console.log("Failed to decrypt dynamic nonPMDD");
-      //   const dynamicNonPMDD = res.data.decryptedDynamicNonPMDD;
-      //   dynamicNonPMDD.META_SHARES.forEach((metaShare) => {
-      //     UNDER_CUSTODY[metaShare.meta.tag] = {
-      //       META_SHARE: metaShare,
-      //     };
-      //   });
-      //   DYNAMIC_NONPMDD = dynamicNonPMDD;
-      // }
-
-      // const DECENTRALIZED_BACKUP = {
-      //   RECOVERY_SHARES: {},
-      //   SHARES_TRANSFER_DETAILS: {},
-      //   UNDER_CUSTODY: {},
-      //   DYNAMIC_NONPMDD: {},
-      //   PK_SHARE: {},
-      // };
-      // console.log({ DECENTRALIZED_BACKUP });
-
-      // const SERVICES = {
-      //   REGULAR_ACCOUNT: JSON.stringify(regularAcc),
-      //   TEST_ACCOUNT: JSON.stringify(testAcc),
-      //   SECURE_ACCOUNT: JSON.stringify(secureAcc),
-      //   S3_SERVICE: JSON.stringify(s3Service),
-      //   TRUSTED_CONTACTS: JSON.stringify(trustedContacts),
-      // };
-      // const payload = { SERVICES, DECENTRALIZED_BACKUP };
-      // yield call(insertDBWorker, { payload });
-      //yield delay(2000); // seconds delay prior to Wallet Image check
       yield put( fetchWalletImage( s3Service ) )
 
       yield call(
@@ -764,7 +716,6 @@ function* recoverWalletWorker( { payload } ) {
         JSON.stringify( securityQuestionHistory )
       )
       yield put( putKeeperInfo( keeperData ) )
-      // yield put(updatedKeeperInfo(keeperData));
 
     } else {
       throw new Error( res.err )
@@ -774,7 +725,6 @@ function* recoverWalletWorker( { payload } ) {
       err: err.message
     } )
     yield put( walletRecoveryFailed( true ) )
-    // Alert.alert('Wallet recovery failed!', err.message);
   }
 
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
@@ -896,7 +846,7 @@ const asyncDataToBackup = async () => {
 
 function* updateWalletImageWorker() {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
-  console.log( 's3SERVICE', s3Service )
+
   let walletImage: WalletImage = {
   }
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
@@ -2209,4 +2159,168 @@ function* modifyLevelDataWorker( ) {
 export const modifyLevelDataWatcher = createWatcher(
   modifyLevelDataWorker,
   MODIFY_LEVELDATA
+)
+
+function* downloadBackupDataWorker( { payload } ) {
+  try {
+    const { walletId, scannedData } = payload
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const downloadedBackupData: {
+      primaryData?: PrimaryStreamData;
+      backupData?: BackupStreamData;
+      secondaryData?: SecondaryStreamData;
+    }[] = yield select( ( state ) => state.health.downloadedBackupData )
+    const qrDataObj = JSON.parse( scannedData )
+    yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
+    const res = yield call( trustedContacts.retrieveFromStream, {
+      walletId,
+      channelKey: qrDataObj.channelKey,
+      options: {
+        retrievePrimaryData: true,
+        retrieveBackupData: true,
+        retrieveSecondaryData: true,
+      },
+      secondaryChannelKey: qrDataObj.secondaryChannelKey
+    } )
+    console.log( 'res', res )
+    // if( res.data.secondaryData.secondaryMnemonicShard ) {
+    //   yield put( secondaryShareDownloaded( res.data.secondaryData.secondaryMnemonicShard ) )
+    //   yield put( setApprovalStatus( true ) )
+    // }
+    downloadedBackupData.push( res.data )
+    yield put( setDownloadedBackupData( downloadedBackupData ) )
+    yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
+    console.log( 'Error EF channel', error )
+  }
+}
+
+export const downloadBackupDataWatcher = createWatcher(
+  downloadBackupDataWorker,
+  DOWNLOAD_BACKUP_DATA
+)
+
+function* setupHealthWorker( { payload } ) {
+  const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+  const s3Service: S3Service = yield select( ( state ) => state.health.service )
+  console.log( 'setupHealthWorker s3Service', s3Service )
+  if ( levelHealth && levelHealth.length ) return
+  const downloadedBackupData: {
+    primaryData?: PrimaryStreamData;
+    backupData?: BackupStreamData;
+    secondaryData?: SecondaryStreamData;
+  }[] = yield select( ( state ) => state.health.downloadedBackupData )
+  const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+  const initLoader = yield select( ( state ) => state.health.loading.initLoader )
+  if( initLoader ) return
+  const { level }: { level: number } = payload
+  console.log( 'level', level )
+  yield put( switchS3LoaderKeeper( 'initLoader' ) )
+
+  const randomIdForSecurityQ = generateRandomString( 8 )
+  const randomIdForCloud = generateRandomString( 8 )
+  if( level == 1 ){
+    const levelInfo = [] = [
+      {
+        shareType: 'cloud',
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForCloud,
+        reshareVersion: 0,
+        name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
+      },
+      {
+        shareType: 'securityQuestion',
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
+        reshareVersion: 0,
+        name: 'Security Question',
+      }
+    ]
+    yield put( updateHealth( [ {
+      level: 1,
+      levelInfo: levelInfo,
+    } ], level ) )
+    console.log( 'setupHealthWorker levelInfo', levelInfo )
+  } else {
+    const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
+    let isLevelInitialized = yield select(
+      ( state ) => state.health.isLevel3Initialized
+    )
+    if ( level == 2 ) {
+      isLevelInitialized = yield select(
+        ( state ) => state.health.isLevel2Initialized
+      )
+    }
+    if ( !isLevelInitialized ) {
+      const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+      const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+      const s3Service: S3Service = yield select( ( state ) => state.health.service )
+      console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
+
+      const levelInfo: LevelInfo[] = [
+        {
+          shareType: 'cloud',
+          updatedAt: moment( new Date() ).valueOf(),
+          status: downloadedBackupData.find( value=>value.backupData.primaryMnemonicShard.shareId == metaShares[ 0 ].shareId ) ? 'accessible': 'notAccessible',
+          shareId: metaShares[ 0 ].shareId,
+          reshareVersion: 0,
+          name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
+        },
+        {
+          shareType: 'securityQuestion',
+          updatedAt: moment( new Date() ).valueOf(),
+          status: 'accessible',
+          shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
+          reshareVersion: 0,
+          name: 'Security Question',
+        }
+      ]
+
+      for ( let i = 1; i < metaShares.length; i++ ) {
+        const element = metaShares[ i ]
+        const status = 'notAccessible'
+        let updatedAt = moment( new Date() ).valueOf()
+        const channelKey = keeperInfo.find( value => value.shareId == element.shareId ) ? keeperInfo.find( value => value.shareId == element.shareId ).channelKey : ''
+        const currentContact: TrustedContact = contacts[ channelKey ]
+        if ( currentContact ) {
+          const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
+          if( instream ){
+            updatedAt = instream.metaData.flags.lastSeen
+          }
+        }
+        const obj = {
+          shareType: keeperInfo.find( value => value.shareId == element.shareId ) ? keeperInfo.find( value => value.shareId == element.shareId ).type : '',
+          updatedAt,
+          status,
+          shareId: element.shareId,
+          reshareVersion: 0,
+        }
+        levelInfo.push( obj )
+      }
+      levelHealth.push( {
+        levelInfo, level
+      } )
+
+      console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
+      yield put( updateHealth( levelHealth, level ) )
+      if ( level == 2 ) yield put( isLevel2InitializedStatus() )
+      if ( level == 3 ) {
+        yield put( isLevel3InitializedStatus() ); yield put( isLevel2InitializedStatus() )
+      }
+    }
+  }
+
+
+  // Update status
+  yield put( healthCheckInitialized() )
+  // Update Initial Health to reduce
+  yield put( switchS3LoaderKeeper( 'initLoader' ) )
+}
+
+export const setupHealthWatcher = createWatcher(
+  setupHealthWorker,
+  SETUP_HEALTH_FOR_RESTORE
 )
