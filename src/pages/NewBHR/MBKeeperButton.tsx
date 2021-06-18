@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, memo } from 'react'
+import React, { memo } from 'react'
 import { View, Image, TouchableOpacity, Text, StyleSheet, ImageBackground } from 'react-native'
-import { useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import {
   widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import { nameToInitials } from '../../common/CommonFunctions'
 
@@ -15,49 +13,24 @@ function MBKeeperButton( props ) {
   const keeper = props.keeper
 
   const getImageIcon = ( chosenContact ) => {
-    if ( chosenContact && chosenContact.name ) {
-      if ( chosenContact.imageAvailable ) {
-        return (
-          <View style={styles.imageBackground}>
-            <Image
-              source={{
-                uri: chosenContact.image.uri
-              }}
-              style={styles.contactImage}
-            />
-          </View>
-        )
-      } else {
-        return (
-          <View style={styles.imageBackground}>
-            <Text
-              style={{
-                textAlign: 'center',
-                fontSize: RFValue( 9 ),
-              }}
-            >
-              {chosenContact &&
-              chosenContact.firstName === 'F&F request' &&
-              chosenContact.contactsWalletName !== undefined &&
-              chosenContact.contactsWalletName !== ''
-                ? nameToInitials( `${chosenContact.contactsWalletName}'s wallet` )
-                : chosenContact && chosenContact.name
-                  ? nameToInitials(
-                    chosenContact &&
-                      chosenContact.firstName &&
-                      chosenContact.lastName
-                      ? chosenContact.firstName + ' ' + chosenContact.lastName
-                      : chosenContact.firstName && !chosenContact.lastName
-                        ? chosenContact.firstName
-                        : !chosenContact.firstName && chosenContact.lastName
-                          ? chosenContact.lastName
-                          : ''
-                  )
-                  : ''}
-            </Text>
-          </View>
-        )
-      }
+    if ( chosenContact && chosenContact.displayedName ) {
+      return (
+        <View style={styles.imageBackground}>
+          {chosenContact.avatarImageSource ? <Image
+            source={{
+              uri: chosenContact.avatarImageSource
+            }}
+            style={styles.contactImage}
+          /> : <Text
+            style={{
+              textAlign: 'center',
+              fontSize: RFValue( 9 ),
+            }}
+          >
+            {nameToInitials( chosenContact.displayedName )}
+          </Text>}
+        </View>
+      )
     }
     return (
       <Image
