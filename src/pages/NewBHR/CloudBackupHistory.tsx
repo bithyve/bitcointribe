@@ -33,6 +33,7 @@ import { getLevelInfo } from '../../common/CommonFunctions'
 import { setCloudData } from '../../store/actions/cloud'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ModalContainer from '../../components/home/ModalContainer'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -60,7 +61,7 @@ const CloudBackupHistory = ( props ) => {
 
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
 
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
 
   const next = props.navigation.getParam( 'next' )
@@ -69,37 +70,21 @@ const CloudBackupHistory = ( props ) => {
   const updateCloudData = () => {
     console.log( 'cloudBackupStatus', cloudBackupStatus, currentLevel )
     if( cloudBackupStatus === CloudBackupStatus.IN_PROGRESS ) return
-    let secretShare = {
-    }
-    if ( levelHealth.length > 0 ) {
-      const levelInfo = getLevelInfo( levelHealth, currentLevel )
-      console.log( 'levelInfo', levelInfo )
-      if ( levelInfo ) {
-        if (
-          levelInfo[ 2 ] &&
-          levelInfo[ 3 ] &&
-          levelInfo[ 2 ].status == 'accessible' &&
-          levelInfo[ 3 ].status == 'accessible'
-        ) {
-          for (
-            let i = 0;
-            i < s3Service.levelhealth.metaSharesKeeper.length;
-            i++
-          ) {
-            const element = s3Service.levelhealth.metaSharesKeeper[ i ]
-
-            if ( levelInfo[ 0 ].shareId == element.shareId ) {
-              secretShare = element
-              break
-            }
-          }
-        }
+    let share = levelHealth[ 0 ].levelInfo[ 0 ]
+    if( levelHealth[ 0 ] && !levelHealth[ 1 ] ){
+      share = levelHealth[ 0 ].levelInfo[ 0 ]
+    } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
+      if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
+        share = levelHealth[ 1 ].levelInfo[ 0 ]
+      } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
+        share = levelHealth[ 1 ].levelInfo[ 0 ]
       }
     }
+    console.log( 'share', share )
     dispatch( setCloudData(
       keeperInfo,
       currentLevel === 0 ? currentLevel + 1 : currentLevel,
-      secretShare
+      share
     ) )
   }
 
@@ -139,7 +124,6 @@ const CloudBackupHistory = ( props ) => {
         console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
         updateCloudData()
-
       }}
       onPressIgnore={( flag )=> {
         // if ( ( bottomSheetRef as any ).current )

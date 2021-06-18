@@ -62,11 +62,11 @@ import { StackActions } from 'react-navigation'
 import ApproveSetup from './ApproveSetup'
 import semver from 'semver'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
-import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
+import { getIndex } from '../../common/utilities'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -738,56 +738,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ chosenContact, trustedQR ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
-    let levelhealth: LevelHealthInterface[] = []
-    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( currentLevel == 3 && levelHealth[ 2 ] )
-      levelhealth = [ levelHealth[ 2 ] ]
-    let changeIndex = 1
-    let contactCount = 0
-    let deviceCount = 0
-    for ( let i = 0; i < levelhealth.length; i++ ) {
-      const element = levelhealth[ i ]
-      for ( let j = 2; j < element.levelInfo.length; j++ ) {
-        const element2 = element.levelInfo[ j ]
-        if (
-          element2.shareType == 'contact' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          contactCount++
-        }
-        if (
-          element2.shareType == 'device' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          deviceCount++
-        }
-        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
-            changeIndex = 2
-          } else changeIndex = 1
-        }
-        if( type == 'device' ){
-          if ( element2.shareType == 'device' && deviceCount == 1 ) {
-            changeIndex = 3
-          } else if( element2.shareType == 'device' && deviceCount == 2 ){
-            changeIndex = 4
-          }
-        }
-      }
-    }
+    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
     if ( type == 'contact' ) {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
     if ( type == 'device' ) {
-      console.log( 'changeIndex', changeIndex )
       props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...props.navigation.state.params,
         selectedTitle: name,
@@ -832,15 +787,9 @@ const TrustedContactHistoryKeeper = ( props ) => {
         }}
         onPressContinue={async() => {
           const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
-          try {
-            dispatch( setApprovalStatus( false ) )
-            dispatch( downloadSMShare( qrScannedData ) )
-            setQrBottomSheetsFlag( false )
-          } catch ( err ) {
-            console.log( {
-              err
-            } )
-          }
+          dispatch( setApprovalStatus( false ) )
+          dispatch( downloadSMShare( qrScannedData ) )
+          setQrBottomSheetsFlag( false )
         }}
       />
     )
@@ -864,7 +813,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
     }
   }, [ approvalStatus ] )
 
-  useEffect( ()=> {
+  useEffect( ()=>{
     if( isChange && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
       dispatch( setApprovalStatus( true ) )
     }

@@ -158,26 +158,25 @@ const HomeHeader = ( {
         }
         if( element.keeper2.name && element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ){
           return {
-            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
+            isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: ' needs your attention.'
           }
         }
-        if( currentLevel == 0 ){
-          return {
-            isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
-          }
+      }
+      if( currentLevel == 0 ){
+        return {
+          isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
         }
-        if( currentLevel === 1 ){
-          return {
-            isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: ''
-          }
-        } else if( currentLevel === 2 ){
-          return {
-            isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: ''
-          }
-        } else if( currentLevel == 3 ){
-          return {
-            isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: ''
-          }
+      } else if( currentLevel === 1 ){
+        return {
+          isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: ''
+        }
+      } else if( currentLevel === 2 ){
+        return {
+          isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: ''
+        }
+      } else if( currentLevel == 3 ){
+        return {
+          isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: ''
         }
       }
     } else

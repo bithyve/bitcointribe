@@ -1,4 +1,6 @@
-import { KeeperInfoInterface, LevelData, LevelHealthInterface, LevelInfo } from '../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelData, LevelHealthInterface, LevelInfo, Trusted_Contacts } from '../bitcoin/utilities/Interface'
+import { makeContactRecipientDescription } from '../utils/sending/RecipientFactories'
+import ContactTrustKind from './data/enums/ContactTrustKind'
 
 export const UsNumberFormat = ( amount, decimalCount = 0, decimal = '.', thousands = ',' ) => {
   try {
@@ -136,18 +138,22 @@ export const checkStatus = ( levelInfo: LevelInfo[] ) => {
   return status
 }
 
-export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVar ) => {
+export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVar: LevelHealthInterface[], trustedContact: Trusted_Contacts ) => {
   if ( keeperInfo.length > 0 ) {
     for ( let j = 0; j < levelHealthVar.length; j++ ) {
       const elementJ = levelHealthVar[ j ]
       for ( let i = 0; i < elementJ.levelInfo.length; i++ ) {
         const element = elementJ.levelInfo[ i ]
-        // Data for Contact Type
-        if ( keeperInfo.find( value => value.shareId == element.shareId && value.type == 'contact' ) ) element.data = keeperInfo.find( value  => value.shareId == element.shareId && value.type == 'contact' ).data
-        // Data for Contact Type
-        if ( keeperInfo.find( value => value.shareId == element.shareId && value.type == 'device' ) ) element.data = keeperInfo.find( value  => value.shareId == element.shareId && value.type == 'device' ).data
+        const channelKey = element.shareType && ( element.shareType == 'contact' || element.shareType == 'device' ) ? keeperInfo.find( value  => value.shareId == element.shareId ).channelKey : null
+
+        const selectedKeeperInfo: KeeperInfoInterface = keeperInfo.find( value  => value.shareId == element.shareId )
+        const data = channelKey ? {
+          index: selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length && selectedKeeperInfo.data.index ? selectedKeeperInfo.data.index : -1, ...makeContactRecipientDescription( channelKey, trustedContact[ channelKey ], ContactTrustKind.KEEPER_OF_USER )
+        } : selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length ? selectedKeeperInfo.data : {
+        }
+        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.data = data
         // Channel Key
-        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = keeperInfo.find( value  => value.shareId == element.shareId ).channelKey
+        if ( keeperInfo.find( value => value.shareId == element.shareId ) ) element.channelKey = channelKey
       }
     }
   }
@@ -188,14 +194,14 @@ export const getLevelInfoStatus = ( levelDataTemp ) => {
     ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
       let name1 = ''; let name2 = ''
       if( element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
-      else name1 = 'Recovery Key 1'
       if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
-      else name2 = 'Recovery Key 2'
       const name = name1 && name2 ? name1 + ' & ' + name2 : name1 && !name2 ? name1 : name2
       levelData[ i ].note = name + ' need your attention.'
     }
-    levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
-    levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
+    const displayName1 = element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.displayedName ? element.keeper1.data.displayedName : ''
+    const displayName2 = element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.displayedName ? element.keeper2.data.displayedName : ''
+    levelData[ i ].keeper1ButtonText = displayName1 ? displayName1 : element.keeper1.data && Object.keys( element.keeper1.data ).length && element.keeper1.data.name ? element.keeper1.data.name : element.keeper1.name
+    levelData[ i ].keeper2ButtonText = displayName2 ? displayName2 : element.keeper2.data && Object.keys( element.keeper2.data ).length && element.keeper2.data.name ? element.keeper2.data.name : element.keeper2.name
   }
   return levelData
 }
@@ -206,4 +212,46 @@ export const arrayChunks = ( arr, size ) => {
   }, ( v, i ) =>
     arr.slice( i * size, i * size + size )
   )
+}
+
+export const getIndex = ( levelHealth, type, selectedKeeper, keeperInfo ) => {
+  let changeIndex = 1
+  let contactCount = 0
+  let deviceCount = 0
+  for ( let i = 0; i < levelHealth.length; i++ ) {
+    const element = levelHealth[ i ]
+    for ( let j = 2; j < element.levelInfo.length; j++ ) {
+      const element2 = element.levelInfo[ j ]
+      if (
+        element2.shareType == 'contact' &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelHealth[ i ]
+      ) {
+        contactCount++
+      }
+      if (
+        element2.shareType == 'device' &&
+          selectedKeeper &&
+          selectedKeeper.shareId != element2.shareId &&
+          levelHealth[ i ]
+      ) {
+        deviceCount++
+      }
+      const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
+      if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
+        if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
+          changeIndex = 2
+        } else changeIndex = 1
+      }
+      if( type == 'device' ){
+        if ( element2.shareType == 'device' && deviceCount == 1 ) {
+          changeIndex = 3
+        } else if( element2.shareType == 'device' && deviceCount == 2 ){
+          changeIndex = 4
+        }
+      }
+    }
+  }
+  return changeIndex
 }

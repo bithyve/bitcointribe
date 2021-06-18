@@ -53,7 +53,8 @@ import {
   setupNotificationList,
   updateNotificationList,
   updateMessageStatusInApp,
-  updateMessageStatus
+  updateMessageStatus,
+  getMessages,
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
@@ -288,6 +289,7 @@ interface HomePropsTypes {
   setWalletId: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
+  getMessages: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -665,6 +667,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
       onNotification: ( notification ) => {
+        this.props.getMessages()
         const { content } = notification.data
         const notificationId = JSON.parse( content ).notificationId
         this.currentNotificationId = notificationId
@@ -821,7 +824,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   notificationCheck = () =>{
     const { messages } = this.props
     console.log( 'messages inside notificationCheck', messages )
-    if( messages.length ){
+    if( messages && messages.length ){
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
       } )
@@ -931,6 +934,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.secondaryDeviceAddressValue
     ) {
       this.setSecondaryDeviceAddresses()
+    }
+    if (
+      prevProps.messages !==
+      this.props.messages
+    ) {
+      this.notificationCheck()
     }
 
   };
@@ -1950,7 +1959,8 @@ export default withNavigationFocus(
     updateNotificationList,
     setWalletId,
     updateMessageStatusInApp,
-    updateMessageStatus
+    updateMessageStatus,
+    getMessages
   } )( Home )
 )
 

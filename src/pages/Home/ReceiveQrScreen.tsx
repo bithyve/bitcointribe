@@ -147,7 +147,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                 <ScrollView>
                   {accounts.map( ( value ) => {
                     return (
-                      <AppBottomSheetTouchableWrapper activeOpacity={10} onPress={() => {
+                      <TouchableOpacity activeOpacity={0.65} onPress={() => {
                         setHideShow( false )
                         setSelectedAccount( value )
                       }}
@@ -166,7 +166,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                           <Text style={styles.accountName}>{value.accountName}</Text>
                           <Text style={styles.balanceText}>Balance {UsNumberFormat( value.balance )} sats</Text>
                         </View>
-                      </AppBottomSheetTouchableWrapper>
+                      </TouchableOpacity>
                     )
                   } )}
                 </ScrollView>

@@ -35,6 +35,7 @@ import {
   createChannelAssets,
   setApprovalStatus,
   createOrChangeGuardian,
+  downloadSMShare,
 } from '../../store/actions/health'
 import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
@@ -57,6 +58,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import ModalContainer from '../../components/home/ModalContainer'
+import { getIndex } from '../../common/utilities'
 
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
@@ -121,6 +123,7 @@ const PersonalCopyHistory = ( props ) => {
   const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
   const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
+  const [ isConfirm, setIsConfirm ] = useState( false )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
@@ -494,51 +497,7 @@ const PersonalCopyHistory = ( props ) => {
   }, [ Contact, trustedContacts ] )
 
   const onPressChangeKeeperType = ( type, name ) => {
-    let levelhealth: LevelHealthInterface[] = []
-    if ( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if ( levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1 )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( currentLevel == 3 && levelHealth[ 2 ] )
-      levelhealth = [ levelHealth[ 2 ] ]
-    let changeIndex = 1
-    let contactCount = 0
-    let deviceCount = 0
-    for ( let i = 0; i < levelhealth.length; i++ ) {
-      const element = levelhealth[ i ]
-      for ( let j = 2; j < element.levelInfo.length; j++ ) {
-        const element2 = element.levelInfo[ j ]
-        if (
-          element2.shareType == 'contact' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          contactCount++
-        }
-        if (
-          element2.shareType == 'device' &&
-          selectedKeeper &&
-          selectedKeeper.shareId != element2.shareId &&
-          levelhealth[ i ]
-        ) {
-          deviceCount++
-        }
-        const kpInfoContactIndex = keeperInfo.findIndex( ( value ) => value.shareId == element2.shareId && value.type == 'contact' )
-        if ( type == 'contact' && element2.shareType == 'contact' && contactCount < 2 ) {
-          if ( kpInfoContactIndex > -1 && keeperInfo[ kpInfoContactIndex ].data.index == 1 ) {
-            changeIndex = 2
-          } else changeIndex = 1
-        }
-        if( type == 'device' ){
-          if ( element2.shareType == 'device' && deviceCount == 1 ) {
-            changeIndex = 3
-          } else if( element2.shareType == 'device' && deviceCount == 2 ){
-            changeIndex = 4
-          }
-        }
-      }
-    }
+    const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -560,7 +519,8 @@ const PersonalCopyHistory = ( props ) => {
     }
   }
   const sendApprovalRequestToPK = ( ) => {
-    setQrBottomSheetsFlag( true );
+    setQrBottomSheetsFlag( true )
+    setIsConfirm( false );
     ( QrBottomSheet as any ).current.snapTo( 1 );
     ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
   }
@@ -577,22 +537,35 @@ const PersonalCopyHistory = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
-          dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-          setQrBottomSheetsFlag( false );
-          ( QrBottomSheet as any ).current.snapTo( 0 )
-          const popAction = StackActions.pop( {
-            n: isChange ? 2 : 1
-          } )
-          props.navigation.dispatch( popAction )
+          if( isConfirm ){
+            dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
+            setQrBottomSheetsFlag( false );
+            ( QrBottomSheet as any ).current.snapTo( 0 )
+            const popAction = StackActions.pop( {
+              n: isChange ? 2 : 1
+            } )
+            props.navigation.dispatch( popAction )
+          } else {
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
+            setQrBottomSheetsFlag( false )
+          }
         }}
         onBackPress={() => {
           setQrBottomSheetsFlag( false )
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"pdf","encryptedData":"35c329e9d0ffa374bf2a9589173578c0bdc8727c4e7a3cb5c6862854717a1c88657751643790a4c48308060e8d4adf47ec647b475cbdc2ced65b2b91c8a2beb1","encryptedKey":"814a3670890461aa790a66385bf3068bdf04f13d296b8a06d6716adf9622b0ac9cbe9b7593e7894efb77afd1a9280588f24a50d300d44e3d37c840a41947232c3b0272fe57465c96e1d09892591a7259"}'
-          dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
-          setQrBottomSheetsFlag( false )
+          if( isConfirm ){
+            const qrScannedData = '{"type":"pdf","encryptedData":"35c329e9d0ffa374bf2a9589173578c0bdc8727c4e7a3cb5c6862854717a1c88657751643790a4c48308060e8d4adf47ec647b475cbdc2ced65b2b91c8a2beb1","encryptedKey":"814a3670890461aa790a66385bf3068bdf04f13d296b8a06d6716adf9622b0ac9cbe9b7593e7894efb77afd1a9280588f24a50d300d44e3d37c840a41947232c3b0272fe57465c96e1d09892591a7259"}'
+            dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
+            setQrBottomSheetsFlag( false )
+          } else {
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
+            dispatch( setApprovalStatus( false ) )
+            dispatch( downloadSMShare( qrScannedData ) )
+            setQrBottomSheetsFlag( false )
+          }
         }}
       />
     )
@@ -658,7 +631,8 @@ const PersonalCopyHistory = ( props ) => {
           IsReshare={isReshare}
           data={sortedHistory( personalCopyHistory )}
           confirmDisable={confirmDisable}
-          onConfirm={ isReshare && selectedKeeper.status == 'notAccessible' ? ()=>{
+          onConfirm={ isReshare && ( selectedKeeper.status == 'notSetup' || selectedKeeper.status == 'notAccessible' ) ? ()=>{
+            setIsConfirm( true );
             ( QrBottomSheet as any ).current.snapTo( 1 )
           } : null}
           confirmButtonText={'Share Now'}

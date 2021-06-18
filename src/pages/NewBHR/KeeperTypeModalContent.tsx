@@ -50,16 +50,16 @@ export default function KeeperTypeModalContents( props ) {
     let deviceCount = 0
     let levelhealth: LevelHealthInterface[] = []
     if (
+      !levelHealth[ 1 ] &&
+      levelHealth[ 0 ] &&
+      levelHealth[ 0 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1
+    )
+      levelhealth = [ levelHealth[ 0 ] ]
+    if (
       levelHealth[ 1 ] &&
       levelHealth[ 1 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1
     )
-      levelhealth = [ levelHealth[ 1 ] ]
-    if (
-      levelHealth[ 2 ] &&
-      levelHealth[ 2 ].levelInfo.findIndex( ( v ) => v.updatedAt > 0 ) > -1
-    )
-      levelhealth = [ levelHealth[ 1 ], levelHealth[ 2 ] ]
-    if ( levelHealth[ 2 ] && currentLevel == 3 ) levelhealth = [ levelHealth[ 2 ] ]
+      levelhealth = [ levelHealth[ 0 ], levelHealth[ 1 ] ]
     for ( let i = 0; i < levelhealth.length; i++ ) {
       const element = levelhealth[ i ]
       for ( let j = 2; j < element.levelInfo.length; j++ ) {
@@ -106,9 +106,6 @@ export default function KeeperTypeModalContents( props ) {
         }
       }
     }
-    // console.log("contactCount", contactCount);
-    // console.log("pdfCount", pdfCount);
-    // console.log("deviceCount", deviceCount);
     if ( contactCount >= 2 ) completedKeeperType.push( 'contact' )
     if ( pdfCount >= 1 ) completedKeeperType.push( 'pdf' )
     if ( deviceCount >= 2 ) completedKeeperType.push( 'device' )
