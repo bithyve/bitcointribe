@@ -433,6 +433,12 @@ class ManageBackupNewBHR extends Component<
         index,
         isChangeKeeperAllow
       } )
+    } else if ( selectedKeeper.shareType == 'existingContact' ) {
+      this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
+        ...navigationParams,
+        index,
+        isChangeKeeperAllow
+      } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
       this.props.navigation.navigate(
         'PersonalCopyHistoryNewBHR',
@@ -720,6 +726,7 @@ class ManageBackupNewBHR extends Component<
               headerText={'Backup Recovery Key'}
               subHeader={'You can save your Recovery Key with a person, on a device running Hexa or simply in a PDF document'}
               onPressSetup={async ( type, name ) => {
+                console.log( type, name )
                 this.setState( {
                   selectedKeeperType: type,
                   selectedKeeperName: name,

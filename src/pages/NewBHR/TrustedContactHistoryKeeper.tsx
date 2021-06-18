@@ -16,6 +16,12 @@ import {
 } from 'react-native-responsive-screen'
 import { useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
+import {
+  ContactRecipientDescribing,
+} from '../../common/data/models/interfaces/RecipientDescribing'
+import { ListItem } from 'react-native-elements'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -49,7 +55,8 @@ import {
   QRCodeTypes,
   TrustedContact,
   Trusted_Contacts,
-  ChannelAssets
+  ChannelAssets,
+  TrustedContactRelationTypes
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -66,6 +73,9 @@ import SSS from '../../bitcoin/utilities/sss/SSS'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import Fonts from '../../common/Fonts'
+import BackupStyles from './Styles'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef<BottomSheet>() )
@@ -122,6 +132,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const trustedContacts: TrustedContactsService = useSelector( ( state ) => state.trustedContacts.service )
+  const [ contacts, setContacts ] = useState( [] )
   const { WALLET_SETUP } = useSelector( ( state ) => state.storage.database )
   const index = props.navigation.getParam( 'index' )
   const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
@@ -137,6 +148,18 @@ const TrustedContactHistoryKeeper = ( props ) => {
         : false
     )
   }, [ props.navigation.state.params ] )
+
+  useEffect( () => {
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const c = []
+    for( const channelKey of Object.keys( contacts ) ){
+      const contact = contacts[ channelKey ]
+      if( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) {
+        c.push( makeContactRecipientDescription( channelKey, contact ) )
+      }
+    }
+    setContacts( c )
+  }, [] )
 
   useEffect( () => {
     if ( isChange ) {
@@ -202,7 +225,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
 
   const renderTrustedContactsContent = useCallback( () => {
-    return (
+    return selectedKeeper.shareType === 'contact' ? (
       <TrustedContacts
         LoadContacts={LoadContacts}
         onPressBack={() => {
@@ -218,7 +241,59 @@ const TrustedContactHistoryKeeper = ( props ) => {
           } )
         }}
       />
-    )
+    ) : (
+      <View
+        style={{
+          height: '100%',
+          backgroundColor: Colors.white,
+          alignSelf: 'center',
+          width: '100%',
+        }}>
+        <View
+          style={{
+            ...BackupStyles.modalHeaderTitleView,
+            paddingTop: hp( '0.5%' ),
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 20,
+          }}
+        >
+          <Text style={BackupStyles.modalHeaderTitleText}>
+          Associate a contact
+          </Text>
+          <AppBottomSheetTouchableWrapper
+            onPress={()=> {}}
+            style={{
+              height: wp( '13%' ),
+              width: wp( '35%' ),
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}
+          >
+            {/* <Text
+              style={{
+                ...{
+                  color: Colors.white,
+                  fontSize: RFValue( 13 ),
+                  fontFamily: Fonts.FiraSansMedium,
+                },
+                color: Colors.blue,
+              }}
+            >
+            Skip
+            </Text> */}
+          </AppBottomSheetTouchableWrapper>
+        </View>
+        {( contacts.length && contacts.map( ( item, index ) => {
+          return renderContactListItem( {
+            contactDescription: item,
+            index,
+            contactsType: 'My Keepers',
+          } )
+        } ) ) || <View style={{
+          height: wp( '22%' ) + 30
+        }} />}
+      </View> )
   }, [ LoadContacts, getContacts ] )
 
   const renderTrustedContactsHeader = useCallback( () => {
@@ -228,6 +303,26 @@ const TrustedContactHistoryKeeper = ( props ) => {
           ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
         }}
       />
+    )
+  }, [] )
+
+  const renderContactListItem = useCallback( ( {
+    contactDescription,
+    index,
+  }: {
+    contactDescription: ContactRecipientDescribing;
+    index: number;
+    contactsType: string;
+  }
+  ) => {
+    return (
+      <ListItem
+        key={String( index )}
+        bottomDivider
+        onPress={() => {} }
+      >
+        <FriendsAndFamilyContactListItemContent contact={contactDescription} />
+      </ListItem>
     )
   }, [] )
 
