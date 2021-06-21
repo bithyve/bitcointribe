@@ -1403,14 +1403,14 @@ function* sharePDFWorker( { payload } ) {
                 subject: 'Recovery Key  '+walletName,
                 body: `<b>A Personal Copy of one of your Recovery Keys is attached as a pdf. The answer to your security question (${security.question}) is used to password protect the PDF.</b>`,
                 isHTML: true,
-                attachment: {
+                attachments: [ {
                   path:
                   Platform.OS == 'android'
-                    ? 'file://' + pdfInfo.filePath
+                    ? pdfInfo.filePath
                     : pdfInfo.filePath, // The absolute path of the file from which to read data.
                   type: 'pdf', // Mime Type: jpg, png, doc, ppt, html, pdf, csv
                   name: 'Recovery Key  '+walletName, // Optional: Custom filename for attachment
-                },
+                } ],
               },
               ( err, event ) => {
                 console.log( {
