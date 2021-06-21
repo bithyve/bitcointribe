@@ -755,7 +755,9 @@ export interface Account {
   id: string,                           // account identifier(derived from xpub)
   walletId: string,                     // wallet's id
   network: networks.Network,            // testnet/mainnet
+  derivationPath: string,               // derivation path of the extended keys belonging to this account
   xpub: string | null,                  // account's xpub (null for multi-sig accounts)
+  xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
   accountName: string,                  // name of the account
   accountDescription: string,           // description of the account
   activeAddresses: string[],            // addresses used(to be synched during soft refresh)

@@ -8,13 +8,17 @@ export function generateAccount(
     walletId,
     accountName,
     accountDescription,
+    derivationPath,
     xpub,
+    xpriv,
     network
   }: {
     accountName: string,
     accountDescription: string,
     walletId: string,
+    derivationPath: string,
     xpub: string,
+    xpriv: string,
     network: networks.Network,
   }
 ): Account {
@@ -26,7 +30,9 @@ export function generateAccount(
     id,
     walletId,
     network,
+    derivationPath,
     xpub,
+    xpriv,
     accountName,
     accountDescription,
     activeAddresses: [],
@@ -58,6 +64,7 @@ export function generateTwoFAAccount(
     walletId,
     accountName,
     accountDescription,
+    derivationPath,
     xpubs,
     xprivs,
     network
@@ -65,6 +72,7 @@ export function generateTwoFAAccount(
     accountName: string,
     accountDescription: string,
     walletId: string,
+    derivationPath: string,
     xpubs: {
       primary: string,
       secondary: string,
@@ -85,8 +93,10 @@ export function generateTwoFAAccount(
     id,
     walletId,
     network,
+    derivationPath,
     is2FA: true,
     xpub: null,
+    xpriv: null,
     xpubs,
     xprivs,
     accountName,
