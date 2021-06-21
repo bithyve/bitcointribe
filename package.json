@@ -42,8 +42,8 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^1.4.1",
-    "@react-native-clipboard/clipboard": "^1.7.0",
     "@react-native-async-storage/async-storage": "^1.15.4",
+    "@react-native-clipboard/clipboard": "^1.7.0",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/netinfo": "^5.9.5",
     "@react-native-community/push-notification-ios": "^1.8.0",
@@ -142,6 +142,7 @@
     "react-navigation-stack": "^1.10.3",
     "react-redux": "^7.2.1",
     "readable-stream": "^1.0.33",
+    "realm": "^10.4.2",
     "reanimated-bottom-sheet": "^1.0.0-alpha.20",
     "redux": "^4.0.5",
     "redux-actions": "^2.6.5",
