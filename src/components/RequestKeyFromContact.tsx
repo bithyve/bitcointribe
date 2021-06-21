@@ -24,28 +24,28 @@ export default function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
   // console.log('props.QR RequestKeyFromContact > ', props.QR);
 
-  const contact = props.navigation ? props.navigation.state.params.contact : props.contact
+  const contact = props.contact
   const [ serviceType, setServiceType ] = useState(
-    props.navigation ? props.navigation.state.params.serviceType : props.serviceType ? props.serviceType : '',
+    props.serviceType ? props.serviceType : '',
   )
   //console.log("amountCurrency", props.amountCurrency);
-  const [ Contact, setContact ] = useState( props.navigation ? props.navigation.state.params.contact : props.contact )
+  const [ Contact, setContact ] = useState( props.contact ? props.contact : {
+  } )
 
   useEffect( () => {
-    setShareLink( props.navigation ? props.navigation.state.params.link : props.link )
+    setShareLink( props.link )
     // if ( props.infoText ) setInfoText( props.infoText )
   }, [ props.link ] )
 
   useEffect( () => {
     if ( contact ) {
-      setContact( props.navigation ? props.navigation.state.params.link : props.link )
+      setContact( props.contact )
     }
   }, [ contact ] )
 
   useEffect( () => {
-    const serviceTypeProp = props.navigation ? props.navigation.state.params.serviceType : props.serviceType
-    if ( serviceTypeProp ) {
-      setServiceType( serviceTypeProp )
+    if ( props.serviceType ) {
+      setServiceType( props.serviceType )
     }
   }, [ props.serviceType ] )
 
@@ -65,11 +65,7 @@ export default function RequestKeyFromContact( props ) {
       Share.open( options )
         .then( ( res ) => {
           // if (res.success) {
-          if ( props.navigation ) {
-            props.navigation.state.params.onPressShare()
-          } else {
-            props.onPressShare()
-          }
+          props.onPressShare()
           // }
         } )
         .catch( ( err ) => {
@@ -79,56 +75,48 @@ export default function RequestKeyFromContact( props ) {
 
     }
   }
-  const isModalProp = props.navigation ? props.navigation.state.params.isModal : props.isModal
-  const headerText = props.navigation ? props.navigation.state.params.headerText : props.headerText
-  const subHeaderText = props.navigation ? props.navigation.state.params.subHeaderText : props.subHeaderText
-  const qrProp = props.navigation ? props.navigation.state.params.QR : props.QR
+
   return (
     <View style={styles.modalContainer}>
       <View
         style={styles.mainView}
       >
-        {isModalProp &&
-					<View style={styles.topSubView}>
-					  <AppBottomSheetTouchableWrapper
-					    onPress={() => {
-					      if ( props.navigation ) {
-					        props.navigation.state.params.onPressBack()
-					      } else {
-					        props.onPressBack()
-					      }
-
-					    }}
-					    style={styles.backButton}
-					  >
-					    <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-					  </AppBottomSheetTouchableWrapper>
-					  <View style={{
-					    flex: 1, marginLeft: 5
-					  }}>
-					    {headerText &&
-								<Text style={styles.modalHeaderTitleText}>
-								  {headerText}
-								</Text>
-					    }
-					    {subHeaderText &&
-								<Text
-								  style={styles.subHeaderText}
-								>
-								  {subHeaderText}
-								</Text>
-					    }
-					  </View>
-					</View>
+        {props.isModal &&
+          <View style={styles.topSubView}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => {
+                props.onPressBack()
+              }}
+              style={styles.backButton}
+            >
+              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            </AppBottomSheetTouchableWrapper>
+            <View style={{
+              flex: 1, marginLeft: 5
+            }}>
+              {props.headerText &&
+                <Text style={styles.modalHeaderTitleText}>
+                  {props.headerText}
+                </Text>
+              }
+              {props.subHeaderText &&
+                <Text
+                  style={styles.subHeaderText}
+                >
+                  {props.subHeaderText}
+                </Text>
+              }
+            </View>
+          </View>
         }
       </View>
       <View style={[ styles.topContainer, {
-        marginTop: !isModalProp ? 0 : hp( '1.7%' ),
-        marginBottom: !isModalProp ? 0 : hp( '1.7%' ),
+        marginTop: !props.isModal ? 0 : hp( '1.7%' ),
+        marginBottom: !props.isModal ? 0 : hp( '1.7%' ),
       } ]}>
         <UserDetails
           titleStyle={styles.titleStyle}
-          contactText={props.navigation ? props.navigation.state.params.contactText : props.contactText}
+          contactText={props.contactText}
           Contact={Contact} />
       </View>
       <ScrollView contentContainerStyle={{
@@ -137,21 +125,21 @@ export default function RequestKeyFromContact( props ) {
         <View
           style={[ styles.mainContainer,
             {
-              marginTop: !isModalProp ? hp( '2%' ) : hp( '1.7%' ),
-              marginBottom: !isModalProp ? hp( '2%' ) : hp( '1.7%' ),
+              marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+              marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
             } ]}
         >
           <View style={[ styles.qrContainer, {
-            marginTop: !isModalProp ? 0 : hp( '4%' )
+            marginTop: !props.isModal ? 0 : hp( '4%' )
           } ]}>
-            {!qrProp ? (
+            {!props.QR ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
-              <QRCode value={qrProp} size={hp( '27%' )} />
+              <QRCode value={props.QR} size={hp( '27%' )} />
             )}
           </View>
           <CopyThisText
-            openLink={shareLink ? shareOption : ()=> {}}
+            openLink={shareLink ? shareOption : () => { }}
             backgroundColor={Colors.backgroundColor1}
             text={shareLink ? shareLink : 'Creating Link....'}
           />
