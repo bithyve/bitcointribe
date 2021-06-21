@@ -42,8 +42,8 @@
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^1.4.1",
-    "@react-native-clipboard/clipboard": "^1.7.0",
     "@react-native-async-storage/async-storage": "^1.15.4",
+    "@react-native-clipboard/clipboard": "^1.7.0",
     "@react-native-community/masked-view": "^0.1.10",
     "@react-native-community/netinfo": "^5.9.5",
     "@react-native-community/push-notification-ios": "^1.8.0",
@@ -115,7 +115,7 @@
     "react-native-level-fs": "^3.0.1",
     "react-native-linear-gradient": "^2.5.6",
     "react-native-localize": "^1.4.1",
-    "react-native-mail": "4.1.0",
+    "react-native-mail": "^6.1.0",
     "react-native-os": "^1.2.6",
     "react-native-print": "^0.6.0",
     "react-native-progress-circle": "^2.1.0",
