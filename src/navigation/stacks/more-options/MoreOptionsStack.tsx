@@ -19,6 +19,7 @@ import Launch from '../../../pages/Launch'
 import ReLogin from '../../../pages/ReLogin'
 import Login from '../../../pages/Login'
 import Intermediate from '../../../pages/Intermediate'
+import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -41,6 +42,13 @@ const MoreOptionsStack = createStackNavigator(
     AccountManagement: {
       screen: AccountManagementStack,
       navigationOptions: {
+        header: null,
+      },
+    },
+    PasscodeChangeSuccessPage: {
+      screen: PasscodeChangeSuccessPage,
+      navigationOptions: {
+        gesturesEnabled: false,
         header: null,
       },
     },

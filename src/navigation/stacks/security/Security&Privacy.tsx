@@ -30,7 +30,6 @@ import PersonalCopyHistory from '../../../pages/ManageBackup/PersonalCopyHistory
 import SecurityQuestionHistory from '../../../pages/ManageBackup/SecurityQuestionHistory'
 import SettingGetNewPin from '../../../pages/SettingGetNewPin'
 import ContactsListForAssociateContact from '../../../pages/CustodianRequest/ContactsListForAssociateContact'
-import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 import NewTwoFASecret from '../../../pages/Accounts/NewTwoFASecret'
 import TwoFASweepFunds from '../../../pages/Accounts/TwoFASweepFunds'
 import UpdateApp from '../../../pages/UpdateApp'
@@ -175,12 +174,6 @@ const SecurityStack = createStackNavigator(
     },
     UpdateApp: {
       screen: UpdateApp,
-      navigationOptions: {
-        gesturesEnabled: false,
-      },
-    },
-    PasscodeChangeSuccessPage: {
-      screen: PasscodeChangeSuccessPage,
       navigationOptions: {
         gesturesEnabled: false,
       },
