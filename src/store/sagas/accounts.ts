@@ -94,6 +94,7 @@ import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperation
 import * as bitcoinJS from 'bitcoinjs-lib'
 import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -214,24 +215,39 @@ function* syncAccountsWorker( { payload }: {payload: {
     blindRefresh?: boolean;
   }}} ) {
   const { options } = payload
+
+  const network = bitcoinJS.networks.testnet
+
+  const mnemonic = 'remember someone much festival stadium cash enlist avocado write blade sunset long virtual stadium inject host obscure clump jazz plunge goddess stone silent title'
+  const derivationPath1 = 'm/49\'/0\'/0\''
+  const xpub  = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath1 )
+  const xpriv =  AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath1 )
   const account: Account = generateAccount( {
     walletId: 'zyx',
-    xpub: 'tpubDCSE6S93MaNAEx5DCMpKu4Np1gNKKwH9nozBcKgiWHdNwVAKx6aS3AQsBqwLukGkAVbrZfHjr67Hxu9QCGxLuYgELmjMGGSJsvs4hnQwGjP',
     accountName: 'Checkinig',
     accountDescription: 'checking Description',
+    derivationPath: derivationPath1,
+    xpub,
+    xpriv,
+    network,
+  } )
+
+
+  const derivationPath2 = 'm/49\'/0\'/1\''
+  const xpub2  = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath2 )
+  const xpriv2 =  AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath2 )
+  const account2: Account = generateAccount( {
+    walletId: 'zyx',
+    accountName: 'Test',
+    accountDescription: 'test Description',
+    derivationPath: derivationPath2,
+    xpub: xpub2,
+    xpriv: xpriv2,
     network: bitcoinJS.networks.testnet,
   } )
 
-  const account2: Account = generateAccount( {
-    walletId: 'zyx',
-    xpub: 'tpubDDXWJsiz1pUPfzfeUuL7nkYNdz8EC8emx9ZBCMydW1pTdcK5B6dQ3JxacaSM3huQ4ZhX46mNTvBZ1J1jU5AXrdot8TQAE1JCGtNFTrXqjWx',
-    accountName: 'Test',
-    accountDescription: 'test Description',
-    network: bitcoinJS.networks.testnet,
-  } )
   // TODO: pick accounts from reducer
   const accounts = [ account, account2 ]
-  const network = accounts[ 0 ].network // n/w reference: first account's n/w
   const { synchedAccounts, txsFound } = yield call(
     AccountOperations.syncAccounts,
     accounts,
@@ -239,6 +255,9 @@ function* syncAccountsWorker( { payload }: {payload: {
     options.hardRefresh,
     options.blindRefresh )
 
+  console.log( {
+    synchedAccounts
+  } )
   // TODO: update reducer and insert into database
 }
 
@@ -798,18 +817,6 @@ function* refreshAccountShellWorker( { payload } ) {
     const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
       payload
     } )
-
-    // yield call( syncAccountsWorker, {
-    //   payload: {
-    //     accounts:[],
-    //     options: {
-    //       hardRefresh: false,
-    //       blindRefresh: false,
-    //     }
-    //   }
-    // } )
-
-
 
     const rescanTxs: RescannedTransactionData[] = []
     deltaTxs.forEach( ( deltaTx ) => {
