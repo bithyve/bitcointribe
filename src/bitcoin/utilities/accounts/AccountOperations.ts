@@ -392,7 +392,8 @@ export default class AccountOperations {
 
     const txPrerequisites: TransactionPrerequisite = {
     }
-    for ( const priority of Object.keys( TxPriority ) ) {
+
+    for ( const priority of [ TxPriority.LOW, TxPriority.MEDIUM, TxPriority.HIGH ] ) {
       if (
         priority === defaultTxPriority ||
         defaultDebitedAmount === confirmedBalance
@@ -546,10 +547,7 @@ export default class AccountOperations {
         } else {
           const privateKey = AccountUtilities.addressToPrivateKey(
             input.address,
-            account.xpub,
-            account.nextFreeAddressIndex,
-            account.nextFreeChangeAddressIndex,
-            account.network
+            account
           )
 
           keyPair = AccountUtilities.getKeyPair(

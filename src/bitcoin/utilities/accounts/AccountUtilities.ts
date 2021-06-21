@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -147,19 +147,21 @@ export default class AccountUtilities {
     return bs58check.encode( data )
   }
 
-  static addressToPrivateKey = ( address: string, xpub: string, nextFreeAddressIndex: number, nextFreeChangeAddressIndex: number, network: bitcoinJS.networks.Network ): string => {
+  static addressToPrivateKey = ( address: string, account: Account ): string => {
+    const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, network } = account
+
+    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
+        return AccountUtilities.getPrivateKeyByIndex( xpriv, false, itr, network )
+    }
+
     for (
       let itr = 0;
       itr <= nextFreeChangeAddressIndex + config.GAP_LIMIT;
       itr++
     ) {
       if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
-        return AccountUtilities.getPrivateKeyByIndex( xpub, true, itr, network )
-    }
-
-    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
-        return AccountUtilities.getPrivateKeyByIndex( xpub, false, itr, network )
+        return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
     }
 
     throw new Error( 'Could not find private key for: ' + address )
