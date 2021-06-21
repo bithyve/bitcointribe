@@ -222,15 +222,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
       // ( trustedContactsBottomSheet as any ).current.snapTo( 0 );
       // ( shareBottomSheet as any ).current.snapTo( 1 )
       // setTrustedContactModal( false )
-      if ( selectedContacts && !isEmpty( selectedContacts ) ) {
-        // props.navigation.navigate( 'AddContactSendRequest', {
-        //   SelectedContact: selectedContacts[ 0 ],
-        //   headerText:'Add a contact  ',
-        //   subHeaderText:'Send a Friends and Family request',
-        //   contactText:'Adding to Friends and Family:',
-        //   showDone:true,
-        // } )
-      }
+      // if ( selectedContacts && !isEmpty( selectedContacts ) ) {
+      props.navigation.navigate( 'AddContactSendRequest', {
+        SelectedContact: [ selectedContacts ], // CHECK ?????????
+        headerText:'Add a contact  ',
+        subHeaderText:'Send a Friends and Family request',
+        contactText:'Adding to Friends and Family:',
+        showDone:true,
+      } )
+      // }
       return selectedContacts[ 0 ]
     },
     [ chosenContact ],
@@ -391,7 +391,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
     // ( shareBottomSheet as any ).current.snapTo( 1 )
     // props.navigation.navigate( 'AddContactSendRequest', {
-    //   SelectedContact: chosenContact,
+    //   SelectedContact: [ chosenContact ],
     //   headerText:'Add a contact  ',
     //   subHeaderText:'Send a Friends and Family request',
     //   contactText:'Adding to Friends and Family:',

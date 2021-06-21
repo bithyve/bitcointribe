@@ -17,7 +17,7 @@ export default function SecondaryDeviceModelContents( props ) {
   return (
     <View
       style={{
-        height: '100%',
+        // height: '100%',
         backgroundColor: Colors.white,
         borderColor: Colors.borderColor,
         alignSelf: 'center',

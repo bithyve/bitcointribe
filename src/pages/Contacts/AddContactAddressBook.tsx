@@ -75,33 +75,33 @@ export default function AddContactAddressBook( props ) {
   }
 
   useEffect( () => {
-    if( props.isLoadContacts ){
-      getContactsAsync()
-    }
+    // if( props.isLoadContacts ){
+    getContactsAsync()
+    // }
   }, [] )
 
 
   const getContact = () => {
-    if ( props.isLoadContacts ) {
-      ExpoContacts.getContactsAsync().then( async ( { data } ) => {
-        if ( !data.length ) {
-          setErrorMessage(
-            'No contacts found. Please add contacts to your Address Book and try again',
-          )
-          setErrModal( true )
+    // if ( props.isLoadContacts ) {
+    ExpoContacts.getContactsAsync().then( async ( { data } ) => {
+      if ( !data.length ) {
+        setErrorMessage(
+          'No contacts found. Please add contacts to your Address Book and try again',
+        )
+        setErrModal( true )
+      }
+      setContactData( data )
+      await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
+      const contactList = data.sort( function ( a, b ) {
+        if ( a.name && b.name ) {
+          if ( a.name.toLowerCase() < b.name.toLowerCase() ) return -1
+          if ( a.name.toLowerCase() > b.name.toLowerCase() ) return 1
         }
-        setContactData( data )
-        await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
-        const contactList = data.sort( function ( a, b ) {
-          if ( a.name && b.name ) {
-            if ( a.name.toLowerCase() < b.name.toLowerCase() ) return -1
-            if ( a.name.toLowerCase() > b.name.toLowerCase() ) return 1
-          }
-          return 0
-        } )
-        setFilterContactData( contactList )
+        return 0
       } )
-    }
+      setFilterContactData( contactList )
+    } )
+    // }
   }
 
   const getContactPermission = async () => {
@@ -545,7 +545,7 @@ export default function AddContactAddressBook( props ) {
                 onPress={() => onPressContinue()}
                 style={styles.bottomButtonView}
               >
-                <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                <Text style={styles.buttonText}>Confirm & Proceed..</Text>
               </AppBottomSheetTouchableWrapper>
             </View>
           )}

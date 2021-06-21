@@ -699,7 +699,7 @@ class ContactDetails extends PureComponent<
     return (
       <ErrorModalContents
         modalRef={this.ReshareBottomSheet}
-        title={'Reshare Recovery Key\nwith Keeper'}
+        title={'Reshare Recovery Ke,,,\nwith Keeper'}
         info={'Did your Keeper not receive the Recovery Key?'}
         note={'You can reshare the Recovery Key with your Keeper'}
         proceedButtonText={'Reshare'}
@@ -1103,7 +1103,7 @@ class ContactDetails extends PureComponent<
             onPressProceed={() => {
               // ( this.shareBottomSheet as any ).current.snapTo( 1 )
               this.props.navigation.navigate( 'AddContactSendRequest', {
-                SelectedContact: [ this.Contact ],
+                SelectedContact: [ this.contact ],
                 headerText:`Send Recovery Key${'\n'}to contact`,
                 subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
                 contactText:'Sharing Recovery Key with',

@@ -312,43 +312,6 @@ class FriendsAndFamilyScreen extends PureComponent<
     )
   };
 
-  renderAddContactFriendsAndFamily = () => {
-    const { navigation } = this.props
-    const { isLoadContacts, selectedContact } = this.state
-    if( !isLoadContacts ) return
-    return (
-      <AddContactAddressBook
-        isLoadContacts={isLoadContacts}
-        proceedButtonText={'Confirm & Proceed'}
-        onPressContinue={() => {
-          if ( selectedContact && selectedContact.length ) {
-            navigation.navigate( 'AddContactSendRequest', {
-              SelectedContact: selectedContact,
-            } )
-            this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-          }
-        }}
-        onSelectContact={( selectedData ) => {
-          this.setState( {
-            selectedContact: selectedData,
-          } )
-        }}
-        onPressBack={() => {
-          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-        }}
-        onSkipContinue={() => {
-          const contactDummy = {
-            id: uuid(),
-          }
-          navigation.navigate( 'AddContactSendRequest', {
-            SelectedContact: [ contactDummy ],
-          } )
-          this.addContactAddressBookBottomSheetRef.current?.snapTo( 0 )
-        }}
-      />
-    )
-  };
-
   renderAddContactAddressBookHeader = () => {
     return <ModalHeader />
   };
