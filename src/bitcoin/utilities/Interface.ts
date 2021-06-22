@@ -755,8 +755,13 @@ export interface Wallet {
   walletId,
   primaryMnemonic,
   secondaryMemonic?,
+  details2FA : {
+    secondaryXpub: string,
+    bithyveXpub: string,
+    twoFAKey: string,
+  }
   accounts: {
-    [id: string]: Account | MultiSigAccount
+    [derivationPath: string]: string // derivation path to account-id mapping
   }
 }
 

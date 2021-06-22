@@ -65,30 +65,42 @@ export function generateMultiSigAccount(
     walletId,
     accountName,
     accountDescription,
+    mnemonic,
     derivationPath,
-    xpubs,
-    xprivs,
+    secondaryXpub,
+    bithyveXpub,
     network
   }: {
     accountName: string,
     accountDescription: string,
     walletId: string,
+    mnemonic: string,
     derivationPath: string,
-    xpubs: {
-      primary: string,
-      secondary: string,
-      bithyve: string,
-    },
-    xprivs: {
-      primary: string,
-      secondary?: string,
-    },
+    secondaryXpub: string,
+    bithyveXpub: string,
     network: networks.Network,
   }
 ): MultiSigAccount {
+  // Note: only primary-xpubs differs b/w different multi-sig account instance(secondary and bh-xpubs stay constant)
 
-  const id = crypto.createHash( 'sha256' ).update( xpubs.secondary ).digest( 'hex' )
-  const initialRecevingAddress = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, network, 0, false ).address
+  const xpubs: {
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  } = {
+    primary: AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath ),
+    secondary: secondaryXpub,
+    bithyve: bithyveXpub,
+  }
+  const xprivs: {
+    primary: string,
+    secondary?: string,
+  } = {
+    primary: AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
+  }
+
+  const id = crypto.createHash( 'sha256' ).update( xpubs.primary + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+  const initialRecevingAddress = AccountUtilities.createMultiSig( xpubs, 2, network, 0, false ).address
 
   const account: MultiSigAccount = {
     id,

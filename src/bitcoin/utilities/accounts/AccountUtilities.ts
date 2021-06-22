@@ -168,7 +168,11 @@ export default class AccountUtilities {
   };
 
   static createMultiSig = (
-    xpubs: string[],
+    xpubs: {
+      primary: string,
+      secondary: string,
+      bithyve: string,
+    },
     required: number,
     network: bitcoinJS.Network,
     childIndex: number,
@@ -181,8 +185,10 @@ export default class AccountUtilities {
     address: string;
   } => {
 
-    const pubkeys = xpubs.map( ( xpub ) => {
-      const pub = AccountUtilities.generateKeyFromExtendedKey( xpub, network, childIndex, internal )
+    const pubkeys = Object.keys( xpubs ).map( ( xpubKey ) => {
+      let pub
+      if( xpubKey === 'primary' ) pub = AccountUtilities.generateKeyFromExtendedKey( xpubs[ xpubKey ], network, childIndex, internal )
+      else pub = AccountUtilities.generateKeyFromExtendedKey( xpubs[ xpubKey ], network, 0, internal )
       return Buffer.from( pub, 'hex' )
     } )
 
@@ -213,7 +219,7 @@ export default class AccountUtilities {
     const { xpubs, xprivs, network } = account
 
     for ( let itr = 0; itr <= account.nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, account.network, itr, false )
+      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, account.network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -227,7 +233,7 @@ export default class AccountUtilities {
     }
 
     for ( let itr = 0; itr <= account.nextFreeChangeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, account.network, itr, true )
+      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, account.network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
