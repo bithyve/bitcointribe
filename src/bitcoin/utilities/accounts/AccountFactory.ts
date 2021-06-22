@@ -8,20 +8,21 @@ export function generateAccount(
     walletId,
     accountName,
     accountDescription,
+    mnemonic,
     derivationPath,
-    xpub,
-    xpriv,
     network
   }: {
+    walletId: string,
     accountName: string,
     accountDescription: string,
-    walletId: string,
+    mnemonic: string,
     derivationPath: string,
-    xpub: string,
-    xpriv: string,
     network: networks.Network,
   }
 ): Account {
+
+  const xpub = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath )
+  const xpriv = AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
 
   const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
   const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network )
@@ -59,7 +60,7 @@ export function generateAccount(
 }
 
 
-export function generateTwoFAAccount(
+export function generateMultiSigAccount(
   {
     walletId,
     accountName,

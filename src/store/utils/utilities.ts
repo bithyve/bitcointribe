@@ -1,3 +1,6 @@
+import * as bip39 from 'bip39'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import crypto from 'crypto'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -5,7 +8,8 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { MetaShare } from '../../bitcoin/utilities/Interface'
+import { Account, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
+import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -219,6 +223,58 @@ export const serviceGeneratorForNewBHR = async (
     regularAcc,
     testAcc,
     secureAcc,
+    s3Service,
+    trustedContacts,
+  }
+}
+
+export const initializeWallet = async (): Promise <{
+  wallet: Wallet,
+  s3Service: S3Service,
+  trustedContacts: TrustedContactsService
+}> => {
+
+  const primaryMnemonic = bip39.generateMnemonic( 256 )
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+  const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
+  const secondaryMemonic = bip39.generateMnemonic( 256 )
+
+  const testAccount: Account = generateAccount( {
+    walletId,
+    accountName: 'Test Account',
+    accountDescription: '',
+    mnemonic: primaryMnemonic,
+    derivationPath: 'm/49\'/1\'/0\'',
+    network: bitcoinJS.networks.testnet,
+  } )
+
+  const checkingAccount: Account = generateAccount( {
+    walletId,
+    accountName: 'Checking Account',
+    accountDescription: '',
+    mnemonic: primaryMnemonic,
+    derivationPath: 'm/49\'/0\'/0\'',
+    network: bitcoinJS.networks.testnet,
+  } )
+
+  const wallet: Wallet = {
+    walletId,
+    primaryMnemonic,
+    secondaryMemonic,
+    accounts: {
+      [ testAccount.id ]: testAccount,
+      [ checkingAccount.id ]: checkingAccount,
+    }
+  }
+
+  // Share generation/restoration
+  const s3Service = new S3Service( primaryMnemonic )
+
+  // Trusted Contacts Service
+  const trustedContacts = new TrustedContactsService()
+
+  return {
+    wallet,
     s3Service,
     trustedContacts,
   }

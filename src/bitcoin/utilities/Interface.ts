@@ -751,6 +751,15 @@ export interface UTXO {
   status?: any;
 }
 
+export interface Wallet {
+  walletId,
+  primaryMnemonic,
+  secondaryMemonic?,
+  accounts: {
+    [id: string]: Account | MultiSigAccount
+  }
+}
+
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   walletId: string,                     // wallet's id
