@@ -53,7 +53,7 @@ export default class TrustedContacts {
     }
   };
 
-  public decryptData = ( key: string, encryptedDataPacket: string ) => {
+  public static decryptData = ( key: string, encryptedDataPacket: string ) => {
     key = key.slice( key.length - TrustedContacts.cipherSpec.keyLength )
     const decipher = crypto.createDecipheriv(
       TrustedContacts.cipherSpec.algorithm,
@@ -180,7 +180,7 @@ export default class TrustedContacts {
     unencryptedInstream = {
       ...unencryptedInstream,
       streamId: instreamUpdates.streamId,
-      primaryData: instreamUpdates.primaryEncryptedData? this.decryptData( channelKey, instreamUpdates.primaryEncryptedData ).data: ( unencryptedInstream as UnecryptedStreamData ).primaryData,
+      primaryData: instreamUpdates.primaryEncryptedData? TrustedContacts.decryptData( channelKey, instreamUpdates.primaryEncryptedData ).data: ( unencryptedInstream as UnecryptedStreamData ).primaryData,
       metaData: instreamUpdates.metaData? instreamUpdates.metaData: ( unencryptedInstream as UnecryptedStreamData ).metaData,
     }
 
@@ -288,7 +288,7 @@ export default class TrustedContacts {
     }
   };
 
-  public retrieveFromStream = async (
+  public static retrieveFromStream = async (
     {
       walletId,
       channelKey,
@@ -338,11 +338,11 @@ export default class TrustedContacts {
       } = {
       }
       if( options.retrievePrimaryData && streamData.primaryEncryptedData )
-        unencryptedStreamData.primaryData = this.decryptData( channelKey, streamData.primaryEncryptedData ).data
+        unencryptedStreamData.primaryData = TrustedContacts.decryptData( channelKey, streamData.primaryEncryptedData ).data
       if( options.retrieveBackupData && streamData.encryptedBackupData )
-        unencryptedStreamData[ 'backupData' ] = this.decryptData( channelKey, streamData.encryptedBackupData ).data
+        unencryptedStreamData[ 'backupData' ] = TrustedContacts.decryptData( channelKey, streamData.encryptedBackupData ).data
       if( options.retrieveSecondaryData && streamData.secondaryEncryptedData && secondaryChannelKey )
-        unencryptedStreamData[ 'secondaryData' ] = this.decryptData( secondaryChannelKey, streamData.secondaryEncryptedData ).data
+        unencryptedStreamData[ 'secondaryData' ] = TrustedContacts.decryptData( secondaryChannelKey, streamData.secondaryEncryptedData ).data
 
       return unencryptedStreamData
     } catch ( err ) {

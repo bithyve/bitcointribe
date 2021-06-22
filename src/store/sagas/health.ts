@@ -63,7 +63,9 @@ import {
   setDownloadedBackupData,
   DOWNLOAD_BACKUP_DATA,
   SETUP_HEALTH_FOR_RESTORE,
-  setupHealth
+  setupHealth,
+  UPDATE_KEEPER_INFO_TO_CHANNEL,
+  setIsKeeperInfoUpdated
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -1283,6 +1285,7 @@ function* getPDFDataWorker( { payload } ) {
         channelKey: channelKey,
         secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
+        walletId,
         encryptedKey: LevelHealth.encryptWithAnswer(
           shareId,
           WALLET_SETUP.security.answer
@@ -1295,6 +1298,7 @@ function* getPDFDataWorker( { payload } ) {
         streamId: TrustedContacts.getStreamId( walletId ),
         secondaryChannelKey: currentContact.secondaryChannelKey,
         version: appVersion,
+        walletId
       }
 
       const qrData = [
@@ -1964,12 +1968,14 @@ function* createChannelAssetsWorker( { payload } ) {
   try {
     const { shareId } = payload
     const MetaShares: MetaShare[] = yield select( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
+    const service: S3Service = yield select( ( state ) => state.health.service )
+    const encryptedSecondaryShares: string[] = service.levelhealth.encryptedSMSecretsKeeper
     if( MetaShares && MetaShares.length ){
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
       const secondaryShareDownloadedVar = yield select( ( state ) => state.health.secondaryShareDownloaded )
       const secureAccount: SecureAccount = yield select( ( state ) => state.accounts[ SECURE_ACCOUNT ].service )
-      let secondaryShare: string = MetaShares.find( value=>value.shareId==shareId ).encryptedShare.smShare
+      let secondaryShare: string = encryptedSecondaryShares && encryptedSecondaryShares.length &&  encryptedSecondaryShares[ 1 ] ? encryptedSecondaryShares[ 1 ] : ''
       if( secondaryShareDownloadedVar ) {
         secondaryShare = secondaryShareDownloadedVar
       }
@@ -2024,7 +2030,7 @@ function* downloadSMShareWorker( { payload } ) {
           }
         }
       }
-      const res = yield call( trustedContacts.retrieveFromStream, {
+      const res = yield call( TrustedContacts.retrieveFromStream, {
         walletId, channelKey, options: {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
@@ -2124,7 +2130,7 @@ function* modifyLevelDataWorker( ) {
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const s3Service = yield select( ( state ) => state.health.service )
     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
-
+    console.log( 'contacts', contacts )
     let isError = false
     const abc = JSON.stringify( levelHealth )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ), contacts ) ]
@@ -2133,8 +2139,10 @@ function* modifyLevelDataWorker( ) {
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
         const currentContact: TrustedContact = contacts[ element.channelKey ]
+        console.log( 'currentContact', currentContact )
         if ( currentContact ) {
           const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
+          console.log( 'instream', instream )
           if( instream ){
             levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'accessible' : levelInfo[ j ].status
             levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
@@ -2163,31 +2171,30 @@ export const modifyLevelDataWatcher = createWatcher(
 
 function* downloadBackupDataWorker( { payload } ) {
   try {
-    const { walletId, scannedData } = payload
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
+    const { scannedData, backupData } = payload
     const downloadedBackupData: {
       primaryData?: PrimaryStreamData;
       backupData?: BackupStreamData;
       secondaryData?: SecondaryStreamData;
     }[] = yield select( ( state ) => state.health.downloadedBackupData )
-    const qrDataObj = JSON.parse( scannedData )
-    yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
-    const res = yield call( trustedContacts.retrieveFromStream, {
-      walletId,
-      channelKey: qrDataObj.channelKey,
-      options: {
-        retrievePrimaryData: true,
-        retrieveBackupData: true,
-        retrieveSecondaryData: true,
-      },
-      secondaryChannelKey: qrDataObj.secondaryChannelKey
-    } )
-    console.log( 'res', res )
-    // if( res.data.secondaryData.secondaryMnemonicShard ) {
-    //   yield put( secondaryShareDownloaded( res.data.secondaryData.secondaryMnemonicShard ) )
-    //   yield put( setApprovalStatus( true ) )
-    // }
-    downloadedBackupData.push( res.data )
+    if( backupData ) {
+      downloadedBackupData.push( backupData )
+    } else {
+      const qrDataObj = scannedData
+      const res = yield call( TrustedContacts.retrieveFromStream, {
+        walletId: qrDataObj.walletId,
+        channelKey: qrDataObj.channelKey,
+        options: {
+          retrievePrimaryData: true,
+          retrieveBackupData: true,
+          retrieveSecondaryData: true,
+        },
+        secondaryChannelKey: qrDataObj.secondaryChannelKey
+      } )
+      console.log( 'res', res )
+      downloadedBackupData.push( res )
+    }
     yield put( setDownloadedBackupData( downloadedBackupData ) )
     yield put( switchS3LoaderKeeper( 'downloadBackupDataStatus' ) )
   } catch ( error ) {
@@ -2323,4 +2330,102 @@ function* setupHealthWorker( { payload } ) {
 export const setupHealthWatcher = createWatcher(
   setupHealthWorker,
   SETUP_HEALTH_FOR_RESTORE
+)
+
+function* updateKeeperInfoToChannelWorker( ) {
+  try {
+    console.log( 'UPDATE KEEPER INFO' )
+    yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+    if ( keeperInfo.length > 0 ) {
+      for ( let i = 0; i < keeperInfo.length; i++ ) {
+        if( currentLevel == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = currentLevel
+        else if( currentLevel == 2 && keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = currentLevel
+        else if( currentLevel == 3 && keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = currentLevel
+      }
+    }
+    yield put( putKeeperInfo( keeperInfo ) )
+    const service: S3Service = yield select( ( state ) => state.health.service )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
+    const walletId = service.levelhealth.walletId
+    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+    const channelSyncUpdates: {
+      channelKey: string,
+      streamId: string,
+      unEncryptedOutstreamUpdates?: UnecryptedStreamData,
+    }[] = []
+    if( levelHealth[ 0 ] ) {
+      for ( let i = 2; i < levelHealth[ 0 ].levelInfo.length; i++ ) {
+        const element = levelHealth[ 0 ].levelInfo[ i ]
+        const channelKey = keeperInfo.find( value=>value.shareId == element.shareId ).channelKey
+        const primaryData: PrimaryStreamData = {
+          contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
+          walletID: walletId,
+          walletName,
+          relationType: TrustedContactRelationTypes.KEEPER,
+        }
+
+        const backupData: BackupStreamData = {
+          primaryMnemonicShard: {
+            ...MetaShares.find( value=>value.shareId == element.shareId ),
+            encryptedShare: {
+              pmShare: MetaShares.find( value=>value.shareId == element.shareId ).encryptedShare.pmShare,
+              smShare: '',
+              bhXpub: '',
+            }
+          },
+          keeperInfo
+        }
+
+        const streamUpdates: UnecryptedStreamData = {
+          streamId: TrustedContacts.getStreamId( walletId ),
+          primaryData,
+          backupData,
+          metaData: {
+            flags:{
+              active: true,
+              newData: true,
+              lastSeen: Date.now(),
+            },
+            version: DeviceInfo.getVersion()
+          }
+        }
+
+        channelSyncUpdates.push( {
+          channelKey,
+          streamId: streamUpdates.streamId,
+          unEncryptedOutstreamUpdates: streamUpdates,
+        } )
+      }
+    }
+    const res = yield call(
+      trustedContacts.syncPermanentChannels,
+      channelSyncUpdates
+    )
+    if ( res.status === 200 ) {
+      let temp = {
+        isKeeperInfoUpdated2: true,
+        isKeeperInfoUpdated3: false
+      }
+      if( currentLevel == 3 ){
+        temp = {
+          isKeeperInfoUpdated2: true,
+          isKeeperInfoUpdated3: true
+        }
+      }
+      yield put( setIsKeeperInfoUpdated( temp ) )
+    }
+    yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+    console.log( 'Error autoShareLevel2KeepersWorker', error )
+  }
+}
+
+export const updateKeeperInfoToChannelWatcher = createWatcher(
+  updateKeeperInfoToChannelWorker,
+  UPDATE_KEEPER_INFO_TO_CHANNEL
 )

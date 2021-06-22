@@ -35,7 +35,8 @@ import {
   IS_LEVEL_TO_NOT_SETUP,
   SET_CHANNEL_ASSETS,
   APPROVAL_STATUS,
-  DOWNLOADED_BACKUP_DATA
+  DOWNLOADED_BACKUP_DATA,
+  SET_IS_KEEPER_INFO_UPDATED
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
 
@@ -57,6 +58,7 @@ const initialState: {
     createChannelAssetsStatus: boolean;
     downloadSMShareLoader: boolean;
     downloadBackupDataStatus: boolean;
+    updateKIToChStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -96,6 +98,8 @@ const initialState: {
     backupData?: BackupStreamData;
     secondaryData?: SecondaryStreamData;
   }[];
+  isKeeperInfoUpdated2: boolean;
+  isKeeperInfoUpdated3: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -113,7 +117,8 @@ const initialState: {
     setToBaseStatus: false,
     createChannelAssetsStatus: false,
     downloadSMShareLoader: false,
-    downloadBackupDataStatus: false
+    downloadBackupDataStatus: false,
+    updateKIToChStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -146,7 +151,9 @@ const initialState: {
   channelAssets: {
   },
   approvalStatus: false,
-  downloadedBackupData: []
+  downloadedBackupData: [],
+  isKeeperInfoUpdated2: false,
+  isKeeperInfoUpdated3: false,
 }
 
 export default ( state = initialState, action ) => {
@@ -366,6 +373,13 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           downloadedBackupData: action.payload.downloadedBackupData
+        }
+
+      case SET_IS_KEEPER_INFO_UPDATED:
+        return {
+          ...state,
+          isKeeperInfoUpdated2: action.payload.isKeeperInfoUpdated2 ? action.payload.isKeeperInfoUpdated2 : state.isKeeperInfoUpdated2,
+          isKeeperInfoUpdated3: action.payload.isKeeperInfoUpdated3 ? action.payload.isKeeperInfoUpdated3 : state.isKeeperInfoUpdated3
         }
 
   }

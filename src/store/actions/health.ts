@@ -69,6 +69,8 @@ export const CREATE_OR_CHANGE_GUARDIAN = 'CREATE_OR_CHANGE_GUARDIAN'
 export const DOWNLOADED_BACKUP_DATA = 'DOWNLOADED_BACKUP_DATA'
 export const DOWNLOAD_BACKUP_DATA = 'DOWNLOAD_BACKUP_DATA'
 export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
+export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
+export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -588,10 +590,10 @@ export const setDownloadedBackupData = ( downloadedBackupData ) => {
   }
 }
 
-export const downloadBackupData = ( scannedData ) => {
+export const downloadBackupData = ( { scannedData, backupData }: { scannedData?: any, backupData?: any } ) => {
   return {
     type: DOWNLOAD_BACKUP_DATA, payload: {
-      scannedData
+      scannedData, backupData
     }
   }
 }
@@ -601,5 +603,20 @@ export const setupHealth = ( level ) => {
     type: SETUP_HEALTH_FOR_RESTORE, payload: {
       level
     }
+  }
+}
+
+export const updateKeeperInfoToChannel = ( ) => {
+  return {
+    type: UPDATE_KEEPER_INFO_TO_CHANNEL
+  }
+}
+
+export const setIsKeeperInfoUpdated = ( payload: {
+  isKeeperInfoUpdated2?: boolean;
+  isKeeperInfoUpdated3?: boolean;
+} ) => {
+  return {
+    type: SET_IS_KEEPER_INFO_UPDATED, payload
   }
 }

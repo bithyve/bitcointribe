@@ -303,12 +303,8 @@ class RestoreWithICloud extends Component<
       this.props.navigation.navigate( 'HomeNav' )
     }
 
-    if (
-      JSON.stringify( prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES ) !==
-      JSON.stringify( this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES )
-    ) {
-      //console.log("INSIDE prevProps.DECENTRALIZED_BACKUP.RECOVERY_SHARES");
-      if ( !isEmpty( this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES ) ) {
+    if( JSON.stringify( prevProps.downloadedBackupData ) !== JSON.stringify( this.props.downloadedBackupData ) ){
+      if ( this.props.downloadedBackupData.length ) {
         this.updateList()
       }
     }
@@ -361,35 +357,20 @@ class RestoreWithICloud extends Component<
   updateList = () => {
     //console.log("INSIDE updateList");
     const { listData, selectedBackup } = this.state
+    const { downloadedBackupData } = this.props
 
     let updatedListData = []
     const shares: MetaShare[] = []
     updatedListData = [ ...listData ]
-    //console.log("this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES", this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES);
-    //console.log("type of", typeof this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES)
-    shares.push( this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES[ 0 ].META_SHARE )
-    Object.keys( this.props.DECENTRALIZED_BACKUP.RECOVERY_SHARES ).forEach(
-      ( key ) => {
-        const META_SHARE: MetaShare = this.props.DECENTRALIZED_BACKUP
-          .RECOVERY_SHARES[ key ].META_SHARE
-        if ( META_SHARE ) {
-          let insert = true
-          shares.forEach( ( share ) => {
-            if ( share.shareId === META_SHARE.shareId ) insert = false
-          }, [] )
 
-          if ( insert ) {
-            for ( let i = 0; i < updatedListData.length; i++ ) {
-              if ( META_SHARE.shareId === updatedListData[ i ].shareId ) {
-                updatedListData[ i ].status = 'received'
-                shares.push( META_SHARE )
-                break
-              }
-            }
-          }
-        }
+    for ( let i = 0; i < updatedListData.length; i++ ) {
+      if ( downloadedBackupData.find( value=>value.backupData.primaryMnemonicShard.shareId == updatedListData[ i ].shareId ) ) {
+        updatedListData[ i ].status = 'received'
+        shares.push( downloadedBackupData.find( value=>value.backupData.primaryMnemonicShard.shareId == updatedListData[ i ].shareId ).backupData.primaryMnemonicShard )
+        break
       }
-    )
+    }
+
     this.setState( {
       listData: updatedListData, showLoader: false
     }, () => {
@@ -543,12 +524,31 @@ class RestoreWithICloud extends Component<
         this.setState( {
           cloudBackup: true
         } )
-        this.props.updateCloudMShare( JSON.parse( selectedBackup.shares ), 0 );
+        const backupData: BackupStreamData = {
+        }
+        const secondaryData: SecondaryStreamData = {
+        }
+        const downloadedBackupData: {
+          primaryData?: PrimaryStreamData;
+          backupData?: BackupStreamData;
+          secondaryData?: SecondaryStreamData;
+        } = {
+          backupData, secondaryData
+        }
+        downloadedBackupData.backupData.primaryMnemonicShard = JSON.parse( selectedBackup.shares )
+        downloadedBackupData.backupData.keeperInfo = KeeperData
+        downloadedBackupData.secondaryData.secondaryMnemonicShard = selectedBackup.secondaryShare
+        downloadedBackupData.secondaryData.bhXpub = selectedBackup.bhXpub
+
+        this.props.downloadBackupData( {
+          backupData: downloadedBackupData
+        } );
+        // this.props.updateCloudMShare( JSON.parse( selectedBackup.shares ), 0 );
         // if(selectedBackup.type == "device"){
         ( this.RestoreFromICloud as any ).current.snapTo( 0 )
       } else if ( decryptedCloudDataJson && !selectedBackup.shares ) {
         this.showLoaderModal()
-        recoverWalletUsingIcloud( decryptedCloudDataJson, selectedBackup.levelStatus )
+        recoverWalletUsingIcloud( decryptedCloudDataJson )
       } else {
         ( this.ErrorBottomSheet as any ).current.snapTo( 1 )
       }
@@ -607,7 +607,9 @@ class RestoreWithICloud extends Component<
   handleScannedData = async ( scannedData ) => {
     console.log( 'scannedData', scannedData )
     const { downloadedBackupData } = this.props
-    this.props.downloadBackupData( scannedData )
+    this.props.downloadBackupData( {
+      scannedData: scannedData
+    }  )
   };
 
   onCreatLink = () => {
