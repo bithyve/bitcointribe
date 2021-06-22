@@ -10,6 +10,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { Account, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
 import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -238,22 +239,44 @@ export const initializeWallet = async (): Promise <{
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
   const secondaryMemonic = bip39.generateMnemonic( 256 )
+  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
+  const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
+  const testDerivationPath = 'm/49\'/1\'/0\''
   const testAccount: Account = generateAccount( {
     walletId,
     accountName: 'Test Account',
     accountDescription: '',
     mnemonic: primaryMnemonic,
-    derivationPath: 'm/49\'/1\'/0\'',
+    derivationPath: testDerivationPath,
     network: bitcoinJS.networks.testnet,
   } )
 
+  const rootDerivationPath = 'm/49\'/0\'/0\''
+  const checkingDerivationPath = rootDerivationPath
   const checkingAccount: Account = generateAccount( {
     walletId,
     accountName: 'Checking Account',
     accountDescription: '',
     mnemonic: primaryMnemonic,
-    derivationPath: 'm/49\'/0\'/0\'',
+    derivationPath: checkingDerivationPath,
+    network: bitcoinJS.networks.testnet,
+  } )
+
+  const { setupData } = await AccountUtilities.registerTwoFA( walletId, secondaryWalletId )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
+  const bithyveXpub = setupData.bhXpub
+  const twoFAKey = setupData.secret
+
+  const savingsDerivationPath = 'm/49\'/0\'/11\''
+  const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
+    walletId,
+    accountName: 'Savings Account',
+    accountDescription: '',
+    mnemonic: primaryMnemonic,
+    derivationPath: savingsDerivationPath,
+    secondaryXpub,
+    bithyveXpub,
     network: bitcoinJS.networks.testnet,
   } )
 
@@ -261,9 +284,15 @@ export const initializeWallet = async (): Promise <{
     walletId,
     primaryMnemonic,
     secondaryMemonic,
+    details2FA: {
+      secondaryXpub,
+      bithyveXpub,
+      twoFAKey
+    },
     accounts: {
-      [ testAccount.id ]: testAccount,
-      [ checkingAccount.id ]: checkingAccount,
+      [ testDerivationPath ]: testAccount.id,
+      [ checkingDerivationPath ]: checkingAccount.id,
+      [ savingsDerivationPath ]: savingsAccount.id
     }
   }
 
