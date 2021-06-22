@@ -510,13 +510,13 @@ export interface PrimaryStreamData {
 }
 
 export interface SecondaryStreamData {
-  secondaryMnemonicShard: any,
-  bhXpub: string,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string,
 }
 
 export interface BackupStreamData {
-  primaryMnemonicShard: any,
-  keeperInfo: any,
+  primaryMnemonicShard?: MetaShare,
+  keeperInfo?: KeeperInfoInterface[],
 }
 
 export interface UnecryptedStreamData {
