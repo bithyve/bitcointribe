@@ -30,9 +30,8 @@ import { initializeHealthSetup } from '../actions/health'
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
 
-  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const { wallet, accounts } = yield call( initializeWallet )
-
+  // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet )
   // TODO: save wallet-instance in realm
   yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
     wallet, accounts
@@ -54,9 +53,12 @@ function* setupWalletWorker( { payload } ) {
       },
     },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
+      REGULAR_ACCOUNT: JSON.stringify( {
+      } ),
+      TEST_ACCOUNT: JSON.stringify( {
+      } ),
+      SECURE_ACCOUNT: JSON.stringify( {
+      } ),
       S3_SERVICE: JSON.stringify( s3Service ),
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
     },
@@ -74,7 +76,7 @@ function* setupWalletWorker( { payload } ) {
 
   // Post Hydration activities
   // saturate the test account w/ 10K sats
-  yield put( getTestcoins() )
+  // yield put( getTestcoins() )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
