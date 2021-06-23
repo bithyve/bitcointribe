@@ -258,7 +258,6 @@ export default class Relay {
   }
 
   public static walletCheckIn = async (
-    walletId: string,
     currencyCode?: any,
   ): Promise<{
     exchangeRates: { [currency: string]: number };
@@ -266,7 +265,6 @@ export default class Relay {
   }> => {
     const res = await BH_AXIOS.post( 'v2/walletCheckIn', {
       HEXA_ID,
-      walletID: walletId,
       ...currencyCode && {
         currencyCode
       },

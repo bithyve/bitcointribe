@@ -285,7 +285,6 @@ export default class RelayServices {
   };
 
   public static walletCheckIn = async (
-    walletId: string,
     currencyCode?: any,
   ): Promise<
     | {
@@ -308,7 +307,6 @@ export default class RelayServices {
       return {
         status: config.STATUS.SUCCESS,
         data: await Relay.walletCheckIn(
-          walletId,
           currencyCode
         ),
       }
