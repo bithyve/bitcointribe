@@ -75,7 +75,9 @@ export const initAccountShells = ( accounts: Accounts ) => {
           primarySubAccount: new SubAccountConstructor( {
             id: account.id,
             xPub: ( account as MultiSigAccount ).is2FA? null: Bitcoin.generateYpub( account.xpub, account.network ),
-            instanceNumber: account.instanceNum
+            instanceNumber: account.instanceNum,
+            customDisplayName: account.accountName,
+            customDescription: account.accountDescription
           } ),
           unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
           displayOrder: displayOrderIndex,

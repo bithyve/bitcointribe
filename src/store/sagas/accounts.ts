@@ -15,7 +15,7 @@ import {
   SYNC_VIA_XPUB_AGENT,
   secondaryXprivGenerated,
   ADD_NEW_ACCOUNT_SHELL,
-  newAccountShellAdded,
+  newAccountShellsAdded,
   newAccountShellAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
@@ -92,9 +92,9 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -897,12 +897,9 @@ function* blindRefreshWorker() {
     const newAccountShells: AccountShell[]
     = yield call( recreatePrimarySubAccounts, accountsState,  )
 
-    for( const newShell of newAccountShells ){
-      yield put( newAccountShellAdded( {
-        accountShell: newShell
-      } ) )
-      yield put( accountShellOrderedToFront( newShell ) )
-    }
+    yield put( newAccountShellsAdded( {
+      accountShells: newAccountShells
+    } ) )
   }
 
   yield put( rescanSucceeded( rescanTxs ) )
@@ -1181,8 +1178,8 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
       primarySubAccount: subAccountInfo,
       displayOrder: 1,
     } )
-    yield put( newAccountShellAdded( {
-      accountShell: newAccountShell
+    yield put( newAccountShellsAdded( {
+      accountShells: [ newAccountShell ]
     } ) )
     yield put( accountShellOrderedToFront( newAccountShell ) )
   } catch ( error ) {

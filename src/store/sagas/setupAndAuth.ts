@@ -23,7 +23,7 @@ import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { getTestcoins, restoredAccountShells } from '../actions/accounts'
+import { getTestcoins, newAccountShellsAdded } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import { initAccountShells } from '../utils/accountShellMapping'
 // import { timer } from '../../utils'
@@ -39,11 +39,7 @@ function* setupWalletWorker( { payload } ) {
   } ) )
 
   const accountShells = yield call ( initAccountShells, accounts )
-  // TODO: update account shells in the reducer using an appropriate update action
-  console.log( {
-    accountShells
-  } )
-  yield put( restoredAccountShells( {
+  yield put( newAccountShellsAdded( {
     accountShells
   } ) )
 
