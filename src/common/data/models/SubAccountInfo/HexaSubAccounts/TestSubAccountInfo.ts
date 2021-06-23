@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface'
@@ -22,6 +23,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
 
   kind: SubAccountKind = SubAccountKind.TEST_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.TEST_ACCOUNT;
+  type: AccountType = AccountType.TEST_ACCOUNT
 
   balances: Balances;
   visibility: AccountVisibility;

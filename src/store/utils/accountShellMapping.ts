@@ -54,7 +54,8 @@ export const initAccountShells = ( accounts: Accounts ) => {
   const accountShells: AccountShell[] = []
   let displayOrderIndex = 1
   for( const accountType of Object.keys( accounts ) ){
-    accounts[ accountType ].forEach( ( account: Account | MultiSigAccount )=> {
+    const accountsByType = accounts[ accountType ]
+    accountsByType.forEach( ( account: Account | MultiSigAccount )=> {
       let SubAccountConstructor
       switch( account.type ){
           case AccountType.TEST_ACCOUNT:
