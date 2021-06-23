@@ -128,7 +128,7 @@ export default class AccountUtilities {
     return xKey
   };
 
-  static generateKeyFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean ) => {
+  static generateChildFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean ) => {
     const xKey = bip32.fromBase58( extendedKey, network )
     const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
     return childXKey.toBase58()
@@ -186,9 +186,12 @@ export default class AccountUtilities {
   } => {
 
     const pubkeys = Object.keys( xpubs ).map( ( xpubKey ) => {
-      let pub
-      if( xpubKey === 'primary' ) pub = AccountUtilities.generateKeyFromExtendedKey( xpubs[ xpubKey ], network, childIndex, internal )
-      else pub = AccountUtilities.generateKeyFromExtendedKey( xpubs[ xpubKey ], network, 0, internal )
+      let childExtendedKey
+      if( xpubKey === 'primary' ) childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, childIndex, internal )
+      else childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, 0, internal )
+
+      const xKey = bip32.fromBase58( childExtendedKey, network )
+      const pub = xKey.publicKey.toString( 'hex' )
       return Buffer.from( pub, 'hex' )
     } )
 
@@ -223,9 +226,9 @@ export default class AccountUtilities {
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateKeyFromExtendedKey( xprivs.primary, network, itr, false ),
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, false ),
           secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, false )
+            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, false )
             : null,
           childIndex: itr,
         }
@@ -237,9 +240,9 @@ export default class AccountUtilities {
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateKeyFromExtendedKey( xprivs.primary, network, itr, true ),
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, true ),
           secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, true )
+            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, true )
             : null,
           childIndex: itr,
           internal: true
