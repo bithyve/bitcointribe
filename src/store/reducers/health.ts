@@ -1,6 +1,6 @@
 import { Platform } from 'react-native'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
 import { LevelDataVar } from '../../common/CommonVars/commonVars'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
@@ -10,7 +10,6 @@ import {
   GET_HEALTH_OBJECT,
   ERROR_SENDING,
   S3_LOADING_STATUS,
-  INIT_LOADING_STATUS,
   MSHARES,
   IS_LEVEL_TWO_METASHARE,
   IS_LEVEL_THREE_METASHARE,
@@ -35,8 +34,9 @@ import {
   PDF_SUCCESSFULLY_CREATED,
   IS_LEVEL_TO_NOT_SETUP,
   SET_CHANNEL_ASSETS,
-  APPROVAL_STATUS
-
+  APPROVAL_STATUS,
+  DOWNLOADED_BACKUP_DATA,
+  SET_IS_KEEPER_INFO_UPDATED
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
 
@@ -57,6 +57,8 @@ const initialState: {
     setToBaseStatus: boolean;
     createChannelAssetsStatus: boolean;
     downloadSMShareLoader: boolean;
+    downloadBackupDataStatus: boolean;
+    updateKIToChStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -91,6 +93,13 @@ const initialState: {
   isLevelToNotSetupStatus: boolean;
   channelAssets: ChannelAssets;
   approvalStatus: boolean;
+  downloadedBackupData: {
+    primaryData?: PrimaryStreamData;
+    backupData?: BackupStreamData;
+    secondaryData?: SecondaryStreamData;
+  }[];
+  isKeeperInfoUpdated2: boolean;
+  isKeeperInfoUpdated3: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -107,7 +116,9 @@ const initialState: {
     healthExpiryStatus: false,
     setToBaseStatus: false,
     createChannelAssetsStatus: false,
-    downloadSMShareLoader: false
+    downloadSMShareLoader: false,
+    downloadBackupDataStatus: false,
+    updateKIToChStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -139,7 +150,10 @@ const initialState: {
   isLevelToNotSetupStatus: false,
   channelAssets: {
   },
-  approvalStatus: false
+  approvalStatus: false,
+  downloadedBackupData: [],
+  isKeeperInfoUpdated2: false,
+  isKeeperInfoUpdated3: false,
 }
 
 export default ( state = initialState, action ) => {
@@ -187,15 +201,6 @@ export default ( state = initialState, action ) => {
           loading: {
             ...state.loading,
             checkMSharesHealth: action.payload.beingLoaded,
-          },
-        }
-
-      case INIT_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            initLoader: action.payload.beingLoaded,
           },
         }
 
@@ -362,6 +367,19 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           approvalStatus: action.payload.flag
+        }
+
+      case DOWNLOADED_BACKUP_DATA:
+        return {
+          ...state,
+          downloadedBackupData: action.payload.downloadedBackupData
+        }
+
+      case SET_IS_KEEPER_INFO_UPDATED:
+        return {
+          ...state,
+          isKeeperInfoUpdated2: action.payload.isKeeperInfoUpdated2 ? action.payload.isKeeperInfoUpdated2 : state.isKeeperInfoUpdated2,
+          isKeeperInfoUpdated3: action.payload.isKeeperInfoUpdated3 ? action.payload.isKeeperInfoUpdated3 : state.isKeeperInfoUpdated3
         }
 
   }

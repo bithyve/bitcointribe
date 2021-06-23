@@ -167,6 +167,9 @@ import {
   createChannelAssetsWatcher,
   downloadSMShareWatcher,
   createOrChangeGuardianWatcher,
+  downloadBackupDataWatcher,
+  setupHealthWatcher,
+  updateKeeperInfoToChannelWatcher,
 } from './sagas/health'
 
 import {
@@ -312,6 +315,9 @@ const rootSaga = function* () {
     createChannelAssetsWatcher,
     downloadSMShareWatcher,
     createOrChangeGuardianWatcher,
+    downloadBackupDataWatcher,
+    setupHealthWatcher,
+    updateKeeperInfoToChannelWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

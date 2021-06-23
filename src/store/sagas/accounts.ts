@@ -1450,7 +1450,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
         }
       }
     }
-    const res = yield call( trustedContacts.retrieveFromStream, {
+    const res = yield call( TrustedContacts.retrieveFromStream, {
       walletId, channelKey, options: {
         retrieveSecondaryData: true,
       }, secondaryChannelKey: qrDataObj.channelKey2

@@ -344,6 +344,14 @@ export enum notificationType {
   smUploadedForPK = 'smUploadedForPK',
   newFCM = 'newFCM',
   newKeeperInfo = 'newKeeperInfo',
+  FNF_REQUEST = 'FNF_REQUEST',
+  FNF_TRANSACTION = 'FNF_TRANSACTION',
+  RELEASE = 'RELEASE',
+  FNF_REQUEST_ACCEPTED='FNF_REQUEST_ACCEPTED',
+  FNF_REQUEST_REJECTED='FNF_REQUEST_REJECTED',
+  FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
+  FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
+  FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -520,13 +528,13 @@ export interface PrimaryStreamData {
 }
 
 export interface SecondaryStreamData {
-  secondaryMnemonicShard: any,
-  bhXpub: string,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string,
 }
 
 export interface BackupStreamData {
-  primaryMnemonicShard: any,
-  keeperInfo: any,
+  primaryMnemonicShard?: MetaShare,
+  keeperInfo?: KeeperInfoInterface[],
 }
 
 export interface UnecryptedStreamData {

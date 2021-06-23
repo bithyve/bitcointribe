@@ -474,7 +474,8 @@ class ContactDetails extends PureComponent<
         streamId: instream.streamId,
         channelKey: this.contact.channelKey,
         secondaryChannelKey: contacts.contactsSecondaryChannelKey,
-        version: appVersion
+        version: appVersion,
+        walletId: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletID
       } )
     } else {
       qrString = JSON.stringify( {
@@ -483,7 +484,8 @@ class ContactDetails extends PureComponent<
         channelId: contacts.permanentChannelAddress,
         streamId: instream.streamId,
         secondaryChannelKey: contacts.contactsSecondaryChannelKey,
-        version: appVersion
+        version: appVersion,
+        walletId: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletID
       } )
     }
     this.setState( {
