@@ -8,7 +8,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { Account, AccountKind, Accounts, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
 import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
@@ -235,7 +235,6 @@ export const initializeWallet = async (): Promise <{
   s3Service: S3Service,
   trustedContacts: TrustedContactsService
 }> => {
-
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
@@ -243,9 +242,12 @@ export const initializeWallet = async (): Promise <{
   const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
+  const initInstanceNumber = 0
   const testDerivationPath = 'm/49\'/1\'/0\''
   const testAccount: Account = generateAccount( {
     walletId,
+    type: AccountType.TEST_ACCOUNT,
+    instanceNum: initInstanceNumber,
     accountName: 'Test Account',
     accountDescription: '',
     mnemonic: primaryMnemonic,
@@ -257,6 +259,8 @@ export const initializeWallet = async (): Promise <{
   const checkingDerivationPath = rootDerivationPath
   const checkingAccount: Account = generateAccount( {
     walletId,
+    type: AccountType.CHECKING_ACCOUNT,
+    instanceNum: initInstanceNumber,
     accountName: 'Checking Account',
     accountDescription: '',
     mnemonic: primaryMnemonic,
@@ -272,6 +276,8 @@ export const initializeWallet = async (): Promise <{
   const savingsDerivationPath = 'm/49\'/0\'/11\''
   const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
     walletId,
+    type: AccountType.SAVINGS_ACCOUNT,
+    instanceNum: initInstanceNumber,
     accountName: 'Savings Account',
     accountDescription: '',
     mnemonic: primaryMnemonic,
@@ -297,17 +303,10 @@ export const initializeWallet = async (): Promise <{
     }
   }
 
-  const defaultInstanceNumber = 0
   const accounts: Accounts = {
-    [ AccountKind.TEST_ACCOUNT ]: {
-      [ defaultInstanceNumber ]: testAccount
-    },
-    [ AccountKind.CHECKING_ACCOUNT ]: {
-      [ defaultInstanceNumber ]: checkingAccount
-    },
-    [ AccountKind.SAVINGS_ACCOUNT ]: {
-      [ defaultInstanceNumber ]: savingsAccount
-    }
+    [ AccountType.TEST_ACCOUNT ]: [ testAccount ],
+    [ AccountType.CHECKING_ACCOUNT ]: [ checkingAccount ],
+    [ AccountType.SAVINGS_ACCOUNT ]: [ savingsAccount ],
   }
 
   // Share generation

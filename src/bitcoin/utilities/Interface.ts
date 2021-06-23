@@ -776,6 +776,8 @@ export interface Wallet {
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   walletId: string,                     // wallet's id
+  type: AccountType,                    // type of account
+  instanceNum: number,                  // instance number of the aforementioned type
   network: networks.Network,            // testnet/mainnet
   derivationPath: string,               // derivation path of the extended keys belonging to this account
   xpub: string | null,                  // account's xpub (null for multi-sig accounts)
@@ -809,14 +811,12 @@ export interface MultiSigAccount extends Account {
   }
 }
 
-export enum AccountKind {
+export enum AccountType {
   TEST_ACCOUNT = 'TEST_ACCOUNT',
   CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
   SAVINGS_ACCOUNT = 'SAVINGS_ACCOUNT'
 }
 
 export interface Accounts {
-  [accountType: string]: {
-    [instanceNumber: number]: Account | MultiSigAccount
-  }
+  [accountType: string]: Account[]
 }

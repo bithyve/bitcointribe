@@ -1,11 +1,13 @@
 import { networks } from 'bitcoinjs-lib'
-import { Account, MultiSigAccount } from '../Interface'
+import { Account, AccountType, MultiSigAccount } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 
 export function generateAccount(
   {
     walletId,
+    type,
+    instanceNum,
     accountName,
     accountDescription,
     mnemonic,
@@ -13,6 +15,8 @@ export function generateAccount(
     network
   }: {
     walletId: string,
+    type: AccountType,
+    instanceNum: number,
     accountName: string,
     accountDescription: string,
     mnemonic: string,
@@ -30,6 +34,8 @@ export function generateAccount(
   const account: Account = {
     id,
     walletId,
+    type,
+    instanceNum,
     network,
     derivationPath,
     xpub,
@@ -63,6 +69,8 @@ export function generateAccount(
 export function generateMultiSigAccount(
   {
     walletId,
+    type,
+    instanceNum,
     accountName,
     accountDescription,
     mnemonic,
@@ -71,9 +79,11 @@ export function generateMultiSigAccount(
     bithyveXpub,
     network
   }: {
+    walletId: string,
+    type: AccountType,
+    instanceNum: number,
     accountName: string,
     accountDescription: string,
-    walletId: string,
     mnemonic: string,
     derivationPath: string,
     secondaryXpub: string,
@@ -105,6 +115,8 @@ export function generateMultiSigAccount(
   const account: MultiSigAccount = {
     id,
     walletId,
+    type,
+    instanceNum,
     network,
     derivationPath,
     is2FA: true,
