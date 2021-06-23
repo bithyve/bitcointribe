@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
+import { createWatcher, initializeWallet, serviceGeneratorForNewBHR } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -29,7 +29,15 @@ import { initializeHealthSetup } from '../actions/health'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
+
   const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  const { wallet, accounts } = yield call( initializeWallet )
+
+  // TODO: save wallet-instance in realm
+  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+    wallet, accounts
+  } ) )
+
 
   const initialDatabase: Database = {
     WALLET_SETUP: {

@@ -8,7 +8,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { Account, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, AccountKind, Accounts, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
 import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
@@ -231,6 +231,7 @@ export const serviceGeneratorForNewBHR = async (
 
 export const initializeWallet = async (): Promise <{
   wallet: Wallet,
+  accounts: Accounts,
   s3Service: S3Service,
   trustedContacts: TrustedContactsService
 }> => {
@@ -296,7 +297,20 @@ export const initializeWallet = async (): Promise <{
     }
   }
 
-  // Share generation/restoration
+  const defaultInstanceNumber = 0
+  const accounts: Accounts = {
+    [ AccountKind.TEST_ACCOUNT ]: {
+      [ defaultInstanceNumber ]: testAccount
+    },
+    [ AccountKind.CHECKING_ACCOUNT ]: {
+      [ defaultInstanceNumber ]: checkingAccount
+    },
+    [ AccountKind.SAVINGS_ACCOUNT ]: {
+      [ defaultInstanceNumber ]: savingsAccount
+    }
+  }
+
+  // Share generation
   const s3Service = new S3Service( primaryMnemonic )
 
   // Trusted Contacts Service
@@ -304,6 +318,7 @@ export const initializeWallet = async (): Promise <{
 
   return {
     wallet,
+    accounts,
     s3Service,
     trustedContacts,
   }

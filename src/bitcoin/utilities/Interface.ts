@@ -800,3 +800,15 @@ export interface MultiSigAccount extends Account {
     secondary?: string,
   }
 }
+
+export enum AccountKind {
+  TEST_ACCOUNT = 'TEST_ACCOUNT',
+  CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
+  SAVINGS_ACCOUNT = 'SAVINGS_ACCOUNT'
+}
+
+export interface Accounts {
+  [accountType: string]: {
+    [instanceNumber: number]: Account | MultiSigAccount
+  }
+}
