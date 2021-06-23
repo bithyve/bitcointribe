@@ -194,7 +194,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
               service: action.payload.services[ SECURE_ACCOUNT ],
             },
             servicesEnriched: true,
-            accountShells: updateAccountShells( services, state.accountShells ),
+            // accountShells: updateAccountShells( services, state.accountShells ),
           }
 
       case ACCOUNTS_SYNCHED:
@@ -462,7 +462,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case REMAP_ACCOUNT_SHELLS:
         return {
           ...state,
-          accountShells: updateAccountShells( action.payload.services, [] ),
+          // accountShells: updateAccountShells( action.payload.services, [] ),
         }
 
       case ACCOUNT_SHELL_REFRESH_STARTED:

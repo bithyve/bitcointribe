@@ -18,6 +18,8 @@ import {
   SwanDerivativeAccountElements,
   Accounts,
   AccountType,
+  MultiSigAccount,
+  Account,
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
@@ -52,7 +54,7 @@ export const initAccountShells = ( accounts: Accounts ) => {
   const accountShells: AccountShell[] = []
   let displayOrderIndex = 1
   for( const accountType of Object.keys( accounts ) ){
-    accounts[ accountType ].forEach( ( account )=> {
+    accounts[ accountType ].forEach( ( account: Account | MultiSigAccount )=> {
       let SubAccountConstructor
       switch( account.type ){
           case AccountType.TEST_ACCOUNT:
@@ -72,7 +74,7 @@ export const initAccountShells = ( accounts: Accounts ) => {
         new AccountShell( {
           primarySubAccount: new SubAccountConstructor( {
             id: account.id,
-            xPub: Bitcoin.generateYpub( account.xpub, account.network ),
+            xPub: ( account as MultiSigAccount ).is2FA? null: Bitcoin.generateYpub( account.xpub, account.network ),
             instanceNumber: account.instanceNum
           } ),
           unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
