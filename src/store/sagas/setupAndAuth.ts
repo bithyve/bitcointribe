@@ -25,6 +25,8 @@ import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 import { updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
+import { initAccountShells } from '../utils/accountShellMapping'
+import dbManager from '../../storage/realm/dbManager'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
@@ -33,6 +35,10 @@ function* setupWalletWorker( { payload } ) {
   // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
   const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet )
   // TODO: save wallet-instance in realm
+  // console.log( 'wallet-instance in realm', wallet, accounts )
+  yield call( dbManager.createWallet, wallet )
+  yield call( dbManager.createAccounts, accounts )
+
   yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
     wallet, accounts
   } ) )
