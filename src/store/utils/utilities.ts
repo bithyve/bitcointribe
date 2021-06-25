@@ -306,15 +306,9 @@ export const initializeWallet = async (): Promise <{
   }
 
   const accounts: Accounts = {
-    [ AccountType.TEST_ACCOUNT ]: {
-      [ testAccount.id ]: testAccount
-    },
-    [ AccountType.CHECKING_ACCOUNT ]: {
-      [ checkingAccount.id ]: checkingAccount
-    },
-    [ AccountType.SAVINGS_ACCOUNT ]: {
-      [ savingsAccount.id ]: savingsAccount
-    },
+    [ testAccount.id ]: testAccount,
+    [ checkingAccount.id ]: checkingAccount,
+    [ savingsAccount.id ]: savingsAccount,
   }
 
   // Share generation

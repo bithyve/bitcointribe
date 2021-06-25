@@ -50,6 +50,7 @@ import {
   resetTwoFA,
   generateSecondaryXpriv,
   SYNC_ACCOUNTS,
+  updateAccounts,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -88,7 +89,6 @@ import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { recreatePrimarySubAccounts } from '../utils/accountShellMapping'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
@@ -217,7 +217,7 @@ function* syncAccountsWorker( { payload }: {payload: {
     blindRefresh?: boolean;
   }}} ) {
   const { accounts, options } = payload
-  const network = accounts[ 0 ].network
+  const network = AccountUtilities.getNetworkByType( accounts[ 0 ].networkType )
 
   const { synchedAccounts, txsFound } = yield call(
     AccountOperations.syncAccounts,
@@ -229,7 +229,6 @@ function* syncAccountsWorker( { payload }: {payload: {
   return {
     synchedAccounts, txsFound
   }
-  // TODO: update reducer and insert into database
 }
 
 export const syncAccountsWatcher = createWatcher(
@@ -724,12 +723,7 @@ function* refreshAccountShellWorker( { payload } ) {
   const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
   const accounts: Accounts = tempDB.accounts
 
-  const accountsByType = accounts[ accountShell.primarySubAccount.type ]
-  const account: Account = accountsByType.find( account => account.id === accountShell.primarySubAccount.id )
-  console.log( {
-    account
-  } )
-
+  const account: Account = accounts[ accountShell.primarySubAccount.id ]
   const { synchedAccounts, txsFound } = yield call( syncAccountsWorker, {
     payload: {
       accounts: [ account ],
@@ -738,8 +732,20 @@ function* refreshAccountShellWorker( { payload } ) {
   } )
 
   console.log( {
-    synchedAccounts, txsFound
+    synchedAccounts
   } )
+  yield put( updateAccounts( {
+    accounts: synchedAccounts
+  } ) )
+
+  // TODO: insert into database
+  synchedAccounts.forEach( ( synchedAcc )=> {
+    accounts[ synchedAcc.id ] = synchedAcc
+  } )
+
+  tempDB.accounts = accounts
+  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {
   //   rescanTxs.push( {
@@ -814,15 +820,16 @@ function* blindRefreshWorker() {
     } )
   } )
 
-  if( netDeltaTxs.length ){
-    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
-    const newAccountShells: AccountShell[]
-    = yield call( recreatePrimarySubAccounts, accountsState,  )
+  // TODO: re-establish accountShell recreation
+  // if( netDeltaTxs.length ){
+  //   const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+  //   const newAccountShells: AccountShell[]
+  //   = yield call( recreatePrimarySubAccounts, accountsState,  )
 
-    yield put( newAccountShellsAdded( {
-      accountShells: newAccountShells
-    } ) )
-  }
+  //   yield put( newAccountShellsAdded( {
+  //     accountShells: newAccountShells
+  //   } ) )
+  // }
 
   yield put( rescanSucceeded( rescanTxs ) )
   yield put( blindRefreshStarted( false ) )
