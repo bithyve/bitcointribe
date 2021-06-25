@@ -193,8 +193,8 @@ export const getLevelInfoStatus = ( levelDataTemp ) => {
     if( ( element.keeper1.status == 'accessible' && element.keeper2.status == 'notAccessible' ) || ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'accessible' ) ||
     ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
       let name1 = ''; let name2 = ''
-      if( element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
-      if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
+      if( element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
+      if( element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name
       const name = name1 && name2 ? name1 + ' & ' + name2 : name1 && !name2 ? name1 : name2
       levelData[ i ].note = name + ' need your attention.'
     }

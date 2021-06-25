@@ -21,6 +21,7 @@ import {
   WyreDerivativeAccountElements,
   RampDerivativeAccountElements,
 } from '../Interface'
+import Bitcoin from './Bitcoin'
 import {
   FAST_BITCOINS,
   TRUSTED_CONTACTS,
@@ -33,11 +34,10 @@ import {
 } from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
-import AccountUtilities from './AccountUtilities'
 const {  HEXA_ID } = config
 
 
-export default class SecureHDWallet {
+export default class SecureHDWallet extends Bitcoin {
   public twoFASetup?: {
     qrData: string;
     secret: string;
@@ -66,8 +66,6 @@ export default class SecureHDWallet {
   public newTransactions: Array<TransactionDetails> = [];
   public accountName: string;
   public accountDescription: string;
-  public network: bitcoinJS.Network;
-
 
   private lastBalTxSync = 0;
   private confirmedUTXOs: Array<{
@@ -157,9 +155,10 @@ export default class SecureHDWallet {
       newTransactions: TransactionDetails[];
       feeRates: any;
     },
+    network?: bitcoinJS.Network,
   ) {
+    super( network )
     this.primaryMnemonic = primaryMnemonic
-    this.network = bitcoinJS.networks.bitcoin
     const { walletId } = this.getWalletId()
     this.walletID = walletId
     this.initializeStateVars( stateVars )
@@ -426,7 +425,7 @@ export default class SecureHDWallet {
     const externalAddress = this.createSecureMultiSig( this.nextFreeAddressIndex + hardGapLimit - 1 ).address
 
     const internalAddress = this.createSecureMultiSig( this.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
-    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.nextFreeAddressIndex += this.gapLimit
@@ -595,7 +594,7 @@ export default class SecureHDWallet {
         accountName: this.accountName,
       }
     }
-    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
     const  {
       UTXOs,
@@ -710,7 +709,7 @@ export default class SecureHDWallet {
       xpub,
     ).address
 
-    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.derivativeAccounts[ accountType ][
@@ -931,7 +930,7 @@ export default class SecureHDWallet {
       }
     }
 
-    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
     const txsFound: TransactionDetails[] = []
     for( const { accountType, accountNumber } of accountsInfo ){
@@ -2169,7 +2168,7 @@ export default class SecureHDWallet {
       // console.log({ txHex: res.data.txHex });
       // console.log('------ Broadcasting Transaction --------');
 
-      const { txid } = await AccountUtilities.broadcastTransaction( res.data.txHex, this.network )
+      const { txid } = await this.broadcastTransaction( res.data.txHex )
       // console.log({ txid });
 
       return {
@@ -2528,7 +2527,7 @@ export default class SecureHDWallet {
       // for generating ga_recovery based recoverable multiSigs
       const pubs = [ childBHPub, childPrimaryPub, childRecoveryPub ]
       // // console.log({ pubs });
-      const multiSig = AccountUtilities.generateMultiSig( 2, pubs, this.network )
+      const multiSig = this.generateMultiSig( 2, pubs )
 
       const construct = {
         scripts: {
@@ -2651,7 +2650,68 @@ export default class SecureHDWallet {
     return this.xpubs
   };
 
+  public setupSecureAccount2 = async () => {
+    // invoked once per wallet (during initial setup)
+    let res: AxiosResponse
+    // this.secondaryMnemonic = bip39.generateMnemonic(256);
+    // const { secondaryID } = this.getSecondaryID(this.secondaryMnemonic);
+    // try {
+    //   res = await SIGNING_AXIOS.post('setupSecureAccount', {
+    //     HEXA_ID,
+    //     walletID: this.walletID,
+    //     secondaryID,
+    //   });
+    // } catch (err) {
+    //   if (err.response) throw new Error(err.response.data.err);
+    //   if (err.code) throw new Error(err.code);
+    // }
+    // console.log({ res });
+    // const { setupSuccessful, setupData } = res.data;
+    const { prepared } = this.prepareSecureAccount2()
+  };
+
+  public prepareSecureAccount2 = (): { prepared: boolean } => {
+    try {
+      const primaryPath = `${config.DPATH_PURPOSE}'/0'/1'`
+      const primaryXpub = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        primaryPath,
+      )
+      this.primaryXpriv = this.getRecoverableXKey(
+        this.primaryMnemonic,
+        primaryPath,
+        true,
+      )
+
+      // if (!secondaryXpub) {
+      //   if (!this.secondaryMnemonic)
+      //     throw new Error(
+      //       'SecondaryXpub required; secondary mnemonic missing ',
+      //     );
+      //   const path = this.derivePath(bhXpub);
+      //   secondaryXpub = this.getRecoverableXKey(this.secondaryMnemonic, path);
+      // }
+
+      this.xpubs = {
+        ...this.xpubs, primary: primaryXpub
+      }
+      console.log( 'this.xpubs prepareSecureAccount2', this.xpubs )
+      return {
+        prepared: true,
+      }
+    } catch ( err ) {
+      console.log( 'prepareSecureAccount2 err', err )
+      return {
+        prepared: false,
+      }
+    }
+  };
+
   public deleteSecondaryMnemonics = () => {
     this.secondaryMnemonic = ''
   };
+
+  // public getSecondaryMnemonic = () => {
+  //   return this.secondaryMnemonic;
+  // };
 }

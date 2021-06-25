@@ -474,7 +474,7 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
-export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED'
+export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
 export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED'
@@ -554,12 +554,12 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const newAccountShellAdded = ( { accountShell, }: {
-  accountShell: AccountShell;
+export const newAccountShellsAdded = ( { accountShells }: {
+  accountShells: AccountShell[];
 } ) => {
   return {
-    type: NEW_ACCOUNT_SHELL_ADDED,
-    payload: accountShell
+    type: NEW_ACCOUNT_SHELLS_ADDED,
+    payload: accountShells
   }
 }
 

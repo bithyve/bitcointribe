@@ -1,14 +1,14 @@
 import { put, call, select } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_DONATION_NOTE, SEND_TX_NOTIFICATION } from '../actions/sending'
+import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { Account, DerivativeAccountTypes, INotification, MultiSigAccount, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -21,6 +21,10 @@ import idx from 'idx'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import * as bitcoinJS from 'bitcoinjs-lib'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -164,61 +168,108 @@ function* processRecipients( accountShell: AccountShell ){
 }
 
 
+// function* executeSendStage1( { payload }: {payload: {
+//   accountShellID: string;
+// }} ) {
+//   const { accountShellID } = payload
+//   const accountsState: AccountsState = yield select(
+//     ( state ) => state.accounts
+//   )
+//   const accountShell: AccountShell = accountsState.accountShells
+//     .find( accountShell => accountShell.id === accountShellID )
+
+//   const service: BaseAccount | SecureAccount = accountsState[
+//     accountShell.primarySubAccount.sourceKind
+//   ].service
+
+//   if( !accountsState.averageTxFees ){
+//     yield put( feeIntelMissing( {
+//       intelMissing: true
+//     } ) )
+//     return
+//   }
+
+//   const averageTxFeeByNetwork = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ]
+//   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+//   try {
+//     const recipients = yield call( processRecipients, accountShell )
+
+//     const res = yield call(
+//       service.transferST1,
+//       recipients,
+//       averageTxFeeByNetwork,
+//       derivativeAccountDetails
+//     )
+//     if ( res.status === 200 ){
+//       const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
+//       yield put( sendStage1Executed( {
+//         successful: true, carryOver: {
+//           txPrerequisites
+//         }
+//       } ) )
+//     }
+//     else {
+//       if ( res.err === 'ECONNABORTED' ) requestTimedout()
+//       yield put( sendStage1Executed( {
+//         successful: false,
+//         err: res.err
+//       } ) )
+//     }
+//   } catch ( err ) {
+//     yield put( sendStage1Executed( {
+//       successful: false,
+//       err
+//     } ) )
+//     return
+//   }
+// }
+
+// export const executeSendStage1Watcher = createWatcher(
+//   executeSendStage1,
+//   EXECUTE_SEND_STAGE1
+// )
+
+
 function* executeSendStage1( { payload }: {payload: {
-  accountShellID: string;
+  account: Account | MultiSigAccount;
 }} ) {
-  const { accountShellID } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ 'TESTNET' ]
 
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
+  const mnemonic = 'remember someone much festival stadium cash enlist avocado write blade sunset long virtual stadium inject host obscure clump jazz plunge goddess stone silent title'
+  const derivationPath1 = 'm/49\'/0\'/0\''
+  const xpub  = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath1 )
+  const xpriv =  AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath1 )
+  const account: Account = generateAccount( {
+    walletId: 'zyx',
+    accountName: 'Checkinig',
+    accountDescription: 'checking Description',
+    derivationPath: derivationPath1,
+    xpub,
+    xpriv,
+    network: bitcoinJS.networks.testnet,
+  } )
 
-  if( !accountsState.averageTxFees ){
-    yield put( feeIntelMissing( {
-      intelMissing: true
-    } ) )
-    return
-  }
 
-  const averageTxFeeByNetwork = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ]
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const { synchedAccounts } = yield call(
+    AccountOperations.syncAccounts,
+    [ account ],
+    account.network )
 
-  try {
-    const recipients = yield call( processRecipients, accountShell )
+  const recipients = [ {
+    address: '2N7njh5EhCbefajvNKMXqtB7kpD1VyQvik7',
+    amount: 1000,
+  } ]
 
-    const res = yield call(
-      service.transferST1,
-      recipients,
-      averageTxFeeByNetwork,
-      derivativeAccountDetails
-    )
-    if ( res.status === 200 ){
-      const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
-      yield put( sendStage1Executed( {
-        successful: true, carryOver: {
-          txPrerequisites
-        }
-      } ) )
-    }
-    else {
-      if ( res.err === 'ECONNABORTED' ) requestTimedout()
-      yield put( sendStage1Executed( {
-        successful: false,
-        err: res.err
-      } ) )
-    }
-  } catch ( err ) {
-    yield put( sendStage1Executed( {
-      successful: false,
-      err
-    } ) )
-    return
-  }
+  const txPrerequisites = yield call( AccountOperations.transferST1, synchedAccounts[ 0 ], recipients, averageTxFeeByNetwork )
+  console.log( {
+    txPrerequisites
+  } )
+
+  // TODO: save txPrerequisites
 }
 
 export const executeSendStage1Watcher = createWatcher(
@@ -226,60 +277,124 @@ export const executeSendStage1Watcher = createWatcher(
   EXECUTE_SEND_STAGE1
 )
 
+// function* executeSendStage2( { payload }: {payload: {
+//   accountShellID: string;
+//   txnPriority: string,
+// }} ) {
+//   const { accountShellID } = payload
+//   const accountsState: AccountsState = yield select(
+//     ( state ) => state.accounts
+//   )
+//   const sending: SendingState = yield select(
+//     ( state ) => state.sending
+//   )
+//   const accountShell: AccountShell = accountsState.accountShells
+//     .find( accountShell => accountShell.id === accountShellID )
+
+//   const service: BaseAccount | SecureAccount = accountsState[
+//     accountShell.primarySubAccount.sourceKind
+//   ].service
+
+//   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+
+//   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
+//   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+
+//   const { txnPriority } = payload
+
+//   const res = yield call(
+//     service.transferST2,
+//     txPrerequisites,
+//     txnPriority,
+//     customTxPrerequisites,
+//     derivativeAccountDetails,
+//   )
+
+//   if ( res.status === 200 ) {
+//     if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
+//       const { txHex, childIndexArray, inputs, derivativeAccountDetails } = res.data
+//       yield put( sendStage2Executed( {
+//         successful: true,
+//         carryOver: {
+//           txHex, childIndexArray, inputs, derivativeAccountDetails
+//         }
+//       }
+//       ) )
+//     } else yield put( sendStage2Executed( {
+//       successful: true,
+//       txid: res.data.txid
+//     } ) )
+//   } else {
+//     if ( res.err === 'ECONNABORTED' ) requestTimedout()
+//     yield put( sendStage2Executed( {
+//       successful: false,
+//       err: res.err
+//     } ) )
+//   }
+// }
+
+// export const executeSendStage2Watcher = createWatcher(
+//   executeSendStage2,
+//   EXECUTE_SEND_STAGE2
+// )
+
+
 function* executeSendStage2( { payload }: {payload: {
   accountShellID: string;
   txnPriority: string,
 }} ) {
-  const { accountShellID } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
-  const sending: SendingState = yield select(
-    ( state ) => state.sending
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ 'TESTNET' ]
 
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
+  const network = bitcoinJS.networks.testnet
+  const mnemonic = 'remember someone much festival stadium cash enlist avocado write blade sunset long virtual stadium inject host obscure clump jazz plunge goddess stone silent title'
+  const derivationPath1 = 'm/49\'/0\'/0\''
+  const xpub  = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath1 )
+  const xpriv =  AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath1 )
+  let account: Account = generateAccount( {
+    walletId: 'zyx',
+    accountName: 'Checkinig',
+    accountDescription: 'checking Description',
+    derivationPath: derivationPath1,
+    xpub,
+    xpriv,
+    network,
+  } )
 
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const { synchedAccounts } = yield call(
+    AccountOperations.syncAccounts,
+    [ account ],
+    account.network )
+  account = synchedAccounts[ 0 ]
 
-  const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
-  const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+  console.log( {
+    account
+  } )
+  const recipients = [ {
+    address: '2N7njh5EhCbefajvNKMXqtB7kpD1VyQvik7',
+    amount: 1000,
+  } ]
 
-  const { txnPriority } = payload
+  const { txPrerequisites } = yield call( AccountOperations.transferST1, account, recipients, averageTxFeeByNetwork )
+  console.log( {
+    txPrerequisites
+  } )
+
+  const txid = yield call( AccountOperations.transferST2, account, txPrerequisites, TxPriority.LOW, account.network )
+  console.log( {
+    txid
+  } )
 
   const res = yield call(
-    service.transferST2,
-    txPrerequisites,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-  )
+    AccountOperations.syncAccounts,
+    [ account ],
+    account.network )
+  console.log( {
+    final: res.synchedAccounts
+  } )
 
-  if ( res.status === 200 ) {
-    if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
-      const { txHex, childIndexArray, inputs, derivativeAccountDetails } = res.data
-      yield put( sendStage2Executed( {
-        successful: true,
-        carryOver: {
-          txHex, childIndexArray, inputs, derivativeAccountDetails
-        }
-      }
-      ) )
-    } else yield put( sendStage2Executed( {
-      successful: true,
-      txid: res.data.txid
-    } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( sendStage2Executed( {
-      successful: false,
-      err: res.err
-    } ) )
-  }
 }
 
 export const executeSendStage2Watcher = createWatcher(

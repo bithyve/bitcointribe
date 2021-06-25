@@ -22,9 +22,15 @@ import {
   ContactInfo,
   ContactDetails,
   TrustedContact,
-  ChannelAssets
+  ChannelAssets,
+  INotification,
+  notificationType,
+  Trusted_Contacts,
+  notificationTag,
 } from '../../bitcoin/utilities/Interface'
+import RecipientKind from '../../common/data/enums/RecipientKind'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
+import { AccountRecipientDescribing, ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
   REGULAR_ACCOUNT,
@@ -32,6 +38,7 @@ import {
   TEST_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import { insertDBWorker } from './storage'
+import { SendingState } from '../reducers/sending'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import Toast from '../../components/Toast'
@@ -250,19 +257,33 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
     trustedContacts.syncPermanentChannels,
     channelSyncUpdates
   )
-
   if ( res.status === 200 ) {
     const { shouldNotUpdateSERVICES }  = payload
     if( shouldNotUpdateSERVICES ){
       if( flowKind === InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT ){
         const temporaryContact = trustedContacts.tc.trustedContacts[ contactIdentifier ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
-        console.log( {
-          temporaryContact, instream
-        } )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         if( fcmToken ){
-          //TODO: send rejection notification
+          const notification: INotification = {
+            notificationType: notificationType.FNF_KEEPER_REQUEST_REJECTED,
+            title: 'Friends and Family notification',
+            body: `F&F keeper request rejected by ${temporaryContact.contactDetails.contactName}`,
+            data: {
+            },
+            tag: notificationTag.IMP,
+          }
+          const notifReceivers = []
+          notifReceivers.push( {
+            walletId: walletId,
+            FCMs: [ fcmToken ],
+          } )
+          if( notifReceivers.length )
+            yield call(
+              RelayServices.sendNotifications,
+              notifReceivers,
+              notification,
+            )
         }
       }
       return
@@ -285,9 +306,28 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       const instream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
       const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
       const relationType: TrustedContactRelationTypes = idx( instream, ( _ ) => _.primaryData.relationType )
+      const temporaryContact = trustedContacts.tc.trustedContacts[ contactIdentifier ] // temporary trusted contact object
 
       if( fcmToken ){
-        //TODO: send approval notification
+        const notification: INotification = {
+          notificationType: notificationType.FNF_KEEPER_REQUEST_ACCEPTED,
+          title: 'Friends and Family notification',
+          body: `F&F keeper request approved by ${temporaryContact.contactDetails.contactName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+        const notifReceivers = []
+        notifReceivers.push( {
+          walletId: walletId,
+          FCMs: [ fcmToken ],
+        } )
+        if( notifReceivers.length )
+          yield call(
+            RelayServices.sendNotifications,
+            notifReceivers,
+            notification,
+          )
       }
       if( relationType === TrustedContactRelationTypes.KEEPER )
         Toast( 'You have been successfully added as a Keeper' )
@@ -451,17 +491,39 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
     channelUpdates: [ channelUpdate ]
   } ) )
 
-  // TODO: Send remove notification
-  // const notification: INotification = {
-  //   notificationType: notificationType.contact,
-  //   title: 'Friends and Family notification',
-  //   body: `F&F removed by ${walletName}`,
-  //   data: {
-  //   },
-  //   tag: notificationTag.IMP,
-  // }
-  // sendNotification( recipient, notification )
-
+  const sendingState: SendingState = yield select( ( state ) => state.sending )
+  const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+  const { selectedRecipients } = sendingState
+  const contacts: Trusted_Contacts = trustedContactsService.tc.trustedContacts
+  const notifReceivers = []
+  const selectedContacts = []
+  selectedRecipients.forEach( ( recipient ) => {
+    if ( recipient.kind === RecipientKind.CONTACT ) {
+      const channelKey = ( recipient as ContactRecipientDescribing ).channelKey
+      const contact = contacts[ channelKey ]
+      if ( contact && contact.walletID ){
+        selectedContacts.push( contact )
+        notifReceivers.push( {
+          walletId: contact.walletID,
+          FCMs: [ idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.FCM ) ],
+        } )
+      }
+    }
+  } )
+  const notification: INotification = {
+    notificationType: notificationType.contact,
+    title: 'Friends and Family notification',
+    body: `F&F removed by ${walletName}`,
+    data: {
+    },
+    tag: notificationTag.IMP,
+  }
+  if( notifReceivers.length )
+    yield call(
+      RelayServices.sendNotifications,
+      notifReceivers,
+      notification,
+    )
 }
 
 export const removeTrustedContactWatcher = createWatcher(
@@ -470,11 +532,6 @@ export const removeTrustedContactWatcher = createWatcher(
 )
 
 function* walletCheckInWorker( { payload } ) {
-  // syncs exchange and fee rates
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const { walletId } = regularAccount.hdWallet.getWalletId()
-
   const storedExchangeRates = yield select(
     ( state ) => state.accounts.exchangeRates,
   )
@@ -486,7 +543,6 @@ function* walletCheckInWorker( { payload } ) {
     const { currencyCode } = payload
     const res = yield call(
       RelayServices.walletCheckIn,
-      walletId,
       currencyCode
     )
 

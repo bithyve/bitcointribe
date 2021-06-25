@@ -15,7 +15,7 @@ import {
   SYNC_VIA_XPUB_AGENT,
   secondaryXprivGenerated,
   ADD_NEW_ACCOUNT_SHELL,
-  newAccountShellAdded,
+  newAccountShellsAdded,
   newAccountShellAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
@@ -59,6 +59,7 @@ import {
 } from '../../common/constants/wallet-service-types'
 import {
   Account,
+  Accounts,
   ContactInfo,
   DerivativeAccountTypes,
   TrustedContact,
@@ -92,8 +93,10 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -213,25 +216,9 @@ function* syncAccountsWorker( { payload }: {payload: {
     hardRefresh?: boolean;
     blindRefresh?: boolean;
   }}} ) {
-  const { options } = payload
-  const account: Account = generateAccount( {
-    walletId: 'zyx',
-    xpub: 'tpubDCSE6S93MaNAEx5DCMpKu4Np1gNKKwH9nozBcKgiWHdNwVAKx6aS3AQsBqwLukGkAVbrZfHjr67Hxu9QCGxLuYgELmjMGGSJsvs4hnQwGjP',
-    accountName: 'Checkinig',
-    accountDescription: 'checking Description',
-    network: bitcoinJS.networks.testnet,
-  } )
+  const { accounts, options } = payload
+  const network = accounts[ 0 ].network
 
-  const account2: Account = generateAccount( {
-    walletId: 'zyx',
-    xpub: 'tpubDDXWJsiz1pUPfzfeUuL7nkYNdz8EC8emx9ZBCMydW1pTdcK5B6dQ3JxacaSM3huQ4ZhX46mNTvBZ1J1jU5AXrdot8TQAE1JCGtNFTrXqjWx',
-    accountName: 'Test',
-    accountDescription: 'test Description',
-    network: bitcoinJS.networks.testnet,
-  } )
-  // TODO: pick accounts from reducer
-  const accounts = [ account, account2 ]
-  const network = accounts[ 0 ].network // n/w reference: first account's n/w
   const { synchedAccounts, txsFound } = yield call(
     AccountOperations.syncAccounts,
     accounts,
@@ -239,6 +226,9 @@ function* syncAccountsWorker( { payload }: {payload: {
     options.hardRefresh,
     options.blindRefresh )
 
+  return {
+    synchedAccounts, txsFound
+  }
   // TODO: update reducer and insert into database
 }
 
@@ -726,102 +716,41 @@ export const updateDonationPreferencesWatcher = createWatcher(
 )
 
 function* refreshAccountShellWorker( { payload } ) {
-  const shell: AccountShell = payload.shell
-  yield put( accountShellRefreshStarted( shell ) )
-  const { primarySubAccount } = shell
+  const accountShell: AccountShell = payload.shell
+  yield put( accountShellRefreshStarted( accountShell ) )
   const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
 
-  let accountKind
-  switch ( primarySubAccount.kind ) {
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        if ( primarySubAccount.instanceNumber )
-          accountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
-        else accountKind = primarySubAccount.kind
-        break
+  // TODO: get accounts from the database(filtering by accountType and accountId)
+  const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+  const accounts: Accounts = tempDB.accounts
 
-      case SubAccountKind.SERVICE:
-        accountKind = ( primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
-        break
+  const accountsByType = accounts[ accountShell.primarySubAccount.type ]
+  const account: Account = accountsByType.find( account => account.id === accountShell.primarySubAccount.id )
+  console.log( {
+    account
+  } )
 
-      default:
-        accountKind = primarySubAccount.kind
-  }
-
-  const nonDerivativeAccounts = [
-    SubAccountKind.TEST_ACCOUNT,
-    SubAccountKind.REGULAR_ACCOUNT,
-    SubAccountKind.SECURE_ACCOUNT,
-  ]
-
-  if ( !nonDerivativeAccounts.includes( accountKind ) ) {
-    if ( accountKind === DONATION_ACCOUNT ) {
-      const payload = {
-        serviceType: primarySubAccount.sourceKind,
-        derivativeAccountType: accountKind,
-        accountNumber: primarySubAccount.instanceNumber,
-      }
-      yield call( syncViaXpubAgentWorker, {
-        payload
-      } )
-    } else {
-      const payload = {
-        serviceType: primarySubAccount.sourceKind,
-        accountType: accountKind,
-        accountNumber: primarySubAccount.instanceNumber,
-        hardRefresh: options.hardRefresh
-      }
-      const deltaTxs: TransactionDescribing[] = yield call( fetchDerivativeAccBalanceTxWorker, {
-        payload
-      } )
-
-      const rescanTxs: RescannedTransactionData[] = []
-      deltaTxs.forEach( ( deltaTx ) => {
-        rescanTxs.push( {
-          details: deltaTx,
-          accountShell: shell,
-        } )
-      } )
-      yield put( rescanSucceeded( rescanTxs ) )
+  const { synchedAccounts, txsFound } = yield call( syncAccountsWorker, {
+    payload: {
+      accounts: [ account ],
+      options,
     }
-  } else {
-    const payload = {
-      serviceType: accountKind,
-      options: {
-        loader: true,
-        syncTrustedDerivative:
-          primarySubAccount.sourceKind === TEST_ACCOUNT ? false : true,
-        hardRefresh: options.hardRefresh
-      },
-    }
+  } )
 
-    const deltaTxs: TransactionDescribing[] = yield call( fetchBalanceTxWorker, {
-      payload
-    } )
-
-    // yield call( syncAccountsWorker, {
-    //   payload: {
-    //     accounts:[],
-    //     options: {
-    //       hardRefresh: false,
-    //       blindRefresh: false,
-    //     }
-    //   }
-    // } )
+  console.log( {
+    synchedAccounts, txsFound
+  } )
+  // const rescanTxs: RescannedTransactionData[] = []
+  // deltaTxs.forEach( ( deltaTx ) => {
+  //   rescanTxs.push( {
+  //     details: deltaTx,
+  //     accountShell: accountShell,
+  //   } )
+  // } )
+  // yield put( rescanSucceeded( rescanTxs ) )
 
 
-
-    const rescanTxs: RescannedTransactionData[] = []
-    deltaTxs.forEach( ( deltaTx ) => {
-      rescanTxs.push( {
-        details: deltaTx,
-        accountShell: shell,
-      } )
-    } )
-    yield put( rescanSucceeded( rescanTxs ) )
-  }
-
-  yield put( accountShellRefreshCompleted( shell ) )
+  // yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
 export const refreshAccountShellWatcher = createWatcher(
@@ -890,12 +819,9 @@ function* blindRefreshWorker() {
     const newAccountShells: AccountShell[]
     = yield call( recreatePrimarySubAccounts, accountsState,  )
 
-    for( const newShell of newAccountShells ){
-      yield put( newAccountShellAdded( {
-        accountShell: newShell
-      } ) )
-      yield put( accountShellOrderedToFront( newShell ) )
-    }
+    yield put( newAccountShellsAdded( {
+      accountShells: newAccountShells
+    } ) )
   }
 
   yield put( rescanSucceeded( rescanTxs ) )
@@ -1174,8 +1100,8 @@ function* addNewAccountShell( { payload: subAccountInfo, }: {
       primarySubAccount: subAccountInfo,
       displayOrder: 1,
     } )
-    yield put( newAccountShellAdded( {
-      accountShell: newAccountShell
+    yield put( newAccountShellsAdded( {
+      accountShells: [ newAccountShell ]
     } ) )
     yield put( accountShellOrderedToFront( newAccountShell ) )
   } catch ( error ) {
@@ -1443,7 +1369,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
         }
       }
     }
-    const res = yield call( trustedContacts.retrieveFromStream, {
+    const res = yield call( TrustedContacts.retrieveFromStream, {
       walletId, channelKey, options: {
         retrieveSecondaryData: true,
       }, secondaryChannelKey: qrDataObj.channelKey2

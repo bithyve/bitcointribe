@@ -19,6 +19,7 @@ import {
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
+import { APP_STAGE } from '../common/interfaces/Interfaces'
 
 class HexaConfig {
   //RAMP details
@@ -235,11 +236,11 @@ class HexaConfig {
 
     const BIT_SERVER_MODE = Config.BIT_SERVER_MODE ? Config.BIT_SERVER_MODE.trim() : 'PROD'
     if ( BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV' ) {
-      this.APP_STAGE = 'dev'
+      this.APP_STAGE = APP_STAGE.DEVELOPMENT
     } else if ( BIT_SERVER_MODE === 'STA' ) {
-      this.APP_STAGE = 'sta'
+      this.APP_STAGE = APP_STAGE.STAGING
     } else {
-      this.APP_STAGE = 'app'
+      this.APP_STAGE = APP_STAGE.PRODUCTION
     }
   }
 

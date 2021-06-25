@@ -13,7 +13,7 @@ import {
   TouchableWithoutFeedback,
   TextInput,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../common/Fonts'
@@ -37,7 +37,7 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import { initializeHealthSetup, initNewBHRFlow } from '../store/actions/health'
+import { initNewBHRFlow } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 
@@ -168,7 +168,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = () =>{
     showLoader()
-    requestAnimationFrame(() => {
+    requestAnimationFrame( () => {
       const security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
@@ -189,7 +189,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         'securityQuestionHistory',
         JSON.stringify( securityQuestionHistory ),
       )
-    })
+    } )
   }
 
   const showLoader = () => {

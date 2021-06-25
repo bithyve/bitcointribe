@@ -43,6 +43,7 @@ import {
   modifyLevelData,
   setApprovalStatus,
   downloadSMShare,
+  updateKeeperInfoToChannel
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -132,6 +133,9 @@ interface ManageBackupNewBHRPropsTypes {
   setApprovalStatus: any;
   approvalStatus: boolean;
   downloadSMShare: any;
+  updateKeeperInfoToChannel: any;
+  isKeeperInfoUpdated2: boolean;
+  isKeeperInfoUpdated3: boolean;
 }
 
 class ManageBackupNewBHR extends Component<
@@ -222,6 +226,8 @@ class ManageBackupNewBHR extends Component<
           refreshControlLoader: false,
           showLoader: false
         } )
+        if( ( this.props.currentLevel == 2 && !this.props.isKeeperInfoUpdated2 ) || this.props.currentLevel == 3 && !this.props.isKeeperInfoUpdated3 )
+          this.props.updateKeeperInfoToChannel()
       }
     }
 
@@ -304,7 +310,6 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.keeperProcessStatusFlag != this.props.keeperProcessStatusFlag && this.props.keeperProcessStatusFlag == KeeperProcessStatus.COMPLETED ) {
-      // this.props.updateKeeperInfoToTrustedChannel()
       this.props.keeperProcessStatus( '' )
     }
 
@@ -438,6 +443,11 @@ class ManageBackupNewBHR extends Component<
     this.props.setHealthStatus()
     this.props.syncPermanentChannels( {
       permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
+      metaSync: true
+    } )
+    this.props.syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+      metaSync: true
     } )
     this.autoCloudUpload()
   };
@@ -904,6 +914,8 @@ const mapStateToProps = ( state ) => {
     shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
     approvalStatus: idx( state, ( _ ) => _.health.approvalStatus ),
+    isKeeperInfoUpdated2: idx( state, ( _ ) => _.health.isKeeperInfoUpdated2 ),
+    isKeeperInfoUpdated3: idx( state, ( _ ) => _.health.isKeeperInfoUpdated3 ),
   }
 }
 
@@ -926,7 +938,8 @@ export default withNavigationFocus(
     updateCloudData,
     modifyLevelData,
     setApprovalStatus,
-    downloadSMShare
+    downloadSMShare,
+    updateKeeperInfoToChannel
   } )( ManageBackupNewBHR )
 )
 

@@ -4,6 +4,7 @@ import * as bitcoinJS from 'bitcoinjs-lib'
 import coinselect from 'coinselect'
 import crypto from 'crypto'
 import config from '../../HexaConfig'
+import Bitcoin from './Bitcoin'
 import {
   Transactions,
   DerivativeAccounts,
@@ -39,10 +40,9 @@ import { BH_AXIOS } from '../../../services/api'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import _ from 'lodash'
 import SSS from '../sss/SSS'
-import AccountUtilities from './AccountUtilities'
 const { HEXA_ID } = config
 
-export default class HDSegwitWallet {
+export default class HDSegwitWallet extends Bitcoin {
   public balances: { balance: number; unconfirmedBalance: number } = {
     balance: 0,
     unconfirmedBalance: 0,
@@ -66,7 +66,6 @@ export default class HDSegwitWallet {
   public feeRates: any;
   public accountName: string;
   public accountDescription: string;
-  public network: bitcoinJS.Network;
 
   private mnemonic: string;
   private passphrase: string;
@@ -107,7 +106,6 @@ export default class HDSegwitWallet {
     mnemonic?: string,
     passphrase?: string,
     dPathPurpose?: number,
-    network?: bitcoinJS.Network,
     stateVars?: {
       accountName: string;
       accountDescription: string;
@@ -139,15 +137,21 @@ export default class HDSegwitWallet {
       trustedContactToDA: { [contactName: string]: number };
       feeRates: any;
     },
+    network?: bitcoinJS.Network,
   ) {
+    super( network )
     this.mnemonic = mnemonic ? mnemonic : bip39.generateMnemonic( 256 )
     this.passphrase = passphrase
     this.purpose = dPathPurpose ? dPathPurpose : config.DPATH_PURPOSE
-    this.network = network? network: bitcoinJS.networks.bitcoin
+    // this.derivationPath =
+    //   this.network === bitcoinJS.networks.bitcoin
+    //     ? `m/${this.purpose}'/0'/0'`
+    //     : `m/${this.purpose}'/1'/0'`;
 
-    this.derivationPath = network === bitcoinJS.networks.testnet
+    this.derivationPath = this.isTest
       ? `m/${this.purpose}'/1'/0'`
-      : `m/${this.purpose}'/0'/0'`
+      : `m/${this.purpose}'/0'/0'` // helps with separating regular and test acc (even on the testnet)
+
     this.initializeStateVars( stateVars )
   }
 
@@ -218,7 +222,7 @@ export default class HDSegwitWallet {
   };
 
   public getTestXPub = (): string => {
-    if ( this.network === bitcoinJS.networks.testnet ) {
+    if ( this.isTest ) {
       if ( this.xpub ) {
         return this.xpub
       }
@@ -351,7 +355,7 @@ export default class HDSegwitWallet {
           account.xpubDetails.xpub,
         )
 
-        const txCounts = await AccountUtilities.getTxCounts( [ address ], this.network )
+        const txCounts = await this.getTxCounts( [ address ] )
         if ( txCounts[ address ] === 0 ) {
           availableAddress = address
           account.xpubDetails.nextFreeAddressIndex += itr
@@ -404,7 +408,7 @@ export default class HDSegwitWallet {
       xpub,
     )
 
-    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.derivativeAccounts[ accountType ][
@@ -643,7 +647,7 @@ export default class HDSegwitWallet {
       }
     }
 
-    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
     const txsFound: TransactionDetails[] = []
     for( let { accountType, accountNumber, contactName } of accountsInfo ){
@@ -1164,7 +1168,7 @@ export default class HDSegwitWallet {
       let itr
       for ( itr = 0; itr < this.gapLimit + 1; itr++ ) {
         const address = this.getAddress( false, itr, xpub )
-        const txCounts = await AccountUtilities.getTxCounts( [ address ], this.network )
+        const txCounts = await this.getTxCounts( [ address ] )
         if ( txCounts[ address ] === 0 ) {
           availableAddress = address
           break
@@ -1185,7 +1189,7 @@ export default class HDSegwitWallet {
     txid: any;
     funded: any;
   }> => {
-    if ( this.network === bitcoinJS.networks.bitcoin ) {
+    if ( !this.isTest ) {
       throw new Error( 'Can only fund test account' )
     }
     const amount = 10000 / SATOSHIS_IN_BTC
@@ -1224,7 +1228,7 @@ export default class HDSegwitWallet {
       this.nextFreeChangeAddressIndex + hardGapLimit - 1,
     )
 
-    const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], this.network )
+    const txCounts = await this.getTxCounts( [ externalAddress, internalAddress ] )
 
     if ( txCounts[ externalAddress ] > 0 ) {
       this.nextFreeAddressIndex += this.gapLimit
@@ -1329,7 +1333,7 @@ export default class HDSegwitWallet {
     }
 
     const batchedDerivativeAddresses = []
-    if ( this.network === bitcoinJS.networks.bitcoin ) {
+    if ( !this.isTest ) {
       for ( const dAccountType of config.DERIVATIVE_ACC_TO_SYNC ) {
         const derivativeAccount = this.derivativeAccounts[ dAccountType ]
         if ( derivativeAccount.instance.using ) {
@@ -1389,11 +1393,11 @@ export default class HDSegwitWallet {
         cachedAQL,
         lastUsedAddressIndex: this.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: this.nextFreeChangeAddressIndex - 1,
-        accountType: this.network === bitcoinJS.networks.testnet ? 'Test Account' : 'Checking Account',
+        accountType: this.isTest ? 'Test Account' : 'Checking Account',
         accountName: this.accountName,
       }
     }
-    const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAddresses( accounts, this.network )
+    const { synchedAccounts } = await this.fetchBalanceTransactionsByAddresses( accounts )
 
     const  {
       UTXOs,
@@ -1410,7 +1414,7 @@ export default class HDSegwitWallet {
     const unconfirmedUTXOs = []
     for ( const utxo of UTXOs ) {
       if ( utxo.status ) {
-        if ( this.network === bitcoinJS.networks.testnet && utxo.address === this.getAddress( false, 0 ) ) {
+        if ( this.isTest && utxo.address === this.getAddress( false, 0 ) ) {
           confirmedUTXOs.push( utxo ) // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
           continue
         }
@@ -1751,15 +1755,14 @@ export default class HDSegwitWallet {
       // console.log('------ Transaction Signing ----------');
       let vin = 0
       for ( const input of inputs ) {
-        const keyPair = AccountUtilities.getKeyPair(
+        const keyPair = this.getKeyPair(
           this.addressToPrivateKey( input.address ),
-          this.network
         )
 
         txb.sign(
           vin,
           keyPair,
-          AccountUtilities.getP2SH( keyPair, this.network ).redeem.output,
+          this.getP2SH( keyPair ).redeem.output,
           null,
           input.value,
           witnessScript,
@@ -2061,10 +2064,9 @@ export default class HDSegwitWallet {
       derivativeXpub ? derivativeXpub : this.getXpub(),
       this.network,
     )
-    return AccountUtilities.deriveAddress(
+    return this.deriveAddress(
       node.derive( internal ? 1 : 0 ).derive( index ),
       this.purpose,
-      this.network
     )
   };
 
@@ -2085,7 +2087,7 @@ export default class HDSegwitWallet {
       }
     }
 
-    if ( this.network === bitcoinJS.networks.bitcoin ) {
+    if ( !this.isTest ) {
       // address to WIF for derivative accounts
       for ( const dAccountType of Object.keys( config.DERIVATIVE_ACC ) ) {
         const derivativeAccount = this.derivativeAccounts[ dAccountType ]

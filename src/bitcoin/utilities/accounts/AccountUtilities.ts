@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -37,6 +37,11 @@ export default class AccountUtilities {
         return ''
       }
     }
+  }
+
+  static getNetworkByType = ( type: NetworkType ) => {
+    if( type === NetworkType.TESTNET ) return bitcoinJS.networks.testnet
+    else return bitcoinJS.networks.bitcoin
   }
 
   static getKeyPair = ( privateKey: string, network: bitcoinJS.Network ): bitcoinJS.ECPairInterface =>
@@ -128,7 +133,7 @@ export default class AccountUtilities {
     return xKey
   };
 
-  static generateKeyFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean ) => {
+  static generateChildFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean ) => {
     const xKey = bip32.fromBase58( extendedKey, network )
     const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
     return childXKey.toBase58()
@@ -147,26 +152,33 @@ export default class AccountUtilities {
     return bs58check.encode( data )
   }
 
-  static addressToPrivateKey = ( address: string, xpub: string, nextFreeAddressIndex: number, nextFreeChangeAddressIndex: number, network: bitcoinJS.networks.Network ): string => {
+  static addressToPrivateKey = ( address: string, account: Account ): string => {
+    const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
+    const network = AccountUtilities.getNetworkByType( networkType )
+
+    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
+        return AccountUtilities.getPrivateKeyByIndex( xpriv, false, itr, network )
+    }
+
     for (
       let itr = 0;
       itr <= nextFreeChangeAddressIndex + config.GAP_LIMIT;
       itr++
     ) {
       if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
-        return AccountUtilities.getPrivateKeyByIndex( xpub, true, itr, network )
-    }
-
-    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
-        return AccountUtilities.getPrivateKeyByIndex( xpub, false, itr, network )
+        return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
     }
 
     throw new Error( 'Could not find private key for: ' + address )
   };
 
   static createMultiSig = (
-    xpubs: string[],
+    xpubs: {
+      primary: string,
+      secondary: string,
+      bithyve: string,
+    },
     required: number,
     network: bitcoinJS.Network,
     childIndex: number,
@@ -179,8 +191,13 @@ export default class AccountUtilities {
     address: string;
   } => {
 
-    const pubkeys = xpubs.map( ( xpub ) => {
-      const pub = AccountUtilities.generateKeyFromExtendedKey( xpub, network, childIndex, internal )
+    const pubkeys = Object.keys( xpubs ).map( ( xpubKey ) => {
+      let childExtendedKey
+      if( xpubKey === 'primary' ) childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, childIndex, internal )
+      else childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, 0, internal )
+
+      const xKey = bip32.fromBase58( childExtendedKey, network )
+      const pub = xKey.publicKey.toString( 'hex' )
       return Buffer.from( pub, 'hex' )
     } )
 
@@ -208,16 +225,17 @@ export default class AccountUtilities {
   }
 
   static signingEssentialsForMultiSig = ( account: MultiSigAccount, address: string ) => {
-    const { xpubs, xprivs, network } = account
+    const { xpubs, xprivs, networkType } = account
+    const network = AccountUtilities.getNetworkByType( networkType )
 
     for ( let itr = 0; itr <= account.nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, account.network, itr, false )
+      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateKeyFromExtendedKey( xprivs.primary, network, itr, false ),
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, false ),
           secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, false )
+            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, false )
             : null,
           childIndex: itr,
         }
@@ -225,13 +243,13 @@ export default class AccountUtilities {
     }
 
     for ( let itr = 0; itr <= account.nextFreeChangeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, account.network, itr, true )
+      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
-          primaryPriv: AccountUtilities.generateKeyFromExtendedKey( xprivs.primary, network, itr, true ),
+          primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, true ),
           secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateKeyFromExtendedKey( xprivs.secondary, network, itr, true )
+            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, true )
             : null,
           childIndex: itr,
           internal: true

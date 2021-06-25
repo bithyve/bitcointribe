@@ -16,6 +16,10 @@ import {
   RampDerivativeAccountElements,
   SwanDerivativeAccount,
   SwanDerivativeAccountElements,
+  Accounts,
+  AccountType,
+  MultiSigAccount,
+  Account,
 } from '../../bitcoin/utilities/Interface'
 import {
   DONATION_ACCOUNT,
@@ -44,118 +48,48 @@ import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/Dona
 import { call } from 'react-native-reanimated'
 import useNewAccountChoices from '../../utils/hooks/account-utils/UseNewAccountChoices'
 import { AccountsState } from '../reducers/accounts'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
-const initAccountShells = ( services ) => {
-  const testAcc: TestAccount = services[ TEST_ACCOUNT ]
-  const regularAcc: RegularAccount = services[ REGULAR_ACCOUNT ]
-  const secureAcc: SecureAccount = services[ SECURE_ACCOUNT ]
-
-  const accountShells = []
-
-  // adding ejected accounts to accountShells (aids upgrade from version < 1.4.0)
-  for ( const sourceKind of [
-    SourceAccountKind.REGULAR_ACCOUNT,
-    SourceAccountKind.SECURE_ACCOUNT,
-  ] ) {
-    let derivativeAccounts, network
-    switch ( sourceKind ) {
-        case SourceAccountKind.REGULAR_ACCOUNT:
-          derivativeAccounts = regularAcc.hdWallet.derivativeAccounts
-          network = regularAcc.hdWallet.network
-          break
-
-        case SourceAccountKind.SECURE_ACCOUNT:
-          derivativeAccounts = secureAcc.secureHDWallet.derivativeAccounts
-          network = secureAcc.secureHDWallet.network
-          break
-    }
-
-    const derivativeAccount: DonationDerivativeAccount =
-      derivativeAccounts[ DONATION_ACCOUNT ]
-
-    if ( derivativeAccount && derivativeAccount.instance.using ) {
-      for (
-        let accountNumber = 1;
-        accountNumber <= derivativeAccount.instance.using;
-        accountNumber++
-      ) {
-        let dervBalances: Balances = {
-          confirmed: 0,
-          unconfirmed: 0,
-        }
-        let dervTransactions: TransactionDescribing[] = []
-
-        if ( derivativeAccount[ accountNumber ].balances )
-          dervBalances = {
-            confirmed: derivativeAccount[ accountNumber ].balances.balance,
-            unconfirmed:
-              derivativeAccount[ accountNumber ].balances.unconfirmedBalance,
-          }
-
-        if ( derivativeAccount[ accountNumber ].transactions )
-          dervTransactions =
-            derivativeAccount[ accountNumber ].transactions.transactionDetails
-
-        const derivativeId = derivativeAccount[ accountNumber ].xpubId
-        const { donee, subject, description, xpub } = derivativeAccount[
-          accountNumber
-        ]
-        const accShell = new AccountShell( {
-          primarySubAccount: new DonationSubAccountInfo( {
-            id: derivativeId,
-            xPub: Bitcoin.generateYpub( xpub, network ),
-            instanceNumber: accountNumber,
-            balances: dervBalances,
-            transactions: dervTransactions,
-            doneeName: donee,
-            customDisplayName: subject,
-            customDescription: description,
-            isTFAEnabled:
-              sourceKind === SourceAccountKind.REGULAR_ACCOUNT ? false : true,
-            causeName: '',
-          } ),
-          unit: BitcoinUnit.SATS,
-          displayOrder: 3,
-        } )
-        accountShells.push( accShell )
-      }
-    }
-  }
-
+export const initAccountShells = ( accounts: Accounts ) => {
   // adding default account shells
-  const defaultTestShell = new AccountShell( {
-    primarySubAccount: new TestSubAccountInfo( {
-      id: testAcc.getAccountId(),
-      xPub: Bitcoin.generateYpub( testAcc.hdWallet.getXpub(), testAcc.hdWallet.network ),
-      instanceNumber: 0, // default instances(0)
-    } ),
-    unit: BitcoinUnit.TSATS,
-    displayOrder: 1,
-  } )
-  const defaultCheckingShell = new AccountShell( {
-    primarySubAccount: new CheckingSubAccountInfo( {
-      id: regularAcc.getAccountId(),
-      xPub: Bitcoin.generateYpub( regularAcc.hdWallet.getXpub(), regularAcc.hdWallet.network ),
-      instanceNumber: 0,
-    } ),
-    unit: BitcoinUnit.SATS,
-    displayOrder: 2,
-  } )
-  const defaultSavingsShell = new AccountShell( {
-    primarySubAccount: new SavingsSubAccountInfo( {
-      id: secureAcc.getAccountId(),
-      xPub: Bitcoin.generateYpub( idx( secureAcc, ( _ ) => _.secureHDWallet.xpubs.secondary ), secureAcc.secureHDWallet.network ),
-      instanceNumber: 0,
-    } ),
-    unit: BitcoinUnit.SATS,
-    displayOrder: 3,
-  } )
-  accountShells.push(
-    defaultTestShell,
-    defaultCheckingShell,
-    defaultSavingsShell,
-  )
+  const accountShells: AccountShell[] = []
+  let displayOrderIndex = 1
+  for( const accountType of Object.keys( accounts ) ){
+    const accountsByType = accounts[ accountType ]
+    Object.values( accountsByType ).forEach( ( account: Account | MultiSigAccount )=> {
+      let SubAccountConstructor
+      switch( account.type ){
+          case AccountType.TEST_ACCOUNT:
+            SubAccountConstructor = TestSubAccountInfo
+            break
 
+          case AccountType.CHECKING_ACCOUNT:
+            SubAccountConstructor = CheckingSubAccountInfo
+            break
+
+          case AccountType.SAVINGS_ACCOUNT:
+            SubAccountConstructor = SavingsSubAccountInfo
+            break
+      }
+
+      accountShells.push(
+        new AccountShell( {
+          primarySubAccount: new SubAccountConstructor( {
+            id: account.id,
+            xPub: ( account as MultiSigAccount ).is2FA? null: Bitcoin.generateYpub( account.xpub, AccountUtilities.getNetworkByType( account.networkType ) ),
+            instanceNumber: account.instanceNum,
+            customDisplayName: account.accountName,
+            customDescription: account.accountDescription
+          } ),
+          unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
+          displayOrder: displayOrderIndex,
+        } )
+      )
+
+      displayOrderIndex++
+    } )
+
+  }
   return accountShells
 }
 
@@ -218,7 +152,7 @@ const updatePrimarySubAccounts = (
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
               }
-              transactions = subPrimInstance.transactions.transactionDetails
+              transactions = subPrimInstance.transactions
             }
           }
 
@@ -253,7 +187,7 @@ const updatePrimarySubAccounts = (
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
               }
-              transactions = subPrimInstance.transactions.transactionDetails
+              transactions = subPrimInstance.transactions
             }
           }
 
@@ -286,7 +220,7 @@ const updatePrimarySubAccounts = (
               confirmed: donationInstance.balances.balance,
               unconfirmed: donationInstance.balances.unconfirmedBalance,
             }
-            transactions = donationInstance.transactions.transactionDetails
+            transactions = donationInstance.transactions
           }
           break
 
@@ -321,7 +255,7 @@ const updatePrimarySubAccounts = (
                     confirmed: dervInstance.balances.balance,
                     unconfirmed: dervInstance.balances.unconfirmedBalance,
                   }
-                  transactions = dervInstance.transactions.transactionDetails
+                  transactions = dervInstance.transactions
                 }
                 break
           }
@@ -404,7 +338,7 @@ const updateSecondarySubAccounts = (
 
           if ( derivativeAccount[ accountNumber ].transactions )
             dervTransactions =
-              derivativeAccount[ accountNumber ].transactions.transactionDetails
+              derivativeAccount[ accountNumber ].transactions
 
           const derivativeId = derivativeAccount[ accountNumber ].xpubId
           const xpub = derivativeAccount[ accountNumber ].xpub
@@ -626,7 +560,7 @@ export const recreatePrimarySubAccounts = (
 
             if ( derivativeAccount[ accountNumber ].transactions )
               dervTransactions =
-                derivativeAccount[ accountNumber ].transactions.transactionDetails
+                derivativeAccount[ accountNumber ].transactions
 
 
             AccountShell.updatePrimarySubAccountDetails(

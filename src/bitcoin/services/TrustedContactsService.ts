@@ -66,7 +66,7 @@ export default class TrustedContactsService {
     }
   };
 
-  public retrieveFromStream = async (
+  public static retrieveFromStream = async (
     {
       walletId,
       channelKey,
@@ -99,16 +99,17 @@ export default class TrustedContactsService {
     message: string;
    }> => {
     try {
+      const data = await TrustedContacts.retrieveFromStream(
+        {
+          walletId,
+          channelKey,
+          options,
+          secondaryChannelKey
+        }
+      )
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.tc.retrieveFromStream(
-          {
-            walletId,
-            channelKey,
-            options,
-            secondaryChannelKey
-          }
-        )
+        data: data
       }
     } catch ( err ) {
       return {

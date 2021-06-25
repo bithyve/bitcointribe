@@ -344,6 +344,14 @@ export enum notificationType {
   smUploadedForPK = 'smUploadedForPK',
   newFCM = 'newFCM',
   newKeeperInfo = 'newKeeperInfo',
+  FNF_REQUEST = 'FNF_REQUEST',
+  FNF_TRANSACTION = 'FNF_TRANSACTION',
+  RELEASE = 'RELEASE',
+  FNF_REQUEST_ACCEPTED='FNF_REQUEST_ACCEPTED',
+  FNF_REQUEST_REJECTED='FNF_REQUEST_REJECTED',
+  FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
+  FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
+  FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -520,13 +528,13 @@ export interface PrimaryStreamData {
 }
 
 export interface SecondaryStreamData {
-  secondaryMnemonicShard: any,
-  bhXpub: string,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string,
 }
 
 export interface BackupStreamData {
-  primaryMnemonicShard: any,
-  keeperInfo: any,
+  primaryMnemonicShard?: MetaShare,
+  keeperInfo?: KeeperInfoInterface[],
 }
 
 export interface UnecryptedStreamData {
@@ -751,11 +759,34 @@ export interface UTXO {
   status?: any;
 }
 
+export enum NetworkType {
+  TESTNET = 'TESTNET',
+  MAINNET = 'MAINNET'
+}
+
+export interface Wallet {
+  walletId,
+  primaryMnemonic,
+  secondaryMemonic?,
+  details2FA : {
+    secondaryXpub: string,
+    bithyveXpub: string,
+    twoFAKey: string,
+  }
+  accounts: {
+    [derivationPath: string]: string // derivation path to account-id mapping
+  }
+}
+
 export interface Account {
   id: string,                           // account identifier(derived from xpub)
   walletId: string,                     // wallet's id
-  network: networks.Network,            // testnet/mainnet
+  type: AccountType,                    // type of account
+  instanceNum: number,                  // instance number of the aforementioned type
+  networkType: NetworkType,                 // testnet/mainnet
+  derivationPath: string,               // derivation path of the extended keys belonging to this account
   xpub: string | null,                  // account's xpub (null for multi-sig accounts)
+  xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
   accountName: string,                  // name of the account
   accountDescription: string,           // description of the account
   activeAddresses: string[],            // addresses used(to be synched during soft refresh)
@@ -782,5 +813,17 @@ export interface MultiSigAccount extends Account {
   xprivs: {                             // xpirv set for multi-sig
     primary: string,
     secondary?: string,
+  }
+}
+
+export enum AccountType {
+  TEST_ACCOUNT = 'TEST_ACCOUNT',
+  CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
+  SAVINGS_ACCOUNT = 'SAVINGS_ACCOUNT'
+}
+
+export interface Accounts {
+  [accountType: string]: {
+    [accountId: string]: Account
   }
 }

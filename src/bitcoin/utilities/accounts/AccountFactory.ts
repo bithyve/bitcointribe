@@ -1,23 +1,33 @@
 import { networks } from 'bitcoinjs-lib'
-import { Account, MultiSigAccount } from '../Interface'
+import { Account, AccountType, MultiSigAccount, NetworkType } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 
 export function generateAccount(
   {
     walletId,
+    type,
+    instanceNum,
     accountName,
     accountDescription,
-    xpub,
-    network
+    mnemonic,
+    derivationPath,
+    networkType
   }: {
+    walletId: string,
+    type: AccountType,
+    instanceNum: number,
     accountName: string,
     accountDescription: string,
-    walletId: string,
-    xpub: string,
-    network: networks.Network,
+    mnemonic: string,
+    derivationPath: string,
+    networkType: NetworkType,
   }
 ): Account {
+
+  const network = AccountUtilities.getNetworkByType( networkType )
+  const xpub = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath )
+  const xpriv = AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
 
   const id = crypto.createHash( 'sha256' ).update( xpub ).digest( 'hex' )
   const initialRecevingAddress = AccountUtilities.getAddressByIndex( xpub, false, 0, network )
@@ -25,8 +35,12 @@ export function generateAccount(
   const account: Account = {
     id,
     walletId,
-    network,
+    type,
+    instanceNum,
+    networkType,
+    derivationPath,
     xpub,
+    xpriv,
     accountName,
     accountDescription,
     activeAddresses: [],
@@ -53,40 +67,63 @@ export function generateAccount(
 }
 
 
-export function generateTwoFAAccount(
+export function generateMultiSigAccount(
   {
     walletId,
+    type,
+    instanceNum,
     accountName,
     accountDescription,
-    xpubs,
-    xprivs,
-    network
+    mnemonic,
+    derivationPath,
+    secondaryXpub,
+    bithyveXpub,
+    networkType
   }: {
+    walletId: string,
+    type: AccountType,
+    instanceNum: number,
     accountName: string,
     accountDescription: string,
-    walletId: string,
-    xpubs: {
-      primary: string,
-      secondary: string,
-      bithyve: string,
-    },
-    xprivs: {
-      primary: string,
-      secondary?: string,
-    },
-    network: networks.Network,
+    mnemonic: string,
+    derivationPath: string,
+    secondaryXpub: string,
+    bithyveXpub: string,
+    networkType: NetworkType,
   }
 ): MultiSigAccount {
+  // Note: only primary-xpubs differs b/w different multi-sig account instance(secondary and bh-xpubs stay constant)
 
-  const id = crypto.createHash( 'sha256' ).update( xpubs.secondary ).digest( 'hex' )
-  const initialRecevingAddress = AccountUtilities.createMultiSig( [ xpubs.primary, xpubs.secondary, xpubs.bithyve ], 2, network, 0, false ).address
+  const network = AccountUtilities.getNetworkByType( networkType )
+  const xpubs: {
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  } = {
+    primary: AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath ),
+    secondary: secondaryXpub,
+    bithyve: bithyveXpub,
+  }
+  const xprivs: {
+    primary: string,
+    secondary?: string,
+  } = {
+    primary: AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
+  }
+
+  const id = crypto.createHash( 'sha256' ).update( xpubs.primary + xpubs.secondary + xpubs.bithyve ).digest( 'hex' )
+  const initialRecevingAddress = AccountUtilities.createMultiSig( xpubs, 2, network, 0, false ).address
 
   const account: MultiSigAccount = {
     id,
     walletId,
-    network,
+    type,
+    instanceNum,
+    networkType,
+    derivationPath,
     is2FA: true,
     xpub: null,
+    xpriv: null,
     xpubs,
     xprivs,
     accountName,
