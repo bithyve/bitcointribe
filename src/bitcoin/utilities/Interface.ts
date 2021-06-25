@@ -823,7 +823,5 @@ export enum AccountType {
 }
 
 export interface Accounts {
-  [accountType: string]: {
     [accountId: string]: Account
-  }
 }
