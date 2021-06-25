@@ -8,9 +8,11 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { Account, Accounts, AccountType, MetaShare, MultiSigAccount, Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, MetaShare, MultiSigAccount, NetworkType, Wallet } from '../../bitcoin/utilities/Interface'
 import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import config from '../../bitcoin/HexaConfig'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -252,7 +254,7 @@ export const initializeWallet = async (): Promise <{
     accountDescription: 'Learn Bitcoin',
     mnemonic: primaryMnemonic,
     derivationPath: testDerivationPath,
-    network: bitcoinJS.networks.testnet,
+    networkType: NetworkType.TESTNET,
   } )
 
   const rootDerivationPath = 'm/49\'/0\'/0\''
@@ -265,7 +267,7 @@ export const initializeWallet = async (): Promise <{
     accountDescription: 'Fast and easy',
     mnemonic: primaryMnemonic,
     derivationPath: checkingDerivationPath,
-    network: bitcoinJS.networks.testnet,
+    networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
   } )
 
   const { setupData } = await AccountUtilities.registerTwoFA( walletId, secondaryWalletId )
@@ -284,7 +286,7 @@ export const initializeWallet = async (): Promise <{
     derivationPath: savingsDerivationPath,
     secondaryXpub,
     bithyveXpub,
-    network: bitcoinJS.networks.testnet,
+    networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
   } )
 
   const wallet: Wallet = {
@@ -304,9 +306,15 @@ export const initializeWallet = async (): Promise <{
   }
 
   const accounts: Accounts = {
-    [ AccountType.TEST_ACCOUNT ]: [ testAccount ],
-    [ AccountType.CHECKING_ACCOUNT ]: [ checkingAccount ],
-    [ AccountType.SAVINGS_ACCOUNT ]: [ savingsAccount ],
+    [ AccountType.TEST_ACCOUNT ]: {
+      [ testAccount.id ]: testAccount
+    },
+    [ AccountType.CHECKING_ACCOUNT ]: {
+      [ checkingAccount.id ]: checkingAccount
+    },
+    [ AccountType.SAVINGS_ACCOUNT ]: {
+      [ savingsAccount.id ]: savingsAccount
+    },
   }
 
   // Share generation

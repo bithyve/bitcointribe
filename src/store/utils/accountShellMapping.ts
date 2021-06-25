@@ -48,6 +48,7 @@ import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/Dona
 import { call } from 'react-native-reanimated'
 import useNewAccountChoices from '../../utils/hooks/account-utils/UseNewAccountChoices'
 import { AccountsState } from '../reducers/accounts'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 export const initAccountShells = ( accounts: Accounts ) => {
   // adding default account shells
@@ -55,7 +56,7 @@ export const initAccountShells = ( accounts: Accounts ) => {
   let displayOrderIndex = 1
   for( const accountType of Object.keys( accounts ) ){
     const accountsByType = accounts[ accountType ]
-    accountsByType.forEach( ( account: Account | MultiSigAccount )=> {
+    Object.values( accountsByType ).forEach( ( account: Account | MultiSigAccount )=> {
       let SubAccountConstructor
       switch( account.type ){
           case AccountType.TEST_ACCOUNT:
@@ -75,7 +76,7 @@ export const initAccountShells = ( accounts: Accounts ) => {
         new AccountShell( {
           primarySubAccount: new SubAccountConstructor( {
             id: account.id,
-            xPub: ( account as MultiSigAccount ).is2FA? null: Bitcoin.generateYpub( account.xpub, account.network ),
+            xPub: ( account as MultiSigAccount ).is2FA? null: Bitcoin.generateYpub( account.xpub, AccountUtilities.getNetworkByType( account.networkType ) ),
             instanceNumber: account.instanceNum,
             customDisplayName: account.accountName,
             customDescription: account.accountDescription
@@ -151,7 +152,7 @@ const updatePrimarySubAccounts = (
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
               }
-              transactions = subPrimInstance.transactions.transactionDetails
+              transactions = subPrimInstance.transactions
             }
           }
 
@@ -186,7 +187,7 @@ const updatePrimarySubAccounts = (
                 confirmed: subPrimInstance.balances.balance,
                 unconfirmed: subPrimInstance.balances.unconfirmedBalance,
               }
-              transactions = subPrimInstance.transactions.transactionDetails
+              transactions = subPrimInstance.transactions
             }
           }
 
@@ -219,7 +220,7 @@ const updatePrimarySubAccounts = (
               confirmed: donationInstance.balances.balance,
               unconfirmed: donationInstance.balances.unconfirmedBalance,
             }
-            transactions = donationInstance.transactions.transactionDetails
+            transactions = donationInstance.transactions
           }
           break
 
@@ -254,7 +255,7 @@ const updatePrimarySubAccounts = (
                     confirmed: dervInstance.balances.balance,
                     unconfirmed: dervInstance.balances.unconfirmedBalance,
                   }
-                  transactions = dervInstance.transactions.transactionDetails
+                  transactions = dervInstance.transactions
                 }
                 break
           }
@@ -337,7 +338,7 @@ const updateSecondarySubAccounts = (
 
           if ( derivativeAccount[ accountNumber ].transactions )
             dervTransactions =
-              derivativeAccount[ accountNumber ].transactions.transactionDetails
+              derivativeAccount[ accountNumber ].transactions
 
           const derivativeId = derivativeAccount[ accountNumber ].xpubId
           const xpub = derivativeAccount[ accountNumber ].xpub
@@ -559,7 +560,7 @@ export const recreatePrimarySubAccounts = (
 
             if ( derivativeAccount[ accountNumber ].transactions )
               dervTransactions =
-                derivativeAccount[ accountNumber ].transactions.transactionDetails
+                derivativeAccount[ accountNumber ].transactions
 
 
             AccountShell.updatePrimarySubAccountDetails(
