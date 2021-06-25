@@ -23,9 +23,8 @@ import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { getTestcoins, newAccountShellsAdded } from '../actions/accounts'
+import { updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
-import { initAccountShells } from '../utils/accountShellMapping'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
@@ -38,9 +37,8 @@ function* setupWalletWorker( { payload } ) {
     wallet, accounts
   } ) )
 
-  const accountShells = yield call ( initAccountShells, accounts )
-  yield put( newAccountShellsAdded( {
-    accountShells
+  yield put( updateAccounts( {
+    accounts,
   } ) )
 
   const initialDatabase: Database = {

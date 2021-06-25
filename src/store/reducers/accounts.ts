@@ -37,7 +37,8 @@ import {
   SET_SHOW_ALL_ACCOUNT,
   RESET_ACCOUNT_UPDATE_FLAG,
   RESET_TWO_FA_LOADER,
-  NEW_ACCOUNT_SHELLS_ADDED
+  NEW_ACCOUNT_SHELLS_ADDED,
+  UPDATE_ACCOUNTS
 } from '../actions/accounts'
 import { SERVICES_ENRICHED } from '../actions/storage'
 import {
@@ -46,10 +47,11 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
-import { updateAccountShells } from '../utils/accountShellMapping'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
+import { Accounts } from '../../bitcoin/utilities/Interface'
+import { updateShells } from '../utils/accountShellMapping'
 
 export type AccountVars = {
   service: any;
@@ -64,6 +66,8 @@ export type AccountsState = {
   servicesEnriched: boolean;
   accountsSynched: boolean;
   testCoinsReceived: boolean,
+
+  accounts: Accounts,
   accountShells: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
@@ -105,7 +109,6 @@ export type AccountsState = {
   // currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
 
   refreshed: boolean;
-  accounts: any,
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
@@ -124,6 +127,8 @@ const initialState: AccountsState = {
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
   averageTxFees: null,
+  accounts: {
+  },
   accountShells: [],
 
   twoFAHelpFlags: {
@@ -156,7 +161,6 @@ const initialState: AccountsState = {
   // currentSwanSubAccount: null,
 
   refreshed: false,
-  accounts: null,
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
@@ -266,6 +270,16 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         return {
           ...state,
           averageTxFees: action.payload.averageTxFees,
+        }
+
+      case UPDATE_ACCOUNTS:
+        return {
+          ...state,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
+          accountShells: updateShells( action.payload.accounts, state.accountShells )
         }
 
       case ADD_NEW_ACCOUNT_SHELL:

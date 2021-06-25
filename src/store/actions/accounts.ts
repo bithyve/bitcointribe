@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Account, ContactInfo } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -474,6 +474,7 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
+export const UPDATE_ACCOUNTS = 'UPDATE_ACCOUNTS'
 export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
 export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
@@ -550,6 +551,15 @@ export const newAccountShellAddFailed = ( {
   return {
     type: NEW_ACCOUNT_ADD_FAILED, payload: {
       accountShell, error
+    }
+  }
+}
+
+export const updateAccounts = ( { accounts }: {accounts: Accounts} ) => {
+  return {
+    type: UPDATE_ACCOUNTS,
+    payload: {
+      accounts
     }
   }
 }
