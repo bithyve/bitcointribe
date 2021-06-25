@@ -6,8 +6,10 @@ const initDb = () => db.init()
 const createWallet = async ( wallet ) => {
   const accountIds = []
   for ( const [ key, value ] of Object.entries( wallet.accounts ) ) {
-    accountIds.push( value )
-  }
+    accountIds.push( {
+      derivationPath: key,
+      accountId: value
+    } )  }
   try {
     db.create( schema.Wallet, {
       ...wallet,
@@ -23,9 +25,7 @@ const createWallet = async ( wallet ) => {
 const createAccounts = accounts => {
   try {
     for ( const [ key1, account ] of Object.entries( accounts ) ) {
-      for ( const [ key2, acc ] of Object.entries( account ) ) {
-        createAccount ( acc )
-      }
+      createAccount ( account )
     }
   } catch ( error ) {
     console.log( error )
