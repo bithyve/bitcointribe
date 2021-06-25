@@ -1,5 +1,5 @@
 import { networks } from 'bitcoinjs-lib'
-import { Account, AccountType, MultiSigAccount } from '../Interface'
+import { Account, AccountType, MultiSigAccount, NetworkType } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 
@@ -12,7 +12,7 @@ export function generateAccount(
     accountDescription,
     mnemonic,
     derivationPath,
-    network
+    networkType
   }: {
     walletId: string,
     type: AccountType,
@@ -21,10 +21,11 @@ export function generateAccount(
     accountDescription: string,
     mnemonic: string,
     derivationPath: string,
-    network: networks.Network,
+    networkType: NetworkType,
   }
 ): Account {
 
+  const network = AccountUtilities.getNetworkByType( networkType )
   const xpub = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath )
   const xpriv = AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath )
 
@@ -36,7 +37,7 @@ export function generateAccount(
     walletId,
     type,
     instanceNum,
-    network,
+    networkType,
     derivationPath,
     xpub,
     xpriv,
@@ -77,7 +78,7 @@ export function generateMultiSigAccount(
     derivationPath,
     secondaryXpub,
     bithyveXpub,
-    network
+    networkType
   }: {
     walletId: string,
     type: AccountType,
@@ -88,11 +89,12 @@ export function generateMultiSigAccount(
     derivationPath: string,
     secondaryXpub: string,
     bithyveXpub: string,
-    network: networks.Network,
+    networkType: NetworkType,
   }
 ): MultiSigAccount {
   // Note: only primary-xpubs differs b/w different multi-sig account instance(secondary and bh-xpubs stay constant)
 
+  const network = AccountUtilities.getNetworkByType( networkType )
   const xpubs: {
     primary: string,
     secondary: string,
@@ -117,7 +119,7 @@ export function generateMultiSigAccount(
     walletId,
     type,
     instanceNum,
-    network,
+    networkType,
     derivationPath,
     is2FA: true,
     xpub: null,

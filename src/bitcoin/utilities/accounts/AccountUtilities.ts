@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -37,6 +37,11 @@ export default class AccountUtilities {
         return ''
       }
     }
+  }
+
+  static getNetworkByType = ( type: NetworkType ) => {
+    if( type === NetworkType.TESTNET ) return bitcoinJS.networks.testnet
+    else return bitcoinJS.networks.bitcoin
   }
 
   static getKeyPair = ( privateKey: string, network: bitcoinJS.Network ): bitcoinJS.ECPairInterface =>
@@ -148,7 +153,8 @@ export default class AccountUtilities {
   }
 
   static addressToPrivateKey = ( address: string, account: Account ): string => {
-    const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, network } = account
+    const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
+    const network = AccountUtilities.getNetworkByType( networkType )
 
     for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
@@ -219,10 +225,11 @@ export default class AccountUtilities {
   }
 
   static signingEssentialsForMultiSig = ( account: MultiSigAccount, address: string ) => {
-    const { xpubs, xprivs, network } = account
+    const { xpubs, xprivs, networkType } = account
+    const network = AccountUtilities.getNetworkByType( networkType )
 
     for ( let itr = 0; itr <= account.nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, account.network, itr, false )
+      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
           multiSig,
@@ -236,7 +243,7 @@ export default class AccountUtilities {
     }
 
     for ( let itr = 0; itr <= account.nextFreeChangeAddressIndex + config.GAP_LIMIT; itr++ ) {
-      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, account.network, itr, true )
+      const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
           multiSig,
