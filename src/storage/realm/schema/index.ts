@@ -2,7 +2,13 @@ import {
   WalletSchema,
   AccountSchema,
   TransactionSchema,
-  UTXOSchema
+  UTXOSchema,
+  Details2FASchema,
+  BalancesSchema,
+  Bip32Schema,
+  NetworkSchema,
+  XPubSchema,
+  AccountIdSchema,
 } from './Schema'
 
 export default
@@ -10,5 +16,11 @@ export default
   WalletSchema,
   AccountSchema,
   TransactionSchema,
-  UTXOSchema
+  UTXOSchema,
+  Details2FASchema,
+  BalancesSchema,
+  Bip32Schema,
+  NetworkSchema,
+  XPubSchema,
+  AccountIdSchema
 ]
