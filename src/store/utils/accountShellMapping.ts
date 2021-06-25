@@ -61,9 +61,8 @@ const updatePrimarySubAccounts = (
     shell, accounts
   } )
   const account = accounts[ shell.primarySubAccount.id ]
-  console.log( {
-    account
-  } )
+  if( !account ) return shell
+
   const accountDetails = {
     accountName: account.accountName,
     accountDescription: account.accountDescription,

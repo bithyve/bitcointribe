@@ -91,7 +91,7 @@ export const fetchBalanceTx = (
 
 
 export const syncAccounts = (
-  accounts: Account[],
+  accounts: Accounts,
   options: {
     hardRefresh?: boolean;
     blindRefresh?: boolean;

@@ -63,6 +63,7 @@ import {
   Accounts,
   ContactInfo,
   DerivativeAccountTypes,
+  MultiSigAccount,
   TrustedContact,
   Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
@@ -211,13 +212,13 @@ export const fetchBalanceTxWatcher = createWatcher(
 )
 
 function* syncAccountsWorker( { payload }: {payload: {
-  accounts: Account[],
+  accounts: Accounts,
   options: {
     hardRefresh?: boolean;
     blindRefresh?: boolean;
   }}} ) {
   const { accounts, options } = payload
-  const network = AccountUtilities.getNetworkByType( accounts[ 0 ].networkType )
+  const network = AccountUtilities.getNetworkByType( Object.values( accounts )[ 0 ].networkType )
 
   const { synchedAccounts, txsFound } = yield call(
     AccountOperations.syncAccounts,
@@ -723,23 +724,22 @@ function* refreshAccountShellWorker( { payload } ) {
   const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
   const accounts: Accounts = tempDB.accounts
 
-  const account: Account = accounts[ accountShell.primarySubAccount.id ]
+  const accountsToSync: Accounts = {
+    [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
+  }
   const { synchedAccounts, txsFound } = yield call( syncAccountsWorker, {
     payload: {
-      accounts: [ account ],
+      accounts: accountsToSync,
       options,
     }
   } )
 
-  console.log( {
-    synchedAccounts
-  } )
   yield put( updateAccounts( {
     accounts: synchedAccounts
   } ) )
 
   // TODO: insert into database
-  synchedAccounts.forEach( ( synchedAcc )=> {
+  Object.values( synchedAccounts ).forEach( ( synchedAcc: Account | MultiSigAccount )=> {
     accounts[ synchedAcc.id ] = synchedAcc
   } )
 

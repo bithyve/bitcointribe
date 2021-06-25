@@ -10,6 +10,7 @@ import {
   Account,
   TxPriority,
   MultiSigAccount,
+  Accounts,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 export default class AccountOperations {
@@ -52,8 +53,8 @@ export default class AccountOperations {
     }
   };
 
-  static syncAccounts = async ( accounts: Account[], network: bitcoinJS.networks.Network, hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
-    synchedAccounts: Account[],
+  static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
+    synchedAccounts: Accounts,
     txsFound: Transaction[]
   }> => {
 
@@ -90,7 +91,7 @@ export default class AccountOperations {
     } = {
     }
 
-    for( const account of accounts ){
+    for( const account of Object.values( accounts ) ){
       const ownedAddresses = [] // owned address mapping
       // owned addresses are used for apt tx categorization and transfer amount calculation
 
@@ -176,7 +177,7 @@ export default class AccountOperations {
     const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
 
     const txsFound: Transaction[] = []
-    for( const account of accounts ) {
+    for( const account of Object.values( accounts ) ) {
       const  {
         UTXOs,
         balances,
