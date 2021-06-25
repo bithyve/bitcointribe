@@ -58,3 +58,9 @@ export interface Database {
   SERVICES?: ServicesJSON;
   VERSION?: String;
 }
+
+export enum APP_STAGE {
+  DEVELOPMENT = 'dev',
+  STAGING = 'sta',
+  PRODUCTION = 'app'
+}

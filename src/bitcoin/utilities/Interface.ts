@@ -759,6 +759,11 @@ export interface UTXO {
   status?: any;
 }
 
+export enum NetworkType {
+  TESTNET = 'TESTNET',
+  MAINNET = 'MAINNET'
+}
+
 export interface Wallet {
   walletId,
   primaryMnemonic,
@@ -778,7 +783,7 @@ export interface Account {
   walletId: string,                     // wallet's id
   type: AccountType,                    // type of account
   instanceNum: number,                  // instance number of the aforementioned type
-  network: networks.Network,            // testnet/mainnet
+  networkType: NetworkType,                 // testnet/mainnet
   derivationPath: string,               // derivation path of the extended keys belonging to this account
   xpub: string | null,                  // account's xpub (null for multi-sig accounts)
   xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
@@ -818,5 +823,7 @@ export enum AccountType {
 }
 
 export interface Accounts {
-  [accountType: string]: Account[]
+  [accountType: string]: {
+    [accountId: string]: Account
+  }
 }
