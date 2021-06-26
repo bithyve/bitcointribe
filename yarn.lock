@@ -7982,10 +7982,10 @@ react-native-localize@^1.4.1:
   resolved "https://registry.yarnpkg.com/react-native-localize/-/react-native-localize-1.4.3.tgz#6fde2fb1e73a7205910419a680cb4734187d556f"
   integrity sha512-n3pi89LBeSzB825CBagyaYRtBS93LdvNz3sI386iXwLSg1ONjEGR1Ez36JBuxZalZgORjrKzV2Pun6MO7iwD6w==
 
-react-native-mail@4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/react-native-mail/-/react-native-mail-4.1.0.tgz#2ebe2df2211a84862a3aea77316736189e23435b"
-  integrity sha512-3IHQmUQJwFFV7HwDONeIEahhaEvK9u23liqIUQajPy7frk/AoIGhkdKf4FVSTeq+VlUx97qls4uNizP7hBXIIw==
+react-native-mail@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/react-native-mail/-/react-native-mail-6.1.0.tgz#cd7fa390824f5d1182fbe0599d135d221d11d205"
+  integrity sha512-u2JqlHe19OKbXPKx3mNhBTuF7LfM4EkpVG/DkpY5i5G+dgOz8rRtBDKvcuJfUQnMBNav3kwvcwArjOG3rZhJZQ==
 
 react-native-measureme@0.0.2:
   version "0.0.2"
