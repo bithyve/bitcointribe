@@ -165,7 +165,7 @@ function* executeSendStage1( { payload }: {payload: {
     else
       yield put( sendStage1Executed( {
         successful: false,
-        err: 'Send failed: pre-requisite missing'
+        err: 'Send failed: unable to generate tx pre-requisite'
       } ) )
   } catch ( err ) {
     yield put( sendStage1Executed( {
@@ -181,184 +181,43 @@ export const executeSendStage1Watcher = createWatcher(
   EXECUTE_SEND_STAGE1
 )
 
-// function* executeSendStage2( { payload }: {payload: {
-//   accountShellID: string;
-//   txnPriority: string,
-// }} ) {
-//   const { accountShellID } = payload
-//   const accountsState: AccountsState = yield select(
-//     ( state ) => state.accounts
-//   )
-//   const sending: SendingState = yield select(
-//     ( state ) => state.sending
-//   )
-//   const accountShell: AccountShell = accountsState.accountShells
-//     .find( accountShell => accountShell.id === accountShellID )
-
-//   const service: BaseAccount | SecureAccount = accountsState[
-//     accountShell.primarySubAccount.sourceKind
-//   ].service
-
-//   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
-
-//   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
-//   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
-
-//   const { txnPriority } = payload
-
-//   const res = yield call(
-//     service.transferST2,
-//     txPrerequisites,
-//     txnPriority,
-//     customTxPrerequisites,
-//     derivativeAccountDetails,
-//   )
-
-//   if ( res.status === 200 ) {
-//     if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
-//       const { txHex, childIndexArray, inputs, derivativeAccountDetails } = res.data
-//       yield put( sendStage2Executed( {
-//         successful: true,
-//         carryOver: {
-//           txHex, childIndexArray, inputs, derivativeAccountDetails
-//         }
-//       }
-//       ) )
-//     } else yield put( sendStage2Executed( {
-//       successful: true,
-//       txid: res.data.txid
-//     } ) )
-//   } else {
-//     if ( res.err === 'ECONNABORTED' ) requestTimedout()
-//     yield put( sendStage2Executed( {
-//       successful: false,
-//       err: res.err
-//     } ) )
-//   }
-// }
-
-// export const executeSendStage2Watcher = createWatcher(
-//   executeSendStage2,
-//   EXECUTE_SEND_STAGE2
-// )
-
-
 function* executeSendStage2( { payload }: {payload: {
-  accountShellID: string;
-  txnPriority: string,
+  accountShell: AccountShell;
+  txnPriority: TxPriority,
+  token?: number,
 }} ) {
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const averageTxFeeByNetwork = accountsState.averageTxFees[ 'TESTNET' ]
-
-  const network = bitcoinJS.networks.testnet
-  const mnemonic = 'remember someone much festival stadium cash enlist avocado write blade sunset long virtual stadium inject host obscure clump jazz plunge goddess stone silent title'
-  const derivationPath1 = 'm/49\'/0\'/0\''
-  const xpub  = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath1 )
-  const xpriv =  AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath1 )
-  let account: Account = generateAccount( {
-    walletId: 'zyx',
-    accountName: 'Checkinig',
-    accountDescription: 'checking Description',
-    derivationPath: derivationPath1,
-    xpub,
-    xpriv,
-    network,
-  } )
-
-  const { synchedAccounts } = yield call(
-    AccountOperations.syncAccounts,
-    [ account ],
-    account.network )
-  account = synchedAccounts[ 0 ]
-
-  console.log( {
-    account
-  } )
-  const recipients = [ {
-    address: '2N7njh5EhCbefajvNKMXqtB7kpD1VyQvik7',
-    amount: 1000,
-  } ]
-
-  const { txPrerequisites } = yield call( AccountOperations.transferST1, account, recipients, averageTxFeeByNetwork )
-  console.log( {
-    txPrerequisites
-  } )
-
-  const txid = yield call( AccountOperations.transferST2, account, txPrerequisites, TxPriority.LOW, account.network )
-  console.log( {
-    txid
-  } )
-
-  const res = yield call(
-    AccountOperations.syncAccounts,
-    [ account ],
-    account.network )
-  console.log( {
-    final: res.synchedAccounts
-  } )
-
-}
-
-export const executeSendStage2Watcher = createWatcher(
-  executeSendStage2,
-  EXECUTE_SEND_STAGE2
-)
-
-function* executeAlternateSendStage2Worker( { payload }: {payload: {
-  accountShellID: string;
-  txnPriority: string,
-  }} ) {
-
-  const {
-    accountShellID,
-    txnPriority,
-  } = payload
-
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
   const sending: SendingState = yield select(
     ( state ) => state.sending
   )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
 
-  const service: SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
-    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
-  }
+  const { accountShell, txnPriority, token } = payload
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const res = yield call(
-    service.alternateTransferST2,
-    txPrerequisites,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-  )
-  if ( res.status === 200 ) {
-    yield put( alternateSendStage2Executed( {
-      successful: true, txid: res.data.txid
+  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, token, customTxPrerequisites )
+
+  if ( txid )
+    yield put( sendStage2Executed( {
+      successful: true,
+      txid,
     } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( alternateSendStage2Executed( {
-      successful: false, err: res.err
+  else
+    yield put( sendStage2Executed( {
+      successful: false,
+      err: 'Send failed: unable to generate txid'
     } ) )
-  }
+
 }
 
-export const executeAlternateSendStage2Watcher = createWatcher(
-  executeAlternateSendStage2Worker,
-  EXECUTE_ALTERNATE_SEND_STAGE2
+export const executeSendStage2Watcher = createWatcher(
+  executeSendStage2,
+  EXECUTE_SEND_STAGE2
 )
 
 function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
