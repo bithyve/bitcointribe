@@ -289,6 +289,7 @@ interface HomePropsTypes {
   setWalletId: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
+  initLoader: boolean;
   getMessages: any;
 }
 
@@ -792,7 +793,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if( newBHRFlowStarted === true )
       {
         const { healthCheckInitializedKeeper } = s3Service.levelhealth
-        if ( healthCheckInitializedKeeper === false ) {
+        if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
+          console.log( 'initializeHealthSetup', initializeHealthSetup )
           initializeHealthSetup()
         }
       }
@@ -1922,7 +1924,7 @@ const mapStateToProps = ( state ) => {
     asyncNotificationList: idx( state, ( _ ) => _.notifications.updatedNotificationList ),
     fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
     messages: state.notifications.messages,
-
+    initLoader: idx( state, ( _ ) => _.health.loading.initLoader ),
   }
 }
 

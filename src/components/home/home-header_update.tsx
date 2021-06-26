@@ -151,12 +151,12 @@ const HomeHeader = ( {
     if( levelData ){
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
-        if( element.keeper1.name && element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ){
+        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
           return {
             isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
           }
         }
-        if( element.keeper2.name && element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ){
+        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
           return {
             isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: ' needs your attention.'
           }
