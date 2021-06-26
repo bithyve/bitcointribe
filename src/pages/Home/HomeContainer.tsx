@@ -1764,27 +1764,52 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         <ScrollView style={{
           flex: 1
         }}>
-
-          <Text style={{
-            color: Colors.blue,
-            fontSize: RFValue(16),
-            marginLeft: 2,
-            fontFamily: Fonts.FiraSansMedium,
-            paddingVertical: wp(6),
-            paddingHorizontal: wp(4)
-          }}>
-            My Portfolio
-          </Text>
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingHorizontal: wp(4)
+            paddingVertical: wp(6),
+            paddingHorizontal: wp(4),
+            background: 'red'
           }}>
-            <View style={{
-              width: '80%',
-              background: 'red'
+            <Text style={{
+              color: Colors.blue,
+              fontSize: RFValue(16),
+              marginLeft: 2,
+              fontFamily: Fonts.FiraSansMedium,
+
             }}>
-              <Svg
+              My Portfolio
+            </Text>
+            <CurrencyKindToggleSwitch
+              fiatCurrencyCode={currencyCode}
+              onpress={() => {
+                // dispatch(
+                //   currencyKindSet(
+                //     prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+                //   )
+                // )
+              }}
+              isOn={true}
+            />
+          </View>
+
+          <View style={{
+            // width: '90%',
+            // flex: 1,
+            backgroundColor: 'white',
+            marginHorizontal: wp(4),
+            height: hp('20%'),
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: hp(2),
+            borderRadius: wp(2)
+          }}>
+            <Image source={require('../../assets/images/HomePageIcons/graph.png')} style={{
+              marginBottom: 'auto',
+              width: '100%', height: '100%', margin: 20, flex: 1, resizeMode: 'contain'
+            }} />
+          </View>
+          {/* <Svg
                 xmlns="http://www.w3.org/2000/svg"
                 width={222}
                 height={82}
@@ -1879,10 +1904,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                     {'sun'}
                   </TSpan>
                 </Txt>
-              </Svg>
-            </View>
+              </Svg> */}
 
-            {/* <TouchableOpacity
+          {/* <TouchableOpacity
               style={{
                 flexDirection: 'row'
               }}
@@ -1902,18 +1926,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               </Text>
             </TouchableOpacity> */}
 
-            <CurrencyKindToggleSwitch
-              fiatCurrencyCode={currencyCode}
-              onpress={() => {
-                // dispatch(
-                //   currencyKindSet(
-                //     prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
-                //   )
-                // )
-              }}
-              isOn={true}
-            />
-          </View>
+
+
 
           <HomeAccountCardsList
             // containerStyle={containerView}
