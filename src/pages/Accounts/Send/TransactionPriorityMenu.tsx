@@ -25,11 +25,12 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
+import { TxPriority } from '../../../bitcoin/utilities/Interface'
 
 export type Props = {
   sourceSubAccount: SubAccountDescribing;
   bitcoinDisplayUnit: BitcoinUnit;
-  onTransactionPriorityChanged: ( priority: TransactionPriority ) => void;
+  onTransactionPriorityChanged: ( priority: TxPriority ) => void;
 };
 
 const TransactionPriorityMenu: React.FC<Props> = ( {
@@ -38,7 +39,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
   onTransactionPriorityChanged,
 }: Props ) => {
   const { present: presentBottomSheet, dismiss: dismissBottomSheet } = useBottomSheetModal()
-  const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
+  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const availableTransactionPriorities = useAvailableTransactionPriorities()
   const [ transactionPriorities, setTransactionPriorities ] = useState( availableTransactionPriorities )
   const transactionFeeInfo = useTransactionFeeInfoForSending()
@@ -99,12 +100,12 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
     const txPriorites = availableTransactionPriorities
     if( customPriorityST1.hasFailed ) {
       setTransactionPriorities( txPriorites )
-      setTransactionPriority( TransactionPriority.LOW )
-      onTransactionPriorityChanged( TransactionPriority.LOW )
+      setTransactionPriority( TxPriority.LOW )
+      onTransactionPriorityChanged( TxPriority.LOW )
     } else if ( customPriorityST1.isSuccessful ) {
-      setTransactionPriorities( [ ...txPriorites, TransactionPriority.CUSTOM ] )
-      setTransactionPriority( TransactionPriority.CUSTOM )
-      onTransactionPriorityChanged( TransactionPriority.CUSTOM )
+      setTransactionPriorities( [ ...txPriorites, TxPriority.CUSTOM ] )
+      setTransactionPriority( TxPriority.CUSTOM )
+      onTransactionPriorityChanged( TxPriority.CUSTOM )
       dismissBottomSheet()
     }
   }
@@ -160,7 +161,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
                   ...styles.priorityTableText,
                   marginLeft: 12,
                 }}>
-                  {String( priority )}
+                  {String( priority.toUpperCase() )}
                 </Text>
               </View>
 
@@ -170,11 +171,11 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
               }}>
                 ~
                 {timeConvertNear30(
-                  ( transactionFeeInfo[ priority ].estimatedBlocksBeforeConfirmation + 1 )
+                  ( transactionFeeInfo[ priority.toUpperCase() ].estimatedBlocksBeforeConfirmation + 1 )
                   * 10
                 )}
               </Text>
-              <TextValue amt={transactionFeeInfo[ priority ].amount} unit={{
+              <TextValue amt={transactionFeeInfo[ priority.toUpperCase() ].amount} unit={{
                 bitcoinUnit: BitcoinUnit.SATS,
               }}/>
               {/* <Text style={{
