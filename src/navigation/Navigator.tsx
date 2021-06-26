@@ -134,9 +134,9 @@ const SetupNavigator = createStackNavigator(
   {
     initialRouteName: 'Launch',
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: () => ( {
+    defaultNavigationOptions: () => ({
       header: null,
-    } ),
+    }),
   },
 )
 
@@ -242,7 +242,7 @@ const HomeNavigator = createStackNavigator(
   },
   {
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: ( { navigation } ) => {
+    defaultNavigationOptions: ({ navigation }) => {
       return {
         header: null,
         headerTitleContainerStyle: {
@@ -280,8 +280,8 @@ const Bottomtab = createBottomTabNavigator(
     Home: {
       screen: HomeStack,
       navigationOptions: {
-        tabBarIcon: ( { focused } ) => {
-          return(
+        tabBarIcon: ({ focused }) => {
+          return (
             <View style={{
               // marginVertical: hp( '2%' )
             }}>
@@ -323,14 +323,15 @@ const Bottomtab = createBottomTabNavigator(
                 }} />
               </Svg> */}
             </View>
-          )}
+          )
+        }
       }
     },
     Freiend: {
       screen: FriendsAndFamily,
       navigationOptions: {
-        tabBarIcon: ( { focused } ) => {
-          return(
+        tabBarIcon: ({ focused }) => {
+          return (
             <View style={{
               // marginVertical: hp( '2%' )
             }}>
@@ -375,14 +376,15 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
             </View>
-          )}
+          )
+        }
       },
     },
     Securiy: {
       screen: SecurityStack,
       navigationOptions: {
-        tabBarIcon: ( { focused } ) => {
-          return(
+        tabBarIcon: ({ focused }) => {
+          return (
             <View style={{
               // marginVertical: hp( '2%' )
             }}>
@@ -432,25 +434,75 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
             </View>
-          )}
+          )
+        }
+      },
+    },
+    Buy: {
+      screen: SecurityStack,
+      navigationOptions: {
+        tabBarIcon: ({ focused }) => {
+          return (
+            <View style={{
+              // marginVertical: hp( '2%' )
+            }}>
+              {focused ?
+                <Svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={18.824}
+                  height={23.21}
+                  viewBox="0 0 18.824 23.21"
+                >
+                  <Defs></Defs>
+                  <Path
+                    className="prefix__a"
+                    d="M2.56 16.811c-.333.015-.668.011-1.018.007h-.51a.463.463 0 00-.456.384l-.467 2.681a.463.463 0 00.456.543h4.063v2.195a.463.463 0 00.463.463h2.221a.463.463 0 00.463-.463v-2.08h.84v2.109a.463.463 0 00.463.463h2.25a.463.463 0 00.463-.463v-2.122l1.267-.032a5.35 5.35 0 003.369-9.73 4.821 4.821 0 00-3.567-8.068h-.951V.584a.463.463 0 00-.463-.463H9.195a.463.463 0 00-.463.463v2h-.838V.563a.463.463 0 00-.466-.459H5.182a.463.463 0 00-.463.463v2.137H.709a.463.463 0 00-.463.463v2.337a.463.463 0 00.463.463h.845c.28.007.561.014.84.038.533.048.721.254.717.789q-.037 4.763-.086 9.526c-.004.414-.06.473-.465.491zM2.477 5.084c-.3-.027-.6-.034-.9-.042h-.4V3.633h4.01a.463.463 0 00.463-.463V1.026h1.318v2.021a.463.463 0 00.463.463h1.764a.463.463 0 00.463-.463v-2h1.33v2.118a.463.463 0 00.136.328.426.426 0 00.328.135h1.414a3.895 3.895 0 012.521 6.866.463.463 0 00.075.758 4.43 4.43 0 01-2.405 8.322h-.012l-1.724.044a.463.463 0 00-.451.463v2.103H9.543v-2.109a.463.463 0 00-.463-.463H7.313a.463.463 0 00-.463.463v2.08H5.555V19.96a.463.463 0 00-.463-.463H1.115l.305-1.753h.108c.368 0 .719.007 1.068-.008a1.252 1.252 0 001.351-1.4q.05-4.764.086-9.528a1.561 1.561 0 00-1.556-1.723z"
+                  />
+                  <Path
+                    className="prefix__a"
+                    d="M7.435 10.654h2.953a2.683 2.683 0 100-5.366H7.435a.463.463 0 00-.463.463v4.437a.463.463 0 00.463.466zm.463-4.439h2.49a1.757 1.757 0 110 3.513h-2.49zM7.435 17.807h3.691a2.928 2.928 0 100-5.855H7.435a.463.463 0 00-.463.463v4.929a.463.463 0 00.463.463zm.463-4.929h3.227a2 2 0 110 4H7.898z"
+                  />
+                </Svg>
+                :
+                <Svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={18.824}
+                  height={23.21}
+                  viewBox="0 0 18.824 23.21"
+                >
+                  <Defs></Defs>
+                  <Path
+                    className="prefix__a"
+                    d="M2.56 16.811c-.333.015-.668.011-1.018.007h-.51a.463.463 0 00-.456.384l-.467 2.681a.463.463 0 00.456.543h4.063v2.195a.463.463 0 00.463.463h2.221a.463.463 0 00.463-.463v-2.08h.84v2.109a.463.463 0 00.463.463h2.25a.463.463 0 00.463-.463v-2.122l1.267-.032a5.35 5.35 0 003.369-9.73 4.821 4.821 0 00-3.567-8.068h-.951V.584a.463.463 0 00-.463-.463H9.195a.463.463 0 00-.463.463v2h-.838V.563a.463.463 0 00-.466-.459H5.182a.463.463 0 00-.463.463v2.137H.709a.463.463 0 00-.463.463v2.337a.463.463 0 00.463.463h.845c.28.007.561.014.84.038.533.048.721.254.717.789q-.037 4.763-.086 9.526c-.004.414-.06.473-.465.491zM2.477 5.084c-.3-.027-.6-.034-.9-.042h-.4V3.633h4.01a.463.463 0 00.463-.463V1.026h1.318v2.021a.463.463 0 00.463.463h1.764a.463.463 0 00.463-.463v-2h1.33v2.118a.463.463 0 00.136.328.426.426 0 00.328.135h1.414a3.895 3.895 0 012.521 6.866.463.463 0 00.075.758 4.43 4.43 0 01-2.405 8.322h-.012l-1.724.044a.463.463 0 00-.451.463v2.103H9.543v-2.109a.463.463 0 00-.463-.463H7.313a.463.463 0 00-.463.463v2.08H5.555V19.96a.463.463 0 00-.463-.463H1.115l.305-1.753h.108c.368 0 .719.007 1.068-.008a1.252 1.252 0 001.351-1.4q.05-4.764.086-9.528a1.561 1.561 0 00-1.556-1.723z"
+                  />
+                  <Path
+                    className="prefix__a"
+                    d="M7.435 10.654h2.953a2.683 2.683 0 100-5.366H7.435a.463.463 0 00-.463.463v4.437a.463.463 0 00.463.466zm.463-4.439h2.49a1.757 1.757 0 110 3.513h-2.49zM7.435 17.807h3.691a2.928 2.928 0 100-5.855H7.435a.463.463 0 00-.463.463v4.929a.463.463 0 00.463.463zm.463-4.929h3.227a2 2 0 110 4H7.898z"
+                  />
+                </Svg>
+              }
+            </View>
+          )
+        }
       },
     },
     Setting: {
       screen: MoreOptionsStack,
       navigationOptions: {
-        tabBarIcon: ( { focused } ) => {
-          return(
+        tabBarIcon: ({ focused }) => {
+          return (
             <View style={{
             }}>
 
-              <Image source={require( '../assets/images/tabs/settings.png' )} style={{
+              <Image source={require('../assets/images/tabs/settings.png')} style={{
                 marginBottom: 'auto',
                 width: 30, height: 30, alignSelf: 'center',
                 // backgroundColor: focused ? 'white': 'gray'
               }} />
             </View>
 
-          )}
+          )
+        }
       },
     },
   },
@@ -507,16 +559,16 @@ const Bottomtab = createBottomTabNavigator(
   },
 )
 
-const Navigator = createSwitchNavigator( {
+const Navigator = createSwitchNavigator({
   SetupNav: SetupNavigator,
   HomeNav: Bottomtab,
-} )
+})
 
 
 export type BaseNavigationProp = {
-  getParam: ( param: string ) => any;
-  setParams: ( params: Record<string, unknown> ) => void;
-  navigate: ( route: string, params?: Record<string, unknown> ) => void;
+  getParam: (param: string) => any;
+  setParams: (params: Record<string, unknown>) => void;
+  navigate: (route: string, params?: Record<string, unknown>) => void;
 } & Record<string, unknown>;
 
-export default createAppContainer( Navigator )
+export default createAppContainer(Navigator)
