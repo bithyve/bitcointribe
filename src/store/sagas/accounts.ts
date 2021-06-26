@@ -756,7 +756,7 @@ function* refreshAccountShellWorker( { payload } ) {
   // yield put( rescanSucceeded( rescanTxs ) )
 
 
-  // yield put( accountShellRefreshCompleted( accountShell ) )
+  yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
 export const refreshAccountShellWatcher = createWatcher(
