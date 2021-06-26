@@ -25,6 +25,7 @@ import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperation
 import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { updateAccounts } from '../actions/accounts'
 
 const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
   const network =
@@ -202,17 +203,28 @@ function* executeSendStage2( { payload }: {payload: {
 
   const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, token, customTxPrerequisites )
 
-  if ( txid )
+  if ( txid ){
     yield put( sendStage2Executed( {
       successful: true,
       txid,
     } ) )
-  else
+
+    const accounts = {
+      [ account.id ]: account
+    }
+    yield put( updateAccounts( {
+      accounts
+    } ) )
+
+    //TODO: save accounts object into realm
+    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+    tempDB.accounts[ account.id ] = account
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+  } else
     yield put( sendStage2Executed( {
       successful: false,
       err: 'Send failed: unable to generate txid'
     } ) )
-
 }
 
 export const executeSendStage2Watcher = createWatcher(
