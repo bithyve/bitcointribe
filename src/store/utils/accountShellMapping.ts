@@ -57,9 +57,6 @@ const updatePrimarySubAccounts = (
   accounts: Accounts,
   accountShells: AccountShell[],
 ): AccountShell[] =>  accountShells.map( ( shell )=>{
-  console.log( {
-    shell, accounts
-  } )
   const account = accounts[ shell.primarySubAccount.id ]
   if( !account ) return shell
 

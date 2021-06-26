@@ -2,7 +2,7 @@ import { Action } from 'redux'
 import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import AccountShell from '../../common/data/models/AccountShell'
 import { Satoshis } from '../../common/data/typealiases/UnitAliases'
-import { TransactionPrerequisite, TransactionPrerequisiteElements } from '../../bitcoin/utilities/Interface'
+import { TransactionPrerequisite, TransactionPrerequisiteElements, TxPriority } from '../../bitcoin/utilities/Interface'
 
 export const RESET_SEND_STATE = 'RESET_SEND_STATE'
 export const SOURCE_ACCOUNT_SELECTED_FOR_SENDING = 'SOURCE_ACCOUNT_SELECTED_FOR_SENDING'
@@ -126,13 +126,13 @@ export const amountForRecipientUpdated = (
 export interface ExecuteSendStage1Action extends Action {
   type: typeof EXECUTE_SEND_STAGE1;
   payload: {
-    accountShellID: string;
+    accountShell: AccountShell;
   };
 }
 
 export const executeSendStage1 = (
   payload: {
-    accountShellID: string;
+    accountShell: AccountShell;
   },
 ): ExecuteSendStage1Action => {
   return {
@@ -186,15 +186,15 @@ export const feeIntelMissing = (
 export interface ExecuteSendStage2Action extends Action {
   type: typeof EXECUTE_SEND_STAGE2;
   payload: {
-    accountShellID: string;
-    txnPriority: string,
+    accountShell: AccountShell;
+    txnPriority: TxPriority,
   };
 }
 
 export const executeSendStage2 = (
   payload: {
-    accountShellID: string;
-    txnPriority: string,
+    accountShell: AccountShell;
+    txnPriority: TxPriority,
     },
 ): ExecuteSendStage2Action => {
   return {
@@ -205,49 +205,14 @@ export const executeSendStage2 = (
 
 export interface SendStage2ExecutedAction extends Action {
   type: typeof SEND_STAGE2_EXECUTED;
-  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string};
+  payload: {successful: boolean, txid?: string, err?: string};
 }
 
 export const sendStage2Executed = (
-  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string},
+  payload: {successful: boolean, txid?: string, err?: string},
 ): SendStage2ExecutedAction => {
   return {
     type: SEND_STAGE2_EXECUTED,
-    payload,
-  }
-}
-
-
-export interface ExecuteAlternateSendStage2Action extends Action {
-  type: typeof EXECUTE_ALTERNATE_SEND_STAGE2;
-  payload: {
-    accountShellID: string;
-    txnPriority: string,
-  };
-}
-
-export const executeAlternateSendStage2 = (
-  payload: {
-    accountShellID: string;
-    txnPriority: string,
-    },
-): ExecuteAlternateSendStage2Action => {
-  return {
-    type: EXECUTE_ALTERNATE_SEND_STAGE2,
-    payload,
-  }
-}
-
-export interface AlternateSendStage2ExecutedAction extends Action {
-  type: typeof ALTERNATE_SEND_STAGE2_EXECUTED;
-  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string};
-}
-
-export const alternateSendStage2Executed = (
-  payload: {successful: boolean, carryOver?: {txHex, childIndexArray, inputs, derivativeAccountDetails}, txid?: string, err?: string},
-): AlternateSendStage2ExecutedAction => {
-  return {
-    type: ALTERNATE_SEND_STAGE2_EXECUTED,
     payload,
   }
 }
