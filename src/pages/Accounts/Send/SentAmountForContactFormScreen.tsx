@@ -117,7 +117,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
   function handleConfirmationButtonPress() {
     updateAmountForRecipient()
     dispatch( executeSendStage1( {
-      accountShellID: sourceAccountShell.id
+      accountShell: sourceAccountShell
     } ) )
   }
 

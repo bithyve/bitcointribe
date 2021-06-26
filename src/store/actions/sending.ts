@@ -126,13 +126,13 @@ export const amountForRecipientUpdated = (
 export interface ExecuteSendStage1Action extends Action {
   type: typeof EXECUTE_SEND_STAGE1;
   payload: {
-    accountShellID: string;
+    accountShell: AccountShell;
   };
 }
 
 export const executeSendStage1 = (
   payload: {
-    accountShellID: string;
+    accountShell: AccountShell;
   },
 ): ExecuteSendStage1Action => {
   return {

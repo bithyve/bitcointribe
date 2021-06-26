@@ -76,19 +76,15 @@ function* processRecipients( accountShell: AccountShell ){
   const selectedRecipients: RecipientDescribing[] = yield select(
     ( state ) => state.sending.selectedRecipients
   )
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
 
   const recipients: [
     {
-      id: string;
       address: string;
       amount: number;
-      type?: string;
-      accountNumber?: number;
     }?
   ]  = []
 
@@ -96,44 +92,16 @@ function* processRecipients( accountShell: AccountShell ){
     switch( recipient.kind ){
         case RecipientKind.ADDRESS:
           recipients.push( {
-            id: recipient.id,
             address: recipient.id,
             amount: recipient.amount,
           } )
           break
 
-          // TODO: RecipientDescribing should have type and instance/acc number properties
         case RecipientKind.ACCOUNT_SHELL:
-          const instanceNumber = ( recipient as AccountRecipientDescribing ).instanceNumber
-          let accountKind =  ( ( recipient as AccountRecipientDescribing ).type as string )
-          const serviceType = ( ( recipient as AccountRecipientDescribing ).serviceType as string )
-          if( serviceType ) accountKind = serviceType
-
-          if( instanceNumber && [ REGULAR_ACCOUNT, SECURE_ACCOUNT ].includes( accountKind ) ){
-            accountKind = SUB_PRIMARY_ACCOUNT
-          }
-
-          const sourceAccount = ( recipient as AccountRecipientDescribing ).sourceAccount
-          const subInstance =
-        sourceAccount === REGULAR_ACCOUNT
-          ? regularAccount.hdWallet
-          : secureAccount.secureHDWallet
-
-          let receivingAddress
-          if ( config.EJECTED_ACCOUNTS.includes( accountKind ) )
-            receivingAddress = subInstance.getReceivingAddress(
-              accountKind,
-              instanceNumber
-            )
-          else receivingAddress = subInstance.getReceivingAddress()
-
-
+          const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
           recipients.push( {
-            id: accountKind,
-            address: receivingAddress,
+            address: account.receivingAddress,
             amount: recipient.amount,
-            type: sourceAccount,
-            accountNumber: instanceNumber,
           } )
           break
 
@@ -155,7 +123,6 @@ function* processRecipients( accountShell: AccountShell ){
 
           SubAccountKind.TRUSTED_CONTACTS
           recipients.push( {
-            id: recipient.id,
             address: paymentAddress,
             amount: recipient.amount,
           } )
@@ -168,108 +135,45 @@ function* processRecipients( accountShell: AccountShell ){
 }
 
 
-// function* executeSendStage1( { payload }: {payload: {
-//   accountShellID: string;
-// }} ) {
-//   const { accountShellID } = payload
-//   const accountsState: AccountsState = yield select(
-//     ( state ) => state.accounts
-//   )
-//   const accountShell: AccountShell = accountsState.accountShells
-//     .find( accountShell => accountShell.id === accountShellID )
-
-//   const service: BaseAccount | SecureAccount = accountsState[
-//     accountShell.primarySubAccount.sourceKind
-//   ].service
-
-//   if( !accountsState.averageTxFees ){
-//     yield put( feeIntelMissing( {
-//       intelMissing: true
-//     } ) )
-//     return
-//   }
-
-//   const averageTxFeeByNetwork = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ]
-//   const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
-
-//   try {
-//     const recipients = yield call( processRecipients, accountShell )
-
-//     const res = yield call(
-//       service.transferST1,
-//       recipients,
-//       averageTxFeeByNetwork,
-//       derivativeAccountDetails
-//     )
-//     if ( res.status === 200 ){
-//       const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
-//       yield put( sendStage1Executed( {
-//         successful: true, carryOver: {
-//           txPrerequisites
-//         }
-//       } ) )
-//     }
-//     else {
-//       if ( res.err === 'ECONNABORTED' ) requestTimedout()
-//       yield put( sendStage1Executed( {
-//         successful: false,
-//         err: res.err
-//       } ) )
-//     }
-//   } catch ( err ) {
-//     yield put( sendStage1Executed( {
-//       successful: false,
-//       err
-//     } ) )
-//     return
-//   }
-// }
-
-// export const executeSendStage1Watcher = createWatcher(
-//   executeSendStage1,
-//   EXECUTE_SEND_STAGE1
-// )
-
-
 function* executeSendStage1( { payload }: {payload: {
-  account: Account | MultiSigAccount;
+  accountShell: AccountShell;
 }} ) {
+  const { accountShell } = payload
   const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const averageTxFeeByNetwork = accountsState.averageTxFees[ 'TESTNET' ]
+    ( state ) => state.accounts )
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
-  const mnemonic = 'remember someone much festival stadium cash enlist avocado write blade sunset long virtual stadium inject host obscure clump jazz plunge goddess stone silent title'
-  const derivationPath1 = 'm/49\'/0\'/0\''
-  const xpub  = AccountUtilities.generateExtendedKey( mnemonic, false, network, derivationPath1 )
-  const xpriv =  AccountUtilities.generateExtendedKey( mnemonic, true, network, derivationPath1 )
-  const account: Account = generateAccount( {
-    walletId: 'zyx',
-    accountName: 'Checkinig',
-    accountDescription: 'checking Description',
-    derivationPath: derivationPath1,
-    xpub,
-    xpriv,
-    network: bitcoinJS.networks.testnet,
-  } )
+  if( !accountsState.averageTxFees ){
+    yield put( feeIntelMissing( {
+      intelMissing: true
+    } ) )
+    return
+  }
 
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
 
-  const { synchedAccounts } = yield call(
-    AccountOperations.syncAccounts,
-    [ account ],
-    account.network )
+  try {
+    const recipients = yield call( processRecipients, accountShell )
+    const { txPrerequisites } = yield call( AccountOperations.transferST1, account, recipients, averageTxFeeByNetwork )
 
-  const recipients = [ {
-    address: '2N7njh5EhCbefajvNKMXqtB7kpD1VyQvik7',
-    amount: 1000,
-  } ]
-
-  const txPrerequisites = yield call( AccountOperations.transferST1, synchedAccounts[ 0 ], recipients, averageTxFeeByNetwork )
-  console.log( {
-    txPrerequisites
-  } )
-
-  // TODO: save txPrerequisites
+    if ( txPrerequisites )
+      yield put( sendStage1Executed( {
+        successful: true, carryOver: {
+          txPrerequisites
+        }
+      } ) )
+    else
+      yield put( sendStage1Executed( {
+        successful: false,
+        err: 'Send failed: pre-requisite missing'
+      } ) )
+  } catch ( err ) {
+    yield put( sendStage1Executed( {
+      successful: false,
+      err
+    } ) )
+    return
+  }
 }
 
 export const executeSendStage1Watcher = createWatcher(
