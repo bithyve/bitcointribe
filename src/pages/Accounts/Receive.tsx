@@ -30,15 +30,10 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import BottomSheet from 'reanimated-bottom-sheet'
 
 import {
-  SECURE_ACCOUNT,
-  TEST_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-
-import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences'
-import { getAccountIcon, getAccountIconByShell, getAccountTitle, getAccountTitleByShell } from './Send/utils'
+import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import QRCode from 'react-native-qrcode-svg'
 import CopyThisText from '../../components/CopyThisText'
