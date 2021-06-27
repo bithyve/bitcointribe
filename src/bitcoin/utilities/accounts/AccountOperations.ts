@@ -503,7 +503,7 @@ export default class AccountOperations {
       }
 
       const sortedOuts = await AccountUtilities.sortOutputs(
-        account.xpub,
+        account,
         outputs,
         account.nextFreeChangeAddressIndex,
         network
@@ -534,7 +534,6 @@ export default class AccountOperations {
         txId: string;
         vout: number;
       };
-      internal: boolean,
     }> | null;
   } => {
     try {
@@ -560,7 +559,6 @@ export default class AccountOperations {
               vout: input.vout,
               value: input.value,
             },
-            internal
           } )
         } else {
           const privateKey = AccountUtilities.addressToPrivateKey(

@@ -184,6 +184,7 @@ export interface ExecuteSendStage2Action extends Action {
   payload: {
     accountShell: AccountShell;
     txnPriority: TxPriority,
+    token?: number
   };
 }
 
@@ -191,6 +192,7 @@ export const executeSendStage2 = (
   payload: {
     accountShell: AccountShell;
     txnPriority: TxPriority,
+    token?: number,
     },
 ): ExecuteSendStage2Action => {
   return {
