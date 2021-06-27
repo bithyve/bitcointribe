@@ -715,8 +715,8 @@ export default class AccountOperations {
 
     const { signedTxb, childIndexArray } = AccountOperations.signTransaction( account, inputs, txb )
     let txHex
-    if( ( account as MultiSigAccount ).is2FA ){
 
+    if( ( account as MultiSigAccount ).is2FA ){
       if( token ){
         const partiallySignedTxHex = signedTxb.buildIncomplete().toHex()
         const { signedTxHex } =  await AccountUtilities.getSecondSignature(
@@ -733,7 +733,7 @@ export default class AccountOperations {
           txb,
         )
         txHex = signedTxb.build().toHex()
-        // TODO: remove secondary-xpriv via saga (X AccountUtilities.removeSecondaryXpriv())
+        delete ( account as MultiSigAccount ).xprivs.secondary
       } else throw new Error( 'Multi-sig transaction failed: token/secondary-key missing' )
 
     } else {

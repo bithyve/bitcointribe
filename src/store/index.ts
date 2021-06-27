@@ -196,7 +196,7 @@ import {
   confirmPDFSharedFromUpgradeWatcher,
 } from './sagas/upgradeToNewBhr'
 
-import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendTxNotificationWatcher } from './sagas/sending'
+import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import newBHR from './reducers/newBHR'
 import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
@@ -352,7 +352,6 @@ const rootSaga = function* () {
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,
-    executeSendStage3Watcher,
     calculateSendMaxFeeWatcher,
     calculateCustomFeeWatcher,
     sendTxNotificationWatcher,

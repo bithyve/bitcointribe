@@ -1,20 +1,14 @@
 import { put, call, select } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createWatcher, requestTimedout } from '../utils/utilities'
-import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
-import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import { createWatcher } from '../utils/utilities'
+import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { Account, DerivativeAccountTypes, INotification, MultiSigAccount, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
-import config from '../../bitcoin/HexaConfig'
+import { Account, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { AccountRecipientDescribing, ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
@@ -22,53 +16,8 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import * as bitcoinJS from 'bitcoinjs-lib'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { updateAccounts } from '../actions/accounts'
-
-const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
-  const network =
-  config.APP_STAGE !== 'dev' &&
-  [ SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ].includes( sourceKind )
-    ? 'MAINNET'
-    : 'TESTNET'
-
-  return network
-}
-
-const getDerivativeAccountDetails = ( accountShell: AccountShell ) => {
-  let derivativeAccountDetails: {
-    type: string;
-    number: number;
-  }
-
-  switch( accountShell.primarySubAccount.kind ){
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        if( accountShell.primarySubAccount.instanceNumber ){
-          derivativeAccountDetails = {
-            type: DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT, number: accountShell.primarySubAccount.instanceNumber
-          }
-        }
-        break
-
-      case SubAccountKind.DONATION_ACCOUNT:
-        derivativeAccountDetails = {
-          type: accountShell.primarySubAccount.kind, number: accountShell.primarySubAccount.instanceNumber
-        }
-        break
-
-      case SubAccountKind.SERVICE:
-        derivativeAccountDetails = {
-          type: ( accountShell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind, number: accountShell.primarySubAccount.instanceNumber
-        }
-        break
-  }
-
-  return derivativeAccountDetails
-}
-
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -230,42 +179,6 @@ function* executeSendStage2( { payload }: {payload: {
 export const executeSendStage2Watcher = createWatcher(
   executeSendStage2,
   EXECUTE_SEND_STAGE2
-)
-
-function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
-  const { accountShellID, token } = payload
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const sending: SendingState = yield select(
-    ( state ) => state.sending
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const carryOver =  idx( sending, ( _ ) => _.sendST2.carryOver )
-  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
-
-  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
-  if ( res.status === 200 ) {
-    yield put( sendStage3Executed( {
-      successful: true, txid: res.data.txid
-    } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( sendStage3Executed( {
-      successful: false, err: res.err
-    } ) )
-  }
-}
-
-export const executeSendStage3Watcher = createWatcher(
-  executeSendStage3Worker,
-  EXECUTE_SEND_STAGE3
 )
 
 function* calculateSendMaxFee( { payload }: {payload: {
