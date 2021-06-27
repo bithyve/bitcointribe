@@ -13,7 +13,7 @@ import defaultStackScreenNavigationOptions from '../../../navigation/options/Def
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import KnowMoreButton from '../../../components/KnowMoreButton'
 import { BarCodeReadEvent } from 'react-native-camera'
-import { ScannedAddressKind } from '../../../bitcoin/utilities/Interface'
+import { ScannedAddressKind, Wallet } from '../../../bitcoin/utilities/Interface'
 import Toast from '../../../components/Toast'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
@@ -33,6 +33,7 @@ import Colors from '../../../common/Colors'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export type Props = {
   navigation: any;
@@ -208,15 +209,19 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   useEffect( () => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    if ( primarySubAccount.isTFAEnabled ) {
-      const twoFASetupDetails = idx( accountsState, ( _ ) => _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
+    ( async() => {
+    // TODO: read 2FA deatils from realm
+      const { wallet }: { wallet: Wallet } = JSON.parse( await AsyncStorage.getItem( 'tempDB' ) )
+      if ( primarySubAccount.isTFAEnabled ) {
+        const twoFASetupDetails = idx( wallet, ( _ ) => _.details2FA )
+        const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
+        if ( twoFASetupDetails && !twoFAValid )
+          navigation.navigate( 'TwoFASetup', {
+            twoFASetup: twoFASetupDetails,
+          } )
+      }
+    } )()
 
-      if ( twoFASetupDetails && !twoFAValid )
-        navigation.navigate( 'TwoFASetup', {
-          twoFASetup: twoFASetupDetails,
-        } )
-    }
   }, [ primarySubAccount.sourceKind ] )
 
 

@@ -174,13 +174,8 @@ export default class AccountOperations {
       }
     }
 
-    console.log( {
-      accountInstances
-    } )
     const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
-    console.log( {
-      synchedAccounts
-    } )
+
     const txsFound: Transaction[] = []
     for( const account of Object.values( accounts ) ) {
       const  {

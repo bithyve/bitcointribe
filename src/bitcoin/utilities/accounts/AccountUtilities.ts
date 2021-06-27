@@ -901,6 +901,30 @@ export default class AccountUtilities {
      }
    };
 
+   static validateTwoFA = async ( walletID: string, token: number ): Promise<{
+    valid: Boolean
+  }> => {
+     let res: AxiosResponse
+     try {
+       res = await SIGNING_AXIOS.post( 'validate2FASetup', {
+         HEXA_ID: config.HEXA_ID,
+         walletID,
+         token,
+       } )
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+     }
+
+     const { valid } = res.data
+     if ( !valid ) throw new Error( '2FA validation failed' )
+
+     return {
+       valid
+     }
+   }
+
+
   static getSecondSignature = async (
     walletId: string,
     token: number,
