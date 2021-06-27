@@ -66,6 +66,7 @@ import {
   MultiSigAccount,
   TrustedContact,
   Trusted_Contacts,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -588,38 +589,22 @@ function* resetTwoFAWorker( { payload } ) {
 export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
 
 
-function* validateTwoFAWorker( { payload } ) {
-  const service: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
+function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
+  // TODO: read wallet from realm
+  const tempDB = JSON.parse( yield call( AsyncStorage.getItem, 'tempDB' ) )
+  const wallet: Wallet = tempDB.wallet
+  const { token } = payload
+  const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
 
-  const res = yield call( service.validate2FASetup, payload.token )
-
-  if ( res.status == 200 && res.data.valid ) {
+  if ( valid ) {
     yield put( twoFAValid( true ) )
-    const { removed } = yield call( service.removeTwoFADetails )
-
-    if ( removed ) {
-      const { SERVICES } = yield select( ( state ) => state.storage.database )
-      const updatedSERVICES = {
-        ...SERVICES,
-        [ SECURE_ACCOUNT ]: JSON.stringify( service ),
-      }
-
-      yield call( insertDBWorker, {
-        payload: {
-          SERVICES: updatedSERVICES
-        }
-      } )
-    } else {
-      console.log( 'Failed to remove 2FA details from the device' )
-    }
-
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    console.log( 'Failed to validate twoFA', res.err )
-    yield put( twoFAValid( false ) )
-  }
+    delete wallet.details2FA
+    // TODO: save udpated wallet into realm
+    yield call( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+      ...tempDB,
+      wallet
+    } ) )
+  } else yield put( twoFAValid( false ) )
 }
 
 export const validateTwoFAWatcher = createWatcher(

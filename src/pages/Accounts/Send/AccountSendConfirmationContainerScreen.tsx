@@ -145,10 +145,15 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   [ presentBottomSheet, dismissBottomSheet ] )
 
   function handleConfirmationButtonPress() {
-    dispatch( executeSendStage2( {
-      accountShell: sourceAccountShell,
-      txnPriority: transactionPriority,
-    } ) )
+    if( sourceAccountShell.primarySubAccount.isTFAEnabled )
+      navigation.navigate( 'OTPAuthentication', {
+        txnPriority: transactionPriority
+      } )
+    else
+      dispatch( executeSendStage2( {
+        accountShell: sourceAccountShell,
+        txnPriority: transactionPriority,
+      } ) )
   }
 
   function handleBackButtonPress() {
@@ -167,8 +172,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       if ( txid ) {
         dispatch( sendTxNotification() )
         showSendSuccessBottomSheet()
-      } else {
-        navigation.navigate( 'OTPAuthentication' )
       }
     },
     onFailure: showSendFailureBottomSheet,
@@ -209,7 +212,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationCurrentTotalHeader />
 
       <TransactionPriorityMenu
-        sourceSubAccount={sourcePrimarySubAccount}
+        accountShell={sourceAccountShell}
         bitcoinDisplayUnit={sourceAccountShell.unit}
         onTransactionPriorityChanged={setTransactionPriority}
       />

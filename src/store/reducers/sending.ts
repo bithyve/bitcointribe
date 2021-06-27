@@ -4,7 +4,7 @@ import { SOURCE_ACCOUNT_SELECTED_FOR_SENDING, ADD_RECIPIENT_FOR_SENDING, RECIPIE
 import AccountShell from '../../common/data/models/AccountShell'
 import TransactionPriority from '../../common/data/enums/TransactionPriority'
 import TransactionFeeSnapshot from '../../common/data/models/TransactionFeeSnapshot'
-import {  InputUTXOs, TransactionPrerequisite, TransactionPrerequisiteElements } from '../../bitcoin/utilities/Interface'
+import { TransactionPrerequisite, TransactionPrerequisiteElements } from '../../bitcoin/utilities/Interface'
 
 type RecipientID = string;
 

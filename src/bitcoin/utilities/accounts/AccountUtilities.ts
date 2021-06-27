@@ -312,7 +312,7 @@ export default class AccountUtilities {
   }
 
   static sortOutputs = async (
-    xpub: string,
+    account: Account | MultiSigAccount,
     outputs: Array<{
       address: string;
       value: number;
@@ -327,12 +327,18 @@ export default class AccountUtilities {
   > => {
     for ( const output of outputs ) {
       if ( !output.address ) {
-        const changeAddress = AccountUtilities.getAddressByIndex(
-          xpub,
-          true,
-          nextFreeChangeAddressIndex,
-          network
-        )
+        let changeAddress: string
+
+        if( ( account as MultiSigAccount ).is2FA )
+          changeAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, nextFreeChangeAddressIndex, true ).address
+        else
+          changeAddress = AccountUtilities.getAddressByIndex(
+            account.xpub,
+            true,
+            nextFreeChangeAddressIndex,
+            network
+          )
+
         output.address = changeAddress
         // console.log(`adding the change address: ${output.address}`);
       }
@@ -901,6 +907,30 @@ export default class AccountUtilities {
      }
    };
 
+   static validateTwoFA = async ( walletID: string, token: number ): Promise<{
+    valid: Boolean
+  }> => {
+     let res: AxiosResponse
+     try {
+       res = await SIGNING_AXIOS.post( 'validate2FASetup', {
+         HEXA_ID: config.HEXA_ID,
+         walletID,
+         token,
+       } )
+     } catch ( err ) {
+       if ( err.response ) throw new Error( err.response.data.err )
+       if ( err.code ) throw new Error( err.code )
+     }
+
+     const { valid } = res.data
+     if ( !valid ) throw new Error( '2FA validation failed' )
+
+     return {
+       valid
+     }
+   }
+
+
   static getSecondSignature = async (
     walletId: string,
     token: number,
@@ -916,6 +946,9 @@ export default class AccountUtilities {
     signedTxHex: string;
   }> => {
     let res: AxiosResponse
+    console.log( {
+      walletId, token, partiallySignedTxHex, childIndexArray
+    } )
     try {
       res = await SIGNING_AXIOS.post( 'secureHDTransaction', {
         HEXA_ID: config.HEXA_ID,
