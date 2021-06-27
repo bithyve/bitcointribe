@@ -62,19 +62,23 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   return ( <View style={{
     ...styles.modalContentContainer,
   }}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={onPress}
+      style={{
+        width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+        alignSelf: 'flex-end',
+        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+        marginTop: wp( 3 ), marginRight: wp( 3 )
+      }}
+    >
+      <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+      }} />
+    </TouchableOpacity>
     <View style={styles.successModalHeaderView}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={onPress}
-        style={{
-          flexDirection: 'row'
-        }}
-      >
-        <FontAwesome name="long-arrow-left" color={Colors.blue} size={19} style={{
-          marginTop: hp( 0.5 )
-        }} />
-        <Text style={styles.modalTitleText}>{rampTitle}</Text>
-      </TouchableOpacity>
+
+      <Text style={styles.modalTitleText}>{rampTitle}</Text>
       <Text style={{
         ...styles.modalInfoText,
         marginTop: wp( 1.5 ),
@@ -83,14 +87,20 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
     </View>
     <View style={{
       flexDirection: 'row',
-      // marginLeft: wp( '1.5%' ),
-      alignSelf: 'center',
-      width: wp( '90%' ),
+      marginLeft: wp( '3%' ),
+      // alignSelf: 'center',
+      width: wp( '85%' ),
       height: hp( 9 ),
-      backgroundColor: Colors.backgroundColor1,
+      backgroundColor: Colors.white,
       alignItems: 'center',
       marginBottom: wp( 2 ),
-      borderRadius: wp( 2 )
+      borderRadius: wp( 2 ),
+      elevation: 10,
+      shadowColor: Colors.borderColor,
+      shadowOpacity: 10,
+      shadowOffset: {
+        width: 2, height: 2
+      },
     }}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
@@ -123,13 +133,21 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 
     <View style={{
       flexDirection: 'row',
-      alignSelf: 'center',
-      width: wp( '90%' ),
+      // alignSelf: 'center',
+      marginLeft: wp( '3%' ),
+      // alignSelf: 'center',
+      width: wp( '85%' ),
       height: hp( 9 ),
-      backgroundColor: Colors.backgroundColor1,
+      backgroundColor: Colors.white,
       alignItems: 'center',
       marginBottom: wp( 2 ),
-      borderRadius: wp( 2 )
+      borderRadius: wp( 2 ),
+      elevation: 10,
+      shadowColor: Colors.borderColor,
+      shadowOpacity: 10,
+      shadowOffset: {
+        width: 2, height: 2
+      },
     }}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
@@ -158,6 +176,21 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         </ListItem.Title>
       </ListItem.Content>
     </View>
+
+    <View style={{
+      flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto', marginBottom: hp( '1%' )
+    }} >
+      <AppBottomSheetTouchableWrapper
+        disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
+        onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+        style={{
+          ...styles.successModalButtonView
+        }}
+      >
+        <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
+
+      </AppBottomSheetTouchableWrapper>
+    </View>
     {rampFromBuyMenu
       ? <View style={{
         alignSelf: 'flex-end',
@@ -165,7 +198,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         alignItems: 'center',
         alignContent: 'center',
         marginTop: hp( '1.5' ),
-        marginRight: wp( '9%' ),
+        marginRight: wp( '6%' ),
       }}>
         <Text style={{
           fontStyle: 'italic',
@@ -185,21 +218,6 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       </View>
       : null
     }
-    <View style={{
-      flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto', marginBottom: hp( '1%' )
-    }} >
-      <AppBottomSheetTouchableWrapper
-        disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
-        onPress={rampFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-        style={{
-          ...styles.successModalButtonView
-        }}
-      >
-        <Text style={styles.proceedButtonText}>{rampFromBuyMenu ? 'Buy bitcoin' : 'OK'}</Text>
-
-      </AppBottomSheetTouchableWrapper>
-    </View>
-
   </View>
   )
 }
@@ -235,7 +253,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( '13%' ) / 2,
   },
   modalContentContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
   },
   avatarImage: {
     ...ImageStyles.circledAvatarContainer,
@@ -251,17 +269,17 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '3%' ),
-    marginTop: hp( '1%' )
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.FiraSansRegular,
     width: wp( 30 ),
     marginLeft: 10
   },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
+    marginLeft: wp( '3%' ),
+    marginRight: wp( 4 ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
@@ -285,7 +303,8 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '10%' ),
+    marginLeft: wp( '6%' ),
+    marginTop: hp( 2 )
   },
   successModalImage: {
     width: wp( '25%' ),

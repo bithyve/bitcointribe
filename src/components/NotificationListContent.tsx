@@ -20,27 +20,30 @@ const releaseNotificationTopic = getEnvReleaseTopic()
 export default function NotificationListContent( props ) {
   return (
     <View style={styles.modalContainer}>
+      <AppBottomSheetTouchableWrapper
+        onPress={() => props.onPressBack()}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+        }} />
+      </AppBottomSheetTouchableWrapper>
       <View style={styles.modalHeaderTitleView}>
+
         <View style={{
-          flexDirection: 'row'
+          justifyContent: 'center'
         }}>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressBack()}
-            style={{
-              height: 30, width: 30, justifyContent: 'center'
-            }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{
-            justifyContent: 'center'
-          }}>
-            <Text style={styles.modalHeaderTitleText}>{'Notifications'}</Text>
-          </View>
+          <Text style={styles.modalHeaderTitleText}>{'Notifications'}</Text>
         </View>
       </View>
       <ScrollView style={{
-        height: '63%'
+        // height: '63%'
+        // flex: 1
       }}>
         {props.notificationLoading
           ? null
@@ -129,7 +132,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '2%' ),
+    // paddingTop: hp( '2%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
   },

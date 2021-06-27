@@ -150,7 +150,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           }}>
             Settings & More,
           </Text>
-          <View style={{
+          {/* <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
           }}>
             <Image
@@ -179,7 +179,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               }}
               isOn={prefersBitcoin}
             />
-          </View>
+          </View> */}
           <FlatList
             data={menuOptions}
             keyExtractor={listItemKeyExtractor}

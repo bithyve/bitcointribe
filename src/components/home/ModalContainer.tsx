@@ -1,5 +1,6 @@
 import React from 'react'
 import { TouchableOpacity, TouchableWithoutFeedback, Modal, View } from 'react-native'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 const ModalContainer = ( {
   visible,
@@ -27,8 +28,9 @@ const ModalContainer = ( {
           backgroundColor: 'rgba(0,0,0,0.5)',
           flex: 1,
           flexDirection: 'column',
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
           alignItems: 'center',
+          paddingBottom: hp( '9%' )
           // borderRadius: 20
 
         }}
@@ -36,7 +38,7 @@ const ModalContainer = ( {
         <TouchableWithoutFeedback>
           <View style={{
             width: '95%',
-            borderRadius: 20,
+            borderRadius: wp( '2%' ),
             overflow: 'hidden',
           }}>
 

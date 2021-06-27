@@ -46,7 +46,7 @@ const ListStyles = StyleSheet.create( {
   },
   container : {
     // paddingHorizontal: 3,
-    height: hp( '11%' ),
+    height: hp( '9%' ),
     marginHorizontal: 14
   },
   disabledContainer: {

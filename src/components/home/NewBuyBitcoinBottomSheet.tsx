@@ -1,11 +1,10 @@
 import React from 'react'
-import { View, ImageSourcePropType, FlatList, Image, Platform, TouchableOpacity, Text } from 'react-native'
+import { View, ImageSourcePropType, FlatList, Image, Platform, TouchableOpacity } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import ListStyles from '../../common/Styles/ListStyles'
 import ImageStyles from '../../common/Styles/ImageStyles'
 import Colors from '../../common/Colors'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { RFValue } from 'react-native-responsive-fontsize'
 
 export type Props = {
   onMenuItemSelected: ( menuItem: BuyBitcoinBottomSheetMenuItem ) => void;
@@ -24,53 +23,42 @@ export type BuyBitcoinBottomSheetMenuItem = {
   kind: BuyMenuItemKind;
   imageSource: ImageSourcePropType;
   disabled: boolean;
-  hasButton: boolean;
 }
 
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
-    title: Platform.OS == 'ios' ? 'Ramp Bitcoin' : 'Ramp Bitcoin',
+    title: Platform.OS == 'ios' ? 'FastBitcoin' : 'FastBitcoin',
     subtitle: 'Low fee for those big buys',
     kind: BuyMenuItemKind.RAMP,
-    imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
-    disabled: false,
-    hasButton: false,
+    imageSource: require( '../../assets/images/icons/fastbitcoin.png' ),
+    disabled: false
   },
   {
-    title: 'Wyre Bitcoin',
+    title: 'GetBittr',
     subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
-    imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
-    disabled: false,
-    hasButton: false,
+    imageSource: require( '../../assets/images/icons/icon_getbitter.png' ),
+    disabled: false
   },
-  {
-    title: 'Samurai Wallet',
-    subtitle: 'Stack sats with Swan Bitcoin',
-    kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/swan.png' ),
-    disabled: false,
-    hasButton: true,
-  }
-  // {
-  //   title: 'Set up automatic buys',
-  //   subtitle: 'Stack sats with Swan Bitcoin',
-  //   kind: BuyMenuItemKind.SWAN,
-  //   imageSource: require( '../../assets/images/icons/swan.png' ),
-  //   disabled: false
-  // },
-  // {
-  //   title: 'Scan a Voucher',
-  //   subtitle: 'From select retail stores with FastBitcoins',
-  //   kind: BuyMenuItemKind.FAST_BITCOINS,
-  //   imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
-  //   disabled: false
-  // }
+//   {
+//     title: 'Set up automatic buys',
+//     subtitle: 'Stack sats with Swan Bitcoin',
+//     kind: BuyMenuItemKind.SWAN,
+//     imageSource: require( '../../assets/images/icons/swan.png' ),
+//     disabled: false
+//   },
+//   {
+//     title: 'Scan a Voucher',
+//     subtitle: 'From select retail stores with FastBitcoins',
+//     kind: BuyMenuItemKind.FAST_BITCOINS,
+//     imageSource: require( '../../assets/images/icons/icon_fastbitcoins_light_blue.png' ),
+//     disabled: false
+//   }
 ]
 
 const listItemKeyExtractor = ( item: BuyBitcoinBottomSheetMenuItem ) => item.title
 
-const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Props ) => {
+const NewBuyBitcoinBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Props ) => {
 
   const renderItem = ( { item: menuItem }: { item: BuyBitcoinBottomSheetMenuItem } ) => {
     return (
@@ -132,17 +120,6 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
             <ListItem.Title style={menuItem.disabled ? ListStyles.disabledListItemTitle : ListStyles.listItemTitle}>{menuItem.title}</ListItem.Title>
             <ListItem.Subtitle style={ListStyles.listItemSubtitle}>{menuItem.subtitle}</ListItem.Subtitle>
           </ListItem.Content>
-          {menuItem.hasButton &&
-          <TouchableOpacity style={{
-            backgroundColor: Colors.lightBlue, borderRadius: widthPercentageToDP( '1%' )
-          }}>
-            <Text style={{
-              margin: heightPercentageToDP( 0.5 ), color: Colors.white, fontSize: RFValue( 12 ),
-            }}>
-              Sats Back
-            </Text>
-          </TouchableOpacity>
-          }
           <ListItem.Chevron />
         </ListItem>
 
@@ -168,4 +145,4 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
 //   },
 // } )
 
-export default BuyBitcoinHomeBottomSheet
+export default NewBuyBitcoinBottomSheet

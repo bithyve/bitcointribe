@@ -162,9 +162,10 @@ export default function NewWalletName( props ) {
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
               secondLineTitle={''}
-              infoTextNormal={'Please enter a '}
-              infoTextBold={'display name.'}
-              infoTextNormal1={'Your contacts will see this'}
+              infoTextNormal={'Please '}
+              infoTextBold={'name'}
+              infoTextNormal1={'your wallet'}
+              step={'Step 1: '}
             />
             <TextInput
               style={inputStyle}
@@ -189,11 +190,12 @@ export default function NewWalletName( props ) {
               autoCompleteType="off"
             />
             <View style={{
-              marginLeft: 20,
+              marginRight: 20,
             }}>
               <Text style={{
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                alignSelf: 'flex-end'
               }}>
                   No numbers or special characters allowed</Text>
             </View>
@@ -219,7 +221,7 @@ export default function NewWalletName( props ) {
                   }}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>Continue</Text>
+                  <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
               </View>
             ) : null}

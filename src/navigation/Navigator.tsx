@@ -98,6 +98,7 @@ import { Text, View, Image } from 'react-native'
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as dp,
+  widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import Svg, { G, Path, Defs } from 'react-native-svg'
 
@@ -135,9 +136,9 @@ const SetupNavigator = createStackNavigator(
   {
     initialRouteName: 'Launch',
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: () => ({
+    defaultNavigationOptions: () => ( {
       header: null,
-    }),
+    } ),
   },
 )
 
@@ -243,7 +244,7 @@ const HomeNavigator = createStackNavigator(
   },
   {
     headerLayoutPreset: 'center',
-    defaultNavigationOptions: ({ navigation }) => {
+    defaultNavigationOptions: ( { navigation } ) => {
       return {
         header: null,
         headerTitleContainerStyle: {
@@ -281,7 +282,7 @@ const Bottomtab = createBottomTabNavigator(
     Home: {
       screen: HomeStack,
       navigationOptions: {
-        tabBarIcon: ({ focused }) => {
+        tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
               // marginVertical: hp( '2%' )
@@ -317,7 +318,13 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
 
-
+              {focused &&
+              <View style={{
+                alignSelf: 'center',
+                // marginTop: hp( 1 ),
+                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
+              }}/>
+              }
               {/* <Svg height= '30'>
                 <Image source={focused ? require( '../assets/images/tabs/fnf_active.svg' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
                   width: 30, height: 30, alignSelf: 'center'
@@ -331,7 +338,7 @@ const Bottomtab = createBottomTabNavigator(
     Freiend: {
       screen: FriendsAndFamily,
       navigationOptions: {
-        tabBarIcon: ({ focused }) => {
+        tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
               // marginVertical: hp( '2%' )
@@ -356,25 +363,36 @@ const Bottomtab = createBottomTabNavigator(
                     />
                   </G>
                 </Svg> :
-                <Svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={25.25}
-                  height={23}
-                  viewBox="0 0 25.25 23"
-                >
-                  <G fill="#fafafa" strokeLinecap="round" strokeLinejoin="round">
-                    <Path
-                      d="M5.052 11.336A4 4 0 017.252 4a.5.5 0 01.5.5 7.491 7.491 0 010 7c0 .162-2.083 1.561-3.1 3.436A9.187 9.187 0 003.684 19H.753a.5.5 0 01-.5-.5v-.955a6.61 6.61 0 014.799-6.209z"
-                      stroke="#fafafa"
-                      strokeWidth={0.5}
-                    />
-                    <Path d="M22.75 22h-17c-.827 0-1.5-.673-1.5-1.5v-1.228c0-2.069.722-4.026 2.088-5.66a9.993 9.993 0 013.453-2.629A5.965 5.965 0 018.25 7c0-3.308 2.692-6 6-6s6 2.692 6 6a5.965 5.965 0 01-1.541 3.983 9.996 9.996 0 013.454 2.629c1.365 1.634 2.087 3.591 2.087 5.66V20.5c0 .827-.673 1.5-1.5 1.5z" />
-                    <Path
-                      d="M14.25 2c-2.757 0-5 2.243-5 5 0 1.856 1.029 3.461 2.535 4.323-3.767.988-6.535 4.174-6.535 7.949V20.5a.5.5 0 00.5.5h17a.5.5 0 00.5-.5v-1.228c0-3.775-2.768-6.96-6.535-7.949C18.221 10.461 19.25 8.856 19.25 7c0-2.757-2.243-5-5-5m-4 5.637V6.363v1.274m4-7.637c3.86 0 7 3.14 7 7a6.929 6.929 0 01-1.045 3.648 10.848 10.848 0 012.725 2.322c1.518 1.817 2.32 3.996 2.32 6.302V20.5c0 1.379-1.121 2.5-2.5 2.5h-17a2.503 2.503 0 01-2.5-2.5v-1.228c0-2.306.802-4.485 2.32-6.302a10.847 10.847 0 012.725-2.322A6.929 6.929 0 017.25 7c0-3.86 3.14-7 7-7z"
-                      fill="#006db4"
-                    />
-                  </G>
-                </Svg>
+                <Image source={require( '../assets/images/tabs/f&f.png' )} style={{
+                  marginBottom: 'auto',
+                  width: 20, height: 20, alignSelf: 'center',
+                  // backgroundColor: focused ? 'white': 'gray'
+                }} />
+                // <Svg
+                //   xmlns="http://www.w3.org/2000/svg"
+                //   width={25.25}
+                //   height={23}
+                //   viewBox="0 0 25.25 23"
+                // >
+                //   <G fill="#fafafa" strokeLinecap="round" strokeLinejoin="round">
+                //     <Path
+                //       d="M5.052 11.336A4 4 0 017.252 4a.5.5 0 01.5.5 7.491 7.491 0 010 7c0 .162-2.083 1.561-3.1 3.436A9.187 9.187 0 003.684 19H.753a.5.5 0 01-.5-.5v-.955a6.61 6.61 0 014.799-6.209z"
+                //       stroke="#fafafa"
+                //       strokeWidth={0.5}
+                //     />
+                //     <Path d="M22.75 22h-17c-.827 0-1.5-.673-1.5-1.5v-1.228c0-2.069.722-4.026 2.088-5.66a9.993 9.993 0 013.453-2.629A5.965 5.965 0 018.25 7c0-3.308 2.692-6 6-6s6 2.692 6 6a5.965 5.965 0 01-1.541 3.983 9.996 9.996 0 013.454 2.629c1.365 1.634 2.087 3.591 2.087 5.66V20.5c0 .827-.673 1.5-1.5 1.5z" />
+                //     <Path
+                //       d="M14.25 2c-2.757 0-5 2.243-5 5 0 1.856 1.029 3.461 2.535 4.323-3.767.988-6.535 4.174-6.535 7.949V20.5a.5.5 0 00.5.5h17a.5.5 0 00.5-.5v-1.228c0-3.775-2.768-6.96-6.535-7.949C18.221 10.461 19.25 8.856 19.25 7c0-2.757-2.243-5-5-5m-4 5.637V6.363v1.274m4-7.637c3.86 0 7 3.14 7 7a6.929 6.929 0 01-1.045 3.648 10.848 10.848 0 012.725 2.322c1.518 1.817 2.32 3.996 2.32 6.302V20.5c0 1.379-1.121 2.5-2.5 2.5h-17a2.503 2.503 0 01-2.5-2.5v-1.228c0-2.306.802-4.485 2.32-6.302a10.847 10.847 0 012.725-2.322A6.929 6.929 0 017.25 7c0-3.86 3.14-7 7-7z"
+                //       fill="#006db4"
+                //     />
+                //   </G>
+                // </Svg>
+              }
+              {focused &&
+              <View style={{
+                alignSelf: 'center',
+                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
+              }}/>
               }
             </View>
           )
@@ -384,19 +402,19 @@ const Bottomtab = createBottomTabNavigator(
     Buy: {
       screen: BuyStack,
       navigationOptions: {
-        tabBarIcon: ({ focused }) => {
+        tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
               // marginVertical: hp( '2%' )
             }}>
               {focused ?
-                <Image source={require('../assets/images/tabs/buy_active.png')} style={{
+                <Image source={require( '../assets/images/tabs/buy_active.png' )} style={{
                   marginBottom: 'auto',
                   width: 20, height: 20, alignSelf: 'center',
                   // backgroundColor: focused ? 'white': 'gray'
                 }} />
                 :
-                <Image source={require('../assets/images/tabs/buy.png')} style={{
+                <Image source={require( '../assets/images/tabs/buy.png' )} style={{
                   marginBottom: 'auto',
                   width: 20, height: 20, alignSelf: 'center',
                   // backgroundColor: focused ? 'white': 'gray'
@@ -437,6 +455,13 @@ const Bottomtab = createBottomTabNavigator(
                   />
                 </Svg>
               } */}
+              {focused &&
+              <View style={{
+                alignSelf: 'center',
+                // margin: hp( 1 ),
+                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
+              }}/>
+              }
             </View>
           )
         }
@@ -445,7 +470,7 @@ const Bottomtab = createBottomTabNavigator(
     Securiy: {
       screen: SecurityStack,
       navigationOptions: {
-        tabBarIcon: ({ focused }) => {
+        tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
               // marginVertical: hp( '2%' )
@@ -495,6 +520,13 @@ const Bottomtab = createBottomTabNavigator(
                   />
                 </Svg>
               }
+              {focused &&
+              <View style={{
+                alignSelf: 'center',
+                // margin: hp( 1 ),
+                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
+              }}/>
+              }
             </View>
           )
         }
@@ -504,16 +536,23 @@ const Bottomtab = createBottomTabNavigator(
     Setting: {
       screen: MoreOptionsStack,
       navigationOptions: {
-        tabBarIcon: ({ focused }) => {
+        tabBarIcon: ( { focused } ) => {
           return (
             <View style={{
             }}>
 
-              <Image source={require('../assets/images/tabs/settings.png')} style={{
+              <Image source={require( '../assets/images/tabs/settings.png' )} style={{
                 marginBottom: 'auto',
                 width: 30, height: 30, alignSelf: 'center',
                 // backgroundColor: focused ? 'white': 'gray'
               }} />
+              {focused &&
+              <View style={{
+                alignSelf: 'center',
+                // margin: hp( 1 ),
+                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
+              }}/>
+              }
             </View>
 
           )
@@ -574,16 +613,16 @@ const Bottomtab = createBottomTabNavigator(
   },
 )
 
-const Navigator = createSwitchNavigator({
+const Navigator = createSwitchNavigator( {
   SetupNav: SetupNavigator,
   HomeNav: Bottomtab,
-})
+} )
 
 
 export type BaseNavigationProp = {
-  getParam: (param: string) => any;
-  setParams: (params: Record<string, unknown>) => void;
-  navigate: (route: string, params?: Record<string, unknown>) => void;
+  getParam: ( param: string ) => any;
+  setParams: ( params: Record<string, unknown> ) => void;
+  navigate: ( route: string, params?: Record<string, unknown> ) => void;
 } & Record<string, unknown>;
 
-export default createAppContainer(Navigator)
+export default createAppContainer( Navigator )

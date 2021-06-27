@@ -62,20 +62,23 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
+    <TouchableOpacity
+      activeOpacity={1}
+      onPress={onPress}
+      style={{
+        width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+        alignSelf: 'flex-end',
+        backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+        marginTop: wp( 3 ), marginRight: wp( 3 )
+      }}
+    >
+      <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+      }} />
+    </TouchableOpacity>
+    {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
     <View style={styles.successModalHeaderView}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={onPress}
-        style={{
-          flexDirection: 'row'
-        }}
-      >
-        <FontAwesome name="long-arrow-left" color={Colors.blue} size={19} style={{
-          marginTop: hp( 0.5 )
-        }} />
-        <Text style={styles.modalTitleText}>{wyreTitle}</Text>
-      </TouchableOpacity>
-
+      <Text style={styles.modalTitleText}>{wyreTitle}</Text>
       <Text style={{
         ...styles.modalInfoText,
         marginTop: wp( 1.5 ),
@@ -88,10 +91,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       alignSelf: 'center',
       width: wp( '90%' ),
       height: hp( 9 ),
-      backgroundColor: Colors.backgroundColor1,
+      backgroundColor: Colors.white,
       alignItems: 'center',
       marginBottom: wp( 2 ),
-      borderRadius: wp( 2 )
+      borderRadius: wp( 2 ),
+      elevation: 10,
+      shadowColor: Colors.borderColor,
+      shadowOpacity: 10,
+      shadowOffset: {
+        width: 2, height: 2
+      },
     }}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
@@ -127,10 +136,16 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       alignSelf: 'center',
       width: wp( '90%' ),
       height: hp( 9 ),
-      backgroundColor: Colors.backgroundColor1,
+      backgroundColor: Colors.white,
       alignItems: 'center',
       marginBottom: wp( 2 ),
-      borderRadius: wp( 2 )
+      borderRadius: wp( 2 ),
+      elevation: 10,
+      shadowColor: Colors.borderColor,
+      shadowOpacity: 10,
+      shadowOffset: {
+        width: 2, height: 2
+      },
     }}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
@@ -159,6 +174,21 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         </ListItem.Title>
       </ListItem.Content>
     </View>
+
+    <View style={{
+      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start', marginBottom: hp( '1%' )
+    }} >
+      <AppBottomSheetTouchableWrapper
+        disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
+        onPress={wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting}
+        style={{
+          ...styles.successModalButtonView
+        }}
+      >
+        <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
+
+      </AppBottomSheetTouchableWrapper>
+    </View>
     {wyreFromBuyMenu
       ? <View style={{
         alignSelf: 'flex-end',
@@ -186,21 +216,6 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       </View>
       : null
     }
-    <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start', marginBottom: hp( '1%' )
-    }} >
-      <AppBottomSheetTouchableWrapper
-        disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
-        onPress={wyreFromBuyMenu ? handleProceedButtonPress : onClickSetting}
-        style={{
-          ...styles.successModalButtonView
-        }}
-      >
-        <Text style={styles.proceedButtonText}>{wyreFromBuyMenu ? 'Buy Bitcoins' : 'OK'}</Text>
-
-      </AppBottomSheetTouchableWrapper>
-    </View>
-
   </View>
   )
 }
@@ -236,7 +251,7 @@ const styles = StyleSheet.create( {
     borderRadius: wp( '13%' ) / 2,
   },
   modalContentContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor1,
 
   },
   avatarImage: {
@@ -252,17 +267,18 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '3%' ),
-    marginTop: hp( '1%' )
+    // marginTop: hp( '1%' )
   },
   modalTitleText: {
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.FiraSansRegular,
     width: wp( 30 ),
     marginLeft: 10
   },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
+    marginLeft: wp( '3%' ),
+    marginRight: wp( '6%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
@@ -286,7 +302,8 @@ const styles = StyleSheet.create( {
     },
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '10%' ),
+    marginLeft: wp( '6%' ),
+    marginTop: hp( 2 )
   },
   successModalImage: {
     width: wp( '25%' ),
