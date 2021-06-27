@@ -11,28 +11,24 @@ import {
   TxPriority,
   MultiSigAccount,
   Accounts,
+  AccountType,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 export default class AccountOperations {
 
-  static syncGapLimit = async ( account: Account ) => {
+  static syncGapLimit = async ( account: Account | MultiSigAccount ) => {
     let tryAgain = false
     const hardGapLimit = 10
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
-    const externalAddress = AccountUtilities.getAddressByIndex(
-      account.xpub,
-      false,
-      account.nextFreeAddressIndex + hardGapLimit - 1,
-      network
-    )
+    let externalAddress: string
+    if( ( account as MultiSigAccount ).is2FA ) externalAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex + hardGapLimit - 1, false ).address
+    else externalAddress = AccountUtilities.getAddressByIndex( account.xpub, false,  account.nextFreeAddressIndex + hardGapLimit - 1, network )
 
-    const internalAddress = AccountUtilities.getAddressByIndex(
-      account.xpub,
-      true,
-      account.nextFreeChangeAddressIndex + hardGapLimit - 1,
-      network
-    )
+
+    let internalAddress: string
+    if( ( account as MultiSigAccount ).is2FA ) internalAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeChangeAddressIndex + hardGapLimit - 1, true ).address
+    else internalAddress = AccountUtilities.getAddressByIndex( account.xpub, true, account.nextFreeChangeAddressIndex + hardGapLimit - 1, network )
 
     const txCounts = await AccountUtilities.getTxCounts( [ externalAddress, internalAddress ], network )
 
@@ -119,7 +115,9 @@ export default class AccountOperations {
       const externalAddressSet:{[address: string]: number}= {
       } // external address range set w/ query list
       for ( let itr = 0; itr < closingExtIndex; itr++ ) {
-        const address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, false ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
         externalAddresses[ address ] = itr
         ownedAddresses.push( address )
         if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
@@ -130,7 +128,9 @@ export default class AccountOperations {
       const internalAddressSet :{[address: string]: number}= {
       } // internal address range set
       for ( let itr = 0; itr < closingIntIndex; itr++ ) {
-        const address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, true ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
         internalAddresses[ address ] = itr
         ownedAddresses.push( address )
         if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
@@ -174,8 +174,13 @@ export default class AccountOperations {
       }
     }
 
+    console.log( {
+      accountInstances
+    } )
     const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
-
+    console.log( {
+      synchedAccounts
+    } )
     const txsFound: Transaction[] = []
     for( const account of Object.values( accounts ) ) {
       const  {
@@ -194,9 +199,11 @@ export default class AccountOperations {
       const unconfirmedUTXOs = []
       for ( const utxo of UTXOs ) {
         if ( utxo.status ) {
-          if ( network === bitcoinJS.networks.testnet && utxo.address === AccountUtilities.getAddressByIndex( account.xpub, false, 0, network ) ) {
-            confirmedUTXOs.push( utxo ) // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
-            continue
+          if ( account.type === AccountType.TEST_ACCOUNT ) {
+            if( utxo.address === AccountUtilities.getAddressByIndex( account.xpub, false, 0, network ) ){
+              confirmedUTXOs.push( utxo ) // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
+              continue
+            }
           }
 
           if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
@@ -219,7 +226,9 @@ export default class AccountOperations {
       account.addressQueryList = addressQueryList
       account.nextFreeAddressIndex = nextFreeAddressIndex
       account.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
-      account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
+
+      if( ( account as MultiSigAccount ).is2FA ) account.receivingAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex, false ).address
+      else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
 
       // find tx delta(missing txs): hard vs soft refresh
       if( hardRefresh ){
@@ -255,7 +264,10 @@ export default class AccountOperations {
       // is out of bound external address?
       if( startingExtIndex )
         for ( let itr = 0; itr < startingExtIndex; itr++ ) {
-          const address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+          let address: string
+          if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, false ).address
+          else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+
           if( consumedUTXO.address === address ){
             account.addressQueryList.external[ consumedUTXO.address ] = true// include out of bound(soft-refresh range) ext address
             found = true
@@ -266,7 +278,10 @@ export default class AccountOperations {
       // is out of bound internal address?
       if( startingIntIndex && !found )
         for ( let itr = 0; itr < startingIntIndex; itr++ ) {
-          const address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+          let address: string
+          if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, true ).address
+          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+
           if( consumedUTXO.address === address ){
             account.addressQueryList.internal[ consumedUTXO.address ] = true // include out of bound(soft-refresh range) int address
             found = true
