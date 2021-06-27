@@ -1,7 +1,7 @@
 import { put, call, select } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
+import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -270,27 +270,22 @@ export const executeSendStage3Watcher = createWatcher(
 
 function* calculateSendMaxFee( { payload }: {payload: {
   numberOfRecipients: number;
-  accountShellID: string;
+  accountShell: AccountShell;
 }} ) {
-
-  const { numberOfRecipients, accountShellID } = payload
+  const { numberOfRecipients, accountShell } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
+  const feePerByte = averageTxFeeByNetwork[ TxPriority.LOW ].feePerByte
+  const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const feePerByte = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ][ 'low' ].feePerByte
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
-
-  const { fee } = service.calculateSendMaxFee(
+  const { fee } = AccountOperations.calculateSendMaxFee(
+    account,
     numberOfRecipients,
     feePerByte,
-    derivativeAccountDetails,
+    network
   )
 
   yield put( sendMaxFeeCalculated( fee ) )

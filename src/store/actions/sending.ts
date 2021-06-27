@@ -287,14 +287,14 @@ export interface CalculateSendMaxFeeAction extends Action {
   type: typeof CALCULATE_SEND_MAX_FEE;
   payload: {
     numberOfRecipients: number;
-    accountShellID: string;
+    accountShell: AccountShell;
   };
 }
 
 export const calculateSendMaxFee = (
   payload: {
     numberOfRecipients: number;
-    accountShellID: string;
+    accountShell: AccountShell;
   },
 ): CalculateSendMaxFeeAction => {
   return {
