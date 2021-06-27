@@ -26,15 +26,16 @@ import { Satoshis } from '../../../common/data/typealiases/UnitAliases'
 import useFormattedAmountText from '../../../utils/hooks/formatting/UseFormattedAmountText'
 import useFormattedUnitText from '../../../utils/hooks/formatting/UseFormattedUnitText'
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
+import AccountShell from '../../../common/data/models/AccountShell'
 
 export type Props = {
-  sourceSubAccount: SubAccountDescribing;
+  accountShell: AccountShell;
   bitcoinDisplayUnit: BitcoinUnit;
   onTransactionPriorityChanged: ( priority: TxPriority ) => void;
 };
 
 const TransactionPriorityMenu: React.FC<Props> = ( {
-  sourceSubAccount,
+  accountShell,
   bitcoinDisplayUnit,
   onTransactionPriorityChanged,
 }: Props ) => {
@@ -48,9 +49,9 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
   const network = useMemo( () => {
     return config.APP_STAGE === 'dev' ||
-      sourceSubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
+    accountShell.primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT
       ? NetworkKind.TESTNET : NetworkKind.MAINNET
-  }, [ sourceSubAccount.sourceKind, config ] )
+  }, [ accountShell.primarySubAccount.sourceKind, config ] )
 
   const TextValue = ( { amt, unit } ) => {
     return (
@@ -89,7 +90,7 @@ const TransactionPriorityMenu: React.FC<Props> = ( {
 
   const handleCustomFee = ( feePerByte, customEstimatedBlocks ) => {
     dispatch( calculateCustomFee( {
-      accountShellID: sourceSubAccount.accountShellID,
+      accountShell: accountShell,
       feePerByte,
       customEstimatedBlocks,
     } ) )

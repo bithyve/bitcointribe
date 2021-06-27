@@ -298,7 +298,7 @@ export const calculateSendMaxFeeWatcher = createWatcher(
 
 
 function* calculateCustomFee( { payload }: {payload: {
-  accountShellID: string,
+  accountShell: AccountShell,
   feePerByte: string,
   customEstimatedBlocks: string,
 }} ) {
@@ -315,24 +315,18 @@ function* calculateCustomFee( { payload }: {payload: {
     return
   }
 
-  const { accountShellID, feePerByte, customEstimatedBlocks } = payload
+  const { accountShell, feePerByte, customEstimatedBlocks }  = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+
   const sendingState: SendingState = yield select(
     ( state ) => state.sending
   )
-
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const selectedRecipients: RecipientDescribing[] = [ ...sendingState.selectedRecipients
-  ]
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const selectedRecipients: RecipientDescribing[] = [ ...sendingState.selectedRecipients ]
+  const numberOfRecipients = selectedRecipients.length
   const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
 
   let outputs
@@ -349,21 +343,22 @@ function* calculateCustomFee( { payload }: {payload: {
     outputs = outputsArray
   } else {
     if( !txPrerequisites ) throw new Error( 'ST1 carry-over missing' )
-    outputs = txPrerequisites[ 'low' ].outputs.filter(
+    outputs = txPrerequisites[ TxPriority.LOW ].outputs.filter(
       ( output ) => output.address,
     )
   }
 
   if( !sendingState.feeIntelMissing && sendingState.sendMaxFee ){
     // custom fee w/ send max
-    const { fee } = service.calculateSendMaxFee(
-      selectedRecipients.length,
+    const { fee } = AccountOperations.calculateSendMaxFee(
+      account,
+      numberOfRecipients,
       parseInt( feePerByte ),
-      derivativeAccountDetails,
+      network
     )
 
     // upper bound: default low
-    if( fee > txPrerequisites[ 'low' ].fee ){
+    if( fee > txPrerequisites[ TxPriority.LOW ].fee ){
       yield put ( customFeeCalculated( {
         successful: false,
         carryOver:{
@@ -376,21 +371,16 @@ function* calculateCustomFee( { payload }: {payload: {
 
     const recipients: [
       {
-        id: string;
         address: string;
         amount: number;
-        type?: string;
-        accountNumber?: number;
       }
     ] = yield call( processRecipients, accountShell )
     const recipientToBeModified = recipients[ recipients.length - 1 ]
 
     // deduct the previous(default low) fee and add the custom fee
-    // TODO: recapture custom fee from sending reducer
-
     const customFee = idx( sendingState, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites.fee )
     if( customFee ) recipientToBeModified.amount += customFee // reusing custom-fee feature
-    else recipientToBeModified.amount += txPrerequisites[ 'low' ].fee
+    else recipientToBeModified.amount += txPrerequisites[ TxPriority.LOW ].fee
     recipientToBeModified.amount -= fee
     recipients[ recipients.length - 1 ] = recipientToBeModified
 
@@ -399,19 +389,16 @@ function* calculateCustomFee( { payload }: {payload: {
         output.value = recipientToBeModified.amount
     } )
 
-    selectedRecipients.forEach( ( recipient ) => {
-      if( recipient.id === recipientToBeModified.id ) recipient.amount = recipientToBeModified.amount
-    } )
-
+    selectedRecipients[ selectedRecipients.length - 1 ].amount = recipientToBeModified.amount
     yield put ( customSendMaxUpdated( {
       recipients: selectedRecipients
     } ) )
   }
 
-  const customTxPrerequisites = service.calculateCustomFee(
+  const customTxPrerequisites = AccountOperations.prepareCustomTransactionPrerequisites(
+    account,
     outputs,
     parseInt( feePerByte ),
-    derivativeAccountDetails,
   )
 
   if ( customTxPrerequisites.inputs ) {

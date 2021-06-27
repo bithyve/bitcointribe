@@ -327,7 +327,7 @@ export const sendMaxFeeCalculated = (
 export interface CalculateCustomFeeAction extends Action {
   type: typeof CALCULATE_CUSTOM_FEE;
   payload: {
-    accountShellID: string,
+    accountShell: AccountShell,
     feePerByte: string,
     customEstimatedBlocks: string,
   };
@@ -335,7 +335,7 @@ export interface CalculateCustomFeeAction extends Action {
 
 export const calculateCustomFee = (
   payload: {
-    accountShellID: string,
+    accountShell: AccountShell,
     feePerByte: string,
     customEstimatedBlocks: string,
   },
