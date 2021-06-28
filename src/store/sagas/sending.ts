@@ -23,6 +23,7 @@ function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
+  const accountShells = accountsState.accountShells
   const selectedRecipients: RecipientDescribing[] = yield select(
     ( state ) => state.sending.selectedRecipients
   )
@@ -48,11 +49,14 @@ function* processRecipients( accountShell: AccountShell ){
           break
 
         case RecipientKind.ACCOUNT_SHELL:
-          const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
+          const recipientShell = accountShells.find( ( shell ) => shell.id === recipient.id )
+          const recipientAccount: Account = accountsState.accounts[ recipientShell.primarySubAccount.id  ]
+
           recipients.push( {
-            address: account.receivingAddress,
+            address: recipientAccount.receivingAddress,
             amount: recipient.amount,
           } )
+
           break
 
         case RecipientKind.CONTACT:
