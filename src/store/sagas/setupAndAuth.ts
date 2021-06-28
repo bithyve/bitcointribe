@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
+import { createWatcher, initializeWallet, serviceGeneratorForNewBHR } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -23,13 +23,29 @@ import { keyFetched, fetchFromDB } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { getTestcoins } from '../actions/accounts'
+import { updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
+import { initAccountShells } from '../utils/accountShellMapping'
+import dbManager from '../../storage/realm/dbManager'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
-  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+
+  // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet )
+  // TODO: save wallet-instance in realm
+  // console.log( 'wallet-instance in realm', wallet, accounts )
+  yield call( dbManager.createWallet, wallet )
+  yield call( dbManager.createAccounts, accounts )
+
+  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+    wallet, accounts
+  } ) )
+
+  yield put( updateAccounts( {
+    accounts,
+  } ) )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
@@ -46,9 +62,12 @@ function* setupWalletWorker( { payload } ) {
       },
     },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
+      REGULAR_ACCOUNT: JSON.stringify( {
+      } ),
+      TEST_ACCOUNT: JSON.stringify( {
+      } ),
+      SECURE_ACCOUNT: JSON.stringify( {
+      } ),
       S3_SERVICE: JSON.stringify( s3Service ),
       TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
     },
@@ -66,7 +85,7 @@ function* setupWalletWorker( { payload } ) {
 
   // Post Hydration activities
   // saturate the test account w/ 10K sats
-  yield put( getTestcoins() )
+  // yield put( getTestcoins() )
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )

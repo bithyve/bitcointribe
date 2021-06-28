@@ -353,8 +353,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                   }}
                   onReceivePressed={() => {
                     navigation.navigate( 'Receive', {
-                      serviceType: primarySubAccount.sourceKind,
-                      derivativeAccountDetails,
+                      accountShell,
                     } )
                   }}
                   averageTxFees={averageTxFees}

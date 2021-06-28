@@ -1,10 +1,11 @@
 import { Action } from 'redux'
-import { ContactInfo } from '../../bitcoin/utilities/Interface'
+import { Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
+export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
 export const GET_TESTCOINS = 'GET_TESTCOINS'
 export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
@@ -74,9 +75,6 @@ export const setAllAccountsData = ( accounts ) => {
 export const fetchBalanceTx = (
   serviceType: string,
   options: {
-    service?;
-    loader?: boolean;
-    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
     blindRefresh?: boolean;
     shouldNotInsert?: boolean;
@@ -87,6 +85,22 @@ export const fetchBalanceTx = (
   return {
     type: FETCH_BALANCE_TX, payload: {
       serviceType, options
+    }
+  }
+}
+
+
+export const syncAccounts = (
+  accounts: Accounts,
+  options: {
+    hardRefresh?: boolean;
+    blindRefresh?: boolean;
+  } = {
+  }
+) => {
+  return {
+    type: SYNC_ACCOUNTS, payload: {
+      accounts, options
     }
   }
 }
@@ -460,7 +474,8 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
-export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED'
+export const UPDATE_ACCOUNTS = 'UPDATE_ACCOUNTS'
+export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
 export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED'
@@ -540,12 +555,21 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const newAccountShellAdded = ( { accountShell, }: {
-  accountShell: AccountShell;
+export const updateAccounts = ( { accounts }: {accounts: Accounts} ) => {
+  return {
+    type: UPDATE_ACCOUNTS,
+    payload: {
+      accounts
+    }
+  }
+}
+
+export const newAccountShellsAdded = ( { accountShells }: {
+  accountShells: AccountShell[];
 } ) => {
   return {
-    type: NEW_ACCOUNT_SHELL_ADDED,
-    payload: accountShell
+    type: NEW_ACCOUNT_SHELLS_ADDED,
+    payload: accountShells
   }
 }
 

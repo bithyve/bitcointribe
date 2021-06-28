@@ -13,8 +13,7 @@ import defaultStackScreenNavigationOptions from '../../../navigation/options/Def
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import KnowMoreButton from '../../../components/KnowMoreButton'
 import { BarCodeReadEvent } from 'react-native-camera'
-import useWalletServiceForSourceAccountKind from '../../../utils/hooks/state-selectors/accounts/UseWalletServiceForSourceAccountKind'
-import { ScannedAddressKind } from '../../../bitcoin/utilities/Interface'
+import { ScannedAddressKind, Wallet } from '../../../bitcoin/utilities/Interface'
 import Toast from '../../../components/Toast'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
@@ -33,6 +32,9 @@ import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHand
 import Colors from '../../../common/Colors'
 import ModalContainer from '../../../components/home/ModalContainer'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
+import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export type Props = {
   navigation: any;
@@ -44,10 +46,10 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const [ isShowingKnowMoreSheet, setIsShowingKnowMoreSheet ] = useState( false )
 
   const accountShell = useSourceAccountShellForSending()
+  const account = useAccountByAccountShell( accountShell )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
-  const walletService = useWalletServiceForSourceAccountKind( primarySubAccount.sourceKind )
 
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
@@ -90,7 +92,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     let amount: number | null = 0
 
     try {
-      const decodingResult = walletService.decodePaymentURI( uri )
+      const decodingResult = AccountUtilities.decodePaymentURI( uri )
 
       address = decodingResult.address
       const options = decodingResult.options
@@ -133,7 +135,8 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 
   function handleQRScan( { data: barcodeDataString }: BarCodeReadEvent ) {
-    const { type: scannedAddressKind }: { type: ScannedAddressKind } = walletService.addressDiff( barcodeDataString.trim() )
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+    const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( barcodeDataString.trim(), network )
     switch ( scannedAddressKind ) {
         case ScannedAddressKind.ADDRESS:
           const recipientAddress = barcodeDataString
@@ -215,21 +218,25 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   useEffect( () => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    if ( primarySubAccount.isTFAEnabled ) {
-      const twoFASetupDetails = idx( accountsState, ( _ ) => _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
+    ( async() => {
+    // TODO: read 2FA deatils from realm
+      const { wallet }: { wallet: Wallet } = JSON.parse( await AsyncStorage.getItem( 'tempDB' ) )
+      if ( primarySubAccount.isTFAEnabled ) {
+        const twoFASetupDetails = idx( wallet, ( _ ) => _.details2FA )
+        const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
+        if ( twoFASetupDetails && !twoFAValid )
+          navigation.navigate( 'TwoFASetup', {
+            twoFASetup: twoFASetupDetails,
+          } )
+      }
+    } )()
 
-      if ( twoFASetupDetails && !twoFAValid )
-        navigation.navigate( 'TwoFASetup', {
-          twoFASetup: twoFASetupDetails,
-        } )
-    }
   }, [ primarySubAccount.sourceKind ] )
 
 
   return (
     <AccountSendScreen
-      primarySubAccount={primarySubAccount}
+      accountShell={accountShell}
       sendableContacts={sendableContacts}
       sendableAccountShells={sendableAccountShells}
       onQRScanned={handleQRScan}

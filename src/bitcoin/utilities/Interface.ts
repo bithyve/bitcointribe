@@ -3,6 +3,7 @@ import {
   DecentralizedBackup,
   ServicesJSON,
 } from '../../common/interfaces/Interfaces'
+import { networks } from 'bitcoinjs-lib'
 import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 
 export interface InputUTXOs {
@@ -28,7 +29,7 @@ export interface TransactionPrerequisite {
   [txnPriority: string]: TransactionPrerequisiteElements
 }
 
-export interface TransactionDetails {
+export interface Transaction {
   txid: string;
   status: string;
   confirmations: number;
@@ -96,16 +97,25 @@ export interface TransactionDetails {
   address?: string
 }
 
+export type TransactionDetails = Transaction
+
 export interface Balances {
   confirmed: number;
   unconfirmed: number;
+}
+
+export enum TxPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CUSTOM = 'custom'
 }
 
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
   unconfirmedTransactions: number;
-  transactionDetails: Array<TransactionDetails>;
+  transactionDetails: Array<Transaction>;
 }
 
 export interface MetaShare {
@@ -183,11 +193,11 @@ export interface DerivativeAccountElements {
     balance: number;
     unconfirmedBalance: number;
   };
-  transactions?: Transactions;
+  transactions?: Transaction[];
   txIdMap?: {[txid: string]: string[]};
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
-  newTransactions?: TransactionDetails[];
+  newTransactions?: Transaction[];
   blindGeneration?: boolean // temporarily generated during blind refresh
 }
 
@@ -739,4 +749,83 @@ export enum QRCodeTypes {
   CONTACT_REQUEST = 'CONTACT_REQUEST',
   KEEPER_REQUEST = 'KEEPER_REQUEST',
   RECOVERY_REQUEST = 'RECOVERY_REQUEST'
+}
+
+export interface UTXO {
+  txId: string;
+  vout: number;
+  value: number;
+  address: string;
+  status?: any;
+}
+
+export enum NetworkType {
+  TESTNET = 'TESTNET',
+  MAINNET = 'MAINNET'
+}
+
+export interface Wallet {
+  walletId,
+  primaryMnemonic,
+  secondaryMemonic?,
+  details2FA : {
+    secondaryXpub: string,
+    bithyveXpub: string,
+    twoFAKey: string,
+  }
+  accounts: {
+    [derivationPath: string]: string // derivation path to account-id mapping
+  }
+}
+
+export interface Account {
+  id: string,                           // account identifier(derived from xpub)
+  walletId: string,                     // wallet's id
+  type: AccountType,                    // type of account
+  instanceNum: number,                  // instance number of the aforementioned type
+  networkType: NetworkType,                 // testnet/mainnet
+  derivationPath: string,               // derivation path of the extended keys belonging to this account
+  xpub: string | null,                  // account's xpub (null for multi-sig accounts)
+  xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
+  accountName: string,                  // name of the account
+  accountDescription: string,           // description of the account
+  activeAddresses: string[],            // addresses used(to be synched during soft refresh)
+  receivingAddress: string,             // current external address
+  nextFreeAddressIndex: number;         // external-chain free address marker
+  nextFreeChangeAddressIndex: number;   // internal-chain free address marker
+  confirmedUTXOs: UTXO[];               // utxo set available for use
+  unconfirmedUTXOs: UTXO[];             // utxos to arrive
+  balances: Balances;                   // confirmed/unconfirmed balances
+  transactions: Transaction[];          // transactions belonging to this account
+  lastSynched: number;                  // account's last sync timestamp
+  newTransactions?: Transaction[];      // new transactions arrived during the current sync
+  txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
+}
+
+export interface MultiSigAccount extends Account {
+  is2FA: boolean,                       // is2FA enabled
+  xpubs: {                              // xpub set for multi-sig
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  }
+  xprivs: {                             // xpirv set for multi-sig
+    primary: string,
+    secondary?: string,
+  }
+}
+
+export enum AccountType {
+  TEST_ACCOUNT = 'TEST_ACCOUNT',
+  CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
+  SAVINGS_ACCOUNT = 'SAVINGS_ACCOUNT',
+  DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+  RAMP_ACCOUNT = 'RAMP_ACCOUNT',
+  SWAN_ACCOUNT = 'SWAN_ACCOUNT',
+  WYRE_ACCOUNT = 'WYRE_ACCOUNT'
+}
+
+export interface Accounts {
+    [accountId: string]: Account
 }

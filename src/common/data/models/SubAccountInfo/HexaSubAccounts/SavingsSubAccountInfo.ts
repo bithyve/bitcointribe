@@ -1,5 +1,6 @@
 import { v4 as uuid } from 'uuid'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../../bitcoin/utilities/Interface'
@@ -22,6 +23,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
 
   kind: SubAccountKind = SubAccountKind.SECURE_ACCOUNT;
   sourceKind: SourceAccountKind = SourceAccountKind.SECURE_ACCOUNT;
+  type: AccountType = AccountType.SAVINGS_ACCOUNT
 
   balances: Balances;
   visibility: AccountVisibility;
