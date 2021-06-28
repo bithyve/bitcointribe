@@ -48,6 +48,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { sourceAccountSelectedForSending, addRecipientForSending, recipientSelectedForAmountSetting, amountForRecipientUpdated } from '../../store/actions/sending'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
+import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
@@ -118,6 +119,8 @@ interface ContactDetailsStateTypes {
   trustedContactHistory: any;
   SMShareQR: string;
   qrModalTitle: string;
+  reshareModal: boolean;
+  showQRCode: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -154,6 +157,7 @@ class ContactDetails extends PureComponent<
       trustedQR: '',
       SMShareQR: '',
       encryptedExitKey: '',
+      showQRCode: false,
       trustedContactHistory: [
         {
           id: 1,
@@ -187,6 +191,7 @@ class ContactDetails extends PureComponent<
         },
       ],
       qrModalTitle: '',
+      reshareModal: false,
     }
 
     this.contact = this.props.navigation.state.params.contact
@@ -306,11 +311,18 @@ class ContactDetails extends PureComponent<
     if ( this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER ) {
       this.createDeepLink( this.contact )
       setTimeout( () => {
-        ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
+        // ( this.ReshareBottomSheet as any ).current.snapTo( 1 )
+        this.setState( {
+          reshareModal: true
+        } )
       }, 2 )
     } else {
       this.props.navigation.navigate( 'AddContactSendRequest', {
         SelectedContact: [ this.contact ],
+        headerText:'Add a contact',
+        subHeaderText:'Send a Friends and Family request',
+        contactText:'Adding to Friends and Family:',
+        showDone:true,
       } )
     }
   };
@@ -538,15 +550,24 @@ class ContactDetails extends PureComponent<
           link={this.state.trustedLink}
           contactEmail={''}
           onPressBack={() => {
-            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // this.setState( {
+            //   showQRCode: false
+            // } )
             this.props.navigation.goBack()
           }}
           onPressDone={() => {
-            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // this.setState( {
+            //   showQRCode: false
+            // } )
             this.props.navigation.goBack()
           }}
           onPressShare={() => {
-            ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            // ( this.shareBottomSheet as any ).current.snapTo( 0 )
+            this.setState( {
+              showQRCode: false
+            } )
             this.props.navigation.goBack()
           }}
         />
@@ -554,15 +575,15 @@ class ContactDetails extends PureComponent<
     }
   };
 
-  SendModalFunction = () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( this.shareBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  };
+  // SendModalFunction = () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         ( this.shareBottomSheet as any ).current.snapTo( 0 )
+  //       }}
+  //     />
+  //   )
+  // };
 
   renderSendViaLinkContents = () => {
     return (
@@ -680,29 +701,30 @@ class ContactDetails extends PureComponent<
     return (
       <ErrorModalContents
         modalRef={this.ReshareBottomSheet}
-        title={'Reshare Recovery Key\nwith Keeper'}
+        title={'Reshare Recovery Ke,,,\nwith Keeper'}
         info={'Did your Keeper not receive the Recovery Key?'}
         note={'You can reshare the Recovery Key with your Keeper'}
         proceedButtonText={'Reshare'}
         cancelButtonText={'Back'}
         isIgnoreButton={true}
         onPressProceed={() => {
-          ( this.shareBottomSheet as any ).current.snapTo( 1 );
           ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+          // ( this.shareBottomSheet as any ).current.snapTo( 1 );
+          // this.setState( {
+          //   showQRCode: true
+          // } )
+          // this.props.navigation.navigate( 'RequestKeyFromContact' )
+          this.props.navigation.navigate( 'AddContactSendRequest', {
+            SelectedContact: [ this.contact ],
+          } )
         }}
         onPressIgnore={() => {
           ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+          this.setState( {
+            showQRCode: false
+          } )
         }}
         isBottomImage={false}
-      />
-    )
-  };
-  renderReshareHeader = () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (this.ReshareBottomSheet as any).current.snapTo(0);
-      // }}
       />
     )
   };
@@ -715,6 +737,7 @@ class ContactDetails extends PureComponent<
       encryptedExitKey,
       isSendDisabled,
       trustedContactHistory,
+      reshareModal
     } = this.state
     return (
       <View style={{
@@ -1068,19 +1091,45 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderExitKeyQRContents}
           renderHeader={this.renderExitKeyQRHeader}
         />
-        <BottomSheet
-          enabledInnerScrolling={true}
-          enabledGestureInteraction={false}
-          ref={this.ReshareBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '37%' )
-              : hp( '45%' ),
-          ]}
-          renderContent={this.renderReshareContent}
-          renderHeader={this.renderReshareHeader}
-        />
+        <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
+          reshareModal: false
+        } )}>
+          <ErrorModalContents
+            modalRef={this.ReshareBottomSheet}
+            title={'Reshare Recovery Key\nwith Keeper'}
+            info={'Did your Keeper not receive the Recovery Key?'}
+            note={'You can reshare the Recovery Key with your Keeper'}
+            proceedButtonText={'Reshare'}
+            cancelButtonText={'Back'}
+            isIgnoreButton={true}
+            onPressProceed={() => {
+              // ( this.shareBottomSheet as any ).current.snapTo( 1 )
+              this.props.navigation.navigate( 'AddContactSendRequest', {
+                SelectedContact: [ this.contact ],
+                headerText:`Send Recovery Key${'\n'}to contact`,
+                subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
+                contactText:'Sharing Recovery Key with',
+                showDone:false,
+              } )
+
+              // ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                reshareModal: false
+              }, () => {
+                // this.setState( {
+                //   showQRCode: true
+                // } )
+              } )
+            }}
+            onPressIgnore={() => {
+              // ( this.ReshareBottomSheet as any ).current.snapTo( 0 )
+              this.setState( {
+                reshareModal: false
+              } )
+            }}
+            isBottomImage={false}
+          />
+        </ModalContainer>
         <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
@@ -1094,7 +1143,12 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderErrorModalContent}
           renderHeader={this.renderErrorModalHeader}
         />
-        <BottomSheet
+        <ModalContainer visible={this.state.showQRCode} closeBottomSheet={() => this.setState( {
+          showQRCode: false
+        } )}>
+          {this.SendShareModalFunction}
+        </ModalContainer>
+        {/* <BottomSheet
           enabledInnerScrolling={true}
           enabledGestureInteraction={false}
           ref={this.shareBottomSheet as any}
@@ -1106,7 +1160,7 @@ class ContactDetails extends PureComponent<
           ]}
           renderContent={this.SendShareModalFunction}
           renderHeader={this.SendModalFunction}
-        />
+        /> */}
       </View>
     )
   }

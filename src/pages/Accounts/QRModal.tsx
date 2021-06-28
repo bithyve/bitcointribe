@@ -312,7 +312,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   qrModalScrollView: {

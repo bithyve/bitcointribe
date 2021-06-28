@@ -138,6 +138,15 @@ import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
+import HomeBuyCard from './HomeBuyCard'
+import HomeContainer from './HomeContainer'
+import FriendsAndFamilyScreen from '../FriendsAndFamily/FriendsAndFamilyScreen'
+import ManageBackupNewBHR from '../NewBHR/ManageBackupNewBHR'
+import UpgradeBackup from '../UpgradeBackupWithKeeper/UpgradeBackup'
+import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScreen'
+import Header from '../../navigation/stacks/Header'
 import { NotificationType } from '../../components/home/NotificationType'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
 
@@ -767,7 +776,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       'change',
       this.onAppStateChange
     )
-    InteractionManager.runAfterInteractions( () => {
+    requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
       // Keeping autoSynn disabled
@@ -914,13 +923,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   componentDidUpdate = ( prevProps, prevState ) => {
-    if (
-      prevProps.accountsState.accountShells !==
-      this.props.accountsState.accountShells
-    ) {
-      this.calculateNetBalance()
-      // this.getNewTransactionNotifications()
-    }
+    // if (
+    //   prevProps.accountsState.accountShells !==
+    //   this.props.accountsState.accountShells
+    // ) {
+    //   this.calculateNetBalance()
+    //   // this.getNewTransactionNotifications()
+    // }
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1325,17 +1334,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       selectedBottomTab: tab,
     } )
 
-    if ( tab === BottomTab.Transactions ) {
-      this.props.navigation.navigate( 'AllTransactions' )
-    } else if ( tab === BottomTab.More ) {
-      this.props.navigation.navigate( 'MoreOptions' )
-    } else if ( tab === BottomTab.QR ) {
-      this.props.navigation.navigate( 'QRScanner', {
-        onCodeScanned: this.processQRData,
-      } )
-    } else if ( tab === BottomTab.FriendsAndFamily ) {
-      this.props.navigation.navigate( 'FriendsAndFamily' )
-    }
+    // if ( tab === BottomTab.Transactions ) {
+    //   this.props.navigation.navigate( 'AllTransactions' )
+    // } else if ( tab === BottomTab.More ) {
+    //   this.props.navigation.navigate( 'MoreOptions' )
+    // } else if ( tab === BottomTab.QR ) {
+    //   this.props.navigation.navigate( 'QRScanner', {
+    //     onCodeScanned: this.processQRData,
+    //   } )
+    // } else if ( tab === BottomTab.FriendsAndFamily ) {
+    //   this.props.navigation.navigate( 'FriendsAndFamily' )
+    // }
   };
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
@@ -1720,6 +1729,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                   navigation.navigate( 'AddContactSendRequest', {
                     SelectedContact: selectedContact,
+                    headerText:'Add a contact  ',
+                    subHeaderText:'Send a Friends and Family request',
+                    contactText:'Adding to Friends and Family:',
+                    showDone:true,
                   } )
                 }
               }}
@@ -1736,6 +1749,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 }
                 navigation.navigate( 'AddContactSendRequest', {
                   SelectedContact: [ contactDummy ],
+                  headerText:'Add a contact  ',
+                  subHeaderText:'Send a Friends and Family request',
+                  contactText:'Adding to Friends and Family:',
+                  showDone:true,
                 } )
               }}
             />
@@ -1832,7 +1849,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <View
+        <Header />
+        {/* <View
           style={{
             flex: 3.8,
             paddingTop:
@@ -1856,81 +1874,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             // navigation={this.props.navigation}
             // overallHealth={overallHealth}
           />
-        </View>
+        </View> */}
+        <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />
 
-        <HomeAccountCardsList
-          containerStyle={styles.accountCardsSectionContainer}
-          contentContainerStyle={{
-            paddingTop: 36,
-            paddingLeft: 14,
-          }}
-          currentLevel={currentLevel}
-          onAddNewSelected={this.navigateToAddNewAccountScreen}
-          onCardSelected={this.handleAccountCardSelection}
-        />
-
-        <View
-          style={styles.floatingActionButtonContainer}
-          pointerEvents="box-none"
-        >
-          <Button
-            raised
-            title="Buy"
-            icon={
-              <Image
-                source={require( '../../assets/images/icons/icon_buy.png' )}
-                style={{
-                  width: widthPercentageToDP( 8 ),
-                  height: widthPercentageToDP( 8 ),
-                  marginTop: widthPercentageToDP( -3 ),
-                  marginBottom: widthPercentageToDP( -3 ),
-                }}
-              />
-            }
-            buttonStyle={{
-              ...ButtonStyles.floatingActionButton,
-              borderRadius: 9999,
-              paddingHorizontal: widthPercentageToDP( 10 ),
-            }}
-            titleStyle={{
-              ...ButtonStyles.floatingActionButtonText,
-              marginLeft: 8,
-            }}
-            onPress={() =>
-              this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-            }
-          />
-        </View>
-
-        <BottomSheetBackground
-          isVisible={this.state.bottomSheetState === BottomSheetState.Open}
-          onPress={this.closeBottomSheet}
-        />
-
-        <CustomBottomTabs
-          isEnabled={this.props.navigation.isFocused()}
-          onSelect={this.handleBottomTabSelection}
-          tabBarZIndex={
-            this.state.currentBottomSheetKind ==
-              BottomSheetKind.TAB_BAR_BUY_MENU || null
-              ? 1
-              : 0
-          }
-        />
-
-        {this.state.currentBottomSheetKind != null && (
-          <BottomSheet
-            ref={this.bottomSheetRef}
-            snapPoints={this.getBottomSheetSnapPoints()}
-            initialSnapIndex={-1}
-            animationDuration={defaultBottomSheetConfigs.animationDuration}
-            animationEasing={Easing.out( Easing.back( 1 ) )}
-            handleComponent={defaultBottomSheetConfigs.handleComponent}
-            onChange={this.handleBottomSheetPositionChange}
-          >
-            <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
-          </BottomSheet>
-        )}
       </ImageBackground>
     )
   }
@@ -2021,9 +1967,24 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  cardContainer: {
+    backgroundColor: Colors.white,
+    width: widthPercentageToDP( '95%' ),
+    // height: heightPercentageToDP( '7%' ),
+    // borderColor: Colors.borderColor,
+    // borderWidth: 1,
+    borderRadius: widthPercentageToDP( 3 ),
+    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: widthPercentageToDP( 5 ),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: widthPercentageToDP ( 2 )
+  },
   accountCardsSectionContainer: {
-    flex: 7,
-    marginTop: 30,
+    flex: 16,
+    // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
@@ -2032,14 +1993,16 @@ const styles = StyleSheet.create( {
       width: 2,
       height: -1,
     },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
   },
 
   floatingActionButtonContainer: {
-    position: 'absolute',
-    zIndex: 0,
-    bottom: TAB_BAR_HEIGHT,
-    right: 0,
-    flexDirection: 'row',
+    // position: 'absolute',
+    // zIndex: 0,
+    // bottom: TAB_BAR_HEIGHT,
+    // right: 0,
+    // flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
     padding: heightPercentageToDP( 1.5 ),

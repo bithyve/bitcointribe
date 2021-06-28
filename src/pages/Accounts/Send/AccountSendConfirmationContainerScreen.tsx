@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -27,6 +27,7 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import ModalContainer from '../../../components/home/ModalContainer'
 import { TxPriority } from '../../../bitcoin/utilities/Interface'
 
 export type NavigationParams = {
@@ -43,11 +44,9 @@ export type Props = {
 const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }: Props ) => {
   const dispatch = useDispatch()
 
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
-
+  const [ sendSuccessModal, setSuccess ] = useState( false )
+  const [ sendFailureModal, setFailure ] = useState( false )
+  const [ errorMessage, setError ] = useState( '' )
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
@@ -70,12 +69,14 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   useEffect( () => {
     return () => {
-      dismissBottomSheet()
+      // dismissBottomSheet()
+      setSuccess( false )
+      setFailure( false )
     }
   }, [ navigation ] )
 
-  const showSendSuccessBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  const showSendSuccessBottomSheet = () => {
+    return(
       <SendConfirmationContent
         title={'Sent Successfully'}
         info={'Transaction(s) successfully submitted'}
@@ -86,7 +87,8 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         cancelButtonText={'Back'}
         isCancel={false}
         onPressOk={() => {
-          dismissBottomSheet()
+        // dismissBottomSheet()
+          setSuccess( false )
           // dispatch( resetSendState() ) // need to delay reset as other background sagas read from the send state
           dispatch( refreshAccountShell( sourceAccountShell, {
             autoSync: false,
@@ -98,22 +100,22 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
             } )
           )
         }}
-        onPressCancel={dismissBottomSheet}
+        onPressCancel={() => setSuccess( false )}
         isSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        dismissOnOverlayPress: false,
-        dismissOnScrollDown: false,
-        snapPoints: [ '52%', '52%' ],
-      },
+      />
+    //   ,
+    //   {
+    //     ...defaultBottomSheetConfigs,
+    //     dismissOnOverlayPress: false,
+    //     dismissOnScrollDown: false,
+    //     snapPoints: [ '52%', '52%' ],
+    //   },
     )
-  },
-  [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
-  const showSendFailureBottomSheet = useCallback( ( errorMessage: string | null ) => {
-    presentBottomSheet(
+  const showSendFailureBottomSheet = useCallback( () => {
+    return(
       <SendConfirmationContent
         title={'Send Unsuccessful'}
         info={String( errorMessage )}
@@ -122,11 +124,11 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         okButtonText={'Try Again'}
         cancelButtonText={'Back'}
         isCancel={true}
-        onPressOk={dismissBottomSheet}
+        onPressOk={() => setFailure( false )}
         onPressCancel={() => {
           dispatch( clearTransfer( sourcePrimarySubAccount.kind ) )
-          dismissBottomSheet()
-
+          // dismissBottomSheet()
+          setFailure( false )
           navigation.dispatch(
             resetStackToAccountDetails( {
               accountShellID: sourceAccountShell.id,
@@ -135,14 +137,9 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
         }}
         isUnSuccess={true}
         accountKind={sourcePrimarySubAccount.kind}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-      },
+      />
     )
-  },
-  [ presentBottomSheet, dismissBottomSheet ] )
+  }, [ errorMessage ] )
 
   function handleConfirmationButtonPress() {
     if( sourceAccountShell.primarySubAccount.isTFAEnabled )
@@ -169,17 +166,32 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
 
   useAccountSendST2CompletionEffect( {
     onSuccess: ( txid: string | null ) => {
+
       if ( txid ) {
         dispatch( sendTxNotification() )
-        showSendSuccessBottomSheet()
+        // showSendSuccessBottomSheet()
+        setSuccess( true )
       }
     },
-    onFailure: showSendFailureBottomSheet,
+    onFailure: ( errorMessage: string | null ) => {
+      if ( errorMessage ) {
+        setError( errorMessage )
+        setTimeout( () => {
+          // setFailure( true )
+        }, 200 )
+      }
+    },
   } )
 
 
   return (
     <ScrollView style={styles.rootContainer}>
+      <ModalContainer visible={sendSuccessModal} closeBottomSheet={() => {}} >
+        {showSendSuccessBottomSheet()}
+      </ModalContainer>
+      <ModalContainer visible={sendFailureModal} closeBottomSheet={() => {}} >
+        {showSendFailureBottomSheet()}
+      </ModalContainer>
       <View style={{
         flexDirection: 'row',
         justifyContent: 'center',

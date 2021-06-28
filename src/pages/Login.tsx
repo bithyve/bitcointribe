@@ -33,6 +33,7 @@ import { initMigration, updateLastSeen } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
 import { processDL } from '../common/CommonFunctions'
+import ModalContainer from '../components/home/ModalContainer'
 import firebase from '@react-native-firebase/app'
 import {
   setIsPermissionGiven,
@@ -96,9 +97,12 @@ export default function Login( props ) {
   const [ JailBrokenInfo, setJailBrokenInfo ] = useState( '' )
   const [ passcodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
-  const [ loaderBottomSheet ] = useState(
-    React.createRef<BottomSheet>(),
-  )
+  // const [ loaderBottomSheet ] = useState(
+  //   React.createRef<BottomSheet>(),
+  // )
+  const [ loaderModal, setloaderModal ] = useState( false )
+  const [ errorModal, setErrorModal ] = useState( false )
+
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
@@ -173,7 +177,8 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( JailMonkey.isJailBroken() ) {
-      ErrorBottomSheet.current.snapTo( 1 )
+      // ErrorBottomSheet.current.snapTo( 1 )
+      setErrorModal( true )
       setTimeout( () => {
         setJailBrokenTitle(
           Platform.OS == 'ios'
@@ -190,7 +195,8 @@ export default function Login( props ) {
     }
     DeviceInfo.isPinOrFingerprintSet().then( ( isPinOrFingerprintSet ) => {
       if ( !isPinOrFingerprintSet ) {
-        ErrorBottomSheet.current.snapTo( 1 )
+        // ErrorBottomSheet.current.snapTo( 1 )
+        setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
             'Your phone does not have any secure entry like Pin or Biometric',
@@ -243,19 +249,20 @@ export default function Login( props ) {
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
           setTimeout( () => {
-            if ( loaderBottomSheet.current ) {
-              loaderBottomSheet.current.snapTo( 0 )
-            }
+            // if ( loaderBottomSheet.current ) {
+            //   loaderBottomSheet.current.snapTo( 0 )
+            // }
+            setloaderModal( false )
             //console.log( 'requestName**', requestName )
             //console.log( 'creationFlag**', creationFlag )
 
             if( !creationFlag ) {
-              props.navigation.navigate( 'HomeRoot', {
+              props.navigation.navigate( 'Home', {
                 screen: 'Home',
               }
               )
             } else if( requestName ){
-              props.navigation.navigate( 'HomeRoot', {
+              props.navigation.navigate( 'Home', {
                 screen: 'Home',
                 params: {
                   custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
@@ -361,7 +368,8 @@ export default function Login( props ) {
   const checkPasscode = () => {
     if ( checkAuth ) {
       setTimeout( () => {
-        loaderBottomSheet.current.snapTo( 0 )
+        // loaderBottomSheet.current.snapTo( 0 )
+        setloaderModal( false )
       }, 2 )
 
       return (
@@ -392,7 +400,8 @@ export default function Login( props ) {
         info={JailBrokenInfo}
         proceedButtonText={'Ok'}
         onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
+          // ErrorBottomSheet.current.snapTo( 0 )
+          setErrorModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../assets/images/icons/errorImage.png' )}
@@ -400,15 +409,15 @@ export default function Login( props ) {
     )
   }, [ JailBrokenTitle ] )
 
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+  // const renderErrorModalHeader = useCallback( () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         ErrorBottomSheet.current.snapTo( 0 )
+  //       }}
+  //     />
+  //   )
+  // }, [] )
 
   return (
     <View style={{
@@ -574,7 +583,7 @@ export default function Login( props ) {
                     setIsDisabledProceed( true )
                     setElevation( 0 )
                   }, 2 )
-                  setTimeout( () => loaderBottomSheet.current?.snapTo( 1 ), 2 )
+                  setTimeout( () => setloaderModal( true ), 2 )
                   handleLoaderMessages( passcode )
                 }}
                 style={{
@@ -729,17 +738,14 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <BottomSheet
-          onCloseEnd={() => { }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
+        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}}>
+          {renderLoaderModalContent()}
+        </ModalContainer>
       </View>
-      <BottomSheet
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+        {renderErrorModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )
         }}
@@ -754,7 +760,7 @@ export default function Login( props ) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
-      />
+      /> */}
     </View>
   )
 }

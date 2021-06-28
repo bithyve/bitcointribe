@@ -59,6 +59,7 @@ function setCurrencyCodeToImage( currencyName, currencyColor ) {
 
 const HomeHeader = ( {
   onPressNotifications,
+  navigateToQRScreen,
   notificationData,
   walletName,
   netBalance,
@@ -258,7 +259,8 @@ const HomeHeader = ( {
       <View style={{
         flexDirection: 'row'
       }}>
-        <CurrencyKindToggleSwitch
+        {/* <<<<<<< Updated upstream */}
+        {/* <CurrencyKindToggleSwitch
           fiatCurrencyCode={CurrencyCode}
           onpress={() => {
             dispatch(
@@ -299,64 +301,139 @@ const HomeHeader = ( {
             ) : null}
           </ImageBackground>
         </TouchableOpacity>
-      </View>
-      <View style={{
-        flex: 1, justifyContent: 'center', alignItems: 'center'
-      }}>
-        <View
-          style={{
-            marginBottom: wp( '2%' ),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+      </View> */}
+        <View style={{
+          flex: 1, justifyContent: 'center', alignItems: 'flex-start'
+          // =======
+        // <View style={{
+        // flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start'
+          // >>>>>>> Stashed changes
+        }}>
           <View
             style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              // marginBottom: wp('3%'),
+              marginBottom: wp( '2%' ),
+              justifyContent: 'center',
+              alignItems: 'flex-start',
             }}
           >
-            {prefersBitcoin ? (
-              <Image
-                style={{
-                  ...CommonStyles.homepageAmountImage,
-                  marginBottom: wp( '1.5%' ),
-                }}
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-              />
-            ) : currencyCode.includes( CurrencyCode ) ? (
-              setCurrencyCodeToImage(
-                getCurrencyImageName( CurrencyCode ),
-                'light'
-              )
-            ) : (
-              <Image
-                style={{
-                  ...styles.cardBitCoinImage,
-                  marginBottom: wp( '1.5%' ),
-                }}
-                source={getCurrencyImageByRegion( CurrencyCode, 'light' )}
-              />
-            )}
-            <Text style={styles.homeHeaderAmountText}>
-              {prefersBitcoin
-                ? UsNumberFormat( netBalance )
-                : exchangeRates && exchangeRates[ CurrencyCode ]
-                  ? (
-                    ( netBalance / SATOSHIS_IN_BTC ) *
+            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+              // marginBottom: wp('3%'),
+              }}
+            >
+              {prefersBitcoin ? (
+                <Image
+                  style={{
+                    ...CommonStyles.homepageAmountImage,
+                    marginBottom: wp( '1.5%' ),
+                  }}
+                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                />
+              ) : currencyCode.includes( CurrencyCode ) ? (
+                setCurrencyCodeToImage(
+                  getCurrencyImageName( CurrencyCode ),
+                  'light'
+                )
+              ) : (
+                <Image
+                  style={{
+                    ...styles.cardBitCoinImage,
+                    marginBottom: wp( '1.5%' ),
+                  }}
+                  source={getCurrencyImageByRegion( CurrencyCode, 'light' )}
+                />
+              )}
+              <Text style={styles.homeHeaderAmountText}>
+                {prefersBitcoin
+                  ? UsNumberFormat( netBalance )
+                  : exchangeRates && exchangeRates[ CurrencyCode ]
+                    ? (
+                      ( netBalance / SATOSHIS_IN_BTC ) *
                     exchangeRates[ CurrencyCode ].last
-                  ).toFixed( 2 )
-                  : 0}
-            </Text>
-            <Text style={styles.homeHeaderAmountUnitText}>
-              {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
-            </Text>
+                    ).toFixed( 2 )
+                    : 0}
+              </Text>
+              <Text style={styles.homeHeaderAmountUnitText}>
+                {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+              </Text>
+            </View>
           </View>
         </View>
+        {/* <CurrencyKindToggleSwitch
+          fiatCurrencyCode={CurrencyCode}
+          onpress={() => {
+            dispatch(
+              currencyKindSet(
+                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+              )
+            )
+          }}
+          isOn={prefersBitcoin}
+        /> */}
+        <TouchableOpacity
+          onPress={navigateToQRScreen}
+          style={{
+            height: wp( '10%' ),
+            width: wp( '10%' ),
+            justifyContent: 'center',
+            marginLeft: 'auto',
+          }}
+        >
+          <ImageBackground
+            source={require( '../../assets/images/HomePageIcons/icon_qr_active.png' )}
+            style={{
+              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+            }}
+            resizeMode={'contain'}
+          >
+            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
+          </ImageBackground>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onPressNotifications}
+          style={{
+            height: wp( '10%' ),
+            width: wp( '10%' ),
+            justifyContent: 'center',
+            marginLeft: 'auto',
+          }}
+        >
+          <ImageBackground
+            source={require( '../../assets/images/icons/icon_notification.png' )}
+            style={{
+              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+            }}
+            resizeMode={'contain'}
+          >
+            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
+          </ImageBackground>
+        </TouchableOpacity>
       </View>
-      <View
+
+      {/* <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -407,7 +484,7 @@ const HomeHeader = ( {
             size={17}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
     </View>
   )
 }
@@ -416,7 +493,7 @@ export default HomeHeader
 
 const styles = StyleSheet.create( {
   headerViewContainer: {
-    marginTop: hp( '1%' ),
+    marginTop: hp( '2%' ),
     marginLeft: 20,
     marginRight: 20,
   },

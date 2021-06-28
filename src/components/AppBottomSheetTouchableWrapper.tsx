@@ -14,7 +14,7 @@ export const AppBottomSheetTouchableWrapper = (
   props: { children: ReactNode } & Pick<TouchableOpacityProps, 'onPress' | 'style' | 'activeOpacity' | 'disabled' | 'hitSlop' | 'delayPressIn'>,
 ) =>
   Platform.select( {
-    android: <TouchableOpacityGestureHandler {...props} />,
+    android: <TouchableOpacity {...props} />,
     ios: (
       <TouchableOpacity {...props}/>
     ),

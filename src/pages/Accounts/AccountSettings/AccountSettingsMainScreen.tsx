@@ -1,9 +1,6 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { StyleSheet, FlatList, ImageSourcePropType, Image, Alert } from 'react-native'
 import { ListItem } from 'react-native-elements'
-import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import ListStyles from '../../../common/Styles/ListStyles'
 import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
@@ -14,6 +11,7 @@ import AccountArchiveModal from './AccountArchiveModal'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 
 const SELECTABLE_VISIBILITY_OPTIONS = [
@@ -43,22 +41,19 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }, [ navigation ] )
   const dispatch = useDispatch()
 
+  const [ showRescanning, setShowRescanning ] = useState( false )
+  const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
+  const [ showAccountArchiveModal, setShowAccountArchiveModal ] = useState( false )
+  const [ checkAccountModal, setCheckAccountModal ] = useState( false )
   const accountShell = useAccountShellForID( accountShellID )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   //  const [ accountBalance, setAccountBalance ] = useState( primarySubAccount.balances )
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
-
-  const {
-    present: openArchiveModal,
-    dismiss: closeArchiveModal,
-  } = useBottomSheetModal()
 
   useEffect( () => {
     return () => {
-      dismissBottomSheet()
+      // dismissBottomSheet()
+      setShowRescanningPrompt( false )
+      setShowRescanning( false )
     }
   }, [ navigation ] )
 
@@ -168,25 +163,23 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }
 
   const checkAccountBalance = useCallback( () => {
-    openArchiveModal(
+    return(
       <AccountArchiveModal
         isError={true}
         onProceed={() => {
-          closeArchiveModal()
+          // closeArchiveModal()
+          setCheckAccountModal( false )
         }}
-        onBack={closeArchiveModal}
-        onViewAccount={closeArchiveModal}
+        onBack={() => setCheckAccountModal( false )}
+        onViewAccount={() => setCheckAccountModal( false )}
         account={primarySubAccount}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '40%' ],
-      },
+      />
     )
-  }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
+  }, [ primarySubAccount ] )
 
   function handleRescanListItemSelection() {
-    showRescanningPromptBottomSheet()
+    // showRescanningPromptBottomSheet()
+    setShowRescanningPrompt( true )
   }
 
   function handleAccountArchive() {
@@ -197,86 +190,94 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
 
 
   const showAccountArchiveBottomSheet = useCallback( () => {
-    openArchiveModal(
+    return(
       <AccountArchiveModal
         isError={false}
         onProceed={() => {
           handleAccountArchive()
-          closeArchiveModal()
+          // closeArchiveModal()
+          setShowAccountArchiveModal( false )
         }}
-        onBack={closeArchiveModal}
-        onViewAccount={closeArchiveModal}
+        onBack={() => setShowAccountArchiveModal( false )}
+        onViewAccount={() => setShowAccountArchiveModal( false )}
         account={primarySubAccount}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '40%' ],
-      },
+      />
     )
-  }, [ openArchiveModal, closeArchiveModal, primarySubAccount ] )
+  }, [ primarySubAccount ] )
 
   function showArchiveModal() {
     if ( primarySubAccount.balances.confirmed === 0 ) {
-      showAccountArchiveBottomSheet()
+      setShowAccountArchiveModal( true )
     } else {
-      checkAccountBalance()
+      // checkAccountBalance()
+      setCheckAccountModal( true )
     }
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
-    dismissBottomSheet()
-
+    // dismissBottomSheet()
+    setShowRescanning( false )
     navigation.navigate( 'TransactionDetails', {
       transaction: transactionData.details,
       accountShellID: accountShell.id,
     } )
   }
 
-  const showRescanningPromptBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  const showRescanningPromptBottomSheet = () => {
+    return (
       <AccountShellRescanningPromptBottomSheet
         onContinue={() => {
-          dismissBottomSheet()
+          setShowRescanningPrompt( false )
           setTimeout( () => {
-            showRescanningBottomSheet()
+            // showRescanningBottomSheet()
+            setShowRescanning( true )
           }, 800 )
         }}
-        onDismiss={dismissBottomSheet}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '33%' ],
-      },
+        onDismiss={() => setShowRescanningPrompt( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
 
-  const showRescanningBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  const showRescanningBottomSheet = () => {
+    return (
       <AccountShellRescanningBottomSheet
         accountShell={accountShell}
-        onDismiss={dismissBottomSheet}
+        onDismiss={() => setShowRescanning( false )}
         onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
 
   return (
-    <FlatList
-      style={styles.rootContainer}
-      contentContainerStyle={{
-        paddingHorizontal: 14
-      }}
-      extraData={accountShell}
-      data={listItems}
-      keyExtractor={listItemKeyExtractor}
-      renderItem={renderItem}
-    />
+    <>
+      <FlatList
+        style={styles.rootContainer}
+        contentContainerStyle={{
+          paddingHorizontal: 14
+        }}
+        extraData={accountShell}
+        data={listItems}
+        keyExtractor={listItemKeyExtractor}
+        renderItem={renderItem}
+      />
+      <ModalContainer visible={showAccountArchiveModal} closeBottomSheet={() => {}}>
+        {showAccountArchiveBottomSheet()}
+      </ModalContainer>
+
+      <ModalContainer visible={checkAccountModal} closeBottomSheet={() => {}}>
+        {checkAccountBalance()}
+      </ModalContainer>
+
+      <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
+        {showRescanningPromptBottomSheet()}
+      </ModalContainer>
+
+      <ModalContainer visible={showRescanning} closeBottomSheet={() => {}}>
+        {showRescanningBottomSheet()}
+      </ModalContainer>
+    </>
   )
 }
 

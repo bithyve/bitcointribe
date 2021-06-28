@@ -1,5 +1,6 @@
 import React, { useState, useCallback } from 'react'
-import { View, Text } from 'react-native'
+import { View, Text, SafeAreaView, StatusBar } from 'react-native'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Fonts from '../../common/Fonts'
 import BackupStyles from './Styles'
 import Colors from '../../common/Colors'
@@ -19,14 +20,14 @@ const TrustedContacts = ( props ) => {
   }, [] )
 
   const onPressContinue = useCallback( () => {
-    props.onPressContinue( contacts )
-  }, [ contacts, props.onPressContinue ] )
+    props.navigation.state.params.onPressContinue( contacts )
+  }, [ contacts, props.navigation.state.params.onPressContinue ] )
 
   const onPressSkip = () => {
     const contactDummy = {
       id: uuid(),
     }
-    props.onPressContinue( [ contactDummy ] )
+    props.navigation.state.params.onPressContinue( [ contactDummy ] )
   }
 
   const renderContactList = useCallback(
@@ -45,14 +46,16 @@ const TrustedContacts = ( props ) => {
   )
 
   return (
-    <View
+    <SafeAreaView
       style={{
-        height: '100%',
+        // height: '90%',
+        // flex: 1,
         backgroundColor: Colors.white,
-        alignSelf: 'center',
-        width: '100%',
+        // alignSelf: 'center',
+        // width: '100%',
       }}
     >
+      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View
         style={{
           ...BackupStyles.modalHeaderTitleView,
@@ -62,6 +65,18 @@ const TrustedContacts = ( props ) => {
           marginLeft: 20,
         }}
       >
+        <AppBottomSheetTouchableWrapper
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+          style={{
+            height: 30,
+            width: 30,
+            justifyContent: 'center'
+          }}
+        >
+          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+        </AppBottomSheetTouchableWrapper>
         <Text style={BackupStyles.modalHeaderTitleText}>
           Associate a contact
         </Text>
@@ -90,7 +105,7 @@ const TrustedContacts = ( props ) => {
       </View>
 
       <View style={{
-        flex: 1
+        // flex: 1
       }}>
         <Text
           style={{
@@ -111,9 +126,9 @@ const TrustedContacts = ( props ) => {
             send Recovery Keys
           </Text>
         </Text>
-        {props.LoadContacts ? renderContactList() : null}
+        {props.navigation.state.params.LoadContacts ? renderContactList() : null}
       </View>
-    </View>
+    </SafeAreaView>
   )
 }
 

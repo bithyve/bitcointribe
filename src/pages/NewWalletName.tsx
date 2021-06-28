@@ -36,6 +36,7 @@ import { BottomSheetView } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
 import { Easing } from 'react-native-reanimated'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
+import ModalContainer from '../components/home/ModalContainer'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -47,15 +48,38 @@ export enum BottomSheetState {
 }
 
 export default function NewWalletName( props ) {
-
+  // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
+  // const [ timeLeft, setTimeLeft ] = useState( null )
+  // const [ intervalRef, setIntervalRef ] = useState( null )
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
-  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( BottomSheetKind.CLOUD_PERMISSION )
+  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
   const bottomSheetRef = createRef<BottomSheet>()
   const dispatch = useDispatch()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+
+  // useEffect( () => {
+  //   if( timeLeft===0 ){
+  //     props.autoClose()
+  //     setTimeLeft( null )
+  //   }
+  //   if ( !timeLeft ) return
+  //   const intervalId = setInterval( () => {
+  //     setTimeLeft( timeLeft - 1 )
+  //     if( timeLeft - 1 == 2 ){ setTimerArray( [ 1, 1, 0 ] )
+  //     } else if( timeLeft - 1 == 1 ){
+  //       setTimerArray( [ 1, 0, 0 ] )
+  //     }
+  //     else if( timeLeft - 1 == 0 ){
+  //       setTimerArray( [ 0, 0, 0 ] )
+  //     }
+  //   }, 1000 )
+  //   console.log( 'timeLeft', timeLeft )
+  //   setIntervalRef( intervalId )
+  //   return () => { clearInterval( intervalId ) }
+  // }, [ timeLeft ] )
 
   const renderBottomSheetContent = () =>{
 
@@ -114,27 +138,6 @@ export default function NewWalletName( props ) {
     }
   }
 
-  const getBottomSheetSnapPoints = (): any[] => {
-    switch ( currentBottomSheetKind ) {
-        case BottomSheetKind.CLOUD_PERMISSION:
-          return [
-            -50,
-            hp(
-              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 40 : 35,
-            ),
-          ]
-
-        default:
-          return defaultBottomSheetConfigs.snapPoints
-    }
-  }
-
-  const handleBottomSheetPositionChange = ( newIndex: number ) => {
-    if ( newIndex === 0 ) {
-      onBottomSheetClosed()
-    }
-  }
-
   const onBottomSheetClosed =()=> {
     setBottomSheetState( BottomSheetState.Closed )
     setCurrentBottomSheetKind( null )
@@ -142,7 +145,8 @@ export default function NewWalletName( props ) {
 
   const closeBottomSheet = () => {
     setIsCloudPermissionRender( false )
-    bottomSheetRef.current.snapTo( 0 )
+    // bottomSheetRef.current.snapTo( 0 )
+    setCurrentBottomSheetKind( null )
     onBottomSheetClosed()
   }
 
@@ -181,9 +185,10 @@ export default function NewWalletName( props ) {
             <HeaderTitle
               firstLineTitle={'New Hexa Wallet'}
               secondLineTitle={''}
-              infoTextNormal={'Please enter a '}
-              infoTextBold={'display name.'}
-              infoTextNormal1={'Your contacts will see this'}
+              infoTextNormal={'Please '}
+              infoTextBold={'name'}
+              infoTextNormal1={'your wallet'}
+              step={'Step 1: '}
             />
             <TextInput
               style={inputStyle}
@@ -208,11 +213,12 @@ export default function NewWalletName( props ) {
               autoCompleteType="off"
             />
             <View style={{
-              marginLeft: 20,
+              marginRight: 20,
             }}>
               <Text style={{
-                fontSize: RFValue( 12 ),
-                fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+                fontSize: RFValue( 10 ),
+                fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
+                alignSelf: 'flex-end'
               }}>
                   No numbers or special characters allowed</Text>
             </View>
@@ -238,7 +244,7 @@ export default function NewWalletName( props ) {
                   }}
                   style={styles.buttonView}
                 >
-                  <Text style={styles.buttonText}>Continue</Text>
+                  <Text style={styles.buttonText}>Next</Text>
                 </TouchableOpacity>
               </View>
             ) : null}
@@ -262,23 +268,13 @@ export default function NewWalletName( props ) {
           ) : null}
         </KeyboardAvoidingView>
       </View>
-      <BottomSheetBackground
+      {/* <BottomSheetBackground
         isVisible={bottomSheetState === BottomSheetState.Open}
         onPress={closeBottomSheet}
-      />
-      {currentBottomSheetKind != null && (
-        <BottomSheet
-          ref={bottomSheetRef}
-          snapPoints={getBottomSheetSnapPoints()}
-          initialSnapIndex={-1}
-          animationDuration={defaultBottomSheetConfigs.animationDuration}
-          animationEasing={Easing.out( Easing.back( 1 ) )}
-          handleComponent={defaultBottomSheetConfigs.handleComponent}
-          onChange={handleBottomSheetPositionChange}
-        >
-          <BottomSheetView>{renderBottomSheetContent()}</BottomSheetView>
-        </BottomSheet>
-      )}
+      /> */}
+      <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
+        {renderBottomSheetContent()}
+      </ModalContainer>
     </SafeAreaView>
   )
 }

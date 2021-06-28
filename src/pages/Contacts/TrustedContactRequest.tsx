@@ -299,7 +299,7 @@ export default function TrustedContactRequest( props ) {
   return (
     <KeyboardAvoidingView
       style={{
-        height: '100%',
+        // height: '100%',
         backgroundColor: Colors.white,
       }}
       behavior={Platform.OS == 'ios' ? 'padding' : 'height'}
@@ -438,6 +438,7 @@ export default function TrustedContactRequest( props ) {
               flexDirection: 'row',
               marginTop: 'auto',
               alignItems: 'center',
+              marginBottom: hp( '2%' )
             }}
           >
             <AppBottomSheetTouchableWrapper
@@ -497,7 +498,7 @@ export default function TrustedContactRequest( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   box: {

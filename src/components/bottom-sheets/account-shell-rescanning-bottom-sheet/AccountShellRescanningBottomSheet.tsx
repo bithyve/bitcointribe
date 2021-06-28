@@ -152,7 +152,7 @@ const AccountShellRescanningBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: Colors.white,
   },
 
@@ -165,7 +165,7 @@ const styles = StyleSheet.create( {
   mainContentContainer: {
     padding: 30,
     paddingBottom: 40,
-    flex: 1,
+    // flex: 1,
   },
 
   footerSectionContainer: {

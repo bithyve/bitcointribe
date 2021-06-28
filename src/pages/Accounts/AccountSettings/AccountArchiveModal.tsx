@@ -78,26 +78,27 @@ const AccountArchiveBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
 
   mainContentContainer: {
-    padding: 30,
+    padding: wp( '6%' ),
     paddingBottom: 20,
   },
 
   footerSectionContainer: {
     marginTop: 'auto',
     flexDirection: 'row',
+    // backgroundColor: 'red'
   },
 
   actionButtonContainer: {
-    marginLeft: 20,
+    marginLeft: wp( '6%' ),
     flexDirection: 'row',
     marginTop: 'auto',
     justifyContent:'center',
-    marginBottom: 30
+    marginBottom: hp( '2%' )
   },
   errorImage: {
     width: wp( '31%' ),

@@ -131,30 +131,36 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           swanTitle = 'Buy bitcoin\nwith Swan'
     }
     return (
-      <View style={styles.successModalHeaderView}>
+      <>
         <TouchableOpacity
           activeOpacity={1}
           onPress={onPress}
           style={{
-            flexDirection: 'row'
+            width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+            alignSelf: 'flex-end',
+            backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+            marginTop: wp( 3 ), marginRight: wp( 3 )
           }}
         >
-          <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} style={{
-            marginTop: hp( 0.5 )
+          <FontAwesome name="close" color={Colors.white} size={19} style={{
+            // marginTop: hp( 0.5 )
           }} />
-          <Text style={styles.modalTitleText}>{swanTitle}</Text>
         </TouchableOpacity>
+        <View style={styles.successModalHeaderView}>
 
-        <Text style={{
-          ...styles.modalInfoText,
-          marginTop: wp( 1.5 ),
-          marginBottom: wp( 5 ),
-        }}>{swanMessage}</Text>
-        {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
+          <Text style={styles.modalTitleText}>{swanTitle}</Text>
+
+          <Text style={{
+            ...styles.modalInfoText,
+            marginTop: wp( 1.5 ),
+            marginBottom: wp( 5 ),
+          }}>{swanMessage}</Text>
+          {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
           ||
           swanAccountCreationStatus == SwanAccountCreationStatus.ACCOUNT_CREATED ) ? renderAccount() : null}
 
-      </View>
+        </View>
+      </>
     )
   }
 
@@ -228,7 +234,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const renderSuccessButton = () => {
     return ( <View style={{
       marginTop: 'auto',
-      flexDirection: 'row'
+      flexDirection: 'row',
+      marginBottom: hp( 4 )
     }} >
       <AppBottomSheetTouchableWrapper
         onPress={onClickSetting}
@@ -236,26 +243,21 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Done'}</Text>
+        <Text style={styles.proceedButtonText}>{'Buy Bitcoin'}</Text>
       </AppBottomSheetTouchableWrapper>
-      <Image
+      {/* <Image
         source={require( '../../../assets/images/icons/success.png' )
         }
         style={styles.successImage}
-      />
+      /> */}
     </View> )
   }
 
   return ( <View style={{
     ...styles.modalContentContainer
   }}>
-    <View style={{
-      height: '95%'
-    }}>
-      {renderMessage()}
-      {renderFooter()}
-    </View>
-
+    {renderMessage()}
+    {renderFooter()}
   </View>
   )
 }
@@ -278,18 +280,18 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '3%' ),
-    marginTop: wp( '5%' ),
-    flex: 1.7
+    // marginTop: wp( '5%' ),
+    // flex: 1.7
   },
   modalTitleText: {
     marginBottom: wp( '5%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
-    fontFamily: Fonts.FiraSansMedium,
+    fontFamily: Fonts.FiraSansRegular,
     marginLeft: 10
   },
   modalInfoText: {
-    marginLeft: wp( '7%' ),
+    marginLeft: wp( '3%' ),
     color: Colors.textColorGrey,
     fontSize: RFValue( 11 ),
     fontFamily: Fonts.FiraSansRegular,
@@ -314,7 +316,7 @@ const styles = StyleSheet.create( {
     marginTop: 'auto',
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
-    marginLeft: wp( '10%' ),
+    marginLeft: wp( '6%' ),
   },
   proceedButtonText: {
     color: Colors.white,

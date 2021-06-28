@@ -20,6 +20,7 @@ const initialState: {
 export default ( state = initialState, action ) => {
   switch ( action.type ) {
       case NOTIFICATIONS_FETCHED:
+        console.log( 'action.payload.notifications', action.payload.notifications )
         return {
           ...state,
           notifications: action.payload.notifications,

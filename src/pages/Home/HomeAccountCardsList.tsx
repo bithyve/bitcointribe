@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from 'react-redux'
 
 
 export type Props = {
-  containerStyle?: Record<string, unknown>;
+  // containerStyle?: Record<string, unknown>;
   contentContainerStyle?: Record<string, unknown>;
   onCardSelected: ( selectedAccount: AccountShell ) => void;
   onAddNewSelected: () => void;
@@ -51,8 +51,8 @@ const EditModeBottomSheetHeader: React.FC = () => {
 }
 
 const HomeAccountCardsList: React.FC<Props> = ( {
-  containerStyle = {
-  },
+  // containerStyle = {
+  // },
   contentContainerStyle = {
   },
   onCardSelected,
@@ -85,30 +85,30 @@ const HomeAccountCardsList: React.FC<Props> = ( {
     return <View />
   }
 
-  const showEditModeBottomSheet = useCallback( () => {
-    present(
-      <View style={containerStyle}>
-        <EditModeBottomSheetHeader />
+  // const showEditModeBottomSheet = useCallback( () => {
+  //   present(
+  //     <View style={containerStyle}>
+  //       <EditModeBottomSheetHeader />
 
-        <View style={styles.editModeBottomSheetContentContainer}>
-          <HomeAccountCardsDraggableList
-            accountShells={accountShells}
-            onDragEnded={handleAccountReordering}
-          />
-        </View>
-      </View>,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '68%' ],
-        overlayComponent: EditModeBottomSheetBackground,
-        handleComponent: EmptyView,
-      },
-    )
-  }, [ present, dismiss ] )
+  //       <View style={styles.editModeBottomSheetContentContainer}>
+  //         <HomeAccountCardsDraggableList
+  //           accountShells={accountShells}
+  //           onDragEnded={handleAccountReordering}
+  //         />
+  //       </View>
+  //     </View>,
+  //     {
+  //       ...defaultBottomSheetConfigs,
+  //       snapPoints: [ 0, '68%' ],
+  //       overlayComponent: EditModeBottomSheetBackground,
+  //       handleComponent: EmptyView,
+  //     },
+  //   )
+  // }, [ present, dismiss ] )
 
 
   return (
-    <View style={containerStyle}>
+    // <View style={containerStyle}>
       <HomeAccountCardsGrid
         currentLevel={currentLevel}
         accountShells={accountShells}
@@ -118,7 +118,7 @@ const HomeAccountCardsList: React.FC<Props> = ( {
         contentContainerStyle={contentContainerStyle}
         showAllAccount={showAllAccount}
       />
-    </View>
+    // </View>
   )
 }
 

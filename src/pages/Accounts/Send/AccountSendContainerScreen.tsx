@@ -30,6 +30,7 @@ import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
 import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
 import Colors from '../../../common/Colors'
+import ModalContainer from '../../../components/home/ModalContainer'
 import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
@@ -164,6 +165,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [] )
 
   const toggleKnowMoreSheet = () => {
+    showKnowMoreBottomSheet()
     const shouldShow = !isShowingKnowMoreSheet
     setIsShowingKnowMoreSheet( shouldShow )
     if ( shouldShow ) {
@@ -184,21 +186,28 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }} />
   }
 
-  const showKnowMoreBottomSheet = useCallback( () => {
-    presentBottomSheet(
-      <SendHelpContents titleClicked={dismissBottomSheet} />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '89%' ],
-        handleComponent: KnowMoreBottomSheetHandle,
-        onChange: ( newIndex ) => {
-          if ( newIndex < 1 ) {
-            dispatch( initialKnowMoreSendSheetShown() )
-          }
-        }
-      },
+  // const showKnowMoreBottomSheet = useCallback( () => {
+  //   presentBottomSheet(
+  //     <SendHelpContents titleClicked={dismissBottomSheet} />,
+  //     {
+  //       ...defaultBottomSheetConfigs,
+  //       snapPoints: [ 0, '89%' ],
+  //       handleComponent: KnowMoreBottomSheetHandle,
+  //       onChange: ( newIndex ) => {
+  //         if ( newIndex < 1 ) {
+  //           dispatch( initialKnowMoreSendSheetShown() )
+  //         }
+  //       }
+  //     },
+  //   )
+  // }, [ presentBottomSheet, dismissBottomSheet ] )
+  const showKnowMoreBottomSheet = () => {
+    return(
+      // <ModalContainer visible={true} closeBottomSheet={() => {}}>
+      <SendHelpContents titleClicked={dismissBottomSheet} />
+      // </ModalContainer>
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   useEffect( () => {
     if ( primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT && hasShownInitialKnowMoreSendSheet == false ) {

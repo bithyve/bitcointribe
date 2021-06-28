@@ -32,6 +32,7 @@ import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import { getLevelInfo } from '../../common/CommonFunctions'
 import { setCloudData } from '../../store/actions/cloud'
 import BottomSheet from 'reanimated-bottom-sheet'
+import ModalContainer from '../../components/home/ModalContainer'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
@@ -46,6 +47,7 @@ export enum BottomSheetState {
 
 const CloudBackupHistory = ( props ) => {
   const [ cloudBackupHistory, setCloudBackupHistory ] = useState( [] )
+  const [ confirmationModal, setConfirmationModal ] = useState( false )
   const [
     bottomSheetRef,
     setBottomSheetRef,
@@ -116,21 +118,24 @@ const CloudBackupHistory = ( props ) => {
       info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
       note={''}
       onPressProceed={( flag )=>{
-        if ( ( bottomSheetRef as any ).current )
-          ( bottomSheetRef as any ).current.snapTo( 0 )
+        // if ( ( bottomSheetRef as any ).current )
+        //   ( bottomSheetRef as any ).current.snapTo( 0 )
+        setConfirmationModal( false )
         console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
         updateCloudData()
       }}
       onPressIgnore={( flag )=> {
-        if ( ( bottomSheetRef as any ).current )
-          ( bottomSheetRef as any ).current.snapTo( 0 )
+        // if ( ( bottomSheetRef as any ).current )
+        //   ( bottomSheetRef as any ).current.snapTo( 0 )
+        setConfirmationModal( false )
         console.log( 'updateCloudPermission', flag )
         dispatch( updateCloudPermission( flag ) )
       }}
       autoClose={()=>{
-        if ( ( bottomSheetRef as any ).current )
-          ( bottomSheetRef as any ).current.snapTo( 0 )
+        // if ( ( bottomSheetRef as any ).current )
+        //   ( bottomSheetRef as any ).current.snapTo( 0 )
+        setConfirmationModal( false )
         console.log( 'updateCloudPermission', true )
         dispatch( updateCloudPermission( true ) )
       }}
@@ -203,7 +208,8 @@ const CloudBackupHistory = ( props ) => {
           infoBoxInfo={'The history of your backup will appear here'}
           type={'security'}
           onPressConfirm={() => {
-            ( bottomSheetRef as any ).current.snapTo( 1 )
+            // ( bottomSheetRef as any ).current.snapTo( 1 )
+            setConfirmationModal( true )
           }}
           data={cloudBackupHistory.length ? sortedHistory( cloudBackupHistory ) : []}
           confirmButtonText={'Backup'}
@@ -217,14 +223,16 @@ const CloudBackupHistory = ( props ) => {
           }}
         />
       </View>
-
-      <BottomSheet
+      <ModalContainer visible={confirmationModal} closeBottomSheet={() => {}}>
+        {renderCloudPermissionContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         enabledInnerScrolling={true}
         ref={bottomSheetRef as any}
         snapPoints={[ -30, Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '40%' ) : hp( '35%' ), ]}
         renderContent={renderCloudPermissionContent}
         renderHeader={renderCloudPermissionHeader}
-      />
+      /> */}
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}

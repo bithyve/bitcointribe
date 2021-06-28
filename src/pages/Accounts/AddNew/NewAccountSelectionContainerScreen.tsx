@@ -132,119 +132,106 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
     <SafeAreaView style={styles.rootContainer}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <View style={NavStyles.modalContainer}>
-      <View
+        <TouchableOpacity
+          onPress={() => {
+            navigation.pop()
+          }}
+          hitSlop={{
+            top: 20, left: 20, bottom: 20, right: 20
+          }}
           style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingRight: 10,
-            paddingBottom: hp( '1.5%' ),
-            paddingTop: hp( '1%' ),
-            marginLeft: 10,
-            marginRight: 10,
-            // marginBottom: hp( '1.5%' ),
+            height: 30, width: 30, justifyContent: 'center',
+            marginLeft: wp( '5%' )
           }}
         >
-          <View style={{
-            flex: 1, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.pop()
-              }}
-              hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20
-              }}
-              style={{
-                height: 30, width: 30, justifyContent: 'center'
-              }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <View style={{
-              flex: 1
-            }}>
-              <Text
-                style={{
-                  ...NavStyles.modalHeaderTitleText,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Add new Account
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  paddingTop: 5,
-                }}
-              >
+          <FontAwesome
+            name="long-arrow-left"
+            color={Colors.blue}
+            size={17}
+          />
+        </TouchableOpacity>
+        <View style={{
+          // flex: 1
+        }}>
+          <Text
+            style={{
+              ...NavStyles.modalHeaderTitleText,
+              fontFamily: Fonts.FiraSansRegular,
+              fontSize: RFValue( 25 ),
+              marginLeft: wp( '5%' ),
+              marginTop: hp( '2%' )
+            }}
+          >
+                Add Accounts
+          </Text>
+          {/* <Text
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 12 ),
+              fontFamily: Fonts.FiraSansRegular,
+              paddingTop: 5,
+            }}
+          >
                 Add an account, add a service, or import a wallet
-              </Text>
-            </View>
-          </View>
+          </Text> */}
         </View>
-      <SectionList
-        contentContainerStyle={{
-          paddingVertical: 25
-        }}
-        ListFooterComponent={<ListFooter />}
-        extraData={[ selectedChoice ]}
-        sections={[
-          {
-            kind: SectionKind.ADD_NEW_HEXA_ACCOUNT,
-            data: [ newAccountChoices.hexaAccounts ],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <NewAccountOptionsSection
-                    choices={newAccountChoices.hexaAccounts}
-                    selectedChoice={selectedChoice}
-                    onOptionSelected={handleChoiceSelection}
-                  />
-                </View>
-              )
+        <SectionList
+          contentContainerStyle={{
+            paddingVertical: 25
+          }}
+          ListFooterComponent={<ListFooter />}
+          extraData={[ selectedChoice ]}
+          sections={[
+            {
+              kind: SectionKind.ADD_NEW_HEXA_ACCOUNT,
+              data: [ newAccountChoices.hexaAccounts ],
+              renderItem: () => {
+                return (
+                  <View style={styles.viewSectionContainer}>
+                    <NewAccountOptionsSection
+                      choices={newAccountChoices.hexaAccounts}
+                      selectedChoice={selectedChoice}
+                      onOptionSelected={handleChoiceSelection}
+                    />
+                  </View>
+                )
+              },
             },
-          },
-          {
-            kind: SectionKind.ADD_NEW_SERVICE_ACCOUNT,
-            data: [ newAccountChoices.serviceAccounts ],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <NewAccountOptionsSection
-                    choices={newAccountChoices.serviceAccounts}
-                    selectedChoice={selectedChoice}
-                    onOptionSelected={handleChoiceSelection}
-                  />
-                </View>
-              )
+            {
+              kind: SectionKind.ADD_NEW_SERVICE_ACCOUNT,
+              data: [ newAccountChoices.serviceAccounts ],
+              renderItem: () => {
+                return (
+                  <View style={styles.viewSectionContainer}>
+                    <NewAccountOptionsSection
+                      choices={newAccountChoices.serviceAccounts}
+                      selectedChoice={selectedChoice}
+                      onOptionSelected={handleChoiceSelection}
+                    />
+                  </View>
+                )
+              },
             },
-          },
-          {
-            kind: SectionKind.IMPORT_WALLET,
-            data: [ newAccountChoices.importedWalletAccounts ],
-            renderItem: () => {
-              return (
-                <View style={styles.viewSectionContainer}>
-                  <NewAccountOptionsSection
-                    choices={newAccountChoices.importedWalletAccounts}
-                    selectedChoice={selectedChoice}
-                    onOptionSelected={handleChoiceSelection}
-                  />
-                </View>
-              )
+            {
+              kind: SectionKind.IMPORT_WALLET,
+              data: [ newAccountChoices.importedWalletAccounts ],
+              renderItem: () => {
+                return (
+                  <View style={styles.viewSectionContainer}>
+                    <NewAccountOptionsSection
+                      choices={newAccountChoices.importedWalletAccounts}
+                      selectedChoice={selectedChoice}
+                      onOptionSelected={handleChoiceSelection}
+                    />
+                  </View>
+                )
+              },
             },
-          },
-        ]}
-        keyExtractor={sectionListItemKeyExtractor}
-        renderSectionHeader={renderSectionHeader}
-        stickySectionHeadersEnabled={false}
-      ></SectionList>
+          ]}
+          keyExtractor={sectionListItemKeyExtractor}
+          renderSectionHeader={renderSectionHeader}
+          stickySectionHeadersEnabled={false}
+        ></SectionList>
       </View>
     </SafeAreaView>
   )
