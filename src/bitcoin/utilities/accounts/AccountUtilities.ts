@@ -133,9 +133,11 @@ export default class AccountUtilities {
     return xKey
   };
 
-  static generateChildFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean ) => {
+  static generateChildFromExtendedKey = ( extendedKey: string, network:bitcoinJS.networks.Network, childIndex: number, internal: boolean, shouldNotDerive?: boolean ) => {
     const xKey = bip32.fromBase58( extendedKey, network )
-    const childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
+    let childXKey
+    if( shouldNotDerive ) childXKey = xKey.derive( childIndex )
+    else childXKey = xKey.derive( internal ? 1 : 0 ).derive( childIndex )
     return childXKey.toBase58()
   }
 
@@ -192,10 +194,7 @@ export default class AccountUtilities {
   } => {
 
     const pubkeys = Object.keys( xpubs ).map( ( xpubKey ) => {
-      let childExtendedKey
-      if( xpubKey === 'primary' ) childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, childIndex, internal )
-      else childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, 0, internal )
-
+      const childExtendedKey = AccountUtilities.generateChildFromExtendedKey( xpubs[ xpubKey ], network, childIndex, internal, xpubKey !== 'primary' )
       const xKey = bip32.fromBase58( childExtendedKey, network )
       const pub = xKey.publicKey.toString( 'hex' )
       return Buffer.from( pub, 'hex' )
@@ -235,7 +234,7 @@ export default class AccountUtilities {
           multiSig,
           primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, false ),
           secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, false )
+            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, false, true )
             : null,
           childIndex: itr,
         }
@@ -249,7 +248,7 @@ export default class AccountUtilities {
           multiSig,
           primaryPriv: AccountUtilities.generateChildFromExtendedKey( xprivs.primary, network, itr, true ),
           secondaryPriv: xprivs.secondary
-            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, true )
+            ? AccountUtilities.generateChildFromExtendedKey( xprivs.secondary, network, itr, true, true )
             : null,
           childIndex: itr,
           internal: true
@@ -946,9 +945,7 @@ export default class AccountUtilities {
     signedTxHex: string;
   }> => {
     let res: AxiosResponse
-    console.log( {
-      walletId, token, partiallySignedTxHex, childIndexArray
-    } )
+
     try {
       res = await SIGNING_AXIOS.post( 'secureHDTransaction', {
         HEXA_ID: config.HEXA_ID,
