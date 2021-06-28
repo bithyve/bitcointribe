@@ -1,4 +1,5 @@
 import config from '../../HexaConfig'
+import AccountUtilities from '../../utilities/accounts/AccountUtilities'
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
 import { ErrMap } from '../../utilities/ErrMap'
 import {
@@ -211,19 +212,6 @@ export default class SecureAccount {
       return {
         status: config.STATUS.SUCCESS,
         data: await this.secureHDWallet.validate2FASetup( token ),
-      }
-    } catch ( err ) {
-      return {
-        status: 301, err: err.message, message: ErrMap[ 301 ]
-      }
-    }
-  };
-
-  public setupSecureAccount2 = async () => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await this.secureHDWallet.setupSecureAccount2(),
       }
     } catch ( err ) {
       return {
@@ -452,13 +440,13 @@ export default class SecureAccount {
     },
   ): {
     paymentURI: string;
-  } => this.secureHDWallet.generatePaymentURI( address, options );
+  } => AccountUtilities.generatePaymentURI( address, options );
 
   public addressDiff = (
     scannedStr: string,
   ): {
       type: ScannedAddressKind | null
-  } => this.secureHDWallet.addressDiff( scannedStr );
+  } => AccountUtilities.addressDiff( scannedStr, this.secureHDWallet.network );
 
   public decodePaymentURI = (
     paymentURI: string,
@@ -469,10 +457,10 @@ export default class SecureAccount {
       label?: string;
       message?: string;
     };
-  } => this.secureHDWallet.decodePaymentURI( paymentURI );
+  } => AccountUtilities.decodePaymentURI( paymentURI );
 
   public isValidAddress = ( recipientAddress: string ): boolean =>
-    this.secureHDWallet.isValidAddress( recipientAddress );
+    AccountUtilities.isValidAddress( recipientAddress, this.secureHDWallet.network );
 
   public getReceivingAddress = (
     derivativeAccountType?: string,
@@ -1067,7 +1055,7 @@ export default class SecureAccount {
 
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
-      const { txid } = await this.secureHDWallet.broadcastTransaction( txHex )
+      const { txid } = await AccountUtilities.broadcastTransaction( txHex, this.secureHDWallet.network )
       if( txid ){
         // chip consumed utxos
         this.secureHDWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )
@@ -1195,8 +1183,4 @@ export default class SecureAccount {
   public deleteSecondaryMnemonics = () => {
     return this.secureHDWallet.deleteSecondaryMnemonics()
   };
-
-  // public getSecondaryMnemonics = () => {
-  //   return this.secureHDWallet.getSecondaryMnemonic()
-  // };
 }

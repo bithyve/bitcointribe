@@ -6,7 +6,6 @@ import {
   TWO_FA_RESETTED,
   AVERAGE_TX_FEE,
   ADD_NEW_ACCOUNT_SHELL,
-  NEW_ACCOUNT_SHELL_ADDED,
   NEW_ACCOUNT_ADD_FAILED,
   ADD_NEW_ACCOUNT_SHELL_COMPLETED,
   ACCOUNT_SETTINGS_UPDATED,
@@ -37,11 +36,10 @@ import {
   VALIDATE_TWO_FA,
   SET_SHOW_ALL_ACCOUNT,
   RESET_ACCOUNT_UPDATE_FLAG,
-  RESET_TWO_FA_LOADER
+  RESET_TWO_FA_LOADER,
+  NEW_ACCOUNT_SHELLS_ADDED,
+  UPDATE_ACCOUNTS
 } from '../actions/accounts'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import { SERVICES_ENRICHED } from '../actions/storage'
 import {
   REGULAR_ACCOUNT,
@@ -49,10 +47,11 @@ import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
-import { updateAccountShells } from '../utils/accountShellMapping'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
+import { Accounts } from '../../bitcoin/utilities/Interface'
+import { updateShells } from '../utils/accountShellMapping'
 
 export type AccountVars = {
   service: any;
@@ -67,6 +66,8 @@ export type AccountsState = {
   servicesEnriched: boolean;
   accountsSynched: boolean;
   testCoinsReceived: boolean,
+
+  accounts: Accounts,
   accountShells: AccountShell[];
 
   // TODO: Consider removing these in favor of just looking
@@ -103,12 +104,11 @@ export type AccountsState = {
   accountShellMergeSource: AccountShell | null;
   accountShellMergeDestination: AccountShell | null;
 
-  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-  currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
+  // currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
+  // currentRampSubAccount: ExternalServiceSubAccountInfo | null;
+  // currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
 
   refreshed: boolean;
-  accounts: any,
 
   receiveAddress: string| null;
   hasReceiveAddressSucceeded: boolean | null;
@@ -127,6 +127,8 @@ const initialState: AccountsState = {
   SECURE_ACCOUNT: ACCOUNT_VARS,
 
   averageTxFees: null,
+  accounts: {
+  },
   accountShells: [],
 
   twoFAHelpFlags: {
@@ -154,12 +156,11 @@ const initialState: AccountsState = {
   accountShellMergeSource: null,
   accountShellMergeDestination: null,
 
-  currentWyreSubAccount: null,
-  currentRampSubAccount: null,
-  currentSwanSubAccount: null,
+  // currentWyreSubAccount: null,
+  // currentRampSubAccount: null,
+  // currentSwanSubAccount: null,
 
   refreshed: false,
-  accounts: null,
 
   receiveAddress: null,
   hasReceiveAddressSucceeded: false,
@@ -194,7 +195,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
               service: action.payload.services[ SECURE_ACCOUNT ],
             },
             servicesEnriched: true,
-            accountShells: updateAccountShells( services, state.accountShells ),
+            // accountShells: updateAccountShells( services, state.accountShells ),
           }
 
       case ACCOUNTS_SYNCHED:
@@ -271,6 +272,16 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           averageTxFees: action.payload.averageTxFees,
         }
 
+      case UPDATE_ACCOUNTS:
+        return {
+          ...state,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
+          accountShells: updateShells( action.payload.accounts, state.accountShells )
+        }
+
       case ADD_NEW_ACCOUNT_SHELL:
         return {
           ...state,
@@ -279,47 +290,13 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           hasNewAccountShellGenerationFailed: false,
         }
 
-      case NEW_ACCOUNT_SHELL_ADDED:
-        // using temperory variable to assign wyre account
-        // need to add the default wyre account to account state
-        // for now there is only one wyre account created so the first one is added as default
-        // this will need to be modified later elsewhere to add default wyre account to state
-        let currentWyreSubAccount: ExternalServiceSubAccountInfo | null
-        let currentRampSubAccount: ExternalServiceSubAccountInfo | null
-        let currentSwanSubAccount: ExternalServiceSubAccountInfo | null
-        if (
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.WYRE
-        ) {
-          currentWyreSubAccount = action.payload.primarySubAccount
-        }
-        if (
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.SWAN
-        ) {
-          currentSwanSubAccount = action.payload.primarySubAccount
-        }
-        if (
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ) &&
-          ( action.payload.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind == ServiceAccountKind.RAMP
-        ) {
-          currentRampSubAccount = action.payload.primarySubAccount
-        }
-
+      case NEW_ACCOUNT_SHELLS_ADDED:
+        // TODO: restrict wyre/ramp/swan to single instance(disable add)
         return {
           ...state,
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
-          accountShells: state.accountShells.concat( action.payload ),
-          ...currentWyreSubAccount && {
-            currentWyreSubAccount
-          },
-          ...currentRampSubAccount && {
-            currentRampSubAccount
-          },
-          ...currentSwanSubAccount && {
-            currentSwanSubAccount
-          }
+          accountShells: state.accountShells.concat( ...action.payload ),
         }
 
       case NEW_ACCOUNT_ADD_FAILED:
@@ -462,7 +439,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
       case REMAP_ACCOUNT_SHELLS:
         return {
           ...state,
-          accountShells: updateAccountShells( action.payload.services, [] ),
+          // accountShells: updateAccountShells( action.payload.services, [] ),
         }
 
       case ACCOUNT_SHELL_REFRESH_STARTED:

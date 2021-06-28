@@ -11,7 +11,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Video from 'react-native-video'
 import Colors from '../common/Colors'
-
 import { initializeDB } from '../store/actions/storage'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
@@ -26,6 +25,7 @@ import { processDL } from '../common/CommonFunctions'
 import {
   getMessages,
 } from '../store/actions/notifications'
+import dbManager from '../storage/realm/dbManager'
 
 type LaunchScreenProps = {
   initializeDB: any;
@@ -48,6 +48,11 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   }
 
   componentDidMount = async() => {
+    try {
+      dbManager.initDb(  )
+    } catch ( error ) {
+      console.log( error )
+    }
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {

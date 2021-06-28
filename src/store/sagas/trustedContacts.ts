@@ -532,11 +532,6 @@ export const removeTrustedContactWatcher = createWatcher(
 )
 
 function* walletCheckInWorker( { payload } ) {
-  // syncs exchange and fee rates
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const { walletId } = regularAccount.hdWallet.getWalletId()
-
   const storedExchangeRates = yield select(
     ( state ) => state.accounts.exchangeRates,
   )
@@ -548,7 +543,6 @@ function* walletCheckInWorker( { payload } ) {
     const { currencyCode } = payload
     const res = yield call(
       RelayServices.walletCheckIn,
-      walletId,
       currencyCode
     )
 

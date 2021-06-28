@@ -18,11 +18,11 @@ import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
 import QRCode from 'react-native-qrcode-svg'
-
+import { authenticator } from 'otplib'
 
 const TwoFASetup = props => {
   const twoFASetup = props.navigation.getParam( 'twoFASetup' )
-  const { qrData, secret } = twoFASetup
+  const { twoFAKey } = twoFASetup
 
   return (
     <SafeAreaView style={{
@@ -63,8 +63,8 @@ const TwoFASetup = props => {
         </View>
       </View>
       <View style={NavStyles.modalContentView}>
-        <QRCode value={qrData} size={hp( '27%' )} />
-        <CopyThisText text={secret} />
+        <QRCode value={authenticator.keyuri( 'hexawallet.io', 'HEXA', twoFAKey )} size={hp( '27%' )} />
+        <CopyThisText text={twoFAKey} />
       </View>
       <View style={{
         margin: 20

@@ -14,9 +14,7 @@ import useSourceAccountShellForSending from '../../../utils/hooks/state-selector
 import SelectedRecipientsCarousel from './SelectedRecipientsCarousel'
 import SendConfirmationCurrentTotalHeader from '../../../components/send/SendConfirmationCurrentTotalHeader'
 import TransactionPriorityMenu from './TransactionPriorityMenu'
-import { executeAlternateSendStage2, executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
-import useExitKeyForSending from '../../../utils/hooks/state-selectors/sending/UseExitKeyForSending'
-import TransactionPriority from '../../../common/data/enums/TransactionPriority'
+import { executeSendStage2, resetSendStage1, sendTxNotification } from '../../../store/actions/sending'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import SendConfirmationContent from '../SendConfirmationContent'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
@@ -29,6 +27,7 @@ import BitcoinUnit from '../../../common/data/enums/BitcoinUnit'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
+import { TxPriority } from '../../../bitcoin/utilities/Interface'
 
 export type NavigationParams = {
 };
@@ -52,7 +51,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   const selectedRecipients = useSelectedRecipientsForSending()
   const sourceAccountShell = useSourceAccountShellForSending()
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
-  const usingExitKey = useExitKeyForSending()
   const sendingState = useSendingState()
   const formattedUnitText = useFormattedUnitText( {
     bitcoinUnit: BitcoinUnit.SATS,
@@ -61,7 +59,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
     return AccountShell.getSpendableBalance( sourceAccountShell )
   }, [ sourceAccountShell ] )
 
-  const [ transactionPriority, setTransactionPriority ] = useState( TransactionPriority.LOW )
+  const [ transactionPriority, setTransactionPriority ] = useState( TxPriority.LOW )
   const formattedAvailableBalanceAmountText = useFormattedAmountText( availableBalance )
 
   const sourceAccountHeadlineText = useMemo( () => {
@@ -147,17 +145,15 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
   [ presentBottomSheet, dismissBottomSheet ] )
 
   function handleConfirmationButtonPress() {
-    if( usingExitKey ){
-      dispatch( executeAlternateSendStage2( {
-        accountShellID: sourceAccountShell.id,
-        txnPriority: String( transactionPriority ),
-      } ) )
-    } else {
+    if( sourceAccountShell.primarySubAccount.isTFAEnabled )
+      navigation.navigate( 'OTPAuthentication', {
+        txnPriority: transactionPriority
+      } )
+    else
       dispatch( executeSendStage2( {
-        accountShellID: sourceAccountShell.id,
-        txnPriority: String( transactionPriority ),
+        accountShell: sourceAccountShell,
+        txnPriority: transactionPriority,
       } ) )
-    }
   }
 
   function handleBackButtonPress() {
@@ -176,8 +172,6 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       if ( txid ) {
         dispatch( sendTxNotification() )
         showSendSuccessBottomSheet()
-      } else {
-        navigation.navigate( 'OTPAuthentication' )
       }
     },
     onFailure: showSendFailureBottomSheet,
@@ -218,7 +212,7 @@ const AccountSendConfirmationContainerScreen: React.FC<Props> = ( { navigation }
       <SendConfirmationCurrentTotalHeader />
 
       <TransactionPriorityMenu
-        sourceSubAccount={sourcePrimarySubAccount}
+        accountShell={sourceAccountShell}
         bitcoinDisplayUnit={sourceAccountShell.unit}
         onTransactionPriorityChanged={setTransactionPriority}
       />
