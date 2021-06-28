@@ -18,6 +18,7 @@ import moment from 'moment'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { updateAccounts } from '../actions/accounts'
+import dbManager from '../../storage/realm/dbManager'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -168,11 +169,11 @@ function* executeSendStage2( { payload }: {payload: {
     yield put( updateAccounts( {
       accounts
     } ) )
-
     //TODO: save accounts object into realm
     const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
     tempDB.accounts[ account.id ] = account
     yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+    yield call( dbManager.updateAccount, account.id, account )
   } else
     yield put( sendStage2Executed( {
       successful: false,

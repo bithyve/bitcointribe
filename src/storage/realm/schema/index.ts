@@ -3,6 +3,7 @@ import {
   AccountSchema,
   TransactionSchema,
   UTXOSchema,
+  UTXOStatusSchema,
   Details2FASchema,
   BalancesSchema,
   Bip32Schema,
@@ -22,5 +23,6 @@ export default
   Bip32Schema,
   NetworkSchema,
   XPubSchema,
-  AccountIdSchema
+  AccountIdSchema,
+  UTXOStatusSchema
 ]
