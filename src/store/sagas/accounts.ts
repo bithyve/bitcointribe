@@ -703,12 +703,12 @@ export const updateDonationPreferencesWatcher = createWatcher(
 function* refreshAccountShellWorker( { payload } ) {
   const accountShell: AccountShell = payload.shell
   yield put( accountShellRefreshStarted( accountShell ) )
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+
+  const accounts: Accounts = accountState.accounts
   const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
-
-  // TODO: get accounts from the database(filtering by accountType and accountId)
-  const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-  const accounts: Accounts = tempDB.accounts
-
   const accountsToSync: Accounts = {
     [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
   }
@@ -723,13 +723,9 @@ function* refreshAccountShellWorker( { payload } ) {
     accounts: synchedAccounts
   } ) )
 
-  // TODO: insert into database
   Object.values( synchedAccounts ).forEach( ( synchedAcc: Account | MultiSigAccount )=> {
     accounts[ synchedAcc.id ] = synchedAcc
   } )
-
-  tempDB.accounts = accounts
-  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
 
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {
@@ -740,6 +736,10 @@ function* refreshAccountShellWorker( { payload } ) {
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
 
+  // TODO: insert into database
+  const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+  tempDB.accounts = accounts
+  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
 
   yield put( accountShellRefreshCompleted( accountShell ) )
 }
