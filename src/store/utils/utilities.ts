@@ -231,33 +231,23 @@ export const serviceGeneratorForNewBHR = async (
   }
 }
 
-export const initializeWallet = async (): Promise <{
+export const initializeWallet = async ( chosenAccounts ): Promise <{
   wallet: Wallet,
   accounts: Accounts,
   s3Service: S3Service,
   trustedContacts: TrustedContactsService
 }> => {
+  const { REGULAR_ACCOUNT, TEST_ACCOUNT, SECURE_ACCOUNT } = chosenAccounts
+  // Always assuming REGULAR_ACCOUNT to be always true
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
-  const secondaryMemonic = bip39.generateMnemonic( 256 )
-  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
-  const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
+
 
   const initInstanceNumber = 0
-  const testDerivationPath = 'm/49\'/1\'/0\''
-  const testAccount: Account = generateAccount( {
-    walletId,
-    type: AccountType.TEST_ACCOUNT,
-    instanceNum: initInstanceNumber,
-    accountName: 'Test Account',
-    accountDescription: 'Learn Bitcoin',
-    mnemonic: primaryMnemonic,
-    derivationPath: testDerivationPath,
-    networkType: NetworkType.TESTNET,
-  } )
-
   const rootDerivationPath = 'm/49\'/0\'/0\''
+  const testDerivationPath = 'm/49\'/1\'/0\''
+
   const checkingDerivationPath = rootDerivationPath
   const checkingAccount: Account = generateAccount( {
     walletId,
@@ -269,6 +259,80 @@ export const initializeWallet = async (): Promise <{
     derivationPath: checkingDerivationPath,
     networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
   } )
+
+  const wallet: Wallet = {
+    walletId,
+    secondaryMemonic: '',
+    details2FA: {
+    },
+    primaryMnemonic,
+    accounts: {
+      [ checkingDerivationPath ]: checkingAccount.id,
+    }
+  }
+
+  let accounts: Accounts = {
+    [ checkingAccount.id ]: checkingAccount,
+  }
+
+  if( SECURE_ACCOUNT ) {
+    console.log( 'initialising Secure Account ' )
+    const { secondaryXpub, bithyveXpub, twoFAKey, secondaryMemonic, savingsAccount, savingsDerivationPath } = await initializeSecondaryAccount( walletId, initInstanceNumber, primaryMnemonic, rootDerivationPath )
+    wallet.secondaryMemonic = secondaryMemonic
+    wallet.details2FA = {
+      secondaryXpub,
+      bithyveXpub,
+      twoFAKey
+    }
+    wallet.accounts = {
+      ...wallet.accounts,
+      [ savingsDerivationPath ]: savingsAccount.id
+    }
+    accounts = {
+      ...accounts,
+      [ savingsAccount.id ]: savingsAccount,
+    }
+  }
+
+
+
+  if( TEST_ACCOUNT ) {
+    const { testAccount } = await initializeTestAccount( walletId, initInstanceNumber, primaryMnemonic, testDerivationPath )
+    wallet.accounts = {
+      ...wallet.accounts,
+      [ testDerivationPath ]: testAccount.id,
+    }
+    accounts = {
+      ...accounts,
+      [ testAccount.id ]: testAccount,
+    }
+  }
+
+  // Share generation
+  const s3Service = new S3Service( primaryMnemonic )
+
+  // Trusted Contacts Service
+  const trustedContacts = new TrustedContactsService()
+  console.log( '***-> wallet, accounts ', wallet, accounts )
+  return {
+    wallet,
+    accounts,
+    s3Service,
+    trustedContacts,
+  }
+}
+
+const initializeSecondaryAccount = async ( walletId: string, initInstanceNumber: number, primaryMnemonic: string, rootDerivationPath: string  ): Promise <{
+  secondaryMemonic: string,
+  secondaryXpub: string,
+  bithyveXpub: string,
+  twoFAKey: string,
+  savingsAccount: MultiSigAccount,
+  savingsDerivationPath: string
+}> => {
+  const secondaryMemonic = bip39.generateMnemonic( 256 )
+  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
+  const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = await AccountUtilities.registerTwoFA( walletId, secondaryWalletId )
   const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
@@ -289,38 +353,31 @@ export const initializeWallet = async (): Promise <{
     networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
   } )
 
-  const wallet: Wallet = {
-    walletId,
-    primaryMnemonic,
-    secondaryMemonic,
-    details2FA: {
-      secondaryXpub,
-      bithyveXpub,
-      twoFAKey
-    },
-    accounts: {
-      [ testDerivationPath ]: testAccount.id,
-      [ checkingDerivationPath ]: checkingAccount.id,
-      [ savingsDerivationPath ]: savingsAccount.id
-    }
-  }
-
-  const accounts: Accounts = {
-    [ testAccount.id ]: testAccount,
-    [ checkingAccount.id ]: checkingAccount,
-    [ savingsAccount.id ]: savingsAccount,
-  }
-
-  // Share generation
-  const s3Service = new S3Service( primaryMnemonic )
-
-  // Trusted Contacts Service
-  const trustedContacts = new TrustedContactsService()
 
   return {
-    wallet,
-    accounts,
-    s3Service,
-    trustedContacts,
+    secondaryXpub, bithyveXpub, twoFAKey, secondaryMemonic, savingsAccount, savingsDerivationPath
+  }
+}
+
+
+
+const initializeTestAccount = async ( walletId: string, initInstanceNumber: number, primaryMnemonic: string, testDerivationPath: string  ): Promise <{
+  testAccount: Account,
+  testDerivationPath: string,
+}> => {
+
+  const testAccount: Account = generateAccount( {
+    walletId,
+    type: AccountType.TEST_ACCOUNT,
+    instanceNum: initInstanceNumber,
+    accountName: 'Test Account',
+    accountDescription: 'Learn Bitcoin',
+    mnemonic: primaryMnemonic,
+    derivationPath: testDerivationPath,
+    networkType: NetworkType.TESTNET,
+  } )
+
+  return {
+    testAccount, testDerivationPath
   }
 }

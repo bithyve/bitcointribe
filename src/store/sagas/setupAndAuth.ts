@@ -30,10 +30,10 @@ import dbManager from '../../storage/realm/dbManager'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security } = payload
+  const { walletName, security, chosenAccounts } = payload
 
   // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet )
+  const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet, chosenAccounts )
   // TODO: save wallet-instance in realm
   // console.log( 'wallet-instance in realm', wallet, accounts )
   yield call( dbManager.createWallet, wallet )

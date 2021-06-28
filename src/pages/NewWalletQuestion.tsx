@@ -189,6 +189,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ walletSetupCompleted, levelHealth ] )
 
   const checkCloudLogin = () =>{
+    const chosenAccounts = {
+      REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
+    }
     showLoader()
     requestAnimationFrame( () => {
       const security = {
@@ -196,7 +199,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         question: dropdownBoxValue.question,
         answer,
       }
-      dispatch( setupWallet( walletName, security ) )
+      dispatch( setupWallet( walletName, security, chosenAccounts ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()

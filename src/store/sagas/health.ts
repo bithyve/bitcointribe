@@ -198,7 +198,7 @@ function* generateMetaSharesWorker( { payload } ) {
     secondaryMnemonic: secondaryMnemonic,
     twoFASecret: '',
     secondaryXpub: '',
-    bhXpub: secureAccount.secureHDWallet.xpubs.bh,
+    bhXpub: secureAccount ? secureAccount.secureHDWallet.xpubs.bh : '',
   }
 
   let serviceCall = null
@@ -1990,7 +1990,7 @@ function* createChannelAssetsWorker( { payload } ) {
         },
         secondaryMnemonicShard: secondaryShare,
         keeperInfo: keeperInfo,
-        bhXpub: secureAccount.secureHDWallet.xpubs.bh,
+        bhXpub: secureAccount ? secureAccount.secureHDWallet.xpubs.bh : '',
         shareId
       }
       yield put( setChannelAssets( channelAssets ) )

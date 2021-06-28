@@ -105,6 +105,12 @@ function* cloudWorker( { payload } ) {
           reshareVersion: 0,
         },
       ]
+      let bhXpub = ''
+
+      if ( secureAccount && secureAccount.secureHDWallet && secureAccount.secureHDWallet.xpubs ) {
+        bhXpub = secureAccount.secureHDWallet.xpubs.bh
+
+      }
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
@@ -115,7 +121,7 @@ function* cloudWorker( { payload } ) {
         question: questionId === '0' ? question: '',
         regularAccount: regularAccount,
         keeperData: kpInfo ? JSON.stringify( kpInfo ) : JSON.stringify( keeperData ),
-        bhXpub: secureAccount.secureHDWallet.xpubs.bh,
+        bhXpub,
       }
 
       const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
