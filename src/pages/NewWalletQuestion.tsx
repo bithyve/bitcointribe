@@ -111,25 +111,39 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     question: '',
   } )
   const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
+  const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
   const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
     styles.inputBox,
   )
+  const [ confirmPswdInputStyle, setConfirmPswdInputStyle ] = useState(
+    styles.inputBox,
+  )
   const [ confirmAnswer, setConfirmAnswer ] = useState( '' )
+  const [ confirmPswd, setConfirmPswd ] = useState( '' )
   const [ answer, setAnswer ] = useState( '' )
   const [ answerMasked, setAnswerMasked ] = useState( '' )
   const [ confirmAnswerMasked, setConfirmAnswerMasked ] = useState( '' )
+  const [ pswd, setPswd ] = useState( '' )
+  const [ pswdMasked, setPswdMasked ] = useState( '' )
+  const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
+  const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
+  const [ hideShowPswd, setHideShowPswd ] = useState( true )
+
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
   const [ answerError, setAnswerError ] = useState( '' )
+  const [ pswdError, setPswdError ] = useState( '' )
   const [ tempAns, setTempAns ] = useState( '' )
+  const [ tempPswd, setTempPswd ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   // const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
+  const [ confirmPswdTextInput ] = useState( React.createRef() )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
   const [ securityQue, showSecurityQue ] = useState( false )
@@ -231,6 +245,23 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }
 
+  const handlePswdSubmit = () => {
+    setConfirmPswd( tempPswd )
+
+    if ( pswd && confirmPswd && confirmPswd != pswd ) {
+      setPswdError( 'Password do not match' )
+    } else if (
+      validateAllowedCharacters( pswd ) == false ||
+      validateAllowedCharacters( tempPswd ) == false
+    ) {
+      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+    } else {
+      setTimeout( () => {
+        setPswdError( '' )
+      }, 2 )
+    }
+  }
+
 
   useEffect( () => {
     if ( answer.trim() == confirmAnswer.trim() && answer && confirmAnswer && answerError.length == 0 ) {
@@ -249,21 +280,42 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ confirmAnswer ] )
 
+  useEffect( () => {
+    if ( pswd.trim() == confirmPswd.trim() && pswd && confirmPswd && pswdError.length == 0 ) {
+      setVisibleButton( true )
+    } else {
+      setVisibleButton( false )
+
+      if ( pswd && confirmPswd && confirmPswd != pswd ) {
+        setPswdError( 'Password do not match' )
+      } else if (
+        validateAllowedCharacters( pswd ) == false ||
+        validateAllowedCharacters( confirmPswd ) == false
+      ) {
+        setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+      }
+    }
+  }, [ confirmPswd ] )
+
 
 
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
         onPress={async () => {
-          checkCloudLogin()
-          showSecurityQue( false )
+          if ( activeIndex === 0 ) {
+            checkCloudLogin()
+            showSecurityQue( false )
+          } else {
+            showEncryptionPswd( false )
+          }
         }}
         style={{
           ...styles.buttonView, elevation: Elevation
         }}
       >
         {/* {!loading.initializing ? ( */}
-        <Text style={styles.buttonText}>Confirm</Text>
+        <Text style={styles.buttonText}>Proceed</Text>
         {/* ) : (
           <ActivityIndicator size="small" />
         )} */}
@@ -327,8 +379,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const confirmAction = () => {
     if ( activeIndex === 0 ) {
       showSecurityQue( true )
+      setAnswer( '' )
+      setConfirmAnswer( '' )
     } else {
       showEncryptionPswd( true )
+      setTempPswd( '' )
+      setConfirmPswdMasked( '' )
+      setPswd( '' )
+      setPswdMasked( '' )
     }
   }
 
@@ -375,9 +433,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           >
             <TextInput
               style={styles.modalInputBox}
-              placeholder={'Enter your answer'}
+              placeholder={'Enter your password'}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowAnswer ? answerMasked : answer}
+              value={hideShowPswd ? pswdMasked : pswd}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
@@ -385,7 +443,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               editable={isEditable}
               autoCapitalize="none"
               onSubmitEditing={() =>
-                ( confirmAnswerTextInput as any ).current.focus()
+                ( confirmPswdTextInput as any ).current.focus()
               }
               keyboardType={
                 Platform.OS == 'ios'
@@ -393,34 +451,34 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setAnswer( text )
-                setAnswerMasked( text )
+                setPswd( text )
+                setPswdMasked( text )
               }}
               onFocus={() => {
                 setShowNote( false )
                 setDropdownBoxOpenClose( false )
-                setAnswerInputStyle( styles.inputBoxFocused )
-                if ( answer.length > 0 ) {
-                  setAnswer( '' )
-                  setAnswerMasked( '' )
+                setPswdInputStyle( styles.inputBoxFocused )
+                if ( pswd.length > 0 ) {
+                  setPswd( '' )
+                  setPswdMasked( '' )
                 }
               }}
               onBlur={() => {
                 setShowNote( true )
-                setAnswerInputStyle( styles.inputBox )
+                setPswdInputStyle( styles.inputBox )
                 setDropdownBoxOpenClose( false )
                 let temp = ''
-                for ( let i = 0; i < answer.length; i++ ) {
+                for ( let i = 0; i < pswd.length; i++ ) {
                   temp += '*'
                 }
-                setAnswerMasked( temp )
-                handleSubmit()
+                setPswdMasked( temp )
+                handlePswdSubmit()
               }}
             />
-            {answer ? (
+            {pswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  setHdeShowAnswer( !hideShowAnswer )
+                  setHideShowPswd( !hideShowPswd )
                 }}
               >
                 <Feather
@@ -429,7 +487,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   }}
                   size={15}
                   color={Colors.blue}
-                  name={hideShowAnswer ? 'eye-off' : 'eye'}
+                  name={hideShowPswd ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
             ) : null}
@@ -440,58 +498,62 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: answerError ? Colors.red : Colors.borderColor,
+              borderColor: pswdError ? Colors.red : Colors.borderColor,
               marginVertical: 20
             }}
           >
             <TextInput
               style={styles.modalInputBox}
-              placeholder={'Enter your answer'}
+              ref={confirmPswdTextInput}
+              placeholder={'Confirm your password'}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowAnswer ? answerMasked : answer}
+              value={hideShowConfirmPswd ? confirmPswdMasked : tempPswd}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
               autoCorrect={false}
               editable={isEditable}
               autoCapitalize="none"
-              onSubmitEditing={() =>
-                ( confirmAnswerTextInput as any ).current.focus()
-              }
+              onSubmitEditing={handlePswdSubmit}
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setAnswer( text )
-                setAnswerMasked( text )
+                setTempPswd( text )
+                setConfirmPswdMasked( text )
               }}
               onFocus={() => {
                 setShowNote( false )
                 setDropdownBoxOpenClose( false )
-                setAnswerInputStyle( styles.inputBoxFocused )
-                if ( answer.length > 0 ) {
-                  setAnswer( '' )
-                  setAnswerMasked( '' )
+                setConfirmPswdInputStyle( styles.inputBoxFocused )
+                if ( tempPswd.length > 0 ) {
+                  // setTempPswd( '' )
+                  // setPswdMasked( '' )
+                  setTempPswd( '' )
+                  setPswdError( '' )
+                  setConfirmPswd( '' )
+                  setConfirmPswdMasked( '' )
                 }
               }}
               onBlur={() => {
                 setShowNote( true )
-                setAnswerInputStyle( styles.inputBox )
+                setConfirmPswdInputStyle( styles.inputBox )
                 setDropdownBoxOpenClose( false )
                 let temp = ''
-                for ( let i = 0; i < answer.length; i++ ) {
+                for ( let i = 0; i < tempPswd.length; i++ ) {
                   temp += '*'
                 }
-                setAnswerMasked( temp )
-                handleSubmit()
+                setConfirmPswdMasked( temp )
+                handlePswdSubmit()
               }}
             />
-            {answer ? (
+            {tempPswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  setHdeShowAnswer( !hideShowAnswer )
+                  setHideShowConfirmPswd( !hideShowConfirmAnswer )
+                  setDropdownBoxOpenClose( false )
                 }}
               >
                 <Feather
@@ -500,28 +562,51 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   }}
                   size={15}
                   color={Colors.blue}
-                  name={hideShowAnswer ? 'eye-off' : 'eye'}
+                  name={hideShowConfirmPswd ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-          {showNote ? <View style={{
-            ...styles.bottomButtonView,
-          }}>
-            {(
-              answer.trim() === confirmAnswer.trim() &&
-            confirmAnswer.trim() &&
-            answer.trim() && answerError.length === 0
-            ) && (
-              setButtonVisible()
-            ) || null}
-            <View style={styles.statusIndicatorView}>
-              <View style={styles.statusIndicatorInactiveView} />
-              <View style={styles.statusIndicatorActiveView} />
-            </View>
-          </View> : null}
-        </View>
 
+          {/* {pswdError.length == 0 && (
+            <Text style={styles.helpText}>
+              Password must only contain lowercase characters (a-z) and digits (0-9).
+            </Text>
+          )} */}
+        </View>
+        <View
+          style={{
+            marginLeft: 20,
+            marginRight: 20,
+            flexDirection: 'row',
+          }}
+        >
+          <Text
+            style={{
+              color: Colors.red,
+              fontFamily: Fonts.FiraSansMediumItalic,
+              fontSize: RFValue( 10 ),
+              marginLeft: 'auto',
+            }}
+          >
+            {pswdError}
+          </Text>
+        </View>
+        {showNote ? <View style={{
+          ...styles.bottomButtonView,
+        }}>
+          {(
+            pswd.trim() === confirmPswd.trim() &&
+            confirmPswd.trim() &&
+            pswd.trim() && pswdError.length === 0
+          ) && (
+            setButtonVisible()
+          ) || null}
+          <View style={styles.statusIndicatorView}>
+            <View style={styles.statusIndicatorInactiveView} />
+            <View style={styles.statusIndicatorActiveView} />
+          </View>
+        </View> : null}
       </ScrollView>
     )
   }
@@ -815,7 +900,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </Text>
           </View>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               flexDirection: 'row',
               marginLeft: 25,
@@ -845,7 +930,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             >
         Or choose your own question
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
         {showNote ? <View style={{
           ...styles.bottomButtonView,
@@ -868,7 +953,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   return (
     <View style={{
-      flex: 1
+      flex: 1,
+      backgroundColor: Colors.backgroundColor1
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView style={{
@@ -880,7 +966,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           flex: 1,
           backgroundColor: Colors.backgroundColor1
         }}>
-          <View style={CommonStyles.headerContainer}>
+          <View style={[ CommonStyles.headerContainer, {
+            backgroundColor: Colors.backgroundColor1
+          } ]}>
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {

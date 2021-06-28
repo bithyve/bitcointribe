@@ -48,7 +48,9 @@ export enum BottomSheetState {
 }
 
 export default function NewWalletName( props ) {
-
+  // const [ timerArray, setTimerArray ] = useState( [ 1, 1, 1 ] )
+  // const [ timeLeft, setTimeLeft ] = useState( null )
+  // const [ intervalRef, setIntervalRef ] = useState( null )
   const [ walletName, setWalletName ] = useState( '' )
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
@@ -57,6 +59,27 @@ export default function NewWalletName( props ) {
   const bottomSheetRef = createRef<BottomSheet>()
   const dispatch = useDispatch()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
+
+  // useEffect( () => {
+  //   if( timeLeft===0 ){
+  //     props.autoClose()
+  //     setTimeLeft( null )
+  //   }
+  //   if ( !timeLeft ) return
+  //   const intervalId = setInterval( () => {
+  //     setTimeLeft( timeLeft - 1 )
+  //     if( timeLeft - 1 == 2 ){ setTimerArray( [ 1, 1, 0 ] )
+  //     } else if( timeLeft - 1 == 1 ){
+  //       setTimerArray( [ 1, 0, 0 ] )
+  //     }
+  //     else if( timeLeft - 1 == 0 ){
+  //       setTimerArray( [ 0, 0, 0 ] )
+  //     }
+  //   }, 1000 )
+  //   console.log( 'timeLeft', timeLeft )
+  //   setIntervalRef( intervalId )
+  //   return () => { clearInterval( intervalId ) }
+  // }, [ timeLeft ] )
 
   const renderBottomSheetContent = () =>{
 
