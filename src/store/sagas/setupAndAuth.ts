@@ -19,7 +19,7 @@ import {
   initializeRecoveryCompleted,
   completedWalletSetup,
 } from '../actions/setupAndAuth'
-import { keyFetched, fetchFromDB } from '../actions/storage'
+import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
@@ -45,6 +45,9 @@ function* setupWalletWorker( { payload } ) {
 
   yield put( updateAccounts( {
     accounts,
+  } ) )
+  yield put( updateWallet( {
+    wallet
   } ) )
 
   const initialDatabase: Database = {
