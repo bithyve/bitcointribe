@@ -146,14 +146,10 @@ interface HomePropsTypes {
   messages: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
+  from: string;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
-  focusListener: any;
-  appStateListener: any;
-  firebaseNotificationListener: any;
-  notificationOpenedListener: any;
-
   bottomSheetRef = createRef<BottomSheet>();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
 
@@ -161,8 +157,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-    this.focusListener = null
-    this.appStateListener = null
+    console.log( '>>>>>', this.props.from )
     this.openBottomSheetOnLaunchTimeout = null
 
     this.state = {
@@ -495,7 +490,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   notificationCheck = () =>{
     const { messages } = this.props
-    console.log( 'messages inside notificationCheck', messages )
     if( messages.length ){
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
@@ -583,18 +577,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
-
-    if ( typeof this.appStateListener === 'function' ) {
-      AppState.removeEventListener( 'change', this.appStateListener )
-    }
 
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    if ( this.firebaseNotificationListener ) {
-      this.firebaseNotificationListener()
-    }
   }
 
   componentWillUnmount() {
@@ -611,19 +595,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   setUpFocusListener = () => {
-    const t0 = performance.now()
-    const { navigation } = this.props
-
-    this.focusListener = navigation.addListener( 'didFocus', () => {
-
-      // this.setCurrencyCodeFromAsync()
-      // this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
-      // this.notificationCheck()
-    } )
     this.notificationCheck()
     this.setCurrencyCodeFromAsync()
-    const t1 = performance.now()
-    console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
 
@@ -816,7 +789,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
-    console.log( 'notificationData', notificationData )
+    console.log( 'notificationData this.props.from >>>> ', this.props.from )
     const {
       navigation,
       exchangeRates,

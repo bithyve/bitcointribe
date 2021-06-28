@@ -788,7 +788,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
       }
-      this.calculateNetBalance()
+      // this.calculateNetBalance()
 
       if( newBHRFlowStarted === true )
       {

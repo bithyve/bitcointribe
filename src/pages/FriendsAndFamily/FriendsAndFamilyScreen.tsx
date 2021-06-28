@@ -386,10 +386,13 @@ class FriendsAndFamilyScreen extends PureComponent<
                   ...styles.selectedContactsView,
                 }}
               >
-                <Image
+                <Text style={[ styles.contactText, {
+                  fontSize: RFValue( 20 ), padding: wp( 0 )
+                } ]}>+</Text>
+                {/* <Image
                   style={styles.addGrayImage}
                   source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                />
+                /> */}
                 <View>
                   <Text style={styles.contactText}>Add New</Text>
                 </View>
@@ -595,6 +598,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     color: Colors.white,
+    // padding: wp( 2 )
   },
   phoneText: {
     marginTop: 3,
@@ -614,8 +618,10 @@ const styles = StyleSheet.create( {
     // paddingTop: 15,
     // borderBottomWidth: 1,
     // borderColor: Colors.borderColor,
-    backgroundColor: Colors.blue,
-    borderRadius: wp ( 2 )
+    backgroundColor: Colors.lightBlue,
+    borderRadius: wp ( 2 ),
+    // width: wp( 22 )
+    padding: wp( 1 )
   },
   pageTitle: {
     color: Colors.blue,

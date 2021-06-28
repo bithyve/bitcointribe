@@ -23,81 +23,22 @@ import TrustedContacts from '../pages/ManageBackup/TrustedContacts'
 import WalletNameRecovery from '../pages/Recovery/WalletNameRecovery'
 import RecoveryQuestionScreen from '../pages/Recovery/RecoveryQuestionScreen'
 import RecoveryCommunication from '../pages/Recovery/RecoveryCommunication'
-import ReceivingAddress from '../pages/Accounts/ReceivingAddress'
 import QRScannerScreen from '../pages/QRScannerScreen'
-import HealthCheck from '../pages/HealthCheck'
-import SecondaryDeviceHealthCheck from '../pages/HealthCheck/SecondaryDeviceHealthCheck'
-import TrustedContactHealthCheck from '../pages/HealthCheck/TrustedContactHealthCheck'
-import NoteHealthCheck from '../pages/HealthCheck/NoteHealthCheck'
-import CloudHealthCheck from '../pages/HealthCheck/CloudHealthCheck'
-import SweepFundsFromExistingAccount from '../pages/RegenerateShare/SweepFundsFromExistingAccount'
-import NewWalletNameRegenerateShare from '../pages/RegenerateShare/NewWalletNameRegenerateShare'
-import NewWalletQuestionRegenerateShare from '../pages/RegenerateShare/NewWalletQuestionRegenerateShare'
-import NewWalletGenerationOTP from '../pages/RegenerateShare/NewWalletGenerationOTP'
-import WalletCreationSuccess from '../pages/RegenerateShare/WalletCreationSuccess'
-import SecureScan from '../pages/Accounts/SecureScan'
-import GoogleAuthenticatorOTP from '../pages/Accounts/GoogleAuthenticatorOTP'
-import TwoFASetup from '../pages/Accounts/TwoFASetup'
-import SecondaryDeviceHistory from '../pages/ManageBackup/SecondaryDeviceHistory'
-import SecondaryDeviceHistoryNewBHR from '../pages/NewBHR/SecondaryDeviceHistoryNewBHR'
-import TrustedContactHistory from '../pages/ManageBackup/TrustedContactHistory'
-import PersonalCopyHistory from '../pages/ManageBackup/PersonalCopyHistory'
-import SecurityQuestionHistory from '../pages/ManageBackup/SecurityQuestionHistory'
-import SettingGetNewPin from '../pages/SettingGetNewPin'
-import ContactsListForAssociateContact from '../pages/CustodianRequest/ContactsListForAssociateContact'
-import NewTwoFASecret from '../pages/Accounts/NewTwoFASecret'
-import TwoFASweepFunds from '../pages/Accounts/TwoFASweepFunds'
 import UpdateApp from '../pages/UpdateApp'
-import SendRequest from '../pages/Contacts/SendRequest'
-import VoucherScanner from '../pages/FastBitcoin/VoucherScanner'
-import AddContactSendRequest from '../pages/Contacts/AddContactSendRequest'
-import ContactDetails from '../pages/Contacts/ContactDetails'
-import Receive from '../pages/Accounts/Receive'
-import PairNewWallet from '../pages/FastBitcoin/PairNewWallet'
-import Intermediate from '../pages/Intermediate'
 import NewOwnQuestions from '../pages/NewOwnQuestions'
 import NewRecoveryOwnQuestions from '../pages/Recovery/NewRecoveryOwnQuestions'
 import HomeStack from './stacks/home/HomeStack'
 import FriendsAndFamily from './stacks/F&F/F&FStack'
-import SendStack from './stacks/send/SendStack'
 import Colors from '../common/Colors'
-import AccountDetailsStack from './stacks/accounts/AccountDetailsStack'
-import WyreIntegrationScreen from '../pages/WyreIntegration/WyreIntegrationScreen'
 
 
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
-import RestoreWithoutICloud from '../pages/RestoreHexaWithKeeper/RestoreWithoutICloud'
-import SettingsContents from '../pages/SettingsContents'
-import SweepFunds from '../pages/SweepFunds/SweepFunds'
-import SweepFundsEnterAmount from '../pages/SweepFunds/SweepFundsEnterAmount'
-import SweepFundUseExitKey from '../pages/SweepFunds/SweepFundUseExitKey'
-import SweepConfirmation from '../pages/SweepFunds/SweepConfirmation'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
-import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup'
-import ConfirmKeys from '../pages/UpgradeBackupWithKeeper/ConfirmKeys'
-import ManageBackupUpgradeSecurity from '../pages/UpgradeBackupWithKeeper/ManageBackupUpgradeSecurity'
-// import ManageBackupKeeper from '../pages/Keeper/ManageBackup';
-import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR'
-// import SecurityQuestionHistoryKeeper from '../pages/Keeper/SecurityQuestionHistory';
-import SecurityQuestionHistoryNewBHR from '../pages/NewBHR/SecurityQuestionHistory'
-// import KeeperFeatures from "../pages/Keeper/KeeperFeatures";
-// import TrustedContactHistoryKeeper from '../pages/Keeper/TrustedContactHistoryKeeper';
-import TrustedContactHistoryNewBHR from '../pages/NewBHR/TrustedContactHistoryKeeper'
-// import KeeperDeviceHistory from '../pages/Keeper/KeeperDeviceHistory';
-// import PersonalCopyHistoryKeeper from '../pages/Keeper/PersonalCopyHistory';
-import PersonalCopyHistoryNewBHR from '../pages/NewBHR/PersonalCopyHistory'
-import CloudBackupHistory from '../pages/NewBHR/CloudBackupHistory'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
-// import Bottomtab from './Bottomtab'
-// import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs'
-// import TabNavigator from './TabNavigator'
-// import { BottomTab } from '../components/home/custom-bottom-tabs'
-import Boottomtab from './Bottomtab'
 import { Text, View, Image } from 'react-native'
 import {
   heightPercentageToDP as hp,
-  widthPercentageToDP as dp,
+  widthPercentageToDP as wp,
   widthPercentageToDP,
 } from 'react-native-responsive-screen'
 import Svg, { G, Path, Defs } from 'react-native-svg'
@@ -564,7 +505,7 @@ const Bottomtab = createBottomTabNavigator(
     initialRouteName: 'Home',
     // swipeEnabled: false,
     // animationEnabled: false,
-    lazy: false,
+    // lazy: false,
     tabBarOptions: {
       showLabel: false,
       style: {

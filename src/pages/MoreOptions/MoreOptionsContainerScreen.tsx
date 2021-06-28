@@ -26,24 +26,24 @@ interface MenuOption {
   imageSource: ImageSourcePropType;
   screenName?: string;
   onOptionPressed?: () => void;
-  isSwitch: boolean;
+  // isSwitch: boolean;
 }
 
 const menuOptions: MenuOption[] = [
-  {
-    title: 'Use FaceId',
-    imageSource: require( '../../assets/images/icons/addressbook.png' ),
-    subtitle: 'Unlock your wallet using FaceId',
-    // screenName: 'FriendsAndFamily',
-    isSwitch: true
-  },
-  {
-    title: 'Dark Mode',
-    imageSource: require( '../../assets/images/icons/addressbook.png' ),
-    subtitle: 'Use dark Mode on your wallet',
-    // screenName: 'FriendsAndFamily',
-    isSwitch: true
-  },
+  // {
+  //   title: 'Use FaceId',
+  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+  //   subtitle: 'Unlock your wallet using FaceId',
+  //   // screenName: 'FriendsAndFamily',
+  //   isSwitch: true
+  // },
+  // {
+  //   title: 'Dark Mode',
+  //   imageSource: require( '../../assets/images/icons/addressbook.png' ),
+  //   subtitle: 'Use dark Mode on your wallet',
+  //   // screenName: 'FriendsAndFamily',
+  //   isSwitch: true
+  // },
   {
     title: 'Account Management',
     imageSource: require( '../../assets/images/icons/icon_account_management.png' ),
@@ -64,7 +64,7 @@ const menuOptions: MenuOption[] = [
   {
     title: 'Node Settings',
     imageSource: require( '../../assets/images/icons/own-node.png' ),
-    subtitle: 'Connect Hexa wallet to your own Bitcoin node',
+    subtitle: 'Connect Hexa wallet to your own node',
     screenName: 'NodeSettings',
   },
   /*
@@ -93,7 +93,7 @@ const menuOptions: MenuOption[] = [
   {
     title: 'Wallet Settings',
     imageSource: require( '../../assets/images/icons/settings.png' ),
-    subtitle: 'Wallet setting and preferences',
+    subtitle: 'Your wallet settings & preferences',
     screenName: 'WalletSettings',
   },
 ]
@@ -137,7 +137,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
       }}
     >
       <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-      <Header />
+      <Header from={'More'} />
       <View style={styles.accountCardsSectionContainer}>
         <ScrollView>
           <Text style={{
@@ -146,9 +146,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             marginLeft: 2,
             fontFamily: Fonts.FiraSansMedium,
             paddingTop: widthPercentageToDP( 8 ),
-            paddingLeft: widthPercentageToDP( 8 )
+            paddingLeft: widthPercentageToDP( 8 ),
+            paddingBottom: heightPercentageToDP( 3 )
           }}>
-            Settings & More,
+            Settings & More
           </Text>
           {/* <View style={{
             flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', margin: 15
@@ -183,13 +184,13 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
           <FlatList
             data={menuOptions}
             keyExtractor={listItemKeyExtractor}
-            ItemSeparatorComponent={() => (
-              <View style={{
-                backgroundColor: Colors.white
-              }}>
-                <View style={styles.separatorView} />
-              </View>
-            )}
+            // ItemSeparatorComponent={() => (
+            //   <View style={{
+            //     backgroundColor: Colors.white
+            //   }}>
+            //     <View style={styles.separatorView} />
+            //   </View>
+            // )}
             renderItem={( { item: menuOption }: { item: MenuOption } ) => {
               return <AppBottomSheetTouchableWrapper
                 onPress={() => handleOptionSelection( menuOption )}
@@ -197,7 +198,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               >
                 <View style={styles.modalElementInfoView}>
                   <View style={{
-                    justifyContent: 'center'
+                    justifyContent: 'center',
                   }}>
                     <Image
                       source={menuOption.imageSource}
@@ -209,10 +210,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   <View style={{
                     justifyContent: 'center', marginLeft: 10
                   }}>
-                    <Text style={styles.addModalTitleText}>{menuOption.title} </Text>
+                    <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
                     <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
                   </View>
-                  {menuOption.isSwitch &&
+                  {/* {menuOption.isSwitch &&
                 <View style={{
                   alignItems: 'flex-end',
                   marginLeft: 'auto'
@@ -227,8 +228,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                     onTintColor={Colors.blue}
                   />
                 </View>
-                  }
+                  } */}
                 </View>
+                <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+                  style={{
+                    width: widthPercentageToDP( '2%' ),
+                    height: widthPercentageToDP( '2%' ),
+                    alignSelf: 'center'
+                  }}
+                />
+
               </AppBottomSheetTouchableWrapper>
             }}
           />
@@ -240,9 +249,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                   alert( 'Make sure Telegram installed on your device' )
                 } )
             }}
+            // style={styles.addModalView}
             style={{
-              flexDirection: 'row', margin: 15
-            }}>
+              flex: 1,
+              flexDirection: 'row',
+              width: '90%',
+              alignSelf: 'center',
+              borderRadius: widthPercentageToDP( '2' ),
+              backgroundColor: Colors.white,
+              paddingVertical: heightPercentageToDP( 2 ),
+              paddingHorizontal: widthPercentageToDP( 4 ),
+              marginTop: heightPercentageToDP( '10%' )
+            }}
+          >
             <Image
               source={require( '../../assets/images/icons/telegram.png' )}
               style={{
@@ -254,10 +273,49 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               marginLeft: 10
             }}>
               <Text style={styles.addModalTitleText}>
-          Telegram Support Group
+              App Info
               </Text>
               <Text style={styles.addModalInfoText}>
-        Lorem ipsum dolor sit amet, consectetur
+              Questions, feedback and more
+              </Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              Linking.openURL( 'https://t.me/HexaWallet' )
+                .then( ( _data ) => { } )
+                .catch( ( _error ) => {
+                  alert( 'Make sure Telegram installed on your device' )
+                } )
+            }}
+            // style={styles.addModalView}
+            style={{
+              flex: 1,
+              flexDirection: 'row',
+              width: '90%',
+              alignSelf: 'center',
+              borderRadius: widthPercentageToDP( '2' ),
+              backgroundColor: Colors.white,
+              paddingVertical: heightPercentageToDP( 2 ),
+              paddingHorizontal: widthPercentageToDP( 4 ),
+              marginTop: heightPercentageToDP( '1%' )
+            }}
+          >
+            <Image
+              source={require( '../../assets/images/icons/telegram.png' )}
+              style={{
+                width: widthPercentageToDP( 8 ),
+                height: widthPercentageToDP( 8 ),
+              }}
+            />
+            <View style={{
+              marginLeft: 10
+            }}>
+              <Text style={styles.addModalTitleText}>
+              Hexa Community Telegram Group
+              </Text>
+              <Text style={styles.addModalInfoText}>
+              Questions, feedback and more
               </Text>
             </View>
           </TouchableOpacity>
@@ -332,10 +390,15 @@ const styles = StyleSheet.create( {
   addModalView: {
     backgroundColor: Colors.white,
     paddingVertical: 4,
-    paddingHorizontal: 24,
+    paddingHorizontal: 18,
     flexDirection: 'row',
     display: 'flex',
     justifyContent: 'space-between',
+    width: '90%',
+    alignSelf: 'center',
+    borderRadius: widthPercentageToDP( '2' ),
+
+    marginBottom: heightPercentageToDP( '1' )
   },
 
   addModalTitleText: {
@@ -353,7 +416,7 @@ const styles = StyleSheet.create( {
 
   modalElementInfoView: {
     flex: 1,
-    margin: 10,
+    marginVertical: 10,
     height: heightPercentageToDP( '5%' ),
     flexDirection: 'row',
     // justifyContent: 'center',
