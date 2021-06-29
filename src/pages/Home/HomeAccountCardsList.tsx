@@ -72,52 +72,18 @@ const HomeAccountCardsList: React.FC<Props> = ( {
     // onEditModeChanged(true);
   }
 
-  const EditModeBottomSheetBackground = () => {
-    return (
-      <BottomSheetBackground isVisible onPress={() => {
-        onEditModeChanged( false )
-        dismiss()
-      }} />
-    )
-  }
-
-  const EmptyView: React.FC = () => {
-    return <View />
-  }
-
-  // const showEditModeBottomSheet = useCallback( () => {
-  //   present(
-  //     <View style={containerStyle}>
-  //       <EditModeBottomSheetHeader />
-
-  //       <View style={styles.editModeBottomSheetContentContainer}>
-  //         <HomeAccountCardsDraggableList
-  //           accountShells={accountShells}
-  //           onDragEnded={handleAccountReordering}
-  //         />
-  //       </View>
-  //     </View>,
-  //     {
-  //       ...defaultBottomSheetConfigs,
-  //       snapPoints: [ 0, '68%' ],
-  //       overlayComponent: EditModeBottomSheetBackground,
-  //       handleComponent: EmptyView,
-  //     },
-  //   )
-  // }, [ present, dismiss ] )
-
 
   return (
     // <View style={containerStyle}>
-      <HomeAccountCardsGrid
-        currentLevel={currentLevel}
-        accountShells={accountShells}
-        onCardLongPressed={handleGridCardLongPress}
-        onAccountSelected={onCardSelected}
-        onAddNewSelected={onAddNewSelected}
-        contentContainerStyle={contentContainerStyle}
-        showAllAccount={showAllAccount}
-      />
+    <HomeAccountCardsGrid
+      currentLevel={currentLevel}
+      accountShells={accountShells}
+      onCardLongPressed={handleGridCardLongPress}
+      onAccountSelected={onCardSelected}
+      onAddNewSelected={onAddNewSelected}
+      contentContainerStyle={contentContainerStyle}
+      showAllAccount={showAllAccount}
+    />
     // </View>
   )
 }

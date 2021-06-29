@@ -786,13 +786,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
       }
-      this.calculateNetBalance()
+      // this.calculateNetBalance()
 
       if( newBHRFlowStarted === true )
       {
         const { healthCheckInitializedKeeper } = s3Service.levelhealth
         if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
-          console.log( 'initializeHealthSetup', initializeHealthSetup )
           initializeHealthSetup()
         }
       }
@@ -824,7 +823,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   notificationCheck = () =>{
     const { messages } = this.props
-    console.log( 'messages inside notificationCheck', messages )
     if( messages && messages.length ){
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
@@ -951,7 +949,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
     const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
     const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
-    console.log( 'trustedContactRequest', trustedContactRequest )
     if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
@@ -1282,23 +1279,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  calculateNetBalance = () => {
-    const { accountShells } = this.props.accountsState
-
-    let totalBalance = 0
-    accountShells.forEach( ( accountShell: AccountShell ) => {
-      if (
-        accountShell.primarySubAccount.sourceKind !==
-        SourceAccountKind.TEST_ACCOUNT
-      )
-        totalBalance += AccountShell.getTotalBalance( accountShell )
-    } )
-
-    this.setState( {
-      netBalance: totalBalance,
-    } )
-  };
-
   onTrustedContactRequestAccepted = ( key ) => {
     this.closeBottomSheet()
     const { navigation } = this.props
@@ -1328,23 +1308,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onPhoneNumberChange = () => {};
 
-  handleBottomTabSelection = ( tab: BottomTab ) => {
-    this.setState( {
-      selectedBottomTab: tab,
-    } )
-
-    // if ( tab === BottomTab.Transactions ) {
-    //   this.props.navigation.navigate( 'AllTransactions' )
-    // } else if ( tab === BottomTab.More ) {
-    //   this.props.navigation.navigate( 'MoreOptions' )
-    // } else if ( tab === BottomTab.QR ) {
-    //   this.props.navigation.navigate( 'QRScanner', {
-    //     onCodeScanned: this.processQRData,
-    //   } )
-    // } else if ( tab === BottomTab.FriendsAndFamily ) {
-    //   this.props.navigation.navigate( 'FriendsAndFamily' )
-    // }
-  };
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
     switch ( menuItem.kind ) {
@@ -1585,17 +1548,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
     console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_BUY_MENU:
-          return (
-            <>
-              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
-                // onPress={this.closeBottomSheet}
-              />
-            </>
-          )
 
         case BottomSheetKind.SWAN_STATUS_INFO:
           return (
@@ -1826,15 +1778,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   render() {
-    const { netBalance, notificationData, currencyCode } = this.state
-    console.log( 'notificationData', notificationData )
-    const {
-      navigation,
-      exchangeRates,
-      walletName,
-      currentLevel,
-    } = this.props
-
+    console.log( 'notificationData' )
     return (
       <ImageBackground
         source={require( '../../assets/images/home-bg.png' )}
@@ -1848,7 +1792,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header />
+        <Header fromScreen={'Home'} />
         {/* <View
           style={{
             flex: 3.8,
