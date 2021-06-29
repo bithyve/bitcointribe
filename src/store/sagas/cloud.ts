@@ -385,7 +385,7 @@ export const GoogleDriveLoginWatcher = createWatcher(
 function* updateDataWorker( { payload } ) {
   try {
     const { result1, googleData, share, data } = payload
-    const walletId  = data.regularAccount.getWalletId().data.walletId
+    const walletId: string = yield select( ( state ) => state.storage.wallet.walletId )
 
     let arr = []
     const newArray = []
@@ -423,7 +423,6 @@ function* updateDataWorker( { payload } ) {
         newArray[ index ].secondaryShare = data.secondaryShare
         newArray[ index ].bhXpub = data.bhXpub
       }
-      //console.log( 'ARR', newArray )
       if ( Platform.OS == 'ios' ) {
         if( newArray.length ) {
           const result = yield call( iCloud.startBackup, JSON.stringify( newArray )  )
@@ -469,7 +468,7 @@ function* createFileWorker( { payload } ) {
   try {
     const { share, data } = payload
     const WalletData = []
-    const walletId  = data.regularAccount.getWalletId().data.walletId
+    const walletId: string = yield select( ( state ) => state.storage.wallet.walletId )
     const tempData = {
       levelStatus: data.levelStatus,
       walletName: data.walletName,
@@ -630,8 +629,7 @@ export const readFileWatcher = createWatcher(
 function* uplaodFileWorker( { payload } ) {
   try {
     const { readResult, googleData, share, data } = payload
-
-    const walletId  = data.regularAccount.getWalletId().data.walletId
+    const walletId: string = yield select( ( state ) => state.storage.wallet.walletId )
     let arr = []
     const newArray = []
     if ( readResult ) {
