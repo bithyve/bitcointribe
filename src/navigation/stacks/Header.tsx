@@ -100,10 +100,6 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  lastActiveTime: string;
-  swanDeepLinkContent: string | null;
-  isBalanceLoading: boolean;
-  addContactModalOpened: boolean;
   encryptedCloudDataJson: any;
   notificationTitle: string | null;
   notificationInfo: string | null;
@@ -137,7 +133,6 @@ interface HomePropsTypes {
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
-  swanDeepLinkContent: string | null;
   regularAccount: RegularAccount;
   database: any;
   accountShells: AccountShell[];
@@ -146,7 +141,7 @@ interface HomePropsTypes {
   messages: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
-  from: string;
+  fromScreen: string;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -157,7 +152,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-    console.log( '>>>>>', this.props.from )
     this.openBottomSheetOnLaunchTimeout = null
 
     this.state = {
@@ -175,11 +169,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
-      lastActiveTime: moment().toISOString(),
       notificationLoading: true,
-      swanDeepLinkContent: null,
-      isBalanceLoading: true,
-      addContactModalOpened: false,
       encryptedCloudDataJson: [],
       notificationTitle: null,
       notificationInfo: null,
@@ -484,7 +474,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // }
       this.calculateNetBalance()
       this.setUpFocusListener()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      // this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
@@ -565,6 +555,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
+      this.props.fromScreen === 'Home' &&
       prevProps.accountsState.accountShells !==
       this.props.accountsState.accountShells
     ) {
@@ -789,7 +780,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
-    console.log( 'notificationData this.props.from >>>> ', this.props.from )
     const {
       navigation,
       exchangeRates,

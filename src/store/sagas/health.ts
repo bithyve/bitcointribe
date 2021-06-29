@@ -2104,7 +2104,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
         yield put( syncPermanentChannels( {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
-          updatedSERVICES: SERVICES
         } ) )
       }
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )

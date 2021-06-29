@@ -100,7 +100,6 @@ import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
-  setWalletId
 } from '../../store/actions/preferences'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -286,7 +285,6 @@ interface HomePropsTypes {
   updateNotificationList: any;
   fetchStarted: any;
   messages: any;
-  setWalletId: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
   initLoader: boolean;
@@ -373,7 +371,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   processQRData = async ( qrData ) => {
     const { accountsState, addTransferDetails, navigation } = this.props
-
+    console.log( {
+      qrData
+    } )
     const network = Bitcoin.networkType( qrData )
     if ( network ) {
       const serviceType =
@@ -437,7 +437,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Toast( 'Invalid QR' )
       }
     }
-
+    console.log( 'HERE' )
     try {
       const scannedData = JSON.parse( qrData )
 
@@ -465,6 +465,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               version: scannedData.version,
               type: scannedData.type
             }
+            console.log( {
+              trustedContactRequest
+            } )
             this.setState( {
               trustedContactRequest
             },
@@ -767,10 +770,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       initializeHealthSetup,
       newBHRFlowStarted,
       credsAuthenticated,
-      regularAccount,
-      setWalletId
     } = this.props
-    const { data } = await regularAccount.getWalletId()
     this.appStateListener = AppState.addEventListener(
       'change',
       this.onAppStateChange
@@ -779,7 +779,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
       // Keeping autoSynn disabled
-      setWalletId( data.walletId )
+      credsAuthenticated( false )
+      console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
@@ -816,6 +818,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.props.setVersion()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
+
   };
 
   notificationCheck = () =>{
@@ -1775,15 +1778,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   render() {
-    const { netBalance, notificationData, currencyCode } = this.state
-    console.log( 'notificationData', notificationData )
-    const {
-      navigation,
-      exchangeRates,
-      walletName,
-      currentLevel,
-    } = this.props
-
+    console.log( 'notificationData' )
     return (
       <ImageBackground
         source={require( '../../assets/images/home-bg.png' )}
@@ -1797,7 +1792,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header />
+        <Header fromScreen={'Home'} />
         {/* <View
           style={{
             flex: 3.8,
@@ -1907,7 +1902,6 @@ export default withNavigationFocus(
     updateLastSeen,
     setupNotificationList,
     updateNotificationList,
-    setWalletId,
     updateMessageStatusInApp,
     updateMessageStatus,
     getMessages

@@ -27,6 +27,7 @@ import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
 import ToggleContainer from './ToggleContainer'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 interface HomeStateTypes {
   currencyCode: string;
@@ -67,7 +68,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const { currencyCode } = this.state
-    console.log( 'home container rendered' )
     const {
       currentLevel,
       containerView

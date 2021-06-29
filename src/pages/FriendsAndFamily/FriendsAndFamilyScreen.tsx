@@ -151,7 +151,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   }
 
   componentWillUnmount() {
-    this.focusListener.remove()
+    ( this.focusListener )?.remove()
   }
 
   setUpFocusListener = ( walletId ) => {
@@ -339,7 +339,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <Header />
+        <Header fromScreen={'F&F'} />
 
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&

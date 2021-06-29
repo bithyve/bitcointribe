@@ -826,7 +826,7 @@ class ManageBackupNewBHR extends Component<
         }>
           <HeaderComponent />
         </Suspense> */}
-        <Header />
+        <Header fromScreen={'ManageBackup'} />
         <View style={styles.accountCardsSectionContainer}>
           {/* <View style={{
         flex: 1, backgroundColor: 'white'

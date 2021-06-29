@@ -19,7 +19,7 @@ import {
   initializeRecoveryCompleted,
   completedWalletSetup,
 } from '../actions/setupAndAuth'
-import { keyFetched, fetchFromDB } from '../actions/storage'
+import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
@@ -27,6 +27,8 @@ import { updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import { initAccountShells } from '../utils/accountShellMapping'
 import dbManager from '../../storage/realm/dbManager'
+import { setWalletId } from '../actions/preferences'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
@@ -46,6 +48,10 @@ function* setupWalletWorker( { payload } ) {
   yield put( updateAccounts( {
     accounts,
   } ) )
+  yield put( updateWallet( {
+    wallet
+  } ) )
+  yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {

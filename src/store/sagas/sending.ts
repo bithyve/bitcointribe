@@ -5,7 +5,7 @@ import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, cus
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { Account, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
@@ -67,11 +67,11 @@ function* processRecipients( accountShell: AccountShell ){
           let paymentAddress
           switch( accountShell.primarySubAccount.sourceKind ){
               case SourceAccountKind.TEST_ACCOUNT:
-                paymentAddress = paymentAddresses[ SubAccountKind.TEST_ACCOUNT ]
+                paymentAddress = paymentAddresses[ AccountType.TEST_ACCOUNT ]
                 break
 
               default:
-                paymentAddress = paymentAddresses[ SubAccountKind.TRUSTED_CONTACTS ]
+                paymentAddress = paymentAddresses[ AccountType.CHECKING_ACCOUNT ]
           }
           if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
