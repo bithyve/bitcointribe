@@ -30,7 +30,7 @@ import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -406,7 +406,10 @@ export default function AddContactSendRequest( props ) {
             {showDone  &&
             <TouchableOpacity
               onPress={() => {
-                // createTrustedContact()
+                dispatch( syncPermanentChannels( {
+                  permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+                  metaSync: true,
+                } ) )
                 props.navigation.popToTop()
               }}
               style={{

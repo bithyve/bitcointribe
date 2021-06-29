@@ -114,17 +114,12 @@ class FriendsAndFamilyScreen extends PureComponent<
   }
 
   componentDidMount = async() => {
-    const { regularAccount } = this.props
-    const { walletId } = regularAccount.hdWallet.getWalletId()
     requestAnimationFrame( () => {
-      this.setUpFocusListener( walletId )
       this.props.syncPermanentChannels( {
         permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
         metaSync: true,
       } )
-
     } )
-
   }
 
   componentDidUpdate( prevProps, prevState ) {
@@ -154,7 +149,7 @@ class FriendsAndFamilyScreen extends PureComponent<
     ( this.focusListener )?.remove()
   }
 
-  setUpFocusListener = ( walletId ) => {
+  setUpFocusListener = ( ) => {
     this.focusListener = this.props.navigation.addListener( 'didFocus', () => {
 
       this.setState( {
@@ -163,7 +158,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       // this.props.syncPermanentChannels( {
       //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
       // } )
-      this.updateAddressBook( walletId )
     } )
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
