@@ -35,6 +35,7 @@ import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { setupWallet } from '../store/actions/setupAndAuth'
+
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
 
@@ -51,7 +52,7 @@ import Toast from '../components/Toast'
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
-let messageIndex = 0
+const messageIndex = 0
 const LOADER_MESSAGE_TIME = 2000
 
 interface AccountOption {
@@ -65,38 +66,38 @@ interface AccountOption {
 
 const accountOptions: AccountOption[] = [
   {
-    id: 0,
+    id: 1,
     title: 'Test Account',
     imageSource: require( '../assets/images/accIcons/icon_test.png' ),
     subtitle: 'An on-chain, single-signature wallet Fast and easy. Ideal for small amounts',
     // screenName: 'FriendsAndFamily',
   },
   {
-    id: 1,
+    id: 2,
     title: 'Checking Account',
     imageSource: require( '../assets/images/accIcons/icon_checking.png' ),
     subtitle: 'An on-chain, single-signature wallet Fast and easy. Ideal for small amounts',
   },
   {
-    id: 2,
+    id: 3,
     title: 'Savings Account',
     imageSource: require( '../assets/images/accIcons/icon_savings.png' ),
     subtitle: 'An on-chain, 2 of 3 multi-signature wallet. Use for securing larger amounts',
   },
   {
-    id: 3,
+    id: 4,
     title: 'Donation Account',
     imageSource: require( '../assets/images/accIcons/icon_donation.png' ),
     subtitle: 'An on-chain, 2 of 3 multi-signature wallet. Use for securing larger amountss',
   },
   {
-    id: 4,
+    id: 5,
     title: 'F&F Account',
     imageSource: require( '../assets/images/accIcons/icon_F&F.png' ),
     subtitle: 'A separate account where you can receive funds from your contacts',
   },
   {
-    id: 5,
+    id: 6,
     title: 'Bought BTC Account',
     imageSource: require( '../assets/images/accIcons/boughtbtc.png' ),
     subtitle: 'Bought or Exchange Account where newly bought bitcoins land',
@@ -143,58 +144,13 @@ const loaderMessages = [
   }
 ]
 
-const getNextMessage = () => {
-  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
-  return loaderMessages[ messageIndex++ ]
-}
-
-function validateAllowedCharacters( answer: string ): boolean {
-  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
-}
-
 export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any, selectedAcc: string[] } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Creating your wallet' )
-  const [ subTextMessage, setSubTextMessage ] = useState(
-    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
-  )
   const [ processing, showProcessing ] = useState( false )
   const [ knowMore, showKnowMore ] = useState( false )
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
-  const [ dropdownBoxList ] = useState( QuestionList )
-  const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
-    id: '',
-    question: '',
-  } )
-  const [ answerInputStyle, setAnswerInputStyle ] = useState( styles.inputBox )
-  const [ pswdInputStyle, setPswdInputStyle ] = useState( styles.inputBox )
-  const [ confirmInputStyle, setConfirmAnswerInputStyle ] = useState(
-    styles.inputBox,
-  )
-  const [ confirmPswdInputStyle, setConfirmPswdInputStyle ] = useState(
-    styles.inputBox,
-  )
-  const [ confirmAnswer, setConfirmAnswer ] = useState( '' )
-  const [ confirmPswd, setConfirmPswd ] = useState( '' )
-  const [ answer, setAnswer ] = useState( '' )
-  const [ answerMasked, setAnswerMasked ] = useState( '' )
-  const [ confirmAnswerMasked, setConfirmAnswerMasked ] = useState( '' )
-  const [ pswd, setPswd ] = useState( '' )
-  const [ pswdMasked, setPswdMasked ] = useState( '' )
-  const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
-  const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
-  const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
-  const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
-  const [ hideShowPswd, setHideShowPswd ] = useState( true )
-
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
-  const [ answerError, setAnswerError ] = useState( '' )
-  const [ pswdError, setPswdError ] = useState( '' )
-  const [ tempAns, setTempAns ] = useState( '' )
-  const [ tempPswd, setTempPswd ] = useState( '' )
-  const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   // const [ loaderBottomSheet ] = useState( React.createRef() )
@@ -213,226 +169,16 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const [ selectedAcc, setSelectedAcc ] = useState( [ 'Checking Account' ] )
 
-
   useEffect( () => {
-    if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
-      // ( loaderBottomSheet as any ).current.snapTo( 0 )
-      setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
-        walletName, selectedAcc
-      } )
-    }
-  }, [ cloudBackupStatus ] )
-
-  useEffect( () => {
-    if( walletSetupCompleted ){
-      console.log( 'walletSetupCompleted****', walletSetupCompleted )
-
-      dispatch( walletCheckIn() )
-    }
-  }, [ walletSetupCompleted ] )
-
-  useEffect( () => {
-    if( walletSetupCompleted && levelHealth && levelHealth.length ){
-      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
-      if( cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        // ( loaderBottomSheet as any ).current.snapTo( 0 )
-        setLoaderModal( false )
-        props.navigation.navigate( 'HomeNav', {
-          walletName, selectedAcc
-        } ) }
-    }
-  }, [ walletSetupCompleted, levelHealth ] )
-
-  const checkCloudLogin = () =>{
-    showLoader()
-    requestAnimationFrame( () => {
-      const security = {
-        questionId: dropdownBoxValue.id,
-        question: dropdownBoxValue.question,
-        answer,
+    requestAnimationFrame(
+      () => {
+        dispatch( setupWallet( walletName, '', {
+          REGULAR_ACCOUNT: true
+        } ) )
       }
-      dispatch( setupWallet( walletName, security ) )
-      dispatch( initNewBHRFlow( true ) )
-      dispatch( setVersion( 'Current' ) )
-      const current = Date.now()
-      AsyncStorage.setItem(
-        'SecurityAnsTimestamp',
-        JSON.stringify( current ),
-      )
-      const securityQuestionHistory = {
-        created: current,
-      }
-      AsyncStorage.setItem(
-        'securityQuestionHistory',
-        JSON.stringify( securityQuestionHistory ),
-      )
-    } )
-  }
-
-  const showLoader = () => {
-    // ( loaderBottomSheet as any ).current.snapTo( 1 )
-    setLoaderModal( true )
-    setLoaderMessages()
-    setTimeout( () => {
-      setElevation( 0 )
-    }, 0.2 )
-    setTimeout( () => {
-      setIsLoaderStart( true )
-      setIsEditable( false )
-      setIsDisabled( true )
-    }, 2 )
-  }
-
-  const handleSubmit = () => {
-    setConfirmAnswer( tempAns )
-
-    if ( answer && confirmAnswer && confirmAnswer != answer ) {
-      setAnswerError( 'Answers do not match' )
-    } else if (
-      validateAllowedCharacters( answer ) == false ||
-      validateAllowedCharacters( tempAns ) == false
-    ) {
-      setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
-    } else {
-      setTimeout( () => {
-        setAnswerError( '' )
-      }, 2 )
-    }
-  }
-
-  const handlePswdSubmit = () => {
-    setConfirmPswd( tempPswd )
-
-    if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
-    } else if (
-      validateAllowedCharacters( pswd ) == false ||
-      validateAllowedCharacters( tempPswd ) == false
-    ) {
-      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
-    } else {
-      setTimeout( () => {
-        setPswdError( '' )
-      }, 2 )
-    }
-  }
-
-
-  useEffect( () => {
-    if ( answer.trim() == confirmAnswer.trim() && answer && confirmAnswer && answerError.length == 0 ) {
-      setVisibleButton( true )
-    } else {
-      setVisibleButton( false )
-
-      if ( answer && confirmAnswer && confirmAnswer != answer ) {
-        setAnswerError( 'Answers do not match' )
-      } else if (
-        validateAllowedCharacters( answer ) == false ||
-        validateAllowedCharacters( confirmAnswer ) == false
-      ) {
-        setAnswerError( 'Answers must only contain lowercase characters (a-z) and digits (0-9)' )
-      }
-    }
-  }, [ confirmAnswer ] )
-
-  useEffect( () => {
-    if ( pswd.trim() == confirmPswd.trim() && pswd && confirmPswd && pswdError.length == 0 ) {
-      setVisibleButton( true )
-    } else {
-      setVisibleButton( false )
-
-      if ( pswd && confirmPswd && confirmPswd != pswd ) {
-        setPswdError( 'Password do not match' )
-      } else if (
-        validateAllowedCharacters( pswd ) == false ||
-        validateAllowedCharacters( confirmPswd ) == false
-      ) {
-        setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
-      }
-    }
-  }, [ confirmPswd ] )
-
-
-
-  const setButtonVisible = () => {
-    return (
-      <TouchableOpacity
-        onPress={async () => {
-          if ( activeIndex === 0 ) {
-            checkCloudLogin()
-            showSecurityQue( false )
-          } else {
-            showEncryptionPswd( false )
-          }
-        }}
-        style={{
-          ...styles.buttonView, elevation: Elevation
-        }}
-      >
-        {/* {!loading.initializing ? ( */}
-        <Text style={styles.buttonText}>Proceed</Text>
-        {/* ) : (
-          <ActivityIndicator size="small" />
-        )} */}
-      </TouchableOpacity>
     )
-  }
+  }, [] )
 
-  const setLoaderMessages = () => {
-    setTimeout( () => {
-      const newMessage = getNextMessage()
-      setMessage( newMessage.heading )
-      setSubTextMessage( newMessage.text )
-      setTimeout( () => {
-        const newMessage = getNextMessage()
-        setMessage( newMessage.heading )
-        setSubTextMessage( newMessage.text )
-        setTimeout( () => {
-          const newMessage = getNextMessage()
-          setMessage( newMessage.heading )
-          setSubTextMessage( newMessage.text )
-          setTimeout( () => {
-            const newMessage = getNextMessage()
-            setMessage( newMessage.heading )
-            setSubTextMessage( newMessage.text )
-            setTimeout( () => {
-              const newMessage = getNextMessage()
-              setMessage( newMessage.heading )
-              setSubTextMessage( newMessage.text )
-              setTimeout( () => {
-                const newMessage = getNextMessage()
-                setMessage( newMessage.heading )
-                setSubTextMessage( newMessage.text )
-              }, LOADER_MESSAGE_TIME )
-            }, LOADER_MESSAGE_TIME )
-          }, LOADER_MESSAGE_TIME )
-        }, LOADER_MESSAGE_TIME )
-      }, LOADER_MESSAGE_TIME )
-    }, LOADER_MESSAGE_TIME )
-  }
-
-  const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} />
-  }, [ message, subTextMessage ] )
-
-  const renderLoaderModalHeader = () => {
-    return (
-      <View
-        style={{
-          marginTop: 'auto',
-          flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp( '75%' ),
-          zIndex: 9999,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      />
-    )
-  }
 
   const confirmAction = ( isAccountselected ) => {
     if ( isAccountselected ) {
@@ -448,6 +194,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   }
 
   const selectAccount = ( title ) => {
+
     if ( title === 'Checking Account' ) {
       return
     }
@@ -457,11 +204,29 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
       showProcessing( true )
       setTimeout( () => {
         showProcessing( false )
-        Toast( `${title} is being added successfully` )
-      }, 2000 )
+        Toast( `${title} has been added successfully` )
+      }, 3000 )
       const newArr = [ ...selectedAcc ]
       newArr.push( title )
       setSelectedAcc( newArr )
+    }
+    switch( title ) {
+        case 'Test Account': requestAnimationFrame(
+          () => {
+            dispatch( setupWallet( walletName, '', {
+              TEST_ACCOUNT: true
+            } ) )
+          }
+        )
+          break
+        case 'Savings Account': requestAnimationFrame(
+          () => {
+            dispatch( setupWallet( walletName, '', {
+              SECURE_ACCOUNT: true
+            } ) )
+          }
+        )
+          break
     }
   }
 

@@ -31,7 +31,6 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
@@ -150,7 +149,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ tempPswd, setTempPswd ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   // const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
@@ -182,16 +180,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ cloudBackupStatus ] )
 
-  useEffect( () => {
-    if( walletSetupCompleted ){
-      console.log( 'walletSetupCompleted****', walletSetupCompleted )
+  // useEffect( () => {
+  //   if( walletSetupCompleted ){
+  //     console.log( 'walletSetupCompleted****', walletSetupCompleted )
 
-      dispatch( walletCheckIn() )
-    }
-  }, [ walletSetupCompleted ] )
+  //     dispatch( walletCheckIn() )
+  //   }
+  // }, [ walletSetupCompleted ] )
 
   useEffect( () => {
-    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+    if( levelHealth && levelHealth.length ){
       console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
@@ -202,12 +200,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           walletName,
         } ) }
     }
-  }, [ walletSetupCompleted, levelHealth ] )
+  }, [ levelHealth ] )
 
   const checkCloudLogin = () =>{
-    const chosenAccounts = {
-      REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
-    }
+    
     showLoader()
     requestAnimationFrame( () => {
       const security = {
@@ -215,7 +211,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         question: dropdownBoxValue.question,
         answer,
       }
-      dispatch( setupWallet( walletName, security, chosenAccounts ) )
+      //const chosenAccounts = {
+    //   REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
+    // }
+      // dispatch( setupWallet( walletName, security, chosenAccounts ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()
