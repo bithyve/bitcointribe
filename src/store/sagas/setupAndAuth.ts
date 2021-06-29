@@ -27,6 +27,8 @@ import { updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import { initAccountShells } from '../utils/accountShellMapping'
 import dbManager from '../../storage/realm/dbManager'
+import { setWalletId } from '../actions/preferences'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
@@ -49,6 +51,7 @@ function* setupWalletWorker( { payload } ) {
   yield put( updateWallet( {
     wallet
   } ) )
+  yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {

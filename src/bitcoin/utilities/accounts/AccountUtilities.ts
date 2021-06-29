@@ -20,7 +20,7 @@ let accAxios: AxiosInstance = axios.create( {
 
 export default class AccountUtilities {
 
-  static networkType = ( scannedStr: string ) => {
+  static networkType = ( scannedStr: string ): NetworkType => {
     scannedStr = scannedStr.replace( 'BITCOIN', 'bitcoin' )
     let address = scannedStr
     if ( scannedStr.slice( 0, 8 ) === 'bitcoin:' ) {
@@ -28,13 +28,13 @@ export default class AccountUtilities {
     }
     try {
       bitcoinJS.address.toOutputScript( address, bitcoinJS.networks.bitcoin )
-      return 'MAINNET'
+      return NetworkType.MAINNET
     } catch ( err ) {
       try {
         bitcoinJS.address.toOutputScript( address, bitcoinJS.networks.testnet )
-        return 'TESTNET'
+        return NetworkType.TESTNET
       } catch ( err ) {
-        return ''
+        return null
       }
     }
   }
