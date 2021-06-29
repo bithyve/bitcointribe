@@ -485,6 +485,31 @@ const HomeHeader = ( {
           />
         </TouchableOpacity>
       </View> */}
+      <View style={{
+        flexDirection: 'row', marginTop: hp( 1 )
+      }}>
+        <View style={{
+          backgroundColor: Colors.gold,
+          width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
+          alignItems:'center',
+          justifyContent: 'center'
+        }}>
+          <Image
+            source={require( '../../assets/images/icons/icon_info.png' )}
+            style={{
+              width: wp( '3%' ), height: wp( '3%' ),
+            }}
+            resizeMode={'contain'}
+          />
+        </View>
+
+        <Text style={{
+          color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+        }}>Approve the request for <Text style={{
+            fontFamily: Fonts.FiraSansMediumItalic
+          }}>recovery</Text></Text>
+
+      </View>
     </View>
   )
 }

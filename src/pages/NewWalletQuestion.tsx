@@ -324,8 +324,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         onPress={async () => {
           if ( activeIndex === 0 ) {
             checkCloudLogin()
-            setIsCloudPermissionRender( true )
-            openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+            // setIsCloudPermissionRender( true )
+            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
             showSecurityQue( false )
           } else {
             showEncryptionPswd( false )
