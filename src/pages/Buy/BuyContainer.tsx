@@ -91,7 +91,6 @@ import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
-  setWalletId
 } from '../../store/actions/preferences'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -270,7 +269,6 @@ interface HomePropsTypes {
     updateNotificationList: any;
     fetchStarted: any;
     messages: any;
-    setWalletId: any;
     updateMessageStatusInApp: any;
     updateMessageStatus: any;
 }
@@ -763,11 +761,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         initializeHealthSetup,
         newBHRFlowStarted,
         credsAuthenticated,
-        regularAccount,
-        setWalletId
       } = this.props
-      const { data } = await regularAccount.getWalletId()
-      console.log( '**** data.walletId', data.walletId )
+
       this.appStateListener = AppState.addEventListener(
         'change',
         this.onAppStateChange
@@ -776,7 +771,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         // This will sync balances and transactions for all account shells
         // this.props.autoSyncShells()
         // Keeping autoSynn disabled
-        setWalletId( data.walletId )
         credsAuthenticated( false )
         console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
@@ -1937,7 +1931,6 @@ export default withNavigationFocus(
     updateLastSeen,
     setupNotificationList,
     updateNotificationList,
-    setWalletId,
     updateMessageStatusInApp,
     updateMessageStatus
   } )( Home )

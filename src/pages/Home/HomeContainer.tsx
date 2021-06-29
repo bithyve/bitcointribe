@@ -92,7 +92,6 @@ import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
-  setWalletId
 } from '../../store/actions/preferences'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -139,6 +138,7 @@ import NotificationInfoContents from '../../components/NotificationInfoContents'
 import CurrencyKindToggleSwitch from '../../components/CurrencyKindToggleSwitch'
 import Svg, { Defs, G, Circle, Path, Text as Txt, TSpan } from 'react-native-svg'
 import ToggleContainer from './ToggleContainer'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
@@ -274,7 +274,6 @@ interface HomePropsTypes {
   updateNotificationList: any;
   fetchStarted: any;
   messages: any;
-  setWalletId: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
 }
@@ -355,19 +354,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   processQRData = async ( qrData ) => {
-    const { accountsState, addTransferDetails, navigation } = this.props
+    const { navigation } = this.props
 
-    const network = Bitcoin.networkType( qrData )
-    if ( network ) {
-      const serviceType =
-        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-
-      const service = accountsState[ serviceType ].service
-      const { type } = service.addressDiff( qrData )
+    const networkType = AccountUtilities.networkType( qrData )
+    if ( networkType ) {
+      const { type } = AccountUtilities.addressDiff( qrData, AccountUtilities.getNetworkByType( networkType ) )
 
       if ( type ) {
         let item
-
         switch ( type ) {
             case ScannedAddressKind.ADDRESS:
               const recipientAddress = qrData
@@ -376,13 +370,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 id: recipientAddress
               }
 
-              addTransferDetails( serviceType, {
-                selectedContact: item,
-              } )
-
               navigation.navigate( 'SendToContact', {
                 selectedContact: item,
-                serviceType,
               } )
               break
 
@@ -390,7 +379,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               let address, options
 
               try {
-                const res = service.decodePaymentURI( qrData )
+                const res = AccountUtilities.decodePaymentURI( qrData )
                 address = res.address
                 options = res.options
 
@@ -403,13 +392,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 id: address
               }
 
-              addTransferDetails( serviceType, {
-                selectedContact: item,
-              } )
-
               navigation.navigate( 'SendToContact', {
                 selectedContact: item,
-                serviceType,
                 bitcoinAmount: options.amount
                   ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
                   : '',
@@ -746,11 +730,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       initializeHealthSetup,
       newBHRFlowStarted,
       credsAuthenticated,
-      regularAccount,
-      setWalletId
     } = this.props
-    const { data } = await regularAccount.getWalletId()
-    console.log( '**** data.walletId', data.walletId )
+
     this.appStateListener = AppState.addEventListener(
       'change',
       this.onAppStateChange
@@ -759,7 +740,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
       // Keeping autoSynn disabled
-      setWalletId( data.walletId )
       credsAuthenticated( false )
       console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
@@ -2031,7 +2011,6 @@ export default withNavigationFocus(
     updateLastSeen,
     setupNotificationList,
     updateNotificationList,
-    setWalletId,
     updateMessageStatusInApp,
     updateMessageStatus
   } )( Home )

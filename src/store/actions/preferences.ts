@@ -193,7 +193,6 @@ export const setIsPermissionGiven = ( data ) => {
 }
 
 export const setWalletId = ( data ) => {
-  console.log( 'SET_WALLET_ID', data )
   return {
     type: SET_WALLET_ID,
     payload: {

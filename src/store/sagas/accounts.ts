@@ -76,7 +76,6 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import { createTrustedContactSubAccount } from './trustedContacts'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
@@ -99,6 +98,7 @@ import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { updateWallet } from '../actions/storage'
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -588,11 +588,9 @@ function* resetTwoFAWorker( { payload } ) {
 
 export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
 
-
 function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
   // TODO: read wallet from realm
-  const tempDB = JSON.parse( yield call( AsyncStorage.getItem, 'tempDB' ) )
-  const wallet: Wallet = tempDB.wallet
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { token } = payload
   const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
 
@@ -600,8 +598,12 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
     yield put( twoFAValid( true ) )
     delete wallet.details2FA
     // TODO: save udpated wallet into realm
+    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
     yield call( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
       ...tempDB,
+      wallet
+    } ) )
+    yield put( updateWallet( {
       wallet
     } ) )
   } else yield put( twoFAValid( false ) )
@@ -1053,10 +1055,6 @@ function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccou
 
   const { secondarySubAccount, parentShell, contactInfo } = payload
   switch ( secondarySubAccount.kind ) {
-      case SubAccountKind.TRUSTED_CONTACTS:
-        yield call( createTrustedContactSubAccount, ( secondarySubAccount as TrustedContactsSubAccountInfo ), parentShell, contactInfo )
-        break
-
       case SubAccountKind.SERVICE:
         yield call( createServiceSecondarySubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
         break

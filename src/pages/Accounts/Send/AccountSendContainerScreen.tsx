@@ -35,6 +35,7 @@ import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store
 import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import useWalletState from '../../../utils/hooks/state-selectors/storage/useWalletState'
 
 export type Props = {
   navigation: any;
@@ -53,6 +54,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
+  const wallet: Wallet = useWalletState()
 
   useEffect( ()=> {
     dispatch( syncPermanentChannels( {
@@ -215,22 +217,16 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }
   }, [ hasShownInitialKnowMoreSendSheet, primarySubAccount.kind ] )
 
-
   useEffect( () => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    ( async() => {
-    // TODO: read 2FA deatils from realm
-      const { wallet }: { wallet: Wallet } = JSON.parse( await AsyncStorage.getItem( 'tempDB' ) )
-      if ( primarySubAccount.isTFAEnabled ) {
-        const twoFASetupDetails = idx( wallet, ( _ ) => _.details2FA )
-        const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
-        if ( twoFASetupDetails && !twoFAValid )
-          navigation.navigate( 'TwoFASetup', {
-            twoFASetup: twoFASetupDetails,
-          } )
-      }
-    } )()
-
+    if ( primarySubAccount.isTFAEnabled ) {
+      const twoFASetupDetails = idx( wallet, ( _ ) => _.details2FA )
+      const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
+      if ( twoFASetupDetails && !twoFAValid )
+        navigation.navigate( 'TwoFASetup', {
+          twoFASetup: twoFASetupDetails,
+        } )
+    }
   }, [ primarySubAccount.sourceKind ] )
 
 
