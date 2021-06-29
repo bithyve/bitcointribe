@@ -555,7 +555,7 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const updateAccounts = ( { accounts }: {accounts: Accounts} ) => {
+export const updateAccounts = ( { accounts }: { accounts: Accounts } ) => {
   return {
     type: UPDATE_ACCOUNTS,
     payload: {
