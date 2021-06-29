@@ -44,6 +44,7 @@ import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import idx from 'idx'
 import { ScrollView } from 'react-native-gesture-handler'
+import Colors from '../../../common/Colors'
 
 export type Props = {
   navigation: any;
@@ -414,6 +415,7 @@ const styles = StyleSheet.create( {
     paddingTop: 20,
     height: '100%',
     paddingHorizontal: 24,
+    backgroundColor: Colors.backgroundColor,
   },
 
   viewSectionContainer: {
