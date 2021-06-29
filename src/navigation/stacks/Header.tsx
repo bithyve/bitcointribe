@@ -4,7 +4,6 @@ import {
   Platform,
   Linking,
   Alert,
-  AppState,
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -552,6 +551,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  shouldComponentUpdate =( nextProps, nextState ) => {
+    if( this.props.accountsState.accountShells === nextProps.accountsState.accountShells ) {
+      return false
+    }
+  }
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
@@ -586,11 +590,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   setUpFocusListener = () => {
-    this.notificationCheck()
-    this.setCurrencyCodeFromAsync()
+    // this.notificationCheck()
+    // this.setCurrencyCodeFromAsync()
   };
-
-
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
@@ -640,8 +642,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     kind: BottomSheetKind,
     snapIndex: number | null = null
   ) => {
-    console.log( 'kind', kind )
-    console.log( 'snapIndex', snapIndex )
 
     this.setState(
       {
@@ -786,7 +786,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       walletName,
       currentLevel,
     } = this.props
-
     return (
       <View
         style={{
