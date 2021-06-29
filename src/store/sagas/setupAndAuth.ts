@@ -96,8 +96,6 @@ function* setupWalletWorker( { payload } ) {
     // saturate the test account w/ 10K sats
     // yield put( getTestcoins() )
 
-
-
     // End of regular account option
 
   }
@@ -112,19 +110,27 @@ function* setupWalletWorker( { payload } ) {
 
     const currentWallet = yield select( ( state ) => state.storage.wallet )
 
-    currentWallet.accounts = {
+    wallet.accounts = {
       ...currentWallet.accounts,
       ...wallet.accounts
     }
+    currentWallet.accounts = wallet.accounts
+    const currentAccounts = yield select( ( state ) => state.accounts )
+    const newAccounts = {
+      ...currentAccounts,
+      ...accounts
+    }
+
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+      wallet, accounts: newAccounts
+    } ) )
 
     yield put( updateAccounts( {
-      accounts
+      accounts: newAccounts
     } ) )
     yield put( updateWallet( {
       wallet: currentWallet
     } ) )
-
-
     // End of when test account selected
   }
   if( SECURE_ACCOUNT )  {
@@ -137,18 +143,28 @@ function* setupWalletWorker( { payload } ) {
 
     const currentWallet = yield select( ( state ) => state.storage.wallet )
 
-    currentWallet.accounts = {
+    wallet.accounts = {
       ...currentWallet.accounts,
       ...wallet.accounts
     }
 
+    currentWallet.accounts = wallet.accounts
+    const currentAccounts = yield select( ( state ) => state.accounts )
+    const newAccounts = {
+      ...currentAccounts,
+      ...accounts
+    }
+
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+      wallet, accounts: newAccounts
+    } ) )
+
     yield put( updateAccounts( {
-      accounts
+      accounts: newAccounts
     } ) )
     yield put( updateWallet( {
       wallet: currentWallet
     } ) )
-
     // End of when savings account selected
   }
 }

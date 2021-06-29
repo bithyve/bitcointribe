@@ -1,4 +1,4 @@
-import { call, delay, put, select, spawn } from 'redux-saga/effects'
+import { call, delay, put, select, spawn, fork } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
   GET_TESTCOINS,
@@ -756,11 +756,10 @@ function* autoSyncShellsWorker( { payload } ) {
   const shells = yield select(
     ( state ) => state.accounts.accountShells
   )
-
   for ( const shell of shells ) {
     if ( shell.syncStatus === SyncStatus.PENDING ) {
       yield delay( 3000 )
-      yield spawn( refreshAccountShellWorker,
+      yield call( refreshAccountShellWorker,
         {
           payload: {
             shell: shell,

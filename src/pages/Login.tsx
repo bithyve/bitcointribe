@@ -43,6 +43,7 @@ import messaging from '@react-native-firebase/messaging'
 import {
   updateFCMTokens,
 } from '../store/actions/notifications'
+import { autoSyncShells } from '../store/actions/accounts'
 
 const LOADER_MESSAGE_TIME = 2
 const loaderMessages = [
@@ -248,6 +249,8 @@ export default function Login( props ) {
 
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
+          dispatch( autoSyncShells() )
+
           setTimeout( () => {
             // if ( loaderBottomSheet.current ) {
             //   loaderBottomSheet.current.snapTo( 0 )

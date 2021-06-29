@@ -259,10 +259,13 @@ export const initializeWallet = async ( chosenAccounts, currentWalletId, current
       networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
     } )
 
-    const wallet: Wallet = {
+    const wallet = {
       walletId,
       secondaryMemonic: '',
       details2FA: {
+        secondaryXpub: '',
+        bithyveXpub: '',
+        twoFAKey: ''
       },
       primaryMnemonic,
       accounts: {
@@ -289,25 +292,17 @@ export const initializeWallet = async ( chosenAccounts, currentWalletId, current
   }
 
   if( SECURE_ACCOUNT ) {
-    console.log( 'initialising Secure Account ' )
     const { secondaryXpub, bithyveXpub, twoFAKey, secondaryMemonic, savingsAccount, savingsDerivationPath } = await initializeSecondaryAccount( currentWalletId, initInstanceNumber, currentPrimaryMnemonic, rootDerivationPath )
-
-    const wallet: Wallet = {
+    const wallet = {
+      details2FA: {
+        secondaryXpub,
+        bithyveXpub,
+        twoFAKey
+      },
       accounts: {
+        [ savingsDerivationPath ]: savingsAccount.id
       }
     }
-
-    wallet.secondaryMemonic = secondaryMemonic
-    wallet.details2FA = {
-      secondaryXpub,
-      bithyveXpub,
-      twoFAKey
-    }
-    wallet.accounts = {
-      ...wallet.accounts,
-      [ savingsDerivationPath ]: savingsAccount.id
-    }
-
 
     const accounts: Accounts = {
       [ savingsAccount.id ]: savingsAccount,
