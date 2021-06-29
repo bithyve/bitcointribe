@@ -76,7 +76,6 @@ import RelayServices from '../../bitcoin/services/RelayService'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
-import { createTrustedContactSubAccount } from './trustedContacts'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
@@ -1056,10 +1055,6 @@ function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccou
 
   const { secondarySubAccount, parentShell, contactInfo } = payload
   switch ( secondarySubAccount.kind ) {
-      case SubAccountKind.TRUSTED_CONTACTS:
-        yield call( createTrustedContactSubAccount, ( secondarySubAccount as TrustedContactsSubAccountInfo ), parentShell, contactInfo )
-        break
-
       case SubAccountKind.SERVICE:
         yield call( createServiceSecondarySubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
         break
