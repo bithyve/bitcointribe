@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -42,6 +42,15 @@ export default class AccountUtilities {
   static getNetworkByType = ( type: NetworkType ) => {
     if( type === NetworkType.TESTNET ) return bitcoinJS.networks.testnet
     else return bitcoinJS.networks.bitcoin
+  }
+
+  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number ): string => {
+    const { series, upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
+    if( instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
+    const accountNumber = series + instanceNumber
+
+    if( type === NetworkType.TESTNET ) return `m/49'/1'/${accountNumber}'`
+    else return `m/49'/0'/${accountNumber}'`
   }
 
   static getKeyPair = ( privateKey: string, network: bitcoinJS.Network ): bitcoinJS.ECPairInterface =>

@@ -774,7 +774,7 @@ export interface Wallet {
     twoFAKey: string,
   }
   accounts: {
-    [derivationPath: string]: string // derivation path to account-id mapping
+    [accountType: string]: string[] // array of accountIds
   }
 }
 

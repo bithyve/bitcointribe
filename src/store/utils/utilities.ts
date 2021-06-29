@@ -245,7 +245,6 @@ export const initializeWallet = async (): Promise <{
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const initInstanceNumber = 0
-  const testDerivationPath = 'm/49\'/1\'/0\''
   const testAccount: Account = generateAccount( {
     walletId,
     type: AccountType.TEST_ACCOUNT,
@@ -253,12 +252,11 @@ export const initializeWallet = async (): Promise <{
     accountName: 'Test Account',
     accountDescription: 'Learn Bitcoin',
     mnemonic: primaryMnemonic,
-    derivationPath: testDerivationPath,
+    derivationPath: AccountUtilities.getDerivationPath( NetworkType.TESTNET, AccountType.TEST_ACCOUNT, initInstanceNumber ),
     networkType: NetworkType.TESTNET,
   } )
 
-  const rootDerivationPath = 'm/49\'/0\'/0\''
-  const checkingDerivationPath = rootDerivationPath
+  const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, initInstanceNumber )
   const checkingAccount: Account = generateAccount( {
     walletId,
     type: AccountType.CHECKING_ACCOUNT,
@@ -266,7 +264,7 @@ export const initializeWallet = async (): Promise <{
     accountName: 'Checking Account',
     accountDescription: 'Fast and easy',
     mnemonic: primaryMnemonic,
-    derivationPath: checkingDerivationPath,
+    derivationPath: rootDerivationPath,
     networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
   } )
 
@@ -275,7 +273,6 @@ export const initializeWallet = async (): Promise <{
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
 
-  const savingsDerivationPath = 'm/49\'/0\'/11\''
   const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
     walletId,
     type: AccountType.SAVINGS_ACCOUNT,
@@ -283,7 +280,7 @@ export const initializeWallet = async (): Promise <{
     accountName: 'Savings Account',
     accountDescription: 'Multi-factor security',
     mnemonic: primaryMnemonic,
-    derivationPath: savingsDerivationPath,
+    derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, initInstanceNumber ),
     secondaryXpub,
     bithyveXpub,
     networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
@@ -299,9 +296,9 @@ export const initializeWallet = async (): Promise <{
       twoFAKey
     },
     accounts: {
-      [ testDerivationPath ]: testAccount.id,
-      [ checkingDerivationPath ]: checkingAccount.id,
-      [ savingsDerivationPath ]: savingsAccount.id
+      [ AccountType.TEST_ACCOUNT ]: [ testAccount.id ],
+      [ AccountType.CHECKING_ACCOUNT ]:[ checkingAccount.id ],
+      [ AccountType.SAVINGS_ACCOUNT ]:[ savingsAccount.id ]
     }
   }
 
