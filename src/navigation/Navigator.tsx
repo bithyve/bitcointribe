@@ -11,6 +11,7 @@ import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
 import NewWalletName from '../pages/NewWalletName'
+import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
@@ -53,6 +54,7 @@ const SetupNavigator = createStackNavigator(
     Login,
     PasscodeConfirm,
     NewWalletName,
+    AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
     WalletNameRecovery,
