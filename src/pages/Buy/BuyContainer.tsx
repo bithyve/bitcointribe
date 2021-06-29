@@ -159,7 +159,6 @@ export enum BottomSheetKind {
 
 interface HomeStateTypes {
     notificationLoading: boolean;
-    notificationData: any[];
     CurrencyCode: string;
     netBalance: number;
     bottomSheetState: BottomSheetState;
@@ -1742,7 +1741,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     render() {
       const { notificationData, currencyCode } = this.state
-      console.log( 'notificationData', notificationData )
       const {
         currentLevel,
         containerView

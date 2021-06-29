@@ -4,7 +4,6 @@ import {
   Platform,
   Linking,
   Alert,
-  AppState,
 } from 'react-native'
 import {
   heightPercentageToDP,
@@ -100,10 +99,6 @@ interface HomeStateTypes {
   recoveryRequest: any;
   custodyRequest: any;
   isLoadContacts: boolean;
-  lastActiveTime: string;
-  swanDeepLinkContent: string | null;
-  isBalanceLoading: boolean;
-  addContactModalOpened: boolean;
   encryptedCloudDataJson: any;
   notificationTitle: string | null;
   notificationInfo: string | null;
@@ -137,7 +132,6 @@ interface HomePropsTypes {
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
-  swanDeepLinkContent: string | null;
   regularAccount: RegularAccount;
   database: any;
   accountShells: AccountShell[];
@@ -146,14 +140,10 @@ interface HomePropsTypes {
   messages: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
+  fromScreen: string;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
-  focusListener: any;
-  appStateListener: any;
-  firebaseNotificationListener: any;
-  notificationOpenedListener: any;
-
   bottomSheetRef = createRef<BottomSheet>();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
 
@@ -161,8 +151,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-    this.focusListener = null
-    this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
 
     this.state = {
@@ -180,11 +168,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       recoveryRequest: null,
       custodyRequest: null,
       isLoadContacts: false,
-      lastActiveTime: moment().toISOString(),
       notificationLoading: true,
-      swanDeepLinkContent: null,
-      isBalanceLoading: true,
-      addContactModalOpened: false,
       encryptedCloudDataJson: [],
       notificationTitle: null,
       notificationInfo: null,
@@ -489,13 +473,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // }
       this.calculateNetBalance()
       this.setUpFocusListener()
-      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      // this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
   notificationCheck = () =>{
     const { messages } = this.props
-    console.log( 'messages inside notificationCheck', messages )
     if( messages.length ){
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
@@ -568,9 +551,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  shouldComponentUpdate =( nextProps, nextState ) => {
+    if( this.props.accountsState.accountShells === nextProps.accountsState.accountShells ) {
+      return false
+    }
+  }
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
+      this.props.fromScreen === 'Home' &&
       prevProps.accountsState.accountShells !==
       this.props.accountsState.accountShells
     ) {
@@ -583,18 +572,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   cleanupListeners() {
-    if ( typeof this.focusListener === 'function' ) {
-      this.props.navigation.removeListener( 'didFocus', this.focusListener )
-    }
-
-    if ( typeof this.appStateListener === 'function' ) {
-      AppState.removeEventListener( 'change', this.appStateListener )
-    }
 
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    if ( this.firebaseNotificationListener ) {
-      this.firebaseNotificationListener()
-    }
   }
 
   componentWillUnmount() {
@@ -611,22 +590,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   setUpFocusListener = () => {
-    const t0 = performance.now()
-    const { navigation } = this.props
-
-    this.focusListener = navigation.addListener( 'didFocus', () => {
-
-      // this.setCurrencyCodeFromAsync()
-      // this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
-      // this.notificationCheck()
-    } )
-    this.notificationCheck()
-    this.setCurrencyCodeFromAsync()
-    const t1 = performance.now()
-    console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
+    // this.notificationCheck()
+    // this.setCurrencyCodeFromAsync()
   };
-
-
 
   setCurrencyCodeFromAsync = async () => {
     const { currencyCode } = this.props
@@ -676,8 +642,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     kind: BottomSheetKind,
     snapIndex: number | null = null
   ) => {
-    console.log( 'kind', kind )
-    console.log( 'snapIndex', snapIndex )
 
     this.setState(
       {
@@ -816,14 +780,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   render() {
     const { netBalance, notificationData, currencyCode } = this.state
-    console.log( 'notificationData', notificationData )
     const {
       navigation,
       exchangeRates,
       walletName,
       currentLevel,
     } = this.props
-
     return (
       <View
         style={{
