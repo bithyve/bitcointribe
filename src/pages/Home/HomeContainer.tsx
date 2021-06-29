@@ -81,7 +81,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <View style={{
             flexDirection: 'row',
             justifyContent: 'space-between',
-            paddingVertical: wp( 6 ),
+            paddingVertical: wp( 4 ),
             paddingHorizontal: wp( 4 ),
             alignItems: 'center'
           }}>
@@ -103,7 +103,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             height: hp( '15%' ),
             alignItems: 'center',
             justifyContent: 'center',
-            marginBottom: hp( 2 ),
+            marginBottom: hp( 1 ),
             borderRadius: wp( 2 ),
             padding: hp( '1.5%' )
           }}>
