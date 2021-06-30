@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
+import { Accounts, AccountType, ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -322,15 +322,18 @@ export const accountShellRefreshStarted = ( payload: AccountShell ) => {
 
 export interface AddNewAccountShellAction extends Action {
   type: typeof ADD_NEW_ACCOUNT_SHELL;
-  payload: SubAccountDescribing;
+  payload: { accountType: AccountType, accountDetails?: { name?: string, description?: string }, };
 }
 
 export const addNewAccountShell = (
-  payload: SubAccountDescribing
+  payload: {
+    accountType: AccountType,
+    accountDetails?: { name?: string, description?: string }
+  }
 ): AddNewAccountShellAction => {
   return {
     type: ADD_NEW_ACCOUNT_SHELL,
-    payload,
+    payload
   }
 }
 

@@ -104,6 +104,11 @@ import { updateWallet } from '../actions/storage'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
 import bip39 from 'bip39'
 import crypto from 'crypto'
+import idx from 'idx'
+import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
+import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -854,7 +859,40 @@ function* setup2FADetails( wallet: Wallet ) {
   return wallet
 }
 
-function* addNewAccount( subAccountInfo: SubAccountDescribing ) {
+
+function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
+  let SubAccountConstructor
+  switch( account.type ){
+      case AccountType.TEST_ACCOUNT:
+        SubAccountConstructor = TestSubAccountInfo
+        break
+
+      case AccountType.CHECKING_ACCOUNT:
+        SubAccountConstructor = CheckingSubAccountInfo
+        break
+
+      case AccountType.SAVINGS_ACCOUNT:
+        SubAccountConstructor = SavingsSubAccountInfo
+        break
+  }
+
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+  const accountShell = new AccountShell( {
+    primarySubAccount: new SubAccountConstructor( {
+      id: account.id,
+      xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+      instanceNumber: account.instanceNum,
+      customDisplayName: account.accountName,
+      customDescription: account.accountDescription
+    } ),
+    unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
+    displayOrder: 1,
+  } )
+
+  return accountShell
+}
+
+function* addNewAccount( accountType, accountName, accountDescription ) {
   let wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
 
@@ -862,15 +900,15 @@ function* addNewAccount( subAccountInfo: SubAccountDescribing ) {
   let subAccountXpub: string
   let subAccountInstanceNum: number
 
-  switch ( subAccountInfo.type ) {
+  switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
         const testInstance = accounts[ AccountType.TEST_ACCOUNT ].length
         const testAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.TEST_ACCOUNT,
           instanceNum: testInstance,
-          accountName: subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: 'Test Account',
-          accountDescription: subAccountInfo.customDescription? subAccountInfo.customDescription: 'Learn Bitcoin',
+          accountName: accountName? accountName: 'Test Account',
+          accountDescription: accountDescription? accountDescription: 'Learn Bitcoin',
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstance ),
           networkType: NetworkType.TESTNET,
@@ -883,8 +921,8 @@ function* addNewAccount( subAccountInfo: SubAccountDescribing ) {
           walletId,
           type: AccountType.CHECKING_ACCOUNT,
           instanceNum: checkingInstance,
-          accountName: subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: 'Checking Account',
-          accountDescription: subAccountInfo.customDescription? subAccountInfo.customDescription: 'Fast and easy',
+          accountName: accountName? accountName: 'Checking Account',
+          accountDescription: accountDescription? accountDescription: 'Fast and easy',
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstance ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
@@ -899,8 +937,8 @@ function* addNewAccount( subAccountInfo: SubAccountDescribing ) {
           walletId,
           type: AccountType.SAVINGS_ACCOUNT,
           instanceNum: savingsInstance,
-          accountName: subAccountInfo.customDisplayName? subAccountInfo.customDisplayName: 'Savings Account',
-          accountDescription: subAccountInfo.customDescription? subAccountInfo.customDescription: 'Multi-factor security',
+          accountName: accountName? accountName: 'Savings Account',
+          accountDescription: accountDescription? accountDescription: 'Multi-factor security',
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstance ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
@@ -1106,46 +1144,36 @@ function* addNewAccount( subAccountInfo: SubAccountDescribing ) {
 //   ADD_NEW_SECONDARY_SUBACCOUNT
 // )
 
-function* addNewAccountShell( { payload: subAccountInfo }: {
-  payload: SubAccountDescribing;
-} ) {
-  const networkType = ( subAccountInfo.type === AccountType.TEST_ACCOUNT || config.APP_STAGE === APP_STAGE.DEVELOPMENT ) ? NetworkType.TESTNET: NetworkType.MAINNET
-  const network = AccountUtilities.getNetworkByType( networkType )
-  const bitcoinUnit = subAccountInfo.type === AccountType.TEST_ACCOUNT
-    ? BitcoinUnit.TSATS
-    : BitcoinUnit.SATS
-
+function* addNewAccountShell( { payload }: {payload: {accountType: AccountType, accountDetails?: { name?: string, description?: string }, }} ) {
+  const { accountType, accountDetails } = payload
   try {
+    const accountName = idx( accountDetails, ( _ ) => _.name )
+    const accountDescription = idx( accountDetails, ( _ ) => _.description )
     const account: Account | MultiSigAccount = yield call(
       addNewAccount,
-      subAccountInfo
+      accountType,
+      accountName,
+      accountDescription
     )
-
-    const newAccountShell = new AccountShell( {
-      unit: bitcoinUnit,
-      primarySubAccount: {
-        ...subAccountInfo,
-        id: account.id,
-        instanceNumber: account.instanceNum,
-        xPub: account.xpub? AccountUtilities.generateYpub( account.xpub, network ): null,
-      },
-      displayOrder: 1,
-    } )
+    const accountShell = yield call( generateShellFromAccount, account )
     yield put( newAccountShellsAdded( {
-      accountShells: [ newAccountShell ]
+      accountShells: [ accountShell ]
     } ) )
-    yield put( accountShellOrderedToFront( newAccountShell ) )
+    yield put( accountShellOrderedToFront( accountShell ) )
   } catch ( error ) {
-    const newAccountShell = new AccountShell( {
-      unit: bitcoinUnit,
-      primarySubAccount: subAccountInfo,
-      displayOrder: 1,
+    console.log( {
+      error
     } )
-    yield put(
-      newAccountShellAddFailed( {
-        accountShell: newAccountShell, error
-      } )
-    )
+    // const newAccountShell = new AccountShell( {
+    //   unit: bitcoinUnit,
+    //   primarySubAccount: new A,
+    //   displayOrder: 1,
+    // } )
+    // yield put(
+    //   newAccountShellAddFailed( {
+    //     accountShell: newAccountShell, error
+    //   } )
+    // )
   }
 }
 
