@@ -1927,7 +1927,7 @@ const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
     flex: 16,
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,

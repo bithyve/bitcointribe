@@ -109,7 +109,7 @@ export default function NewWalletName( props ) {
               autoClose={()=>{
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', true )
-                dispatch( updateCloudPermission( true ) )
+                // dispatch( updateCloudPermission( true ) )
                 props.navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )

@@ -43,7 +43,7 @@ import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
 import { updateCloudPermission } from '../store/actions/health'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -193,16 +193,20 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     if( levelHealth && levelHealth.length ){
       console.log( '@@@-> levelHealth ', levelHealth )
       console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
+      console.log( 'cloudPermissionGranted >>>>>>', cloudPermissionGranted )
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
-      } else{
-        // ( loaderBottomSheet as any ).current.snapTo( 0 )
-        setLoaderModal( false )
-        props.navigation.navigate( 'HomeNav', {
-          walletName,
-        } ) }
+      }
+      //  else{
+      //   console.log( '@@@-> levelHealth ', '2222' )
+      //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
+      //   setLoaderModal( false )
+      //   props.navigation.navigate( 'HomeNav', {
+      //     walletName,
+      //   } )
+      // }
     }
-  }, [ levelHealth ] )
+  }, [ levelHealth, cloudPermissionGranted ] )
 
   const checkCloudLogin = () =>{
 
@@ -414,11 +418,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const renderEncryptionPswd = () => {
     return(
-      <ScrollView style={{
-        backgroundColor: Colors.white,
-        height: '63%'
+      // <ScrollView >
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        // style={styles.rootContainer}
+        style={{
+          backgroundColor: Colors.white,
+          height: '72%'
 
-      }}>
+        }}
+      >
         <View style={{
           flex: 1
         }}>
@@ -433,7 +445,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             }}
           >
             <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
+              // marginTop: hp( 0.5 )
             }} />
           </TouchableOpacity>
           <Text style={{
@@ -629,16 +641,24 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
         </View> : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
+      // </ScrollView>
     )
   }
   const renderSecurityQuestion = () => {
     return (
-      <ScrollView style={{
-        backgroundColor: Colors.white,
-        height: '63%'
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        // style={styles.rootContainer}
+        style={{
+          backgroundColor: Colors.white,
+          height: '72%'
 
-      }}>
+        }}
+      >
         <View style={{
           flex: 1
         }}>
@@ -969,7 +989,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
         </View> : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     )
   }
 
@@ -1045,7 +1065,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   return (
     <View style={{
       flex: 1,
-      backgroundColor: Colors.backgroundColor1
+      backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView style={{
@@ -1055,10 +1075,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ScrollView>
         <View style={{
           flex: 1,
-          backgroundColor: Colors.backgroundColor1
+          backgroundColor: Colors.backgroundColor
         }}>
           <View style={[ CommonStyles.headerContainer, {
-            backgroundColor: Colors.backgroundColor1
+            backgroundColor: Colors.backgroundColor
           } ]}>
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
@@ -1098,7 +1118,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TouchableOpacity
               onPress={() => setActiveIndex( 0 )}
               style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.white,
+                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1,
                 alignSelf: 'center', justifyContent: 'center',
                 borderRadius: wp( '4' ),
                 marginVertical: hp( '3%' )
@@ -1112,10 +1132,18 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 <View style={{
                   width: 18,
                   height: 18,
-                  borderRadius: 999,
-                  borderWidth: 0.5,
+                  borderRadius: 9,
+                  // borderWidth: 0.3,
+                  // borderColor: Colors.borderColor,
+                  backgroundColor: Colors.white,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  elevation: 10,
+                  // shadowColor: Colors.gray,
+                  shadowOpacity: 0.1,
+                  shadowOffset: {
+                    width: 1, height: 1
+                  },
                 }}>
                   {activeIndex === 0 &&
                     <Image
@@ -1126,6 +1154,13 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     />
                   }
                 </View>
+                <Image
+                  style={{
+                    width: 27, height: 27, resizeMode: 'contain'
+                  }}
+                  source={require( '../assets/images/icons/icon_questions.png' )}
+                />
+
                 <View >
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.blue
@@ -1147,7 +1182,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TouchableOpacity
               onPress={() => setActiveIndex( 1 )}
               style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.white,
+                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.backgroundColor1,
                 alignSelf: 'center', justifyContent: 'center',
                 borderRadius: wp( '4' ),
                 // marginVertical: hp( '3%' )
@@ -1156,15 +1191,23 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 flexDirection:'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginHorizontal: wp( '5%' )
+                marginHorizontal: wp( '5%' ),
               }}>
                 <View style={{
                   width: 18,
                   height: 18,
-                  borderRadius: 999,
-                  borderWidth: 0.5,
+                  borderRadius: 9,
+                  // borderWidth: 0.3,
+                  // borderColor: Colors.borderColor,
+                  backgroundColor: Colors.white,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  elevation: 10,
+                  // shadowColor: Colors.gray,
+                  shadowOpacity: 0.1,
+                  shadowOffset: {
+                    width: 1, height: 1
+                  },
                 }}>
                   {activeIndex === 1 &&
                     <Image
@@ -1175,7 +1218,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     />
                   }
                 </View>
+                <Image
+                  style={{
+                    width: 27, height: 27, resizeMode: 'contain'
+                  }}
+                  source={require( '../assets/images/icons/icon_password.png' )}
+                />
                 <View >
+
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue
                   }}>
@@ -1225,7 +1275,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           buttonDisable={false}
         />
         <TouchableOpacity
-          onPress={() => {}}
+          onPress={() => {dispatch( updateCloudPermission( true ) )}}
 
         >
           <Text style={{
