@@ -174,7 +174,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     dispatch( clearAccountSyncCache() )
   }, [] )
   useEffect( () => {
-    console.log( '@@@-> cloudBackupStatus ', cloudBackupStatus )
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
@@ -184,38 +183,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ cloudBackupStatus ] )
 
-  // useEffect( () => {
-  //   if( walletSetupCompleted ){
-  //     console.log( 'walletSetupCompleted****', walletSetupCompleted )
-
-  //     dispatch( walletCheckIn() )
-  //   }
-  // }, [ walletSetupCompleted ] )
-
-  useEffect( () => {
-    if( levelHealth && levelHealth.length ){
-      console.log( '@@@-> levelHealth ', levelHealth )
-      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
-      console.log( 'cloudPermissionGranted >>>>>>', cloudPermissionGranted )
-      if( cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      }
-    }
-  }, [ levelHealth, cloudPermissionGranted ] )
-
   const checkCloudLogin = () =>{
 
-    showLoader()
     requestAnimationFrame( () => {
       const security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
         answer,
       }
-      //const chosenAccounts = {
-      //   REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
-      // }
-      // dispatch( setupWallet( walletName, security, chosenAccounts ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()
@@ -322,10 +297,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     return (
       <TouchableOpacity
         onPress={async () => {
+          showLoader()
           if ( activeIndex === 0 ) {
             checkCloudLogin()
             // setIsCloudPermissionRender( true )
             // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+            dispatch( setCloudData() )
             showSecurityQue( false )
           } else {
             showEncryptionPswd( false )
