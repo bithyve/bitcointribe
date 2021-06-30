@@ -113,132 +113,6 @@ const styles= StyleSheet.create( {
   }
 } )
 
-const HomeNavigator = createStackNavigator(
-  {
-    Home: {
-      screen: HomeStack,
-      path: 'home',
-    },
-    // ReLogin: {
-    //   screen: ReLogin,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //   },
-    // },
-    // Intermediate,
-    // AccountDetails: {
-    //   screen: AccountDetailsStack,
-    // },
-    // ManageBackup,
-    // SecondaryDevice,
-    // TrustedContacts,
-    // CustodianRequestOTP,
-    // CustodianRequestAccepted,
-    // HealthCheck,
-    // SecondaryDeviceHealthCheck,
-    // TrustedContactHealthCheck,
-    // NoteHealthCheck,
-    // CloudHealthCheck,
-    // SweepFundsFromExistingAccount,
-    // NewWalletNameRegenerateShare,
-    // NewWalletQuestionRegenerateShare,
-    // NewWalletGenerationOTP,
-    // WalletCreationSuccess,
-    // SecureScan,
-    // GoogleAuthenticatorOTP,
-    // SecondaryDeviceHistory,
-    // SecondaryDeviceHistoryNewBHR,
-    // TrustedContactHistory,
-    // PersonalCopyHistory,
-    // SecurityQuestionHistory,
-    // SettingGetNewPin,
-    // ContactsListForAssociateContact,
-    // NewTwoFASecret,
-    // TwoFASweepFunds,
-    // SendRequest,
-    // VoucherScanner,
-    // AddContactSendRequest,
-    // ContactDetails,
-    // Receive,
-    // PairNewWallet,
-    // // ManageBackupKeeper,
-    // ManageBackupNewBHR,
-    // // SecurityQuestionHistoryKeeper,
-    // SecurityQuestionHistoryNewBHR,
-    // // KeeperFeatures,
-    // // TrustedContactHistoryKeeper,
-    // TrustedContactHistoryNewBHR,
-    // // KeeperDeviceHistory,
-    // // PersonalCopyHistoryKeeper,
-    // PersonalCopyHistoryNewBHR,
-    // CloudBackupHistory,
-    // NewOwnQuestions,
-    // RestoreWithICloud,
-    // RestoreWithoutICloud,
-    // SettingsContents,
-    // SweepFunds,
-    // SweepFundsEnterAmount,
-    // SweepFundUseExitKey,
-    // SweepConfirmation,
-    // ScanRecoveryKey,
-    // UpgradeBackup,
-    // ConfirmKeys,
-    // ManageBackupUpgradeSecurity,
-    // TwoFAValidation,
-    // TwoFASetup: {
-    //   screen: TwoFASetup,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //   },
-    // },
-    // UpdateApp: {
-    //   screen: UpdateApp,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //   },
-    // },
-    // WyreIntegrationScreen: {
-    //   screen: WyreIntegrationScreen,
-    //   navigationOptions: {
-    //     title: 'Wyre Home'
-    //   }
-    // },
-  },
-  {
-    headerLayoutPreset: 'center',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        header: null,
-        headerTitleContainerStyle: {
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-        },
-      }
-    },
-    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
-
-    //   // 📝 Override the default presentation mode for screens that we
-    //   // want to present modally
-    //   const isModal = MODAL_ROUTES.some(
-    //     ( screenName ) =>
-    //       screenName === transitionProps.scene.route.routeName ||
-    //       ( prevTransitionProps &&
-    //         screenName === prevTransitionProps.scene.route.routeName ),
-    //   )
-
-    //   return StackViewTransitionConfigs.defaultTransitionConfig(
-    //     transitionProps,
-    //     prevTransitionProps,
-    //     isModal,
-    //   )
-    // },
-  },
-)
-// const TabNavigator = createBottomTabNavigator( {
-//   Home: HomeNavigator,
-//   Settings: AccountDetailsStack,
-// } )
-
 const Bottomtab = createBottomTabNavigator(
   {
     Home: {
@@ -491,12 +365,19 @@ const Bottomtab = createBottomTabNavigator(
           return (
             <View style={{
             }}>
-
-              <Image source={require( '../assets/images/tabs/settings.png' )} style={{
-                marginBottom: 'auto',
-                width: 30, height: 30, alignSelf: 'center',
+              {focused ?
+                <Image source={require( '../assets/images/tabs/settings_active.png' )} style={{
+                  marginBottom: 'auto',
+                  width: 30, height: 30, alignSelf: 'center',
                 // backgroundColor: focused ? 'white': 'gray'
-              }} />
+                }} />
+                :
+                <Image source={require( '../assets/images/tabs/settings.png' )} style={{
+                  marginBottom: 'auto',
+                  width: 30, height: 30, alignSelf: 'center',
+                // backgroundColor: focused ? 'white': 'gray'
+                }} />
+              }
               {focused &&
               <View style={styles.activeStyle}/>
               }

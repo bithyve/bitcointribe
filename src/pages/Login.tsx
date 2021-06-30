@@ -740,7 +740,7 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}}>
+        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'}>
           {renderLoaderModalContent()}
         </ModalContainer>
       </View>

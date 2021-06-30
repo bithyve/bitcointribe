@@ -124,7 +124,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
       setTimeout( () => {
         showProcessing( false )
         Toast( `${title} has been added successfully` )
-      }, 3000 )
+      }, 700 )
       const newArr = [ ...selectedAcc ]
       newArr.push( title )
       setSelectedAcc( newArr )
@@ -418,7 +418,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
           handleButtonPress={() => confirmAction( true )}
           buttonDisable={false}
         />
-        <TouchableOpacity
+        {/* <TouchableOpacity
           onPress={() => confirmAction( false )}
         >
           <Text style={{
@@ -427,7 +427,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
             alignSelf: 'center',
             marginLeft: wp( '5%' )
           }}>Skip</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
     </View>

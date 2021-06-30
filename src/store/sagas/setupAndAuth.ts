@@ -1,5 +1,5 @@
-import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, initializeWallet, serviceGeneratorForNewBHR } from '../utils/utilities'
+import { call, fork, put, select } from 'redux-saga/effects'
+import { createWatcher, initializeWallet } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -28,7 +28,6 @@ import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { Wallet } from '../../bitcoin/utilities/Interface'
-// import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security, chosenAccounts } = payload

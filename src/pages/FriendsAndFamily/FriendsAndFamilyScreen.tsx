@@ -293,12 +293,12 @@ class FriendsAndFamilyScreen extends PureComponent<
     return (
       <ListItem
         key={String( index )}
-        bottomDivider
         onPress={() =>
           this.handleContactSelection( contactDescription, index, contactsType )
         }
         containerStyle={{
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
+          marginHorizontal: wp( 3 )
         }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} />
@@ -356,41 +356,118 @@ class FriendsAndFamilyScreen extends PureComponent<
               flex: 1
             }}
           >
-            <View style={{
-              marginTop: wp( '4%' ),
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginHorizontal: wp ( 6 ),
-            }}>
-              <Text
-                style={styles.pageTitle}
-              >
+            <Text
+              style={[ styles.pageTitle, {
+                marginTop: hp( 2 )
+              } ]}
+            >
               Friends & Family
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState( {
-                    isLoadContacts: true,
-                  }, () => {
-                    navigation.navigate( 'AddContact' )
-                  } )
-                }}
-                style={{
-                  ...styles.selectedContactsView,
-                }}
-              >
-                <Text style={[ styles.contactText, {
-                  fontSize: RFValue( 20 ), padding: wp( 0 )
-                } ]}>+</Text>
-                {/* <Image
+            </Text>
+            <View style={{
+              width: '90%',
+              backgroundColor: Colors.white,
+              shadowOpacity: 0.1,
+              shadowOffset: {
+                width: 3, height: 5
+              },
+              shadowRadius: 5,
+              elevation: 2,
+              alignSelf: 'center',
+              borderRadius: wp( 2 ),
+              marginTop: hp( 3 ),
+              padding: hp( 2 )
+            }}>
+              <View style={[ styles.subInfo, {
+                marginBottom: hp( 2 )
+              } ]}>
+                <View>
+                  <Text style={[ styles.pageTitle, {
+                    fontSize: RFValue( 12 ),
+                    marginHorizontal: wp ( 0 ),
+                  } ]}>
+              Add Friends & Family
+                  </Text>
+                  <Text style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue( 11 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: 3,
+                  }}>
+      Add a new contact, or invite a ward
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState( {
+                      isLoadContacts: true,
+                    }, () => {
+                      navigation.navigate( 'AddContact' )
+                    } )
+                  }}
+                  style={{
+                    ...styles.selectedContactsView,
+                  }}
+                >
+                  <Text style={[ styles.contactText, {
+                    fontSize: RFValue( 20 ), padding: wp( 0 )
+                  } ]}>+</Text>
+                  {/* <Image
                   style={styles.addGrayImage}
                   source={require( '../../assets/images/icons/icon_add_grey.png' )}
                 /> */}
+                  <View>
+                    <Text style={styles.contactText}>Add New</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.subInfo}>
                 <View>
-                  <Text style={styles.contactText}>Add New</Text>
+                  <Text style={[ styles.pageTitle, {
+                    fontSize: RFValue( 12 ),
+                    marginHorizontal: wp ( 0 ),
+                  } ]}>
+              Gift Sats
+                  </Text>
+                  <Text style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue( 11 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: 3,
+                  }}>
+      Add a new contact, or invite a ward
+                  </Text>
                 </View>
-              </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    // this.setState( {
+                    //   isLoadContacts: true,
+                    // }, () => {
+                    //   navigation.navigate( 'AddContact' )
+                    // } )
+                  }}
+                  style={{
+                    ...styles.selectedContactsView,
+                  }}
+                >
+                  {/* <Text style={[ styles.contactText, {
+                    fontSize: RFValue( 20 ), padding: wp( 0 )
+                  } ]}>+</Text> */}
+                  <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/icon_bitcoin.png' )}
+                  />
+                  <View>
+                    <Text style={styles.contactText}>Gift BTC</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+
+            <View>
+
               {/* <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
@@ -414,7 +491,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               </View>
             </View> */}
             </View>
-            {otherContacts.length > 0 &&
+            {/* {otherContacts.length > 0 &&
             <View style={{
               width: wp ( '95%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
             }}>
@@ -450,7 +527,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
               </View>
             </View>
-            }
+            } */}
 
             <View style={{
               marginTop: wp( '5%' )
@@ -575,7 +652,7 @@ const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
     flex: 16,
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
@@ -615,13 +692,25 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightBlue,
     borderRadius: wp ( 2 ),
     // width: wp( 22 )
-    padding: wp( 1 )
+    padding: wp( 1 ),
+    width: wp( 24 ),
+    height: hp( 4 )
   },
   pageTitle: {
     color: Colors.blue,
     fontSize: RFValue( 16 ),
     // fontFamily: Fonts.FiraSansRegular,
     fontFamily: Fonts.FiraSansMedium,
+    alignItems: 'center',
+    marginHorizontal: wp ( 6 ),
+  },
+  subInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // marginHorizontal: wp ( 6 ),
+    // flex: 1,
+    marginBottom: 2
   },
   cardTitle: {
     color: Colors.blue,
@@ -671,8 +760,8 @@ const styles = StyleSheet.create( {
     marginRight: 10,
   },
   addGrayImage: {
-    width: wp( '10%' ),
-    height: wp( '10%' ),
+    width: wp( 3 ),
+    height: wp( 4 ),
     marginLeft: 5,
   },
   moreImage: {

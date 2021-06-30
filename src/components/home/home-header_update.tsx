@@ -380,12 +380,13 @@ const HomeHeader = ( {
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
+            marginTop: hp( 1 )
           }}
         >
           <ImageBackground
-            source={require( '../../assets/images/HomePageIcons/icon_qr_active.png' )}
+            source={require( '../../assets/images/icons/qr.png' )}
             style={{
-              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+              width: wp( '7%' ), height: wp( '7%' ), marginLeft: 'auto',
             }}
             resizeMode={'contain'}
           >
@@ -409,6 +410,7 @@ const HomeHeader = ( {
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
+            marginTop: hp( 1 )
           }}
         >
           <ImageBackground
@@ -486,18 +488,18 @@ const HomeHeader = ( {
         </TouchableOpacity>
       </View> */}
       <View style={{
-        flexDirection: 'row', marginTop: hp( 1 )
+        flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
       }}>
         <View style={{
-          backgroundColor: Colors.gold,
+          backgroundColor: Colors.white,
           width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
           alignItems:'center',
           justifyContent: 'center'
         }}>
           <Image
-            source={require( '../../assets/images/icons/icon_info.png' )}
+            source={require( '../../assets/images/icons/icon_check_green.png' )}
             style={{
-              width: wp( '3%' ), height: wp( '3%' ),
+              width: wp( '5%' ), height: wp( '5%' ),
             }}
             resizeMode={'contain'}
           />
@@ -505,7 +507,7 @@ const HomeHeader = ( {
 
         <Text style={{
           color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
-        }}>Approve the request for <Text style={{
+        }}>Your Backup is at Level 1 <Text style={{
             fontFamily: Fonts.FiraSansMediumItalic
           }}>recovery</Text></Text>
 
