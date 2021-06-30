@@ -100,7 +100,6 @@ function* setupWalletWorker( { payload } ) {
   }
   if( TEST_ACCOUNT )  {
 
-
     // When test account selected
 
     const currentWalletId: string = yield select( ( state ) => state.storage.wallet.walletId )
@@ -114,7 +113,7 @@ function* setupWalletWorker( { payload } ) {
       ...wallet.accounts
     }
     currentWallet.accounts = wallet.accounts
-    const currentAccounts = yield select( ( state ) => state.accounts )
+    const currentAccounts = yield select( ( state ) => state.accounts.accounts )
     const newAccounts = {
       ...currentAccounts,
       ...accounts
@@ -125,7 +124,7 @@ function* setupWalletWorker( { payload } ) {
     } ) )
 
     yield put( updateAccounts( {
-      accounts: newAccounts
+      accounts: accounts, newAccounts: true
     } ) )
     yield put( updateWallet( {
       wallet: currentWallet
@@ -148,7 +147,7 @@ function* setupWalletWorker( { payload } ) {
     }
 
     currentWallet.accounts = wallet.accounts
-    const currentAccounts = yield select( ( state ) => state.accounts )
+    const currentAccounts = yield select( ( state ) => state.accounts.accounts )
     const newAccounts = {
       ...currentAccounts,
       ...accounts
@@ -159,7 +158,7 @@ function* setupWalletWorker( { payload } ) {
     } ) )
 
     yield put( updateAccounts( {
-      accounts: newAccounts
+      accounts: accounts, newAccounts: true
     } ) )
     yield put( updateWallet( {
       wallet: currentWallet
