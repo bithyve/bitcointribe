@@ -45,7 +45,7 @@ import {
 } from '../store/actions/notifications'
 import { autoSyncShells } from '../store/actions/accounts'
 
-const LOADER_MESSAGE_TIME = 2
+const LOADER_MESSAGE_TIME = 4000
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
@@ -255,7 +255,7 @@ export default function Login( props ) {
             // if ( loaderBottomSheet.current ) {
             //   loaderBottomSheet.current.snapTo( 0 )
             // }
-            setloaderModal( false )
+            setloaderModal( true )
             //console.log( 'requestName**', requestName )
             //console.log( 'creationFlag**', creationFlag )
 
@@ -331,7 +331,6 @@ export default function Login( props ) {
 
       await AsyncStorage.setItem( 'fcmToken', fcmToken )
       dispatch( updateFCMTokens( fcmArray ) )
-
     }
   }
 
