@@ -34,7 +34,7 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/ramp_logo_notext.png' ),
     disabled: false,
-    hasButton: false,
+    hasButton: true,
   },
   {
     title: 'Wyre Bitcoin',
@@ -45,12 +45,12 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     hasButton: false,
   },
   {
-    title: 'Samurai Wallet',
+    title: 'Swan Bitcoin',
     subtitle: 'Stack sats with Swan Bitcoin',
     kind: BuyMenuItemKind.SWAN,
     imageSource: require( '../../assets/images/icons/swan.png' ),
     disabled: false,
-    hasButton: true,
+    hasButton: false,
   }
   // {
   //   title: 'Set up automatic buys',

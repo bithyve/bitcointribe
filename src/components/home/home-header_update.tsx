@@ -380,12 +380,13 @@ const HomeHeader = ( {
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
+            marginTop: hp( 1 )
           }}
         >
           <ImageBackground
-            source={require( '../../assets/images/HomePageIcons/icon_qr_active.png' )}
+            source={require( '../../assets/images/icons/qr.png' )}
             style={{
-              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+              width: wp( '7%' ), height: wp( '7%' ), marginLeft: 'auto',
             }}
             resizeMode={'contain'}
           >
@@ -409,6 +410,7 @@ const HomeHeader = ( {
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
+            marginTop: hp( 1 )
           }}
         >
           <ImageBackground
@@ -486,7 +488,7 @@ const HomeHeader = ( {
         </TouchableOpacity>
       </View> */}
       <View style={{
-        flexDirection: 'row', marginTop: hp( 1 )
+        flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
       }}>
         <View style={{
           backgroundColor: Colors.gold,

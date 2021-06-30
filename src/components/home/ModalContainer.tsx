@@ -5,6 +5,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 const ModalContainer = ( {
   visible,
   closeBottomSheet,
+  background = 'rgba(0,0,0,0.5)',
   children
 } ) => {
   return(
@@ -25,7 +26,7 @@ const ModalContainer = ( {
         }}
         style={{
           // flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: background,
           flex: 1,
           flexDirection: 'column',
           justifyContent: 'flex-end',

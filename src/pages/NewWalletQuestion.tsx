@@ -589,11 +589,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             ) : null}
           </View>
 
-          {/* {pswdError.length == 0 && (
+          {pswdError.length == 0 && (
             <Text style={styles.helpText}>
-              Password must only contain lowercase characters (a-z) and digits (0-9).
+              No numbers or special characters allowed
             </Text>
-          )} */}
+          )}
         </View>
         <View
           style={{
@@ -623,10 +623,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           ) && (
             setButtonVisible()
           ) || null}
-          <View style={styles.statusIndicatorView}>
+          {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
-          </View>
+          </View> */}
         </View> : null}
       </ScrollView>
     )
@@ -893,7 +893,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
               {answerError.length == 0 && (
                 <Text style={styles.helpText}>
-              Answers must only contain lowercase characters (a-z) and digits (0-9).
+              Answers must contain only lower case alphabets and numbers
                 </Text>
               )}
             </View>
@@ -963,10 +963,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           ) && (
             setButtonVisible()
           ) || null}
-          <View style={styles.statusIndicatorView}>
+          {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
-          </View>
+          </View> */}
         </View> : null}
       </ScrollView>
     )
@@ -1245,7 +1245,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {showEncryptionPswd( false ) }} >
         {renderEncryptionPswd()}
       </ModalContainer>
-      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
         {renderLoaderModalContent()}
       </ModalContainer>
       {/* <BottomSheet
