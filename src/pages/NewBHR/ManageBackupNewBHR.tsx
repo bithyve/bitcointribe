@@ -12,7 +12,7 @@ import {
   Platform,
   Switch,
   Image,
-  // InteractionManager
+  InteractionManager
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
@@ -227,9 +227,8 @@ class ManageBackupNewBHR extends Component<
   }
 
   componentDidMount = async () => {
-
-    this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
-    requestAnimationFrame( async() => {
+    InteractionManager.runAfterInteractions( async() => {
+      this.onPressKeeperButton= debounce( this.onPressKeeperButton.bind( this ), 1500 )
       await AsyncStorage.getItem( 'walletRecovered' ).then( async( recovered ) => {
         if( !this.props.isLevelToNotSetupStatus && JSON.parse( recovered ) ) {
           this.setState( {
@@ -827,7 +826,7 @@ class ManageBackupNewBHR extends Component<
         }>
           <HeaderComponent />
         </Suspense> */}
-        <Header />
+        <Header fromScreen={'ManageBackup'} />
         <View style={styles.accountCardsSectionContainer}>
           {/* <View style={{
         flex: 1, backgroundColor: 'white'

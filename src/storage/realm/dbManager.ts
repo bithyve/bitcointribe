@@ -43,16 +43,41 @@ const createAccount = async ( account ) => {
   }
 }
 
+const updateAccount = async ( accountId, account ) => {
+  try {
+    let acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
+    const data = {
+      ...account, txIdMap: [],
+    }
+    for ( let i = 0; i < data.transactions.length; i++ ) {
+      if( !data.transactions[ i ].senderAddresses ) {
+        data.transactions[ i ].senderAddresses = []
+      }
+      if( !data.transactions[ i ].recipientAddresses ) {
+        data.transactions[ i ].recipientAddresses = []
+      }
+    }
+    data.addressQueryList = []
+    acccountRef = data
+    db.create( schema.Account, acccountRef, true )  } catch ( error ) {
+    console.log( error )
+  }
+}
+
 const getWallets = () => {
   const walletsRef = db.objects( schema.Wallet )
-  const wallets = Array.from( walletsRef )
+  const wallets =
   console.log( 'wallets',  JSON.stringify( wallets ) )
 }
 
 const getAccounts = () => {
-  const accountsRef = db.objects( schema.Account )
-  const accounts = Array.from( accountsRef )
-  console.log( 'accounts',  JSON.stringify( accounts ) )
+  try {
+    const accountsRef = db.objects( schema.Account )
+    const accounts = Array.from( accountsRef )
+    console.log( 'accounts',  JSON.stringify( accounts ) )
+  } catch ( error ) {
+    console.log( error )
+  }
 }
 
 export default {
@@ -62,4 +87,5 @@ export default {
   getAccounts,
   createAccounts,
   createAccount,
+  updateAccount,
 }
