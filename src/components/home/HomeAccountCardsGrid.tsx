@@ -3,6 +3,7 @@ import { FlatList } from 'react-native'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import AccountCardColumn from './AccountCardColumn'
+import AddNewAccountCard from '../../pages/Home/AddNewAccountCard'
 
 export type Props = {
   accountShells: AccountShell[];
@@ -39,9 +40,9 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       return []
     }
 
-    if ( accountShells.length == 1 ) {
-      return [ accountShells ]
-    }
+    // if ( accountShells.length == 1 ) {
+    //   return [ accountShells ]
+    // }
 
     ///////////////////
     // Even though we're rendering the list as horizontally scrolling set of
@@ -96,7 +97,7 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       // very first item. This is because the first column
       // will only contain one item, since the "Add new" button will be placed
       // in front of everything.
-      if ( currentColumn.length == 2 || index == 0 ) {
+      if ( currentColumn.length == 2 ) {
         columns.push( currentColumn )
         currentColumn = []
       }
@@ -108,6 +109,11 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
       }
     //  }
     } )
+    if( columns[ columns.length - 1 ].length === 1 && columns.length !== 1 ) {
+      columns[ columns.length - 1 ].push( 'add new' )
+    } else {
+      columns.push( [ 'add new' ] )
+    }
 
     return columns
   }, [ accountShells, showAllAccount ] )
@@ -123,11 +129,13 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
         return <AccountCardColumn
           cardData={item}
           currentLevel={currentLevel}
-          prependsAddButton={index == 0}
+          // prependsAddButton={typeof item === 'string'}
           onAccountCardSelected={onAccountSelected}
           onAddNewAccountPressed={onAddNewSelected}
           onCardLongPressed={onCardLongPressed}
         />
+
+
       }}
     />
   )

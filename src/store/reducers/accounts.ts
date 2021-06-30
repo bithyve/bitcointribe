@@ -279,7 +279,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
             ...state.accounts,
             ...action.payload.accounts,
           },
-          accountShells: updateShells( action.payload.accounts, state.accountShells )
+          accountShells: updateShells( action.payload.accounts, state.accountShells, action.payload.newAccounts )
         }
 
       case ADD_NEW_ACCOUNT_SHELL:

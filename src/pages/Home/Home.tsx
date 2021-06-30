@@ -778,7 +778,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSynn disabled
+      // Keeping autoSync disabled
       credsAuthenticated( false )
       console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
