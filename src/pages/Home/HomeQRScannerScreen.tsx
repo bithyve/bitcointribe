@@ -41,15 +41,15 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
   const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
 
-  function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
-    const networkType: NetworkType = AccountUtilities.networkType( dataString )
-    const network = AccountUtilities.getNetworkByType( networkType )
+  function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
+    const networkType: NetworkType = AccountUtilities.networkType( scannedData )
     if ( networkType ) {
-      const { type } = AccountUtilities.addressDiff( dataString, network )
+      const network = AccountUtilities.getNetworkByType( networkType )
+      const { type } = AccountUtilities.addressDiff( scannedData, network )
       if ( type===ScannedAddressKind.ADDRESS ) {
-        onSend( dataString, 0 )
+        onSend( scannedData, 0 )
       } else if( type===ScannedAddressKind.PAYMENT_URI )  {
-        const res = AccountUtilities.decodePaymentURI( dataString )
+        const res = AccountUtilities.decodePaymentURI( scannedData )
         const address = res.address
         const options = res.options
 
@@ -59,11 +59,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     }
 
     const onCodeScanned = navigation.getParam( 'onCodeScanned' )
-    if ( typeof onCodeScanned === 'function' ) {
-      const data = getFormattedStringFromQRString( dataString )
-      onCodeScanned( data )
-    }
-
+    if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
     navigation.goBack( null )
   }
 
