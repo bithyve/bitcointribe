@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, createRef } from 'react'
 import {
   StyleSheet,
   View,
@@ -31,10 +31,8 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
-
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
@@ -43,6 +41,18 @@ import {  setCloudData } from '../store/actions/cloud'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
+import { updateCloudPermission } from '../store/actions/health'
+import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
+
+
+export enum BottomSheetKind {
+  CLOUD_PERMISSION,
+}
+
+export enum BottomSheetState {
+  Closed,
+  Open,
+}
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -139,7 +149,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ tempPswd, setTempPswd ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   // const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
@@ -154,9 +163,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
+  const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
+  const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
+  const bottomSheetRef = createRef<BottomSheet>()
+  const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
 
   useEffect( () => {
+    console.log( '@@@-> cloudBackupStatus ', cloudBackupStatus )
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
@@ -166,16 +181,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ cloudBackupStatus ] )
 
-  useEffect( () => {
-    if( walletSetupCompleted ){
-      console.log( 'walletSetupCompleted****', walletSetupCompleted )
+  // useEffect( () => {
+  //   if( walletSetupCompleted ){
+  //     console.log( 'walletSetupCompleted****', walletSetupCompleted )
 
-      dispatch( walletCheckIn() )
-    }
-  }, [ walletSetupCompleted ] )
+  //     dispatch( walletCheckIn() )
+  //   }
+  // }, [ walletSetupCompleted ] )
 
   useEffect( () => {
-    if( walletSetupCompleted && levelHealth && levelHealth.length ){
+    if( levelHealth && levelHealth.length ){
+      console.log( '@@@-> levelHealth ', levelHealth )
       console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
@@ -186,9 +202,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           walletName,
         } ) }
     }
-  }, [ walletSetupCompleted, levelHealth ] )
+  }, [ levelHealth ] )
 
   const checkCloudLogin = () =>{
+
     showLoader()
     requestAnimationFrame( () => {
       const security = {
@@ -196,7 +213,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         question: dropdownBoxValue.question,
         answer,
       }
-      dispatch( setupWallet( walletName, security ) )
+      //const chosenAccounts = {
+      //   REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
+      // }
+      // dispatch( setupWallet( walletName, security, chosenAccounts ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()
@@ -305,6 +325,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         onPress={async () => {
           if ( activeIndex === 0 ) {
             checkCloudLogin()
+            // setIsCloudPermissionRender( true )
+            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
             showSecurityQue( false )
           } else {
             showEncryptionPswd( false )
@@ -951,6 +973,75 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     )
   }
 
+  const openBottomSheet = (
+    kind: BottomSheetKind,
+    snapIndex: number | null = null
+  ) => {
+    setBottomSheetState( BottomSheetState.Open )
+    setCurrentBottomSheetKind( kind )
+
+    if ( snapIndex == null ) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.snapTo( snapIndex )
+    }
+  }
+
+  const onBottomSheetClosed =()=> {
+    setBottomSheetState( BottomSheetState.Closed )
+    setCurrentBottomSheetKind( null )
+  }
+
+  const closeBottomSheet = () => {
+    setIsCloudPermissionRender( false )
+    // bottomSheetRef.current.snapTo( 0 )
+    setCurrentBottomSheetKind( null )
+    onBottomSheetClosed()
+  }
+
+  const renderBottomSheetContent = () =>{
+
+    switch ( currentBottomSheetKind ) {
+        case BottomSheetKind.CLOUD_PERMISSION:
+          return (
+            <CloudPermissionModalContents
+              title={'Automated Cloud Backup'}
+              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+              note={''}
+              onPressProceed={( flag )=>{
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', flag )
+                dispatch( updateCloudPermission( flag ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              onPressIgnore={( flag )=> {
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', flag )
+                dispatch( updateCloudPermission( flag ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              autoClose={()=>{
+                closeBottomSheet()
+                console.log( 'updateCloudPermission', true )
+                dispatch( updateCloudPermission( true ) )
+                props.navigation.navigate( 'NewWalletQuestion', {
+                  walletName,
+                } )
+              }}
+              isRendered={isCloudPermissionRender}
+              bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
+            />
+          )
+
+        default:
+          break
+    }
+  }
+
   return (
     <View style={{
       flex: 1,
@@ -972,7 +1063,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {
-                props.navigation.navigate( 'WalletInitialization' )
+                props.navigation.goBack()
               }}
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -997,12 +1088,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'New Hexa Wallet'}
-              secondLineTitle={''}
-              infoTextNormal={'Create initial '}
-              infoTextBold={'cloud backup'}
+              firstLineTitle={'Step 3'}
+              secondLineTitle={'Create initial cloud backup'}
+              infoTextNormal={'New Wallet creation'}
+              infoTextBold={''}
               infoTextNormal1={''}
-              step={'Step 2: '}
+              step={''}
             />
             <TouchableOpacity
               onPress={() => setActiveIndex( 0 )}
@@ -1145,6 +1236,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>Skip Backup</Text>
         </TouchableOpacity>
       </View>
+      <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
+        {renderBottomSheetContent()}
+      </ModalContainer>
 
       <ModalContainer visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
         {renderSecurityQuestion()}

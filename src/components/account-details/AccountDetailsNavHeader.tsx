@@ -75,7 +75,9 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
         barStyle="dark-content"
       />
 
-      <View style={ScreenHeaderStyles.smallHeaderContainer}>
+      <View style={[ ScreenHeaderStyles.smallHeaderContainer, {
+        backgroundColor: Colors.backgroundColor
+      } ]}>
 
         <View style={styles.mainContentContainer}>
           <TouchableOpacity

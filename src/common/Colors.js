@@ -29,6 +29,7 @@ const Colors = {
   danube: '#5D8ED1',
   riptide: '#77E3B5',
   kashmirBlue: '#546D92',
+  gold: '#E9BB35',
 
   // Grayscale
   gray1: '#d0d0d0',

@@ -127,8 +127,12 @@ function* generateMetaSharesWorker() {
   if ( !secondaryMnemonic || !twoFASecret ) {
     throw new Error( 'secure assets missing; staticNonPMDD' )
   }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs
-
+  let secondary = ''
+  let bh = ''
+  if ( secureAccount && secureAccount.secureHDWallet && secureAccount.secureHDWallet.xpubs ) {
+    secondary = secureAccount.secureHDWallet.xpubs.secondary
+    bh = secureAccount.secureHDWallet.xpubs.bh
+  }
   const secureAssets = {
     secondaryMnemonic,
     twoFASecret,
@@ -735,7 +739,12 @@ function* generatePersonalCopyWorker( { payload } ) {
       'Personal copies generation failed; secondary mnemonic missing',
     )
   }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs
+  let secondary = ''
+  let bh = ''
+  if ( secureAccount && secureAccount.secureHDWallet && secureAccount.secureHDWallet.xpubs ) {
+    secondary = secureAccount.secureHDWallet.xpubs.secondary
+    bh = secureAccount.secureHDWallet.xpubs.bh
+  }
   const secureAssets = {
     secondaryMnemonic: secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '',
     secondaryXpub: secureAccount.secureHDWallet.xpubs && secureAccount.secureHDWallet.xpubs.secondary ? secureAccount.secureHDWallet.xpubs.secondary : '',

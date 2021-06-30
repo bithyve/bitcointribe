@@ -11,6 +11,7 @@ import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
 import NewWalletName from '../pages/NewWalletName'
+import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
@@ -35,7 +36,7 @@ import Colors from '../common/Colors'
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
-import { Text, View, Image } from 'react-native'
+import { Text, View, Image, StyleSheet } from 'react-native'
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -53,6 +54,7 @@ const SetupNavigator = createStackNavigator(
     Login,
     PasscodeConfirm,
     NewWalletName,
+    AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
     WalletNameRecovery,
@@ -91,6 +93,25 @@ const MODAL_ROUTES = [
   'HealthCheckSecurityAnswer',
   'Intermediate',
 ]
+
+const styles= StyleSheet.create( {
+  activeStyle:{
+    alignSelf: 'center',
+    marginTop: 3,
+    width: widthPercentageToDP( 1 ),
+    height: widthPercentageToDP( 1 ),
+    borderRadius: widthPercentageToDP( 0.5 ),
+    backgroundColor: Colors.white
+  },
+  inactiveStyle: {
+    alignSelf: 'center',
+    marginTop: 3,
+    width: widthPercentageToDP( 1 ),
+    height: widthPercentageToDP( 1 ),
+    borderRadius: widthPercentageToDP( 0.5 ),
+    // backgroundColor: Colors.white
+  }
+} )
 
 const HomeNavigator = createStackNavigator(
   {
@@ -259,12 +280,10 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
 
-              {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // marginTop: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
               }
               {/* <Svg height= '30'>
                 <Image source={focused ? require( '../assets/images/tabs/fnf_active.svg' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
@@ -330,10 +349,7 @@ const Bottomtab = createBottomTabNavigator(
                 // </Svg>
               }
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
           )
@@ -351,13 +367,15 @@ const Bottomtab = createBottomTabNavigator(
               {focused ?
                 <Image source={require( '../assets/images/tabs/buy_active.png' )} style={{
                   marginBottom: 'auto',
-                  width: 20, height: 20, alignSelf: 'center',
+                  width: 19, height: 23, alignSelf: 'center',
+                  resizeMode: 'contain'
                   // backgroundColor: focused ? 'white': 'gray'
                 }} />
                 :
                 <Image source={require( '../assets/images/tabs/buy.png' )} style={{
                   marginBottom: 'auto',
-                  width: 20, height: 20, alignSelf: 'center',
+                  width: 19, height: 23, alignSelf: 'center',
+                  resizeMode: 'contain'
                   // backgroundColor: focused ? 'white': 'gray'
                 }} />
               }
@@ -397,11 +415,7 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               } */}
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // margin: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
           )
@@ -462,11 +476,7 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // margin: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
           )
@@ -488,11 +498,7 @@ const Bottomtab = createBottomTabNavigator(
                 // backgroundColor: focused ? 'white': 'gray'
               }} />
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // margin: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
 

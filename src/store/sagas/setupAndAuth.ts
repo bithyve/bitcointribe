@@ -31,66 +31,140 @@ import { Wallet } from '../../bitcoin/utilities/Interface'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security } = payload
+  const { walletName, security, chosenAccounts } = payload
+  const { REGULAR_ACCOUNT, TEST_ACCOUNT, SECURE_ACCOUNT } = chosenAccounts
+  if( REGULAR_ACCOUNT ) {
 
-  // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet )
-  // TODO: save wallet-instance in realm
-  // console.log( 'wallet-instance in realm', wallet, accounts )
-  yield call( dbManager.createWallet, wallet )
-  yield call( dbManager.createAccounts, accounts )
+    // When only regular account selected
 
-  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-    wallet, accounts
-  } ) )
+    const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet, chosenAccounts, '', '' )
+    // TODO: save wallet-instance in realm
+    // console.log( 'wallet-instance in realm', wallet, accounts )
+    yield call( dbManager.createWallet, wallet )
+    yield call( dbManager.createAccounts, accounts )
 
-  yield put( updateAccounts( {
-    accounts, newAccounts: true
-  } ) )
-  yield put( updateWallet( {
-    wallet
-  } ) )
-  yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+      wallet, accounts
+    } ) )
 
-  const initialDatabase: Database = {
-    WALLET_SETUP: {
-      walletName, security
-    },
-    DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {
+    yield put( updateAccounts( {
+      accounts, newAccounts: true
+    } ) )
+    yield put( updateWallet( {
+      wallet
+    } ) )
+    yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
+
+    const initialDatabase: Database = {
+      WALLET_SETUP: {
+        walletName, security
       },
-      SHARES_TRANSFER_DETAILS: {
+      DECENTRALIZED_BACKUP: {
+        RECOVERY_SHARES: {
+        },
+        SHARES_TRANSFER_DETAILS: {
+        },
+        UNDER_CUSTODY: {
+        },
+        DYNAMIC_NONPMDD: {
+        },
       },
-      UNDER_CUSTODY: {
+      SERVICES: {
+        REGULAR_ACCOUNT: JSON.stringify( {
+        } ),
+        TEST_ACCOUNT: JSON.stringify( {
+        } ),
+        SECURE_ACCOUNT: JSON.stringify( {
+        } ),
+        S3_SERVICE: JSON.stringify( s3Service ),
+        TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
       },
-      DYNAMIC_NONPMDD: {
-      },
-    },
-    SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( {
-      } ),
-      TEST_ACCOUNT: JSON.stringify( {
-      } ),
-      SECURE_ACCOUNT: JSON.stringify( {
-      } ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-    },
-    VERSION: DeviceInfo.getVersion(),
+      VERSION: DeviceInfo.getVersion(),
+    }
+    yield call( insertDBWorker, {
+      payload: initialDatabase
+    } )
+
+    yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+
+    // initialize health-check schema on relay
+    yield put( initializeHealthSetup() )
+    yield put( completedWalletSetup( ) )
+
+    // Post Hydration activities
+    // saturate the test account w/ 10K sats
+    // yield put( getTestcoins() )
+
+    // End of regular account option
+
   }
-  yield call( insertDBWorker, {
-    payload: initialDatabase
-  } )
+  if( TEST_ACCOUNT )  {
 
-  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+    // When test account selected
 
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
-  yield put( completedWalletSetup( ) )
+    const currentWalletId: string = yield select( ( state ) => state.storage.wallet.walletId )
+    const currentPrimaryMnemonic: string = yield select( ( state ) => state.storage.wallet.walletId )
+    const { wallet, accounts } = yield call( initializeWallet, chosenAccounts, currentWalletId, currentPrimaryMnemonic )
 
-  // Post Hydration activities
-  // saturate the test account w/ 10K sats
-  // yield put( getTestcoins() )
+    const currentWallet = yield select( ( state ) => state.storage.wallet )
+
+    wallet.accounts = {
+      ...currentWallet.accounts,
+      ...wallet.accounts
+    }
+    currentWallet.accounts = wallet.accounts
+    const currentAccounts = yield select( ( state ) => state.accounts.accounts )
+    const newAccounts = {
+      ...currentAccounts,
+      ...accounts
+    }
+
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+      wallet, accounts: newAccounts
+    } ) )
+
+    yield put( updateAccounts( {
+      accounts: accounts, newAccounts: true
+    } ) )
+    yield put( updateWallet( {
+      wallet: currentWallet
+    } ) )
+    // End of when test account selected
+  }
+  if( SECURE_ACCOUNT )  {
+
+    // When savings account selected
+
+    const currentWalletId: string = yield select( ( state ) => state.storage.wallet.walletId )
+    const currentPrimaryMnemonic: string = yield select( ( state ) => state.storage.wallet.walletId )
+    const { wallet, accounts } = yield call( initializeWallet, chosenAccounts, currentWalletId, currentPrimaryMnemonic )
+
+    const currentWallet = yield select( ( state ) => state.storage.wallet )
+
+    wallet.accounts = {
+      ...currentWallet.accounts,
+      ...wallet.accounts
+    }
+
+    currentWallet.accounts = wallet.accounts
+    const currentAccounts = yield select( ( state ) => state.accounts.accounts )
+    const newAccounts = {
+      ...currentAccounts,
+      ...accounts
+    }
+
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
+      wallet, accounts: newAccounts
+    } ) )
+
+    yield put( updateAccounts( {
+      accounts: accounts, newAccounts: true
+    } ) )
+    yield put( updateWallet( {
+      wallet: currentWallet
+    } ) )
+    // End of when savings account selected
+  }
 }
 
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
