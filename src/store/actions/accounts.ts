@@ -555,11 +555,11 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const updateAccounts = ( { accounts }: { accounts: Accounts } ) => {
+export const updateAccounts = ( { accounts, newAccounts }: { accounts: Accounts, newAccounts?: boolean } ) => {
   return {
     type: UPDATE_ACCOUNTS,
     payload: {
-      accounts
+      accounts, newAccounts
     }
   }
 }
