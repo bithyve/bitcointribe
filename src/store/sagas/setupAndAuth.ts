@@ -25,7 +25,6 @@ import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 import { updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
-import { initAccountShells } from '../utils/accountShellMapping'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
 import { Wallet } from '../../bitcoin/utilities/Interface'
@@ -49,7 +48,7 @@ function* setupWalletWorker( { payload } ) {
     } ) )
 
     yield put( updateAccounts( {
-      accounts,
+      accounts, newAccounts: true
     } ) )
     yield put( updateWallet( {
       wallet

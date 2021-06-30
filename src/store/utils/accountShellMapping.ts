@@ -12,10 +12,8 @@ import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaS
 import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 
-export const initAccountShells = ( accounts: Accounts ) => {
-  // adding default account shells
+export const generateAccountShells = ( accounts: Accounts ) => {
   const accountShells: AccountShell[] = []
-  let displayOrderIndex = 1
 
   Object.values( accounts ).forEach( ( account: Account | MultiSigAccount )=> {
     let SubAccountConstructor
@@ -43,41 +41,41 @@ export const initAccountShells = ( accounts: Accounts ) => {
           customDescription: account.accountDescription
         } ),
         unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
-        displayOrder: displayOrderIndex,
       } )
     )
-
-    displayOrderIndex++
   } )
-
   return accountShells
 }
 
 const updatePrimarySubAccounts = (
   accounts: Accounts,
   accountShells: AccountShell[],
-): AccountShell[] =>  accountShells.map( ( shell )=>{
-  const account = accounts[ shell.primarySubAccount.id ]
-  if( !account ) return shell
+): AccountShell[] => {
+  accountShells.forEach( ( shell )=>{
+    const account = accounts[ shell.primarySubAccount.id ]
+    if( !account ) return shell
 
-  const accountDetails = {
-    accountName: account.accountName,
-    accountDescription: account.accountDescription,
-    accountXpub: account.xpub
-  }
-  AccountShell.updatePrimarySubAccountDetails(
-    shell,
-    account.balances,
-    account.transactions,
-    accountDetails
-  )
-  return shell
-} )
+    const accountDetails = {
+      accountName: account.accountName,
+      accountDescription: account.accountDescription,
+      accountXpub: account.xpub
+    }
+    AccountShell.updatePrimarySubAccountDetails(
+      shell,
+      account.balances,
+      account.transactions,
+      accountDetails
+    )
+    return shell
+  } )
+  return accountShells
+}
 
 export const updateShells = (
   accounts: Accounts,
   accountShells: AccountShell[],
+  newAccounts?: boolean
 ): AccountShell[] => {
-  if ( !accountShells.length ) return initAccountShells( accounts ) // init out-of-the-box account shells
+  if ( newAccounts ) return accountShells.concat( generateAccountShells( accounts ) )
   else return updatePrimarySubAccounts( accounts, accountShells )  // update primary sub-accounts
 }
