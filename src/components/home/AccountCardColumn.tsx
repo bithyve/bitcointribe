@@ -30,32 +30,40 @@ const AccountCardColumn: React.FC<Props> = ( {
 }: Props ) => {
   return (
     <View style={styles.rootContainer}>
+
+      {cardData.map( ( accountShell ) => {
+        const disabled = false
+        // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
+        return typeof accountShell === 'string' ?
+          (
+            <AddNewAccountCard
+              containerStyle={styles.cardContainer}
+              onPress={onAddNewAccountPressed}
+            />
+          )
+          :
+          (
+            <TouchableOpacity
+              key={accountShell.id}
+              disabled={disabled}
+              style={styles.cardContainer}
+              onPress={() => onAccountCardSelected( accountShell )}
+              onLongPress={() => onCardLongPressed( accountShell )}
+              delayPressIn={0}
+            >
+              <HomeAccountsListCard
+                accountShell={accountShell}
+                cardDisabled={disabled}
+              />
+            </TouchableOpacity>
+          )
+      } )}
       {prependsAddButton && (
         <AddNewAccountCard
           containerStyle={styles.cardContainer}
           onPress={onAddNewAccountPressed}
         />
       )}
-
-      {cardData.map( ( accountShell ) => {
-        const disabled = false
-        // if(currentLevel < 2 && accountShell.primarySubAccount.kind === SECURE_ACCOUNT) disabled = true;
-        return (
-          <TouchableOpacity
-            key={accountShell.id}
-            disabled={disabled}
-            style={styles.cardContainer}
-            onPress={() => onAccountCardSelected( accountShell )}
-            onLongPress={() => onCardLongPressed( accountShell )}
-            delayPressIn={0}
-          >
-            <HomeAccountsListCard
-              accountShell={accountShell}
-              cardDisabled={disabled}
-            />
-          </TouchableOpacity>
-        )
-      } )}
     </View>
   )
 }
