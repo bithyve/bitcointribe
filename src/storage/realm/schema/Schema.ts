@@ -1,6 +1,7 @@
 import { ObjectSchema } from 'realm'
 
 const UTXO = 'UTXO'
+const UTXOStatus = 'UTXOStatus'
 const Wallet = 'Wallet'
 const Account = 'Account'
 const Transaction = 'Transaction'
@@ -140,27 +141,57 @@ export const XPubSchema: ObjectSchema = {
 
 export const TransactionSchema: ObjectSchema = {
   name: Transaction,
-  primaryKey: 'txId',
+  primaryKey: 'txid',
   properties: {
-    txId: {
+    txid: {
       type: 'string', indexed: true
     },
-    status: 'string',
-    confirmations: 'int',
-    fee: 'string',
-    date: 'string',
-    transactionType: 'string',
-    amount: 'int',
-    accountType: 'string',
-    primaryAccType: 'string',
-    accountName: 'string',
-    contactName: 'string',
-    recipientAddresses: 'string?[]',
-    senderAddresses: 'string?[]',
-    blockTime: 'int',
-    message: 'string',
-    address: 'string',
-    notes: 'string?[]'
+    status: {
+      type: 'string', optional: true
+    },
+    confirmations: {
+      type: 'int', optional: true
+    },
+    fee: {
+      type: 'int', optional: true
+    },
+    date: {
+      type: 'string', optional: true
+    },
+    transactionType: {
+      type: 'string', optional: true
+    },
+    amount: {
+      type: 'int', optional: true
+    },
+    accountType: {
+      type: 'string', optional: true
+    },
+    // primaryAccType: 'string',
+    accountName: {
+      type: 'string', optional: true
+    },
+    contactName: {
+      type: 'string', optional: true
+    },
+    recipientAddresses: {
+      type: 'string?[]', default: []
+    },
+    senderAddresses: {
+      type: 'string?[]', default: []
+    },
+    blockTime: {
+      type: 'int', optional: true,
+    },
+    message: {
+      type: 'string', optional: true
+    },
+    address: {
+      type: 'string', optional: true
+    },
+    notes: {
+      type: 'string?[]', default: []
+    }
   },
 }
 
@@ -174,8 +205,28 @@ export const UTXOSchema: ObjectSchema = {
     vout: 'int',
     value: 'int',
     address: 'string',
-    status: 'string',
-    tags: 'string?[]'
+    status: UTXOStatus,
+    tags: {
+      type: 'string?[]', default: []
+    }
+  },
+}
+
+export const UTXOStatusSchema: ObjectSchema = {
+  name: UTXOStatus,
+  properties: {
+    block_hash: {
+      type: 'string', optional: true,
+    },
+    block_height: {
+      type: 'int', optional: true,
+    },
+    block_time: {
+      type: 'int', optional: true,
+    },
+    confirmed: {
+      type: 'bool', optional: true,
+    },
   },
 }
 
