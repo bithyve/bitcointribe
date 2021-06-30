@@ -124,7 +124,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
       setTimeout( () => {
         showProcessing( false )
         Toast( `${title} has been added successfully` )
-      }, 3000 )
+      }, 700 )
       const newArr = [ ...selectedAcc ]
       newArr.push( title )
       setSelectedAcc( newArr )
