@@ -247,7 +247,7 @@ export default function Login( props ) {
 
       bootStrapNotifications()
 
-      AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
+      AsyncStorage.getItem( 'XwalletExists' ).then( ( exists ) => {
         if ( exists ) {
           dispatch( autoSyncShells() )
 

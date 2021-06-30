@@ -38,6 +38,7 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import { initNewBHRFlow } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
+import { clearAccountSyncCache } from '../store/actions/accounts'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
@@ -169,7 +170,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const bottomSheetRef = createRef<BottomSheet>()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
-
+  useEffect( ()=>{
+    dispatch( clearAccountSyncCache() )
+  }, [] )
   useEffect( () => {
     console.log( '@@@-> cloudBackupStatus ', cloudBackupStatus )
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
@@ -197,14 +200,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
       }
-      //  else{
-      //   console.log( '@@@-> levelHealth ', '2222' )
-      //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
-      //   setLoaderModal( false )
-      //   props.navigation.navigate( 'HomeNav', {
-      //     walletName,
-      //   } )
-      // }
     }
   }, [ levelHealth, cloudPermissionGranted ] )
 
@@ -403,6 +398,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const confirmAction = () => {
+    dispatch( updateCloudPermission( true ) )
     if ( activeIndex === 0 ) {
       showSecurityQue( true )
       setAnswer( '' )
@@ -1019,48 +1015,40 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     onBottomSheetClosed()
   }
 
-  const renderBottomSheetContent = () =>{
+  // const renderBottomSheetContent = () =>{
 
-    switch ( currentBottomSheetKind ) {
-        case BottomSheetKind.CLOUD_PERMISSION:
-          return (
-            <CloudPermissionModalContents
-              title={'Automated Cloud Backup'}
-              info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
-              note={''}
-              onPressProceed={( flag )=>{
-                closeBottomSheet()
-                console.log( 'updateCloudPermission', flag )
-                dispatch( updateCloudPermission( flag ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
-                  walletName,
-                } )
-              }}
-              onPressIgnore={( flag )=> {
-                closeBottomSheet()
-                console.log( 'updateCloudPermission', flag )
-                dispatch( updateCloudPermission( flag ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
-                  walletName,
-                } )
-              }}
-              autoClose={()=>{
-                closeBottomSheet()
-                console.log( 'updateCloudPermission', true )
-                dispatch( updateCloudPermission( true ) )
-                props.navigation.navigate( 'NewWalletQuestion', {
-                  walletName,
-                } )
-              }}
-              isRendered={isCloudPermissionRender}
-              bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
-            />
-          )
+  //   switch ( currentBottomSheetKind ) {
+  //       case BottomSheetKind.CLOUD_PERMISSION:
+  //         return (
+  //           <CloudPermissionModalContents
+  //             title={'Automated Cloud Backup'}
+  //             info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+  //             note={''}
+  //             onPressProceed={( flag )=>{
+  //               dispatch( updateCloudPermission( flag ) )
+  //               closeBottomSheet()
+  //               console.log( 'updateCloudPermission', flag )
+  //               props.navigation.navigate( 'NewWalletQuestion', {
+  //                 walletName,
+  //               } )
+  //             }}
+  //             onPressIgnore={( flag )=> {
+  //               closeBottomSheet()
+  //               console.log( 'updateCloudPermission', flag )
+  //               dispatch( updateCloudPermission( flag ) )
+  //               props.navigation.navigate( 'NewWalletQuestion', {
+  //                 walletName,
+  //               } )
+  //             }}
+  //             isRendered={isCloudPermissionRender}
+  //             bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
+  //           />
+  //         )
 
-        default:
-          break
-    }
-  }
+  //       default:
+  //         break
+  //   }
+  // }
 
   return (
     <View style={{
@@ -1275,8 +1263,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           buttonDisable={false}
         />
         <TouchableOpacity
-          onPress={() => {dispatch( updateCloudPermission( true ) )}}
-
+          onPress={() => {
+            dispatch( updateCloudPermission( false ) )}
+          }
         >
           <Text style={{
             color: Colors.blue,
@@ -1286,10 +1275,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>Skip Backup</Text>
         </TouchableOpacity>
       </View>
-      <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
+      {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
         {renderBottomSheetContent()}
-      </ModalContainer>
-
+      </ModalContainer> */}
       <ModalContainer visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
         {renderSecurityQuestion()}
       </ModalContainer>

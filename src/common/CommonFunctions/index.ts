@@ -151,7 +151,8 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
       walletImage.WALLET_SETUP = database.WALLET_SETUP
     walletImage.ASYNC_DATA = await asyncDataToBackup()
     walletImage.STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo )
-    const key = SSS.strechKey( database.WALLET_SETUP.security.answer )
+    // this has to be updated to keep the correct answer
+    const key = 'answer'//SSS.strechKey( database.WALLET_SETUP.security.answer )
     CloudDataJson = {
       walletImage,
       keeperInfo: [],
