@@ -7,54 +7,28 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  KeyboardAvoidingView,
-  Platform,
   Keyboard,
   TouchableWithoutFeedback,
-  TextInput,
   Image,
   ImageSourcePropType,
   Modal,
   ImageBackground
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../common/Fonts'
 import Colors from '../common/Colors'
-import QuestionList from '../common/QuestionList'
 import CommonStyles from '../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import Feather from 'react-native-vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeaderTitle from '../components/HeaderTitle'
-import BottomInfoBox from '../components/BottomInfoBox'
-
 import { useDispatch, useSelector } from 'react-redux'
 import { setupWallet } from '../store/actions/setupAndAuth'
-
-import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../components/LoaderModal'
-
-import DeviceInfo from 'react-native-device-info'
-import { walletCheckIn } from '../store/actions/trustedContacts'
-import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/health'
-import {  setCloudData } from '../store/actions/cloud'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
-import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
 import { ActivityIndicator } from 'react-native-paper'
 import Toast from '../components/Toast'
-
-// only admit lowercase letters and digits
-const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
-const messageIndex = 0
-const LOADER_MESSAGE_TIME = 2000
-
 interface AccountOption {
     id: number;
     title: string;
@@ -104,69 +78,14 @@ const accountOptions: AccountOption[] = [
   }
 ]
 
-const loaderMessages = [
-  {
-    heading: 'Bootstrapping Accounts',
-    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-    subText: '',
-  },
-  {
-    heading: 'Filling Test Account with test sats',
-    text:
-      'Preloaded Test Account is the best place to start your Bitcoin journey',
-    subText: '',
-  },
-  {
-    heading: 'Generating Recovery Keys',
-    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
-    subText: '',
-  },
-  {
-    heading: 'Manage Backup',
-    text:
-      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 1 - Automated Cloud Backup',
-    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
-    subText: '',
-  },
-  {
-    heading: 'Level 2 - Double Backup',
-    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 3 - Multi-key Backup',
-    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
-    subText: '',
-  }
-]
-
 export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any, selectedAcc: string[] } ) => void } } ) {
   const [ processing, showProcessing ] = useState( false )
   const [ knowMore, showKnowMore ] = useState( false )
-  const [ Elevation, setElevation ] = useState( 10 )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
-  // const [ loaderBottomSheet ] = useState( React.createRef() )
-  const [ loaderModal, setLoaderModal ] = useState( false )
-  const [ confirmAnswerTextInput ] = useState( React.createRef() )
-  const [ confirmPswdTextInput ] = useState( React.createRef() )
-  const [ visibleButton, setVisibleButton ] = useState( false )
-  const [ showNote, setShowNote ] = useState( true )
-  const [ securityQue, showSecurityQue ] = useState( false )
-  const [ encryptionPswd, showEncryptionPswd ] = useState( false )
-  const [ activeIndex, setActiveIndex ] = useState( 1 )
-  const s3service = useSelector( ( state ) => state.health.service )
-  const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
-  const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
-  const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const [ selectedAcc, setSelectedAcc ] = useState( [ 'Checking Account' ] )
 
   useEffect( () => {

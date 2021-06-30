@@ -171,6 +171,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
 
   useEffect( () => {
+    console.log( '@@@-> cloudBackupStatus ', cloudBackupStatus )
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
@@ -190,6 +191,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   useEffect( () => {
     if( levelHealth && levelHealth.length ){
+      console.log( '@@@-> levelHealth ', levelHealth )
       console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
       if( cloudPermissionGranted ){
         dispatch( setCloudData() )
@@ -203,7 +205,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }, [ levelHealth ] )
 
   const checkCloudLogin = () =>{
-    
+
     showLoader()
     requestAnimationFrame( () => {
       const security = {
@@ -212,8 +214,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         answer,
       }
       //const chosenAccounts = {
-    //   REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
-    // }
+      //   REGULAR_ACCOUNT: true, TEST_ACCOUNT: true, SECURE_ACCOUNT: true
+      // }
       // dispatch( setupWallet( walletName, security, chosenAccounts ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
