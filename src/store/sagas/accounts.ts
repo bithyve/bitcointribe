@@ -51,6 +51,7 @@ import {
   generateSecondaryXpriv,
   SYNC_ACCOUNTS,
   updateAccounts,
+  refreshAccountShell,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -86,7 +87,7 @@ import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import { AccountsState } from '../reducers/accounts'
+import accounts, { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -455,17 +456,24 @@ export const generateSecondaryXprivWatcher = createWatcher(
 )
 
 
-function* testcoinsWorker() {
-  const service = yield select(
-    ( state ) => state.accounts[ TEST_ACCOUNT ].service
-  )
-  const res = yield call( service.getTestcoins )
+function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
+  const receivingAddress = testAccount.receivingAddress
+  const network = AccountUtilities.getNetworkByType( testAccount.networkType )
 
-  if ( res.status === 200 )
-    yield put( testcoinsReceived( ) )
-  else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( 'Failed to get testcoins' )
+  const { txid } = yield call( AccountUtilities.getTestcoins, receivingAddress, network )
+
+  if( !txid ) console.log( 'Failed to get testcoins' )
+  else{
+    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+    let testShell: AccountShell
+    accountsState.accountShells.forEach( ( shell )=>{
+      if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
+    } )
+    // auto-sync test account
+    const options = {
+      autoSync: true
+    }
+    if( testShell ) yield put( refreshAccountShell( testShell, options ) )
   }
 }
 

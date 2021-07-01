@@ -854,7 +854,7 @@ export default class AccountUtilities {
   }
 
   // test-account specific utilities
-  static testnetFaucet = async ( recipientAddress: string, network: bitcoinJS.networks.Network ): Promise<{
+  static getTestcoins = async ( recipientAddress: string, network: bitcoinJS.networks.Network ): Promise<{
     txid: any;
     funded: any;
   }> => {
