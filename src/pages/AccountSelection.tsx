@@ -43,7 +43,7 @@ const accountOptions: AccountOption[] = [
     id: 1,
     title: 'Test Account',
     imageSource: require( '../assets/images/accIcons/icon_test.png' ),
-    subtitle: 'An on-chain, single-signature wallet Fast and easy. Ideal for small amounts',
+    subtitle: 'A test-net wallet with pre-filled test sats. Best place to start learning Bitcoin',
     // screenName: 'FriendsAndFamily',
   },
   {
@@ -62,7 +62,7 @@ const accountOptions: AccountOption[] = [
     id: 4,
     title: 'Donation Account',
     imageSource: require( '../assets/images/accIcons/icon_donation.png' ),
-    subtitle: 'An on-chain, 2 of 3 multi-signature wallet. Use for securing larger amountss',
+    subtitle: 'Create a donation link in a few clicks. Post it anywhere, get sats in your wallet',
   },
   {
     id: 5,
