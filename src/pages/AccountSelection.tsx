@@ -246,9 +246,10 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                   <TouchableOpacity
                     onPress={() => showKnowMore( true )
                     }
+                    activeOpacity={0.5}
                     style={{
                       borderRadius: 6, borderWidth: selectedAcc.includes( item.title ) ? 0.6 : 0, borderColor: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey, backgroundColor: selectedAcc.includes( item.title ) ? Colors.lightBlue : Colors.backgroundColor,
-                      alignSelf: 'flex-end',  position: 'absolute', right: 10, top: 10
+                      alignSelf: 'flex-end',  position: 'absolute', right: 10, top: 10, zIndex: 10
                     }}>
                     <Text style={{
                       margin: 6, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey, fontSize: RFValue( 10 )
@@ -284,7 +285,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                         marginBottom: hp( 1 ),
                         fontSize: RFValue( 12 ), fontFamily:  Fonts.FiraSansRegular, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.black
                       }}>
-                        {item.title}
+                        {item.id === 6? selectedAcc.includes( item.title ) ? 'Exchange Account' : item.title : item.title}
                       </Text>
                       <Text style={{
                         // flex: 1,

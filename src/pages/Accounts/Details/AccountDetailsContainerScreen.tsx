@@ -397,6 +397,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         <RefreshControl
           onRefresh={performRefreshOnPullDown}
           refreshing={isRefreshing}
+          style={{
+            backgroundColor: Colors.backgroundColor,
+          }}
         />
       }
       sections={sections}
