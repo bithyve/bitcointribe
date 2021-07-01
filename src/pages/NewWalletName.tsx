@@ -183,9 +183,9 @@ export default function NewWalletName( props ) {
         >
           <ScrollView>
             <HeaderTitle
-              firstLineTitle={'Step 1'}
-              secondLineTitle={'Please name your wallet'}
-              infoTextNormal={'New Wallet creation'}
+              firstLineTitle={'Provide a Display Name'}
+              secondLineTitle={'This is used for communication with your contacts'}
+              infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
@@ -262,9 +262,9 @@ export default function NewWalletName( props ) {
               marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
             }}>
               <BottomInfoBox
-                title={'We do not store this'}
+                title={'Note: '}
                 infoText={
-                  'This is used during your communication with your contacts'
+                  'We do not store this, it is only for your and your contacts’ eyes'
                 }
               />
             </View>

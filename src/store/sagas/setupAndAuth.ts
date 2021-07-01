@@ -23,11 +23,11 @@ import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { updateAccounts } from '../actions/accounts'
+import { getTestcoins, updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security, chosenAccounts } = payload
@@ -92,8 +92,6 @@ function* setupWalletWorker( { payload } ) {
 
     // Post Hydration activities
     // saturate the test account w/ 10K sats
-    // yield put( getTestcoins() )
-
     // End of regular account option
 
   }
@@ -128,6 +126,14 @@ function* setupWalletWorker( { payload } ) {
     yield put( updateWallet( {
       wallet: currentWallet
     } ) )
+
+    // request testcoins
+    let testAcc: Account
+    Object.values( accounts ).forEach( ( account: Account )=>{
+      testAcc = account
+    } )
+    yield put( getTestcoins( testAcc ) )
+
     // End of when test account selected
   }
   if( SECURE_ACCOUNT )  {

@@ -673,7 +673,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Use answer to{'\n'}a Security Question</Text>
+          }} >Answer to {'\n'}a Security Question</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -1091,9 +1091,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Step 3'}
-              secondLineTitle={'Create initial cloud backup'}
-              infoTextNormal={'New Wallet creation'}
+              firstLineTitle={'Initial Cloud Backup'}
+              secondLineTitle={'Select how you want to encrypt the backup'}
+              infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
@@ -1162,7 +1162,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Use answer to a Security Question
+                     Easier to remember. Recommended
                   </Text>
                 </View>
               </View>
@@ -1226,7 +1226,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   />
                 }
                 <View >
-
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue
                   }}>
@@ -1235,7 +1234,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Need text to be replaced
+                    Make sure you remember and keep it safe
                   </Text>
                 </View>
               </View>
@@ -1261,7 +1260,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial wallet backup is essential for security This can be changed later from the '}
+            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the Security Centre '}
             italicText={'Security Centre'}
           />
         </View>

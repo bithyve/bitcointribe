@@ -32,7 +32,21 @@ export default StyleSheet.create( {
     marginLeft: 20,
     fontFamily: Fonts.FiraSansRegular
   },
-
+  subHeaderTitles: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    marginLeft: 20,
+    fontFamily: Fonts.FiraSansRegular
+  },
+  headerInfoText: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    marginLeft: 15,
+    marginRight: 15,
+    fontWeight: 'normal',
+    marginTop: 3,
+    fontFamily: Fonts.FiraSansRegular,
+  },
   headerTitlesInfoText: {
     color: Colors.textColorGrey,
     fontSize: RFValue( 12 ),

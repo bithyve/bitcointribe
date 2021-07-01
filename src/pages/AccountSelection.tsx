@@ -43,14 +43,14 @@ const accountOptions: AccountOption[] = [
     id: 1,
     title: 'Test Account',
     imageSource: require( '../assets/images/accIcons/icon_test.png' ),
-    subtitle: 'An on-chain, single-signature wallet Fast and easy. Ideal for small amounts',
+    subtitle: 'A test-net wallet with pre-filled test sats. Best place to start learning Bitcoin',
     // screenName: 'FriendsAndFamily',
   },
   {
     id: 2,
     title: 'Checking Account',
     imageSource: require( '../assets/images/accIcons/icon_checking.png' ),
-    subtitle: 'An on-chain, single-signature wallet Fast and easy. Ideal for small amounts',
+    subtitle: 'An on-chain, single-signature wallet. Fast and easy. Ideal for small amounts',
   },
   {
     id: 3,
@@ -62,19 +62,19 @@ const accountOptions: AccountOption[] = [
     id: 4,
     title: 'Donation Account',
     imageSource: require( '../assets/images/accIcons/icon_donation.png' ),
-    subtitle: 'An on-chain, 2 of 3 multi-signature wallet. Use for securing larger amountss',
+    subtitle: 'Create a donation link in a few clicks. Post it anywhere, get sats in your wallet',
   },
   {
     id: 5,
     title: 'F&F Account',
     imageSource: require( '../assets/images/accIcons/icon_F&F.png' ),
-    subtitle: 'A separate account where you can receive funds from your contacts',
+    subtitle: 'A separate account where you receive funds from your contacts',
   },
   {
     id: 6,
-    title: 'Bought BTC Account',
+    title: 'Exchange Account',
     imageSource: require( '../assets/images/accIcons/boughtbtc.png' ),
-    subtitle: 'Bought or Exchange Account where newly bought bitcoins land',
+    subtitle: 'A separate wallet where your newly bought bitcoin/ sats land',
   }
 ]
 
@@ -220,9 +220,9 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Step 2'}
-              secondLineTitle={'Personalize your accounts'}
-              infoTextNormal={'New Wallet creation '}
+              firstLineTitle={'Select Initial Accounts'}
+              secondLineTitle={'Accounts provide you different ways to manage your sats. Start with an initial set, or add later'}
+              infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
@@ -246,9 +246,10 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                   <TouchableOpacity
                     onPress={() => showKnowMore( true )
                     }
+                    activeOpacity={0.5}
                     style={{
                       borderRadius: 6, borderWidth: selectedAcc.includes( item.title ) ? 0.6 : 0, borderColor: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey, backgroundColor: selectedAcc.includes( item.title ) ? Colors.lightBlue : Colors.backgroundColor,
-                      alignSelf: 'flex-end',  position: 'absolute', right: 10, top: 10
+                      alignSelf: 'flex-end',  position: 'absolute', right: 10, top: 10, zIndex: 10
                     }}>
                     <Text style={{
                       margin: 6, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey, fontSize: RFValue( 10 )
@@ -284,7 +285,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                         marginBottom: hp( 1 ),
                         fontSize: RFValue( 12 ), fontFamily:  Fonts.FiraSansRegular, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.black
                       }}>
-                        {item.title}
+                        {item.id === 6? selectedAcc.includes( item.title ) ? 'Exchange Account' : item.title : item.title}
                       </Text>
                       <Text style={{
                         // flex: 1,
