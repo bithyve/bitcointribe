@@ -23,34 +23,35 @@ import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { updateAccounts } from '../actions/accounts'
+import { addNewAccountShells, updateAccountShells } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
+import { newAccountsInfo } from './accounts'
 // import { timer } from '../../utils'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
 
   // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet )
-  // TODO: save wallet-instance in realm
-  // console.log( 'wallet-instance in realm', wallet, accounts )
-  yield call( dbManager.createWallet, wallet )
-  yield call( dbManager.createAccounts, accounts )
+  const { wallet, s3Service,  trustedContacts } = yield call( initializeWallet )
 
-  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-    wallet, accounts
-  } ) )
-
-  yield put( updateAccounts( {
-    accounts, newAccounts: true
-  } ) )
-  yield put( updateWallet( {
-    wallet
-  } ) )
+  yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
+  yield call( dbManager.createWallet, wallet )
+
+  const testAccountInfo = {
+    accountType: AccountType.TEST_ACCOUNT
+  }
+  const checkingAccountInfo = {
+    accountType: AccountType.CHECKING_ACCOUNT
+  }
+  const savingsAccountInfo = {
+    accountType: AccountType.SAVINGS_ACCOUNT
+  }
+  const newAccountsInfo: newAccountsInfo[] = [ testAccountInfo, checkingAccountInfo, savingsAccountInfo ]
+  yield put( addNewAccountShells( newAccountsInfo ) )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {
