@@ -61,7 +61,7 @@ export const DB_FETCHED = 'DB_FETCHED'
 export const DB_INSERTED = 'DB_INSERTED'
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED'
 
-export const updateWallet = ( { wallet }: { wallet: Wallet } ) => {
+export const updateWallet = ( wallet: Wallet ) => {
   return {
     type: UPDATE_WALLET,
     payload: {

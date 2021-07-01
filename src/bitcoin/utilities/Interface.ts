@@ -768,7 +768,7 @@ export interface Wallet {
   walletId,
   primaryMnemonic,
   secondaryMemonic?,
-  details2FA : {
+  details2FA? : {
     secondaryXpub: string,
     bithyveXpub: string,
     twoFAKey: string,

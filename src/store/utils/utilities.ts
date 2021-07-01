@@ -233,80 +233,20 @@ export const serviceGeneratorForNewBHR = async (
 
 export const initializeWallet = async (): Promise <{
   wallet: Wallet,
-  accounts: Accounts,
   s3Service: S3Service,
   trustedContacts: TrustedContactsService
 }> => {
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
-  const secondaryMemonic = bip39.generateMnemonic( 256 )
-  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
-  const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
-
-  const initInstanceNumber = 0
-  const testAccount: Account = generateAccount( {
-    walletId,
-    type: AccountType.TEST_ACCOUNT,
-    instanceNum: initInstanceNumber,
-    accountName: 'Test Account',
-    accountDescription: 'Learn Bitcoin',
-    mnemonic: primaryMnemonic,
-    derivationPath: AccountUtilities.getDerivationPath( NetworkType.TESTNET, AccountType.TEST_ACCOUNT, initInstanceNumber ),
-    networkType: NetworkType.TESTNET,
-  } )
-
-  const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, initInstanceNumber )
-  const checkingAccount: Account = generateAccount( {
-    walletId,
-    type: AccountType.CHECKING_ACCOUNT,
-    instanceNum: initInstanceNumber,
-    accountName: 'Checking Account',
-    accountDescription: 'Fast and easy',
-    mnemonic: primaryMnemonic,
-    derivationPath: rootDerivationPath,
-    networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
-  } )
-
-  const { setupData } = await AccountUtilities.registerTwoFA( walletId, secondaryWalletId )
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
-  const bithyveXpub = setupData.bhXpub
-  const twoFAKey = setupData.secret
-
-  const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
-    walletId,
-    type: AccountType.SAVINGS_ACCOUNT,
-    instanceNum: initInstanceNumber,
-    accountName: 'Savings Account',
-    accountDescription: 'Multi-factor security',
-    mnemonic: primaryMnemonic,
-    derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, initInstanceNumber ),
-    secondaryXpub,
-    bithyveXpub,
-    networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
-  } )
 
   const wallet: Wallet = {
     walletId,
     primaryMnemonic,
-    secondaryMemonic,
-    details2FA: {
-      secondaryXpub,
-      bithyveXpub,
-      twoFAKey
-    },
     accounts: {
-      [ AccountType.TEST_ACCOUNT ]: [ testAccount.id ],
-      [ AccountType.CHECKING_ACCOUNT ]:[ checkingAccount.id ],
-      [ AccountType.SAVINGS_ACCOUNT ]:[ savingsAccount.id ]
     }
   }
 
-  const accounts: Accounts = {
-    [ testAccount.id ]: testAccount,
-    [ checkingAccount.id ]: checkingAccount,
-    [ savingsAccount.id ]: savingsAccount,
-  }
 
   // Share generation
   const s3Service = new S3Service( primaryMnemonic )
@@ -316,7 +256,6 @@ export const initializeWallet = async (): Promise <{
 
   return {
     wallet,
-    accounts,
     s3Service,
     trustedContacts,
   }
