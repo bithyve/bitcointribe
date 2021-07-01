@@ -5,7 +5,7 @@ import {
   SECONDARY_XPRIV_GENERATED,
   TWO_FA_RESETTED,
   AVERAGE_TX_FEE,
-  ADD_NEW_ACCOUNT_SHELL,
+  ADD_NEW_ACCOUNT_SHELLS,
   NEW_ACCOUNT_ADD_FAILED,
   ADD_NEW_ACCOUNT_SHELL_COMPLETED,
   ACCOUNT_SETTINGS_UPDATED,
@@ -38,7 +38,7 @@ import {
   RESET_ACCOUNT_UPDATE_FLAG,
   RESET_TWO_FA_LOADER,
   NEW_ACCOUNT_SHELLS_ADDED,
-  UPDATE_ACCOUNTS
+  UPDATE_ACCOUNT_SHELLS
 } from '../actions/accounts'
 import { SERVICES_ENRICHED } from '../actions/storage'
 import {
@@ -51,7 +51,6 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import { Accounts } from '../../bitcoin/utilities/Interface'
-import { updateShells } from '../utils/accountShellMapping'
 
 export type AccountVars = {
   service: any;
@@ -272,17 +271,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           averageTxFees: action.payload.averageTxFees,
         }
 
-      case UPDATE_ACCOUNTS:
-        return {
-          ...state,
-          accounts: {
-            ...state.accounts,
-            ...action.payload.accounts,
-          },
-          accountShells: updateShells( action.payload.accounts, state.accountShells, action.payload.newAccounts )
-        }
-
-      case ADD_NEW_ACCOUNT_SHELL:
+      case ADD_NEW_ACCOUNT_SHELLS:
         return {
           ...state,
           isGeneratingNewAccountShell: true,
@@ -296,7 +285,11 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: true,
-          accountShells: state.accountShells.concat( ...action.payload ),
+          accountShells: state.accountShells.concat( ...action.payload.accountShells ),
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts
+          }
         }
 
       case NEW_ACCOUNT_ADD_FAILED:
@@ -313,6 +306,36 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: false,
           hasNewAccountShellGenerationFailed: false,
+        }
+
+      case UPDATE_ACCOUNT_SHELLS:
+        const accounts = action.payload.accounts
+        const shells = state.accountShells
+        shells.forEach( ( shell )=>{
+          const account = accounts[ shell.primarySubAccount.id ]
+          if( !account ) return shell
+
+          const accountDetails = {
+            accountName: account.accountName,
+            accountDescription: account.accountDescription,
+            accountXpub: account.xpub
+          }
+          AccountShell.updatePrimarySubAccountDetails(
+            shell,
+            account.balances,
+            account.transactions,
+            accountDetails
+          )
+          return shell
+        } )
+
+        return {
+          ...state,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
+          accountShells: shells,
         }
 
       case RESTORED_ACCOUNT_SHELLS:

@@ -14,7 +14,7 @@ import {
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
   secondaryXprivGenerated,
-  ADD_NEW_ACCOUNT_SHELL,
+  ADD_NEW_ACCOUNT_SHELLS,
   newAccountShellsAdded,
   newAccountShellAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
@@ -50,7 +50,7 @@ import {
   resetTwoFA,
   generateSecondaryXpriv,
   SYNC_ACCOUNTS,
-  updateAccounts,
+  updateAccountShells,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -77,7 +77,6 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
@@ -91,23 +90,22 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { updateWallet } from '../actions/storage'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
-import bip39 from 'bip39'
+import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import idx from 'idx'
 import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
 import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import dbManager from '../../storage/realm/dbManager'
 
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
@@ -613,9 +611,7 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
       ...tempDB,
       wallet
     } ) )
-    yield put( updateWallet( {
-      wallet
-    } ) )
+    yield put( updateWallet( wallet ) )
   } else yield put( twoFAValid( false ) )
 }
 
@@ -731,7 +727,7 @@ function* refreshAccountShellWorker( { payload } ) {
     }
   } )
 
-  yield put( updateAccounts( {
+  yield put( updateAccountShells( {
     accounts: synchedAccounts
   } ) )
 
@@ -843,20 +839,23 @@ function* setup2FADetails( wallet: Wallet ) {
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
-
+  console.log( {
+    setupData
+  } )
   const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
   const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
-  wallet.details2FA = {
-    secondaryXpub,
-    bithyveXpub,
-    twoFAKey
+  const updatedWallet = {
+    ...wallet,
+    details2FA: {
+      secondaryXpub,
+      bithyveXpub,
+      twoFAKey
+    }
   }
-  yield put( updateWallet( {
-    wallet
-  } ) )
-  return wallet
+  yield put( updateWallet( updatedWallet ) )
+  return updatedWallet
 }
 
 
@@ -902,7 +901,7 @@ function* addNewAccount( accountType, accountName, accountDescription ) {
 
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
-        const testInstance = accounts[ AccountType.TEST_ACCOUNT ].length
+        const testInstance = ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
         const testAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.TEST_ACCOUNT,
@@ -916,7 +915,7 @@ function* addNewAccount( accountType, accountName, accountDescription ) {
         return testAccount
 
       case AccountType.CHECKING_ACCOUNT:
-        const checkingInstance = accounts[ AccountType.CHECKING_ACCOUNT ].length
+        const checkingInstance = ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
         const checkingAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.CHECKING_ACCOUNT,
@@ -930,8 +929,8 @@ function* addNewAccount( accountType, accountName, accountDescription ) {
         return checkingAccount
 
       case AccountType.SAVINGS_ACCOUNT:
-        const savingsInstance = accounts[ AccountType.SAVINGS_ACCOUNT ].length
-        if( !savingsInstance ) wallet = yield call( setup2FADetails, wallet )
+        const savingsInstance = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
+        if( !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
 
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
           walletId,
@@ -1144,9 +1143,20 @@ function* addNewAccount( accountType, accountName, accountDescription ) {
 //   ADD_NEW_SECONDARY_SUBACCOUNT
 // )
 
-function* addNewAccountShell( { payload }: {payload: {accountType: AccountType, accountDetails?: { name?: string, description?: string }, }} ) {
-  const { accountType, accountDetails } = payload
-  try {
+export interface newAccountsInfo {
+  accountType: AccountType,
+  accountDetails?: {
+    name?: string,
+    description?: string
+  }
+}
+
+function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
+  const newAccountShells: AccountShell[] = []
+  const accounts = {
+  }
+
+  for ( const { accountType, accountDetails } of newAccountsInfo ){
     const accountName = idx( accountDetails, ( _ ) => _.name )
     const accountDescription = idx( accountDetails, ( _ ) => _.description )
     const account: Account | MultiSigAccount = yield call(
@@ -1156,30 +1166,41 @@ function* addNewAccountShell( { payload }: {payload: {accountType: AccountType, 
       accountDescription
     )
     const accountShell = yield call( generateShellFromAccount, account )
-    yield put( newAccountShellsAdded( {
-      accountShells: [ accountShell ]
-    } ) )
-    yield put( accountShellOrderedToFront( accountShell ) )
-  } catch ( error ) {
-    console.log( {
-      error
-    } )
-    // const newAccountShell = new AccountShell( {
-    //   unit: bitcoinUnit,
-    //   primarySubAccount: new A,
-    //   displayOrder: 1,
-    // } )
-    // yield put(
-    //   newAccountShellAddFailed( {
-    //     accountShell: newAccountShell, error
-    //   } )
-    // )
+    newAccountShells.push( accountShell )
+    accounts [ account.id ] = account
+    // yield put( accountShellOrderedToFront( accountShell ) )
   }
+
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  let accountsMap = wallet.accounts
+  Object.values( ( accounts as Accounts ) ).forEach( account => {
+    if( accountsMap[ account.type ] ) accountsMap[ account.type ].push( account.id )
+    else accountsMap = {
+      ...accountsMap,
+      [ account.type ]: [ account.id ]
+    }
+  } )
+
+  const updatedWallet: Wallet = {
+    ...wallet,
+    accounts: accountsMap
+  }
+  yield put( updateWallet( updatedWallet ) )
+
+  yield put( newAccountShellsAdded( {
+    accountShells: newAccountShells,
+    accounts,
+  } ) )
+
+
+  // TODO: insert the new accounts & wallet into Realm
+  yield call( dbManager.createAccounts, accounts )
+  yield call( dbManager.createWallet, wallet )
 }
 
-export const addNewAccountShellWatcher = createWatcher(
-  addNewAccountShell,
-  ADD_NEW_ACCOUNT_SHELL
+export const addNewAccountShellsWatcher = createWatcher(
+  addNewAccountShells,
+  ADD_NEW_ACCOUNT_SHELLS
 )
 
 function* updateAccountSettings( { payload: account, }: {
