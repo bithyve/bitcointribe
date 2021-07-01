@@ -1,5 +1,5 @@
-import React from 'react'
-import { TouchableOpacity, TouchableWithoutFeedback, Modal, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 
 const ModalContainer = ( {
@@ -8,6 +8,26 @@ const ModalContainer = ( {
   background = 'rgba(0,0,0,0.5)',
   children
 } ) => {
+  const [ height, setHeight ] = useState( 9 )
+  useEffect( ()=>{
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setHeight( 0 )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setHeight( 9 )
+      }
+    )
+
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [] )
   return(
     <Modal
       visible={visible}
@@ -31,7 +51,7 @@ const ModalContainer = ( {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           alignItems: 'center',
-          paddingBottom: hp( '9%' )
+          paddingBottom: hp( `${height}%` )
           // borderRadius: 20
 
         }}

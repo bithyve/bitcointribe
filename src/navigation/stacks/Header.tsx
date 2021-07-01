@@ -487,7 +487,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   shouldComponentUpdate =( nextProps, nextState ) => {
-    if( this.props.accountsState.accountShells === nextProps.accountsState.accountShells ) {
+    if ( this.state.currentBottomSheetKind !== nextState.currentBottomSheetKind ) {
+      return true
+    } else if( this.props.accountsState.accountShells === nextProps.accountsState.accountShells ) {
       return false
     }
   }

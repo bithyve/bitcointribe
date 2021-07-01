@@ -12,7 +12,7 @@ export default StyleSheet.create( {
     height: 54,
     backgroundColor: Colors.white,
     borderBottomColor: Colors.white,
-    borderBottomWidth: 0.5,
+    // borderBottomWidth: 0.5,
   },
 
   headerLeftIconContainer: {

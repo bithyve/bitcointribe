@@ -420,17 +420,17 @@ const HomeHeader = ( {
             }}
             resizeMode={'contain'}
           >
-            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
-              <View
-                style={{
-                  backgroundColor: Colors.red,
-                  height: wp( '2.5%' ),
-                  width: wp( '2.5%' ),
-                  borderRadius: wp( '2.5%' ) / 2,
-                  alignSelf: 'flex-end',
-                }}
-              />
-            ) : null}
+            {/* {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? ( */}
+            <View
+              style={{
+                backgroundColor: Colors.red,
+                height: wp( '2.5%' ),
+                width: wp( '2.5%' ),
+                borderRadius: wp( '2.5%' ) / 2,
+                alignSelf: 'flex-end',
+              }}
+            />
+            {/* ) : null} */}
           </ImageBackground>
         </TouchableOpacity>
       </View>
