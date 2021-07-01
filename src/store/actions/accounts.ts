@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 
@@ -105,9 +105,10 @@ export const syncAccounts = (
   }
 }
 
-export const getTestcoins = ( ) => {
+export const getTestcoins = ( testAccount: Account ) => {
   return {
     type: GET_TESTCOINS,
+    payload: testAccount
   }
 }
 
