@@ -1075,7 +1075,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <HeaderTitle
               firstLineTitle={'Initial Cloud Backup'}
               secondLineTitle={'Select how you want to encrypt the backup'}
-              infoTextNormal={'New Wallet creation'}
+              infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}
               step={''}
@@ -1130,7 +1130,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.blue
                   }}>
-                    Answer to a Security Question
+                    Use answer to a Security Question
                   </Text>
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.textColorGrey
@@ -1190,7 +1190,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   source={require( '../assets/images/icons/icon_password.png' )}
                 />
                 <View >
-
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue
                   }}>
@@ -1199,7 +1198,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Choose any password. Make sure you remember and keep it safe
+                    Make sure you remember and keep it safe
                   </Text>
                 </View>
               </View>
