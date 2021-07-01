@@ -486,11 +486,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  shouldComponentUpdate =( nextProps, nextState ) => {
-    if( this.props.accountsState.accountShells === nextProps.accountsState.accountShells ) {
-      return false
-    }
-  }
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
