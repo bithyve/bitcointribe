@@ -50,7 +50,7 @@ const accountOptions: AccountOption[] = [
     id: 2,
     title: 'Checking Account',
     imageSource: require( '../assets/images/accIcons/icon_checking.png' ),
-    subtitle: 'An on-chain, single-signature wallet Fast and easy. Ideal for small amounts',
+    subtitle: 'An on-chain, single-signature wallet. Fast and easy. Ideal for small amounts',
   },
   {
     id: 3,
