@@ -72,7 +72,7 @@ const accountOptions: AccountOption[] = [
   },
   {
     id: 6,
-    title: 'Bought BTC Account',
+    title: 'Exchange Account',
     imageSource: require( '../assets/images/accIcons/boughtbtc.png' ),
     subtitle: 'Bought or Exchange Account where newly bought bitcoins land',
   }
@@ -285,7 +285,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                         marginBottom: hp( 1 ),
                         fontSize: RFValue( 12 ), fontFamily:  Fonts.FiraSansRegular, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.black
                       }}>
-                        {item.id === 6? selectedAcc.includes( item.title ) ? 'Exchange Account' : item.title : item.title}
+                        {item.title}
                       </Text>
                       <Text style={{
                         // flex: 1,
