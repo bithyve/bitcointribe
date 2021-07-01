@@ -368,32 +368,32 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                 }}>
                   <Text style={{
                     marginTop: hp( 1 ), marginBottom: hp( 4 ), color: Colors.backgroundColor1, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 18 )
-                  }}>Checking Account</Text>
+                  }}>Savings Account</Text>
                   <Text style={{
                     textAlign: 'center',
                     marginHorizontal: hp( 2 ),
                     color: Colors.backgroundColor1, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 )
-                  }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididun.</Text>
+                  }}>Use this account to store, or hold bitcoin and sats long term</Text>
 
                   <View style={{
                     alignSelf: 'center',
-                    borderWidth: 1,
-                    borderColor: Colors.white,
-                    borderRadius: wp( 20 ), width: wp( 40 ), height: wp( 40 ), padding: wp( 6 ),
-                    marginVertical: hp( 5 )
+                    // borderWidth: 1,
+                    // borderColor: Colors.white,
+                    // //borderRadius: wp( 20 ), width: wp( 40 ), height: wp( 40 ), padding: wp( 6 ),
+                    // marginVertical: hp( 5 )
                   }}>
                     <View style={{
                       alignSelf: 'center',
-                      borderWidth: 1,
-                      borderColor: Colors.white,
-                      borderRadius: wp( 15 ), width: wp( 30 ), height: wp( 30 ), padding: wp( 6 ),
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      // borderWidth: 1,
+                      // borderColor: Colors.white,
+                      // borderRadius: wp( 15 ), width: wp( 30 ), height: wp( 30 ), padding: wp( 6 ),
+                      // alignItems: 'center',
+                      // justifyContent: 'center',
                     //   marginVertical: hp( 6 )
                     }}>
-                      <Image source={require( '../assets/images/icons/icon_checking_blue.png' )}
+                      <Image source={require( '../assets/images/icons/savings_account_info_1.png' )}
                         style={ {
-                          width: 60, height: 60, alignSelf: 'center'
+                          width: wp( 60 ), height: wp( 60 ), alignSelf: 'center'
                         }} />
                     </View>
                   </View>
@@ -401,7 +401,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                     textAlign: 'center',
                     margin: hp( 2 ),
                     color: Colors.backgroundColor1, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 )
-                  }}>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididun.</Text>
+                  }}>Be careful: If you end up spending sats from your Checking account to your Savings account and then decide to spend sats from your Savings account, it will cost you much more in transaction fees every time.</Text>
                 </View>
 
               </ImageBackground>
