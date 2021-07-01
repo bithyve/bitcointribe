@@ -17,9 +17,10 @@ import { agoTextForLastSeen } from '../send/LastSeenActiveUtils'
 
 export type Props = {
   contact: ContactRecipientDescribing,
+  index: number
 };
 
-const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: Props ) => {
+const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, index }: Props ) => {
 
   const firstNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' )[ 0 ] + ' '
@@ -87,12 +88,14 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
         </ListItem.Subtitle> */}
 
       </ListItem.Content>
+      {index === 1 &&
       <Image
         style={{
           width: 18, height: 18
         }}
         source={require( '../../assets/images/icons/own-node.png' )}
       />
+      }
     </>
   )
 }

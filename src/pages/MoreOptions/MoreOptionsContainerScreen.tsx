@@ -241,7 +241,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               </AppBottomSheetTouchableWrapper>
             }}
           />
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://t.me/HexaWallet' )
                 .then( ( _data ) => { } )
@@ -279,7 +279,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               Questions, feedback and more
               </Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://t.me/HexaWallet' )
@@ -298,7 +298,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               backgroundColor: Colors.white,
               paddingVertical: heightPercentageToDP( 2 ),
               paddingHorizontal: widthPercentageToDP( 4 ),
-              marginTop: heightPercentageToDP( '1%' )
+              marginTop: heightPercentageToDP( '18%' )
             }}
           >
             <Image
@@ -362,7 +362,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    flex: 16,
+    height: heightPercentageToDP( '68.5%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

@@ -114,6 +114,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
   )
   const [ Elevation, setElevation ] = useState( 10 )
+  const [ height, setHeight ] = useState( 72 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -170,8 +171,25 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const bottomSheetRef = createRef<BottomSheet>()
   const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
+
   useEffect( ()=>{
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setHeight( 85 )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setHeight( 72 )
+      }
+    )
     dispatch( clearAccountSyncCache() )
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
   }, [] )
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
@@ -628,7 +646,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.white,
-          height: '72%'
+          height: `${height}%`
 
         }}
       >
@@ -1119,12 +1137,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     />
                   }
                 </View>
-                <Image
-                  style={{
-                    width: 27, height: 27, resizeMode: 'contain'
-                  }}
-                  source={require( '../assets/images/icons/icon_questions.png' )}
-                />
+                {activeIndex === 0 ?
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/icon_questions.png' )}
+                  />
+                  :
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/question_inactive.png' )}
+                  />
+                }
 
                 <View >
                   <Text style={{
@@ -1183,12 +1210,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     />
                   }
                 </View>
-                <Image
-                  style={{
-                    width: 27, height: 27, resizeMode: 'contain'
-                  }}
-                  source={require( '../assets/images/icons/icon_password.png' )}
-                />
+                {activeIndex === 1 ?
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/icon_password_active.png' )}
+                  />
+                  :
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/icon_password.png' )}
+                  />
+                }
                 <View >
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue

@@ -874,7 +874,7 @@ class ManageBackupNewBHR extends Component<
               fontSize: RFValue( 16 ),
               marginLeft: 2,
               fontFamily: Fonts.FiraSansMedium,
-              paddingTop: wp( 8 ),
+              marginTop: hp( 2 ),
               paddingLeft: wp( 6 ),
               paddingBottom: wp( 4 ),
             }}>
@@ -1039,7 +1039,7 @@ Wallet Backup
                 justifyContent: 'center',
               }}>
                 <Text style={styles.addModalTitleText}>Enable Tor </Text>
-                <Text style={styles.addModalInfoText}>When you want to be anonymous online</Text>
+                <Text style={styles.addModalInfoText}>Improve your online privacy</Text>
               </View>
               <View style={{
                 alignItems: 'flex-end',
@@ -1389,7 +1389,7 @@ const styles = StyleSheet.create( {
     paddingHorizontal: wp ( '6%' )
   },
   accountCardsSectionContainer: {
-    flex: 16,
+    height: hp( '68.5%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,
