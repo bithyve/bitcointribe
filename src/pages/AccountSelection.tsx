@@ -68,13 +68,13 @@ const accountOptions: AccountOption[] = [
     id: 5,
     title: 'F&F Account',
     imageSource: require( '../assets/images/accIcons/icon_F&F.png' ),
-    subtitle: 'A separate account where you can receive funds from your contacts',
+    subtitle: 'A separate account where you receive funds from your contacts',
   },
   {
     id: 6,
-    title: 'Bought BTC Account',
+    title: 'Exchange Account',
     imageSource: require( '../assets/images/accIcons/boughtbtc.png' ),
-    subtitle: 'Bought or Exchange Account where newly bought bitcoins land',
+    subtitle: 'A separate wallet where your newly bought bitcoin/ sats land',
   }
 ]
 
