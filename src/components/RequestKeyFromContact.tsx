@@ -141,7 +141,7 @@ export default function RequestKeyFromContact( props ) {
           <CopyThisText
             openLink={shareLink ? shareOption : () => { }}
             backgroundColor={Colors.backgroundColor1}
-            text={shareLink ? shareLink : 'Creating Link....'}
+            text={shareLink ? shareLink : 'https://hexawallet...'}
           />
         </View>
       </ScrollView>

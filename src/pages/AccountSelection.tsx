@@ -220,8 +220,8 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Step 2'}
-              secondLineTitle={'Personalize your accounts'}
+              firstLineTitle={'Select Initial Accounts'}
+              secondLineTitle={'Accounts provide you different ways to manage your bitcoin/sats. Start with an initial set, or add later.'}
               infoTextNormal={'New Wallet creation '}
               infoTextBold={''}
               infoTextNormal1={''}

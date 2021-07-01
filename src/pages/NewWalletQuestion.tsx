@@ -1225,7 +1225,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial wallet backup is essential for security This can be changed later from the '}
+            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the Security Centre '}
             italicText={'Security Centre'}
           />
         </View>
