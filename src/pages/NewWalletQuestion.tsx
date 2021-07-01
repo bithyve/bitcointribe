@@ -655,7 +655,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Use answer to{'\n'}a Security Question</Text>
+          }} >Answer to {'\n'}a Security Question</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -1073,8 +1073,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Step 3'}
-              secondLineTitle={'Create initial cloud backup'}
+              firstLineTitle={'Initial Cloud Backup'}
+              secondLineTitle={'Select how you want to encrypt the backup'}
               infoTextNormal={'New Wallet creation'}
               infoTextBold={''}
               infoTextNormal1={''}
@@ -1130,12 +1130,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.blue
                   }}>
-                    Use answer to a Security Question
+                    Answer to a Security Question
                   </Text>
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Use answer to a Security Question
+                     Easier to remember. Recommended
                   </Text>
                 </View>
               </View>
@@ -1199,7 +1199,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Need text to be replaced
+                    Choose any password. Make sure you remember and keep it safe
                   </Text>
                 </View>
               </View>
