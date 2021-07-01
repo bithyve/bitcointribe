@@ -67,7 +67,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
   return (
     <View>
       <SafeAreaView style={{
-        flex: 0
+        flex: 0, backgroundColor: Colors.backgroundColor
       }} />
 
       <StatusBar
