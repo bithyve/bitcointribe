@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType } from '../Interface'
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -536,8 +536,8 @@ export default class AccountUtilities {
         // calculate balance
         for( const utxo of UTXOs ){
           if (
-            accountType === 'Test Account' &&
-          externalAddresses[ utxo.address ] === 0
+            accountType === AccountType.TEST_ACCOUNT &&
+            externalAddresses[ utxo.address ] === 0
           ) {
             balances.confirmed += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
             continue
