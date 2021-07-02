@@ -98,10 +98,10 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   const [ selectedAcc, setSelectedAcc ] = useState( [ AccountType.CHECKING_ACCOUNT ] )
 
   const onProceed = useCallback( () => {
-    dispatch( setupWallet( walletName, selectedAcc ) )
     props.navigation.navigate( 'NewWalletQuestion', {
       walletName,
     } )
+    dispatch( setupWallet( walletName, selectedAcc ) )
   }, [ selectedAcc ] )
 
   const selectAccount = useCallback( ( accountType: AccountType ) => {
