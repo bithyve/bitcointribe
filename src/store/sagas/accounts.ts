@@ -895,183 +895,101 @@ function* addNewAccount( accountType, accountName, accountDescription ) {
   let wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
 
-  let subAccountId: string
-  let subAccountXpub: string
-  let subAccountInstanceNum: number
-
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
-        const testInstance = ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
+        const testInstanceCount = ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
         const testAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.TEST_ACCOUNT,
-          instanceNum: testInstance,
+          instanceNum: testInstanceCount,
           accountName: accountName? accountName: 'Test Account',
           accountDescription: accountDescription? accountDescription: 'Learn Bitcoin',
           mnemonic: primaryMnemonic,
-          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstance ),
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstanceCount ),
           networkType: NetworkType.TESTNET,
         } )
         return testAccount
 
       case AccountType.CHECKING_ACCOUNT:
-        const checkingInstance = ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
+        const checkingInstanceCount = ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
         const checkingAccount: Account = yield call( generateAccount, {
           walletId,
           type: AccountType.CHECKING_ACCOUNT,
-          instanceNum: checkingInstance,
+          instanceNum: checkingInstanceCount,
           accountName: accountName? accountName: 'Checking Account',
           accountDescription: accountDescription? accountDescription: 'Fast and easy',
           mnemonic: primaryMnemonic,
-          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstance ),
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return checkingAccount
 
       case AccountType.SAVINGS_ACCOUNT:
-        const savingsInstance = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         if( !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
 
+        const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
         const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
           walletId,
           type: AccountType.SAVINGS_ACCOUNT,
-          instanceNum: savingsInstance,
+          instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
           accountDescription: accountDescription? accountDescription: 'Multi-factor security',
           mnemonic: primaryMnemonic,
-          derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstance ),
+          derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
           bithyveXpub: wallet.details2FA.bithyveXpub,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return savingsAccount
 
-      // case SubAccountKind.DONATION_ACCOUNT:
-      //   const donationInstance = yield call( setupDonationAccountWorker, {
-      //     payload: {
-      //       serviceType: subAccountInfo.sourceKind,
-      //       donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
-      //       subject: subAccountInfo.customDisplayName,
-      //       description: subAccountInfo.customDescription,
-      //       configuration: {
-      //         displayBalance: true,
-      //       },
-      //     },
-      //   } )
+        // case AccountType.DONATION_ACCOUNT:
+        //   const donationAccount = yield call( setupDonationAccountWorker, {
+        //     payload: {
+        //       serviceType: subAccountInfo.sourceKind,
+        //       donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
+        //       subject: subAccountInfo.customDisplayName,
+        //       description: subAccountInfo.customDescription,
+        //       configuration: {
+        //         displayBalance: true,
+        //       },
+        //     },
+        //   } )
+        //   return donationAccount
 
-      //   subAccountId = donationInstance.accountId
-      //   subAccountXpub = donationInstance.accountXpub
-      //   subAccountInstanceNum = donationInstance.accountNumber
-      //   break
+      case AccountType.WYRE_ACCOUNT:
+      case AccountType.RAMP_ACCOUNT:
+      case AccountType.SWAN_ACCOUNT:
+        let defaultAccountName, defaultAccountDescription
+        switch( accountType ){
+            case AccountType.WYRE_ACCOUNT:
+              defaultAccountName = 'Wyre Account'
+              defaultAccountDescription = 'Buy with Apple Pay or Debit card'
+              break
 
-      // case SubAccountKind.SERVICE:
-      //   switch ( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
-      //       case ServiceAccountKind.WYRE:
-      //         const wyreAccountDetails = {
-      //           accountName: subAccountInfo.customDisplayName,
-      //           accountDescription: subAccountInfo.customDescription,
-      //         }
-      //         const wyreSetupRes = yield call(
-      //           service.setupDerivativeAccount,
-      //           DerivativeAccountTypes.WYRE,
-      //           wyreAccountDetails
-      //         )
+            case AccountType.RAMP_ACCOUNT:
+              defaultAccountName = 'Ramp Account'
+              defaultAccountDescription = 'Buy with Apple Pay, Bank or Card'
+              break
 
-      //         if ( wyreSetupRes.status === 200 ) {
-      //           const { SERVICES } = yield select( ( state ) => state.storage.database )
-      //           const updatedSERVICES = {
-      //             ...SERVICES,
-      //             [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
-      //           }
-      //           yield call( insertDBWorker, {
-      //             payload: {
-      //               SERVICES: updatedSERVICES
-      //             }
-      //           } )
+            case AccountType.SWAN_ACCOUNT:
+              defaultAccountName = 'Swan Bitcoin'
+              defaultAccountDescription = 'Stack sats with Swan'
+              break
+        }
 
-      //           subAccountId = wyreSetupRes.data.accountId
-      //           subAccountXpub = wyreSetupRes.data.accountXpub
-      //           subAccountInstanceNum = wyreSetupRes.data.accountNumber
-      //         } else {
-      //           console.log( {
-      //             err: wyreSetupRes.err
-      //           } )
-      //         }
-      //         break
-
-      //       case ServiceAccountKind.RAMP:
-      //         const rampAccountDetails = {
-      //           accountName: subAccountInfo.customDisplayName,
-      //           accountDescription: subAccountInfo.customDescription,
-      //         }
-      //         const rampSetupRes = yield call(
-      //           service.setupDerivativeAccount,
-      //           DerivativeAccountTypes.RAMP,
-      //           rampAccountDetails
-      //         )
-
-      //         if ( rampSetupRes.status === 200 ) {
-      //           const { SERVICES } = yield select( ( state ) => state.storage.database )
-      //           const updatedSERVICES = {
-      //             ...SERVICES,
-      //             [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
-      //           }
-      //           yield call( insertDBWorker, {
-      //             payload: {
-      //               SERVICES: updatedSERVICES
-      //             }
-      //           } )
-
-      //           subAccountId = rampSetupRes.data.accountId
-      //           subAccountXpub = rampSetupRes.data.accountXpub
-      //           subAccountInstanceNum = rampSetupRes.data.accountNumber
-      //         } else {
-      //           console.log( {
-      //             err: rampSetupRes.err
-      //           } )
-      //         }
-      //         break
-
-      //       case ServiceAccountKind.SWAN:
-      //         const swanAccountDetails = {
-      //           accountName: subAccountInfo.customDisplayName,
-      //           accountDescription: subAccountInfo.customDescription,
-      //         }
-      //         const swanSetupRes = yield call(
-      //           service.setupDerivativeAccount,
-      //           DerivativeAccountTypes.SWAN,
-      //           swanAccountDetails
-      //         )
-
-      //         if ( swanSetupRes.status === 200 ) {
-      //           const { SERVICES } = yield select( ( state ) => state.storage.database )
-      //           const updatedSERVICES = {
-      //             ...SERVICES,
-      //             [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
-      //           }
-      //           yield call( insertDBWorker, {
-      //             payload: {
-      //               SERVICES: updatedSERVICES
-      //             }
-      //           } )
-
-      //           subAccountId = swanSetupRes.data.accountId
-      //           subAccountXpub = swanSetupRes.data.accountXpub
-      //           subAccountInstanceNum = swanSetupRes.data.accountNumber
-      //         } else {
-      //           console.log( {
-      //             err: swanSetupRes.err
-      //           } )
-      //         }
-      //         break
-      //   }
-      //   break
+        const serviceInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const serviceAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: serviceInstanceCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          mnemonic: primaryMnemonic,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, serviceInstanceCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        return serviceAccount
   }
-
-  if ( subAccountId ) return {
-    subAccountId, subAccountInstanceNum, subAccountXpub
-  }
-  else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
 }
 
 
