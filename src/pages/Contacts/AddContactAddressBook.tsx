@@ -578,11 +578,11 @@ export default function AddContactAddressBook( props ) {
               onPressProceed={() => {
                 getContactPermission()
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-                // setModal( false )
+                setModal( false )
               }}
               onPressIgnore={() => {
                 // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-                // setModal( false )
+                setModal( false )
               }}
               isBottomImage={true}
               bottomImage={require( '../../assets/images/icons/contactPermission.png' )}

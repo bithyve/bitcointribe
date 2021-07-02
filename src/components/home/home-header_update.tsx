@@ -39,6 +39,10 @@ import S3Service from '../../bitcoin/services/sss/S3Service'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import MaterialCurrencyCodeIcon, {
+  materialIconCurrencyCodes,
+} from '../MaterialCurrencyCodeIcon'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -69,6 +73,7 @@ const HomeHeader = ( {
   navigation,
   currentLevel,
 } ) => {
+  const fiatCurrencyCode = useCurrencyCode()
   const levelHealth: LevelHealthInterface[] = useSelector(
     ( state ) => state.health.levelHealth
   )
@@ -332,18 +337,29 @@ const HomeHeader = ( {
                   }}
                   source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                 />
-              ) : currencyCode.includes( CurrencyCode ) ? (
-                setCurrencyCodeToImage(
-                  getCurrencyImageName( CurrencyCode ),
-                  'light'
-                )
+              ) : materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
+                // setCurrencyCodeToImage(
+                //   getCurrencyImageName( CurrencyCode ),
+                //   'light'
+                // )
+                <MaterialCurrencyCodeIcon
+                  currencyCode={fiatCurrencyCode}
+                  color={Colors.white}
+                  size={wp( '3.5%' )}
+                  style={{
+                    width: 20,
+                    height: 18,
+                    resizeMode: 'contain',
+                    marginTop: 0
+                  }}
+                />
               ) : (
                 <Image
                   style={{
                     ...styles.cardBitCoinImage,
                     marginBottom: wp( '1.5%' ),
                   }}
-                  source={getCurrencyImageByRegion( CurrencyCode, 'light' )}
+                  source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
                 />
               )}
               <Text style={styles.homeHeaderAmountText}>
@@ -357,7 +373,7 @@ const HomeHeader = ( {
                     : 0}
               </Text>
               <Text style={styles.homeHeaderAmountUnitText}>
-                {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
+                {prefersBitcoin ? 'sats' : fiatCurrencyCode.toLocaleLowerCase()}
               </Text>
             </View>
           </View>
@@ -420,17 +436,17 @@ const HomeHeader = ( {
             }}
             resizeMode={'contain'}
           >
-            {/* {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? ( */}
-            <View
-              style={{
-                backgroundColor: Colors.red,
-                height: wp( '2.5%' ),
-                width: wp( '2.5%' ),
-                borderRadius: wp( '2.5%' ) / 2,
-                alignSelf: 'flex-end',
-              }}
-            />
-            {/* ) : null} */}
+            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
           </ImageBackground>
         </TouchableOpacity>
       </View>
