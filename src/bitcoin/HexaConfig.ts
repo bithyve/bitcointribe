@@ -8,6 +8,7 @@ import {
   SwanDerivativeAccount,
   RampDerivativeAccount,
   WyreDerivativeAccount,
+  AccountType,
 } from './utilities/Interface'
 import Config from 'react-native-config'
 import {
@@ -121,6 +122,21 @@ class HexaConfig {
   public LEGACY_TC_REQUEST_EXPIRY = Config.BIT_LEGACY_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_LEGACY_TC_REQUEST_EXPIRY.trim(), 10 ) : 1200000;
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
   public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt( Config.KP_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
+
+  public ACCOUNT_INSTANCES = {
+    [ AccountType.TEST_ACCOUNT ]: {
+      series: 0,
+      upperBound: 5,
+    },
+    [ AccountType.CHECKING_ACCOUNT ]: {
+      series: 0,
+      upperBound: 10,
+    },
+    [ AccountType.SAVINGS_ACCOUNT ]: {
+      series: 10,
+      upperBound: 10,
+    }
+  }
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {

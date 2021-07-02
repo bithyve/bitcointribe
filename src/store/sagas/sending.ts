@@ -17,7 +17,7 @@ import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { updateAccounts } from '../actions/accounts'
+import { updateAccountShells } from '../actions/accounts'
 import dbManager from '../../storage/realm/dbManager'
 
 function* processRecipients( accountShell: AccountShell ){
@@ -166,7 +166,7 @@ function* executeSendStage2( { payload }: {payload: {
     const accounts = {
       [ account.id ]: account
     }
-    yield put( updateAccounts( {
+    yield put( updateAccountShells( {
       accounts
     } ) )
     //TODO: save accounts object into realm

@@ -2,6 +2,7 @@ import { Action } from 'redux'
 import { Account, Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { newAccountsInfo } from '../sagas/accounts'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
@@ -25,7 +26,7 @@ export const VALIDATE_TWO_FA = 'VALIDATE_TWO_FA'
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
-export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL'
+export const ADD_NEW_ACCOUNT_SHELLS = 'ADD_NEW_ACCOUNT_SHELLS'
 export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
@@ -321,17 +322,17 @@ export const accountShellRefreshStarted = ( payload: AccountShell ) => {
   }
 }
 
-export interface AddNewAccountShellAction extends Action {
-  type: typeof ADD_NEW_ACCOUNT_SHELL;
-  payload: SubAccountDescribing;
+export interface AddNewAccountShellsAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT_SHELLS;
+  payload: newAccountsInfo[];
 }
 
-export const addNewAccountShell = (
-  payload: SubAccountDescribing
-): AddNewAccountShellAction => {
+export const addNewAccountShells = (
+  payload: newAccountsInfo[]
+): AddNewAccountShellsAction => {
   return {
-    type: ADD_NEW_ACCOUNT_SHELL,
-    payload,
+    type: ADD_NEW_ACCOUNT_SHELLS,
+    payload
   }
 }
 
@@ -475,7 +476,7 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
-export const UPDATE_ACCOUNTS = 'UPDATE_ACCOUNTS'
+export const UPDATE_ACCOUNT_SHELLS = 'UPDATE_ACCOUNT_SHELLS'
 export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
 export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
@@ -556,21 +557,25 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const updateAccounts = ( { accounts, newAccounts }: { accounts: Accounts, newAccounts?: boolean } ) => {
+export const newAccountShellsAdded = ( { accountShells, accounts }: {
+  accountShells: AccountShell[];
+  accounts: Accounts
+} ) => {
   return {
-    type: UPDATE_ACCOUNTS,
+    type: NEW_ACCOUNT_SHELLS_ADDED,
     payload: {
-      accounts, newAccounts
+      accountShells,
+      accounts
     }
   }
 }
 
-export const newAccountShellsAdded = ( { accountShells }: {
-  accountShells: AccountShell[];
-} ) => {
+export const updateAccountShells = ( { accounts }: { accounts: Accounts } ) => {
   return {
-    type: NEW_ACCOUNT_SHELLS_ADDED,
-    payload: accountShells
+    type: UPDATE_ACCOUNT_SHELLS,
+    payload: {
+      accounts
+    }
   }
 }
 

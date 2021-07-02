@@ -14,7 +14,7 @@ import {
   UPDATE_DONATION_PREFERENCES,
   SYNC_VIA_XPUB_AGENT,
   secondaryXprivGenerated,
-  ADD_NEW_ACCOUNT_SHELL,
+  ADD_NEW_ACCOUNT_SHELLS,
   newAccountShellsAdded,
   newAccountShellAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
@@ -50,8 +50,9 @@ import {
   resetTwoFA,
   generateSecondaryXpriv,
   SYNC_ACCOUNTS,
-  updateAccounts,
+  updateAccountShells,
   refreshAccountShell,
+  getTestcoins,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -62,9 +63,11 @@ import {
 import {
   Account,
   Accounts,
+  AccountType,
   ContactInfo,
   DerivativeAccountTypes,
   MultiSigAccount,
+  NetworkType,
   TrustedContact,
   Trusted_Contacts,
   Wallet,
@@ -76,7 +79,6 @@ import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import RelayServices from '../../bitcoin/services/RelayService'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
-import TrustedContactsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TrustedContactsSubAccountInfo'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import { rescanSucceeded } from '../actions/wallet-rescanning'
@@ -90,16 +92,23 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import accounts, { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { generateAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { updateWallet } from '../actions/storage'
+import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import * as bip39 from 'bip39'
+import crypto from 'crypto'
+import idx from 'idx'
+import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
+import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
+import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import dbManager from '../../storage/realm/dbManager'
+
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
   serviceType: string,
@@ -464,16 +473,16 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
 
   if( !txid ) console.log( 'Failed to get testcoins' )
   else{
-    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
-    let testShell: AccountShell
-    accountsState.accountShells.forEach( ( shell )=>{
-      if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
-    } )
-    // auto-sync test account
-    const options = {
-      autoSync: true
-    }
-    if( testShell ) yield put( refreshAccountShell( testShell, options ) )
+    // const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+    // let testShell: AccountShell
+    // accountsState.accountShells.forEach( ( shell )=>{
+    //   if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
+    // } )
+    // // auto-sync test account
+    // const options = {
+    //   autoSync: true
+    // }
+    // if( testShell ) yield put( refreshAccountShell( testShell, options ) )
   }
 }
 
@@ -611,9 +620,7 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
       ...tempDB,
       wallet
     } ) )
-    yield put( updateWallet( {
-      wallet
-    } ) )
+    yield put( updateWallet( wallet ) )
   } else yield put( twoFAValid( false ) )
 }
 
@@ -729,7 +736,7 @@ function* refreshAccountShellWorker( { payload } ) {
     }
   } )
 
-  yield put( updateAccounts( {
+  yield put( updateAccountShells( {
     accounts: synchedAccounts
   } ) )
 
@@ -746,11 +753,7 @@ function* refreshAccountShellWorker( { payload } ) {
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
 
-  // TODO: insert into database
-  const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-  tempDB.accounts = accounts
-  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
-
+  // TODO: insert into Realm database
   yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
@@ -834,291 +837,296 @@ export const blindRefreshWatcher = createWatcher(
   BLIND_REFRESH
 )
 
-function* addNewSubAccount( subAccountInfo: SubAccountDescribing ) {
-  let subAccountId: string
-  let subAccountXpub: string
-  let subAccountInstanceNum: number
+function* setup2FADetails( wallet: Wallet ) {
+  const secondaryMemonic = bip39.generateMnemonic( 256 )
+  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
+  const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
-  const service = yield select(
-    ( state ) => state.accounts[ subAccountInfo.sourceKind ].service
-  )
-
-  switch ( subAccountInfo.kind ) {
-      case SubAccountKind.DONATION_ACCOUNT:
-        const donationInstance = yield call( setupDonationAccountWorker, {
-          payload: {
-            serviceType: subAccountInfo.sourceKind,
-            donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
-            subject: subAccountInfo.customDisplayName,
-            description: subAccountInfo.customDescription,
-            configuration: {
-              displayBalance: true,
-            },
-          },
-        } )
-
-        subAccountId = donationInstance.accountId
-        subAccountXpub = donationInstance.accountXpub
-        subAccountInstanceNum = donationInstance.accountNumber
-        break
-
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        const accountDetails = {
-          accountName: subAccountInfo.customDisplayName,
-          accountDescription: subAccountInfo.customDescription,
-        }
-        const derivativeSetupRes = yield call(
-          service.setupDerivativeAccount,
-          DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT,
-          accountDetails
-        )
-
-        if ( derivativeSetupRes.status === 200 ) {
-          const { SERVICES } = yield select( ( state ) => state.storage.database )
-          const updatedSERVICES = {
-            ...SERVICES,
-            [ subAccountInfo.kind ]: JSON.stringify( service ),
-          }
-          yield call( insertDBWorker, {
-            payload: {
-              SERVICES: updatedSERVICES
-            }
-          } )
-
-          subAccountId = derivativeSetupRes.data.accountId
-          subAccountXpub = derivativeSetupRes.data.accountXpub
-          subAccountInstanceNum = derivativeSetupRes.data.accountNumber
-        } else console.log( {
-          err: derivativeSetupRes.err
-        } )
-        break
-
-      case SubAccountKind.SERVICE:
-        switch ( ( subAccountInfo as ExternalServiceSubAccountDescribing ).serviceAccountKind ) {
-            case ServiceAccountKind.WYRE:
-              const wyreAccountDetails = {
-                accountName: subAccountInfo.customDisplayName,
-                accountDescription: subAccountInfo.customDescription,
-              }
-              const wyreSetupRes = yield call(
-                service.setupDerivativeAccount,
-                DerivativeAccountTypes.WYRE,
-                wyreAccountDetails
-              )
-
-              if ( wyreSetupRes.status === 200 ) {
-                const { SERVICES } = yield select( ( state ) => state.storage.database )
-                const updatedSERVICES = {
-                  ...SERVICES,
-                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
-                }
-                yield call( insertDBWorker, {
-                  payload: {
-                    SERVICES: updatedSERVICES
-                  }
-                } )
-
-                subAccountId = wyreSetupRes.data.accountId
-                subAccountXpub = wyreSetupRes.data.accountXpub
-                subAccountInstanceNum = wyreSetupRes.data.accountNumber
-              } else {
-                console.log( {
-                  err: wyreSetupRes.err
-                } )
-              }
-              break
-
-            case ServiceAccountKind.RAMP:
-              const rampAccountDetails = {
-                accountName: subAccountInfo.customDisplayName,
-                accountDescription: subAccountInfo.customDescription,
-              }
-              const rampSetupRes = yield call(
-                service.setupDerivativeAccount,
-                DerivativeAccountTypes.RAMP,
-                rampAccountDetails
-              )
-
-              if ( rampSetupRes.status === 200 ) {
-                const { SERVICES } = yield select( ( state ) => state.storage.database )
-                const updatedSERVICES = {
-                  ...SERVICES,
-                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
-                }
-                yield call( insertDBWorker, {
-                  payload: {
-                    SERVICES: updatedSERVICES
-                  }
-                } )
-
-                subAccountId = rampSetupRes.data.accountId
-                subAccountXpub = rampSetupRes.data.accountXpub
-                subAccountInstanceNum = rampSetupRes.data.accountNumber
-              } else {
-                console.log( {
-                  err: rampSetupRes.err
-                } )
-              }
-              break
-
-            case ServiceAccountKind.SWAN:
-              const swanAccountDetails = {
-                accountName: subAccountInfo.customDisplayName,
-                accountDescription: subAccountInfo.customDescription,
-              }
-              const swanSetupRes = yield call(
-                service.setupDerivativeAccount,
-                DerivativeAccountTypes.SWAN,
-                swanAccountDetails
-              )
-
-              if ( swanSetupRes.status === 200 ) {
-                const { SERVICES } = yield select( ( state ) => state.storage.database )
-                const updatedSERVICES = {
-                  ...SERVICES,
-                  [ subAccountInfo.sourceKind ]: JSON.stringify( service ),
-                }
-                yield call( insertDBWorker, {
-                  payload: {
-                    SERVICES: updatedSERVICES
-                  }
-                } )
-
-                subAccountId = swanSetupRes.data.accountId
-                subAccountXpub = swanSetupRes.data.accountXpub
-                subAccountInstanceNum = swanSetupRes.data.accountNumber
-              } else {
-                console.log( {
-                  err: swanSetupRes.err
-                } )
-              }
-              break
-        }
-        break
-  }
-
-  if ( subAccountId ) return {
-    subAccountId, subAccountInstanceNum, subAccountXpub
-  }
-  else throw new Error( 'Failed to generate sub-account; subAccountId missing ' )
-}
-
-
-function* createServiceSecondarySubAccount ( secondarySubAccount: ExternalServiceSubAccountDescribing, parentShell: AccountShell ) {
-  const service = yield select(
-    ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
-  )
-
-  let res
-  switch( secondarySubAccount.serviceAccountKind ){
-      case ServiceAccountKind.FAST_BITCOINS:
-        const fastBitcoinsDetails = {
-          accountName: secondarySubAccount.customDisplayName,
-          accountDescription: secondarySubAccount.customDescription,
-        }
-        res = yield call(
-          ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
-          DerivativeAccountTypes.FAST_BITCOINS,
-          fastBitcoinsDetails
-        )
-        break
-  }
-
-  if ( res && res.status === 200 ) {
-    const secondarySubAccountId = res.data.accountId
-    const secondarySubAccountInstanceNum = res.data.accountNumber
-
-    secondarySubAccount.id = secondarySubAccountId
-    secondarySubAccount.balances = {
-      confirmed: 0,
-      unconfirmed: 0,
+  const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
+  console.log( {
+    setupData
+  } )
+  const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
+  const bithyveXpub = setupData.bhXpub
+  const twoFAKey = setupData.secret
+  const updatedWallet = {
+    ...wallet,
+    details2FA: {
+      secondaryXpub,
+      bithyveXpub,
+      twoFAKey
     }
-    secondarySubAccount.transactions = []
-
-    AccountShell.addSecondarySubAccount(
-      parentShell,
-      secondarySubAccountId,
-      secondarySubAccount,
-    )
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ parentShell.primarySubAccount.sourceKind ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    throw new Error( 'Failed to generate secondary sub-account(service)' )
   }
+  yield put( updateWallet( updatedWallet ) )
+  return updatedWallet
 }
 
-function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
-  parentShell: AccountShell, contactInfo?: ContactInfo }} ) {
 
-  const { secondarySubAccount, parentShell, contactInfo } = payload
-  switch ( secondarySubAccount.kind ) {
-      case SubAccountKind.SERVICE:
-        yield call( createServiceSecondarySubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
+function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
+  let SubAccountConstructor
+  switch( account.type ){
+      case AccountType.TEST_ACCOUNT:
+        SubAccountConstructor = TestSubAccountInfo
+        break
+
+      case AccountType.CHECKING_ACCOUNT:
+        SubAccountConstructor = CheckingSubAccountInfo
+        break
+
+      case AccountType.SAVINGS_ACCOUNT:
+        SubAccountConstructor = SavingsSubAccountInfo
         break
   }
+
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+  const accountShell = new AccountShell( {
+    primarySubAccount: new SubAccountConstructor( {
+      id: account.id,
+      xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+      instanceNumber: account.instanceNum,
+      customDisplayName: account.accountName,
+      customDescription: account.accountDescription
+    } ),
+    unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
+    displayOrder: 1,
+  } )
+
+  return accountShell
 }
 
-export const addNewSecondarySubAccountWatcher = createWatcher(
-  addNewSecondarySubAccount,
-  ADD_NEW_SECONDARY_SUBACCOUNT
-)
+function* addNewAccount( accountType, accountName, accountDescription ) {
+  let wallet: Wallet = yield select( state => state.storage.wallet )
+  const { walletId, primaryMnemonic, accounts } = wallet
 
-function* addNewAccountShell( { payload: subAccountInfo, }: {
-  payload: SubAccountDescribing;
-} ) {
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const network = accountsState[ REGULAR_ACCOUNT ].service.hdWallet.network
+  switch ( accountType ) {
+      case AccountType.TEST_ACCOUNT:
+        const testInstanceCount = ( accounts[ AccountType.TEST_ACCOUNT ] )?.length | 0
+        const testAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: AccountType.TEST_ACCOUNT,
+          instanceNum: testInstanceCount,
+          accountName: accountName? accountName: 'Test Account',
+          accountDescription: accountDescription? accountDescription: 'Learn Bitcoin',
+          mnemonic: primaryMnemonic,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstanceCount ),
+          networkType: NetworkType.TESTNET,
+        } )
+        return testAccount
 
-  const bitcoinUnit =
-    subAccountInfo.kind == SubAccountKind.TEST_ACCOUNT
-      ? BitcoinUnit.TSATS
-      : BitcoinUnit.SATS
+      case AccountType.CHECKING_ACCOUNT:
+        const checkingInstanceCount = ( accounts[ AccountType.CHECKING_ACCOUNT ] )?.length | 0
+        const checkingAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: AccountType.CHECKING_ACCOUNT,
+          instanceNum: checkingInstanceCount,
+          accountName: accountName? accountName: 'Checking Account',
+          accountDescription: accountDescription? accountDescription: 'Fast and easy',
+          mnemonic: primaryMnemonic,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        return checkingAccount
 
-  try {
-    const { subAccountId, subAccountInstanceNum, subAccountXpub } = yield call(
-      addNewSubAccount,
-      subAccountInfo
-    )
-    subAccountInfo.id = subAccountId
-    subAccountInfo.xPub = Bitcoin.generateYpub( subAccountXpub, network )
-    subAccountInfo.instanceNumber = subAccountInstanceNum
-    const newAccountShell = new AccountShell( {
-      unit: bitcoinUnit,
-      primarySubAccount: subAccountInfo,
-      displayOrder: 1,
-    } )
-    yield put( newAccountShellsAdded( {
-      accountShells: [ newAccountShell ]
-    } ) )
-    yield put( accountShellOrderedToFront( newAccountShell ) )
-  } catch ( error ) {
-    console.log( 'addNewAccountShell saga::error: ' + error )
-    const newAccountShell = new AccountShell( {
-      unit: bitcoinUnit,
-      primarySubAccount: subAccountInfo,
-      displayOrder: 1,
-    } )
-    yield put(
-      newAccountShellAddFailed( {
-        accountShell: newAccountShell, error
-      } )
-    )
+      case AccountType.SAVINGS_ACCOUNT:
+        if( !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
+
+        const savingsInstanceCount = ( accounts[ AccountType.SAVINGS_ACCOUNT ] )?.length | 0
+        const savingsAccount: MultiSigAccount = generateMultiSigAccount( {
+          walletId,
+          type: AccountType.SAVINGS_ACCOUNT,
+          instanceNum: savingsInstanceCount,
+          accountName: accountName? accountName: 'Savings Account',
+          accountDescription: accountDescription? accountDescription: 'Multi-factor security',
+          mnemonic: primaryMnemonic,
+          derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
+          secondaryXpub: wallet.details2FA.secondaryXpub,
+          bithyveXpub: wallet.details2FA.bithyveXpub,
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        return savingsAccount
+
+        // case AccountType.DONATION_ACCOUNT:
+        //   const donationAccount = yield call( setupDonationAccountWorker, {
+        //     payload: {
+        //       serviceType: subAccountInfo.sourceKind,
+        //       donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
+        //       subject: subAccountInfo.customDisplayName,
+        //       description: subAccountInfo.customDescription,
+        //       configuration: {
+        //         displayBalance: true,
+        //       },
+        //     },
+        //   } )
+        //   return donationAccount
+
+      case AccountType.WYRE_ACCOUNT:
+      case AccountType.RAMP_ACCOUNT:
+      case AccountType.SWAN_ACCOUNT:
+        let defaultAccountName, defaultAccountDescription
+        switch( accountType ){
+            case AccountType.WYRE_ACCOUNT:
+              defaultAccountName = 'Wyre Account'
+              defaultAccountDescription = 'Buy with Apple Pay or Debit card'
+              break
+
+            case AccountType.RAMP_ACCOUNT:
+              defaultAccountName = 'Ramp Account'
+              defaultAccountDescription = 'Buy with Apple Pay, Bank or Card'
+              break
+
+            case AccountType.SWAN_ACCOUNT:
+              defaultAccountName = 'Swan Bitcoin'
+              defaultAccountDescription = 'Stack sats with Swan'
+              break
+        }
+
+        const serviceInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const serviceAccount: Account = yield call( generateAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: serviceInstanceCount,
+          accountName: accountName? accountName: defaultAccountName,
+          accountDescription: accountDescription? accountDescription: defaultAccountDescription,
+          mnemonic: primaryMnemonic,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, serviceInstanceCount ),
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        return serviceAccount
   }
 }
 
-export const addNewAccountShellWatcher = createWatcher(
-  addNewAccountShell,
-  ADD_NEW_ACCOUNT_SHELL
+
+// function* createServiceSecondarySubAccount ( secondarySubAccount: ExternalServiceSubAccountDescribing, parentShell: AccountShell ) {
+//   const service = yield select(
+//     ( state ) => state.accounts[ parentShell.primarySubAccount.sourceKind ].service
+//   )
+
+//   let res
+//   switch( secondarySubAccount.serviceAccountKind ){
+//       case ServiceAccountKind.FAST_BITCOINS:
+//         const fastBitcoinsDetails = {
+//           accountName: secondarySubAccount.customDisplayName,
+//           accountDescription: secondarySubAccount.customDescription,
+//         }
+//         res = yield call(
+//           ( service as BaseAccount|SecureAccount ).setupDerivativeAccount,
+//           DerivativeAccountTypes.FAST_BITCOINS,
+//           fastBitcoinsDetails
+//         )
+//         break
+//   }
+
+//   if ( res && res.status === 200 ) {
+//     const secondarySubAccountId = res.data.accountId
+//     const secondarySubAccountInstanceNum = res.data.accountNumber
+
+//     secondarySubAccount.id = secondarySubAccountId
+//     secondarySubAccount.balances = {
+//       confirmed: 0,
+//       unconfirmed: 0,
+//     }
+//     secondarySubAccount.transactions = []
+
+//     AccountShell.addSecondarySubAccount(
+//       parentShell,
+//       secondarySubAccountId,
+//       secondarySubAccount,
+//     )
+
+//     const { SERVICES } = yield select( ( state ) => state.storage.database )
+//     const updatedSERVICES = {
+//       ...SERVICES,
+//       [ parentShell.primarySubAccount.sourceKind ]: JSON.stringify( service ),
+//     }
+//     yield call( insertDBWorker, {
+//       payload: {
+//         SERVICES: updatedSERVICES
+//       }
+//     } )
+//   } else {
+//     throw new Error( 'Failed to generate secondary sub-account(service)' )
+//   }
+// }
+
+// function* addNewSecondarySubAccount( { payload }: {payload: {  secondarySubAccount: SubAccountDescribing,
+//   parentShell: AccountShell, contactInfo?: ContactInfo }} ) {
+
+//   const { secondarySubAccount, parentShell, contactInfo } = payload
+//   switch ( secondarySubAccount.kind ) {
+//       case SubAccountKind.SERVICE:
+//         yield call( createServiceSecondarySubAccount, ( secondarySubAccount as ExternalServiceSubAccountDescribing ), parentShell )
+//         break
+//   }
+// }
+
+// export const addNewSecondarySubAccountWatcher = createWatcher(
+//   addNewSecondarySubAccount,
+//   ADD_NEW_SECONDARY_SUBACCOUNT
+// )
+
+export interface newAccountsInfo {
+  accountType: AccountType,
+  accountDetails?: {
+    name?: string,
+    description?: string
+  }
+}
+
+function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
+  const newAccountShells: AccountShell[] = []
+  const accounts = {
+  }
+
+  let testcoinsToAccount
+  for ( const { accountType, accountDetails } of newAccountsInfo ){
+    const accountName = idx( accountDetails, ( _ ) => _.name )
+    const accountDescription = idx( accountDetails, ( _ ) => _.description )
+    const account: Account | MultiSigAccount = yield call(
+      addNewAccount,
+      accountType,
+      accountName,
+      accountDescription
+    )
+
+    const accountShell = yield call( generateShellFromAccount, account )
+    newAccountShells.push( accountShell )
+    accounts [ account.id ] = account
+    // yield put( accountShellOrderedToFront( accountShell ) )
+    if( account.type === AccountType.TEST_ACCOUNT && account.instanceNum === 0 ) testcoinsToAccount = account
+  }
+
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  let accountsMap = wallet.accounts
+  Object.values( ( accounts as Accounts ) ).forEach( account => {
+    if( accountsMap[ account.type ] ) accountsMap[ account.type ].push( account.id )
+    else accountsMap = {
+      ...accountsMap,
+      [ account.type ]: [ account.id ]
+    }
+  } )
+
+  const updatedWallet: Wallet = {
+    ...wallet,
+    accounts: accountsMap
+  }
+  yield put( updateWallet( updatedWallet ) )
+
+  yield put( newAccountShellsAdded( {
+    accountShells: newAccountShells,
+    accounts,
+  } ) )
+
+  // TODO: insert the new accounts & wallet into Realm
+  yield call( dbManager.createAccounts, accounts )
+  yield call( dbManager.createWallet, wallet )
+
+  if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
+}
+
+export const addNewAccountShellsWatcher = createWatcher(
+  addNewAccountShells,
+  ADD_NEW_ACCOUNT_SHELLS
 )
 
 function* updateAccountSettings( { payload: account, }: {

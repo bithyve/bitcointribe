@@ -765,16 +765,17 @@ export enum NetworkType {
 }
 
 export interface Wallet {
-  walletId,
-  primaryMnemonic,
-  secondaryMemonic?,
-  details2FA : {
+  walletId: string,
+  walletName: string,
+  primaryMnemonic: string,
+  secondaryMemonic?: string,
+  details2FA? : {
     secondaryXpub: string,
     bithyveXpub: string,
     twoFAKey: string,
   }
   accounts: {
-    [derivationPath: string]: string // derivation path to account-id mapping
+    [accountType: string]: string[] // array of accountIds
   }
 }
 

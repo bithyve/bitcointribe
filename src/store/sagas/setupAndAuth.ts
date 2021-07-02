@@ -1,5 +1,5 @@
-import { call, fork, put, select } from 'redux-saga/effects'
-import { createWatcher, initializeWallet } from '../utils/utilities'
+import { call, put, select } from 'redux-saga/effects'
+import { createWatcher } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -18,161 +18,99 @@ import {
   pinChangedFailed,
   initializeRecoveryCompleted,
   completedWalletSetup,
+  WALLET_SETUP_COMPLETION,
 } from '../actions/setupAndAuth'
 import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { getTestcoins, updateAccounts } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { Account, AccountType, Wallet } from '../../bitcoin/utilities/Interface'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import * as bip39 from 'bip39'
+import crypto from 'crypto'
+import { addNewAccountShells } from '../actions/accounts'
+import { newAccountsInfo } from './accounts'
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security, chosenAccounts } = payload
-  const { REGULAR_ACCOUNT, TEST_ACCOUNT, SECURE_ACCOUNT } = chosenAccounts
-  if( REGULAR_ACCOUNT ) {
+  const { walletName, selectedAccounts } = payload
+  const primaryMnemonic = bip39.generateMnemonic( 256 )
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+  const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
-    // When only regular account selected
-
-    const { wallet, accounts, s3Service,  trustedContacts } = yield call( initializeWallet, chosenAccounts, '', '' )
-    // TODO: save wallet-instance in realm
-    // console.log( 'wallet-instance in realm', wallet, accounts )
-    yield call( dbManager.createWallet, wallet )
-    yield call( dbManager.createAccounts, accounts )
-
-    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-      wallet, accounts
-    } ) )
-
-    yield put( updateAccounts( {
-      accounts, newAccounts: true
-    } ) )
-    yield put( updateWallet( {
-      wallet
-    } ) )
-    yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
-
-    const initialDatabase: Database = {
-      WALLET_SETUP: {
-        walletName, security
-      },
-      DECENTRALIZED_BACKUP: {
-        RECOVERY_SHARES: {
-        },
-        SHARES_TRANSFER_DETAILS: {
-        },
-        UNDER_CUSTODY: {
-        },
-        DYNAMIC_NONPMDD: {
-        },
-      },
-      SERVICES: {
-        REGULAR_ACCOUNT: JSON.stringify( {
-        } ),
-        TEST_ACCOUNT: JSON.stringify( {
-        } ),
-        SECURE_ACCOUNT: JSON.stringify( {
-        } ),
-        S3_SERVICE: JSON.stringify( s3Service ),
-        TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-      },
-      VERSION: DeviceInfo.getVersion(),
+  const wallet: Wallet = {
+    walletId,
+    walletName,
+    primaryMnemonic,
+    accounts: {
     }
-    yield call( insertDBWorker, {
-      payload: initialDatabase
-    } )
-
-    yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-
-    // initialize health-check schema on relay
-    yield put( initializeHealthSetup() )
-    yield put( completedWalletSetup( ) )
-
-    // Post Hydration activities
-    // saturate the test account w/ 10K sats
-    // End of regular account option
-
   }
-  if( TEST_ACCOUNT )  {
 
-    // When test account selected
+  yield put( updateWallet( wallet ) )
+  yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
 
-    const currentWalletId: string = yield select( ( state ) => state.storage.wallet.walletId )
-    const currentPrimaryMnemonic: string = yield select( ( state ) => state.storage.wallet.walletId )
-    const { wallet, accounts } = yield call( initializeWallet, chosenAccounts, currentWalletId, currentPrimaryMnemonic )
-
-    const currentWallet = yield select( ( state ) => state.storage.wallet )
-
-    wallet.accounts = {
-      ...currentWallet.accounts,
-      ...wallet.accounts
+  const accountsInfo: newAccountsInfo[] = []
+  selectedAccounts.forEach( ( accountType ) => {
+    const accountInfo: newAccountsInfo = {
+      accountType
     }
-    currentWallet.accounts = wallet.accounts
-    const currentAccounts = yield select( ( state ) => state.accounts.accounts )
-    const newAccounts = {
-      ...currentAccounts,
-      ...accounts
-    }
+    accountsInfo.push( accountInfo )
+  } )
 
-    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-      wallet, accounts: newAccounts
-    } ) )
+  yield put( addNewAccountShells( accountsInfo ) )
+  yield call( dbManager.createWallet, wallet )
+  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+}
+export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 
-    yield put( updateAccounts( {
-      accounts: accounts, newAccounts: true
-    } ) )
-    yield put( updateWallet( {
-      wallet: currentWallet
-    } ) )
+function* walletSetupCompletion( { payload } ) {
+  // TODO: remove this saga post functionalization of S3 and TC-service
+  const { security } = payload
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
 
-    // request testcoins
-    let testAcc: Account
-    Object.values( accounts ).forEach( ( account: Account )=>{
-      testAcc = account
-    } )
-    yield put( getTestcoins( testAcc ) )
-
-    // End of when test account selected
+  const initialDatabase: Database = {
+    WALLET_SETUP:{
+      walletName: wallet.walletName,
+      security,
+    },
+    DECENTRALIZED_BACKUP: {
+      RECOVERY_SHARES: {
+      },
+      SHARES_TRANSFER_DETAILS: {
+      },
+      UNDER_CUSTODY: {
+      },
+      DYNAMIC_NONPMDD: {
+      },
+    },
+    SERVICES: {
+      REGULAR_ACCOUNT: JSON.stringify( {
+      } ),
+      TEST_ACCOUNT: JSON.stringify( {
+      } ),
+      SECURE_ACCOUNT: JSON.stringify( {
+      } ),
+      S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
+      TRUSTED_CONTACTS: JSON.stringify(  new TrustedContactsService() ),
+    },
+    VERSION: DeviceInfo.getVersion(),
   }
-  if( SECURE_ACCOUNT )  {
 
-    // When savings account selected
+  yield call( insertDBWorker, {
+    payload: initialDatabase
+  } )
 
-    const currentWalletId: string = yield select( ( state ) => state.storage.wallet.walletId )
-    const currentPrimaryMnemonic: string = yield select( ( state ) => state.storage.wallet.walletId )
-    const { wallet, accounts } = yield call( initializeWallet, chosenAccounts, currentWalletId, currentPrimaryMnemonic )
 
-    const currentWallet = yield select( ( state ) => state.storage.wallet )
-
-    wallet.accounts = {
-      ...currentWallet.accounts,
-      ...wallet.accounts
-    }
-
-    currentWallet.accounts = wallet.accounts
-    const currentAccounts = yield select( ( state ) => state.accounts.accounts )
-    const newAccounts = {
-      ...currentAccounts,
-      ...accounts
-    }
-
-    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-      wallet, accounts: newAccounts
-    } ) )
-
-    yield put( updateAccounts( {
-      accounts: accounts, newAccounts: true
-    } ) )
-    yield put( updateWallet( {
-      wallet: currentWallet
-    } ) )
-    // End of when savings account selected
-  }
+  // initialize health-check schema on relay
+  yield put( initializeHealthSetup() )
+  yield put( completedWalletSetup( ) )
 }
 
-export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
+export const walletSetupCompletionWatcher = createWatcher( walletSetupCompletion, WALLET_SETUP_COMPLETION )
+
 
 function* initRecoveryWorker( { payload } ) {
   const { walletName, security } = payload

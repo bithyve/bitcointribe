@@ -44,6 +44,15 @@ export default class AccountUtilities {
     else return bitcoinJS.networks.bitcoin
   }
 
+  static getDerivationPath = ( type: NetworkType, accountType: AccountType, instanceNumber: number ): string => {
+    const { series, upperBound } = config.ACCOUNT_INSTANCES[ accountType ]
+    if( instanceNumber > ( upperBound - 1 ) ) throw new Error( `Cannot create new instance of type ${accountType}, instace upper bound exceeds ` )
+    const accountNumber = series + instanceNumber
+
+    if( type === NetworkType.TESTNET ) return `m/49'/1'/${accountNumber}'`
+    else return `m/49'/0'/${accountNumber}'`
+  }
+
   static getKeyPair = ( privateKey: string, network: bitcoinJS.Network ): bitcoinJS.ECPairInterface =>
     bitcoinJS.ECPair.fromWIF( privateKey, network )
 
