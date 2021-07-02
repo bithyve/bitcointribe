@@ -52,6 +52,7 @@ import {
   SYNC_ACCOUNTS,
   updateAccountShells,
   refreshAccountShell,
+  getTestcoins,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -472,16 +473,16 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
 
   if( !txid ) console.log( 'Failed to get testcoins' )
   else{
-    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
-    let testShell: AccountShell
-    accountsState.accountShells.forEach( ( shell )=>{
-      if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
-    } )
-    // auto-sync test account
-    const options = {
-      autoSync: true
-    }
-    if( testShell ) yield put( refreshAccountShell( testShell, options ) )
+    // const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+    // let testShell: AccountShell
+    // accountsState.accountShells.forEach( ( shell )=>{
+    //   if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
+    // } )
+    // // auto-sync test account
+    // const options = {
+    //   autoSync: true
+    // }
+    // if( testShell ) yield put( refreshAccountShell( testShell, options ) )
   }
 }
 
@@ -752,11 +753,7 @@ function* refreshAccountShellWorker( { payload } ) {
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
 
-  // TODO: insert into database
-  const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-  tempDB.accounts = accounts
-  yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
-
+  // TODO: insert into Realm database
   yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
@@ -1081,6 +1078,7 @@ function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccoun
   const accounts = {
   }
 
+  let testcoinsToAccount
   for ( const { accountType, accountDetails } of newAccountsInfo ){
     const accountName = idx( accountDetails, ( _ ) => _.name )
     const accountDescription = idx( accountDetails, ( _ ) => _.description )
@@ -1090,10 +1088,12 @@ function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccoun
       accountName,
       accountDescription
     )
+
     const accountShell = yield call( generateShellFromAccount, account )
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
     // yield put( accountShellOrderedToFront( accountShell ) )
+    if( account.type === AccountType.TEST_ACCOUNT && account.instanceNum === 0 ) testcoinsToAccount = account
   }
 
   const wallet: Wallet = yield select( state => state.storage.wallet )
@@ -1117,10 +1117,11 @@ function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccoun
     accounts,
   } ) )
 
-
   // TODO: insert the new accounts & wallet into Realm
   yield call( dbManager.createAccounts, accounts )
   yield call( dbManager.createWallet, wallet )
+
+  if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
 export const addNewAccountShellsWatcher = createWatcher(
