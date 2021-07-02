@@ -54,6 +54,7 @@ export default function AddContactSendRequest( props ) {
 
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
+  const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
 
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
@@ -120,6 +121,7 @@ export default function AddContactSendRequest( props ) {
         if ( contacts[ ck ].contactDetails.id === Contact.id ){
           currentContact = contacts[ ck ]
           channelKey = ck
+          setSelectedContactsCHKey( channelKey )
           break
         }
       }
@@ -406,10 +408,19 @@ export default function AddContactSendRequest( props ) {
             {showDone  &&
             <TouchableOpacity
               onPress={() => {
-                dispatch( syncPermanentChannels( {
-                  permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
-                  metaSync: true,
-                } ) )
+                if( selectedContactsCHKey ){
+                  const channelUpdate = {
+                    contactInfo: {
+                      channelKey: selectedContactsCHKey
+                    }
+                  }
+
+                  dispatch( syncPermanentChannels( {
+                    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+                    metaSync: true,
+                    channelUpdates: [ channelUpdate ]
+                  } ) )
+                }
                 props.navigation.popToTop()
               }}
               style={{

@@ -1554,7 +1554,7 @@ export default withNavigationFocus(
 
 const styles = StyleSheet.create( {
   accountCardsSectionContainer: {
-    flex: 13,
+    height: hp( '68.5%' ),
     // marginTop: 30,
     backgroundColor: Colors.backgroundColor,
     borderTopLeftRadius: 25,

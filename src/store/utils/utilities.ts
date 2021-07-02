@@ -1,5 +1,4 @@
 import * as bip39 from 'bip39'
-import * as bitcoinJS from 'bitcoinjs-lib'
 import crypto from 'crypto'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
@@ -8,11 +7,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { Account, Accounts, AccountType, MetaShare, MultiSigAccount, NetworkType, Wallet } from '../../bitcoin/utilities/Interface'
-import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
-import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import config from '../../bitcoin/HexaConfig'
-import { APP_STAGE } from '../../common/interfaces/Interfaces'
+import { MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 
 export const serviceGenerator = async (
   securityAns: string,

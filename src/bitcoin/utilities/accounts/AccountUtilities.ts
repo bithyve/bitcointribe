@@ -545,8 +545,8 @@ export default class AccountUtilities {
         // calculate balance
         for( const utxo of UTXOs ){
           if (
-            accountType === 'Test Account' &&
-          externalAddresses[ utxo.address ] === 0
+            accountType === AccountType.TEST_ACCOUNT &&
+            externalAddresses[ utxo.address ] === 0
           ) {
             balances.confirmed += utxo.value // testnet-utxo from BH-testnet-faucet is treated as an spendable exception
             continue
@@ -863,7 +863,7 @@ export default class AccountUtilities {
   }
 
   // test-account specific utilities
-  static testnetFaucet = async ( recipientAddress: string, network: bitcoinJS.networks.Network ): Promise<{
+  static getTestcoins = async ( recipientAddress: string, network: bitcoinJS.networks.Network ): Promise<{
     txid: any;
     funded: any;
   }> => {

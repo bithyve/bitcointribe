@@ -127,7 +127,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
+          swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\n\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
           swanTitle = 'Buy bitcoin\nwith Swan'
     }
     return (
@@ -152,8 +152,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
 
           <Text style={{
             ...styles.modalInfoText,
-            marginTop: wp( 1.5 ),
-            marginBottom: wp( 5 ),
+
           }}>{swanMessage}</Text>
           {( swanAccountCreationStatus == SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY
           ||
@@ -207,9 +206,9 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Proceed to Swan'}</Text>
+        <Text style={styles.proceedButtonText}>{'Buy Bitcoin'}</Text>
       </AppBottomSheetTouchableWrapper>
-      <View style={{
+      {/* <View style={{
         flexDirection: 'row',
         alignItems: 'center',
         alignContent: 'center'
@@ -228,7 +227,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           }}
         />
 
-      </View>
+      </View> */}
     </View> )
   }
   const renderSuccessButton = () => {
@@ -279,7 +278,7 @@ const styles = StyleSheet.create( {
   },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
-    marginLeft: wp( '3%' ),
+    marginLeft: wp( '4%' ),
     // marginTop: wp( '5%' ),
     // flex: 1.7
   },
@@ -293,17 +292,22 @@ const styles = StyleSheet.create( {
   modalInfoText: {
     marginLeft: wp( '3%' ),
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'justify'
+    textAlign: 'justify',
+    marginTop: wp( 1.5 ),
+    marginBottom: wp( 10 ),
+    marginRight: wp( 5 ),
+    lineHeight: 18,
+    letterSpacing: 0.6
   },
   successModalButtonView: {
     minHeight: 50,
     minWidth: 144,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
-    height: wp( '13%' ),
-    width: wp( '43%' ),
+    height: wp( '15%' ),
+    width: wp( '36%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
@@ -317,6 +321,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.blue,
     alignSelf: 'flex-start',
     marginLeft: wp( '6%' ),
+    marginBottom: hp( 3 )
   },
   proceedButtonText: {
     color: Colors.white,

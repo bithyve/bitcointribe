@@ -109,7 +109,7 @@ export default function NewWalletName( props ) {
               autoClose={()=>{
                 closeBottomSheet()
                 console.log( 'updateCloudPermission', true )
-                dispatch( updateCloudPermission( true ) )
+                // dispatch( updateCloudPermission( true ) )
                 props.navigation.navigate( 'NewWalletQuestion', {
                   walletName,
                 } )
@@ -183,12 +183,12 @@ export default function NewWalletName( props ) {
         >
           <ScrollView>
             <HeaderTitle
-              firstLineTitle={'New Hexa Wallet'}
-              secondLineTitle={''}
-              infoTextNormal={'Please '}
-              infoTextBold={'name'}
-              infoTextNormal1={'your wallet'}
-              step={'Step 1: '}
+              firstLineTitle={'Provide a Display Name'}
+              secondLineTitle={'This is used for communication with your contacts'}
+              infoTextNormal={''}
+              infoTextBold={''}
+              infoTextNormal1={''}
+              step={''}
             />
             <TextInput
               style={inputStyle}
@@ -239,8 +239,11 @@ export default function NewWalletName( props ) {
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss()
-                    setIsCloudPermissionRender( true )
-                    openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+                    props.navigation.navigate( 'AccountSelection', {
+                      walletName
+                    } )
+                    // setIsCloudPermissionRender( true )
+                    // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
                   }}
                   style={styles.buttonView}
                 >
@@ -259,9 +262,9 @@ export default function NewWalletName( props ) {
               marginBottom: DeviceInfo.hasNotch ? hp( '3%' ) : 0
             }}>
               <BottomInfoBox
-                title={'We do not store this'}
+                title={'Note: '}
                 infoText={
-                  'This is used during your communication with your contacts'
+                  'We do not store this, it is only for your and your contacts’ eyes'
                 }
               />
             </View>

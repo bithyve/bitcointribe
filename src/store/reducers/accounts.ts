@@ -486,7 +486,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         // This will clear the sync state at the start of each login session
         // This is required in order to ensure sync icon is shown again for each session
         state.accountShells.map(
-          ( shell ) => shell.syncStatus = SyncStatus.PENDING )
+          ( shell ) => shell.syncStatus = SyncStatus.COMPLETED )
         return {
           ...state,
         }

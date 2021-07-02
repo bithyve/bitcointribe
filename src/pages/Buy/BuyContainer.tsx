@@ -1756,7 +1756,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <View style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              paddingVertical: wp( 6 ),
+              paddingVertical: hp( 3 ),
               paddingHorizontal: wp( 4 ),
               alignItems: 'center'
             }}>
@@ -1834,7 +1834,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               New Services
             </Text>
             <NewBuyBitcoinBottomSheet
-              onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              onMenuItemSelected={() => {}}
               // onPress={this.closeBottomSheet}
             />
             {/* </View> */}
@@ -1950,20 +1950,6 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
     flexDirection: 'row',
     paddingHorizontal: widthPercentageToDP( 2 )
-  },
-  accountCardsSectionContainer: {
-    flex: 13,
-    // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
-    flexDirection: 'column',
-    justifyContent: 'space-around'
   },
 
   floatingActionButtonContainer: {

@@ -183,7 +183,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   navigateToQRScreen = () => {
     this.props.navigation.navigate( 'QRScanner', {
-      onCodeScanned: this.processQRData,
+      onCodeScanned: this.processFAndFQR,
     } )
   };
 
@@ -201,73 +201,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
   };
 
-  processQRData = async ( qrData ) => {
-    const { accountsState, addTransferDetails, navigation } = this.props
-
-    const network = Bitcoin.networkType( qrData )
-    if ( network ) {
-      const serviceType =
-        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-
-      const service = accountsState[ serviceType ].service
-      const { type } = service.addressDiff( qrData )
-
-      if ( type ) {
-        let item
-
-        switch ( type ) {
-            case ScannedAddressKind.ADDRESS:
-              const recipientAddress = qrData
-
-              item = {
-                id: recipientAddress
-              }
-
-              addTransferDetails( serviceType, {
-                selectedContact: item,
-              } )
-
-              navigation.navigate( 'SendToContact', {
-                selectedContact: item,
-                serviceType,
-              } )
-              break
-
-            case ScannedAddressKind.PAYMENT_URI:
-              let address, options
-
-              try {
-                const res = service.decodePaymentURI( qrData )
-                address = res.address
-                options = res.options
-
-              } catch ( err ) {
-                Alert.alert( 'Unable to decode payment URI' )
-                return
-              }
-
-              item = {
-                id: address
-              }
-
-              addTransferDetails( serviceType, {
-                selectedContact: item,
-              } )
-
-              navigation.navigate( 'SendToContact', {
-                selectedContact: item,
-                serviceType,
-                bitcoinAmount: options.amount
-                  ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-                  : '',
-              } )
-              break
-        }
-      } else {
-        Toast( 'Invalid QR' )
-      }
-    }
-
+  processFAndFQR = async ( qrData ) => {
+    const { navigation } = this.props
     try {
       const scannedData = JSON.parse( qrData )
 
@@ -551,11 +486,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  shouldComponentUpdate =( nextProps, nextState ) => {
-    if( this.props.accountsState.accountShells === nextProps.accountsState.accountShells ) {
-      return false
-    }
-  }
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (

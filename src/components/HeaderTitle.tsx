@@ -19,23 +19,24 @@ export default function HeaderTitle( props ) {
       flexDirection: 'row', alignItems: 'center'
     }}>
       <Text style={CommonStyles.headerTitles} >
-        {props.firstLineTitle}{props.secondLineTitle ? '\n' + props.secondLineTitle : ''}
+        {props.firstLineTitle}
       </Text>
-      {props.isKnowMoreButton &&
+    </View>
+    <View style={{
+      flexDirection: 'row', alignItems: 'center'
+    }}>
+      <Text style={CommonStyles.subHeaderTitles} >
+        {props.secondLineTitle}
+      </Text>
+    </View>
+    {props.isKnowMoreButton &&
                 <KnowMoreButton onpress={() => props.onPressKnowMore} containerStyle={{
                   marginLeft: 'auto', marginRight: 20
                 }} />
-      }
-    </View>
+    }
+
     <Text style={CommonStyles.headerTitlesInfoText} >
-      {props.step && <Text style={{
-        fontWeight: 'bold', fontFamily: Fonts.FiraSans
-      }}>{props.step}</Text> }
-      {props.infoTextNormal}<Text style={{
-        fontFamily: Fonts.FiraSansMediumItalic, fontWeight: 'bold', fontStyle:'italic', fontSize: RFValue( 12 ),
-      }}>{props.infoTextBold}
-        {props.infoTextNormal1 ? <Text style={CommonStyles.headerTitlesInfoText} >
-          {' ' + props.infoTextNormal1}</Text> : null}</Text>
+      {props.infoTextNormal}
     </Text>
   </View>
   )

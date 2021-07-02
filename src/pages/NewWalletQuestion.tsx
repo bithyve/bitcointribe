@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, createRef } from 'react'
 import {
   StyleSheet,
   View,
@@ -31,18 +31,29 @@ import HeaderTitle from '../components/HeaderTitle'
 import BottomInfoBox from '../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet } from '../store/actions/setupAndAuth'
 import BottomSheet from 'reanimated-bottom-sheet'
 import LoaderModal from '../components/LoaderModal'
-
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import { initNewBHRFlow } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
+import { clearAccountSyncCache } from '../store/actions/accounts'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
+import { updateCloudPermission } from '../store/actions/health'
+import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
+export enum BottomSheetKind {
+  CLOUD_PERMISSION,
+}
+
+export enum BottomSheetState {
+  Closed,
+  Open,
+}
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
@@ -103,6 +114,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
   )
   const [ Elevation, setElevation ] = useState( 10 )
+  const [ height, setHeight ] = useState( 72 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -139,7 +151,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ tempPswd, setTempPswd ] = useState( '' )
   const [ isEditable, setIsEditable ] = useState( true )
   const [ isDisabled, setIsDisabled ] = useState( false )
-  const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
   // const [ loaderBottomSheet ] = useState( React.createRef() )
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
@@ -154,8 +165,32 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
+  const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
+  const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
+  const bottomSheetRef = createRef<BottomSheet>()
+  const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
 
 
+  useEffect( ()=>{
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setHeight( 85 )
+      }
+    )
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setHeight( 72 )
+      }
+    )
+    dispatch( clearAccountSyncCache() )
+    return () => {
+      keyboardDidHideListener.remove()
+      keyboardDidShowListener.remove()
+    }
+  }, [] )
   useEffect( () => {
     if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
@@ -166,37 +201,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ cloudBackupStatus ] )
 
-  useEffect( () => {
-    if( walletSetupCompleted ){
-      console.log( 'walletSetupCompleted****', walletSetupCompleted )
-
-      dispatch( walletCheckIn() )
-    }
-  }, [ walletSetupCompleted ] )
-
-  useEffect( () => {
-    if( walletSetupCompleted && levelHealth && levelHealth.length ){
-      console.log( 'healthCheckInitializedKeeper****', levelHealth.length )
-      if( cloudPermissionGranted ){
-        dispatch( setCloudData() )
-      } else{
-        // ( loaderBottomSheet as any ).current.snapTo( 0 )
-        setLoaderModal( false )
-        props.navigation.navigate( 'HomeNav', {
-          walletName,
-        } ) }
-    }
-  }, [ walletSetupCompleted, levelHealth ] )
-
   const checkCloudLogin = () =>{
-    showLoader()
+
     requestAnimationFrame( () => {
       const security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
         answer,
       }
-      dispatch( setupWallet( walletName, security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()
@@ -303,8 +315,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     return (
       <TouchableOpacity
         onPress={async () => {
+          showLoader()
           if ( activeIndex === 0 ) {
             checkCloudLogin()
+            // setIsCloudPermissionRender( true )
+            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+            dispatch( setCloudData() )
             showSecurityQue( false )
           } else {
             showEncryptionPswd( false )
@@ -377,6 +393,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   const confirmAction = () => {
+    dispatch( updateCloudPermission( true ) )
     if ( activeIndex === 0 ) {
       showSecurityQue( true )
       setAnswer( '' )
@@ -392,11 +409,19 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const renderEncryptionPswd = () => {
     return(
-      <ScrollView style={{
-        backgroundColor: Colors.white,
-        height: '63%'
+      // <ScrollView >
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        // style={styles.rootContainer}
+        style={{
+          backgroundColor: Colors.white,
+          height: '72%'
 
-      }}>
+        }}
+      >
         <View style={{
           flex: 1
         }}>
@@ -411,7 +436,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             }}
           >
             <FontAwesome name="close" color={Colors.white} size={19} style={{
-            // marginTop: hp( 0.5 )
+              // marginTop: hp( 0.5 )
             }} />
           </TouchableOpacity>
           <Text style={{
@@ -568,11 +593,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             ) : null}
           </View>
 
-          {/* {pswdError.length == 0 && (
+          {pswdError.length == 0 && (
             <Text style={styles.helpText}>
-              Password must only contain lowercase characters (a-z) and digits (0-9).
+              No numbers or special characters allowed
             </Text>
-          )} */}
+          )}
         </View>
         <View
           style={{
@@ -602,21 +627,29 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           ) && (
             setButtonVisible()
           ) || null}
-          <View style={styles.statusIndicatorView}>
+          {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
-          </View>
+          </View> */}
         </View> : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
+      // </ScrollView>
     )
   }
   const renderSecurityQuestion = () => {
     return (
-      <ScrollView style={{
-        backgroundColor: Colors.white,
-        height: '63%'
+      <KeyboardAwareScrollView
+        resetScrollToCoords={{
+          x: 0, y: 0
+        }}
+        scrollEnabled={false}
+        // style={styles.rootContainer}
+        style={{
+          backgroundColor: Colors.white,
+          height: `${height}%`
 
-      }}>
+        }}
+      >
         <View style={{
           flex: 1
         }}>
@@ -640,7 +673,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Use answer to{'\n'}a Security Question</Text>
+          }} >Answer to {'\n'}a Security Question</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -872,7 +905,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
               {answerError.length == 0 && (
                 <Text style={styles.helpText}>
-              Answers must only contain lowercase characters (a-z) and digits (0-9).
+              Answers must contain only lower case alphabets and numbers
                 </Text>
               )}
             </View>
@@ -942,19 +975,80 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           ) && (
             setButtonVisible()
           ) || null}
-          <View style={styles.statusIndicatorView}>
+          {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
-          </View>
+          </View> */}
         </View> : null}
-      </ScrollView>
+      </KeyboardAwareScrollView>
     )
   }
+
+  const openBottomSheet = (
+    kind: BottomSheetKind,
+    snapIndex: number | null = null
+  ) => {
+    setBottomSheetState( BottomSheetState.Open )
+    setCurrentBottomSheetKind( kind )
+
+    if ( snapIndex == null ) {
+      bottomSheetRef.current?.expand()
+    } else {
+      bottomSheetRef.current?.snapTo( snapIndex )
+    }
+  }
+
+  const onBottomSheetClosed =()=> {
+    setBottomSheetState( BottomSheetState.Closed )
+    setCurrentBottomSheetKind( null )
+  }
+
+  const closeBottomSheet = () => {
+    setIsCloudPermissionRender( false )
+    // bottomSheetRef.current.snapTo( 0 )
+    setCurrentBottomSheetKind( null )
+    onBottomSheetClosed()
+  }
+
+  // const renderBottomSheetContent = () =>{
+
+  //   switch ( currentBottomSheetKind ) {
+  //       case BottomSheetKind.CLOUD_PERMISSION:
+  //         return (
+  //           <CloudPermissionModalContents
+  //             title={'Automated Cloud Backup'}
+  //             info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
+  //             note={''}
+  //             onPressProceed={( flag )=>{
+  //               dispatch( updateCloudPermission( flag ) )
+  //               closeBottomSheet()
+  //               console.log( 'updateCloudPermission', flag )
+  //               props.navigation.navigate( 'NewWalletQuestion', {
+  //                 walletName,
+  //               } )
+  //             }}
+  //             onPressIgnore={( flag )=> {
+  //               closeBottomSheet()
+  //               console.log( 'updateCloudPermission', flag )
+  //               dispatch( updateCloudPermission( flag ) )
+  //               props.navigation.navigate( 'NewWalletQuestion', {
+  //                 walletName,
+  //               } )
+  //             }}
+  //             isRendered={isCloudPermissionRender}
+  //             bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
+  //           />
+  //         )
+
+  //       default:
+  //         break
+  //   }
+  // }
 
   return (
     <View style={{
       flex: 1,
-      backgroundColor: Colors.backgroundColor1
+      backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <SafeAreaView style={{
@@ -964,15 +1058,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ScrollView>
         <View style={{
           flex: 1,
-          backgroundColor: Colors.backgroundColor1
+          backgroundColor: Colors.backgroundColor
         }}>
           <View style={[ CommonStyles.headerContainer, {
-            backgroundColor: Colors.backgroundColor1
+            backgroundColor: Colors.backgroundColor
           } ]}>
             <TouchableOpacity
               style={CommonStyles.headerLeftIconContainer}
               onPress={() => {
-                props.navigation.navigate( 'WalletInitialization' )
+                props.navigation.goBack()
               }}
             >
               <View style={CommonStyles.headerLeftIconInnerContainer}>
@@ -997,17 +1091,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'New Hexa Wallet'}
-              secondLineTitle={''}
-              infoTextNormal={'Create initial '}
-              infoTextBold={'cloud backup'}
+              firstLineTitle={'Initial Cloud Backup'}
+              secondLineTitle={'Select how you want to encrypt the backup'}
+              infoTextNormal={''}
+              infoTextBold={''}
               infoTextNormal1={''}
-              step={'Step 2: '}
+              step={''}
             />
             <TouchableOpacity
               onPress={() => setActiveIndex( 0 )}
               style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.white,
+                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1,
                 alignSelf: 'center', justifyContent: 'center',
                 borderRadius: wp( '4' ),
                 marginVertical: hp( '3%' )
@@ -1021,10 +1115,18 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 <View style={{
                   width: 18,
                   height: 18,
-                  borderRadius: 999,
-                  borderWidth: 0.5,
+                  borderRadius: 9,
+                  // borderWidth: 0.3,
+                  // borderColor: Colors.borderColor,
+                  backgroundColor: Colors.white,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  elevation: 10,
+                  // shadowColor: Colors.gray,
+                  shadowOpacity: 0.1,
+                  shadowOffset: {
+                    width: 1, height: 1
+                  },
                 }}>
                   {activeIndex === 0 &&
                     <Image
@@ -1035,6 +1137,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     />
                   }
                 </View>
+                {activeIndex === 0 ?
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/icon_questions.png' )}
+                  />
+                  :
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/question_inactive.png' )}
+                  />
+                }
+
                 <View >
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.blue
@@ -1044,7 +1162,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Use answer to a Security Question
+                     Easier to remember. Recommended
                   </Text>
                 </View>
               </View>
@@ -1056,7 +1174,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <TouchableOpacity
               onPress={() => setActiveIndex( 1 )}
               style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.white,
+                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.backgroundColor1,
                 alignSelf: 'center', justifyContent: 'center',
                 borderRadius: wp( '4' ),
                 // marginVertical: hp( '3%' )
@@ -1065,15 +1183,23 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 flexDirection:'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                marginHorizontal: wp( '5%' )
+                marginHorizontal: wp( '5%' ),
               }}>
                 <View style={{
                   width: 18,
                   height: 18,
-                  borderRadius: 999,
-                  borderWidth: 0.5,
+                  borderRadius: 9,
+                  // borderWidth: 0.3,
+                  // borderColor: Colors.borderColor,
+                  backgroundColor: Colors.white,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  elevation: 10,
+                  // shadowColor: Colors.gray,
+                  shadowOpacity: 0.1,
+                  shadowOffset: {
+                    width: 1, height: 1
+                  },
                 }}>
                   {activeIndex === 1 &&
                     <Image
@@ -1084,6 +1210,21 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                     />
                   }
                 </View>
+                {activeIndex === 1 ?
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/icon_password_active.png' )}
+                  />
+                  :
+                  <Image
+                    style={{
+                      width: 27, height: 27, resizeMode: 'contain'
+                    }}
+                    source={require( '../assets/images/icons/icon_password.png' )}
+                  />
+                }
                 <View >
                   <Text style={{
                     fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue
@@ -1093,7 +1234,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   <Text style={{
                     fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.textColorGrey
                   }}>
-                    Need text to be replaced
+                    Make sure you remember and keep it safe
                   </Text>
                 </View>
               </View>
@@ -1119,7 +1260,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial wallet backup is essential for security This can be changed later from the '}
+            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the Security Centre '}
             italicText={'Security Centre'}
           />
         </View>
@@ -1134,8 +1275,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           buttonDisable={false}
         />
         <TouchableOpacity
-          onPress={() => {}}
-
+          onPress={() => {
+            dispatch( updateCloudPermission( false ) )}
+          }
         >
           <Text style={{
             color: Colors.blue,
@@ -1145,14 +1287,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>Skip Backup</Text>
         </TouchableOpacity>
       </View>
-
+      {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
+        {renderBottomSheetContent()}
+      </ModalContainer> */}
       <ModalContainer visible={securityQue} closeBottomSheet={() => {showSecurityQue( false ) }} >
         {renderSecurityQuestion()}
       </ModalContainer>
       <ModalContainer visible={encryptionPswd} closeBottomSheet={() => {showEncryptionPswd( false ) }} >
         {renderEncryptionPswd()}
       </ModalContainer>
-      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
         {renderLoaderModalContent()}
       </ModalContainer>
       {/* <BottomSheet

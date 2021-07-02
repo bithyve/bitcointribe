@@ -67,7 +67,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
   return (
     <View>
       <SafeAreaView style={{
-        flex: 0
+        flex: 0, backgroundColor: Colors.backgroundColor
       }} />
 
       <StatusBar
@@ -75,7 +75,9 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
         barStyle="dark-content"
       />
 
-      <View style={ScreenHeaderStyles.smallHeaderContainer}>
+      <View style={[ ScreenHeaderStyles.smallHeaderContainer, {
+        backgroundColor: Colors.backgroundColor
+      } ]}>
 
         <View style={styles.mainContentContainer}>
           <TouchableOpacity

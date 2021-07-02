@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, initializeWallet, serviceGeneratorForNewBHR } from '../utils/utilities'
+import { createWatcher, initializeWallet } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -23,35 +23,39 @@ import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { addNewAccountShells, updateAccountShells } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
-import { newAccountsInfo } from './accounts'
-// import { timer } from '../../utils'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security } = payload
-
   // const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
-  const { wallet, s3Service,  trustedContacts } = yield call( initializeWallet )
+  const { wallet, s3Service, trustedContacts } = yield call( initializeWallet )
 
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
   yield call( dbManager.createWallet, wallet )
 
-  const testAccountInfo = {
-    accountType: AccountType.TEST_ACCOUNT
-  }
-  const checkingAccountInfo = {
-    accountType: AccountType.CHECKING_ACCOUNT
-  }
-  const savingsAccountInfo = {
-    accountType: AccountType.SAVINGS_ACCOUNT
-  }
-  const newAccountsInfo: newAccountsInfo[] = [ testAccountInfo, checkingAccountInfo, savingsAccountInfo ]
-  yield put( addNewAccountShells( newAccountsInfo ) )
+  // const testAccountInfo = {
+  //   accountType: AccountType.TEST_ACCOUNT
+  // }
+  // const checkingAccountInfo = {
+  //   accountType: AccountType.CHECKING_ACCOUNT
+  // }
+  // const savingsAccountInfo = {
+  //   accountType: AccountType.SAVINGS_ACCOUNT
+  // }
+  // const newAccountsInfo: newAccountsInfo[] = [ testAccountInfo, checkingAccountInfo, savingsAccountInfo ]
+  // yield put( addNewAccountShells( newAccountsInfo ) )
+
+  // request testcoins
+  // let testAcc: Account
+  // Object.values( accounts ).forEach( ( account: Account )=>{
+  //   testAcc = account
+  // } )
+  // yield put( getTestcoins( testAcc ) )
 
   const initialDatabase: Database = {
     WALLET_SETUP: {

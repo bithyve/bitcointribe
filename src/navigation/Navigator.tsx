@@ -11,6 +11,7 @@ import PasscodeConfirm from '../pages/PasscodeConfirm'
 import WalletInitializationScreen from '../pages/WalletInitializationScreen'
 import RestoreSelectedContactsList from '../pages/Recovery/RestoreSelectedContactsList'
 import NewWalletName from '../pages/NewWalletName'
+import AccountSelection from '../pages/AccountSelection'
 import NewWalletQuestion from '../pages/NewWalletQuestion'
 import RestoreWalletBySecondaryDevice from '../pages/Recovery/RestoreWalletBySecondaryDevice'
 import RestoreWalletByContacts from '../pages/Recovery/RestoreWalletByContacts'
@@ -35,7 +36,7 @@ import Colors from '../common/Colors'
 import RestoreWithICloud from '../pages/RestoreHexaWithKeeper/RestoreWithICloud'
 import ScanRecoveryKey from '../pages/RestoreHexaWithKeeper/ScanRecoveryKey'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
-import { Text, View, Image } from 'react-native'
+import { Text, View, Image, StyleSheet } from 'react-native'
 import {
   heightPercentageToDP as hp,
   widthPercentageToDP as wp,
@@ -53,6 +54,7 @@ const SetupNavigator = createStackNavigator(
     Login,
     PasscodeConfirm,
     NewWalletName,
+    AccountSelection,
     NewWalletQuestion,
     WalletInitialization: WalletInitializationScreen,
     WalletNameRecovery,
@@ -92,131 +94,24 @@ const MODAL_ROUTES = [
   'Intermediate',
 ]
 
-const HomeNavigator = createStackNavigator(
-  {
-    Home: {
-      screen: HomeStack,
-      path: 'home',
-    },
-    // ReLogin: {
-    //   screen: ReLogin,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //   },
-    // },
-    // Intermediate,
-    // AccountDetails: {
-    //   screen: AccountDetailsStack,
-    // },
-    // ManageBackup,
-    // SecondaryDevice,
-    // TrustedContacts,
-    // CustodianRequestOTP,
-    // CustodianRequestAccepted,
-    // HealthCheck,
-    // SecondaryDeviceHealthCheck,
-    // TrustedContactHealthCheck,
-    // NoteHealthCheck,
-    // CloudHealthCheck,
-    // SweepFundsFromExistingAccount,
-    // NewWalletNameRegenerateShare,
-    // NewWalletQuestionRegenerateShare,
-    // NewWalletGenerationOTP,
-    // WalletCreationSuccess,
-    // SecureScan,
-    // GoogleAuthenticatorOTP,
-    // SecondaryDeviceHistory,
-    // SecondaryDeviceHistoryNewBHR,
-    // TrustedContactHistory,
-    // PersonalCopyHistory,
-    // SecurityQuestionHistory,
-    // SettingGetNewPin,
-    // ContactsListForAssociateContact,
-    // NewTwoFASecret,
-    // TwoFASweepFunds,
-    // SendRequest,
-    // VoucherScanner,
-    // AddContactSendRequest,
-    // ContactDetails,
-    // Receive,
-    // PairNewWallet,
-    // // ManageBackupKeeper,
-    // ManageBackupNewBHR,
-    // // SecurityQuestionHistoryKeeper,
-    // SecurityQuestionHistoryNewBHR,
-    // // KeeperFeatures,
-    // // TrustedContactHistoryKeeper,
-    // TrustedContactHistoryNewBHR,
-    // // KeeperDeviceHistory,
-    // // PersonalCopyHistoryKeeper,
-    // PersonalCopyHistoryNewBHR,
-    // CloudBackupHistory,
-    // NewOwnQuestions,
-    // RestoreWithICloud,
-    // RestoreWithoutICloud,
-    // SettingsContents,
-    // SweepFunds,
-    // SweepFundsEnterAmount,
-    // SweepFundUseExitKey,
-    // SweepConfirmation,
-    // ScanRecoveryKey,
-    // UpgradeBackup,
-    // ConfirmKeys,
-    // ManageBackupUpgradeSecurity,
-    // TwoFAValidation,
-    // TwoFASetup: {
-    //   screen: TwoFASetup,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //   },
-    // },
-    // UpdateApp: {
-    //   screen: UpdateApp,
-    //   navigationOptions: {
-    //     gesturesEnabled: false,
-    //   },
-    // },
-    // WyreIntegrationScreen: {
-    //   screen: WyreIntegrationScreen,
-    //   navigationOptions: {
-    //     title: 'Wyre Home'
-    //   }
-    // },
+const styles= StyleSheet.create( {
+  activeStyle:{
+    alignSelf: 'center',
+    marginTop: 3,
+    width: widthPercentageToDP( 1 ),
+    height: widthPercentageToDP( 1 ),
+    borderRadius: widthPercentageToDP( 0.5 ),
+    backgroundColor: Colors.white
   },
-  {
-    headerLayoutPreset: 'center',
-    defaultNavigationOptions: ( { navigation } ) => {
-      return {
-        header: null,
-        headerTitleContainerStyle: {
-          justifyContent: 'flex-start',
-          alignItems: 'flex-start',
-        },
-      }
-    },
-    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
-
-    //   // 📝 Override the default presentation mode for screens that we
-    //   // want to present modally
-    //   const isModal = MODAL_ROUTES.some(
-    //     ( screenName ) =>
-    //       screenName === transitionProps.scene.route.routeName ||
-    //       ( prevTransitionProps &&
-    //         screenName === prevTransitionProps.scene.route.routeName ),
-    //   )
-
-    //   return StackViewTransitionConfigs.defaultTransitionConfig(
-    //     transitionProps,
-    //     prevTransitionProps,
-    //     isModal,
-    //   )
-    // },
-  },
-)
-// const TabNavigator = createBottomTabNavigator( {
-//   Home: HomeNavigator,
-//   Settings: AccountDetailsStack,
-// } )
+  inactiveStyle: {
+    alignSelf: 'center',
+    marginTop: 3,
+    width: widthPercentageToDP( 1 ),
+    height: widthPercentageToDP( 1 ),
+    borderRadius: widthPercentageToDP( 0.5 ),
+    // backgroundColor: Colors.white
+  }
+} )
 
 const Bottomtab = createBottomTabNavigator(
   {
@@ -259,12 +154,10 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
 
-              {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // marginTop: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
               }
               {/* <Svg height= '30'>
                 <Image source={focused ? require( '../assets/images/tabs/fnf_active.svg' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
@@ -330,10 +223,7 @@ const Bottomtab = createBottomTabNavigator(
                 // </Svg>
               }
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
           )
@@ -351,13 +241,15 @@ const Bottomtab = createBottomTabNavigator(
               {focused ?
                 <Image source={require( '../assets/images/tabs/buy_active.png' )} style={{
                   marginBottom: 'auto',
-                  width: 20, height: 20, alignSelf: 'center',
+                  width: 19, height: 23, alignSelf: 'center',
+                  resizeMode: 'contain'
                   // backgroundColor: focused ? 'white': 'gray'
                 }} />
                 :
                 <Image source={require( '../assets/images/tabs/buy.png' )} style={{
                   marginBottom: 'auto',
-                  width: 20, height: 20, alignSelf: 'center',
+                  width: 19, height: 23, alignSelf: 'center',
+                  resizeMode: 'contain'
                   // backgroundColor: focused ? 'white': 'gray'
                 }} />
               }
@@ -397,11 +289,7 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               } */}
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // margin: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
           )
@@ -462,11 +350,7 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg>
               }
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // margin: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
           )
@@ -481,18 +365,21 @@ const Bottomtab = createBottomTabNavigator(
           return (
             <View style={{
             }}>
-
-              <Image source={require( '../assets/images/tabs/settings.png' )} style={{
-                marginBottom: 'auto',
-                width: 30, height: 30, alignSelf: 'center',
+              {focused ?
+                <Image source={require( '../assets/images/tabs/settings_active.png' )} style={{
+                  marginBottom: 'auto',
+                  width: 30, height: 30, alignSelf: 'center',
                 // backgroundColor: focused ? 'white': 'gray'
-              }} />
+                }} />
+                :
+                <Image source={require( '../assets/images/tabs/settings.png' )} style={{
+                  marginBottom: 'auto',
+                  width: 30, height: 30, alignSelf: 'center',
+                // backgroundColor: focused ? 'white': 'gray'
+                }} />
+              }
               {focused &&
-              <View style={{
-                alignSelf: 'center',
-                // margin: hp( 1 ),
-                width: widthPercentageToDP( 1 ), height: widthPercentageToDP( 1 ), borderRadius: widthPercentageToDP( 1 ), backgroundColor: Colors.white
-              }}/>
+              <View style={styles.activeStyle}/>
               }
             </View>
 

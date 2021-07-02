@@ -778,7 +778,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSynn disabled
+      // Keeping autoSync disabled
       credsAuthenticated( false )
       console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
@@ -1925,9 +1925,9 @@ const styles = StyleSheet.create( {
     paddingHorizontal: widthPercentageToDP ( 2 )
   },
   accountCardsSectionContainer: {
-    flex: 16,
+    height: hp( '68.5%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,

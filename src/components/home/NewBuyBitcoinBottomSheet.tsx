@@ -28,7 +28,7 @@ export type BuyBitcoinBottomSheetMenuItem = {
 const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
   {
     title: Platform.OS == 'ios' ? 'FastBitcoin' : 'FastBitcoin',
-    subtitle: 'Low fee for those big buys',
+    subtitle: 'Scan FastBitcoin vouchers',
     kind: BuyMenuItemKind.RAMP,
     imageSource: require( '../../assets/images/icons/fastbitcoin.png' ),
     disabled: false

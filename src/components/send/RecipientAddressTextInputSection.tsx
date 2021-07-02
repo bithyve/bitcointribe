@@ -31,12 +31,6 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
   const network = AccountUtilities.getNetworkByType( account.networkType )
 
   function handleTextChange( newValue: string ) {
-    setRecipientAddress( newValue )
-    const isAddressInvalid = AccountUtilities.isValidAddress( newValue, network ) == false
-    setIsAddressInvalid( isAddressInvalid )
-
-    if ( isAddressInvalid ) { return }
-
     const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( newValue.trim(), network )
 
     switch ( scannedAddressKind ) {
@@ -46,6 +40,8 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
         case ScannedAddressKind.PAYMENT_URI:
           onPaymentURIEntered( newValue )
           break
+        default:
+          return
     }
   }
 

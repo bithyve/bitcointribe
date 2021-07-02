@@ -4,16 +4,13 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Image,
   ScrollView,
-  SafeAreaView,
   RefreshControl,
   Platform,
   ImageBackground,
   StatusBar,
-  Modal,
-  InteractionManager,
-  ActivityIndicator
+  ActivityIndicator,
+  Image
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -32,10 +29,9 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import { TrustedContactRelationTypes, UnecryptedStreamData } from '../../bitcoin/utilities/Interface'
+import { TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import BottomInfoBox from '../../components/BottomInfoBox'
-import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import ModalHeader from '../../components/ModalHeader'
@@ -57,7 +53,7 @@ import ImageStyles from '../../common/Styles/ImageStyles'
 import RecipientAvatar from '../../components/RecipientAvatar'
 import Header from '../../navigation/stacks/Header'
 import ModalContainer from '../../components/home/ModalContainer'
-import { v4 as uuid } from 'uuid'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 interface FriendsAndFamilyPropTypes {
   navigation: any;
@@ -79,7 +75,9 @@ interface FriendsAndFamilyStateTypes {
   onRefresh: boolean;
   isShowingKnowMoreSheet: boolean;
   showLoader: boolean;
-  showIndicator: boolean
+  showIndicator: boolean;
+  addFnF: boolean;
+  activeIndex: number | null;
 }
 
 class FriendsAndFamilyScreen extends PureComponent<
@@ -110,6 +108,8 @@ class FriendsAndFamilyScreen extends PureComponent<
       isShowingKnowMoreSheet: false,
       showLoader: false,
       showIndicator: false,
+      addFnF: false,
+      activeIndex: null
     }
   }
 
@@ -293,15 +293,15 @@ class FriendsAndFamilyScreen extends PureComponent<
     return (
       <ListItem
         key={String( index )}
-        bottomDivider
         onPress={() =>
           this.handleContactSelection( contactDescription, index, contactsType )
         }
         containerStyle={{
-          backgroundColor: Colors.backgroundColor
+          backgroundColor: Colors.backgroundColor,
+          marginHorizontal: wp( 3 )
         }}
       >
-        <FriendsAndFamilyContactListItemContent contact={contactDescription} />
+        <FriendsAndFamilyContactListItemContent contact={contactDescription} index={index} />
       </ListItem>
     )
   };
@@ -309,10 +309,211 @@ class FriendsAndFamilyScreen extends PureComponent<
   renderAddContactAddressBookHeader = () => {
     return <ModalHeader />
   };
+  // renderAddFnFModal = () => {
+  //   const { activeIndex } = this.state
+  //   return(
+  //     <View style={{
+  //       ...styles.modalContentContainer,
+  //     }}>
+  //       <TouchableOpacity
+  //         activeOpacity={1}
+  //         onPress={() => {this.setState( {
+  //           addFnF: false
+  //         } )}}
+  //         style={styles.closeButton}
+  //       >
+  //         <FontAwesome name="close" color={Colors.white} size={19} style={{
+  //           // marginTop: hp( 0.5 )
+  //         }} />
+  //       </TouchableOpacity>
+  //       <Text style={styles.title}>Add Friends & Family</Text>
+  //       <Text style={styles.subTitle}>Add a new contact, or invite a ward Lorem ipsum dolor sit amet, consectetur adipiscing elit</Text>
+  //       <TouchableOpacity
+  //         onPress={() => this.setState( {
+  //           activeIndex: 0
+  //         } )}
+  //         style={[ styles.cardView, {
+  //           backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1
+  //         } ]}>
+  //         <View style={styles.cardSubView}>
+  //           <View style={{
+  //             width: 18,
+  //             height: 18,
+  //             borderRadius: 9,
+  //             // borderWidth: 0.3,
+  //             // borderColor: Colors.borderColor,
+  //             backgroundColor: Colors.white,
+  //             justifyContent: 'center',
+  //             alignItems: 'center',
+  //             elevation: 10,
+  //             // shadowColor: Colors.gray,
+  //             shadowOpacity: 0.1,
+  //             shadowOffset: {
+  //               width: 1, height: 1
+  //             },
+  //           }}>
+  //             {activeIndex === 0 &&
+  //                   <Image
+  //                     style={{
+  //                       width: '100%', height: '100%'
+  //                     }}
+  //                     source={require( '../../assets/images/icons/checkmark.png' )}
+  //                   />
+  //             }
+  //           </View>
+  //           {activeIndex === 0 ?
+  //             <Image
+  //               style={styles.icon}
+  //               source={require( '../../assets/images/icons/phone-bookFnF.png' )}
+  //             />
+  //             :
+  //             <Image
+  //               style={styles.icon}
+  //               source={require( '../../assets/images/icons/phone-book_white.png' )}
+  //             />
+  //           }
+
+  //           <View style={{
+  //             // width: '70%',
+  //             flex: 1,
+  //           }} >
+  //             <Text style={{
+  //               fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.black
+  //             }}>
+  //                  Add Contacts
+  //             </Text>
+  //             <Text style={[ styles.cardSubText, {
+  //               color: activeIndex === 0 ? Colors.white : Colors.textColorGrey,
+  //             } ]}>
+  //                   Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+  //             </Text>
+  //           </View>
+  //         </View>
+  //         {/* {isSelected && ( */}
+
+
+  //         {/* )} */}
+  //       </TouchableOpacity>
+  //       <TouchableOpacity
+  //         onPress={() => this.setState( {
+  //           activeIndex: 1
+  //         } )}
+  //         style={[ styles.cardView, {
+  //           backgroundColor: activeIndex === 1 ?  Colors.lightBlue: Colors.backgroundColor1,
+  //           marginTop: 0
+  //         } ]}>
+  //         <View style={styles.cardSubView}>
+  //           <View style={styles.imageView}>
+  //             {activeIndex === 1 &&
+  //                   <Image
+  //                     style={{
+  //                       width: '100%', height: '100%'
+  //                     }}
+  //                     source={require( '../../assets/images/icons/checkmark.png' )}
+  //                   />
+  //             }
+  //           </View>
+  //           <Image
+  //             style={styles.icon}
+  //             source={require( '../../assets/images/icons/icon_f&F_white.png' )}
+  //           />
+  //           <View style={{
+  //             // width: '70%',
+  //             flex: 1
+  //           }} >
+
+  //             <Text style={{
+  //               fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.black
+  //             }}>
+  //                   Add a Ward
+  //             </Text>
+  //             <Text style={[ styles.cardSubText, {
+  //               color: activeIndex === 1 ? Colors.white : Colors.textColorGrey,
+  //             } ]}>
+  //                   Need text to be replaced
+  //             </Text>
+  //           </View>
+  //         </View>
+  //       </TouchableOpacity>
+
+  //       <TouchableOpacity
+  //         onPress={() => this.setState( {
+  //           activeIndex: 2
+  //         } )}
+  //         style={{
+  //           marginTop: hp( 3 ),
+  //           width: '95%',  height: hp( '12%' ),
+  //           alignSelf: 'center', justifyContent: 'center',
+  //           borderRadius: wp( '4' ),
+  //           // marginVertical: hp( '3%' )
+  //         }}>
+  //         <View style={{
+  //           flexDirection:'row',
+  //           // alignItems: 'center',
+  //           alignItems: 'center',
+  //           justifyContent: 'center',
+  //           marginHorizontal: wp( '5%' ),
+  //         }}>
+  //           <View style={styles.imageView}>
+  //             {activeIndex === 2 &&
+  //                   <Image
+  //                     style={{
+  //                       width: '100%', height: '100%'
+  //                     }}
+  //                     source={require( '../../assets/images/icons/checkmark.png' )}
+  //                   />
+  //             }
+  //           </View>
+
+  //           <Text style={{
+  //             fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey,
+  //             marginHorizontal: wp( 3 ),
+  //             width: '95%', flex: 1
+  //           }}>
+  //                   Gift Sats when sending invite Gift Sats when sending invite Gift Sats when sending invite
+  //           </Text>
+  //         </View>
+  //         {/* {isSelected && ( */}
+
+
+  //         {/* )} */}
+  //       </TouchableOpacity>
+  //       {this.setButtonVisible()}
+  //     </View>
+  //   )
+  // }
+
+  // setButtonVisible = () => {
+  //   return (
+  //     <TouchableOpacity
+  //       onPress={async () => {
+  //         if ( this.state.activeIndex === 0 ) {
+  //           this.setState( {
+  //             isLoadContacts: true,
+  //             addFnF: false
+  //           }, () => {
+  //             this.props.navigation.navigate( 'AddContact' )
+  //           } )
+  //         } else {
+  //           // showEncryptionPswd( false )
+  //         }
+  //       }}
+  //       style={{
+  //         ...styles.buttonView, elevation: 5
+  //       }}
+  //     >
+  //       {/* {!loading.initializing ? ( */}
+  //       <Text style={styles.buttonText}>Proceed</Text>
+  //       {/* ) : (
+  //         <ActivityIndicator size="small" />
+  //       )} */}
+  //     </TouchableOpacity>
+  //   )
+  // }
 
   render() {
     const { syncPermanentChannels, navigation } = this.props
-    const { isLoadContacts } = this.state
+    const { isLoadContacts, addFnF } = this.state
     const {
       keepers,
       keeping,
@@ -334,7 +535,11 @@ class FriendsAndFamilyScreen extends PureComponent<
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <Header fromScreen={'F&F'} />
-
+        {/* {addFnF && */}
+        {/* <ModalContainer visible={addFnF} closeBottomSheet={() => {}}>
+          {this.renderAddFnFModal()}
+        </ModalContainer> */}
+        {/* } */}
         <View style={styles.accountCardsSectionContainer}>
           {showIndicator &&
             <ModalContainer visible={showIndicator} closeBottomSheet={() => {}}>
@@ -356,41 +561,129 @@ class FriendsAndFamilyScreen extends PureComponent<
               flex: 1
             }}
           >
-            <View style={{
-              marginTop: wp( '4%' ),
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginHorizontal: wp ( 6 ),
-            }}>
-              <Text
-                style={styles.pageTitle}
-              >
+            <Text
+              style={[ styles.pageTitle, {
+                marginTop: hp( 2 )
+              } ]}
+            >
               Friends & Family
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  this.setState( {
-                    isLoadContacts: true,
-                  }, () => {
-                    navigation.navigate( 'AddContact' )
-                  } )
-                }}
-                style={{
-                  ...styles.selectedContactsView,
-                }}
-              >
-                <Text style={[ styles.contactText, {
-                  fontSize: RFValue( 20 ), padding: wp( 0 )
-                } ]}>+</Text>
-                {/* <Image
-                  style={styles.addGrayImage}
-                  source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                /> */}
-                <View>
-                  <Text style={styles.contactText}>Add New</Text>
+            </Text>
+            <View style={{
+              width: '95%',
+              backgroundColor: Colors.white,
+              shadowOpacity: 0.06,
+              shadowOffset: {
+                width: 3, height: 2
+              },
+              // shadowRadius: 5,
+              elevation: 2,
+              alignSelf: 'center',
+              borderRadius: wp( 2 ),
+              marginTop: hp( 3 ),
+              // marginBottom: hp( 1 ),
+              paddingVertical: hp( 2.2 ),
+              paddingHorizontal: wp( 4.5 )
+            }}>
+              <View style={[ styles.subInfo, {
+                marginBottom: hp( 3 )
+              } ]}>
+                <View style={{
+                  flex: 1
+                }}>
+                  <Text style={[ styles.pageTitle, {
+                    fontSize: RFValue( 13 ),
+                    marginHorizontal: wp ( 0 ),
+                  } ]}>
+                Add Friends & Family
+                  </Text>
+                  <Text style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue( 11 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: 3,
+                    width: '100%',
+                  }}>
+        Or invite someone as a Bitcoin Sherpa
+                  </Text>
                 </View>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState( {
+                      isLoadContacts: true,
+                    }, () => {
+                      navigation.navigate( 'AddContact' )
+                    } )
+                  }}
+                  style={{
+                    ...styles.selectedContactsView,
+                  }}
+                >
+                  <Text style={[ styles.contactText, {
+                    fontSize: RFValue( 20 ), padding: wp( 0 )
+                  } ]}>+</Text>
+                  {/* <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
+                  /> */}
+                  <View>
+                    <Text style={styles.contactText}>Add New</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.subInfo}>
+                <View style={{
+                  flex: 1
+                }}>
+                  <Text style={[ styles.pageTitle, {
+                    fontSize: RFValue( 13 ),
+                    marginHorizontal: wp ( 0 ),
+                  } ]}>
+              Send Sats
+                  </Text>
+                  <Text style={{
+                    color: Colors.textColorGrey,
+                    fontSize: RFValue( 11 ),
+                    fontFamily: Fonts.FiraSansRegular,
+                    marginTop: 3,
+                    width: '100%',
+                  }}>
+      Send with a link, get back if not claimed
+                  </Text>
+                </View>
+
+                <TouchableOpacity
+                  onPress={() => {
+                    // this.setState( {
+                    //   isLoadContacts: true,
+                    // }, () => {
+                    //   navigation.navigate( 'AddContact' )
+                    // } )
+                  }}
+                  style={{
+                    ...styles.selectedContactsView,
+                  }}
+                >
+                  {/* <Text style={[ styles.contactText, {
+                    fontSize: RFValue( 20 ), padding: wp( 0 )
+                  } ]}>+</Text> */}
+                  {/* <Image
+                    style={styles.addGrayImage}
+                    source={require( '../../assets/images/icons/Holidays_Gift.png' )}
+                  /> */}
+                  <FontAwesome name="gift" color={Colors.white} size={19} style={{
+                    marginLeft: hp( 0.5 )
+                  }} />
+                  <View>
+                    <Text style={styles.contactText}>Gift Sats</Text>
+                  </View>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+
+            <View>
+
               {/* <Text style={styles.pageTitle}>My Keepers</Text>
             <Text style={styles.pageInfoText}>
               Contacts who can help me restore my wallet
@@ -414,7 +707,7 @@ class FriendsAndFamilyScreen extends PureComponent<
               </View>
             </View> */}
             </View>
-            {otherContacts.length > 0 &&
+            {/* {otherContacts.length > 0 &&
             <View style={{
               width: wp ( '95%' ), backgroundColor: Colors.white,  borderRadius: wp ( 3 ), marginTop: hp ( '3%' ), alignSelf: 'center'
             }}>
@@ -450,7 +743,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 
               </View>
             </View>
-            }
+            } */}
 
             <View style={{
               marginTop: wp( '5%' )
@@ -558,6 +851,85 @@ export default connect( mapStateToProps, {
 } )( FriendsAndFamilyScreen )
 
 const styles = StyleSheet.create( {
+  cardSubText: {
+    fontSize: RFValue( 11 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  icon:{
+    width: 27, height: 27, resizeMode: 'contain', marginHorizontal: wp( 3 )
+  },
+  imageView: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    // borderWidth: 0.3,
+    // borderColor: Colors.borderColor,
+    backgroundColor: Colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 10,
+    // shadowColor: Colors.gray,
+    shadowOpacity: 0.1,
+    shadowOffset: {
+      width: 1, height: 1
+    },
+  },
+  cardSubView: {
+    flexDirection:'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: wp( '4%' )
+  },
+  cardView: {
+    width: '95%', height: hp( '12%' ),
+    alignSelf: 'center', justifyContent: 'center',
+    borderRadius: wp( '4' ),
+    marginVertical: hp( '1%' ),
+    marginTop: hp( 5 )
+  },
+  closeButton: {
+    width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+    alignSelf: 'flex-end',
+    backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+    marginTop: wp( 3 ), marginRight: wp( 3 )
+  },
+  buttonView: {
+    height: wp( '13%' ),
+    width: wp( '35%' ),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    shadowColor: Colors.shadowBlue,
+    shadowOpacity: 1,
+    shadowOffset: {
+      width: 15, height: 15
+    },
+    backgroundColor: Colors.blue,
+    margin: wp( 7 )
+  },
+  buttonText: {
+    color: Colors.white,
+    fontSize: RFValue( 13 ),
+    fontFamily: Fonts.FiraSansMedium,
+  },
+  title: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 18 ),
+    marginHorizontal: wp( 7 ),
+    color: Colors.blue,
+    marginVertical: hp( 1 )
+  },
+  subTitle: {
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 12 ),
+    marginHorizontal: wp( 7 ),
+    marginRight: wp( 9 ),
+    color: Colors.textColorGrey,
+    letterSpacing: 0.6
+  },
+  modalContentContainer: {
+    backgroundColor: Colors.backgroundColor,
+  },
   container: {
     flex: 1,
     justifyContent: 'center'
@@ -573,9 +945,9 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp ( 1 )
   },
   accountCardsSectionContainer: {
-    flex: 16,
+    height: hp( '68.5%' ),
     // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
@@ -615,13 +987,25 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.lightBlue,
     borderRadius: wp ( 2 ),
     // width: wp( 22 )
-    padding: wp( 1 )
+    padding: wp( 1 ),
+    width: wp( 24 ),
+    height: hp( 4 )
   },
   pageTitle: {
     color: Colors.blue,
     fontSize: RFValue( 16 ),
     // fontFamily: Fonts.FiraSansRegular,
     fontFamily: Fonts.FiraSansMedium,
+    alignItems: 'center',
+    marginHorizontal: wp ( 6 ),
+  },
+  subInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    // marginHorizontal: wp ( 6 ),
+    flex: 1,
+    marginBottom: 2
   },
   cardTitle: {
     color: Colors.blue,
@@ -671,9 +1055,10 @@ const styles = StyleSheet.create( {
     marginRight: 10,
   },
   addGrayImage: {
-    width: wp( '10%' ),
-    height: wp( '10%' ),
+    width: wp( 3 ),
+    height: wp( 4 ),
     marginLeft: 5,
+    color: Colors.white
   },
   moreImage: {
     width: wp( '10%' ),
