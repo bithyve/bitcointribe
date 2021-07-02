@@ -765,9 +765,10 @@ export enum NetworkType {
 }
 
 export interface Wallet {
-  walletId,
-  primaryMnemonic,
-  secondaryMemonic?,
+  walletId: string,
+  walletName: string,
+  primaryMnemonic: string,
+  secondaryMemonic?: string,
   details2FA? : {
     secondaryXpub: string,
     bithyveXpub: string,

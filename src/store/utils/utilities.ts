@@ -1,5 +1,3 @@
-import * as bip39 from 'bip39'
-import crypto from 'crypto'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -7,7 +5,7 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import { take, fork } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
+import { MetaShare } from '../../bitcoin/utilities/Interface'
 
 export const serviceGenerator = async (
   securityAns: string,
@@ -221,36 +219,6 @@ export const serviceGeneratorForNewBHR = async (
     regularAcc,
     testAcc,
     secureAcc,
-    s3Service,
-    trustedContacts,
-  }
-}
-
-export const initializeWallet = async (): Promise <{
-  wallet: Wallet,
-  s3Service: S3Service,
-  trustedContacts: TrustedContactsService
-}> => {
-  const primaryMnemonic = bip39.generateMnemonic( 256 )
-  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
-  const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
-
-  const wallet: Wallet = {
-    walletId,
-    primaryMnemonic,
-    accounts: {
-    }
-  }
-
-
-  // Share generation
-  const s3Service = new S3Service( primaryMnemonic )
-
-  // Trusted Contacts Service
-  const trustedContacts = new TrustedContactsService()
-
-  return {
-    wallet,
     s3Service,
     trustedContacts,
   }
