@@ -570,7 +570,7 @@ export const newAccountShellsAdded = ( { accountShells, accounts }: {
   }
 }
 
-export const updateAccountShells = ( { accounts }: { accounts: Accounts, newAccounts?: boolean } ) => {
+export const updateAccountShells = ( { accounts }: { accounts: Accounts } ) => {
   return {
     type: UPDATE_ACCOUNT_SHELLS,
     payload: {
