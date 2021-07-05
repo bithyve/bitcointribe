@@ -335,6 +335,8 @@ PODS:
     - React-Core
   - react-native-safe-area-context (3.2.0):
     - React-Core
+  - react-native-screen-corner-radius (0.1.1):
+    - React
   - react-native-sqlite-storage (5.0.0):
     - React
   - react-native-udp (2.7.0):
@@ -516,6 +518,7 @@ DEPENDENCIES:
   - react-native-print (from `../node_modules/react-native-print`)
   - react-native-randombytes (from `../node_modules/react-native-randombytes`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
+  - react-native-screen-corner-radius (from `../node_modules/react-native-screen-corner-radius`)
   - react-native-sqlite-storage (from `../node_modules/react-native-sqlite-storage`)
   - react-native-udp (from `../node_modules/react-native-udp`)
   - react-native-video (from `../node_modules/react-native-video`)
@@ -658,6 +661,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-randombytes"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
+  react-native-screen-corner-radius:
+    :path: "../node_modules/react-native-screen-corner-radius"
   react-native-sqlite-storage:
     :path: "../node_modules/react-native-sqlite-storage"
   react-native-udp:
@@ -809,6 +814,7 @@ SPEC CHECKSUMS:
   react-native-print: d2d083f2305faacfba12d3896ec6ca72303da2b2
   react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
   react-native-safe-area-context: f0906bf8bc9835ac9a9d3f97e8bde2a997d8da79
+  react-native-screen-corner-radius: 57b6dea3c024035bff8377618df6e5056e6c6f27
   react-native-sqlite-storage: 418ef4afc5e6df6ce3574c4617e5f0b65cffde55
   react-native-udp: ff9d13e523f2b58e6bc5d4d32321ac60671b5dc9
   react-native-video: eee541262ada11bc7ffe8ec5508e6a877937c462
