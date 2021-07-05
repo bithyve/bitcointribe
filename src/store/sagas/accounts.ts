@@ -1073,7 +1073,7 @@ export interface newAccountsInfo {
   }
 }
 
-function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
+export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
   const newAccountShells: AccountShell[] = []
   const accounts = {
   }
@@ -1125,7 +1125,7 @@ function* addNewAccountShells( { payload: newAccountsInfo }: {payload: newAccoun
 }
 
 export const addNewAccountShellsWatcher = createWatcher(
-  addNewAccountShells,
+  addNewAccountShellsWorker,
   ADD_NEW_ACCOUNT_SHELLS
 )
 

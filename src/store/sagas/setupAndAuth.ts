@@ -33,10 +33,10 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShells } from '../actions/accounts'
-import { newAccountsInfo } from './accounts'
+import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, selectedAccounts } = payload
+  const { walletName, selectedAccounts, security } = payload
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
@@ -60,17 +60,14 @@ function* setupWalletWorker( { payload } ) {
     accountsInfo.push( accountInfo )
   } )
 
-  yield put( addNewAccountShells( accountsInfo ) )
+  yield call( addNewAccountShellsWorker, {
+    payload: accountsInfo
+  } )
+  yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-}
-export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 
-function* walletSetupCompletion( { payload } ) {
-  // TODO: remove this saga post functionalization of S3 and TC-service
-  const { security } = payload
-  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-
+  // TODO: remove legacy DB post TC service functionalization
   const initialDatabase: Database = {
     WALLET_SETUP:{
       walletName: wallet.walletName,
@@ -103,14 +100,10 @@ function* walletSetupCompletion( { payload } ) {
     payload: initialDatabase
   } )
 
-
   // initialize health-check schema on relay
   yield put( initializeHealthSetup() )
-  yield put( completedWalletSetup( ) )
 }
-
-export const walletSetupCompletionWatcher = createWatcher( walletSetupCompletion, WALLET_SETUP_COMPLETION )
-
+export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 
 function* initRecoveryWorker( { payload } ) {
   const { walletName, security } = payload
