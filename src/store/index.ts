@@ -44,6 +44,7 @@ import {
   credentialStorageWatcher,
   credentialsAuthWatcher,
   changeAuthCredWatcher,
+  walletSetupCompletionWatcher,
 } from './sagas/setupAndAuth'
 
 import {
@@ -56,14 +57,13 @@ import {
   fetchDerivativeAccBalanceTxWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
-  addNewAccountShellWatcher,
+  addNewAccountShellsWatcher,
   syncViaXpubAgentWatcher,
   updateAccountSettingsWatcher,
   reassignTransactionsWatcher,
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
-  addNewSecondarySubAccountWatcher,
   autoSyncShellsWatcher,
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
@@ -210,6 +210,7 @@ const rootSaga = function* () {
     // wallet setup watcher
     initServicesWatcher,
     setupWalletWatcher,
+    walletSetupCompletionWatcher,
     initRecoveryWatcher,
     credentialStorageWatcher,
     credentialsAuthWatcher,
@@ -228,8 +229,7 @@ const rootSaga = function* () {
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
-    addNewAccountShellWatcher,
-    addNewSecondarySubAccountWatcher,
+    addNewAccountShellsWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,

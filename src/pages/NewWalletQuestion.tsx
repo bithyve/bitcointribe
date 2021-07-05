@@ -46,6 +46,7 @@ import { updateCloudPermission } from '../store/actions/health'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
+import { walletSetupCompletion } from '../store/actions/setupAndAuth'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -210,6 +211,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         question: dropdownBoxValue.question,
         answer,
       }
+      dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()

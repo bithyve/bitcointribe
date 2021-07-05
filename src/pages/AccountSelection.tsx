@@ -25,13 +25,16 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeaderTitle from '../components/HeaderTitle'
 import { useDispatch, useSelector } from 'react-redux'
-import { setupWallet } from '../store/actions/setupAndAuth'
 import ButtonBlue from '../components/ButtonBlue'
 import { ActivityIndicator } from 'react-native-paper'
-import Toast from '../components/Toast'
+import { AccountType } from '../bitcoin/utilities/Interface'
+import { addNewAccountShells } from '../store/actions/accounts'
+import { newAccountsInfo } from '../store/sagas/accounts'
+import { setupWallet } from '../store/actions/setupAndAuth'
 interface AccountOption {
     id: number;
     title: string;
+    type: AccountType;
     subtitle: string;
     imageSource: ImageSourcePropType;
     screenName?: string;
@@ -42,6 +45,7 @@ const accountOptions: AccountOption[] = [
   {
     id: 1,
     title: 'Test Account',
+    type: AccountType.TEST_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/icon_test.png' ),
     subtitle: 'A test-net wallet with pre-filled test sats. Best place to start learning Bitcoin',
     // screenName: 'FriendsAndFamily',
@@ -49,36 +53,41 @@ const accountOptions: AccountOption[] = [
   {
     id: 2,
     title: 'Checking Account',
+    type: AccountType.CHECKING_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/icon_checking.png' ),
     subtitle: 'An on-chain, single-signature wallet. Fast and easy. Ideal for small amounts',
   },
   {
     id: 3,
     title: 'Savings Account',
+    type: AccountType.SAVINGS_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/icon_savings.png' ),
     subtitle: 'An on-chain, 2 of 3 multi-signature wallet. Use for securing larger amounts',
   },
   {
     id: 4,
     title: 'Donation Account',
+    type: AccountType.DONATION_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/icon_donation.png' ),
     subtitle: 'Create a donation link in a few clicks. Post it anywhere, get sats in your wallet',
   },
   {
     id: 5,
     title: 'F&F Account',
+    type: AccountType.WYRE_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/icon_F&F.png' ),
     subtitle: 'A separate account where you receive funds from your contacts',
   },
   {
     id: 6,
     title: 'Exchange Account',
+    type: AccountType.WYRE_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/boughtbtc.png' ),
     subtitle: 'A separate wallet where your newly bought bitcoin/ sats land',
   }
 ]
 
-export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any, selectedAcc: string[] } ) => void } } ) {
+export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
   const [ processing, showProcessing ] = useState( false )
   const [ knowMore, showKnowMore ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
@@ -86,68 +95,21 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   const walletName = props.navigation.getParam( 'walletName' )
   const [ isDisabled, setIsDisabled ] = useState( false )
   const { walletSetupCompleted } = useSelector( ( state ) => state.setupAndAuth )
-  const [ selectedAcc, setSelectedAcc ] = useState( [ 'Checking Account' ] )
+  const [ selectedAcc, setSelectedAcc ] = useState( [ AccountType.CHECKING_ACCOUNT ] )
 
-  useEffect( () => {
-    requestAnimationFrame(
-      () => {
-        dispatch( setupWallet( walletName, '', {
-          REGULAR_ACCOUNT: true
-        } ) )
-      }
-    )
-  }, [] )
+  const onProceed = useCallback( () => {
+    props.navigation.navigate( 'NewWalletQuestion', {
+      walletName,
+    } )
+    dispatch( setupWallet( walletName, selectedAcc ) )
+  }, [ selectedAcc ] )
 
+  const selectAccount = useCallback( ( accountType: AccountType ) => {
+    if( accountType === AccountType.CHECKING_ACCOUNT ) return // obligating checking account
 
-  const confirmAction = ( isAccountselected ) => {
-    if ( isAccountselected ) {
-      props.navigation.navigate( 'NewWalletQuestion', {
-        walletName, selectedAcc
-      } )
-    } else {
-      props.navigation.navigate( 'NewWalletQuestion', {
-        walletName, selectedAcc: []
-      } )
-    }
-
-  }
-
-  const selectAccount = ( title ) => {
-
-    if ( title === 'Checking Account' ) {
-      return
-    }
-    if ( selectedAcc.includes( title ) ) {
-      setSelectedAcc( selectedAcc.filter( item => item !== title ) )
-    } else {
-      showProcessing( true )
-      setTimeout( () => {
-        showProcessing( false )
-        Toast( `${title} has been added successfully` )
-      }, 700 )
-      const newArr = [ ...selectedAcc ]
-      newArr.push( title )
-      setSelectedAcc( newArr )
-    }
-    switch( title ) {
-        case 'Test Account': requestAnimationFrame(
-          () => {
-            dispatch( setupWallet( walletName, '', {
-              TEST_ACCOUNT: true
-            } ) )
-          }
-        )
-          break
-        case 'Savings Account': requestAnimationFrame(
-          () => {
-            dispatch( setupWallet( walletName, '', {
-              SECURE_ACCOUNT: true
-            } ) )
-          }
-        )
-          break
-    }
-  }
+    if ( selectedAcc.includes( accountType ) ) setSelectedAcc( selectedAcc.filter( item => item !== accountType ) )
+    else  setSelectedAcc( [ ...selectedAcc, accountType ] )
+  }, [ selectedAcc ] )
 
   return (
     <View style={{
@@ -231,13 +193,14 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
               marginTop: hp( 3 )
             }}/>
             {accountOptions.map( ( item, index ) => {
+              const selected = selectedAcc.includes( item.type )
               return(
                 <TouchableOpacity
                   key={index}
-                  onPress={() => selectAccount( item.title )}
+                  onPress={() => selectAccount( item.type )}
                   style={{
                     // flex: 1,
-                    width: '90%', height: hp( '11%' ), backgroundColor: selectedAcc.includes( item.title ) ?  Colors.lightBlue: Colors.white,
+                    width: '90%', height: hp( '11%' ), backgroundColor: selectedAcc.includes( item.type ) ?  Colors.lightBlue: Colors.white,
                     alignSelf: 'center', justifyContent: 'center',
                     borderRadius: wp( '4' ),
                     marginBottom: hp( '1%' ),
@@ -248,11 +211,11 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                     }
                     activeOpacity={0.5}
                     style={{
-                      borderRadius: 6, borderWidth: selectedAcc.includes( item.title ) ? 0.6 : 0, borderColor: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey, backgroundColor: selectedAcc.includes( item.title ) ? Colors.lightBlue : Colors.backgroundColor,
+                      borderRadius: 6, borderWidth: selected ? 0.6 : 0, borderColor: selected ? Colors.white : Colors.textColorGrey, backgroundColor: selected ? Colors.lightBlue : Colors.backgroundColor,
                       alignSelf: 'flex-end',  position: 'absolute', right: 10, top: 10, zIndex: 10
                     }}>
                     <Text style={{
-                      margin: 6, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey, fontSize: RFValue( 10 )
+                      margin: 6, color: selected ? Colors.white : Colors.textColorGrey, fontSize: RFValue( 10 )
                     }}>
                           Know More
                     </Text>
@@ -283,14 +246,14 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
                     }}>
                       <Text style={{
                         marginBottom: hp( 1 ),
-                        fontSize: RFValue( 12 ), fontFamily:  Fonts.FiraSansRegular, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.black
+                        fontSize: RFValue( 12 ), fontFamily:  Fonts.FiraSansRegular, color: selected ? Colors.white : Colors.black
                       }}>
                         {item.title}
                       </Text>
                       <Text style={{
                         // flex: 1,
                         marginRight: wp( 10 ),
-                        fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: selectedAcc.includes( item.title ) ? Colors.white : Colors.textColorGrey
+                        fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: selected ? Colors.white : Colors.textColorGrey
                       }}>
                         {item.subtitle}
                       </Text>
@@ -416,7 +379,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
       }}>
         <ButtonBlue
           buttonText="Proceed"
-          handleButtonPress={() => confirmAction( true )}
+          handleButtonPress={onProceed}
           buttonDisable={false}
         />
         {/* <TouchableOpacity

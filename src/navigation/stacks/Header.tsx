@@ -759,7 +759,7 @@ const mapStateToProps = ( state ) => {
     accountsState: state.accounts,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
     walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+      idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
