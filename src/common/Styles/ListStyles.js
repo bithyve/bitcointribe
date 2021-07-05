@@ -42,7 +42,7 @@ const ListStyles = StyleSheet.create( {
     marginTop: 3,
   },
   listItemContentContainer: {
-    paddingVertical: 10,
+    // paddingVertical: 10,
   },
   container : {
     // paddingHorizontal: 3,

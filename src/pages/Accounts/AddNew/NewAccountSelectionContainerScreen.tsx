@@ -31,9 +31,19 @@ function titleForSectionHeader( kind: SectionKind ) {
       case SectionKind.ADD_NEW_HEXA_ACCOUNT:
         return 'Add a Hexa Account'
       case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Add a service'
+        return 'Create a Shared Account'
       case SectionKind.IMPORT_WALLET:
         return 'Import a Wallet'
+  }
+}
+function titleForSectionSubHeader( kind: SectionKind ) {
+  switch ( kind ) {
+      case SectionKind.ADD_NEW_HEXA_ACCOUNT:
+        return 'Your keys, your coins, manage them your way'
+      case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
+        return 'Bitcoin is for everyone, share an account with your Friends & Family'
+      case SectionKind.IMPORT_WALLET:
+        return 'Have your sats somewhere else? Import it in Hexa'
   }
 }
 
@@ -41,9 +51,18 @@ function renderSectionHeader( { section } ) {
   const kind: SectionKind = section.kind
 
   return (
-    <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
-      {titleForSectionHeader( kind )}
-    </Text>
+    <>
+      <Text style={[ HeadingStyles.listSectionHeading, styles.listSectionHeading ]}>
+        {titleForSectionHeader( kind )}
+      </Text>
+      <Text style={[ styles.listSectionHeading, {
+        color: Colors.textColorGrey, fontFamily: Fonts.FiraSansRegular, fontSize: RFValue( 12 ),
+        marginBottom: hp( 1 ),
+
+      } ]}>
+        {titleForSectionSubHeader( kind )}
+      </Text>
+    </>
   )
 }
 
@@ -244,13 +263,12 @@ const styles = StyleSheet.create( {
 
   listSectionHeading: {
     fontSize: RFValue( 14 ),
-    marginBottom: 12,
-    paddingHorizontal: 24,
+    paddingHorizontal: wp( 6 ),
   },
 
   viewSectionContainer: {
-    marginBottom: 22,
-    marginHorizontal: 24,
+    marginBottom: hp( 2 ),
+    marginHorizontal: wp( 5 ),
   },
 
   listFooterSection: {

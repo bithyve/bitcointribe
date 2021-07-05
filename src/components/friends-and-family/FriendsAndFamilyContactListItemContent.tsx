@@ -54,19 +54,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
       <ListItem.Content style={{
         flex: 1
       }}>
-        {Number.isFinite( contact.lastSeenActive ) && (
-          <ListItem.Subtitle
-            style={styles.lastSeenText}
-            numberOfLines={1}
-          >
-            <Text>Last seen </Text>
-            <Text style={{
-              fontFamily: Fonts.FiraSansMediumItalic
-            }}>
-              {agoTextForLastSeen( contact.lastSeenActive )}
-            </Text>
-          </ListItem.Subtitle>
-        )}
+
 
         <ListItem.Title
           style={styles.listItemTitle}
@@ -75,6 +63,26 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
           <Text>{firstNamePieceText}</Text>
           <Text style={styles.secondNamePieceText}>{secondNamePieceText}</Text>
         </ListItem.Title>
+        <ListItem.Subtitle
+          style={styles.lastSeenText}
+          numberOfLines={1}
+        >
+          <Text>Last seen </Text>
+          {Number.isFinite( contact.lastSeenActive ) ? (
+
+            <Text style={{
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              {agoTextForLastSeen( contact.lastSeenActive )}
+            </Text>
+          ) : (
+            <Text style={{
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              _unknown_
+            </Text>
+          )}
+        </ListItem.Subtitle>
 
         {/*
           📝 TODO: Show this when the F&F list is refactored to a
@@ -107,8 +115,8 @@ const styles = StyleSheet.create( {
   },
 
   avatarImage: {
-    ...ImageStyles.thumbnailImageLarge,
-    borderRadius: widthPercentageToDP( 14 )/2,
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: widthPercentageToDP( 12 )/2,
   },
 
   listItemTitle: {

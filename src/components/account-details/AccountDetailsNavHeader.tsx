@@ -96,9 +96,9 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
             />
           </TouchableOpacity>
 
-          <Text style={styles.titleText}>
+          {/* <Text style={styles.titleText}>
             {title}
-          </Text>
+          </Text> */}
 
           <View style={styles.currencyKindToggleContainer}>
             <CurrencyKindToggleSwitch
@@ -148,6 +148,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between'
   },
 
   titleText: {

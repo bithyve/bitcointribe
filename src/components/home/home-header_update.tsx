@@ -130,7 +130,7 @@ const HomeHeader = ( {
         <View
           style={{
             flexDirection: 'row',
-            width: wp( '57%' ),
+            width: wp( '54%' ),
             alignItems: 'flex-end',
           }}
         >
@@ -523,9 +523,7 @@ const HomeHeader = ( {
 
         <Text style={{
           color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
-        }}>Your Backup is at Level 1 <Text style={{
-            fontFamily: Fonts.FiraSansMediumItalic
-          }}>recovery</Text></Text>
+        }}>{getMessage()}</Text>
 
       </View>
     </View>
