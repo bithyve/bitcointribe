@@ -28,9 +28,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import ButtonBlue from '../components/ButtonBlue'
 import { ActivityIndicator } from 'react-native-paper'
 import { AccountType } from '../bitcoin/utilities/Interface'
-import { addNewAccountShells } from '../store/actions/accounts'
-import { newAccountsInfo } from '../store/sagas/accounts'
-import { setupWallet } from '../store/actions/setupAndAuth'
+
 interface AccountOption {
     id: number;
     title: string;
@@ -87,7 +85,7 @@ const accountOptions: AccountOption[] = [
   }
 ]
 
-export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
+export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any, selectedAcc: AccountType[] } ) => void } } ) {
   const [ processing, showProcessing ] = useState( false )
   const [ knowMore, showKnowMore ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
@@ -100,8 +98,8 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   const onProceed = useCallback( () => {
     props.navigation.navigate( 'NewWalletQuestion', {
       walletName,
+      selectedAcc
     } )
-    dispatch( setupWallet( walletName, selectedAcc ) )
   }, [ selectedAcc ] )
 
   const selectAccount = useCallback( ( accountType: AccountType ) => {

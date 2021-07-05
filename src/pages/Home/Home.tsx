@@ -101,7 +101,6 @@ import {
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
@@ -229,7 +228,6 @@ interface HomePropsTypes {
   downloadMShare: any;
   initializeTrustedContact: any;
   rejectTrustedContact: any;
-  s3Service: S3Service;
   initializeHealthSetup: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
@@ -766,7 +764,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   componentDidMount = async() => {
     const {
       navigation,
-      s3Service,
       initializeHealthSetup,
       newBHRFlowStarted,
       credsAuthenticated,
@@ -790,7 +787,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       if( newBHRFlowStarted === true )
       {
-        const { healthCheckInitializedKeeper } = s3Service.levelhealth
         if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
           initializeHealthSetup()
         }
@@ -1842,7 +1838,6 @@ const mapStateToProps = ( state ) => {
     ),
     cardDataProps: idx( state, ( _ ) => _.preferences.cardData ),
     secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
