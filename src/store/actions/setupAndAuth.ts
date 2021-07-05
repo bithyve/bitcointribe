@@ -30,10 +30,10 @@ export const credsAuth = ( passcode, reLogin? ) => {
   }
 }
 
-export const setupWallet = ( walletName: string, selectedAccounts: AccountType[] ) => {
+export const setupWallet = ( walletName: string, selectedAccounts: AccountType[], security: any ) => {
   return {
     type: SETUP_WALLET, payload: {
-      walletName, selectedAccounts
+      walletName, selectedAccounts, security
     }
   }
 }

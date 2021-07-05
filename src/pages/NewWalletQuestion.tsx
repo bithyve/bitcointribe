@@ -46,7 +46,7 @@ import { updateCloudPermission } from '../store/actions/health'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
-import { walletSetupCompletion } from '../store/actions/setupAndAuth'
+import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -147,6 +147,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
+  const selectedAcc = props.navigation.getParam( 'selectedAcc' )
+
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
   const [ tempAns, setTempAns ] = useState( '' )
@@ -165,6 +167,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const s3service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
+  const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
@@ -194,24 +197,31 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [] )
   useEffect( () => {
-    if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
+    // if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
+    //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
+    //   setLoaderModal( false )
+    //   props.navigation.navigate( 'HomeNav', {
+    //     walletName,
+    //   } )
+    // }
+    if( walletSetupCompleted ){
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
     }
-  }, [ cloudBackupStatus ] )
+  }, [ walletSetupCompleted ] )
 
   const checkCloudLogin = () =>{
-
     requestAnimationFrame( () => {
       const security = {
         questionId: dropdownBoxValue.id,
         question: dropdownBoxValue.question,
         answer,
       }
-      dispatch( walletSetupCompletion( security ) )
+      dispatch( setupWallet( walletName, selectedAcc, security ) )
+      // dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
       const current = Date.now()
