@@ -521,7 +521,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   setUpFocusListener = () => {
     // this.notificationCheck()
-    // this.setCurrencyCodeFromAsync()
+    this.setCurrencyCodeFromAsync()
   };
 
   setCurrencyCodeFromAsync = async () => {

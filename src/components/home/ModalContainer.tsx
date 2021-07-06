@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
-import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard } from 'react-native'
+import { TouchableOpacity, TouchableWithoutFeedback, Modal, View, Keyboard, Platform } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
+import { ScreenCornerRadius } from 'react-native-screen-corner-radius'
 
 const ModalContainer = ( {
   visible,
@@ -51,16 +52,16 @@ const ModalContainer = ( {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           alignItems: 'center',
-          paddingBottom: hp( `${height}%` )
+          // paddingBottom: Platform.OS === 'ios' ? hp( '0%' ) : hp( `${height}%` )
           // borderRadius: 20
-
         }}
       >
         <TouchableWithoutFeedback>
           <View style={{
-            width: '95%',
-            borderRadius: wp( '2%' ),
+            width: '98%',
+            borderRadius: Platform.OS === 'ios' ? ScreenCornerRadius : wp( '4%' ),
             overflow: 'hidden',
+            marginBottom: hp( 0.5 )
           }}>
 
             {children}

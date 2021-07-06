@@ -890,7 +890,7 @@ class ManageBackupNewBHR extends Component<
                 <Text style={{
                   color: Colors.blue,
                   fontSize: RFValue( 12 ),
-                  marginLeft: 2,
+                  // marginLeft: 2,
                   fontFamily: Fonts.FiraSansRegular
                 }}>
 Wallet Backup

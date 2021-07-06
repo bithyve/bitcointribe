@@ -298,7 +298,7 @@ class FriendsAndFamilyScreen extends PureComponent<
         }
         containerStyle={{
           backgroundColor: Colors.backgroundColor,
-          marginHorizontal: wp( 3 )
+          paddingHorizontal: wp( 3 )
         }}
       >
         <FriendsAndFamilyContactListItemContent contact={contactDescription} index={index} />

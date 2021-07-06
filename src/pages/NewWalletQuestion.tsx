@@ -45,6 +45,7 @@ import ButtonBlue from '../components/ButtonBlue'
 import { updateCloudPermission } from '../store/actions/health'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 
 export enum BottomSheetKind {
@@ -1110,153 +1111,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               infoTextNormal1={''}
               step={''}
             />
-            <TouchableOpacity
-              onPress={() => setActiveIndex( 0 )}
-              style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1,
-                alignSelf: 'center', justifyContent: 'center',
-                borderRadius: wp( '4' ),
-                marginVertical: hp( '3%' )
-              }}>
-              <View style={{
-                flexDirection:'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginHorizontal: wp( '4%' )
-              }}>
-                <View style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
-                  // borderWidth: 0.3,
-                  // borderColor: Colors.borderColor,
-                  backgroundColor: Colors.white,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  elevation: 10,
-                  // shadowColor: Colors.gray,
-                  shadowOpacity: 0.1,
-                  shadowOffset: {
-                    width: 1, height: 1
-                  },
-                }}>
-                  {activeIndex === 0 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../assets/images/icons/checkmark.png' )}
-                    />
-                  }
-                </View>
-                {activeIndex === 0 ?
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/icon_questions.png' )}
-                  />
-                  :
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/question_inactive.png' )}
-                  />
-                }
-
-                <View >
-                  <Text style={{
-                    fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.blue
-                  }}>
-                    Use answer to a Security Question
-                  </Text>
-                  <Text style={{
-                    fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.textColorGrey
-                  }}>
-                     Easier to remember. Recommended
-                  </Text>
-                </View>
-              </View>
-              {/* {isSelected && ( */}
-
-
-              {/* )} */}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setActiveIndex( 1 )}
-              style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.backgroundColor1,
-                alignSelf: 'center', justifyContent: 'center',
-                borderRadius: wp( '4' ),
-                // marginVertical: hp( '3%' )
-              }}>
-              <View style={{
-                flexDirection:'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginHorizontal: wp( '5%' ),
-              }}>
-                <View style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
-                  // borderWidth: 0.3,
-                  // borderColor: Colors.borderColor,
-                  backgroundColor: Colors.white,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  elevation: 10,
-                  // shadowColor: Colors.gray,
-                  shadowOpacity: 0.1,
-                  shadowOffset: {
-                    width: 1, height: 1
-                  },
-                }}>
-                  {activeIndex === 1 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../assets/images/icons/checkmark.png' )}
-                    />
-                  }
-                </View>
-                {activeIndex === 1 ?
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/icon_password_active.png' )}
-                  />
-                  :
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/icon_password.png' )}
-                  />
-                }
-                <View >
-                  <Text style={{
-                    fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue
-                  }}>
-                    Use your own encryption password
-                  </Text>
-                  <Text style={{
-                    fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.textColorGrey
-                  }}>
-                    Make sure you remember and keep it safe
-                  </Text>
-                </View>
-              </View>
-              {/* {isSelected && ( */}
-
-
-              {/* )} */}
-            </TouchableOpacity>
-
-
+            <CardWithRadioBtn
+              icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
+              mainText={'Use answer to a Security Question'}
+              subText={'Easier to remember. Recommended'}
+              isSelected={activeIndex === 0}
+              setActiveIndex={setActiveIndex}
+              index={0}
+            />
+            <CardWithRadioBtn
+              icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
+              mainText={'Use your own encryption password'}
+              subText={'Make sure you remember and keep it safe'}
+              isSelected={activeIndex === 1}
+              setActiveIndex={setActiveIndex}
+              index={1}
+            />
           </TouchableOpacity>
 
         </View>

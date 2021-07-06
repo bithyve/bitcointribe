@@ -94,7 +94,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             }}>
               My Portfolio
             </Text>
-            <ToggleContainer CurrencyCode={currencyCode} />
+            <ToggleContainer />
           </View>
 
           <View style={{
