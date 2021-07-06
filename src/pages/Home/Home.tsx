@@ -1801,8 +1801,7 @@ const mapStateToProps = ( state ) => {
     accountsState: state.accounts,
     cloudPermissionGranted: state.health.cloudPermissionGranted,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
-    wallet:
-      idx( state, ( _ ) => _.storage.wallet ) || '',
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
     UNDER_CUSTODY: idx(
       state,
       ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY

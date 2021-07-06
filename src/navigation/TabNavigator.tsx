@@ -82,20 +82,21 @@ import TrustedContactsService from '../bitcoin/services/TrustedContactsService'
 import HomeHeader from '../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
-import CustomBottomTabs, {
+import {
   BottomTab,
-  TAB_BAR_HEIGHT,
 } from '../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
   autoSyncShells,
-  addNewAccountShell,
+  addNewAccountShells,
   fetchFeeAndExchangeRates
 } from '../store/actions/accounts'
 import {
   trustedChannelActions,
   LevelHealthInterface,
   MetaShare,
+  AccountType,
+  Wallet,
 } from '../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -110,12 +111,10 @@ import {
 import { fetchKeeperTrustedChannel, updateNewFcm } from '../store/actions/keeper'
 import S3Service from '../bitcoin/services/sss/S3Service'
 import RegularAccount from '../bitcoin/services/accounts/RegularAccount'
-import PersonalNode from '../common/data/models/PersonalNode'
 import Bitcoin from '../bitcoin/utilities/accounts/Bitcoin'
 // import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetBackground from '../components/bottom-sheets/BottomSheetBackground'
 // import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import { Button } from 'react-native-elements'
 import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility'
 import defaultBottomSheetConfigs from '../common/configs/BottomSheetConfigs'
 import BottomSheet from '@gorhom/bottom-sheet'
@@ -131,7 +130,6 @@ import SourceAccountKind from '../common/data/enums/SourceAccountKind'
 import ServiceAccountKind from '../common/data/enums/ServiceAccountKind'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../common/data/enums/SwanAccountCreationStatus'
-import TransactionDescribing from '../common/data/models/Transactions/Interfaces'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
@@ -146,29 +144,13 @@ import { clearWyreCache } from '../store/actions/WyreIntegration'
 import { setCloudData } from '../store/actions/cloud'
 import { credsAuthenticated } from '../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../store/actions/accounts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../common/Fonts'
-// import HomeBuyCard from './HomeBuyCard'
-// import HomeContainer from './HomeContainer'
-// import FriendsAndFamilyScreen from '../FriendsAndFamily/FriendsAndFamilyScreen'
-// import ManageBackupNewBHR from '../NewBHR/ManageBackupNewBHR'
-// import UpgradeBackup from '../UpgradeBackupWithKeeper/UpgradeBackup'
-// import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScreen'
 import AddContactAddressBook from '../pages/Contacts/AddContactAddressBook'
 import TrustedContactRequestContent from '../pages/Home/TrustedContactRequestContent'
 import BottomSheetHeader from '../pages/Accounts/BottomSheetHeader'
-import HomeStack from './stacks/home/HomeStack'
 import {
   createStackNavigator,
-  StackViewTransitionConfigs,
 } from 'react-navigation-stack'
 import HomeContainer from '../pages/Home/HomeContainer'
-import FriendsAndFamilyScreen from '../pages/FriendsAndFamily/FriendsAndFamilyScreen'
-import ManageBackupNewBHR from '../pages/NewBHR/ManageBackupNewBHR'
-import UpgradeBackup from '../pages/UpgradeBackupWithKeeper/UpgradeBackup'
-import MoreOptionsContainerScreen from '../pages/MoreOptions/MoreOptionsContainerScreen'
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs'
-import HomeBuyCard from '../pages/Home/HomeBuyCard'
 import Bottomtab from './Bottomtab'
 
 const HomeNavigator = createStackNavigator(
@@ -285,10 +267,7 @@ interface HomePropsTypes {
   accountsState: AccountsState;
   cloudPermissionGranted: any;
 
-  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-  currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
-  walletName: string;
+  wallet: Wallet;
   UNDER_CUSTODY: any;
   fetchNotifications: any;
   updateFCMTokens: any;
@@ -1180,7 +1159,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
       }, () => {
-        this.props.currentSwanSubAccount
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
           ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
           : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
@@ -1275,7 +1254,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
-        this.props.currentSwanSubAccount
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
           ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
           : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
@@ -1552,7 +1531,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onTrustedContactRequestAccepted = ( key ) => {
     this.closeBottomSheet()
-    this.processDLRequest( key, false )
+    // this.processDLRequest( key, false )
   };
 
   onTrustedContactRejected = () => {
@@ -1587,15 +1566,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          this.props.clearSwanCache()
-          if ( !this.props.currentSwanSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Swan Account',
-              defaultDescription: 'Sats purchased from Swan',
-              serviceAccountKind: ServiceAccountKind.SWAN,
-            } )
-            this.props.createTempSwanAccountInfo( newSubAccount )
+          if( !this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length ){
+            this.props.clearSwanCache()
+            const accountDetails = {
+              name: 'Swan Account',
+              description: 'Sats purchased from Swan',
+            }
+            this.props.createTempSwanAccountInfo( accountDetails )
             this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
           }
           else {
@@ -1608,17 +1585,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case BuyMenuItemKind.RAMP:
-          if ( !this.props.currentRampSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Ramp Account',
-              defaultDescription: 'BTC purchased from Ramp',
-              serviceAccountKind: ServiceAccountKind.RAMP,
-            } )
-
-            this.props.addNewAccountShell( newSubAccount )
-          }
-          this.props.clearRampCache()
           this.setState( {
             rampDeepLinkContent: null,
             rampFromDeepLink: false,
@@ -1628,19 +1594,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case BuyMenuItemKind.WYRE:
-          if ( !this.props.currentWyreSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Wyre Account',
-              defaultDescription: 'BTC purchased from Wyre',
-              serviceAccountKind: ServiceAccountKind.WYRE,
-            } )
-            this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
-          }
-          this.props.clearWyreCache()
           this.setState( {
             wyreDeepLinkContent: null,
             wyreFromDeepLink: false,
@@ -1649,208 +1602,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
           } )
           break
-    }
-  };
-
-  processDLRequest = ( key, rejected ) => {
-    try {
-      const { trustedContactRequest, recoveryRequest } = this.state
-      let {
-        requester,
-        isGuardian,
-        approvedTC,
-        encryptedKey,
-        publicKey,
-        info,
-        isQR,
-        uploadedAt,
-        isRecovery,
-        version,
-        isFromKeeper,
-        isPrimaryKeeperRecovery,
-      } = trustedContactRequest || recoveryRequest
-      const {
-        UNDER_CUSTODY,
-        uploadRequestedShare,
-        navigation,
-        approveTrustedContact,
-        fetchTrustedChannel,
-        walletName,
-        trustedContacts,
-        uploadSecondaryShareForPK,
-      } = this.props
-
-      if ( !isRecovery ) {
-        if ( requester === walletName ) {
-          Toast( 'Cannot be your own Contact/Guardian' )
-          return
-        }
-
-        let expiry = config.TC_REQUEST_EXPIRY
-        if ( !semver.valid( version ) ) {
-          // expiry support for 0.7, 0.9 and 1.0
-          expiry = config.LEGACY_TC_REQUEST_EXPIRY
-        }
-
-        if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
-          Alert.alert(
-            `${isQR ? 'QR' : 'Link'} expired!`,
-            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`
-          )
-        } else {
-          if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
-            Alert.alert(
-              'Failed to accept',
-              `You already custody a share against the wallet name: ${requester}`
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-                info = key
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-                return
-              }
-            }
-
-            let existingContactName
-            Object.keys( trustedContacts.tc.trustedContacts ).forEach(
-              ( contactName ) => {
-                const contact = trustedContacts.tc.trustedContacts[ contactName ]
-                if ( contact.contactsPubKey === publicKey ) {
-                  existingContactName = contactName
-                }
-              }
-            )
-            if ( existingContactName && !approvedTC ) {
-              Toast( 'Contact already exists against this request' )
-              return
-            }
-
-            if ( publicKey && !rejected ) {
-              if ( !approvedTC ) {
-                navigation.navigate( 'ContactsListForAssociateContact', {
-                  postAssociation: ( contact ) => {
-                    let contactName = ''
-                    if ( contact ) {
-                      contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                      }`
-                        .toLowerCase()
-                        .trim()
-                    } else {
-                      // contactName = `${requester}'s Wallet`.toLowerCase();
-                      Alert.alert( 'Contact association failed' )
-                      return
-                    }
-                    if ( !semver.valid( version ) ) {
-                      // for 0.7, 0.9 and 1.0: info remains null
-                      info = null
-                    }
-
-                    const contactInfo = {
-                      contactName,
-                      info,
-                    }
-
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                      isGuardian,
-                      isFromKeeper
-                    )
-                  },
-                  isGuardian,
-                } )
-              } else {
-                if ( !existingContactName ) {
-                  Alert.alert(
-                    'Invalid Link/QR',
-                    'You are not a valid trusted contact for approving this request'
-                  )
-                  return
-                }
-                const contactInfo = {
-                  contactName: existingContactName,
-                  info,
-                }
-
-                fetchTrustedChannel(
-                  contactInfo,
-                  trustedChannelActions.downloadShare,
-                  requester
-                )
-              }
-            } else if ( publicKey && rejected ) {
-              // don't associate; only fetch the payment details from EC
-              // fetchEphemeralChannel(null, null, publicKey);
-            }
-          }
-        }
-      } else {
-        if ( !isPrimaryKeeperRecovery ) {
-          if ( requester === walletName ) {
-            Toast( 'You do not host any key of your own' )
-            return
-          }
-
-          if ( !UNDER_CUSTODY[ requester ] ) {
-            this.setState(
-              {
-                errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
-                errorMessage:
-                  'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
-              },
-              () => {
-                this.openBottomSheet( BottomSheetKind.ERROR )
-              }
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-              }
-            }
-            if ( publicKey ) {
-              uploadRequestedShare( recoveryRequest.requester, publicKey )
-            }
-          }
-        } else {
-          if ( !publicKey ) {
-            try {
-              publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                .decryptedPub
-            } catch ( err ) {
-              Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.'
-              )
-            }
-          }
-
-          if ( publicKey ) {
-            uploadSecondaryShareForPK(
-              recoveryRequest.requester,
-              publicKey.substring( 0, 24 )
-            )
-          }
-        }
-      }
-    } catch ( error ) {
-      // console.log( 'PKRECOVERY error', error )
     }
   };
 
@@ -2403,12 +2154,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           )
 
         case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest, recoveryRequest } = this.state
+          const { trustedContactRequest } = this.state
 
           return (
             <TrustedContactRequestContent
               trustedContactRequest={trustedContactRequest}
-              recoveryRequest={recoveryRequest}
               onPressAccept={this.onTrustedContactRequestAccepted}
               onPressReject={this.onTrustedContactRejected}
               onPhoneNumberChange={this.onPhoneNumberChange}
@@ -2451,28 +2201,28 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }}
               onPressBack={this.closeBottomSheet}
               onSkipContinue={() => {
-                let { skippedContactsCount } = this.props.trustedContacts.tc
-                let data
-                if ( !skippedContactsCount ) {
-                  skippedContactsCount = 1
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount}`,
-                    name: `F&F request awaiting ${skippedContactsCount}`,
-                  }
-                } else {
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount + 1}`,
-                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                  }
-                }
+                // let { skippedContactsCount } = this.props.trustedContacts.tc
+                // let data
+                // if ( !skippedContactsCount ) {
+                //   skippedContactsCount = 1
+                //   data = {
+                //     firstName: 'F&F request',
+                //     lastName: `awaiting ${skippedContactsCount}`,
+                //     name: `F&F request awaiting ${skippedContactsCount}`,
+                //   }
+                // } else {
+                //   data = {
+                //     firstName: 'F&F request',
+                //     lastName: `awaiting ${skippedContactsCount + 1}`,
+                //     name: `F&F request awaiting ${skippedContactsCount + 1}`,
+                //   }
+                // }
 
-                this.closeBottomSheet()
+                // this.closeBottomSheet()
 
-                navigation.navigate( 'AddContactSendRequest', {
-                  SelectedContact: [ data ],
-                } )
+                // navigation.navigate( 'AddContactSendRequest', {
+                //   SelectedContact: [ data ],
+                // } )
               }}
             />
           )
@@ -2519,12 +2269,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   render() {
-    const { netBalance, notificationData, currencyCode, selectedBottomTab } = this.state
+    const { netBalance, notificationData, currencyCode } = this.state
 
     const {
       navigation,
       exchangeRates,
-      walletName,
+      wallet,
       currentLevel,
       newBHRFlowStarted
     } = this.props
@@ -2556,7 +2306,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onPressNotifications={this.onPressNotifications}
             navigateToQRScreen={this.navigateToQRScreen}
             notificationData={notificationData}
-            walletName={walletName}
+            walletName={wallet.walletName}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
             netBalance={netBalance}
             exchangeRates={exchangeRates}
@@ -2618,12 +2368,8 @@ const mapStateToProps = ( state ) => {
     notificationList: state.notifications,
     accountsState: state.accounts,
     cloudPermissionGranted: state.health.cloudPermissionGranted,
-    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
-    currentRampSubAccount: state.accounts.currentRampSubAccount,
-    currentSwanSubAccount: state.accounts.currentSwanSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
-    walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
     UNDER_CUSTODY: idx(
       state,
       ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
@@ -2673,7 +2419,7 @@ export default withNavigationFocus(
     clearRampCache,
     clearSwanCache,
     updateSwanStatus,
-    addNewAccountShell,
+    addNewAccountShells,
     fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,
