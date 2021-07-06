@@ -7,7 +7,7 @@ import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLO
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
 import { createWatcher } from '../utils/utilities'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
-import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, LevelInfo, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 
@@ -76,11 +76,10 @@ function* cloudWorker( { payload } ) {
       const versionHistory = yield select( ( state ) => state.versionHistory.versions )
       const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
       const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
-      const secureAccount: SecureAccount = yield select( ( state ) => state.accounts[ SECURE_ACCOUNT ].service )
-      const service: S3Service = yield select( ( state ) => state.health.service )
-      const encryptedSecondaryShares: string[] = service.levelhealth.encryptedSMSecretsKeeper
       const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
-
+      const wallet: Wallet = yield select(
+        ( state ) => state.storage.wallet
+      )
 
       let encryptedCloudDataJson
       const shares =
@@ -105,12 +104,8 @@ function* cloudWorker( { payload } ) {
           reshareVersion: 0,
         },
       ]
-      let bhXpub = ''
+      const bhXpub = wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
 
-      if ( secureAccount && secureAccount.secureHDWallet && secureAccount.secureHDWallet.xpubs ) {
-        bhXpub = secureAccount.secureHDWallet.xpubs.bh
-
-      }
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,

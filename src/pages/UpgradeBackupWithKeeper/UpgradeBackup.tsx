@@ -55,7 +55,7 @@ import {
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { KeeperInfoInterface, LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
@@ -158,7 +158,7 @@ interface UpgradeBackupPropsTypes {
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
-  secureAccount: SecureAccount;
+  wallet: Wallet;
   containerStyle: StyleProp<ViewStyle>;
   setIsPermissionGiven: any;
 }
@@ -322,7 +322,7 @@ class UpgradeBackup extends Component<
     this.setState( {
       showLoader: true
     } )
-    const { levelHealth, overallHealth, secureAccount } = this.props
+    const { levelHealth, overallHealth, wallet } = this.props
     if( levelHealth[ levelToSetup-1 ] ){
       for ( let i = 0; i < keepersInfo.length; i++ ) {
         const element = keepersInfo[ i ]
@@ -442,7 +442,7 @@ class UpgradeBackup extends Component<
         showLoader: false,
         qrScannerText: 'Scan last qr from pdf or scan secondary qr from personal device.'
       } )
-      if( !secureAccount.secureHDWallet.secondaryMnemonic )
+      if( !wallet.details2FA.bithyveXpub )
         ( this.QrBottomSheet as any ).snapTo( 1 )
       else
         this.RestoreFromICloud.current.snapTo( 1 )
@@ -1521,7 +1521,7 @@ const mapStateToProps = ( state ) => {
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
     pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
-    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }
 
