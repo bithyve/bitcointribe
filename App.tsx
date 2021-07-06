@@ -5,7 +5,7 @@ import makeStore from './src/store'
 import NoInternetModalContents from './src/components/NoInternetModalContents'
 import { useDispatch } from 'react-redux'
 import NetInfo from '@react-native-community/netinfo'
-import { getVersion, getBuildId } from 'react-native-device-info'
+import { getVersion, getBuildId, getBuildNumber } from 'react-native-device-info'
 import { setApiHeaders } from './src/services/api'
 import firebase from '@react-native-firebase/app'
 import analytics from '@react-native-firebase/analytics'
@@ -24,13 +24,12 @@ export const URI_PREFIX = 'hexa://'
 
 async function configureAPIHeaders() {
   const version = await getVersion()
-  const buildNumber = await getBuildId()
+  const buildNumber = getBuildNumber()
 
   setApiHeaders( {
     appVersion: version, appBuildNumber: buildNumber
   } )
 }
-
 
 export default function AppWrapper() {
 
