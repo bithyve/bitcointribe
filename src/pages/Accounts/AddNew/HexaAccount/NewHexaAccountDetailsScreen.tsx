@@ -4,12 +4,13 @@ import FormStyles from '../../../../common/Styles/FormStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import { Input } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import { HexaSubAccountDescribing } from '../../../../common/data/models/SubAccountInfo/Interfaces'
 import Loader from '../../../../components/loader'
 import ButtonBlue from '../../../../components/ButtonBlue'
+import { addNewAccountShells } from '../../../../store/actions/accounts'
+import { newAccountsInfo } from '../../../../store/sagas/accounts'
 
 export type Props = {
   navigation: any;
@@ -68,8 +69,14 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     setButtonPressed( true )
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.customDescription = accountDescription
-    console.log( 'dispatching addNewAccountShell' )
-    buttonPressed ? null : dispatch( addNewAccountShell( currentSubAccount ) )
+    const accountsInfo: newAccountsInfo = {
+      accountType: currentSubAccount.type,
+      accountDetails: {
+        name: accountName,
+        description: accountDescription
+      }
+    }
+    buttonPressed ? null : dispatch( addNewAccountShells( [ accountsInfo ] ) )
   }
 
   return (

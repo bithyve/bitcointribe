@@ -1,10 +1,8 @@
-import { call, delay, put, select, spawn, fork } from 'redux-saga/effects'
+import { call, put, select } from 'redux-saga/effects'
 import { createWatcher, requestTimedout } from '../utils/utilities'
 import {
   GET_TESTCOINS,
   ACCUMULATIVE_BAL_AND_TX,
-  testcoinsReceived,
-  accountsSynched,
   FETCH_BALANCE_TX,
   GENERATE_SECONDARY_XPRIV,
   RESET_TWO_FA,
@@ -16,7 +14,6 @@ import {
   secondaryXprivGenerated,
   ADD_NEW_ACCOUNT_SHELLS,
   newAccountShellsAdded,
-  newAccountShellAddFailed,
   UPDATE_SUB_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
@@ -30,7 +27,6 @@ import {
   accountShellMergeFailed,
   REFRESH_ACCOUNT_SHELL,
   AUTO_SYNC_SHELLS,
-  accountShellOrderedToFront,
   accountShellRefreshCompleted,
   accountShellRefreshStarted,
   FETCH_FEE_AND_EXCHANGE_RATES,
@@ -38,7 +34,6 @@ import {
   setAverageTxFee,
   VALIDATE_TWO_FA,
   twoFAValid,
-  ADD_NEW_SECONDARY_SUBACCOUNT,
   clearAccountSyncCache,
   BLIND_REFRESH,
   blindRefreshStarted,
@@ -51,20 +46,17 @@ import {
   generateSecondaryXpriv,
   SYNC_ACCOUNTS,
   updateAccountShells,
-  refreshAccountShell,
   getTestcoins,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  DONATION_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
   Account,
   Accounts,
   AccountType,
-  ContactInfo,
   DerivativeAccountTypes,
   MultiSigAccount,
   NetworkType,
@@ -72,7 +64,7 @@ import {
   Trusted_Contacts,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import SubAccountDescribing, { DonationSubAccountDescribing, ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
+import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
@@ -89,7 +81,7 @@ import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
-import accounts, { AccountsState } from '../reducers/accounts'
+import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -107,7 +99,11 @@ import idx from 'idx'
 import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
 import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+
 import dbManager from '../../storage/realm/dbManager'
+import _ from 'lodash'
 
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
@@ -863,8 +859,8 @@ function* setup2FADetails( wallet: Wallet ) {
 }
 
 
-function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
-  let SubAccountConstructor
+export function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
+  let SubAccountConstructor, serviceAccountKind
   switch( account.type ){
       case AccountType.TEST_ACCOUNT:
         SubAccountConstructor = TestSubAccountInfo
@@ -877,6 +873,15 @@ function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
       case AccountType.SAVINGS_ACCOUNT:
         SubAccountConstructor = SavingsSubAccountInfo
         break
+
+      case AccountType.DONATION_ACCOUNT:
+        SubAccountConstructor = DonationSubAccountInfo
+        break
+
+      case AccountType.SWAN_ACCOUNT:
+        SubAccountConstructor = ExternalServiceSubAccountInfo
+        serviceAccountKind = ServiceAccountKind.SWAN
+        break
   }
 
   const network = AccountUtilities.getNetworkByType( account.networkType )
@@ -886,7 +891,8 @@ function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
       xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
       instanceNumber: account.instanceNum,
       customDisplayName: account.accountName,
-      customDescription: account.accountDescription
+      customDescription: account.accountDescription,
+      serviceAccountKind,
     } ),
     unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
     displayOrder: 1,
@@ -895,7 +901,7 @@ function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
   return accountShell
 }
 
-function* addNewAccount( accountType, accountName, accountDescription ) {
+export function* addNewAccount( accountType: AccountType, accountName: string, accountDescription: string ) {
   let wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
 
@@ -960,21 +966,9 @@ function* addNewAccount( accountType, accountName, accountDescription ) {
         //   } )
         //   return donationAccount
 
-      case AccountType.WYRE_ACCOUNT:
-      case AccountType.RAMP_ACCOUNT:
       case AccountType.SWAN_ACCOUNT:
         let defaultAccountName, defaultAccountDescription
         switch( accountType ){
-            case AccountType.WYRE_ACCOUNT:
-              defaultAccountName = 'Wyre Account'
-              defaultAccountDescription = 'Buy with Apple Pay or Debit card'
-              break
-
-            case AccountType.RAMP_ACCOUNT:
-              defaultAccountName = 'Ramp Account'
-              defaultAccountDescription = 'Buy with Apple Pay, Bank or Card'
-              break
-
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
               defaultAccountDescription = 'Stack sats with Swan'
@@ -1097,18 +1091,18 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   }
 
   const wallet: Wallet = yield select( state => state.storage.wallet )
-  let accountsMap = wallet.accounts
+  let presentAccounts = _.cloneDeep( wallet.accounts )
   Object.values( ( accounts as Accounts ) ).forEach( account => {
-    if( accountsMap[ account.type ] ) accountsMap[ account.type ].push( account.id )
-    else accountsMap = {
-      ...accountsMap,
+    if( presentAccounts[ account.type ] ) presentAccounts[ account.type ].push( account.id )
+    else presentAccounts = {
+      ...presentAccounts,
       [ account.type ]: [ account.id ]
     }
   } )
 
   const updatedWallet: Wallet = {
     ...wallet,
-    accounts: accountsMap
+    accounts: presentAccounts
   }
   yield put( updateWallet( updatedWallet ) )
 

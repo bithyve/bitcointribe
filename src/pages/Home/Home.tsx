@@ -85,12 +85,13 @@ import CustomBottomTabs, {
 import {
   addTransferDetails,
   autoSyncShells,
-  addNewAccountShell,
   fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
+  AccountType,
   LevelHealthInterface,
   QRCodeTypes,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -219,10 +220,7 @@ interface HomePropsTypes {
   accountsState: AccountsState;
   cloudPermissionGranted: any;
 
-  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-  currentSwanSubAccount: ExternalServiceSubAccountInfo | null;
-  walletName: string;
+  wallet: Wallet;
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
   downloadMShare: any;
@@ -949,7 +947,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:swanRequest.url,
       }, () => {
-        this.props.currentSwanSubAccount
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
           ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
           : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
@@ -1045,7 +1043,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
-        this.props.currentSwanSubAccount
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
           ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
           : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
@@ -1311,15 +1309,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          this.props.clearSwanCache()
-          if ( !this.props.currentSwanSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Swan Account',
-              defaultDescription: 'Sats purchased from Swan',
-              serviceAccountKind: ServiceAccountKind.SWAN,
-            } )
-            this.props.createTempSwanAccountInfo( newSubAccount )
+          if( !this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length ){
+            this.props.clearSwanCache()
+            const accountDetails = {
+              name: 'Swan Account',
+              description: 'Sats purchased from Swan',
+            }
+            this.props.createTempSwanAccountInfo( accountDetails )
             this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
           }
           else {
@@ -1332,16 +1328,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case BuyMenuItemKind.RAMP:
-          if ( !this.props.currentRampSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Ramp Account',
-              defaultDescription: 'Sats purchased from Ramp',
-              serviceAccountKind: ServiceAccountKind.RAMP,
-            } )
-
-            this.props.addNewAccountShell( newSubAccount )
-          }
           this.props.clearRampCache()
           this.setState( {
             rampDeepLinkContent: null,
@@ -1352,18 +1338,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case BuyMenuItemKind.WYRE:
-          if ( !this.props.currentWyreSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Wyre Account',
-              defaultDescription: 'Sats purchased from Wyre',
-              serviceAccountKind: ServiceAccountKind.WYRE,
-            } )
-            this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
-          }
           this.props.clearWyreCache()
           this.setState( {
             wyreDeepLinkContent: null,
@@ -1801,7 +1775,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             notificationData={notificationData}
-            walletName={walletName}
+            walletName={wallet.walletName}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
             netBalance={netBalance}
             exchangeRates={exchangeRates}
@@ -1826,12 +1800,9 @@ const mapStateToProps = ( state ) => {
     notificationList: state.notifications.notifications,
     accountsState: state.accounts,
     cloudPermissionGranted: state.health.cloudPermissionGranted,
-    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
-    currentRampSubAccount: state.accounts.currentRampSubAccount,
-    currentSwanSubAccount: state.accounts.currentSwanSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
-    walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+    wallet:
+      idx( state, ( _ ) => _.storage.wallet ) || '',
     UNDER_CUSTODY: idx(
       state,
       ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
@@ -1878,7 +1849,6 @@ export default withNavigationFocus(
     clearRampCache,
     clearSwanCache,
     updateSwanStatus,
-    addNewAccountShell,
     fetchFeeAndExchangeRates,
     createTempSwanAccountInfo,
     addTransferDetails,

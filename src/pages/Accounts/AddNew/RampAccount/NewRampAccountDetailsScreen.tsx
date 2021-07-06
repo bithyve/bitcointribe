@@ -5,7 +5,6 @@ import ButtonStyles from '../../../../common/Styles/ButtonStyles'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import { Input, Button } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import { addNewAccountShell } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import ExternalServiceSubAccountInfo from '../../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useRampIntegrationState from '../../../../utils/hooks/state-selectors/accounts/UseRampIntegrationState'
@@ -43,7 +42,7 @@ const NewRampAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.customDescription = accountDescription
 
-    if( !hasButtonBeenPressed ){dispatch( addNewAccountShell( currentSubAccount ) )}
+    // if( !hasButtonBeenPressed ){dispatch( addNewAccountShell( currentSubAccount ) )}
     setHasButtonBeenPressed( true )
   }
 

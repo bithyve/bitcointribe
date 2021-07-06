@@ -139,10 +139,15 @@ export const createWithdrawalWalletOnSwanSucceeded = ( data ) => {
   }
 }
 
-export const createTempSwanAccountInfo = ( payload: SubAccountDescribing ) => {
+export const createTempSwanAccountInfo = ( accountDetails: {
+  name: string,
+  description: string,
+} ) => {
   return {
     type: CREATE_TEMP_SWAN_ACCOUNT_INFO,
-    payload,
+    payload: {
+      accountDetails
+    }
   }
 }
 

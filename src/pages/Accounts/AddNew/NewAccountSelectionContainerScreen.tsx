@@ -62,51 +62,35 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
   }, [ selectedChoice ] )
 
   function handleProceedButtonPress() {
-    if ( selectedChoice.kind === SubAccountKind.SERVICE ) {
-      // TODO: Implement alongside supporting Service integration from "Add New".
-      //  - Present options for choosing b/w a standalone
-      //    service account or adding it to a Hexa
-      //    account (e.g. Checking or Savings account).
-      switch (
-        ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind
-      ) {
-          case ServiceAccountKind.WYRE:
-            navigation.navigate( 'NewWyreAccountDetails', {
-              currentSubAccount: selectedChoice,
-            } )
-            break
-          case ServiceAccountKind.RAMP:
-            navigation.navigate( 'NewRampAccountDetails', {
-              currentSubAccount: selectedChoice,
-            } )
-            break
-          case ServiceAccountKind.SWAN:
-            navigation.navigate( 'NewSwanAccountDetails', {
-              currentSubAccount: selectedChoice,
-            } )
-            break
-          default:
-            break
-      }
-    }
-
     switch ( selectedChoice.kind ) {
-        case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
           navigation.navigate( 'NewHexaAccountDetails', {
             currentSubAccount: selectedChoice,
           } )
           break
+
         case SubAccountKind.DONATION_ACCOUNT:
           navigation.navigate( 'AddNewDonationAccountDetails', {
             currentSubAccount: selectedChoice,
           } )
           break
+
+        case SubAccountKind.SERVICE:
+          switch( ( selectedChoice as ExternalServiceSubAccountInfo ).serviceAccountKind ){
+              case ServiceAccountKind.SWAN:
+                navigation.navigate( 'NewSwanAccountDetails', {
+                  currentSubAccount: selectedChoice,
+                } )
+                break
+          }
+          break
+
         case SubAccountKind.FULLY_IMPORTED_WALLET:
         case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
         // TODO: Implement alongside supporting Import integration from "Add New".
           break
+
         default:
           break
     }

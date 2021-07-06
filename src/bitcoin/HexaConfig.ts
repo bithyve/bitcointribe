@@ -135,6 +135,14 @@ class HexaConfig {
     [ AccountType.SAVINGS_ACCOUNT ]: {
       series: 10,
       upperBound: 10,
+    },
+    [ AccountType.DONATION_ACCOUNT ]: {
+      series: 20,
+      upperBound: 10,
+    },
+    [ AccountType.SWAN_ACCOUNT ]: {
+      series: 30,
+      upperBound: 10,
     }
   }
 
