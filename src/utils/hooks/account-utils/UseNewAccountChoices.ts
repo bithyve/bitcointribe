@@ -67,12 +67,12 @@ export default function useNewAccountChoices() {
           defaultTitle: 'Savings Account',
           defaultDescription: 'User Savings Account'
         } ),
-        new DonationSubAccountInfo( {
-          defaultTitle: 'Donation Account',
-          defaultDescription: 'Accept donations',
-          doneeName: '',
-          causeName: '',
-        } ),
+        // new DonationSubAccountInfo( {
+        //   defaultTitle: 'Donation Account',
+        //   defaultDescription: 'Accept donations',
+        //   doneeName: '',
+        //   causeName: '',
+        // } ),
       ].sort( sortHexaAccountChoices ),
 
       serviceAccounts: [
