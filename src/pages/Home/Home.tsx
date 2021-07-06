@@ -436,7 +436,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Toast( 'Invalid QR' )
       }
     }
-    console.log( 'HERE' )
     try {
       const scannedData = JSON.parse( qrData )
 
@@ -514,7 +513,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             break
 
           case 'secondaryDeviceGuardian':
-            console.log( 'scannedData', scannedData )
             const secondaryDeviceGuardianRequest = {
               isGuardian: scannedData.isGuardian,
               requester: scannedData.requester,
@@ -778,7 +776,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // this.props.autoSyncShells()
       // Keeping autoSync disabled
       credsAuthenticated( false )
-      console.log( 'isAuthenticated*****', this.props.isAuthenticated )
+      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
@@ -1238,7 +1236,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.notificationCheck()
     this.setCurrencyCodeFromAsync()
     const t1 = performance.now()
-    console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
+    //console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   setSecondaryDeviceAddresses = async () => {
@@ -1393,8 +1391,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     kind: BottomSheetKind,
     snapIndex: number | null = null
   ) => {
-    console.log( 'kind', kind )
-    console.log( 'snapIndex', snapIndex )
+    // console.log( 'kind', kind )
+    // console.log( 'snapIndex', snapIndex )
 
     this.setState(
       {
@@ -1543,7 +1541,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   renderBottomSheetContent() {
     const { UNDER_CUSTODY, navigation } = this.props
     const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
-    console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
+    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
 
         case BottomSheetKind.SWAN_STATUS_INFO:
@@ -1775,7 +1773,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   render() {
-    console.log( 'notificationData' )
     return (
       <ImageBackground
         source={require( '../../assets/images/home-bg.png' )}
