@@ -58,7 +58,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
 
       return accumulated
     }, [] )
-
     const oddIndexedShells = Array.from( accountShells ).reduce( ( accumulated, current, index ) => {
       if ( index % 2 == 1 && ( current.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ) ) {
         accumulated.push( current )
@@ -66,10 +65,9 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
 
       return accumulated
     }, [] )
-
     const sortedShells: AccountShell[] = []
     let isChoosingEvenIndexedShells = true
-    let isFirstShell = true
+    let isFirstShell = false
 
     while ( evenIndexedShells.length > 0 || oddIndexedShells.length > 0 ) {
       if ( isFirstShell ) {
@@ -88,7 +86,6 @@ const HomeAccountCardsGrid: React.FC<Props> = ( {
     const shellCount = sortedShells.length
     const columns = []
     let currentColumn = []
-
     sortedShells.forEach( ( accountShell, index ) => {
       // if( accountShell.primarySubAccount.visibility === AccountVisibility.DEFAULT || showAllAccount === true ){
       currentColumn.push( accountShell )

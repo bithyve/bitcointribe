@@ -197,7 +197,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         notificationLoading: false,
       } )
     }, 500 )
-
+    this.notificationCheck()
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
   };
 

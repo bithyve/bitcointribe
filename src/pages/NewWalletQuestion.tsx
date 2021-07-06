@@ -608,7 +608,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
-              No numbers or special characters allowed
+              Password must only contain lowercase characters (a-z) and digits (0-9)
             </Text>
           )}
         </View>
