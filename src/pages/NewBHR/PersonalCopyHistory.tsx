@@ -557,9 +557,13 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ){
-            const qrScannedData = '{"type":"pdf","encryptedData":"35c329e9d0ffa374bf2a9589173578c0bdc8727c4e7a3cb5c6862854717a1c88657751643790a4c48308060e8d4adf47ec647b475cbdc2ced65b2b91c8a2beb1","encryptedKey":"814a3670890461aa790a66385bf3068bdf04f13d296b8a06d6716adf9622b0ac9cbe9b7593e7894efb77afd1a9280588f24a50d300d44e3d37c840a41947232c3b0272fe57465c96e1d09892591a7259"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Aa","channelId":"88ed885f562644b2c31a71e1298bdd01bb8287a9e00a634e4d2f658c4f46ca1a","streamId":"1763f468d","channelKey":"F0WfMxo5EyhhjH9Z6pQSzfEa","secondaryChannelKey":"b2RayHpnNM7ACm16QRYXOKgm","version":"1.7.5","encryptedKey":"6ddf6dd857796349f11f8b5e881e110585ef0fc1038f97117bdd8a1c157cb690cf8efa21d036acb66028f80232b4844e468a014ee88ff07999d94d34f723ef3aca5f02232dfd2a7cb0dc8704c8094161"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
+            const popAction = StackActions.pop( {
+              n: isChange ? 2 : 1
+            } )
+            props.navigation.dispatch( popAction )
           } else {
             const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
             dispatch( setApprovalStatus( false ) )

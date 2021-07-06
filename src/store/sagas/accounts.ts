@@ -848,6 +848,7 @@ function* setup2FADetails( wallet: Wallet ) {
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
+    secondaryMemonic,
     details2FA: {
       secondaryXpub,
       bithyveXpub,
