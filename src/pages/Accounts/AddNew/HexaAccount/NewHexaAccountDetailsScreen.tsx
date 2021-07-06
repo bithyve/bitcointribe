@@ -69,7 +69,6 @@ const NewHexaAccountDetailsScreen: React.FC<Props> = ( { navigation, }: Props ) 
     setButtonPressed( true )
     currentSubAccount.customDisplayName = accountName
     currentSubAccount.customDescription = accountDescription
-    console.log( 'dispatching addNewAccountShell' )
     const accountsInfo: newAccountsInfo = {
       accountType: currentSubAccount.type,
       accountDetails: {

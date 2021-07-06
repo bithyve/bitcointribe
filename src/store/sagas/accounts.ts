@@ -99,6 +99,9 @@ import idx from 'idx'
 import TestSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
 import CheckingSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/CheckingSubAccountInfo'
 import SavingsSubAccountInfo from '../../common/data/models/SubAccountInfo/HexaSubAccounts/SavingsSubAccountInfo'
+import DonationSubAccountInfo from '../../common/data/models/SubAccountInfo/DonationSubAccountInfo'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
 
@@ -857,7 +860,7 @@ function* setup2FADetails( wallet: Wallet ) {
 
 
 export function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
-  let SubAccountConstructor
+  let SubAccountConstructor, serviceAccountKind
   switch( account.type ){
       case AccountType.TEST_ACCOUNT:
         SubAccountConstructor = TestSubAccountInfo
@@ -870,6 +873,15 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
       case AccountType.SAVINGS_ACCOUNT:
         SubAccountConstructor = SavingsSubAccountInfo
         break
+
+      case AccountType.DONATION_ACCOUNT:
+        SubAccountConstructor = DonationSubAccountInfo
+        break
+
+      case AccountType.SWAN_ACCOUNT:
+        SubAccountConstructor = ExternalServiceSubAccountInfo
+        serviceAccountKind = ServiceAccountKind.SWAN
+        break
   }
 
   const network = AccountUtilities.getNetworkByType( account.networkType )
@@ -879,7 +891,8 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
       xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
       instanceNumber: account.instanceNum,
       customDisplayName: account.accountName,
-      customDescription: account.accountDescription
+      customDescription: account.accountDescription,
+      serviceAccountKind,
     } ),
     unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
     displayOrder: 1,
