@@ -816,9 +816,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   };
 
+  updateBadgeCounter = () => {
+    const { messages } = this.props
+    const unread = messages.filter( msg => msg.status === 'unread' )
+    if ( Platform.OS === 'ios' ) {
+      PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    }
+  }
+
   notificationCheck = () =>{
     const { messages } = this.props
     if( messages && messages.length ){
+      this.updateBadgeCounter()
       messages.sort( function ( left, right ) {
         return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
       } )
@@ -933,7 +942,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       prevProps.messages !==
       this.props.messages
     ) {
-      this.notificationCheck()
+      this.updateBadgeCounter()
     }
 
   };
