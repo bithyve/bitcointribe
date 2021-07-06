@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { View, Image, Text, StyleSheet, Platform } from 'react-native'
+import { View, Image, Text, StyleSheet, Platform, Dimensions } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -16,7 +16,7 @@ import { getEnvReleaseTopic } from '../utils/geEnvSpecificParams'
 import { getTime } from '../common/CommonFunctions/timeFormatter'
 
 const releaseNotificationTopic = getEnvReleaseTopic()
-
+const { height } = Dimensions.get( 'window' )
 export default function NotificationListContent( props ) {
   return (
     <View style={styles.modalContainer}>
@@ -124,6 +124,7 @@ export default function NotificationListContent( props ) {
 const styles = StyleSheet.create( {
   modalContainer: {
     backgroundColor: Colors.white,
+    maxHeight: height - 120,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
