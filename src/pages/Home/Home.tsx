@@ -147,6 +147,7 @@ import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScree
 import Header from '../../navigation/stacks/Header'
 import { NotificationType } from '../../components/home/NotificationType'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -1788,6 +1789,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
+        <ModalContainer
+          visible={this.state.currentBottomSheetKind != null}
+          closeBottomSheet={() => {}}
+        >
+          {this.renderBottomSheetContent()}
+        </ModalContainer>
         <Header fromScreen={'Home'} />
         {/* <View
           style={{
