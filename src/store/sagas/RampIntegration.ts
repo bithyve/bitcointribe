@@ -3,7 +3,6 @@ import { call, put, select } from 'redux-saga/effects'
 import {
   FETCH_RAMP_RESERVATION,
   fetchRampReservationSucceeded,
-  FETCH_RAMP_RECEIVE_ADDRESS,
   fetchRampReceiveAddressSucceeded
 } from '../actions/RampIntegration'
 
@@ -58,30 +57,3 @@ function* fetchRampReservationWorker( { payload } ) {
     rampHostedUrl: url
   } ) )
 }
-
-
-export const fetchRampReceiveAddressWatcher = createWatcher(
-  fetchRampReceiveAddressWorker,
-  FETCH_RAMP_RECEIVE_ADDRESS
-)
-
-function* fetchRampReceiveAddressWorker( { payload } ) {
-  const { instance, sourceKind } = payload
-  let service: RegularAccount| SecureAccount
-  switch ( sourceKind ) {
-      case SourceAccountKind.SECURE_ACCOUNT:
-        service = yield select(
-          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
-        )
-        break
-      default:
-        service = yield select(
-          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
-        )
-  }
-  const receiveAddress =  service.getReceivingAddress( RAMP, instance? instance: 1 )
-  yield put( fetchRampReceiveAddressSucceeded( {
-    rampReceiveAddress: receiveAddress
-  } ) )
-}
-

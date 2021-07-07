@@ -925,7 +925,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.setState( {
           swanDeepLinkContent: swanRequest.url,
         }, () => {
-          this.props.currentSwanSubAccount
+          this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
             ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
             : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
           this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
@@ -1021,7 +1021,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         this.setState( {
           swanDeepLinkContent: url,
         }, () => {
-          this.props.currentSwanSubAccount
+          this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
             ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
             : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
           this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
