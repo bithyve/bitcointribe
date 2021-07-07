@@ -99,48 +99,34 @@ const HomeHeader = ( {
   )
 
   const getMessage = () => {
-    const { messageOne, messageTwo, isFirstMessageBold } = getMessageToShow()
-    if ( isFirstMessageBold ) {
-      return (
-        <View
+    const { messageOne, messageTwo, isFirstMessageBold, isError } = getMessageToShow()
+    return <View style={{
+      flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
+    }}>
+      <View style={{
+        backgroundColor: Colors.white,
+        width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
+        alignItems:'center',
+        justifyContent: 'center'
+      }}>
+        <Image
+          source={isError ? require( '../../assets/images/icons/icon_error_red.png' ) : require( '../../assets/images/icons/icon_check_green.png' )}
           style={{
-            flexDirection: 'row',
-            width: wp( '57%' ),
-            alignItems: 'flex-end',
+            width: wp( '5%' ), height: wp( '5%' ),
           }}
-        >
-          <Text
-            numberOfLines={1}
-            style={styles.manageBackupMessageTextHighlight}
-          >
-            {messageOne}
-          </Text>
-          <Text
-            numberOfLines={1}
-            style={{
-              ...styles.manageBackupMessageText, flex: 1
-            }}
-          >
-            {messageTwo}
-          </Text>
-        </View>
-      )
-    } else {
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            width: wp( '54%' ),
-            alignItems: 'flex-end',
-          }}
-        >
-          <Text style={styles.manageBackupMessageText}>{messageOne}</Text>
-          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
-            {messageTwo}
-          </Text>
-        </View>
-      )
-    }
+          resizeMode={'contain'}
+        />
+      </View>
+      {isFirstMessageBold ? <Text style={{
+        color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+      }}><Text style={{
+          fontFamily: Fonts.FiraSansMediumItalic
+        }}>{messageOne}</Text>{messageTwo}</Text> : <Text style={{
+        color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+      }}>{messageOne} <Text style={{
+          fontFamily: Fonts.FiraSansMediumItalic
+        }}>{messageTwo}</Text></Text>}
+    </View>
   }
 
   useEffect( () => {
@@ -158,102 +144,41 @@ const HomeHeader = ( {
         const element = levelData[ i ]
         if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
           return {
-            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.', isError: true
           }
         }
         if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
           return {
-            isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: ' needs your attention.'
+            isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: ' needs your attention.', isError: true
           }
         }
       }
       if( currentLevel == 0 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
+          isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: '', isError: true
         }
       } else if( currentLevel === 1 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: ''
+          isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: '', isError: false
         }
       } else if( currentLevel === 2 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: ''
+          isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: '', isError: false
         }
       } else if( currentLevel == 3 ){
         return {
-          isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: ''
-        }
-      }
-    } else
-    {
-      let name = ''
-      let message = ''
-      if ( levelHealth.length ) {
-        for ( let i = 0; i < levelHealth.length; i++ ) {
-          const element = levelHealth[ i ].levelInfo
-          let j = 0
-          if ( currentLevel == 1 && i == 1 ) j = 2
-          else if ( currentLevel == 2 && i == 2 ) j = 4
-          for ( j; j < element.length; j++ ) {
-            const item = element[ j ]
-            if ( j == 1 && item.status == 'notAccessible' ) name = 'Security Question'
-            if ( j == 2 && item.status == 'notAccessible' ) name = 'Primary Keeper'
-            if ( j == 3 && item.status == 'notAccessible' ) name = 'Second Keeper'
-            if ( j == 4 && item.status == 'notAccessible' ) name = 'Third Keeper'
-            if ( j == 5 && item.status == 'notAccessible' ) name = 'Fourth Keeper'
-            if ( item.name && item.status == 'notAccessible' ) name = item.name
-            if ( item.updatedAt == 0 && item.status == 'notAccessible' ) {
-              message = 'Add '
-            } else if ( j != 0 && item.updatedAt && item.status == 'notAccessible' ) {
-              message = ' needs your attention'
-            } else {
-              message = ''
-            }
-            if (
-              element[ j ].status == 'notAccessible' &&
-              name &&
-              message == 'Add '
-            ) {
-              return {
-                messageOne: message, messageTwo: name
-              }
-            } else if (
-              element[ j ].status == 'notAccessible' &&
-              name &&
-              message == ' needs your attention'
-            ) {
-              return {
-                messageOne: name, messageTwo: message
-              }
-            }
-            if( currentLevel == 0 ){
-              return {
-                isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
-              }
-            }
-            if( currentLevel == 1 ){
-              return {
-                isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: ''
-              }
-            } else if( currentLevel === 2 ){
-              return {
-                isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: ''
-              }
-            } else if( currentLevel == 3 ){
-              return {
-                isFirstMessageBold: true, messageOne: 'Your wallet is at full security', messageTwo: ''
-              }
-            }
-          }
-        }
-      } else {
-        return {
-          isFirstMessageBold: true, messageOne: 'Manage your wallet backup', messageTwo: ''
+          isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: '', isError: false
         }
       }
     }
-    return {
-      isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
+    if( currentLevel === 1 ){
+      return {
+        isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: '', isError: false
+      }
+    } else {
+      return {
+        isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: '', isError: true
+      }
     }
   }
 
@@ -503,29 +428,7 @@ const HomeHeader = ( {
           />
         </TouchableOpacity>
       </View> */}
-      <View style={{
-        flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
-      }}>
-        <View style={{
-          backgroundColor: Colors.white,
-          width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
-          alignItems:'center',
-          justifyContent: 'center'
-        }}>
-          <Image
-            source={require( '../../assets/images/icons/icon_check_green.png' )}
-            style={{
-              width: wp( '5%' ), height: wp( '5%' ),
-            }}
-            resizeMode={'contain'}
-          />
-        </View>
-
-        <Text style={{
-          color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
-        }}>{getMessage()}</Text>
-
-      </View>
+      {getMessage()}
     </View>
   )
 }

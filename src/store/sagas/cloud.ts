@@ -104,7 +104,7 @@ function* cloudWorker( { payload } ) {
           reshareVersion: 0,
         },
       ]
-      const bhXpub = wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
+      const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
 
       const data = {
         levelStatus: level ? level : 1,
