@@ -948,7 +948,7 @@ export function* addNewAccount( accountType: AccountType, accountName: string, a
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
-          bithyveXpub: wallet.details2FA.bithyveXpub,
+          bithyveXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return savingsAccount

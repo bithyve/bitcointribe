@@ -629,6 +629,7 @@ const PersonalCopyHistory = ( props ) => {
           confirmDisable={confirmDisable}
           onConfirm={ isReshare && ( selectedKeeper.status == 'notSetup' || selectedKeeper.status == 'notAccessible' ) ? ()=>{
             setIsConfirm( true )
+            setQrBottomSheetsFlag( true )
             // ( QrBottomSheet as any ).current.snapTo( 1 )
             setQRModal( true )
           } : null}

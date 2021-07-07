@@ -173,6 +173,7 @@ function* initHealthWorker() {
     levelInfo: levelInfo,
   } ], 0 ) )
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
+  yield call( modifyLevelDataWorker )
 }
 
 export const initHealthWatcher = createWatcher(
@@ -199,7 +200,7 @@ function* generateMetaSharesWorker( { payload } ) {
     secondaryMnemonic: secondaryMnemonic,
     twoFASecret: '',
     secondaryXpub: '',
-    bhXpub: wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
+    bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
   }
 
   let serviceCall = null
@@ -1993,7 +1994,7 @@ function* createChannelAssetsWorker( { payload } ) {
         },
         secondaryMnemonicShard: secondaryShare,
         keeperInfo: keeperInfo,
-        bhXpub: wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
+        bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
         shareId
       }
       yield put( setChannelAssets( channelAssets ) )
@@ -2038,8 +2039,8 @@ function* downloadSMShareWorker( { payload } ) {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
-      if( res.data.secondaryData.secondaryMnemonicShard ) {
-        yield put( secondaryShareDownloaded( res.data.secondaryData.secondaryMnemonicShard ) )
+      if( res.secondaryData.secondaryMnemonicShard ) {
+        yield put( secondaryShareDownloaded( res.secondaryData.secondaryMnemonicShard ) )
         yield put( setApprovalStatus( true ) )
       }
     }
