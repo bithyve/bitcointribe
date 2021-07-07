@@ -10,10 +10,12 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
 import useWyreIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseWyreIntegrationState'
-import { fetchWyreReceiveAddress, fetchWyreReservation } from '../../../store/actions/WyreIntegration'
+import { fetchWyreReservation } from '../../../store/actions/WyreIntegration'
 import useWyreReservationFetchEffect from '../../../utils/hooks/wyre-integration/UseWyreReservationFetchEffect'
 import openLink from '../../../utils/OpenLink'
 import { ListItem } from 'react-native-elements'
+import useReceivingAddressFromAccount from '../../../utils/hooks/account-utils/UseReceivingAddressFromAccount'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -25,17 +27,14 @@ type Props = {
 
 const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBuyMenu, wyreFromDeepLink, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
-  const { wyreHostedUrl, wyreReceiveAddress } = useWyreIntegrationState()
+  const { wyreHostedUrl } = useWyreIntegrationState()
+  const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
+  const wyreReceiveAddress = useReceivingAddressFromAccount( AccountType.WYRE_ACCOUNT, pickReceiveAddressFrom )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
   function handleProceedButtonPress() {
     if( !hasButtonBeenPressed ){dispatch( fetchWyreReservation() )}
     setHasButtonBeenPressed( true )
   }
-
-  useEffect( () => {
-    dispatch( fetchWyreReceiveAddress() )
-  }, [] )
-
 
   useWyreReservationFetchEffect( {
     onSuccess: () => {

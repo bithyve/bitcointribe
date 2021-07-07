@@ -14,6 +14,8 @@ import { fetchRampReceiveAddress, fetchRampReservation } from '../../../store/ac
 import useRampReservationFetchEffect from '../../../utils/hooks/ramp-integration/UseRampReservationFetchEffect'
 import openLink from '../../../utils/OpenLink'
 import { ListItem } from 'react-native-elements'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
+import useReceivingAddressFromAccount from '../../../utils/hooks/account-utils/UseReceivingAddressFromAccount'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -25,17 +27,16 @@ type Props = {
 
 const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDeepLink, rampFromBuyMenu, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
-  const { rampHostedUrl, rampReceiveAddress } = useRampIntegrationState()
+  const { rampHostedUrl } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
+
+  const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
+  const rampReceiveAddress = useReceivingAddressFromAccount( AccountType.RAMP_ACCOUNT, pickReceiveAddressFrom )
+
   function handleProceedButtonPress() {
     if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation() )}
     setHasButtonBeenPressed( true )
   }
-
-  useEffect( () => {
-    dispatch( fetchRampReceiveAddress() )
-  }, [] )
-
 
   useRampReservationFetchEffect( {
     onSuccess: () => {

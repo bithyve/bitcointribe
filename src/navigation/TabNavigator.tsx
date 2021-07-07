@@ -290,7 +290,6 @@ interface HomePropsTypes {
   clearRampCache: any;
   clearSwanCache: any;
   updateSwanStatus: any;
-  addNewAccountShell: any;
   fetchFeeAndExchangeRates: any;
   createTempSwanAccountInfo: any;
   addTransferDetails: any;
