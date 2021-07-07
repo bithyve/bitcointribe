@@ -2039,8 +2039,8 @@ function* downloadSMShareWorker( { payload } ) {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
-      if( res.data.secondaryData.secondaryMnemonicShard ) {
-        yield put( secondaryShareDownloaded( res.data.secondaryData.secondaryMnemonicShard ) )
+      if( res.secondaryData.secondaryMnemonicShard ) {
+        yield put( secondaryShareDownloaded( res.secondaryData.secondaryMnemonicShard ) )
         yield put( setApprovalStatus( true ) )
       }
     }
