@@ -7,7 +7,7 @@ import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
 import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType } from '../Interface'
-import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
+import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
@@ -1047,6 +1047,59 @@ export default class AccountUtilities {
     const { updated } = res.data
     return {
       updated
+    }
+  };
+
+  static syncViaXpubAgent = async (
+    xpubId: string,
+    donationId: string
+  ): Promise<{
+    usedAddresses: string[],
+    nextFreeAddressIndex: number,
+    nextFreeChangeAddressIndex: number,
+    utxos: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+      status?: any;
+    }>,
+    balances: { confirmed: number; unconfirmed: number },
+    transactions: Transaction[],
+  }> => {
+    // syncs account via xpub-agent(relay)
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'fetchXpubInfo', {
+        HEXA_ID: config.HEXA_ID,
+        xpubId,
+        accountType: DONATION_ACCOUNT,
+        accountDetails: {
+          donationId
+        },
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const {
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+      utxos,
+      balances,
+      transactions,
+    } = res.data
+
+    return {
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+      utxos,
+      balances,
+      transactions,
     }
   };
 }
