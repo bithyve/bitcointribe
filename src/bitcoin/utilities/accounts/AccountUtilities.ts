@@ -10,7 +10,7 @@ import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, Ne
 import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import { SIGNING_AXIOS } from '../../../services/api'
+import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -889,54 +889,54 @@ export default class AccountUtilities {
   }
 
   // 2FA-account specific utilities
-   static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
+  static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
     setupData: {
       qrData: string;
       secret: string;
       bhXpub: string;
     };
   }> => {
-     let res: AxiosResponse
-     try {
-       res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
-         HEXA_ID: config.HEXA_ID,
-         walletID,
-         secondaryID,
-       } )
-     } catch ( err ) {
-       if ( err.response ) throw new Error( err.response.data.err )
-       if ( err.code ) throw new Error( err.code )
-     }
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
+        HEXA_ID: config.HEXA_ID,
+        walletID,
+        secondaryID,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
 
-     const { setupSuccessful, setupData } = res.data
-     if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
-     return {
-       setupData
-     }
-   };
+    const { setupSuccessful, setupData } = res.data
+    if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
+    return {
+      setupData
+    }
+  };
 
-   static validateTwoFA = async ( walletID: string, token: number ): Promise<{
+  static validateTwoFA = async ( walletID: string, token: number ): Promise<{
     valid: Boolean
   }> => {
-     let res: AxiosResponse
-     try {
-       res = await SIGNING_AXIOS.post( 'validate2FASetup', {
-         HEXA_ID: config.HEXA_ID,
-         walletID,
-         token,
-       } )
-     } catch ( err ) {
-       if ( err.response ) throw new Error( err.response.data.err )
-       if ( err.code ) throw new Error( err.code )
-     }
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'validate2FASetup', {
+        HEXA_ID: config.HEXA_ID,
+        walletID,
+        token,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
 
-     const { valid } = res.data
-     if ( !valid ) throw new Error( '2FA validation failed' )
+    const { valid } = res.data
+    if ( !valid ) throw new Error( '2FA validation failed' )
 
-     return {
-       valid
-     }
-   }
+    return {
+      valid
+    }
+  }
 
 
   static getSecondSignature = async (
@@ -971,6 +971,82 @@ export default class AccountUtilities {
     const signedTxHex = res.data.txHex
     return {
       signedTxHex
+    }
+  };
+
+  // donation-account specific utilities
+  static setupDonationAccount = async (
+    account: Account | MultiSigAccount,
+    donee: string,
+    subject: string,
+    configuration: {
+      displayBalance: boolean;
+    },
+  ): Promise<{
+    setupSuccessful: boolean;
+  }> => {
+
+    const xpubs = []
+    if( account.xpub ) xpubs.push( account.xpub )
+    else xpubs.push( ...Object.values( ( account as MultiSigAccount ).xpubs ) )
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'setupDonationAccount', {
+        HEXA_ID: config.HEXA_ID,
+        donationId: account.id.slice( 0, 15 ),
+        walletID: account.walletId,
+        details: {
+          donee,
+          subject,
+          description: account.accountDescription,
+          xpubId: account.id,
+          xpubs,
+          configuration,
+        },
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { setupSuccessful } = res.data
+    return {
+      setupSuccessful
+    }
+  };
+
+  static updateDonationPreferences = async (
+    account: Account,
+    preferences: {
+      disableAccount?: boolean;
+      configuration?: {
+        displayBalance: boolean;
+      };
+      accountDetails?: {
+        donee: string;
+        subject: string;
+        description: string;
+      };
+    },
+  ): Promise<{ updated: boolean }> => {
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'updatePreferences', {
+        HEXA_ID: config.HEXA_ID,
+        donationId: account.id.slice( 0, 15 ),
+        walletID: account.walletId,
+        preferences,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { updated } = res.data
+    return {
+      updated
     }
   };
 }
