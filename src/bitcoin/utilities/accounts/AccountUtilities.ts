@@ -1107,8 +1107,10 @@ export default class AccountUtilities {
       nextFreeAddressIndex,
       nextFreeChangeAddressIndex,
       utxos,
-      balances,
-      transactions,
+      balances: {
+        confirmed: balances.balance, unconfirmed: balances.unconfirmedBalance
+      },
+      transactions: transactions.transactionDetails,
     }
   };
 }

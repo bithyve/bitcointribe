@@ -224,20 +224,39 @@ function* syncAccountsWorker( { payload }: {payload: {
   options: {
     hardRefresh?: boolean;
     blindRefresh?: boolean;
+    syncDonationAccount?: boolean,
   }}} ) {
   const { accounts, options } = payload
   const network = AccountUtilities.getNetworkByType( Object.values( accounts )[ 0 ].networkType )
 
-  const { synchedAccounts, txsFound } = yield call(
-    AccountOperations.syncAccounts,
-    accounts,
-    network,
-    options.hardRefresh,
-    options.blindRefresh )
+  if( options.syncDonationAccount ){
+    // can only sync one donation instance at a time
+    const donationAccount = ( Object.values( accounts )[ 0 ] as DonationAccount )
 
-  return {
-    synchedAccounts, txsFound
+    const { synchedAccount, txsFound } = yield call(
+      AccountOperations.syncDonationAccount,
+      donationAccount,
+      network )
+
+    const synchedAccounts = {
+      [ synchedAccount.id ]: synchedAccount
+    }
+    return {
+      synchedAccounts, txsFound
+    }
+  } else {
+    const { synchedAccounts, txsFound } = yield call(
+      AccountOperations.syncAccounts,
+      accounts,
+      network,
+      options.hardRefresh,
+      options.blindRefresh )
+
+    return {
+      synchedAccounts, txsFound
+    }
   }
+
 }
 
 export const syncAccountsWatcher = createWatcher(
@@ -656,7 +675,10 @@ function* refreshAccountShellWorker( { payload } ) {
   )
 
   const accounts: Accounts = accountState.accounts
-  const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
+  const options: { autoSync?: boolean, hardRefresh?: boolean, syncDonationAccount?: boolean } = {
+    ...payload.options,
+    syncDonationAccount: accountShell.primarySubAccount.type === AccountType.DONATION_ACCOUNT
+  }
   const accountsToSync: Accounts = {
     [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
   }

@@ -846,5 +846,5 @@ export enum AccountType {
 }
 
 export interface Accounts {
-    [accountId: string]: Account
+    [accountId: string]: Account | MultiSigAccount | DonationAccount
 }

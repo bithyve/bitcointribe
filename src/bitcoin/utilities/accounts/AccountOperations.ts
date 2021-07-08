@@ -12,6 +12,7 @@ import {
   MultiSigAccount,
   Accounts,
   AccountType,
+  DonationAccount,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 export default class AccountOperations {
@@ -246,7 +247,7 @@ export default class AccountOperations {
     }
   };
 
-  static syncDonationAccount = async ( account: Account, network: bitcoinJS.networks.Network ): Promise<{
+  static syncDonationAccount = async ( account: DonationAccount, network: bitcoinJS.networks.Network ): Promise<{
     synchedAccount: Account,
   }> => {
 
