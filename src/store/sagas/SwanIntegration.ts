@@ -120,8 +120,9 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
     ( state ) => state.swanIntegration
   )
 
-  const swanXpub = swanAccountDetails.xPub
+  const swanXpub = swanAccountDetails.primarySubAccount.xPub
   let swanCreateResponse
+
   try {
     swanCreateResponse = yield call( createWithdrawalWalletOnSwan, {
       access_token: swanAuthenticatedToken,

@@ -442,7 +442,7 @@ class UpgradeBackup extends Component<
         showLoader: false,
         qrScannerText: 'Scan last qr from pdf or scan secondary qr from personal device.'
       } )
-      if( !wallet.details2FA.bithyveXpub )
+      if( wallet.details2FA && !wallet.details2FA.bithyveXpub )
         ( this.QrBottomSheet as any ).snapTo( 1 )
       else
         this.RestoreFromICloud.current.snapTo( 1 )
