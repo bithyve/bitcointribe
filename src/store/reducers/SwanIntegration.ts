@@ -1,4 +1,6 @@
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import AccountShell from '../../common/data/models/AccountShell'
 import {
   UPDATE_SWAN_STATUS,
   CLEAR_SWAN_CACHE,
@@ -44,7 +46,7 @@ export type SwanIntegrationState = {
   hasSwanAccountCreationInitiated: boolean | null,
   hasSwanAccountCreationCompleted: boolean | null,
   hasSwanAccountCreationSucceeded: boolean | null,
-  swanAccountDetails: Object | null, // temperory swan account shell object
+  swanAccountDetails: AccountShell, // temperory swan account shell object
 
   // TODO:: Reducers for linking Hexa Wallet with Swan Withdrawal Wallet
 

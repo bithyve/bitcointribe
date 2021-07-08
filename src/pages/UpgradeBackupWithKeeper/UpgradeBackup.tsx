@@ -13,6 +13,8 @@ import {
   Keyboard,
   PermissionsAndroid,
   RefreshControl,
+  ViewStyle,
+  StyleProp,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
@@ -53,7 +55,7 @@ import {
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { KeeperInfoInterface, LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
@@ -156,7 +158,8 @@ interface UpgradeBackupPropsTypes {
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
-  secureAccount: SecureAccount;
+  wallet: Wallet;
+  containerStyle: StyleProp<ViewStyle>;
   setIsPermissionGiven: any;
 }
 
@@ -319,7 +322,7 @@ class UpgradeBackup extends Component<
     this.setState( {
       showLoader: true
     } )
-    const { levelHealth, overallHealth, secureAccount } = this.props
+    const { levelHealth, overallHealth, wallet } = this.props
     if( levelHealth[ levelToSetup-1 ] ){
       for ( let i = 0; i < keepersInfo.length; i++ ) {
         const element = keepersInfo[ i ]
@@ -439,7 +442,7 @@ class UpgradeBackup extends Component<
         showLoader: false,
         qrScannerText: 'Scan last qr from pdf or scan secondary qr from personal device.'
       } )
-      if( !secureAccount.secureHDWallet.secondaryMnemonic )
+      if( wallet.details2FA && !wallet.details2FA.bithyveXpub )
         ( this.QrBottomSheet as any ).snapTo( 1 )
       else
         this.RestoreFromICloud.current.snapTo( 1 )
@@ -1066,11 +1069,12 @@ class UpgradeBackup extends Component<
 
   render() {
     const { listData, contactToShow, isCloudBackupProcessing, showLoader } = this.state
-    const { navigation } = this.props
+    const { navigation, containerStyle } = this.props
     return (
-      <View style={{
+      <View style={styles.accountCardsSectionContainer}>
+        {/* <View style={{
         flex: 1, backgroundColor: Colors.backgroundColor1
-      }}>
+      }}> */}
         <SafeAreaView style={{
           flex: 0
         }} />
@@ -1517,7 +1521,7 @@ const mapStateToProps = ( state ) => {
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
     pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
-    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }
 
@@ -1549,6 +1553,20 @@ export default withNavigationFocus(
 )
 
 const styles = StyleSheet.create( {
+  accountCardsSectionContainer: {
+    height: hp( '68.5%' ),
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   modalHeaderTitleView: {
     alignItems: 'center',
     flexDirection: 'row',

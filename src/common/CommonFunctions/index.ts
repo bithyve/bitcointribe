@@ -13,9 +13,7 @@ export const nameToInitials = fullName => {
   const namesArray = fullName.split( ' ' )
   if ( namesArray.length === 1 ) return `${namesArray[ 0 ].charAt( 0 )}`
   else
-    return `${namesArray[ 0 ].charAt( 0 )}${namesArray[
-      namesArray.length - 1
-    ].charAt( 0 )}`
+    return `${namesArray[ 0 ].charAt( 0 )} ${namesArray[ namesArray.length - 1 ].charAt( 0 )}`
 }
 
 export const getCurrencyImageName = ( currencyCodeValue ) => {
@@ -153,7 +151,8 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
       walletImage.WALLET_SETUP = database.WALLET_SETUP
     walletImage.ASYNC_DATA = await asyncDataToBackup()
     walletImage.STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo )
-    const key = SSS.strechKey( database.WALLET_SETUP.security.answer )
+    // this has to be updated to keep the correct answer
+    const key = 'answer'//SSS.strechKey( database.WALLET_SETUP.security.answer )
     CloudDataJson = {
       walletImage,
       keeperInfo: [],

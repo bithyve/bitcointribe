@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Image } from 'react-native'
 import { ListItem } from 'react-native-elements'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientAvatar from '../RecipientAvatar'
@@ -17,9 +17,10 @@ import { agoTextForLastSeen } from '../send/LastSeenActiveUtils'
 
 export type Props = {
   contact: ContactRecipientDescribing,
+  index: number
 };
 
-const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: Props ) => {
+const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, index }: Props ) => {
 
   const firstNamePieceText = useMemo( () => {
     return contact.displayedName.split( ' ' )[ 0 ] + ' '
@@ -53,19 +54,7 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
       <ListItem.Content style={{
         flex: 1
       }}>
-        {Number.isFinite( contact.lastSeenActive ) && (
-          <ListItem.Subtitle
-            style={styles.lastSeenText}
-            numberOfLines={1}
-          >
-            <Text>Last seen </Text>
-            <Text style={{
-              fontFamily: Fonts.FiraSansMediumItalic
-            }}>
-              {agoTextForLastSeen( contact.lastSeenActive )}
-            </Text>
-          </ListItem.Subtitle>
-        )}
+
 
         <ListItem.Title
           style={styles.listItemTitle}
@@ -74,6 +63,26 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
           <Text>{firstNamePieceText}</Text>
           <Text style={styles.secondNamePieceText}>{secondNamePieceText}</Text>
         </ListItem.Title>
+        <ListItem.Subtitle
+          style={styles.lastSeenText}
+          numberOfLines={1}
+        >
+          <Text>Last seen </Text>
+          {Number.isFinite( contact.lastSeenActive ) ? (
+
+            <Text style={{
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              {agoTextForLastSeen( contact.lastSeenActive )}
+            </Text>
+          ) : (
+            <Text style={{
+              fontFamily: Fonts.FiraSansMediumItalic
+            }}>
+              _unknown_
+            </Text>
+          )}
+        </ListItem.Subtitle>
 
         {/*
           📝 TODO: Show this when the F&F list is refactored to a
@@ -87,7 +96,12 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, }: 
         </ListItem.Subtitle> */}
 
       </ListItem.Content>
-      <ListItem.Chevron />
+      <Image
+        style={{
+          width: 18, height: 18
+        }}
+        source={require( '../../assets/images/icons/own-node.png' )}
+      />
     </>
   )
 }
@@ -101,8 +115,8 @@ const styles = StyleSheet.create( {
   },
 
   avatarImage: {
-    ...ImageStyles.thumbnailImageLarge,
-    borderRadius: widthPercentageToDP( 14 )/2,
+    ...ImageStyles.thumbnailImageMedium,
+    borderRadius: widthPercentageToDP( 12 )/2,
   },
 
   listItemTitle: {

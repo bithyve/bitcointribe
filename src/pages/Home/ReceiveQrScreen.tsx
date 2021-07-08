@@ -24,6 +24,7 @@ import { AccountsState } from '../../store/reducers/accounts'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export type Props = {
   navigation: any;
@@ -32,6 +33,8 @@ export type Props = {
 const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const [ hideShow, setHideShow ] = useState( false )
+  const [ receiveModal, setReceiveModal ] = useState( false )
+
   const [ amount, setAmount ] = useState( '' )
   const allAccounts = useSelector(
     ( state ) => state.accounts.accounts,
@@ -77,27 +80,22 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   }, [ amount, selectedAccount ] )
 
   const showReceiveAmountBottomSheet = useCallback( () => {
-    presentBottomSheet(
+    return(
       <ReceiveAmountContent
         title={'Receive sats'}
         message={'Receive sats into the selected account'}
         onPressConfirm={( amount ) => {
           setAmount( amount )
-          dismissBottomSheet()
+          setReceiveModal( false )
         }}
         selectedAmount={amount}
         onPressBack={() => {
-          dismissBottomSheet()
+          setReceiveModal( false )
         }
         }
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '50%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, amount ] )
+  }, [ amount ] )
 
   return (
     <View style={styles.rootContainer}>
@@ -112,7 +110,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         />
 
         <AppBottomSheetTouchableWrapper
-          onPress={() => { showReceiveAmountBottomSheet() }}
+          onPress={() => { setReceiveModal( true ) }}
           style={styles.selectedView}
         >
           <View
@@ -221,6 +219,9 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           </AppBottomSheetTouchableWrapper>
 
         </View>}
+        <ModalContainer visible={receiveModal} closeBottomSheet={() => {} } >
+          {showReceiveAmountBottomSheet()}
+        </ModalContainer>
         <BottomInfoBox
           title="Note"
           infoText="It would take some time for the sats to reflect in your account based on the network condition"

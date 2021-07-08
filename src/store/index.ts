@@ -50,19 +50,19 @@ import {
   testcoinsWatcher,
   accumulativeTxAndBalWatcher,
   fetchBalanceTxWatcher,
+  syncAccountsWatcher,
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccBalanceTxWatcher,
   setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
-  addNewAccountShellWatcher,
+  addNewAccountShellsWatcher,
   syncViaXpubAgentWatcher,
   updateAccountSettingsWatcher,
   reassignTransactionsWatcher,
   mergeAccountShellsWatcher,
   refreshAccountShellWatcher,
   feeAndExchangeRatesWatcher,
-  addNewSecondarySubAccountWatcher,
   autoSyncShellsWatcher,
   blindRefreshWatcher,
   getAllAccountsDataWatcher,
@@ -129,11 +129,9 @@ import {
 
 import {
   fetchWyreReservationWatcher,
-  fetchWyreReceiveAddressWatcher
 } from './sagas/WyreIntegration'
 import {
   fetchRampReservationWatcher,
-  fetchRampReceiveAddressWatcher
 } from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
@@ -166,6 +164,9 @@ import {
   createChannelAssetsWatcher,
   downloadSMShareWatcher,
   createOrChangeGuardianWatcher,
+  downloadBackupDataWatcher,
+  setupHealthWatcher,
+  updateKeeperInfoToChannelWatcher,
 } from './sagas/health'
 
 import {
@@ -192,7 +193,7 @@ import {
   confirmPDFSharedFromUpgradeWatcher,
 } from './sagas/upgradeToNewBhr'
 
-import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeAlternateSendStage2Watcher, executeSendStage1Watcher, executeSendStage2Watcher, executeSendStage3Watcher, sendTxNotificationWatcher } from './sagas/sending'
+import { calculateCustomFeeWatcher, calculateSendMaxFeeWatcher, executeSendStage1Watcher, executeSendStage2Watcher, sendTxNotificationWatcher } from './sagas/sending'
 import newBHR from './reducers/newBHR'
 import { onPressKeeperChannelWatcher } from './sagas/newBHR'
 const rootSaga = function* () {
@@ -213,6 +214,7 @@ const rootSaga = function* () {
 
     // accounts watchers
     fetchBalanceTxWatcher,
+    syncAccountsWatcher,
     testcoinsWatcher,
     accumulativeTxAndBalWatcher,
     generateSecondaryXprivWatcher,
@@ -223,8 +225,7 @@ const rootSaga = function* () {
     setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
-    addNewAccountShellWatcher,
-    addNewSecondarySubAccountWatcher,
+    addNewAccountShellsWatcher,
     updateAccountSettingsWatcher,
     reassignTransactionsWatcher,
     mergeAccountShellsWatcher,
@@ -310,6 +311,9 @@ const rootSaga = function* () {
     createChannelAssetsWatcher,
     downloadSMShareWatcher,
     createOrChangeGuardianWatcher,
+    downloadBackupDataWatcher,
+    setupHealthWatcher,
+    updateKeeperInfoToChannelWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,
@@ -319,11 +323,9 @@ const rootSaga = function* () {
 
     // Wyre Integration
     fetchWyreReservationWatcher,
-    fetchWyreReceiveAddressWatcher,
 
     // Ramp Integration
     fetchRampReservationWatcher,
-    fetchRampReceiveAddressWatcher,
 
     //VersionHistory integration
     versionHistoryWatcher,
@@ -344,8 +346,6 @@ const rootSaga = function* () {
     // Sending
     executeSendStage1Watcher,
     executeSendStage2Watcher,
-    executeAlternateSendStage2Watcher,
-    executeSendStage3Watcher,
     calculateSendMaxFeeWatcher,
     calculateCustomFeeWatcher,
     sendTxNotificationWatcher,

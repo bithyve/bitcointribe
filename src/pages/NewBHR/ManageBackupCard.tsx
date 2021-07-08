@@ -25,19 +25,19 @@ function ManageBackupCard( props ) {
     else return buttonText
   }
 
-  const textColor = value.status == 'notSetup' ? Colors.textColorGrey : Colors.white
-  const manageBackupButtonTextColor = value.status == 'notSetup' ? Colors.black : Colors.white
+  const textColor = value.status == 'notSetup' ? Colors.textColorGrey : Colors.textColorGrey
+  const manageBackupButtonTextColor = value.status == 'notSetup' ? Colors.blue : Colors.blue
 
   return (
     <TouchableOpacity onPress={() => props.onPressSelectId( )}>
       <View
         style={{
           borderRadius: 10,
-          marginTop: wp( '7%' ),
-          backgroundColor:
-            value.status == 'good' || value.status == 'bad'
-              ? Colors.blue
-              : Colors.backgroundColor,
+          marginTop: wp( '3%' ),
+          // backgroundColor:
+          //   value.status == 'good' || value.status == 'bad'
+          //     ? Colors.blue
+          //     : Colors.backgroundColor,
           shadowRadius: selectedId && selectedId == value.id ? 10 : 0,
           shadowColor: Colors.borderColor,
           shadowOpacity: selectedId && selectedId == value.id ? 10 : 0,
@@ -45,7 +45,7 @@ function ManageBackupCard( props ) {
             width: 5,
             height: 5,
           },
-          elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
+          // elevation: selectedId == value.id || selectedId == 0 ? 10 : 0,
           opacity: selectedId == value.id || selectedId == 0 ? 1 : 0.3,
         }}
       >
@@ -53,6 +53,15 @@ function ManageBackupCard( props ) {
           <View
             style={{
               flexDirection: 'row',
+            }}
+          >
+          </View>
+
+          <View
+            style={{
+              flexDirection: 'row',
+              marginTop: 'auto',
+              alignItems: 'center', justifyContent: 'flex-start'
             }}
           >
             {value.status == 'good' || value.status == 'bad' ? (
@@ -84,12 +93,12 @@ function ManageBackupCard( props ) {
                 source={require( '../../assets/images/icons/icon_setup.png' )}
                 style={{
                   borderRadius: wp( '7%' ) / 2,
-                  width: wp( '7%' ),
-                  height: wp( '7%' ),
+                  width: wp( '6%' ),
+                  height: wp( '6%' ),
                 }}
               />
             )}
-            <TouchableOpacity
+            {/* <TouchableOpacity
               onPress={()=>props.onPressKnowMore()}
               style={{
                 ...styles.cardButtonView,
@@ -114,10 +123,11 @@ function ManageBackupCard( props ) {
               flexDirection: 'row',
               marginTop: 'auto',
             }}
-          >
+          > */}
             <View
               style={{
                 justifyContent: 'center',
+                paddingLeft: wp ( 2 )
               }}
             >
               <Text
@@ -172,7 +182,10 @@ function ManageBackupCard( props ) {
                 height: 0.5,
               }}
             />
-            <View style={styles.cardView}>
+            <View style={[ styles.cardView, {
+              height: wp( '27%' ),
+              // backgroundColor: 'red'
+            } ]}>
               <View
                 style={{
                   width: wp( '70%' ),
@@ -229,22 +242,24 @@ function ManageBackupCard( props ) {
 
 const styles = StyleSheet.create( {
   cardView: {
-    height: wp( '35%' ),
+    height: wp( '15%' ),
     width: wp( '85%' ),
     padding: 15,
+    borderBottomWidth: 0.5,
+    borderBottomColor: Colors.textColorGrey
   },
   cardHealthImageView: {
     backgroundColor: Colors.red,
-    shadowColor: Colors.deepBlue,
-    shadowOpacity: 1,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    shadowRadius: 10,
-    borderRadius: wp( '7%' ) / 2,
-    width: wp( '7%' ),
-    height: wp( '7%' ),
+    // shadowColor: Colors.deepBlue,
+    // shadowOpacity: 1,
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 3,
+    // },
+    // shadowRadius: 10,
+    borderRadius: wp( '6%' ) / 2,
+    width: wp( '6%' ),
+    height: wp( '6%' ),
     justifyContent: 'center',
     alignItems: 'center',
   },

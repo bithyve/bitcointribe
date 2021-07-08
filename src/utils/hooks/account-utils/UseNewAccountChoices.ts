@@ -9,6 +9,7 @@ import WatchOnlyImportedWalletSubAccountInfo from '../../../common/data/models/S
 import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Interfaces'
 import useActiveAccountShells from '../state-selectors/accounts/UseActiveAccountShells'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 
 type Choices = {
   hexaAccounts: SubAccountDescribing[];
@@ -55,42 +56,19 @@ export default function useNewAccountChoices() {
     }
   }, [ accountShells ] )
 
-  return useMemo<Choices>( () => {
+  return useMemo( () => {
     return {
       hexaAccounts: [
-        // 📝 Holding off on allowing multiple test accounts for now.
-        // (See: https://github.com/bithyve/hexa/issues/2236#issuecomment-743180907)
-        // new TestSubAccountInfo({
-        //   defaultTitle: `Test Account${
-        //     hexaAccountCounts[SubAccountKind.TEST_ACCOUNT] > 0 ?
-        //     ` ${hexaAccountCounts[SubAccountKind.TEST_ACCOUNT] + 1}`
-        //     : ''
-        //   }`,
-        // }),
         new CheckingSubAccountInfo( {
           defaultTitle: 'Checking Account',
-          // defaultTitle: `Checking Account${hexaAccountCounts[ SubAccountKind.REGULAR_ACCOUNT ] > 0 ?
-          //   ` ${hexaAccountCounts[ SubAccountKind.REGULAR_ACCOUNT ] + 1}`
-          //   : ''
-          // }`,
           defaultDescription: 'User Checking Account'
         } ),
         new SavingsSubAccountInfo( {
           defaultTitle: 'Savings Account',
-          // defaultTitle: `Savings Account${
-          //   hexaAccountCounts[ SubAccountKind.SECURE_ACCOUNT ] > 0 ?
-          //     ` ${hexaAccountCounts[ SubAccountKind.SECURE_ACCOUNT ] + 1}`
-          //     : ''
-          // }`,
           defaultDescription: 'User Savings Account'
         } ),
         new DonationSubAccountInfo( {
           defaultTitle: 'Donation Account',
-          // defaultTitle: `Donation Account${
-          //   hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] > 0 ?
-          //     ` ${hexaAccountCounts[ SubAccountKind.DONATION_ACCOUNT ] + 1}`
-          //     : ''
-          // }`,
           defaultDescription: 'Accept donations',
           doneeName: '',
           causeName: '',
@@ -100,33 +78,10 @@ export default function useNewAccountChoices() {
       serviceAccounts: [
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
-          defaultTitle: 'Ramp Account',
-          defaultDescription: 'Buy with Apple Pay, Bank or Card',
-          serviceAccountKind: ServiceAccountKind.RAMP,
-        } ),
-        new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
-          defaultTitle: 'Wyre Account',
-          defaultDescription: 'Buy with ApplePay or Debit card',
-          serviceAccountKind: ServiceAccountKind.WYRE,
-        } ),
-        new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
-          defaultTitle: 'Swan Bitcoin',
-          defaultDescription: 'Stack sats with Swan',
-          serviceAccountKind: ServiceAccountKind.SWAN,
-        } ),
-        new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
-          defaultTitle: 'FastBitcoins.com',
-          defaultDescription: 'Use FastBitcoin vouchers',
-          serviceAccountKind: ServiceAccountKind.FAST_BITCOINS,
-        } ),
-        new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
           defaultTitle: 'Collaborative Custody',
           defaultDescription: 'Multi-sig Vault with a co-signer',
           serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
+          type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
         } ),
       ],
 

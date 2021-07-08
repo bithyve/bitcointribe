@@ -44,6 +44,7 @@ import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
 import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import idx from 'idx'
 import { ScrollView } from 'react-native-gesture-handler'
+import Colors from '../../../common/Colors'
 
 export type Props = {
   navigation: any;
@@ -353,8 +354,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                   }}
                   onReceivePressed={() => {
                     navigation.navigate( 'Receive', {
-                      serviceType: primarySubAccount.sourceKind,
-                      derivativeAccountDetails,
+                      accountShell,
                     } )
                   }}
                   averageTxFees={averageTxFees}
@@ -389,22 +389,23 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <ScrollView style={styles.rootContainer}>
-      <SectionList
-        contentContainerStyle={styles.scrollViewContainer}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-        refreshControl={
-          <RefreshControl
-            onRefresh={performRefreshOnPullDown}
-            refreshing={isRefreshing}
-          />
-        }
-        sections={sections}
-        stickySectionHeadersEnabled={false}
-        keyExtractor={sectionListItemKeyExtractor}
-      />
-    </ScrollView>
+    <SectionList
+      contentContainerStyle={styles.scrollViewContainer}
+      showsVerticalScrollIndicator={false}
+      nestedScrollEnabled
+      refreshControl={
+        <RefreshControl
+          onRefresh={performRefreshOnPullDown}
+          refreshing={isRefreshing}
+          style={{
+            backgroundColor: Colors.backgroundColor,
+          }}
+        />
+      }
+      sections={sections}
+      stickySectionHeadersEnabled={false}
+      keyExtractor={sectionListItemKeyExtractor}
+    />
   )
 }
 
@@ -417,6 +418,7 @@ const styles = StyleSheet.create( {
     paddingTop: 20,
     height: '100%',
     paddingHorizontal: 24,
+    backgroundColor: Colors.backgroundColor,
   },
 
   viewSectionContainer: {

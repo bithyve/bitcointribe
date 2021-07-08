@@ -7,6 +7,7 @@ import {
 import UTXOCompatibilityGroup from '../../enums/UTXOCompatibilityGroup'
 import AccountVisibility from '../../enums/AccountVisibility'
 import {
+  AccountType,
   Balances,
   TransactionDetails,
 } from '../../../../bitcoin/utilities/Interface'
@@ -25,6 +26,7 @@ implements DonationSubAccountDescribing {
   instanceNumber: number;
 
   kind: SubAccountKind = SubAccountKind.DONATION_ACCOUNT;
+  type: AccountType = AccountType.DONATION_ACCOUNT;
   balances: Balances;
   sourceKind: SourceAccountKind;
 

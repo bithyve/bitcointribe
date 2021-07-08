@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { View, Image, Text, StyleSheet, Platform } from 'react-native'
+import { View, Image, Text, StyleSheet, Platform, Dimensions } from 'react-native'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -16,91 +16,90 @@ import { getEnvReleaseTopic } from '../utils/geEnvSpecificParams'
 import { getTime } from '../common/CommonFunctions/timeFormatter'
 
 const releaseNotificationTopic = getEnvReleaseTopic()
-
+const { height } = Dimensions.get( 'window' )
 export default function NotificationListContent( props ) {
   return (
     <View style={styles.modalContainer}>
+      <AppBottomSheetTouchableWrapper
+        onPress={() => props.onPressBack()}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+        }} />
+      </AppBottomSheetTouchableWrapper>
       <View style={styles.modalHeaderTitleView}>
+
         <View style={{
-          flexDirection: 'row'
+          justifyContent: 'center'
         }}>
-          <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressBack()}
-            style={{
-              height: 30, width: 30, justifyContent: 'center'
-            }}
-          >
-            <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-          </AppBottomSheetTouchableWrapper>
-          <View style={{
-            justifyContent: 'center'
-          }}>
-            <Text style={styles.modalHeaderTitleText}>{'Notifications'}</Text>
-          </View>
+          <Text style={styles.modalHeaderTitleText}>{'Notifications'}</Text>
         </View>
       </View>
       <ScrollView style={{
-        height: 'auto'
+        // height: '63%'
+        // flex: 1
       }}>
-        <View style={{
-          flex: 1
-        }}>
-          {props.notificationLoading
-            ? null
-            : props.NotificationData.map( ( value, index ) => {
-              return (
-                <AppBottomSheetTouchableWrapper
-                  key={index}
-                  onPress={() => props.onNotificationClicked( value )}
+        {props.notificationLoading
+          ? null
+          : props.NotificationData.map( ( value, index ) => {
+            return (
+              <AppBottomSheetTouchableWrapper
+                key={index}
+                onPress={() => props.onNotificationClicked( value )}
+                style={{
+                  ...styles.notificationElement,
+                  backgroundColor: value.status === 'read'
+                    ? Colors.white
+                    : Colors.shadowBlue,
+                }}
+              >
+                <View
                   style={{
-                    ...styles.notificationElement,
-                    backgroundColor: value.status === 'read'
-                      ? Colors.white
-                      : Colors.shadowBlue,
+                    flexDirection: 'row', alignItems: 'center'
                   }}
                 >
-                  <View
-                    style={{
-                      flexDirection: 'row', alignItems: 'center'
-                    }}
-                  >
-                    <Image
-                      source={
-                        value.type == releaseNotificationTopic
-                          ? require( '../assets/images/icons/icon_hexa.png' )
-                          : require( '../assets/images/icons/icon_receive.png' )
-                      }
-                      style={styles.notificationElementImage}
-                    />
-                    <View style={{
-                      flex: 1, justifyContent: 'center'
-                    }}>
-                      <Text numberOfLines={1} style={styles.notificationElementTitle}>
-                        {value.title}
-                      </Text>
-                    </View>
-                    <Text style={styles.notificationElementTimeText}>
-                      {getTime( value.timeStamp )}
+                  <Image
+                    source={
+                      value.type == releaseNotificationTopic
+                        ? require( '../assets/images/icons/icon_hexa.png' )
+                        : require( '../assets/images/icons/icon_receive.png' )
+                    }
+                    style={styles.notificationElementImage}
+                  />
+                  <View style={{
+                    flex:1, justifyContent: 'center'
+                  }}>
+                    <Text numberOfLines={1} style={styles.notificationElementTitle}>
+                      {value.title}
                     </Text>
-                    {value.isMandatory ? (
-                      <FontAwesome
-                        name="star"
-                        color={Colors.yellow}
-                        size={17}
-                      />
-                    ) : (
-                      <View style={{
-                        width: 17
-                      }} />
-                    )}
                   </View>
-                  <Text style={styles.notificationElementInfoText}>
-                    {value.info}
+                  <Text style={styles.notificationElementTimeText}>
+                    {getTime( value.timeStamp )}
                   </Text>
-                </AppBottomSheetTouchableWrapper>
-              )
-            } )}
-        </View>
+                  {value.isMandatory ? (
+                    <FontAwesome
+                      name="star"
+                      color={Colors.yellow}
+                      size={17}
+                    />
+                  ) : (
+                    <View style={{
+                      width: 17
+                    }} />
+                  )}
+                </View>
+                <Text style={styles.notificationElementInfoText}>
+                  {value.info}
+                </Text>
+              </AppBottomSheetTouchableWrapper>
+            )
+          } )}
       </ScrollView>
       {
         props.notificationLoading ? <Loader isLoading={true}/> : null
@@ -124,8 +123,8 @@ export default function NotificationListContent( props ) {
 }
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
+    maxHeight: height - 120,
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,
@@ -134,7 +133,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     paddingRight: 10,
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '2%' ),
+    // paddingTop: hp( '2%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
   },

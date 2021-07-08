@@ -32,7 +32,7 @@ export default function SendConfirmationContent( props ) {
 
   return (
     <View style={{
-      height: '100%', backgroundColor: Colors.white
+      backgroundColor: Colors.white
     }}>
       <View
         style={{
@@ -50,7 +50,7 @@ export default function SendConfirmationContent( props ) {
       </View>
 
       <ScrollView style={{
-        marginTop: hp( '1.5%' ), marginBottom: hp( '2%' )
+        marginTop: hp( '1.5%' ), marginBottom: hp( '1%' )
       }}>
         {props.recipients.map( ( item ) => renderRecipientItem( item ) )}
       </ScrollView>
@@ -58,6 +58,7 @@ export default function SendConfirmationContent( props ) {
       {props.infoText && (
         <View
           style={{
+            flex:1,
             marginTop: hp( '1%' ),
             marginBottom: hp( '1%' ),
             marginRight: wp( '8%' ),
@@ -73,14 +74,11 @@ export default function SendConfirmationContent( props ) {
       )}
       <View
         style={{
-          flex: props.recipients.length === 0 ? 1 : 0,
+          // flex: 1,
           flexDirection: 'row',
-          marginTop: 'auto',
+          // marginTop: 'auto',
           alignItems: 'center',
-          marginBottom:
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '2%' )
-              : hp( '1%' ),
+          // backgroundColor: 'red'
         }}
       >
         <AppBottomSheetTouchableWrapper
@@ -113,10 +111,11 @@ export default function SendConfirmationContent( props ) {
           <Image
             style={{
               width: wp( '25%' ),
-              height: hp( '18%' ),
+              height: hp( '10%' ),
               resizeMode: 'cover',
-               marginLeft: 'auto',
-              marginBottom: props.recipients.length === 0 ? 'auto' : 0,
+              marginLeft: 'auto',
+              // backgroundColor: 'green'
+              // marginBottom: props.recipients.length === 0 ? 'auto' : 0,
             }}
             source={
               props.isSuccess

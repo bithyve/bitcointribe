@@ -13,10 +13,9 @@ export default function NotificationInfoContents( props ) {
 
   return (
     <View style={{
-      ...styles.modalContentContainer, height: '100%'
+      ...styles.modalContentContainer
     }}>
       <View style={{
-        height: '100%'
       }}>
         <View style={styles.successModalHeaderView}>
           <Text
@@ -26,7 +25,6 @@ export default function NotificationInfoContents( props ) {
                 : Colors.blue,
               fontSize: RFValue( 18 ),
               fontFamily: Fonts.FiraSansMedium,
-              flex: 1,
             }}
           >
             {props.title}
@@ -85,7 +83,6 @@ export default function NotificationInfoContents( props ) {
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginLeft: wp( '8%' ),
-                marginBottom: wp( '4%' ),
               }}
             >
               <Text
@@ -222,12 +219,10 @@ export default function NotificationInfoContents( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
     backgroundColor: Colors.white,
   },
   successModalHeaderView: {
-    marginHorizontal: wp( '8%' ),
-    marginVertical: wp( '4%' ),
+    margin: wp( '8%' ),
     flexDirection:'row'
   },
   modalInfoText: {

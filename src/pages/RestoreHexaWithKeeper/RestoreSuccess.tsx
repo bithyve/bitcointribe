@@ -24,7 +24,7 @@ export default function RestoreSuccess( props ) {
         </Text>
       </View>
       <View style={{
-        flex: 1, justifyContent: 'center', alignItems: 'center'
+        justifyContent: 'center', alignItems: 'center'
       }}>
         <View style={styles.greyBox}>
           <View style={{
@@ -79,7 +79,7 @@ export default function RestoreSuccess( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   headerTitleText: {

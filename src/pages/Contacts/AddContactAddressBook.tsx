@@ -33,6 +33,7 @@ import * as Permissions from 'expo-permissions'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import Toast from '../../components/Toast'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -43,18 +44,17 @@ export default function AddContactAddressBook( props ) {
   const [ contactPermissionAndroid, setContactPermissionAndroid ] = useState(
     false,
   )
+  const [ permissionModal, setModal ] = useState( false )
+  const [ permissionErrModal, setErrModal ] = useState( false )
   const [
     contactPermissionBottomSheet,
     setContactPermissionBottomSheet,
   ] = useState( React.createRef() )
   const [ contactPermissionIOS, setContactPermissionIOS ] = useState( false )
-  const [
-    contactListErrorBottomSheet,
-    setContactListErrorBottomSheet,
-  ] = useState( React.createRef() )
   const dispatch = useDispatch()
 
   const [ contactData, setContactData ] = useState( [] )
+  // const [ selectedContact, setContact ] = useState( [] )
 
   const requestContactsPermission = async () => {
     try {
@@ -75,33 +75,33 @@ export default function AddContactAddressBook( props ) {
   }
 
   useEffect( () => {
-    if( props.isLoadContacts ){
-      getContactsAsync()
-    }
-  }, [ props.isLoadContacts ] )
+    // if( props.isLoadContacts ){
+    getContactsAsync()
+    // }
+  }, [] )
 
 
   const getContact = () => {
-    if ( props.isLoadContacts ) {
-      ExpoContacts.getContactsAsync().then( async ( { data } ) => {
-        if ( !data.length ) {
-          setErrorMessage(
-            'No contacts found. Please add contacts to your Address Book and try again',
-          );
-          ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
+    // if ( props.isLoadContacts ) {
+    ExpoContacts.getContactsAsync().then( async ( { data } ) => {
+      if ( !data.length ) {
+        setErrorMessage(
+          'No contacts found. Please add contacts to your Address Book and try again',
+        )
+        setErrModal( true )
+      }
+      setContactData( data )
+      await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
+      const contactList = data.sort( function ( a, b ) {
+        if ( a.name && b.name ) {
+          if ( a.name.toLowerCase() < b.name.toLowerCase() ) return -1
+          if ( a.name.toLowerCase() > b.name.toLowerCase() ) return 1
         }
-        setContactData( data )
-        await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
-        const contactList = data.sort( function ( a, b ) {
-          if ( a.name && b.name ) {
-            if ( a.name.toLowerCase() < b.name.toLowerCase() ) return -1
-            if ( a.name.toLowerCase() > b.name.toLowerCase() ) return 1
-          }
-          return 0
-        } )
-        setFilterContactData( contactList )
+        return 0
       } )
-    }
+      setFilterContactData( contactList )
+    } )
+    // }
   }
 
   const getContactPermission = async () => {
@@ -112,11 +112,13 @@ export default function AddContactAddressBook( props ) {
       if ( granted !== PermissionsAndroid.RESULTS.GRANTED ) {
         setErrorMessage(
           'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        );
-        ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
+        )
+        setErrModal( true )
         setContactPermissionAndroid( false )
         return
       } else {
+
+
         // TODO: Migrate it using react-native-contact
         getContact()
       }
@@ -128,8 +130,8 @@ export default function AddContactAddressBook( props ) {
         setContactPermissionIOS( false )
         setErrorMessage(
           'Cannot select contacts. Permission denied.\nYou can enable contacts from the phone settings page Settings > Hexa > contacts',
-        );
-        ( contactListErrorBottomSheet as any ).current.snapTo( 1 )
+        )
+        setErrModal( true )
         return
       } else {
         getContact()
@@ -143,13 +145,15 @@ export default function AddContactAddressBook( props ) {
       const chckContactPermission = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_CONTACTS )
       //console.log("chckContactPermission",chckContactPermission)
       if ( !chckContactPermission ) {
-        ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
+        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
+        setModal( true )
       } else {
         getContactPermission()
       }
     } else if ( Platform.OS === 'ios' ) {
       if( ( await Permissions.getAsync( Permissions.CONTACTS ) ).status === 'undetermined' ){
-        ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
+        // ( contactPermissionBottomSheet as any ).current.snapTo( 1 )
+        setModal( true )
       }
       else {
         getContactPermission()
@@ -238,7 +242,7 @@ export default function AddContactAddressBook( props ) {
       selectedContacts[ 0 ] = contacts[ index ]
     }
     setSelectedContacts( selectedContacts )
-    props.onSelectContact( selectedContacts )
+    // onSelectContact( selectedContacts )
     for ( let i = 0; i < contacts.length; i++ ) {
       if (
         selectedContacts.findIndex( ( value ) => value.id == contacts[ i ].id ) > -1
@@ -269,54 +273,28 @@ export default function AddContactAddressBook( props ) {
     )
     setSelectedContacts( selectedContacts )
     setRadioOnOff( !radioOnOff )
-    props.onSelectContact( selectedContacts )
+    // props.onSelectContact( selectedContacts )
   }
 
-  const renderContactListErrorModalContent = useCallback( () => {
-    return (
-      <ErrorModalContents
-        title={'Error while accessing your contacts '}
-        info={errorMessage}
-        proceedButtonText={'Open Setting'}
-        isIgnoreButton={true}
-        onPressProceed={() => {
-          Linking.openURL( 'app-settings:' );
-          ( contactListErrorBottomSheet as any ).current.snapTo( 0 )
-        }}
-        onPressIgnore={() => {
-          ( contactListErrorBottomSheet as any ).current.snapTo( 0 )
-        }}
-        isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/errorImage.png' )}
-      />
-    )
-  }, [ errorMessage ] )
-
-  const renderContactListErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( contactListErrorBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
 
   const renderContactPermissionModalContent = useCallback( () => {
+
     return (
       <ErrorModalContents
-        modalRef={contactPermissionBottomSheet}
+        // modalRef={contactPermissionBottomSheet}
         title={'Hexa needs access to your address book.'}
         info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
         otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
         proceedButtonText={'Continue'}
         isIgnoreButton={false}
         onPressProceed={() => {
-          getContactPermission();
-          ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+          getContactPermission()
+          // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+          // setModal( false )
         }}
         onPressIgnore={() => {
-          ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+          // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+          // setModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
@@ -324,15 +302,51 @@ export default function AddContactAddressBook( props ) {
     )
   }, [] )
 
-  const renderContactPermissionModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+
+  const onPressContinue= () => {
+    if ( selectedContacts && selectedContacts.length ) {
+      props.navigation.navigate( 'AddContactSendRequest', {
+        SelectedContact: selectedContacts,
+        headerText:'Add a contact  ',
+        subHeaderText:'Send a Friends and Family request',
+        contactText:'Adding to Friends and Family:',
+        showDone:true,
+      } )
+    }
+  }
+
+
+  const onPressBack = () => {
+    props.navigation.goBack()
+  }
+
+  const onSkipContinue= () => {
+    let { skippedContactsCount } = trustedContacts.tc
+    let data
+    if ( !skippedContactsCount ) {
+      skippedContactsCount = 1
+      data = {
+        firstName: 'F&F request',
+        lastName: `awaiting ${skippedContactsCount}`,
+        name: `F&F request awaiting ${skippedContactsCount}`,
+      }
+    } else {
+      data = {
+        firstName: 'F&F request',
+        lastName: `awaiting ${skippedContactsCount + 1}`,
+        name: `F&F request awaiting ${skippedContactsCount + 1}`,
+      }
+    }
+
+    props.navigation.navigate( 'AddContactSendRequest', {
+      SelectedContact: [ data ],
+      headerText:'Add a contact  ',
+      subHeaderText:'Send a Friends and Family request',
+      contactText:'Adding to Friends and Family:',
+      showDone:true,
+    } )
+  }
+  console.log( 'permissionModal >>>>>  value', permissionModal )
 
   return (
     <View style={styles.modalContentContainer}>
@@ -341,7 +355,7 @@ export default function AddContactAddressBook( props ) {
           flexDirection: 'row'
         }}>
           <AppBottomSheetTouchableWrapper
-            onPress={() => props.onPressBack()}
+            onPress={() => onPressBack()}
             style={{
               height: 30, width: 30, justifyContent: 'center'
             }}
@@ -360,7 +374,7 @@ export default function AddContactAddressBook( props ) {
           </View>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              props.onSkipContinue()
+              onSkipContinue()
             }}
             style={{
               height: wp( '8%' ),
@@ -395,17 +409,17 @@ export default function AddContactAddressBook( props ) {
       <View style={{
         flex : 1
       }}>
-        <View
+        {/* <View
           style={{
             paddingLeft: wp( '5%' ),
             paddingRight: wp( '5%' ),
             paddingTop: wp( '5%' ),
           }}
         >
-          {/* <Text style={styles.modalHeaderInfoText}>
+          <Text style={styles.modalHeaderInfoText}>
             {'Add contacts from your Address Book, or add a new contact'}
-          </Text> */}
-        </View>
+          </Text>
+        </View> */}
         <View style={{
           height: '95%', ...props.style
         }}>
@@ -528,35 +542,52 @@ export default function AddContactAddressBook( props ) {
             >
               <AppBottomSheetTouchableWrapper
                 disabled={isTC}
-                onPress={() => props.onPressContinue( selectedContacts )}
+                onPress={() => onPressContinue()}
                 style={styles.bottomButtonView}
               >
-                <Text style={styles.buttonText}>Confirm & Proceed</Text>
+                <Text style={styles.buttonText}>Confirm & Proceed..</Text>
               </AppBottomSheetTouchableWrapper>
             </View>
           )}
-          <BottomSheet
-            enabledInnerScrolling={true}
-            ref={contactListErrorBottomSheet as any}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch()
-                ? hp( '35%' )
-                : hp( '40%' ),
-            ]}
-            renderContent={renderContactListErrorModalContent}
-            renderHeader={renderContactListErrorModalHeader}
-          />
-          <BottomSheet
-            enabledInnerScrolling={true}
-            ref={contactPermissionBottomSheet}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '55%' ) : hp( '60%' ),
-            ]}
-            renderContent={renderContactPermissionModalContent}
-            renderHeader={renderContactPermissionModalHeader}
-          />
+          <ModalContainer visible={permissionErrModal} closeBottomSheet={() => { setErrModal( false ) }}>
+            <ErrorModalContents
+              title={'Error while accessing your contacts '}
+              info={errorMessage}
+              proceedButtonText={'Open Setting'}
+              isIgnoreButton={true}
+              onPressProceed={() => {
+                Linking.openURL( 'app-settings:' )
+                setErrModal( false )
+              }}
+              onPressIgnore={() => {
+                setErrModal( false )
+
+              }}
+              isBottomImage={true}
+              bottomImage={require( '../../assets/images/icons/errorImage.png' )}
+            />
+          </ModalContainer>
+          <ModalContainer visible={permissionModal} closeBottomSheet={() => { setModal( false ) }}>
+            <ErrorModalContents
+              // modalRef={contactPermissionBottomSheet}
+              title={'Hexa needs access to your address book.'}
+              info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
+              otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
+              proceedButtonText={'Continue'}
+              isIgnoreButton={false}
+              onPressProceed={() => {
+                getContactPermission()
+                // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+                setModal( false )
+              }}
+              onPressIgnore={() => {
+                // ( contactPermissionBottomSheet as any ).current.snapTo( 0 )
+                setModal( false )
+              }}
+              isBottomImage={true}
+              bottomImage={require( '../../assets/images/icons/contactPermission.png' )}
+            />
+          </ModalContainer>
         </View>
       </View>
     </View>
@@ -574,7 +605,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '2%' ),
+    paddingTop: hp( '4%' ),
     marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),

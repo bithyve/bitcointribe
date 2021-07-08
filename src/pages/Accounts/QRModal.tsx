@@ -26,7 +26,7 @@ export default function QRModal( props ) {
     if ( barcodes.data ) {
       console.log( 'barcodes.data', barcodes.data )
       setOpenCameraFlag( false )
-      props.modalRef && props.modalRef.current ? props.modalRef.current.snapTo( 1 ) : props.modalRef.snapTo( 1 ) // closes modal
+      props.modalRef && props.modalRef.current ? props.modalRef.current.snapTo( 1 ) : props.modalRef.snapTo ? props.modalRef.snapTo( 1 ) : ()=>{} // closes modal
       props.onQrScan( getFormattedStringFromQRString( barcodes.data ) )
     }
   }
@@ -312,7 +312,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   qrModalScrollView: {

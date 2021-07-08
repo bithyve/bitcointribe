@@ -3,7 +3,6 @@ import {
   UnecryptedStreamData,
   ContactInfo,
 } from '../../bitcoin/utilities/Interface'
-import { ServicesJSON } from '../../common/interfaces/Interfaces'
 
 export const SYNC_PERMANENT_CHANNELS = 'SYNC_PERMANENT_CHANNELS'
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
@@ -23,7 +22,6 @@ export const syncPermanentChannels = (
     channelUpdates, // out-stream updates for the channels
     metaSync,   // sync only meta-data for the channels
     hardSync, // sync channel irrespective of the new-data flag status
-    updatedSERVICES, // service(db)-component to be jointly inserted into database
     shouldNotUpdateSERVICES, // skip database update
   }:
   {
@@ -34,7 +32,6 @@ export const syncPermanentChannels = (
   }[],
   metaSync?: boolean,
   hardSync?: boolean,
-  updatedSERVICES?: ServicesJSON,
   shouldNotUpdateSERVICES?: boolean
 }
 ) => {
@@ -45,7 +42,6 @@ export const syncPermanentChannels = (
       channelUpdates,
       metaSync,
       hardSync,
-      updatedSERVICES,
       shouldNotUpdateSERVICES
     },
   }

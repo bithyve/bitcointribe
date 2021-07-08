@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, serviceGeneratorForNewBHR } from '../utils/utilities'
+import { createWatcher } from '../utils/utilities'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import DeviceInfo from 'react-native-device-info'
 import * as Cipher from '../../common/encryption'
@@ -18,22 +18,60 @@ import {
   pinChangedFailed,
   initializeRecoveryCompleted,
   completedWalletSetup,
+  WALLET_SETUP_COMPLETION,
 } from '../actions/setupAndAuth'
-import { keyFetched, fetchFromDB } from '../actions/storage'
+import { keyFetched, fetchFromDB, updateWallet } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import { insertDBWorker } from './storage'
 import config from '../../bitcoin/HexaConfig'
-import { getTestcoins } from '../actions/accounts'
 import { initializeHealthSetup } from '../actions/health'
-// import { timer } from '../../utils'
+import dbManager from '../../storage/realm/dbManager'
+import { setWalletId } from '../actions/preferences'
+import { Wallet } from '../../bitcoin/utilities/Interface'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import * as bip39 from 'bip39'
+import crypto from 'crypto'
+import { addNewAccountShells } from '../actions/accounts'
+import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, security } = payload
-  const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
+  const { walletName, selectedAccounts, security } = payload
+  const primaryMnemonic = bip39.generateMnemonic( 256 )
+  const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
+  const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
 
+  const wallet: Wallet = {
+    walletId,
+    walletName,
+    primaryMnemonic,
+    accounts: {
+    }
+  }
+
+  yield put( updateWallet( wallet ) )
+  yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
+
+  const accountsInfo: newAccountsInfo[] = []
+  selectedAccounts.forEach( ( accountType ) => {
+    const accountInfo: newAccountsInfo = {
+      accountType
+    }
+    accountsInfo.push( accountInfo )
+  } )
+
+  yield call( addNewAccountShellsWorker, {
+    payload: accountsInfo
+  } )
+  yield put( completedWalletSetup( ) )
+  yield call( dbManager.createWallet, wallet )
+  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
+
+  // TODO: remove legacy DB post TC service functionalization
   const initialDatabase: Database = {
-    WALLET_SETUP: {
-      walletName, security
+    WALLET_SETUP:{
+      walletName: wallet.walletName,
+      security,
     },
     DECENTRALIZED_BACKUP: {
       RECOVERY_SHARES: {
@@ -46,29 +84,25 @@ function* setupWalletWorker( { payload } ) {
       },
     },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( regularAcc ),
-      TEST_ACCOUNT: JSON.stringify( testAcc ),
-      SECURE_ACCOUNT: JSON.stringify( secureAcc ),
-      S3_SERVICE: JSON.stringify( s3Service ),
-      TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
+      REGULAR_ACCOUNT: JSON.stringify( {
+      } ),
+      TEST_ACCOUNT: JSON.stringify( {
+      } ),
+      SECURE_ACCOUNT: JSON.stringify( {
+      } ),
+      S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
+      TRUSTED_CONTACTS: JSON.stringify(  new TrustedContactsService() ),
     },
     VERSION: DeviceInfo.getVersion(),
   }
+
   yield call( insertDBWorker, {
     payload: initialDatabase
   } )
 
-  yield call( AsyncStorage.setItem, 'walletExists', 'true' )
-
   // initialize health-check schema on relay
   yield put( initializeHealthSetup() )
-  yield put( completedWalletSetup( ) )
-
-  // Post Hydration activities
-  // saturate the test account w/ 10K sats
-  yield put( getTestcoins() )
 }
-
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 
 function* initRecoveryWorker( { payload } ) {

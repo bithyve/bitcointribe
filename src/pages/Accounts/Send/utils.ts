@@ -1,4 +1,7 @@
+import { AccountType } from '../../../bitcoin/utilities/Interface'
 import { DONATION_ACCOUNT, REGULAR_ACCOUNT, SECURE_ACCOUNT, TEST_ACCOUNT, WYRE, RAMP, SWAN } from '../../../common/constants/wallet-service-types'
+import SubAccountKind from '../../../common/data/enums/SubAccountKind'
+import AccountShell from '../../../common/data/models/AccountShell'
 
 export const getAccountIcon = ( accountKind, derivativeAccountDetails? ) => {
   // determines account icon
@@ -77,3 +80,68 @@ export const getAccountTitle = ( accountKind, derivativeAccountDetails ) => {
 
   return accountTitle
 }
+
+
+export const getAccountIconByShell = ( accountShell: AccountShell ) => {
+  // determines account icon
+  let accountImageSource
+  switch( accountShell.primarySubAccount.type ){
+      case AccountType.TEST_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_test.png' )
+        break
+
+      case AccountType.CHECKING_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_regular.png' )
+        break
+
+      case AccountType.SAVINGS_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_secureaccount.png' )
+        break
+      case AccountType.DONATION_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_donation_hexa.png' )
+        break
+      case AccountType.RAMP_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_ramp.png' )
+        break
+      case AccountType.WYRE_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_wyre.png' )
+        break
+      case AccountType.SWAN_ACCOUNT:
+        accountImageSource = require( '../../../assets/images/icons/icon_swan.png' )
+        break
+  }
+
+  return accountImageSource
+}
+
+
+export const getAccountTitleByShell = ( accountShell: AccountShell ) => {
+// determines account title
+  let accountTitle
+  switch( accountShell.primarySubAccount.type ){
+      case AccountType.TEST_ACCOUNT:
+        accountTitle = 'Test Account'
+        break
+      case AccountType.CHECKING_ACCOUNT:
+        accountTitle = 'Checking Account'
+        break
+      case AccountType.SAVINGS_ACCOUNT:
+        accountTitle = 'Savings Account'
+        break
+      case AccountType.DONATION_ACCOUNT:
+        accountTitle = 'Donation Account'
+        break
+      case AccountType.RAMP_ACCOUNT:
+        accountTitle = 'Ramp'
+        break
+      case AccountType.WYRE_ACCOUNT:
+        accountTitle = 'Wyre'
+        break
+      case AccountType.SWAN_ACCOUNT:
+        accountTitle = 'Swan'
+        break
+  }
+
+  return accountTitle
+}
+

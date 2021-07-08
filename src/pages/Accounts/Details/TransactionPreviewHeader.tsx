@@ -31,14 +31,14 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
   const formattedUnitText = isTestAccount ?
     displayNameForBitcoinUnit( bitcoinUnit )
     : useFormattedUnitText( {
-      bitcoinUnit 
+      bitcoinUnit
     } )
 
   return (
     <View style={styles.rootContainer}>
 
       <Text style={{
-        ...ListStyles.listItemTitle, marginBottom: 12 
+        ...ListStyles.listItemTitle, marginBottom: 12
       }}>
         Available to Spend: {formattedBalanceText} {formattedUnitText}
       </Text>
@@ -48,7 +48,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
 
         <TouchableOpacity
           style={{
-            marginLeft: 'auto', flex: 0 
+            marginLeft: 'auto', flex: 0
           }}
           onPress={onViewMorePressed}
         >

@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import {
   DerivativeAccount,
@@ -9,6 +8,7 @@ import {
   SwanDerivativeAccount,
   RampDerivativeAccount,
   WyreDerivativeAccount,
+  AccountType,
 } from './utilities/Interface'
 import Config from 'react-native-config'
 import {
@@ -20,6 +20,7 @@ import {
 } from '../common/constants/wallet-service-types'
 import PersonalNode from '../common/data/models/PersonalNode'
 import _ from 'lodash'
+import { APP_STAGE } from '../common/interfaces/Interfaces'
 
 class HexaConfig {
   //RAMP details
@@ -37,10 +38,8 @@ class HexaConfig {
   public VERSION: string = Config.VERSION ? Config.VERSION.trim() : '';
   public ENVIRONMENT: string;
   public NETWORK: bitcoinJS.Network;
-  public BITCOIN_NODE: Client;
   public SECURE_WALLET_XPUB_PATH: string = Config.BIT_SECURE_WALLET_XPUB_PATH ? Config.BIT_SECURE_WALLET_XPUB_PATH.trim() : '2147483651/2147483649/';
   public SECURE_DERIVATION_BRANCH: string = Config.BIT_SECURE_DERIVATION_BRANCH ? Config.BIT_SECURE_DERIVATION_BRANCH.trim() : '1';
-  public TOKEN = 'notUsed';
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
   public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
@@ -124,6 +123,29 @@ class HexaConfig {
   public TC_REQUEST_EXPIRY = Config.BIT_TC_REQUEST_EXPIRY ? parseInt( Config.BIT_TC_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
   public KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY ? parseInt( Config.KP_REQUEST_EXPIRY.trim(), 10 ) : 86400000;
 
+  public ACCOUNT_INSTANCES = {
+    [ AccountType.TEST_ACCOUNT ]: {
+      series: 0,
+      upperBound: 5,
+    },
+    [ AccountType.CHECKING_ACCOUNT ]: {
+      series: 0,
+      upperBound: 10,
+    },
+    [ AccountType.SAVINGS_ACCOUNT ]: {
+      series: 10,
+      upperBound: 10,
+    },
+    [ AccountType.DONATION_ACCOUNT ]: {
+      series: 20,
+      upperBound: 10,
+    },
+    [ AccountType.SWAN_ACCOUNT ]: {
+      series: 30,
+      upperBound: 10,
+    }
+  }
+
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
     TESTNET: {
       MULTIBALANCE: this.TESTNET_BASE_URL + '/balances',
@@ -152,17 +174,6 @@ class HexaConfig {
   public RELAY: string;
   public SIGNING_SERVER: string;
   public APP_STAGE: string;
-
-  public API_URLS = {
-    TESTNET: {
-      BASE: 'notUsed',
-      UNSPENT_OUTPUTS: 'notUsed'
-    },
-    MAINNET: {
-      BASE: 'notUsed',
-      UNSPENT_OUTPUTS: 'notUsed'
-    }
-  };
 
   public SUB_PRIMARY_ACCOUNT: DerivativeAccount = {
     series: Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES ? parseInt( Config.BIT_SUB_PRIMARY_ACCOUNT_SERIES.trim(), 10 ) : 1,
@@ -247,22 +258,13 @@ class HexaConfig {
 
     this.setNetwork()
 
-    // TODO:: Refactor Bitcoin folder to remove Client
-    this.BITCOIN_NODE = new Client( {
-      network:
-        this.NETWORK === bitcoinJS.networks.bitcoin ? 'mainnet' : 'testnet',
-      timeout: 10000,
-      username: 'notUsed',
-      password: 'noUsed',
-      host: 'notUsed',
-    } )
     const BIT_SERVER_MODE = Config.BIT_SERVER_MODE ? Config.BIT_SERVER_MODE.trim() : 'PROD'
     if ( BIT_SERVER_MODE === 'LOCAL' || BIT_SERVER_MODE === 'DEV' ) {
-      this.APP_STAGE = 'dev'
+      this.APP_STAGE = APP_STAGE.DEVELOPMENT
     } else if ( BIT_SERVER_MODE === 'STA' ) {
-      this.APP_STAGE = 'sta'
+      this.APP_STAGE = APP_STAGE.STAGING
     } else {
-      this.APP_STAGE = 'app'
+      this.APP_STAGE = APP_STAGE.PRODUCTION
     }
   }
 

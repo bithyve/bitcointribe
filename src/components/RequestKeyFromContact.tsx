@@ -82,32 +82,32 @@ export default function RequestKeyFromContact( props ) {
         style={styles.mainView}
       >
         {props.isModal &&
-					<View style={styles.topSubView}>
-					  <AppBottomSheetTouchableWrapper
-					    onPress={() => {
-					      props.onPressBack()
-					    }}
-					    style={styles.backButton}
-					  >
-					    <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
-					  </AppBottomSheetTouchableWrapper>
-					  <View style={{
-					    flex: 1, marginLeft: 5
-					  }}>
-					    {props.headerText &&
-								<Text style={styles.modalHeaderTitleText}>
-								  {props.headerText}
-								</Text>
-					    }
-					    {props.subHeaderText &&
-								<Text
-								  style={styles.subHeaderText}
-								>
-								  {props.subHeaderText}
-								</Text>
-					    }
-					  </View>
-					</View>
+          <View style={styles.topSubView}>
+            <AppBottomSheetTouchableWrapper
+              onPress={() => {
+                props.onPressBack()
+              }}
+              style={styles.backButton}
+            >
+              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            </AppBottomSheetTouchableWrapper>
+            <View style={{
+              flex: 1, marginLeft: 5
+            }}>
+              {props.headerText &&
+                <Text style={styles.modalHeaderTitleText}>
+                  {props.headerText}
+                </Text>
+              }
+              {props.subHeaderText &&
+                <Text
+                  style={styles.subHeaderText}
+                >
+                  {props.subHeaderText}
+                </Text>
+              }
+            </View>
+          </View>
         }
       </View>
       <View style={[ styles.topContainer, {
@@ -139,7 +139,7 @@ export default function RequestKeyFromContact( props ) {
             )}
           </View>
           <CopyThisText
-            openLink={shareLink ? shareOption : ()=> {}}
+            openLink={shareLink ? shareOption : () => { }}
             backgroundColor={Colors.backgroundColor1}
             text={shareLink ? shareLink : 'Creating Link....'}
           />

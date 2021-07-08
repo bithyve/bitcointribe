@@ -1,90 +1,42 @@
 import { put, call, select } from 'redux-saga/effects'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createWatcher, requestTimedout } from '../utils/utilities'
-import { alternateSendStage2Executed, CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_ALTERNATE_SEND_STAGE2, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, EXECUTE_SEND_STAGE3, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, sendStage3Executed, SEND_DONATION_NOTE, SEND_TX_NOTIFICATION } from '../actions/sending'
-import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
+import { createWatcher } from '../utils/utilities'
+import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, customSendMaxUpdated, EXECUTE_SEND_STAGE1, EXECUTE_SEND_STAGE2, feeIntelMissing, sendMaxFeeCalculated, sendStage1Executed, sendStage2Executed, SEND_TX_NOTIFICATION } from '../actions/sending'
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { ExternalServiceSubAccountDescribing } from '../../common/data/models/SubAccountInfo/Interfaces'
-import { DerivativeAccountTypes, INotification, notificationTag, notificationType, TransactionPrerequisite, TrustedContactDerivativeAccountElements, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import config from '../../bitcoin/HexaConfig'
+import { Account, AccountType, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { REGULAR_ACCOUNT, SECURE_ACCOUNT, SUB_PRIMARY_ACCOUNT } from '../../common/constants/wallet-service-types'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { AccountRecipientDescribing, ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
+import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
 import RelayServices from '../../bitcoin/services/RelayService'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
-
-const getBitcoinNetwork  = ( sourceKind: SourceAccountKind ) => {
-  const network =
-  config.APP_STAGE !== 'dev' &&
-  [ SourceAccountKind.REGULAR_ACCOUNT, SourceAccountKind.SECURE_ACCOUNT ].includes( sourceKind )
-    ? 'MAINNET'
-    : 'TESTNET'
-
-  return network
-}
-
-const getDerivativeAccountDetails = ( accountShell: AccountShell ) => {
-  let derivativeAccountDetails: {
-    type: string;
-    number: number;
-  }
-
-  switch( accountShell.primarySubAccount.kind ){
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        if( accountShell.primarySubAccount.instanceNumber ){
-          derivativeAccountDetails = {
-            type: DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT, number: accountShell.primarySubAccount.instanceNumber
-          }
-        }
-        break
-
-      case SubAccountKind.DONATION_ACCOUNT:
-        derivativeAccountDetails = {
-          type: accountShell.primarySubAccount.kind, number: accountShell.primarySubAccount.instanceNumber
-        }
-        break
-
-      case SubAccountKind.SERVICE:
-        derivativeAccountDetails = {
-          type: ( accountShell.primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind, number: accountShell.primarySubAccount.instanceNumber
-        }
-        break
-  }
-
-  return derivativeAccountDetails
-}
-
+import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { updateAccountShells } from '../actions/accounts'
+import dbManager from '../../storage/realm/dbManager'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
+  const accountShells = accountsState.accountShells
   const selectedRecipients: RecipientDescribing[] = yield select(
     ( state ) => state.sending.selectedRecipients
   )
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const secureAccount: SecureAccount = accountsState[ SECURE_ACCOUNT ].service
+
   const trustedContacts: TrustedContactsService = yield select(
     ( state ) => state.trustedContacts.service,
   )
 
   const recipients: [
     {
-      id: string;
       address: string;
       amount: number;
-      type?: string;
-      accountNumber?: number;
     }?
   ]  = []
 
@@ -92,45 +44,20 @@ function* processRecipients( accountShell: AccountShell ){
     switch( recipient.kind ){
         case RecipientKind.ADDRESS:
           recipients.push( {
-            id: recipient.id,
             address: recipient.id,
             amount: recipient.amount,
           } )
           break
 
-          // TODO: RecipientDescribing should have type and instance/acc number properties
         case RecipientKind.ACCOUNT_SHELL:
-          const instanceNumber = ( recipient as AccountRecipientDescribing ).instanceNumber
-          let accountKind =  ( ( recipient as AccountRecipientDescribing ).type as string )
-          const serviceType = ( ( recipient as AccountRecipientDescribing ).serviceType as string )
-          if( serviceType ) accountKind = serviceType
-
-          if( instanceNumber && [ REGULAR_ACCOUNT, SECURE_ACCOUNT ].includes( accountKind ) ){
-            accountKind = SUB_PRIMARY_ACCOUNT
-          }
-
-          const sourceAccount = ( recipient as AccountRecipientDescribing ).sourceAccount
-          const subInstance =
-        sourceAccount === REGULAR_ACCOUNT
-          ? regularAccount.hdWallet
-          : secureAccount.secureHDWallet
-
-          let receivingAddress
-          if ( config.EJECTED_ACCOUNTS.includes( accountKind ) )
-            receivingAddress = subInstance.getReceivingAddress(
-              accountKind,
-              instanceNumber
-            )
-          else receivingAddress = subInstance.getReceivingAddress()
-
+          const recipientShell = accountShells.find( ( shell ) => shell.id === recipient.id )
+          const recipientAccount: Account = accountsState.accounts[ recipientShell.primarySubAccount.id  ]
 
           recipients.push( {
-            id: accountKind,
-            address: receivingAddress,
+            address: recipientAccount.receivingAddress,
             amount: recipient.amount,
-            type: sourceAccount,
-            accountNumber: instanceNumber,
           } )
+
           break
 
         case RecipientKind.CONTACT:
@@ -141,17 +68,16 @@ function* processRecipients( accountShell: AccountShell ){
           let paymentAddress
           switch( accountShell.primarySubAccount.sourceKind ){
               case SourceAccountKind.TEST_ACCOUNT:
-                paymentAddress = paymentAddresses[ SubAccountKind.TEST_ACCOUNT ]
+                paymentAddress = paymentAddresses[ AccountType.TEST_ACCOUNT ]
                 break
 
               default:
-                paymentAddress = paymentAddresses[ SubAccountKind.TRUSTED_CONTACTS ]
+                paymentAddress = paymentAddresses[ AccountType.CHECKING_ACCOUNT ]
           }
           if( !paymentAddress ) throw new Error( `Payment address missing for: ${recipient.displayedName}` )
 
           SubAccountKind.TRUSTED_CONTACTS
           recipients.push( {
-            id: recipient.id,
             address: paymentAddress,
             amount: recipient.amount,
           } )
@@ -165,18 +91,12 @@ function* processRecipients( accountShell: AccountShell ){
 
 
 function* executeSendStage1( { payload }: {payload: {
-  accountShellID: string;
+  accountShell: AccountShell;
 }} ) {
-  const { accountShellID } = payload
+  const { accountShell } = payload
   const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
+    ( state ) => state.accounts )
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
   if( !accountsState.averageTxFees ){
     yield put( feeIntelMissing( {
@@ -185,33 +105,23 @@ function* executeSendStage1( { payload }: {payload: {
     return
   }
 
-  const averageTxFeeByNetwork = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ]
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
 
   try {
     const recipients = yield call( processRecipients, accountShell )
+    const { txPrerequisites } = yield call( AccountOperations.transferST1, account, recipients, averageTxFeeByNetwork )
 
-    const res = yield call(
-      service.transferST1,
-      recipients,
-      averageTxFeeByNetwork,
-      derivativeAccountDetails
-    )
-    if ( res.status === 200 ){
-      const txPrerequisites: TransactionPrerequisite = res.data.txPrerequisites
+    if ( txPrerequisites )
       yield put( sendStage1Executed( {
         successful: true, carryOver: {
           txPrerequisites
         }
       } ) )
-    }
-    else {
-      if ( res.err === 'ECONNABORTED' ) requestTimedout()
+    else
       yield put( sendStage1Executed( {
         successful: false,
-        err: res.err
+        err: 'Send failed: unable to generate tx pre-requisite'
       } ) )
-    }
   } catch ( err ) {
     yield put( sendStage1Executed( {
       successful: false,
@@ -227,59 +137,48 @@ export const executeSendStage1Watcher = createWatcher(
 )
 
 function* executeSendStage2( { payload }: {payload: {
-  accountShellID: string;
-  txnPriority: string,
+  accountShell: AccountShell;
+  txnPriority: TxPriority,
+  token?: number,
 }} ) {
-  const { accountShellID } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
   const sending: SendingState = yield select(
     ( state ) => state.sending
   )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
 
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const { accountShell, txnPriority, token } = payload
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
 
   const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
   const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
+  const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const { txnPriority } = payload
+  const { txid } = yield call( AccountOperations.transferST2, account, txPrerequisites, txnPriority, network, token, customTxPrerequisites )
 
-  const res = yield call(
-    service.transferST2,
-    txPrerequisites,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-  )
-
-  if ( res.status === 200 ) {
-    if ( accountShell.primarySubAccount.sourceKind === SECURE_ACCOUNT ) {
-      const { txHex, childIndexArray, inputs, derivativeAccountDetails } = res.data
-      yield put( sendStage2Executed( {
-        successful: true,
-        carryOver: {
-          txHex, childIndexArray, inputs, derivativeAccountDetails
-        }
-      }
-      ) )
-    } else yield put( sendStage2Executed( {
+  if ( txid ){
+    yield put( sendStage2Executed( {
       successful: true,
-      txid: res.data.txid
+      txid,
     } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
+
+    const accounts = {
+      [ account.id ]: account
+    }
+    yield put( updateAccountShells( {
+      accounts
+    } ) )
+    //TODO: save accounts object into realm
+    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+    tempDB.accounts[ account.id ] = account
+    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+    yield call( dbManager.updateAccount, account.id, account )
+  } else
     yield put( sendStage2Executed( {
       successful: false,
-      err: res.err
+      err: 'Send failed: unable to generate txid'
     } ) )
-  }
 }
 
 export const executeSendStage2Watcher = createWatcher(
@@ -287,120 +186,24 @@ export const executeSendStage2Watcher = createWatcher(
   EXECUTE_SEND_STAGE2
 )
 
-function* executeAlternateSendStage2Worker( { payload }: {payload: {
-  accountShellID: string;
-  txnPriority: string,
-  }} ) {
-
-  const {
-    accountShellID,
-    txnPriority,
-  } = payload
-
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const sending: SendingState = yield select(
-    ( state ) => state.sending
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  if ( accountShell.primarySubAccount.sourceKind !== SECURE_ACCOUNT ) {
-    throw new Error( 'ST3 cannot be executed for a non-2FA account' )
-  }
-
-  const txPrerequisites = idx( sending, ( _ ) => _.sendST1.carryOver.txPrerequisites )
-  const customTxPrerequisites = idx( sending, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites )
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
-
-  const res = yield call(
-    service.alternateTransferST2,
-    txPrerequisites,
-    txnPriority,
-    customTxPrerequisites,
-    derivativeAccountDetails,
-  )
-  if ( res.status === 200 ) {
-    yield put( alternateSendStage2Executed( {
-      successful: true, txid: res.data.txid
-    } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( alternateSendStage2Executed( {
-      successful: false, err: res.err
-    } ) )
-  }
-}
-
-export const executeAlternateSendStage2Watcher = createWatcher(
-  executeAlternateSendStage2Worker,
-  EXECUTE_ALTERNATE_SEND_STAGE2
-)
-
-function* executeSendStage3Worker( { payload }: {payload: {accountShellID: string, token: number}} ) {
-  const { accountShellID, token } = payload
-  const accountsState: AccountsState = yield select(
-    ( state ) => state.accounts
-  )
-  const sending: SendingState = yield select(
-    ( state ) => state.sending
-  )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const carryOver =  idx( sending, ( _ ) => _.sendST2.carryOver )
-  const { txHex, childIndexArray, inputs, derivativeAccountDetails } = carryOver
-
-  const res = yield call( ( service as SecureAccount ).transferST3, token, txHex, childIndexArray, inputs, derivativeAccountDetails )
-  if ( res.status === 200 ) {
-    yield put( sendStage3Executed( {
-      successful: true, txid: res.data.txid
-    } ) )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    yield put( sendStage3Executed( {
-      successful: false, err: res.err
-    } ) )
-  }
-}
-
-export const executeSendStage3Watcher = createWatcher(
-  executeSendStage3Worker,
-  EXECUTE_SEND_STAGE3
-)
-
 function* calculateSendMaxFee( { payload }: {payload: {
   numberOfRecipients: number;
-  accountShellID: string;
+  accountShell: AccountShell;
 }} ) {
-
-  const { numberOfRecipients, accountShellID } = payload
+  const { numberOfRecipients, accountShell } = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
+  const averageTxFeeByNetwork = accountsState.averageTxFees[ account.networkType ]
+  const feePerByte = averageTxFeeByNetwork[ TxPriority.LOW ].feePerByte
+  const network = AccountUtilities.getNetworkByType( account.networkType )
 
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const feePerByte = accountsState.averageTxFees[ yield call( getBitcoinNetwork, accountShell.primarySubAccount.sourceKind ) ][ 'low' ].feePerByte
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
-
-  const { fee } = service.calculateSendMaxFee(
+  const { fee } = AccountOperations.calculateSendMaxFee(
+    account,
     numberOfRecipients,
     feePerByte,
-    derivativeAccountDetails,
+    network
   )
 
   yield put( sendMaxFeeCalculated( fee ) )
@@ -413,7 +216,7 @@ export const calculateSendMaxFeeWatcher = createWatcher(
 
 
 function* calculateCustomFee( { payload }: {payload: {
-  accountShellID: string,
+  accountShell: AccountShell,
   feePerByte: string,
   customEstimatedBlocks: string,
 }} ) {
@@ -430,24 +233,18 @@ function* calculateCustomFee( { payload }: {payload: {
     return
   }
 
-  const { accountShellID, feePerByte, customEstimatedBlocks } = payload
+  const { accountShell, feePerByte, customEstimatedBlocks }  = payload
   const accountsState: AccountsState = yield select(
     ( state ) => state.accounts
   )
+  const account: Account = accountsState.accounts[ accountShell.primarySubAccount.id ]
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+
   const sendingState: SendingState = yield select(
     ( state ) => state.sending
   )
-
-  const accountShell: AccountShell = accountsState.accountShells
-    .find( accountShell => accountShell.id === accountShellID )
-
-  const service: BaseAccount | SecureAccount = accountsState[
-    accountShell.primarySubAccount.sourceKind
-  ].service
-
-  const selectedRecipients: RecipientDescribing[] = [ ...sendingState.selectedRecipients
-  ]
-  const derivativeAccountDetails = yield call( getDerivativeAccountDetails, accountShell )
+  const selectedRecipients: RecipientDescribing[] = [ ...sendingState.selectedRecipients ]
+  const numberOfRecipients = selectedRecipients.length
   const txPrerequisites = idx( sendingState, ( _ ) => _.sendST1.carryOver.txPrerequisites )
 
   let outputs
@@ -464,21 +261,22 @@ function* calculateCustomFee( { payload }: {payload: {
     outputs = outputsArray
   } else {
     if( !txPrerequisites ) throw new Error( 'ST1 carry-over missing' )
-    outputs = txPrerequisites[ 'low' ].outputs.filter(
+    outputs = txPrerequisites[ TxPriority.LOW ].outputs.filter(
       ( output ) => output.address,
     )
   }
 
   if( !sendingState.feeIntelMissing && sendingState.sendMaxFee ){
     // custom fee w/ send max
-    const { fee } = service.calculateSendMaxFee(
-      selectedRecipients.length,
+    const { fee } = AccountOperations.calculateSendMaxFee(
+      account,
+      numberOfRecipients,
       parseInt( feePerByte ),
-      derivativeAccountDetails,
+      network
     )
 
     // upper bound: default low
-    if( fee > txPrerequisites[ 'low' ].fee ){
+    if( fee > txPrerequisites[ TxPriority.LOW ].fee ){
       yield put ( customFeeCalculated( {
         successful: false,
         carryOver:{
@@ -491,21 +289,16 @@ function* calculateCustomFee( { payload }: {payload: {
 
     const recipients: [
       {
-        id: string;
         address: string;
         amount: number;
-        type?: string;
-        accountNumber?: number;
       }
     ] = yield call( processRecipients, accountShell )
     const recipientToBeModified = recipients[ recipients.length - 1 ]
 
     // deduct the previous(default low) fee and add the custom fee
-    // TODO: recapture custom fee from sending reducer
-
     const customFee = idx( sendingState, ( _ ) => _.customPriorityST1.carryOver.customTxPrerequisites.fee )
     if( customFee ) recipientToBeModified.amount += customFee // reusing custom-fee feature
-    else recipientToBeModified.amount += txPrerequisites[ 'low' ].fee
+    else recipientToBeModified.amount += txPrerequisites[ TxPriority.LOW ].fee
     recipientToBeModified.amount -= fee
     recipients[ recipients.length - 1 ] = recipientToBeModified
 
@@ -514,19 +307,16 @@ function* calculateCustomFee( { payload }: {payload: {
         output.value = recipientToBeModified.amount
     } )
 
-    selectedRecipients.forEach( ( recipient ) => {
-      if( recipient.id === recipientToBeModified.id ) recipient.amount = recipientToBeModified.amount
-    } )
-
+    selectedRecipients[ selectedRecipients.length - 1 ].amount = recipientToBeModified.amount
     yield put ( customSendMaxUpdated( {
       recipients: selectedRecipients
     } ) )
   }
 
-  const customTxPrerequisites = service.calculateCustomFee(
+  const customTxPrerequisites = AccountOperations.prepareCustomTransactionPrerequisites(
+    account,
     outputs,
     parseInt( feePerByte ),
-    derivativeAccountDetails,
   )
 
   if ( customTxPrerequisites.inputs ) {
