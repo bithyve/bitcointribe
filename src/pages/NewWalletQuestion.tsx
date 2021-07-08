@@ -451,7 +451,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
+          // height: `${height}%`
 
         }}
       >
@@ -731,7 +731,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View> */}
         </View> : null}
         <View style={{
-          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' )
+          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+          marginBottom: hp( 1 )
         }}>
           <BottomInfoBox
             title={'Note'}
@@ -754,7 +755,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: `${height}%`
+          // height: `${height}%`
 
         }}
       >
@@ -1091,7 +1092,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View> */}
           </View> : null}
           <View style={{
-            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' )
+            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+            marginBottom: hp( 1 )
           }}>
             <BottomInfoBox
               title={'Note'}
@@ -1412,7 +1414,7 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   modalInputBox: {
-    // flex: 1,
+    flex: 1,
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
