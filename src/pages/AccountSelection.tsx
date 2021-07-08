@@ -372,7 +372,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
         </TouchableOpacity>
       </Modal>
       <View style={{
-        alignItems: 'center', marginLeft: wp( '9%' ), marginBottom: hp( '3%' ),
+        alignItems: 'center', marginHorizontal: wp( '6%' ), marginBottom: hp( '3%' ),
         flexDirection: 'row', backgroundColor: Colors.backgroundColor
       }}>
         <ButtonBlue
@@ -380,6 +380,11 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
           handleButtonPress={onProceed}
           buttonDisable={false}
         />
+        <View style={styles.statusIndicatorView}>
+          <View style={styles.statusIndicatorInactiveView} />
+          <View style={styles.statusIndicatorActiveView} />
+          <View style={styles.statusIndicatorInactiveView} />
+        </View>
         {/* <TouchableOpacity
           onPress={() => confirmAction( false )}
         >

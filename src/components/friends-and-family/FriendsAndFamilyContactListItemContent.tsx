@@ -96,12 +96,12 @@ const FriendsAndFamilyContactListItemContent: React.FC<Props> = ( { contact, ind
         </ListItem.Subtitle> */}
 
       </ListItem.Content>
-      <Image
+      {/* <Image
         style={{
           width: 18, height: 18
         }}
         source={require( '../../assets/images/icons/own-node.png' )}
-      />
+      /> */}
     </>
   )
 }
