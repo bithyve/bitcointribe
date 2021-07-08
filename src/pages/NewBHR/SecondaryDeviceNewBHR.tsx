@@ -27,7 +27,7 @@ export default function SecondaryDeviceModelContents( props ) {
       <View
         style={{
           ...NavStyles.modalHeaderTitleView,
-          paddingTop: hp( '0.5%' ),
+          paddingTop: hp( '3%' ),
           alignItems: 'center',
           marginLeft: 20,
         }}
