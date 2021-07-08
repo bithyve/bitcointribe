@@ -7,26 +7,12 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import { ScrollView } from 'react-native-gesture-handler'
 import CountDown from 'react-native-countdown-component'
 import Config from '../../bitcoin/HexaConfig'
-import { useSelector } from 'react-redux'
-import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 export default function ApproveSetup( props ) {
   const KP_REQUEST_EXPIRY = Config.KP_REQUEST_EXPIRY
-  const levelHealth: LevelHealthInterface[] = useSelector(
-    ( state ) => state.health.levelHealth
-  )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-  const Pk_name =
-    currentLevel == 2 && levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo[ 2 ]
-      ? levelHealth[ 1 ].levelInfo[ 2 ].name
-      : currentLevel == 3 && levelHealth[ 2 ] && levelHealth[ 2 ].levelInfo[ 2 ]
-        ? levelHealth[ 2 ].levelInfo[ 2 ].name
-        : ''
 
   return (
     <View style={{
@@ -39,16 +25,6 @@ export default function ApproveSetup( props ) {
           <Text style={styles.headerText}>
           Share Recovery Key
           </Text>
-          {/* <Text
-            numberOfLines={2}
-            style={{
-              ...styles.modalInfoText,
-              width: wp( '70%' ),
-              color: Colors.lightTextColor,
-            }}
-          >
-            Using the other device running Hexa, accept the link you just shared to backup Recovery Key
-          </Text> */}
         </View>
         <View style={{
           flex: 1
