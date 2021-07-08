@@ -58,6 +58,7 @@ import {
   Accounts,
   AccountType,
   DerivativeAccountTypes,
+  DonationAccount,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -861,40 +862,68 @@ function* setup2FADetails( wallet: Wallet ) {
 
 
 export function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
-  let SubAccountConstructor, serviceAccountKind
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+  let primarySubAccount: SubAccountDescribing
+
   switch( account.type ){
       case AccountType.TEST_ACCOUNT:
-        SubAccountConstructor = TestSubAccountInfo
+        primarySubAccount = new TestSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
         break
 
       case AccountType.CHECKING_ACCOUNT:
-        SubAccountConstructor = CheckingSubAccountInfo
+        primarySubAccount = new CheckingSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
         break
 
       case AccountType.SAVINGS_ACCOUNT:
-        SubAccountConstructor = SavingsSubAccountInfo
+        primarySubAccount = new SavingsSubAccountInfo( {
+          id: account.id,
+          xPub: null,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
         break
 
       case AccountType.DONATION_ACCOUNT:
-        SubAccountConstructor = DonationSubAccountInfo
+        primarySubAccount = new DonationSubAccountInfo( {
+          id: account.id,
+          xPub: ( account as DonationAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          doneeName: ( account as DonationAccount ).donee,
+          causeName: account.accountName
+        } )
         break
 
       case AccountType.SWAN_ACCOUNT:
-        SubAccountConstructor = ExternalServiceSubAccountInfo
-        serviceAccountKind = ServiceAccountKind.SWAN
+        primarySubAccount = new ExternalServiceSubAccountInfo( {
+          id: account.id,
+          xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          type: account.type,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          serviceAccountKind: ServiceAccountKind.SWAN,
+        } )
         break
   }
 
-  const network = AccountUtilities.getNetworkByType( account.networkType )
+
   const accountShell = new AccountShell( {
-    primarySubAccount: new SubAccountConstructor( {
-      id: account.id,
-      xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
-      instanceNumber: account.instanceNum,
-      customDisplayName: account.accountName,
-      customDescription: account.accountDescription,
-      serviceAccountKind,
-    } ),
+    primarySubAccount,
     unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
     displayOrder: 1,
   } )
@@ -968,8 +997,8 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
           is2FA: is2FAEnabled,
-          secondaryXpub: wallet.details2FA.secondaryXpub,
-          bithyveXpub:  wallet.details2FA.bithyveXpub,
+          secondaryXpub: is2FAEnabled? wallet.details2FA.secondaryXpub: null,
+          bithyveXpub:  is2FAEnabled? wallet.details2FA.bithyveXpub: null,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return donationAccount
@@ -1082,8 +1111,11 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   const newAccountShells: AccountShell[] = []
   const accounts = {
   }
-
   let testcoinsToAccount
+
+  console.log( {
+    newAccountsInfo
+  } )
   for ( const { accountType, accountDetails } of newAccountsInfo ){
     const account: Account | MultiSigAccount = yield call(
       addNewAccount,
@@ -1092,7 +1124,15 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
       }
     )
 
+    console.log( {
+      accounts
+    } )
+
     const accountShell = yield call( generateShellFromAccount, account )
+    console.log( {
+      accountShell
+    } )
+
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
     // yield put( accountShellOrderedToFront( accountShell ) )
