@@ -89,7 +89,7 @@ import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { updateWallet } from '../actions/storage'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
@@ -902,9 +902,10 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
   return accountShell
 }
 
-export function* addNewAccount( accountType: AccountType, accountName: string, accountDescription: string ) {
+export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
   let wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
+  const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
@@ -948,24 +949,30 @@ export function* addNewAccount( accountType: AccountType, accountName: string, a
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
-          bithyveXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
+          bithyveXpub: wallet.details2FA.bithyveXpub,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return savingsAccount
 
-        // case AccountType.DONATION_ACCOUNT:
-        //   const donationAccount = yield call( setupDonationAccountWorker, {
-        //     payload: {
-        //       serviceType: subAccountInfo.sourceKind,
-        //       donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
-        //       subject: subAccountInfo.customDisplayName,
-        //       description: subAccountInfo.customDescription,
-        //       configuration: {
-        //         displayBalance: true,
-        //       },
-        //     },
-        //   } )
-        //   return donationAccount
+      case AccountType.DONATION_ACCOUNT:
+        if( is2FAEnabled && !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
+
+        const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const donationAccount: Account = yield call( generateDonationAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: donationInstanceCount,
+          accountName: accountName? accountName: 'Donation Account',
+          accountDescription: accountDescription? accountDescription: 'Accept donations',
+          donee: doneeName,
+          mnemonic: primaryMnemonic,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
+          is2FA: is2FAEnabled,
+          secondaryXpub: wallet.details2FA.secondaryXpub,
+          bithyveXpub:  wallet.details2FA.bithyveXpub,
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        return donationAccount
 
       case AccountType.SWAN_ACCOUNT:
         let defaultAccountName, defaultAccountDescription
@@ -1060,12 +1067,15 @@ export function* addNewAccount( accountType: AccountType, accountName: string, a
 //   ADD_NEW_SECONDARY_SUBACCOUNT
 // )
 
+export interface newAccountDetails {
+  name?: string,
+  description?: string,
+  is2FAEnabled?: boolean,
+  doneeName?: string,
+}
 export interface newAccountsInfo {
   accountType: AccountType,
-  accountDetails?: {
-    name?: string,
-    description?: string
-  }
+  accountDetails?: newAccountDetails
 }
 
 export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
@@ -1075,13 +1085,11 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
 
   let testcoinsToAccount
   for ( const { accountType, accountDetails } of newAccountsInfo ){
-    const accountName = idx( accountDetails, ( _ ) => _.name )
-    const accountDescription = idx( accountDetails, ( _ ) => _.description )
     const account: Account | MultiSigAccount = yield call(
       addNewAccount,
       accountType,
-      accountName,
-      accountDescription
+      accountDetails || {
+      }
     )
 
     const accountShell = yield call( generateShellFromAccount, account )

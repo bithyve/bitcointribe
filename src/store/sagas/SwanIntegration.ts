@@ -160,8 +160,7 @@ function* createTempSwanAccountInfo( { payload }: {
   const account: Account = yield call(
     addNewAccount,
     AccountType.SWAN_ACCOUNT,
-    accountDetails.name,
-    accountDetails.description
+    accountDetails,
   )
   const accountShell = yield call( generateShellFromAccount, account )
 
