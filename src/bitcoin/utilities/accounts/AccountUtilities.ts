@@ -167,16 +167,14 @@ export default class AccountUtilities {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
-    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+    const closingExtIndex = nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= nextFreeAddressIndex + closingExtIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, false, itr, network )
     }
 
-    for (
-      let itr = 0;
-      itr <= nextFreeChangeAddressIndex + config.GAP_LIMIT;
-      itr++
-    ) {
+    const closingIntIndex = nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
     }
@@ -236,7 +234,8 @@ export default class AccountUtilities {
     const { xpubs, xprivs, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
-    for ( let itr = 0; itr <= account.nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+    const closingExtIndex = account.nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
@@ -250,7 +249,8 @@ export default class AccountUtilities {
       }
     }
 
-    for ( let itr = 0; itr <= account.nextFreeChangeAddressIndex + config.GAP_LIMIT; itr++ ) {
+    const closingIntIndex = account.nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {

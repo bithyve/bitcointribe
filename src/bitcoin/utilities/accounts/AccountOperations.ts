@@ -15,6 +15,7 @@ import {
   DonationAccount,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
+import config from '../../HexaConfig'
 export default class AccountOperations {
 
   static syncGapLimit = async ( account: Account | MultiSigAccount ) => {
@@ -256,8 +257,7 @@ export default class AccountOperations {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, utxos, balances, transactions } = await AccountUtilities.syncViaXpubAgent( xpubId, donationId )
 
     const internalAddresses = []
-    const hardGapLimit  = 10
-    for ( let itr = 0; itr < nextFreeChangeAddressIndex + hardGapLimit; itr++ )
+    for ( let itr = 0; itr < nextFreeChangeAddressIndex + config.DONATION_GAP_LIMIT_INTERNAL; itr++ )
     {
       let address
       if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, true ).address
@@ -596,7 +596,7 @@ export default class AccountOperations {
       for ( const input of inputs ) {
         let keyPair, redeemScript
         if( ( account as MultiSigAccount ).is2FA ){
-          const { multiSig, primaryPriv, childIndex, internal } = AccountUtilities.signingEssentialsForMultiSig(
+          const { multiSig, primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
             ( account as MultiSigAccount ),
             input.address,
           )
