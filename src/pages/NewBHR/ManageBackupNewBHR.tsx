@@ -105,12 +105,15 @@ interface ManageBackupNewBHRStateTypes {
   errorTitle: string;
   errorInfo: string;
   refreshControlLoader: boolean;
-  QrBottomSheetsFlag: boolean;
   showLoader: boolean;
   knowMoreType: string;
   keeping: any[];
   listModal: boolean;
   errorModal: boolean;
+  showQRModal: boolean;
+  approvePrimaryKeeper: boolean;
+  loaderModal: boolean;
+  knwowMoreModal: boolean;
 }
 
 interface ManageBackupNewBHRPropsTypes {
@@ -178,7 +181,6 @@ class ManageBackupNewBHR extends Component<
   ErrorBottomSheet: any;
   keeperTypeBottomSheet: any;
   QrBottomSheet: any;
-  ApprovePrimaryKeeperBottomSheet: any
   loaderBottomSheet: any
   knowMoreBottomSheet: any
 
@@ -189,10 +191,6 @@ class ManageBackupNewBHR extends Component<
     this.unsubscribe = null
     this.ErrorBottomSheet
     this.keeperTypeBottomSheet
-    this.QrBottomSheet
-    this.ApprovePrimaryKeeperBottomSheet
-    this.loaderBottomSheet
-    this.knowMoreBottomSheet = React.createRef( )
 
     const obj = {
       shareType: '',
@@ -217,12 +215,15 @@ class ManageBackupNewBHR extends Component<
       errorTitle: '',
       errorInfo: '',
       refreshControlLoader: false,
-      QrBottomSheetsFlag: false,
       showLoader: false,
       knowMoreType: 'manageBackup',
       keeping: [],
       listModal: false,
       errorModal: false,
+      showQRModal: false,
+      approvePrimaryKeeper: false,
+      loaderModal: false,
+      knwowMoreModal: false,
     }
   }
 
@@ -519,8 +520,14 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ) {
-      ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 1 );
-      ( this.QrBottomSheet as any ).snapTo( 0 )
+      this.setState( {
+        showQRModal: false
+      },
+      () => {
+        this.setState( {
+          approvePrimaryKeeper: true
+        } )
+      } )
     }
 
     if( prevProps.levelHealth != this.props.levelHealth ){
@@ -582,10 +589,10 @@ class ManageBackupNewBHR extends Component<
     }
     // ( this.keeperTypeBottomSheet as any ).snapTo( 0 );
     this.setState( {
-      listModal: false
-    } );
-    ( this.QrBottomSheet as any ).snapTo( 0 );
-    ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
+      listModal: false,
+      showQRModal: false,
+      approvePrimaryKeeper: false
+    } )
     if ( selectedKeeper.shareType == 'device' ) {
       this.props.navigation.navigate( 'SecondaryDeviceHistoryNewBHR', {
         ...navigationParams,
@@ -655,9 +662,8 @@ class ManageBackupNewBHR extends Component<
 
   sendApprovalRequestToPK = ( ) => {
     this.setState( {
-      QrBottomSheetsFlag: true
-    } );
-    ( this.QrBottomSheet as any ).snapTo( 1 )
+      showQRModal: true
+    } )
     // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
     this.setState( {
       listModal: false
@@ -673,27 +679,25 @@ class ManageBackupNewBHR extends Component<
         infoText={
           'Please approve this request by scanning the Secondary Key stored with any of the other backups'
         }
-        modalRef={this.QrBottomSheet}
-        isOpenedFlag={this.state.QrBottomSheetsFlag}
+        isOpenedFlag={this.state.showQRModal}
         onQrScan={async( qrScannedData ) => {
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
           this.setState( {
-            QrBottomSheetsFlag: false
+            showQRModal: false
           } )
         }}
         onBackPress={() => {
           this.setState( {
-            QrBottomSheetsFlag: false
+            showQRModal: false
           } )
-          if ( this.QrBottomSheet ) ( this.QrBottomSheet as any ).snapTo( 0 )
         }}
         onPressContinue={async() => {
           const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Aa","channelId":"235e93417c8c4fcc99f37c5f99a259a619db14d6019b9d1e5b62becb78de0740","streamId":"1763f468d","secondaryChannelKey":"TMxy31wVg8lVdFStOtoL70r6","version":"1.7.5"}'
           this.props.setApprovalStatus( false )
           this.props.downloadSMShare( qrScannedData )
           this.setState( {
-            QrBottomSheetsFlag: false
+            showQRModal: false
           } )
         }}
       />
@@ -705,9 +709,8 @@ class ManageBackupNewBHR extends Component<
       <ModalHeader
         onPressHeader={() => {
           this.setState( {
-            QrBottomSheetsFlag: false
-          } );
-          ( this.QrBottomSheet as any ).snapTo( 0 )
+            showQRModal: false,
+          } )
         }}
       />
     )
@@ -743,7 +746,11 @@ class ManageBackupNewBHR extends Component<
   renderKnowMoreModalContent = () => {
     return ( <MBNewBhrKnowMoreSheetContents
       type={this.state.knowMoreType}
-      titleClicked={()=>{this.knowMoreBottomSheet.snapTo( 0 )}}
+      titleClicked={()=>{
+        this.setState( {
+          knwowMoreModal: false
+        } )
+      }}
       containerStyle={{
         shadowOpacity: 0,
       }}
@@ -755,7 +762,9 @@ class ManageBackupNewBHR extends Component<
       <ModalHeader
         backgroundColor={Colors.blue}
         onPressHeader={() => {
-          this.knowMoreBottomSheet.snapTo( 0 )
+          this.setState( {
+            knwowMoreModal: false
+          } )
         }}
       />
     )
@@ -806,6 +815,10 @@ class ManageBackupNewBHR extends Component<
       selectedKeeperType,
       listModal,
       errorModal,
+      showQRModal,
+      approvePrimaryKeeper,
+      loaderModal,
+      knwowMoreModal
     } = this.state
     const { navigation, currentLevel, levelData, shieldHealth } = this.props
     return (
@@ -1024,9 +1037,9 @@ Wallet Backup
                     }}
                     onPressKnowMore={() => {
                       this.setState( {
-                        knowMoreType: value.levelName
+                        knowMoreType: value.levelName,
+                        knwowMoreModal: true
                       } )
-                      this.knowMoreBottomSheet.snapTo( 1 )
                     }}
                     onPressKeeper1={()=> this.onKeeperButtonPress( value, 1 )}
                     onPressKeeper2={()=> this.onKeeperButtonPress( value, 2 )}
@@ -1184,85 +1197,40 @@ Wallet Backup
             />}
             renderHeader={()=><ModalHeader onPressHeader={() => ( this.ErrorBottomSheet as any ).snapTo( 0 )} />}
           /> */}
-          <BottomSheet
-            enabledInnerScrolling={true}
-            ref={( c )=>this.ApprovePrimaryKeeperBottomSheet=c}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
-            ]}
-            renderContent={() => (
-              <ApproveSetup
-                isContinueDisabled={false}
-                onPressContinue={() => {
-                  ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
-                  const {
-                    selectedKeeper,
-                    selectedLevelId,
-                    selectedKeeperType,
-                    selectedKeeperName,
-                  } = this.state
-                  const obj = {
-                    id: selectedLevelId,
-                    selectedKeeper: {
-                      ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
-                      shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
-                    },
-                    isSetup: true,
-                  }
-                  this.goToHistory( obj )
-                }}
-              />
-            )}
-            renderHeader={() => (
-              <SmallHeaderModal
-                onPressHeader={() => {
-                  // ( this.keeperTypeBottomSheet as any ).snapTo( 1 );
-                  this.setState( {
-                    listModal: true
-                  } );
-                  ( this.ApprovePrimaryKeeperBottomSheet as any ).snapTo( 0 )
-                }}
-              />
-            )}
-          />
-          <BottomSheet
-            onOpenEnd={() => {
-              this.setState( {
-                QrBottomSheetsFlag: true
-              } )
-            }}
-            onCloseEnd={() => {
-              this.setState( {
-                QrBottomSheetsFlag: false
-              } )
-            }}
-            enabledGestureInteraction={false}
-            enabledInnerScrolling={true}
-            ref={( c )=>this.QrBottomSheet=c}
-            snapPoints={[
-              -50,
-              Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '90%' ) : hp( '89%' ),
-            ]}
-            renderContent={this.renderQrContent}
-            renderHeader={this.renderQrHeader}
-          />
-          <BottomSheet
-            enabledGestureInteraction={false}
-            enabledInnerScrolling={true}
-            ref={( c )=>this.loaderBottomSheet = c}
-            snapPoints={[ -50, hp( '100%' ) ]}
-            renderContent={this.renderLoaderModalContent}
-            renderHeader={this.renderLoaderModalHeader}
-          />
-          <BottomSheet
-            enabledGestureInteraction={false}
-            enabledInnerScrolling={true}
-            ref={( c )=>this.knowMoreBottomSheet = c}
-            snapPoints={[ -50, hp( '95%' ) ]}
-            renderContent={this.renderKnowMoreModalContent}
-            renderHeader={this.renderKnowMoreModalHeader}
-          />
+          <ModalContainer visible={approvePrimaryKeeper} closeBottomSheet={() => {}}>
+            <ApproveSetup
+              isContinueDisabled={false}
+              onPressContinue={() => {
+                this.setState( {
+                  approvePrimaryKeeper: false
+                } )
+                const {
+                  selectedKeeper,
+                  selectedLevelId,
+                  selectedKeeperType,
+                  selectedKeeperName,
+                } = this.state
+                const obj = {
+                  id: selectedLevelId,
+                  selectedKeeper: {
+                    ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name:selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+                    shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
+                  },
+                  isSetup: true,
+                }
+                this.goToHistory( obj )
+              }}
+            />
+          </ModalContainer>
+          <ModalContainer visible={showQRModal} closeBottomSheet={() => {}} >
+            {this.renderQrContent()}
+          </ModalContainer>
+          <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} >
+            {this.renderLoaderModalContent()}
+          </ModalContainer>
+          <ModalContainer visible={knwowMoreModal} closeBottomSheet={() => {}} >
+            {this.renderKnowMoreModalContent()}
+          </ModalContainer>
         </View>
       </ImageBackground>
     )
