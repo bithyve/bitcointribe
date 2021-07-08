@@ -12,8 +12,10 @@ import {
   MultiSigAccount,
   Accounts,
   AccountType,
+  DonationAccount,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
+import config from '../../HexaConfig'
 export default class AccountOperations {
 
   static syncGapLimit = async ( account: Account | MultiSigAccount ) => {
@@ -245,6 +247,56 @@ export default class AccountOperations {
       txsFound
     }
   };
+
+  static syncDonationAccount = async ( account: DonationAccount, network: bitcoinJS.networks.Network ): Promise<{
+    synchedAccount: Account,
+  }> => {
+
+    const xpubId = account.id
+    const donationId = account.id.slice( 0, 15 )
+    const { nextFreeAddressIndex, nextFreeChangeAddressIndex, utxos, balances, transactions } = await AccountUtilities.syncViaXpubAgent( xpubId, donationId )
+
+    const internalAddresses = []
+    for ( let itr = 0; itr < nextFreeChangeAddressIndex + config.DONATION_GAP_LIMIT_INTERNAL; itr++ )
+    {
+      let address
+      if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, true ).address
+      else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+      internalAddresses.push( address )
+    }
+
+    const confirmedUTXOs = []
+    const unconfirmedUTXOs = []
+    for ( const utxo of utxos ) {
+      if ( utxo.status ) {
+        if ( utxo.status.confirmed ) confirmedUTXOs.push( utxo )
+        else {
+          if ( internalAddresses.includes( utxo.address ) ) {
+            // defaulting utxo's on the change branch to confirmed
+            confirmedUTXOs.push( utxo )
+          }
+          else unconfirmedUTXOs.push( utxo )
+        }
+      } else {
+        // utxo's from fallback won't contain status var (defaulting them as confirmed)
+        confirmedUTXOs.push( utxo )
+      }
+    }
+
+    const { newTransactions, lastSynched } = AccountUtilities.setNewTransactions( transactions, account.lastSynched )
+    account.unconfirmedUTXOs = unconfirmedUTXOs
+    account.confirmedUTXOs = confirmedUTXOs
+    account.balances = balances
+    account.nextFreeAddressIndex = nextFreeAddressIndex
+    account.nextFreeChangeAddressIndex = nextFreeChangeAddressIndex
+    account.transactions = transactions
+    account.newTransactions = newTransactions
+    account.lastSynched = lastSynched
+
+    return {
+      synchedAccount: account
+    }
+  }
 
   static updateQueryList = ( account: Account, consumedUTXOs: {[txid: string]: InputUTXOs} ) => {
     const softGapLimit = 5
@@ -544,7 +596,7 @@ export default class AccountOperations {
       for ( const input of inputs ) {
         let keyPair, redeemScript
         if( ( account as MultiSigAccount ).is2FA ){
-          const { multiSig, primaryPriv, childIndex, internal } = AccountUtilities.signingEssentialsForMultiSig(
+          const { multiSig, primaryPriv, childIndex } = AccountUtilities.signingEssentialsForMultiSig(
             ( account as MultiSigAccount ),
             input.address,
           )

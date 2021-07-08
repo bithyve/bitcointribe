@@ -31,20 +31,16 @@ import { fetchFeeAndExchangeRates, refreshAccountShell } from '../../../store/ac
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
 import NetworkKind from '../../../common/data/enums/NetworkKind'
 import config from '../../../bitcoin/HexaConfig'
-import { DerivativeAccounts, DerivativeAccountTypes } from '../../../bitcoin/utilities/Interface'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { Button } from 'react-native-elements'
 import DonationWebPageBottomSheet from '../../../components/bottom-sheets/DonationWebPageBottomSheet'
-import { DONATION_ACCOUNT, SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import TransactionsPreviewSection from './TransactionsPreviewSection'
-import { ExternalServiceSubAccountDescribing } from '../../../common/data/models/SubAccountInfo/Interfaces'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
-import useSpendableBalanceForAccountShell from '../../../utils/hooks/account-utils/UseSpendableBalanceForAccountShell'
 import idx from 'idx'
-import { ScrollView } from 'react-native-gesture-handler'
 import Colors from '../../../common/Colors'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 
 export type Props = {
   navigation: any;
@@ -68,34 +64,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const account = useAccountByAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
-  let derivativeAccountKind: any = primarySubAccount.kind
-
-  switch( primarySubAccount.kind ){
-      case SubAccountKind.REGULAR_ACCOUNT:
-      case SubAccountKind.SECURE_ACCOUNT:
-        if ( primarySubAccount.instanceNumber )
-          derivativeAccountKind = DerivativeAccountTypes.SUB_PRIMARY_ACCOUNT
-        else derivativeAccountKind = primarySubAccount.kind
-        break
-
-      case SubAccountKind.SERVICE:
-        derivativeAccountKind = ( primarySubAccount as ExternalServiceSubAccountDescribing ).serviceAccountKind
-        break
-
-      default:
-        derivativeAccountKind = primarySubAccount.kind
-  }
-
-  const derivativeAccountDetails: {
-    type: string;
-    number: number;
-  } = config.EJECTED_ACCOUNTS.includes( derivativeAccountKind ) ?
-    {
-      type: derivativeAccountKind,
-      number: primarySubAccount.instanceNumber,
-    }
-    : null
 
   const isRefreshing = useMemo( () => {
     return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
@@ -129,11 +99,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     } )
   }
 
-  function navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType ) {
+  function navigateToDonationAccountWebViewSettings( donationAccount ) {
     navigation.navigate( 'DonationAccountWebViewSettings', {
       account: donationAccount,
-      accountNumber,
-      serviceType,
     } )
   }
 
@@ -231,25 +199,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   } )
 
   const showDonationWebViewSheet = useCallback( () => {
-    const accountNumber = primarySubAccount.instanceNumber
-    const serviceType = primarySubAccount.sourceKind
-
-    let derivativeAccounts: DerivativeAccounts
-
-    if ( serviceType === SourceAccountKind.REGULAR_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.hdWallet.derivativeAccounts
-    } else if ( serviceType === SourceAccountKind.SECURE_ACCOUNT ) {
-      derivativeAccounts = accountsState[ serviceType ].service.secureHDWallet.derivativeAccounts
-    }
-
-    const donationAccount = derivativeAccounts[ DONATION_ACCOUNT ][ accountNumber ]
-
     presentBottomSheet(
       <DonationWebPageBottomSheet
-        account={donationAccount}
+        account={account}
         onClickSetting={() => {
           dismissBottomSheet()
-          navigateToDonationAccountWebViewSettings( donationAccount, accountNumber, serviceType )
+          navigateToDonationAccountWebViewSettings( account )
         }}
       />,
       {
@@ -258,19 +213,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       },
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
-
-  useEffect( ()=>{
-    // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
-    if ( primarySubAccount.isTFAEnabled ) {
-      const twoFASetupDetails = idx( accountsState, ( _ )=> _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
-      const twoFAValid = idx( accountsState, ( _ )=> _.twoFAHelpFlags.twoFAValid )
-
-      if( twoFASetupDetails && !twoFAValid )
-        navigation.navigate( 'TwoFASetup', {
-          twoFASetup: twoFASetupDetails,
-        } )
-    }
-  }, [ primarySubAccount.sourceKind ] )
 
   useEffect( () => {
     // 📝 A slight timeout is needed here in order for the refresh control to

@@ -817,6 +817,24 @@ export interface MultiSigAccount extends Account {
   }
 }
 
+export interface DonationAccount extends Account {
+  donee: string;
+  configuration: {
+    displayBalance: boolean;
+  };
+  disableAccount: boolean;
+  is2FA: boolean,                       // is2FA enabled
+  xpubs?: {                              // xpub set for multi-sig
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  }
+  xprivs?: {                             // xpirv set for multi-sig
+    primary: string,
+    secondary?: string,
+  }
+}
+
 export enum AccountType {
   TEST_ACCOUNT = 'TEST_ACCOUNT',
   CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
@@ -828,5 +846,5 @@ export enum AccountType {
 }
 
 export interface Accounts {
-    [accountId: string]: Account
+    [accountId: string]: Account | MultiSigAccount | DonationAccount
 }

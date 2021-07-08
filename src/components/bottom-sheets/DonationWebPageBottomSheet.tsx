@@ -89,7 +89,7 @@ export default function DonationWebPageBottomSheet( props ) {
                   : config.APP_STAGE === 'sta'
                     ? 'donate-stage'
                     : 'donate-test'
-                }/?donationid=` + props.account.id
+                }/?donationid=` + props.account.id.slice( 0, 15 )
               }
             />
           </View>
@@ -115,7 +115,7 @@ export default function DonationWebPageBottomSheet( props ) {
                 : config.APP_STAGE === 'sta'
                   ? 'donate-stage'
                   : 'donate-test'
-              }/?donationid=${props.account.id
+              }/?donationid=${props.account.id.slice( 0, 15 )
               }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
           </View>

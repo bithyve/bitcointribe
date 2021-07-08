@@ -6,11 +6,11 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType } from '../Interface'
-import { SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount } from '../Interface'
+import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
-import { SIGNING_AXIOS } from '../../../services/api'
+import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 
 
 const { REQUEST_TIMEOUT } = config
@@ -167,16 +167,14 @@ export default class AccountUtilities {
     const { nextFreeAddressIndex, nextFreeChangeAddressIndex, xpub, xpriv, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
-    for ( let itr = 0; itr <= nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+    const closingExtIndex = nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= nextFreeAddressIndex + closingExtIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, false, itr, network ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, false, itr, network )
     }
 
-    for (
-      let itr = 0;
-      itr <= nextFreeChangeAddressIndex + config.GAP_LIMIT;
-      itr++
-    ) {
+    const closingIntIndex = nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       if ( AccountUtilities.getAddressByIndex( xpub, true, itr, network ) === address )
         return AccountUtilities.getPrivateKeyByIndex( xpriv, true, itr, network )
     }
@@ -236,7 +234,8 @@ export default class AccountUtilities {
     const { xpubs, xprivs, networkType } = account
     const network = AccountUtilities.getNetworkByType( networkType )
 
-    for ( let itr = 0; itr <= account.nextFreeAddressIndex + config.GAP_LIMIT; itr++ ) {
+    const closingExtIndex = account.nextFreeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= closingExtIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, false )
       if ( multiSig.address === address ) {
         return {
@@ -250,7 +249,8 @@ export default class AccountUtilities {
       }
     }
 
-    for ( let itr = 0; itr <= account.nextFreeChangeAddressIndex + config.GAP_LIMIT; itr++ ) {
+    const closingIntIndex = account.nextFreeChangeAddressIndex + ( account.type === AccountType.DONATION_ACCOUNT? config.DONATION_GAP_LIMIT_INTERNAL : config.GAP_LIMIT )
+    for ( let itr = 0; itr <= closingIntIndex; itr++ ) {
       const multiSig = AccountUtilities.createMultiSig( xpubs, 2, network, itr, true )
       if ( multiSig.address === address ) {
         return {
@@ -889,54 +889,54 @@ export default class AccountUtilities {
   }
 
   // 2FA-account specific utilities
-   static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
+  static registerTwoFA = async ( walletID: string, secondaryID: string ): Promise<{
     setupData: {
       qrData: string;
       secret: string;
       bhXpub: string;
     };
   }> => {
-     let res: AxiosResponse
-     try {
-       res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
-         HEXA_ID: config.HEXA_ID,
-         walletID,
-         secondaryID,
-       } )
-     } catch ( err ) {
-       if ( err.response ) throw new Error( err.response.data.err )
-       if ( err.code ) throw new Error( err.code )
-     }
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'setupSecureAccount', {
+        HEXA_ID: config.HEXA_ID,
+        walletID,
+        secondaryID,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
 
-     const { setupSuccessful, setupData } = res.data
-     if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
-     return {
-       setupData
-     }
-   };
+    const { setupSuccessful, setupData } = res.data
+    if ( !setupSuccessful ) throw new Error( 'Secure account setup failed' )
+    return {
+      setupData
+    }
+  };
 
-   static validateTwoFA = async ( walletID: string, token: number ): Promise<{
+  static validateTwoFA = async ( walletID: string, token: number ): Promise<{
     valid: Boolean
   }> => {
-     let res: AxiosResponse
-     try {
-       res = await SIGNING_AXIOS.post( 'validate2FASetup', {
-         HEXA_ID: config.HEXA_ID,
-         walletID,
-         token,
-       } )
-     } catch ( err ) {
-       if ( err.response ) throw new Error( err.response.data.err )
-       if ( err.code ) throw new Error( err.code )
-     }
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'validate2FASetup', {
+        HEXA_ID: config.HEXA_ID,
+        walletID,
+        token,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
 
-     const { valid } = res.data
-     if ( !valid ) throw new Error( '2FA validation failed' )
+    const { valid } = res.data
+    if ( !valid ) throw new Error( '2FA validation failed' )
 
-     return {
-       valid
-     }
-   }
+    return {
+      valid
+    }
+  }
 
 
   static getSecondSignature = async (
@@ -971,6 +971,146 @@ export default class AccountUtilities {
     const signedTxHex = res.data.txHex
     return {
       signedTxHex
+    }
+  };
+
+  // donation-account specific utilities
+  static setupDonationAccount = async (
+    account: DonationAccount,
+  ): Promise<{
+    setupSuccessful: boolean;
+  }> => {
+
+    const xpubs = []
+    if( account.xpub ) xpubs.push( account.xpub )
+    else xpubs.push( ...Object.values( ( account as MultiSigAccount ).xpubs ) )
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'setupDonationAccount', {
+        HEXA_ID: config.HEXA_ID,
+        donationId: account.id.slice( 0, 15 ),
+        walletID: account.walletId,
+        details: {
+          donee: account.donee,
+          subject: account.accountName,
+          description: account.accountDescription,
+          xpubId: account.id,
+          xpubs,
+          configuration: account.configuration,
+        },
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { setupSuccessful } = res.data
+    return {
+      setupSuccessful
+    }
+  };
+
+  static updateDonationPreferences = async (
+    account: DonationAccount,
+    preferences: {
+      disableAccount?: boolean;
+      configuration?: {
+        displayBalance: boolean;
+      };
+      accountDetails?: {
+        donee: string;
+        subject: string;
+        description: string;
+      };
+    },
+  ): Promise<{ updated: boolean, updatedAccount: DonationAccount }> => {
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'updatePreferences', {
+        HEXA_ID: config.HEXA_ID,
+        donationId: account.id.slice( 0, 15 ),
+        walletID: account.walletId,
+        preferences,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const { updated } = res.data
+    if( updated ){
+      if( preferences.disableAccount !== undefined && preferences.disableAccount !== account.disableAccount )
+        account.disableAccount = preferences.disableAccount
+
+      if( preferences.configuration )
+        account.configuration = preferences.configuration
+
+      if( preferences.accountDetails ){
+        account.accountName = preferences.accountDetails.subject
+        account.accountDescription = preferences.accountDetails.description
+        account.donee = preferences.accountDetails.donee
+      }
+    }
+
+    return {
+      updated, updatedAccount: account
+    }
+  };
+
+  static syncViaXpubAgent = async (
+    xpubId: string,
+    donationId: string
+  ): Promise<{
+    usedAddresses: string[],
+    nextFreeAddressIndex: number,
+    nextFreeChangeAddressIndex: number,
+    utxos: Array<{
+      txId: string;
+      vout: number;
+      value: number;
+      address: string;
+      status?: any;
+    }>,
+    balances: { confirmed: number; unconfirmed: number },
+    transactions: Transaction[],
+  }> => {
+    // syncs account via xpub-agent(relay)
+
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'fetchXpubInfo', {
+        HEXA_ID: config.HEXA_ID,
+        xpubId,
+        accountType: DONATION_ACCOUNT,
+        accountDetails: {
+          donationId
+        },
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const {
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+      utxos,
+      balances,
+      transactions,
+    } = res.data
+
+    return {
+      usedAddresses,
+      nextFreeAddressIndex,
+      nextFreeChangeAddressIndex,
+      utxos,
+      balances: {
+        confirmed: balances.balance, unconfirmed: balances.unconfirmedBalance
+      },
+      transactions: transactions.transactionDetails,
     }
   };
 }
