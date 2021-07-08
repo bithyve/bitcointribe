@@ -626,87 +626,21 @@ export const validateTwoFAWatcher = createWatcher(
   VALIDATE_TWO_FA
 )
 
-function* setupDonationAccountWorker( { payload } ) {
-  const {
-    serviceType,
-    donee,
-    subject,
-    description,
-    configuration,
-    disableAccount,
-  } = payload
-  const service = yield select( ( state ) => state.accounts[ serviceType ].service )
-
-  const res = yield call(
-    service.setupDonationAccount,
-    donee,
-    subject,
-    description,
-    configuration,
-    disableAccount
-  )
-
-  if ( res.status === 200 ) {
-    // console.log( { res } )
-    const { setupSuccessful, accountId, accountNumber, accountXpub } = res.data
-    if ( !setupSuccessful ) {
-      throw new Error( 'Donation account setup failed' )
-    }
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-
-    return {
-      accountId, accountNumber, accountXpub
-    }
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( res.err )
-  }
-}
-
-export const setupDonationAccountWatcher = createWatcher(
-  setupDonationAccountWorker,
-  SETUP_DONATION_ACCOUNT
-)
-
 function* updateDonationPreferencesWorker( { payload } ) {
-  const { serviceType, accountNumber, preferences } = payload
-  const service = yield select( ( state ) => state.accounts[ serviceType ].service )
+  const { donationAccount, preferences } = payload
 
-  const res = yield call(
-    service.updateDonationPreferences,
-    accountNumber,
+  const { updated, updatedAccount }  = yield call(
+    AccountUtilities.updateDonationPreferences,
+    donationAccount,
     preferences
   )
 
-  if ( res.status === 200 ) {
-    console.log( {
-      res
-    } )
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ serviceType ]: JSON.stringify( service ),
+  if( updated ) yield put( updateAccountShells( {
+    accounts: {
+      [ updatedAccount.id ]: updatedAccount
     }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( res.err )
-  }
+  } ) )
+  else throw new Error( 'Failed to update donation preferences' )
 }
 
 export const updateDonationPreferencesWatcher = createWatcher(
@@ -904,7 +838,8 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
           doneeName: ( account as DonationAccount ).donee,
-          causeName: account.accountName
+          causeName: account.accountName,
+          isTFAEnabled: ( account as DonationAccount ).is2FA
         } )
         break
 
@@ -987,13 +922,13 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         if( is2FAEnabled && !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
 
         const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
-        const donationAccount: Account = yield call( generateDonationAccount, {
+        const donationAccount: DonationAccount = yield call( generateDonationAccount, {
           walletId,
           type: accountType,
           instanceNum: donationInstanceCount,
           accountName: accountName? accountName: 'Donation Account',
           accountDescription: accountDescription? accountDescription: 'Accept donations',
-          donee: doneeName,
+          donee: doneeName? doneeName: wallet.walletName,
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
           is2FA: is2FAEnabled,
@@ -1001,6 +936,8 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           bithyveXpub:  is2FAEnabled? wallet.details2FA.bithyveXpub: null,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
+        const { setupSuccessful } = yield call( AccountUtilities.setupDonationAccount, donationAccount )
+        if( !setupSuccessful ) throw new Error( 'Failed to generate donation account' )
         return donationAccount
 
       case AccountType.SWAN_ACCOUNT:
@@ -1113,26 +1050,15 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   }
   let testcoinsToAccount
 
-  console.log( {
-    newAccountsInfo
-  } )
   for ( const { accountType, accountDetails } of newAccountsInfo ){
-    const account: Account | MultiSigAccount = yield call(
+    const account: Account | MultiSigAccount | DonationAccount = yield call(
       addNewAccount,
       accountType,
       accountDetails || {
       }
     )
 
-    console.log( {
-      accounts
-    } )
-
     const accountShell = yield call( generateShellFromAccount, account )
-    console.log( {
-      accountShell
-    } )
-
     newAccountShells.push( accountShell )
     accounts [ account.id ] = account
     // yield put( accountShellOrderedToFront( accountShell ) )

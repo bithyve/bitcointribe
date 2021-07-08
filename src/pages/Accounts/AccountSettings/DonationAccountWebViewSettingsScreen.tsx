@@ -25,11 +25,10 @@ import { SafeAreaView } from 'react-navigation'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
+import { DonationAccount } from '../../../bitcoin/utilities/Interface'
 
 export type NavigationParams = {
   account: Record<string, unknown>;
-  serviceType: string;
-  accountNumber: number;
 };
 
 export type NavigationProp = {
@@ -42,16 +41,8 @@ export type Props = {
 
 const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
-  const {
-    donationAccount,
-    serviceType,
-    accountNumber,
-  } = useMemo( () => {
-    return {
-      donationAccount: navigation.getParam( 'account' ),
-      serviceType: navigation.getParam( 'serviceType' ),
-      accountNumber: navigation.getParam( 'accountNumber' ),
-    }
+  const donationAccount: DonationAccount = useMemo( () => {
+    return navigation.getParam( 'account' )
   }, [ navigation.params ] )
 
 
@@ -61,8 +52,8 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
   const [ disableSave, setDisableSave ] = useState( true )
   const [ doneeName, setDoneeName ] = useState( donationAccount.donee )
-  const [ description, setDescription ] = useState( donationAccount.description )
-  const [ cause, setCause ] = useState( donationAccount.subject )
+  const [ description, setDescription ] = useState( donationAccount.accountDescription )
+  const [ cause, setCause ] = useState( donationAccount.accountName )
 
   const [ isDonationPause, setIsDonationPause ] = useState(
     donationAccount.disableAccount ? donationAccount.disableAccount : false,
@@ -101,13 +92,13 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.description ) ||
-      ( cause && cause !== donationAccount.subject )
+      ( description && description !== donationAccount.accountDescription ) ||
+      ( cause && cause !== donationAccount.accountName )
     ) {
       const accountDetails = {
         donee: doneeName ? doneeName : donationAccount.donee,
-        subject: cause ? cause : donationAccount.subject,
-        description: description ? description : donationAccount.description,
+        subject: cause ? cause : donationAccount.accountName,
+        description: description ? description : donationAccount.accountDescription,
       }
       preferences = preferences
         ? {
@@ -121,7 +112,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     if ( preferences ) {
       Toast( 'Your preferences would be updated shortly' )
       dispatch(
-        updateDonationPreferences( serviceType, accountNumber, preferences ),
+        updateDonationPreferences( donationAccount, preferences ),
       )
       setDisableSave( true )
     }
@@ -130,8 +121,8 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
   useEffect( () => {
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.description ) ||
-      ( cause && cause !== donationAccount.subject ) ||
+      ( description && description !== donationAccount.accountDescription ) ||
+      ( cause && cause !== donationAccount.accountName ) ||
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
       isDonationPause !== donationAccount.disableAccount
     ) {

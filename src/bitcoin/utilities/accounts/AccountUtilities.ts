@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount } from '../Interface'
 import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -976,12 +976,7 @@ export default class AccountUtilities {
 
   // donation-account specific utilities
   static setupDonationAccount = async (
-    account: Account | MultiSigAccount,
-    donee: string,
-    subject: string,
-    configuration: {
-      displayBalance: boolean;
-    },
+    account: DonationAccount,
   ): Promise<{
     setupSuccessful: boolean;
   }> => {
@@ -997,12 +992,12 @@ export default class AccountUtilities {
         donationId: account.id.slice( 0, 15 ),
         walletID: account.walletId,
         details: {
-          donee,
-          subject,
+          donee: account.donee,
+          subject: account.accountName,
           description: account.accountDescription,
           xpubId: account.id,
           xpubs,
-          configuration,
+          configuration: account.configuration,
         },
       } )
     } catch ( err ) {
@@ -1017,7 +1012,7 @@ export default class AccountUtilities {
   };
 
   static updateDonationPreferences = async (
-    account: Account,
+    account: DonationAccount,
     preferences: {
       disableAccount?: boolean;
       configuration?: {
@@ -1029,7 +1024,7 @@ export default class AccountUtilities {
         description: string;
       };
     },
-  ): Promise<{ updated: boolean }> => {
+  ): Promise<{ updated: boolean, updatedAccount: DonationAccount }> => {
 
     let res: AxiosResponse
     try {
@@ -1045,8 +1040,22 @@ export default class AccountUtilities {
     }
 
     const { updated } = res.data
+    if( updated ){
+      if( preferences.disableAccount !== undefined && preferences.disableAccount !== account.disableAccount )
+        account.disableAccount = preferences.disableAccount
+
+      if( preferences.configuration )
+        account.configuration = preferences.configuration
+
+      if( preferences.accountDetails ){
+        account.accountName = preferences.accountDetails.subject
+        account.accountDescription = preferences.accountDetails.description
+        account.donee = preferences.accountDetails.donee
+      }
+    }
+
     return {
-      updated
+      updated, updatedAccount: account
     }
   };
 
