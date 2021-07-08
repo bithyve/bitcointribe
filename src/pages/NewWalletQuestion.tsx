@@ -116,7 +116,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
   )
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ height, setHeight ] = useState( 72 )
+  const [ height, setHeight ] = useState( 81 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -191,7 +191,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 72 )
+        setHeight( 81 )
       }
     )
     dispatch( clearAccountSyncCache() )
@@ -451,7 +451,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
-          height: '72%'
+          height: `${height}%`
 
         }}
       >
@@ -486,7 +486,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               alignItems: 'center',
               paddingRight: 15,
               borderColor: pswdError ? Colors.red : Colors.borderColor,
-              marginTop: 20,
+              marginTop: 10,
               backgroundColor: Colors.white
             }}
           >
@@ -558,7 +558,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               alignItems: 'center',
               paddingRight: 15,
               borderColor: pswdError ? Colors.red : Colors.borderColor,
-              marginVertical: 20,
+              marginTop: 10,
               backgroundColor: Colors.white
             }}
           >
@@ -643,7 +643,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               alignItems: 'center',
               paddingRight: 15,
               borderColor: Colors.borderColor,
-              marginVertical: 20,
+              marginVertical: 10,
               backgroundColor: Colors.white
             }}
           >
@@ -731,7 +731,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View> */}
         </View> : null}
         <View style={{
-          marginTop: 'auto'
+          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' )
         }}>
           <BottomInfoBox
             title={'Note'}
@@ -862,7 +862,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           ) : null}
           {dropdownBoxValue.id ? (
             <View style={{
-              marginTop: 15
+              marginTop: 10
             }}>
               <View
                 style={{
@@ -942,7 +942,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingRight: 15,
-                  marginTop: 15,
+                  marginTop: 10,
                   borderColor: answerError ? Colors.red : Colors.borderColor,
                   backgroundColor: Colors.white
                 }}
@@ -1021,7 +1021,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </View>
           ) : (
             <View style={{
-              marginTop: 15
+              marginTop: 9
             }} />
           )}
           <View
@@ -1091,7 +1091,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View> */}
           </View> : null}
           <View style={{
-            marginTop: showNote ? hp( 1 ) : hp( 7 )
+            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' )
           }}>
             <BottomInfoBox
               title={'Note'}
@@ -1314,7 +1314,7 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: 30,
+    marginTop: 15,
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -1328,7 +1328,7 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: 30,
+    marginTop: 15,
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -1365,7 +1365,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     paddingLeft: 30,
     paddingRight: 30,
-    paddingBottom: 40,
+    paddingBottom: hp( 2 ),
     alignItems: 'center',
   },
   bottomButtonView1: {
