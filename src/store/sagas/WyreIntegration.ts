@@ -53,28 +53,3 @@ function* fetchWyreReservationWorker( { payload } ) {
     wyreHostedUrl: url
   } ) )
 }
-
-export const fetchWyreReceiveAddressWatcher = createWatcher(
-  fetchWyreReceiveAddressWorker,
-  FETCH_WYRE_RECEIVE_ADDRESS
-)
-
-function* fetchWyreReceiveAddressWorker( { payload } ) {
-  const { instance, sourceKind } = payload
-  let service: RegularAccount| SecureAccount
-  switch ( sourceKind ) {
-      case SourceAccountKind.SECURE_ACCOUNT:
-        service = yield select(
-          ( state ) => state.accounts[ SourceAccountKind.SECURE_ACCOUNT ].service
-        )
-        break
-      default:
-        service = yield select(
-          ( state ) => state.accounts[ SourceAccountKind.REGULAR_ACCOUNT ].service
-        )
-  }
-  const receiveAddress =  service.getReceivingAddress( WYRE, instance? instance: 1 )
-  yield put( fetchWyreReceiveAddressSucceeded( {
-    wyreReceiveAddress: receiveAddress
-  } ) )
-}
