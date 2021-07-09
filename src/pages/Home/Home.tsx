@@ -39,6 +39,7 @@ import {
 import {
   initializeHealthSetup,
   updateCloudPermission,
+  acceptExistingContactRequest
 } from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
@@ -226,6 +227,7 @@ interface HomePropsTypes {
   updateFCMTokens: any;
   downloadMShare: any;
   initializeTrustedContact: any;
+  acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   initializeHealthSetup: any;
   overallHealth: any;
@@ -451,14 +453,41 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       switch ( scannedData.type ) {
           case QRCodeTypes.CONTACT_REQUEST:
           case QRCodeTypes.KEEPER_REQUEST:
-            const trustedContactRequest = {
+            let trustedContactRequest = {
               walletName: scannedData.walletName,
               channelKey: scannedData.channelKey,
               contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
               isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
               isQR: true,
               version: scannedData.version,
-              type: scannedData.type
+              type: scannedData.type,
+              isExistingContact: false
+            }
+            console.log( {
+              trustedContactRequest
+            } )
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
+            break
+
+          case QRCodeTypes.EXISTING_CONTACT:
+            trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: true,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type,
+              isExistingContact: true
             }
             console.log( {
               trustedContactRequest
@@ -1284,19 +1313,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet()
     const { navigation } = this.props
     const { trustedContactRequest } = this.state
+    console.log( 'trustedContactRequest', trustedContactRequest )
+    if( trustedContactRequest.isExistingContact ){
+      this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+    } else {
+      navigation.navigate( 'ContactsListForAssociateContact', {
+        postAssociation: ( contact ) => {
 
-    navigation.navigate( 'ContactsListForAssociateContact', {
-      postAssociation: ( contact ) => {
-        this.props.initializeTrustedContact( {
-          contact,
-          flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
-          channelKey: trustedContactRequest.channelKey,
-          contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
-        } )
-        // TODO: navigate post approval (from within saga)
-        navigation.navigate( 'Home' )
-      }
-    } )
+          this.props.initializeTrustedContact( {
+            contact,
+            flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+            channelKey: trustedContactRequest.channelKey,
+            contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+          } )
+
+          // TODO: navigate post approval (from within saga)
+          navigation.navigate( 'Home' )
+        }
+      } )
+    }
   };
 
   onTrustedContactRejected = () => {
@@ -1853,6 +1888,7 @@ export default withNavigationFocus(
     updateFCMTokens,
     downloadMShare,
     initializeTrustedContact,
+    acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,
     autoSyncShells,
