@@ -65,6 +65,7 @@ import AccountShell from '../../common/data/models/AccountShell'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { NotificationType } from '../../components/home/NotificationType'
 import ModalContainer from '../../components/home/ModalContainer'
+import { acceptExistingContactRequest } from '../../store/actions/health'
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
 
@@ -120,6 +121,7 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
   initializeTrustedContact: any;
+  acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -221,14 +223,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       switch ( scannedData.type ) {
           case QRCodeTypes.CONTACT_REQUEST:
           case QRCodeTypes.KEEPER_REQUEST:
-            const trustedContactRequest = {
+            let trustedContactRequest = {
               walletName: scannedData.walletName,
               channelKey: scannedData.channelKey,
               contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
               isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
               isQR: true,
               version: scannedData.version,
-              type: scannedData.type
+              type: scannedData.type,
+              isExistingContact: false
             }
             this.setState( {
               trustedContactRequest
@@ -242,6 +245,31 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             )
             break
 
+          case QRCodeTypes.EXISTING_CONTACT:
+            trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: true,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type,
+              isExistingContact: true
+            }
+            console.log( {
+              trustedContactRequest
+            } )
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
+            break
           case 'trustedGuardian':
             const trustedGuardianRequest = {
               isGuardian: scannedData.isGuardian,
@@ -643,19 +671,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet()
     const { navigation } = this.props
     const { trustedContactRequest } = this.state
-
-    navigation.navigate( 'ContactsListForAssociateContact', {
-      postAssociation: ( contact ) => {
-        this.props.initializeTrustedContact( {
-          contact,
-          flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
-          channelKey: trustedContactRequest.channelKey,
-          contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
-        } )
-        // TODO: navigate post approval (from within saga)
-        navigation.navigate( 'Home' )
-      }
-    } )
+    if( trustedContactRequest.isExistingContact ){
+      this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+    } else {
+      navigation.navigate( 'ContactsListForAssociateContact', {
+        postAssociation: ( contact ) => {
+          this.props.initializeTrustedContact( {
+            contact,
+            flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+            channelKey: trustedContactRequest.channelKey,
+            contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+          } )
+          // TODO: navigate post approval (from within saga)
+          navigation.navigate( 'Home' )
+        }
+      } )
+    }
   };
 
   onTrustedContactRejected = () => {
@@ -777,6 +808,7 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
     initializeTrustedContact,
+    acceptExistingContactRequest,
     rejectTrustedContact,
     fetchFeeAndExchangeRates,
     addTransferDetails,
