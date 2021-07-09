@@ -609,8 +609,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
     async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
       console.log( 'chosenContact', chosenContact )
-      const Contact = ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload ? payload.chosenContactTmp : chosenContact : chosenContact
-
+      const Contact = ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload && payload.chosenContactTmp ? payload.chosenContactTmp : chosenContact : chosenContact
+      setChosenContact( Contact )
       if( selectedKeeper.shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
       const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
@@ -641,7 +641,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: selectedKeeper.shareType == 'existingContact' ? true : false
       } ) )
     }
-  }, [ createChannelAssetsStatus, channelAssets ] )
+  }, [ chosenContact, createChannelAssetsStatus, channelAssets ] )
 
   useEffect( () => {
     if( selectedKeeper.shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
