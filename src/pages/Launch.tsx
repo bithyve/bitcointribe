@@ -25,7 +25,6 @@ import { processDL } from '../common/CommonFunctions'
 import {
   getMessages,
 } from '../store/actions/notifications'
-import dbManager from '../storage/realm/dbManager'
 
 type LaunchScreenProps = {
   initializeDB: any;
@@ -48,11 +47,6 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   }
 
   componentDidMount = async() => {
-    try {
-      dbManager.initDb(  )
-    } catch ( error ) {
-      console.log( error )
-    }
     AppState.addEventListener( 'change', this.handleAppStateChange )
     Linking.addEventListener( 'url', this.handleDeepLinkEvent )
     Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
