@@ -21,7 +21,6 @@ class Database  {
     try {
       this.getDb().write( () => {
         const res = this.db.create( ...args )
-        //console.log( 'created', res )
       } )
     } catch ( error ) {
       console.log( error )
@@ -37,7 +36,6 @@ class Database  {
   objects( ...args ) {
     try {
       const res = this.getDb().objects( ...args )
-      //console.log( 'objects$$$$', Array.from( res ) )
       return res
     } catch ( error ) {
       console.log( error )
@@ -48,26 +46,21 @@ class Database  {
     if( this.db ) {
       return this.db
     } else {
-      Realm.open( {
-        schema, schemaVersion: 1, path: 'hexa.realm',
-      } )
-        .then( ( res ) => {
-          this.db = res
-          return res
-        } )
-        .catch( ( e ) => console.log( e ) )
+      // TODO
     }
   }
 
-  init() {
+  init( key ) {
     Realm.open( {
-      schema, schemaVersion: 1, path: 'hexa.realm',
+      schema, schemaVersion: 1, path: 'hexa.realm', encryptionKey: key
     } )
       .then( ( res ) => {
         this.db = res
         console.log( res )
       } )
-      .catch( ( e ) => console.log( e ) )
+      .catch( ( e ) => {
+        console.log( e )
+      } )
   }
 }
 export default new Database()

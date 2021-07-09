@@ -1,7 +1,9 @@
 import db from './realm'
 import schema from './schema/Schema'
 
-const initDb = () => db.init()
+const initDb = ( key ) => {
+  db.init( key )
+}
 
 const createWallet = async ( wallet ) => {
   const accountIds = []

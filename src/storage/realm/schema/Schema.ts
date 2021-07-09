@@ -237,8 +237,12 @@ export const WalletSchema: ObjectSchema = {
     walletId: {
       type: 'string', indexed: true
     },
-    primaryMnemonic: 'string',
-    secondaryMemonic: 'string',
+    primaryMnemonic: {
+      type: 'string', optional: true,
+    },
+    secondaryMemonic: {
+      type: 'string', optional: true,
+    },
     details2FA: {
       type: Details2FA
     },

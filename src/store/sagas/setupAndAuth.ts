@@ -147,7 +147,8 @@ function* credentialsStorageWorker( { payload } ) {
   //generate an AES key and ecnrypt it with
   const AES_KEY = yield call( Cipher.generateKey )
   const encryptedKey = yield call( Cipher.encrypt, AES_KEY, hash )
-
+  const uint8array =  yield call( Cipher.stringToArrayBuffer, AES_KEY )
+  yield call( dbManager.initDb, uint8array )
   //store the AES key against the hash
   if ( !( yield call( SecureStore.store, hash, encryptedKey ) ) ) {
     yield call( AsyncStorage.setItem, 'hasCreds', 'false' )
@@ -173,6 +174,8 @@ function* credentialsAuthWorker( { payload } ) {
     const hash = yield call( Cipher.hash, payload.passcode )
     const encryptedKey = yield call( SecureStore.fetch, hash )
     key = yield call( Cipher.decrypt, encryptedKey, hash )
+    const uint8array =  yield call( Cipher.stringToArrayBuffer, key )
+    yield call( dbManager.initDb, uint8array )
   } catch ( err ) {
     console.log( {
       err
