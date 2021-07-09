@@ -562,10 +562,10 @@ class ManageBackupNewBHR extends Component<
     }
     let index = 1
     let count = 0
-    if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' ) {
+    if ( selectedKeeper.shareType == 'device' || selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
       for ( let i = 0; i < this.props.levelData.length; i++ ) {
         const element = this.props.levelData[ i ]
-        if( selectedKeeper.shareType == 'contact' ) {
+        if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
           if ( element.keeper1.shareType == 'contact' ) count++
           if ( element.keeper2.shareType == 'contact' ) count++
         }
@@ -574,7 +574,7 @@ class ManageBackupNewBHR extends Component<
           if ( element.keeper2.shareType == 'device' ) count++
         }
       }
-      if( selectedKeeper.shareType == 'contact' ) {
+      if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
         if ( count == 1 && isSetup ) index = 2
         else if ( count == 0 && isSetup ) index = 1
         else index = selectedKeeper.data.index
@@ -600,7 +600,7 @@ class ManageBackupNewBHR extends Component<
         isChangeKeeperAllow,
         index: index > -1 ? index : 0,
       } )
-    } else if ( selectedKeeper.shareType == 'contact' ) {
+    } else if ( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
       this.props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...navigationParams,
         index,

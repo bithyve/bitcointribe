@@ -71,6 +71,7 @@ export const DOWNLOAD_BACKUP_DATA = 'DOWNLOAD_BACKUP_DATA'
 export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
 export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
+export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -574,11 +575,9 @@ export const downloadSMShare = ( scannedData ) => {
   }
 }
 
-export const createOrChangeGuardian = ( channelKey, shareId, contact, index, isChange?, oldChannelKey? ) => {
+export const createOrChangeGuardian = ( payload: {channelKey: string, shareId: string, contact: any, index: number, isChange?: boolean, oldChannelKey?: string, existingContact?: boolean} ) => {
   return {
-    type: CREATE_OR_CHANGE_GUARDIAN, payload: {
-      channelKey, shareId, contact, index, isChange, oldChannelKey
-    }
+    type: CREATE_OR_CHANGE_GUARDIAN, payload: payload
   }
 }
 
@@ -618,5 +617,13 @@ export const setIsKeeperInfoUpdated = ( payload: {
 } ) => {
   return {
     type: SET_IS_KEEPER_INFO_UPDATED, payload
+  }
+}
+
+export const acceptExistingContactRequest = ( channelKey, contactsSecondaryChannelKey ) => {
+  return {
+    type: ACCEPT_EC_REQUEST, payload:{
+      channelKey, contactsSecondaryChannelKey
+    }
   }
 }

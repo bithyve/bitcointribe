@@ -9,6 +9,7 @@ import {
   Platform,
   AsyncStorage,
   Keyboard,
+  TouchableOpacity,
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -16,6 +17,12 @@ import {
 } from 'react-native-responsive-screen'
 import { useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
+import {
+  ContactRecipientDescribing,
+} from '../../common/data/models/interfaces/RecipientDescribing'
+import { ListItem } from 'react-native-elements'
+import { makeContactRecipientDescription } from '../../utils/sending/RecipientFactories'
+import FriendsAndFamilyContactListItemContent from '../../components/friends-and-family/FriendsAndFamilyContactListItemContent'
 import { RFValue } from 'react-native-responsive-fontsize'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import BottomSheet from 'reanimated-bottom-sheet'
@@ -49,7 +56,8 @@ import {
   QRCodeTypes,
   TrustedContact,
   Trusted_Contacts,
-  ChannelAssets
+  ChannelAssets,
+  TrustedContactRelationTypes
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -67,6 +75,10 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import { getIndex } from '../../common/utilities'
+import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
+import Fonts from '../../common/Fonts'
+import BackupStyles from './Styles'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 const TrustedContactHistoryKeeper = ( props ) => {
   const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
@@ -116,7 +128,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
       ? props.navigation.state.params.selectedKeeper.data
       : null,
   )
-  const [ showQRCode, setShowQRCode ] = useState( false )
+  const [ showQrCode, setShowQrCode ] = useState( false )
+  const [ showFNFList, setShowFNFList ] = useState( false )
 
   const createChannelAssetsStatus = useSelector( ( state ) => state.health.loading.createChannelAssetsStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
@@ -127,6 +140,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const trustedContacts: TrustedContactsService = useSelector( ( state ) => state.trustedContacts.service )
+  const [ contacts, setContacts ] = useState( [] )
   const { WALLET_SETUP } = useSelector( ( state ) => state.storage.database )
   const index = props.navigation.getParam( 'index' )
   const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
@@ -145,17 +159,40 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ props.navigation.state.params ] )
 
   useEffect( () => {
+    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const c = []
+    for( const channelKey of Object.keys( contacts ) ){
+      const contact = contacts[ channelKey ]
+      if( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) {
+        c.push( {
+          ...contact, channelKey
+        } )
+      }
+    }
+    console.log( 'c', c )
+    setContacts( c )
+  }, [] )
+
+  useEffect( () => {
     if ( isChange ) {
       setTimeout( () => {
         setLoadContacts( true )
       }, 2 )
-      props.navigation.navigate( 'TrustedContactNewBHR', {
-        LoadContacts: true,
-        onPressContinue:async ( selectedContacts ) => {
-          Keyboard.dismiss()
-          createGuardian( getContacts( selectedContacts ) )
-        }
-      } )
+      // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
+      // setTrustedContactModal( true )
+      if( selectedKeeper.shareType === 'existingContact' ){ setShowFNFList( true ) }
+      else {
+        props.navigation.navigate( 'TrustedContactNewBHR', {
+          LoadContacts: true,
+          onPressContinue:async ( selectedContacts ) => {
+            Keyboard.dismiss()
+            createGuardian( {
+              chosenContactTmp: getContacts( selectedContacts )
+            } )
+            setShowQrCode( true )
+          }
+        } )
+      }
     }
   }, [ isChange ] )
 
@@ -165,15 +202,22 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setTimeout( () => {
           setLoadContacts( true )
         }, 2 )
-        props.navigation.navigate( 'TrustedContactNewBHR', {
-          LoadContacts: true,
-          onPressContinue:async ( selectedContacts ) => {
-            Keyboard.dismiss()
-            createGuardian( {
-              chosenContactTmp:  getContacts( selectedContacts )
-            } )
-          }
-        } )
+        // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
+        // setTrustedContactModal( true )
+        if( selectedKeeper.shareType === 'existingContact' ){ setShowFNFList( true ) }
+        else {
+          props.navigation.navigate( 'TrustedContactNewBHR', {
+            LoadContacts: true,
+            onPressContinue:async ( selectedContacts ) => {
+              Keyboard.dismiss()
+              createGuardian( {
+                chosenContactTmp: getContacts( selectedContacts )
+              } )
+              setShowQrCode( true )
+            }
+          } )
+        }
+
       }
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
@@ -212,11 +256,120 @@ const TrustedContactHistoryKeeper = ( props ) => {
           )
         }
       }, 2 )
-      setShowQRCode( true )
+      setShowQrCode( true )
       return selectedContacts[ 0 ]
     },
     [ chosenContact ],
   )
+
+  const renderTrustedContactsContent = useCallback( () => {
+    return selectedKeeper.shareType === 'contact' ? (
+      <TrustedContacts
+        LoadContacts={LoadContacts}
+        onPressBack={() => {
+          ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
+        }}
+        onPressContinue={async ( selectedContacts ) => {
+          Keyboard.dismiss()
+          if ( selectedContacts[ 0 ] ) {
+            setChosenContact( selectedContacts[ 0 ] )
+          }
+          createGuardian( {
+            chosenContactTmp: getContacts( selectedContacts )
+          } )
+          setShowQrCode( true )
+        }}
+      />
+    ) : (
+      <View
+        style={{
+          height: '100%',
+          backgroundColor: Colors.white,
+          alignSelf: 'center',
+          width: '100%',
+        }}>
+        <View
+          style={{
+            ...BackupStyles.modalHeaderTitleView,
+            paddingTop: hp( '0.5%' ),
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginLeft: 20,
+          }}
+        >
+          <Text style={BackupStyles.modalHeaderTitleText}>
+          Associate a contact
+          </Text>
+          <AppBottomSheetTouchableWrapper
+            onPress={()=> {}}
+            style={{
+              height: wp( '13%' ),
+              width: wp( '35%' ),
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}
+          >
+            {/* <Text
+              style={{
+                ...{
+                  color: Colors.white,
+                  fontSize: RFValue( 13 ),
+                  fontFamily: Fonts.FiraSansMedium,
+                },
+                color: Colors.blue,
+              }}
+            >
+            Skip
+            </Text> */}
+          </AppBottomSheetTouchableWrapper>
+        </View>
+        {( contacts.length && contacts.map( ( item, index ) => {
+          return renderContactListItem( {
+            contactDescription: item,
+            index,
+            contactsType: 'My Keepers',
+          } )
+        } ) ) || <View style={{
+          height: wp( '22%' ) + 30
+        }} />}
+      </View> )
+  }, [ LoadContacts, getContacts ] )
+
+  const renderTrustedContactsHeader = useCallback( () => {
+    return (
+      <ModalHeader
+        onPressHeader={() => {
+          ( trustedContactsBottomSheet as any ).current.snapTo( 0 )
+        }}
+      />
+    )
+  }, [] )
+
+  const renderContactListItem = useCallback( ( {
+    contactDescription,
+    index,
+  }: {
+    contactDescription: any;
+    index: number;
+    contactsType: string;
+  }
+  ) => {
+    console.log( 'contactDescription', contactDescription )
+    return <TouchableOpacity style={{
+      padding : 5
+    }} onPress={()=>{
+      const obj = {
+        name: contactDescription.contactDetails.contactName,
+        imageAvailable: contactDescription.contactDetails.imageAvailable ? true : false,
+        image: contactDescription.contactDetails.imageAvailable,
+        id: contactDescription.contactDetails.id
+      }
+      setChannelKey( contactDescription.channelKey )
+      setChosenContact( obj ); setShowFNFList( false )}}>
+      <Text>{contactDescription.contactDetails.contactName}</Text>
+    </TouchableOpacity>
+
+  }, [] )
 
   const updateHistory = useCallback(
     ( shareHistory ) => {
@@ -338,8 +491,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const onPressReshare = useCallback( async () => {
+    console.log( 'onPressReshare >>>>>>>>>', chosenContact )
     setReshareModal( false )
-    setShowQRCode( true )
+    createGuardian( {
+      chosenContactTmp: getContacts( chosenContact )
+    } )
+    setShowQrCode( true )
   }, [ selectedTitle, chosenContact, getContacts ] )
 
   const renderChangeContent = useCallback( () => {
@@ -359,13 +516,21 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setLoadContacts( true )
             setChangeContact( true )
           }, 2 )
-          props.navigation.navigate( 'TrustedContactNewBHR', {
-            LoadContacts: true,
-            onPressContinue:async ( selectedContacts ) => {
-              Keyboard.dismiss()
-              createGuardian( getContacts( selectedContacts ) )
-            }
-          } );
+
+          // ( trustedContactsBottomSheet as any ).current.snapTo( 1 );
+          if( selectedKeeper.shareType === 'existingContact' ){ setShowFNFList( true ) }
+          else {
+            props.navigation.navigate( 'TrustedContactNewBHR', {
+              LoadContacts: true,
+              onPressContinue:async ( selectedContacts ) => {
+                Keyboard.dismiss()
+                createGuardian( {
+                  chosenContactTmp: getContacts( selectedContacts )
+                } )
+                setShowQrCode( true )
+              }
+            } )
+          }
           ( ChangeBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressIgnore={() => {
@@ -424,7 +589,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
                         ? chosenContact.firstName
                         : !chosenContact.firstName && chosenContact.lastName
                           ? chosenContact.lastName
-                          : '',
+                          : chosenContact.name ? chosenContact.name : '',
                   )
                   : ''}
             </Text>
@@ -441,14 +606,15 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const createGuardian = useCallback(
-    async ( payload: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
-      const { chosenContactTmp } = payload
+    async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      const Contact = ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? chosenContactTmp : chosenContact
-      if( ( trustedQR || isReshare ) && !isChangeKeeper ) return
+      console.log( 'chosenContact', chosenContact )
+      const Contact = ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload ? payload.chosenContactTmp : chosenContact : chosenContact
+
+      if( selectedKeeper.shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKey )
+      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKeyTemp )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
@@ -470,10 +636,20 @@ const TrustedContactHistoryKeeper = ( props ) => {
   )
 
   useEffect( ()=> {
-    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
-      dispatch( createOrChangeGuardian( channelKey, selectedKeeper.shareId, chosenContact, index, isChange, oldChannelKey ) )
+    if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
+      dispatch( createOrChangeGuardian( {
+        channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: selectedKeeper.shareType == 'existingContact' ? true : false
+      } ) )
     }
   }, [ createChannelAssetsStatus, channelAssets ] )
+
+  useEffect( () => {
+    if( selectedKeeper.shareType == 'existingContact' && !isGuardianCreationClicked && ( ( chosenContact && Object.keys( chosenContact ).length ) || chosenContact != null ) ) {
+      console.log( 'createGuardian >>>>>>>> chosenContact', chosenContact )
+      createGuardian( )
+      setShowQrCode( true )
+    }
+  }, [ chosenContact ] )
 
   useEffect( () => {
     if( !chosenContact ) return
@@ -493,7 +669,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
       // setTrustedLink( numberDL )
-      console.log( JSON.stringify( {
+      console.log( 'QR DATA', JSON.stringify( {
         type: QRCodeTypes.KEEPER_REQUEST,
         channelKey,
         walletName: WALLET_SETUP.walletName,
@@ -502,7 +678,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       } ) )
       setTrustedQR(
         JSON.stringify( {
-          type: QRCodeTypes.KEEPER_REQUEST,
+          type: selectedKeeper.shareType == 'existingContact' ? QRCodeTypes.EXISTING_CONTACT : QRCodeTypes.KEEPER_REQUEST,
           channelKey,
           walletName: WALLET_SETUP.walletName,
           secondaryChannelKey,
@@ -708,13 +884,22 @@ const TrustedContactHistoryKeeper = ( props ) => {
             setTimeout( () => {
               setLoadContacts( true )
             }, 2 )
-            props.navigation.navigate( 'TrustedContactNewBHR', {
-              LoadContacts: true,
-              onPressContinue:async ( selectedContacts ) => {
-                Keyboard.dismiss()
-                createGuardian( getContacts( selectedContacts ) )
-              }
-            } )
+            // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
+            // setTrustedContactModal( true )
+            console.log( 'selectedKeeper.shareType', selectedKeeper.shareType )
+            if( selectedKeeper.shareType === 'existingContact' ){ setShowFNFList( true ) }
+            else {
+              props.navigation.navigate( 'TrustedContactNewBHR', {
+                LoadContacts: true,
+                onPressContinue:async ( selectedContacts ) => {
+                  Keyboard.dismiss()
+                  createGuardian( {
+                    chosenContactTmp: getContacts( selectedContacts )
+                  } )
+                  setShowQrCode( true )
+                }
+              } )
+            }
           }}
           onPressReshare={() => {
             setReshareModal( true )
@@ -800,7 +985,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         renderContent={renderErrorModalContent}
         renderHeader={() => <ModalHeader />}
       />
-      <ModalContainer visible={showQRCode} closeBottomSheet={() => setShowQRCode( false )}>
+      <ModalContainer visible={showQrCode} closeBottomSheet={() => setShowQrCode( false )}>
         <RequestKeyFromContact
           isModal={true}
           headerText={`Send Recovery Key${'\n'}to contact`}
@@ -811,9 +996,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
           link={trustedLink}
           contactEmail={''}
           onPressBack={() => {
+            // ( shareBottomSheet as any ).current.snapTo( 0 )
             props.navigation.goBack()
           }}
           onPressDone={() => {
+            // ( shareBottomSheet as any ).current.snapTo( 0 )
             props.navigation.goBack()
           }}
           onPressShare={() => {
@@ -821,10 +1008,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
               setTimeout( () => {
                 setRenderTimer( true )
               }, 2 )
+              // ( shareBottomSheet as any ).current.snapTo( 0 );
               props.navigation.goBack();
               ( shareOtpWithTrustedContactBottomSheet as any ).current.snapTo( 1 )
             }
             else {
+              // ( shareBottomSheet as any ).current.snapTo( 0 )
               props.navigation.goBack()
               const popAction = StackActions.pop( {
                 n: isChange ? 2 : 1
@@ -834,6 +1023,68 @@ const TrustedContactHistoryKeeper = ( props ) => {
           }}
         />
       </ModalContainer>
+      <ModalContainer visible={showFNFList} closeBottomSheet={() => setShowFNFList( false )}>
+        <View
+          style={{
+            height: '100%',
+            backgroundColor: Colors.white,
+            alignSelf: 'center',
+            width: '100%',
+          }}>
+          <View
+            style={{
+              ...BackupStyles.modalHeaderTitleView,
+              paddingTop: hp( '0.5%' ),
+              flexDirection: 'row',
+              alignItems: 'center',
+              marginLeft: 20,
+            }}
+          >
+            <AppBottomSheetTouchableWrapper
+              onPress={() => setShowFNFList( false )}
+              style={{
+                height: 30,
+                width: 30,
+                justifyContent: 'center'
+              }}
+            >
+              <FontAwesome name="long-arrow-left" color={Colors.blue} size={17} />
+            </AppBottomSheetTouchableWrapper>
+            <Text style={BackupStyles.modalHeaderTitleText}>
+              Associate a contact
+            </Text>
+            <AppBottomSheetTouchableWrapper
+              onPress={()=> {}}
+              style={{
+                height: wp( '13%' ),
+                width: wp( '35%' ),
+                justifyContent: 'center',
+                alignItems: 'flex-end',
+              }}
+            >
+            </AppBottomSheetTouchableWrapper>
+          </View>
+          {( contacts.length && contacts.map( ( item, index ) => {
+            return renderContactListItem( {
+              contactDescription: item,
+              index,
+              contactsType: 'My Keepers',
+            } )
+          } ) ) || <View style={{
+            height: wp( '22%' ) + 30
+          }} />}
+        </View>
+      </ModalContainer>
+      {/* <BottomSheet
+        enabledInnerScrolling={true}
+        ref={shareBottomSheet as any}
+        snapPoints={[
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? 0 : 0,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '85%' ) : hp( '90%' ),
+        ]}
+        renderContent={SendShareModalFunction}
+        renderHeader={SendModalFunction}
+      /> */}
       <BottomSheet
         enabledGestureInteraction={false}
         enabledInnerScrolling={true}

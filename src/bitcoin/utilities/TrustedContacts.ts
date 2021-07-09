@@ -137,6 +137,8 @@ export default class TrustedContacts {
         contact.relationType = idx( primaryData, ( _ ) => _.relationType )
       }
 
+      if( secondaryChannelKey ) contact.secondaryChannelKey = secondaryChannelKey
+
       if( secondaryData && secondaryChannelKey )
         outstreamUpdates.secondaryEncryptedData = this.encryptData( secondaryChannelKey, secondaryData ).encryptedData
       else if ( secondaryData === null )
@@ -242,6 +244,8 @@ export default class TrustedContacts {
         }
 
         if( !contact.isActive ) continue // skip non-active contacts
+
+        if( contactsSecondaryChannelKey ) contact.contactsSecondaryChannelKey = contactsSecondaryChannelKey // for contact to keeper conversion
 
         let outstreamUpdates: StreamData
         if( unEncryptedOutstreamUpdates )

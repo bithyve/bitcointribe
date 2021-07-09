@@ -21,6 +21,12 @@ export default function KeeperTypeModalContents( props ) {
       image: require( '../../assets/images/icons/icon_contact.png' ),
     },
     {
+      type: 'existingContact',
+      name: 'Backup with existing contact',
+      info: 'Backup the Recovery Key with a existing contact  ',
+      image: require( '../../assets/images/icons/icon_contact.png' ),
+    },
+    {
       type: 'device',
       name: 'Backup on a device',
       info: 'Use another device running Hexa to secure the Recovery Key',

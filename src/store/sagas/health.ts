@@ -65,7 +65,8 @@ import {
   SETUP_HEALTH_FOR_RESTORE,
   setupHealth,
   UPDATE_KEEPER_INFO_TO_CHANNEL,
-  setIsKeeperInfoUpdated
+  setIsKeeperInfoUpdated,
+  ACCEPT_EC_REQUEST
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -128,6 +129,7 @@ import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import SSS from '../../bitcoin/utilities/sss/SSS'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -2058,40 +2060,44 @@ export const downloadSMShareWatcher = createWatcher(
 
 function* createOrChangeGuardianWorker( { payload } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey } = payload
+    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = payload
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
+    const channelAssets: ChannelAssets = yield select( ( state ) => state.health.channelAssets )
     const s3Service = yield select( ( state ) => state.health.service )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const walletId = s3Service.levelhealth.walletId
+    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
     if( MetaShares && MetaShares.length ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-      yield put( initializeTrustedContact( {
-        contact: contact,
-        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
-        isKeeper: true,
-        channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
-        shareId: shareId
-      } ) )
-      if( isChange ) {
-        const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
-        const { SERVICES } = yield select( ( state ) => state.storage.database )
+      console.log( 'existingContact', existingContact )
+      console.log( 'channelKey', channelKey )
+      if( existingContact ){
         const contactInfo = {
-          channelKey: oldChannelKey,
+          channelKey: channelKey,
+          secondaryChannelKey: SSS.generateKey( config.CIPHER_SPEC.keyLength )
         }
         const primaryData: PrimaryStreamData = {
-          contactDetails: trustedContacts.tc.trustedContacts[ oldChannelKey ].contactDetails,
+          contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
-          relationType: TrustedContactRelationTypes.CONTACT,
+          relationType: TrustedContactRelationTypes.KEEPER,
+        }
+        const secondaryData: SecondaryStreamData = {
+          secondaryMnemonicShard: channelAssets.secondaryMnemonicShard,
+          bhXpub: channelAssets.bhXpub
+        }
+        const backupData: BackupStreamData = {
+          primaryMnemonicShard: channelAssets.primaryMnemonicShard,
+          keeperInfo
         }
         const streamUpdates: UnecryptedStreamData = {
           streamId: TrustedContacts.getStreamId( walletId ),
           primaryData,
-          secondaryData: null,
-          backupData: null,
+          secondaryData,
+          backupData,
           metaData: {
             flags:{
               active: true,
@@ -2105,10 +2111,55 @@ function* createOrChangeGuardianWorker( { payload } ) {
         const channelUpdate =  {
           contactInfo, streamUpdates
         }
+        console.log( 'channelUpdate', channelUpdate )
         yield put( syncPermanentChannels( {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         } ) )
+      } else {
+        yield put( initializeTrustedContact( {
+          contact: contact,
+          flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
+          isKeeper: true,
+          channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
+          shareId: shareId
+        } ) )
+
+        if( isChange ) {
+
+          const { SERVICES } = yield select( ( state ) => state.storage.database )
+          const contactInfo = {
+            channelKey: oldChannelKey,
+          }
+          const primaryData: PrimaryStreamData = {
+            contactDetails: trustedContacts.tc.trustedContacts[ oldChannelKey ].contactDetails,
+            walletID: walletId,
+            walletName,
+            relationType: TrustedContactRelationTypes.CONTACT,
+          }
+          const streamUpdates: UnecryptedStreamData = {
+            streamId: TrustedContacts.getStreamId( walletId ),
+            primaryData,
+            secondaryData: null,
+            backupData: null,
+            metaData: {
+              flags:{
+                active: true,
+                newData: true,
+                lastSeen: Date.now(),
+              },
+              version: DeviceInfo.getVersion()
+            }
+          }
+          // initiate permanent channel
+          const channelUpdate =  {
+            contactInfo, streamUpdates
+          }
+          yield put( syncPermanentChannels( {
+            permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+            channelUpdates: [ channelUpdate ],
+          } ) )
+        }
       }
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     }
@@ -2431,4 +2482,65 @@ function* updateKeeperInfoToChannelWorker( ) {
 export const updateKeeperInfoToChannelWatcher = createWatcher(
   updateKeeperInfoToChannelWorker,
   UPDATE_KEEPER_INFO_TO_CHANNEL
+)
+
+function* acceptExistingContactRequestWorker( { payload } ) {
+  try {
+    console.log( 'UPDATE KEEPER INFO' )
+    yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+    const { channelKey, contactsSecondaryChannelKey } = payload
+    const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
+    if ( keeperInfo.length > 0 ) {
+      for ( let i = 0; i < keeperInfo.length; i++ ) {
+        if( currentLevel == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = currentLevel
+        else if( currentLevel == 2 && keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = currentLevel
+        else if( currentLevel == 3 && keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = currentLevel
+      }
+    }
+    yield put( putKeeperInfo( keeperInfo ) )
+    const service: S3Service = yield select( ( state ) => state.health.service )
+    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const walletId = service.levelhealth.walletId
+    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+    const contactInfo = {
+      channelKey,
+      contactsSecondaryChannelKey
+    }
+    const primaryData: PrimaryStreamData = {
+      contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
+      walletID: walletId,
+      walletName,
+      relationType: TrustedContactRelationTypes.KEEPER,
+    }
+    const streamUpdates: UnecryptedStreamData = {
+      streamId: TrustedContacts.getStreamId( walletId ),
+      primaryData,
+      metaData: {
+        flags:{
+          active: true,
+          newData: true,
+          lastSeen: Date.now(),
+        },
+        version: DeviceInfo.getVersion()
+      }
+    }
+    // initiate permanent channel
+    const channelUpdate =  {
+      contactInfo, streamUpdates
+    }
+    yield put( syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      channelUpdates: [ channelUpdate ],
+    } ) )
+    yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
+    console.log( 'Error autoShareLevel2KeepersWorker', error )
+  }
+}
+
+export const acceptExistingContactRequestWatcher = createWatcher(
+  acceptExistingContactRequestWorker,
+  ACCEPT_EC_REQUEST
 )
