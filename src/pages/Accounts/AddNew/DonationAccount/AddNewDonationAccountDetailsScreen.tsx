@@ -6,7 +6,7 @@ import Fonts from '../../../../common/Fonts'
 import ListStyles from '../../../../common/Styles/ListStyles'
 import { Input } from 'react-native-elements'
 import { useDispatch } from 'react-redux'
-import { addNewAccountShell } from '../../../../store/actions/accounts'
+import { addNewAccountShells } from '../../../../store/actions/accounts'
 import useAccountShellCreationCompletionEffect from '../../../../utils/hooks/account-effects/UseAccountShellCreationCompletionEffect'
 import { resetToHomeAction } from '../../../../navigation/actions/NavigationActions'
 import {
@@ -23,6 +23,8 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Entypo from 'react-native-vector-icons/Entypo'
+import { newAccountsInfo } from '../../../../store/sagas/accounts'
+import { AccountType } from '../../../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -67,7 +69,16 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
       ? SourceAccountKind.SECURE_ACCOUNT
       : SourceAccountKind.REGULAR_ACCOUNT
 
-    dispatch( addNewAccountShell( currentSubAccount ) )
+    const newAccountInfo: newAccountsInfo = {
+      accountType: AccountType.DONATION_ACCOUNT,
+      accountDetails: {
+        name: accountName,
+        description: accountDescription,
+        is2FAEnabled: isTFAEnabled,
+        doneeName: doneeName
+      }
+    }
+    dispatch( addNewAccountShells( [ newAccountInfo ] ) )
   }
 
   async function openTermsAndConditions() {
@@ -150,14 +161,14 @@ const AddNewDonationAccountDetailsScreen: React.FC<Props> = ( { navigation, }: P
               Enable 2-Factor Authentication
                 </Text>
                 <View style={styles.checkbox}>
-                    {isTFAEnabled && (
-                      <Entypo
-                        name="check"
-                        size={RFValue( 20 )}
-                        color={Colors.green}
-                      />
-                    )}
-                  </View>
+                  {isTFAEnabled && (
+                    <Entypo
+                      name="check"
+                      size={RFValue( 20 )}
+                      color={Colors.green}
+                    />
+                  )}
+                </View>
                 {/* <CheckBox
                   checkedIcon="check"
                   uncheckedIcon="square-o"
@@ -239,14 +250,14 @@ const styles = StyleSheet.create( {
   },
   checkbox: {
     width: wp( '7%' ),
-      height: wp( '7%' ),
-      borderRadius: 7,
-      backgroundColor: Colors.white,
-      borderColor: Colors.borderColor,
-      borderWidth: 1,
-      marginLeft: 'auto',
-      alignItems: 'center',
-      justifyContent: 'center',
+    height: wp( '7%' ),
+    borderRadius: 7,
+    backgroundColor: Colors.white,
+    borderColor: Colors.borderColor,
+    borderWidth: 1,
+    marginLeft: 'auto',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   linkText: {
     fontFamily: Fonts.FiraSansItalic,

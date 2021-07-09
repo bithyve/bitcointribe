@@ -81,12 +81,12 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
             imageSource: require( '../../../assets/images/icons/xpub.png' ),
           }
         ] : [] ),
-        {
-          title: 'Account Sync',
-          subtitle: 'Manually scan the account',
-          imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
-          onOptionPressed: handleRescanListItemSelection,
-        },
+        // {
+        //   title: 'Account Sync',
+        //   subtitle: 'Manually scan the account',
+        //   imageSource: require( '../../../assets/images/icons/icon_checking_blue_visibility.png' ),
+        //   onOptionPressed: handleRescanListItemSelection,
+        // },
       ],
       ...( accountShell.primarySubAccount.isTFAEnabled ? [
         {
@@ -223,31 +223,31 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
     } )
   }
 
-  const showRescanningPromptBottomSheet = () => {
-    return (
-      <AccountShellRescanningPromptBottomSheet
-        onContinue={() => {
-          setShowRescanningPrompt( false )
-          setTimeout( () => {
-            // showRescanningBottomSheet()
-            setShowRescanning( true )
-          }, 800 )
-        }}
-        onDismiss={() => setShowRescanningPrompt( false )}
-      />
-    )
-  }
+  // const showRescanningPromptBottomSheet = () => {
+  //   return (
+  //     <AccountShellRescanningPromptBottomSheet
+  //       onContinue={() => {
+  //         setShowRescanningPrompt( false )
+  //         setTimeout( () => {
+  //           // showRescanningBottomSheet()
+  //           setShowRescanning( true )
+  //         }, 800 )
+  //       }}
+  //       onDismiss={() => setShowRescanningPrompt( false )}
+  //     />
+  //   )
+  // }
 
 
-  const showRescanningBottomSheet = () => {
-    return (
-      <AccountShellRescanningBottomSheet
-        accountShell={accountShell}
-        onDismiss={() => setShowRescanning( false )}
-        onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
-      />
-    )
-  }
+  // const showRescanningBottomSheet = () => {
+  //   return (
+  //     <AccountShellRescanningBottomSheet
+  //       accountShell={accountShell}
+  //       onDismiss={() => setShowRescanning( false )}
+  //       onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
+  //     />
+  //   )
+  // }
 
 
   return (
@@ -270,13 +270,13 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
         {checkAccountBalance()}
       </ModalContainer>
 
-      <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
+      {/* <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => {}}>
         {showRescanningPromptBottomSheet()}
       </ModalContainer>
 
       <ModalContainer visible={showRescanning} closeBottomSheet={() => {}}>
         {showRescanningBottomSheet()}
-      </ModalContainer>
+      </ModalContainer> */}
     </>
   )
 }

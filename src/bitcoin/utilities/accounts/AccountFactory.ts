@@ -1,5 +1,4 @@
-import { networks } from 'bitcoinjs-lib'
-import { Account, AccountType, MultiSigAccount, NetworkType } from '../Interface'
+import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
 
@@ -65,7 +64,6 @@ export function generateAccount(
 
   return account
 }
-
 
 export function generateMultiSigAccount(
   {
@@ -150,6 +148,78 @@ export function generateMultiSigAccount(
 
   return account
 }
+
+export function generateDonationAccount(
+  {
+    walletId,
+    type,
+    instanceNum,
+    accountName,
+    accountDescription,
+    donee,
+    mnemonic,
+    derivationPath,
+    is2FA,
+    secondaryXpub,
+    bithyveXpub,
+    networkType,
+  }: {
+    walletId: string,
+    type: AccountType,
+    instanceNum: number,
+    accountName: string,
+    accountDescription: string,
+    donee: string,
+    mnemonic: string,
+    derivationPath: string,
+    is2FA?: boolean,
+    secondaryXpub?: string,
+    bithyveXpub?: string,
+    networkType: NetworkType,
+  }
+): DonationAccount {
+
+  let baseAccount: Account | MultiSigAccount
+  if( is2FA ) baseAccount = generateMultiSigAccount( {
+    walletId,
+    type,
+    instanceNum,
+    accountName,
+    accountDescription,
+    mnemonic,
+    derivationPath,
+    secondaryXpub,
+    bithyveXpub,
+    networkType,
+  } )
+  else {
+    baseAccount = {
+      ...generateAccount( {
+        walletId,
+        type,
+        instanceNum,
+        accountName,
+        accountDescription,
+        mnemonic,
+        derivationPath,
+        networkType,
+      } ),
+    }
+  }
+
+  const donationAccount: DonationAccount = {
+    ...baseAccount,
+    donee,
+    configuration: {
+      displayBalance: true,
+    },
+    disableAccount: false,
+    is2FA,
+  }
+
+  return donationAccount
+}
+
 
 
 

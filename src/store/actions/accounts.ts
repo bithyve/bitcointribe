@@ -1,5 +1,5 @@
 import { Action } from 'redux'
-import { Account, Accounts, ContactInfo } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, ContactInfo, DonationAccount } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { newAccountsInfo } from '../sagas/accounts'
@@ -260,8 +260,7 @@ export const setupDonationAccount = (
 }
 
 export const updateDonationPreferences = (
-  serviceType: string,
-  accountNumber: number,
+  donationAccount: DonationAccount,
   preferences: {
     disableAccount?: boolean;
     configuration?: {
@@ -277,7 +276,7 @@ export const updateDonationPreferences = (
   return {
     type: UPDATE_DONATION_PREFERENCES,
     payload: {
-      serviceType, accountNumber, preferences
+      donationAccount, preferences
     },
   }
 }

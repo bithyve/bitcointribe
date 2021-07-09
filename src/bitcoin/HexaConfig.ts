@@ -43,6 +43,9 @@ class HexaConfig {
   public SSS_OTP_LENGTH: string = Config.BIT_SSS_OTP_LENGTH ? Config.BIT_SSS_OTP_LENGTH.trim() : '6';
   public REQUEST_TIMEOUT: number = Config.BIT_REQUEST_TIMEOUT ? parseInt( Config.BIT_REQUEST_TIMEOUT.trim(), 10 ) : 15000;
   public GAP_LIMIT: number = Config.BIT_GAP_LIMIT ? parseInt( Config.BIT_GAP_LIMIT.trim(), 10 ) : 5;
+  public DONATION_GAP_LIMIT = Config.BIT_DONATION_GAP_LIMIT? parseInt( Config.BIT_DONATION_GAP_LIMIT.trim(), 10 ) : 50;
+  public DONATION_GAP_LIMIT_INTERNAL = Config.DONATION_GAP_LIMIT_INTERNAL? parseInt( Config.DONATION_GAP_LIMIT_INTERNAL.trim(), 10 ) : 20;
+
   public DERIVATIVE_GAP_LIMIT = 5;
   public CIPHER_SPEC: {
     algorithm: string;

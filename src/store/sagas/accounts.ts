@@ -58,6 +58,7 @@ import {
   Accounts,
   AccountType,
   DerivativeAccountTypes,
+  DonationAccount,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
@@ -89,7 +90,7 @@ import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
-import { generateAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
+import { generateAccount, generateDonationAccount, generateMultiSigAccount } from '../../bitcoin/utilities/accounts/AccountFactory'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { updateWallet } from '../actions/storage'
 import { APP_STAGE } from '../../common/interfaces/Interfaces'
@@ -223,20 +224,39 @@ function* syncAccountsWorker( { payload }: {payload: {
   options: {
     hardRefresh?: boolean;
     blindRefresh?: boolean;
+    syncDonationAccount?: boolean,
   }}} ) {
   const { accounts, options } = payload
   const network = AccountUtilities.getNetworkByType( Object.values( accounts )[ 0 ].networkType )
 
-  const { synchedAccounts, txsFound } = yield call(
-    AccountOperations.syncAccounts,
-    accounts,
-    network,
-    options.hardRefresh,
-    options.blindRefresh )
+  if( options.syncDonationAccount ){
+    // can only sync one donation instance at a time
+    const donationAccount = ( Object.values( accounts )[ 0 ] as DonationAccount )
 
-  return {
-    synchedAccounts, txsFound
+    const { synchedAccount, txsFound } = yield call(
+      AccountOperations.syncDonationAccount,
+      donationAccount,
+      network )
+
+    const synchedAccounts = {
+      [ synchedAccount.id ]: synchedAccount
+    }
+    return {
+      synchedAccounts, txsFound
+    }
+  } else {
+    const { synchedAccounts, txsFound } = yield call(
+      AccountOperations.syncAccounts,
+      accounts,
+      network,
+      options.hardRefresh,
+      options.blindRefresh )
+
+    return {
+      synchedAccounts, txsFound
+    }
   }
+
 }
 
 export const syncAccountsWatcher = createWatcher(
@@ -625,87 +645,21 @@ export const validateTwoFAWatcher = createWatcher(
   VALIDATE_TWO_FA
 )
 
-function* setupDonationAccountWorker( { payload } ) {
-  const {
-    serviceType,
-    donee,
-    subject,
-    description,
-    configuration,
-    disableAccount,
-  } = payload
-  const service = yield select( ( state ) => state.accounts[ serviceType ].service )
-
-  const res = yield call(
-    service.setupDonationAccount,
-    donee,
-    subject,
-    description,
-    configuration,
-    disableAccount
-  )
-
-  if ( res.status === 200 ) {
-    // console.log( { res } )
-    const { setupSuccessful, accountId, accountNumber, accountXpub } = res.data
-    if ( !setupSuccessful ) {
-      throw new Error( 'Donation account setup failed' )
-    }
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-
-    return {
-      accountId, accountNumber, accountXpub
-    }
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( res.err )
-  }
-}
-
-export const setupDonationAccountWatcher = createWatcher(
-  setupDonationAccountWorker,
-  SETUP_DONATION_ACCOUNT
-)
-
 function* updateDonationPreferencesWorker( { payload } ) {
-  const { serviceType, accountNumber, preferences } = payload
-  const service = yield select( ( state ) => state.accounts[ serviceType ].service )
+  const { donationAccount, preferences } = payload
 
-  const res = yield call(
-    service.updateDonationPreferences,
-    accountNumber,
+  const { updated, updatedAccount }  = yield call(
+    AccountUtilities.updateDonationPreferences,
+    donationAccount,
     preferences
   )
 
-  if ( res.status === 200 ) {
-    console.log( {
-      res
-    } )
-
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ serviceType ]: JSON.stringify( service ),
+  if( updated ) yield put( updateAccountShells( {
+    accounts: {
+      [ updatedAccount.id ]: updatedAccount
     }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    throw new Error( res.err )
-  }
+  } ) )
+  else throw new Error( 'Failed to update donation preferences' )
 }
 
 export const updateDonationPreferencesWatcher = createWatcher(
@@ -721,7 +675,10 @@ function* refreshAccountShellWorker( { payload } ) {
   )
 
   const accounts: Accounts = accountState.accounts
-  const options: { autoSync?: boolean, hardRefresh?: boolean } = payload.options
+  const options: { autoSync?: boolean, hardRefresh?: boolean, syncDonationAccount?: boolean } = {
+    ...payload.options,
+    syncDonationAccount: accountShell.primarySubAccount.type === AccountType.DONATION_ACCOUNT
+  }
   const accountsToSync: Accounts = {
     [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
   }
@@ -861,40 +818,69 @@ function* setup2FADetails( wallet: Wallet ) {
 
 
 export function* generateShellFromAccount ( account: Account | MultiSigAccount ) {
-  let SubAccountConstructor, serviceAccountKind
+  const network = AccountUtilities.getNetworkByType( account.networkType )
+  let primarySubAccount: SubAccountDescribing
+
   switch( account.type ){
       case AccountType.TEST_ACCOUNT:
-        SubAccountConstructor = TestSubAccountInfo
+        primarySubAccount = new TestSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
         break
 
       case AccountType.CHECKING_ACCOUNT:
-        SubAccountConstructor = CheckingSubAccountInfo
+        primarySubAccount = new CheckingSubAccountInfo( {
+          id: account.id,
+          xPub: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
         break
 
       case AccountType.SAVINGS_ACCOUNT:
-        SubAccountConstructor = SavingsSubAccountInfo
+        primarySubAccount = new SavingsSubAccountInfo( {
+          id: account.id,
+          xPub: null,
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+        } )
         break
 
       case AccountType.DONATION_ACCOUNT:
-        SubAccountConstructor = DonationSubAccountInfo
+        primarySubAccount = new DonationSubAccountInfo( {
+          id: account.id,
+          xPub: ( account as DonationAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          doneeName: ( account as DonationAccount ).donee,
+          causeName: account.accountName,
+          isTFAEnabled: ( account as DonationAccount ).is2FA
+        } )
         break
 
       case AccountType.SWAN_ACCOUNT:
-        SubAccountConstructor = ExternalServiceSubAccountInfo
-        serviceAccountKind = ServiceAccountKind.SWAN
+        primarySubAccount = new ExternalServiceSubAccountInfo( {
+          id: account.id,
+          xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
+          instanceNumber: account.instanceNum,
+          type: account.type,
+          customDisplayName: account.accountName,
+          customDescription: account.accountDescription,
+          serviceAccountKind: ServiceAccountKind.SWAN,
+        } )
         break
   }
 
-  const network = AccountUtilities.getNetworkByType( account.networkType )
+
   const accountShell = new AccountShell( {
-    primarySubAccount: new SubAccountConstructor( {
-      id: account.id,
-      xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
-      instanceNumber: account.instanceNum,
-      customDisplayName: account.accountName,
-      customDescription: account.accountDescription,
-      serviceAccountKind,
-    } ),
+    primarySubAccount,
     unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
     displayOrder: 1,
   } )
@@ -902,9 +888,10 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
   return accountShell
 }
 
-export function* addNewAccount( accountType: AccountType, accountName: string, accountDescription: string ) {
+export function* addNewAccount( accountType: AccountType, accountDetails: newAccountDetails ) {
   let wallet: Wallet = yield select( state => state.storage.wallet )
   const { walletId, primaryMnemonic, accounts } = wallet
+  const { name: accountName, description: accountDescription, is2FAEnabled, doneeName } = accountDetails
 
   switch ( accountType ) {
       case AccountType.TEST_ACCOUNT:
@@ -948,24 +935,32 @@ export function* addNewAccount( accountType: AccountType, accountName: string, a
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
-          bithyveXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
+          bithyveXpub: wallet.details2FA.bithyveXpub,
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
         } )
         return savingsAccount
 
-        // case AccountType.DONATION_ACCOUNT:
-        //   const donationAccount = yield call( setupDonationAccountWorker, {
-        //     payload: {
-        //       serviceType: subAccountInfo.sourceKind,
-        //       donee: ( subAccountInfo as DonationSubAccountDescribing ).doneeName,
-        //       subject: subAccountInfo.customDisplayName,
-        //       description: subAccountInfo.customDescription,
-        //       configuration: {
-        //         displayBalance: true,
-        //       },
-        //     },
-        //   } )
-        //   return donationAccount
+      case AccountType.DONATION_ACCOUNT:
+        if( is2FAEnabled && !wallet.details2FA ) wallet = yield call( setup2FADetails, wallet )
+
+        const donationInstanceCount = ( accounts[ accountType ] )?.length | 0
+        const donationAccount: DonationAccount = yield call( generateDonationAccount, {
+          walletId,
+          type: accountType,
+          instanceNum: donationInstanceCount,
+          accountName: accountName? accountName: 'Donation Account',
+          accountDescription: accountDescription? accountDescription: 'Accept donations',
+          donee: doneeName? doneeName: wallet.walletName,
+          mnemonic: primaryMnemonic,
+          derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
+          is2FA: is2FAEnabled,
+          secondaryXpub: is2FAEnabled? wallet.details2FA.secondaryXpub: null,
+          bithyveXpub:  is2FAEnabled? wallet.details2FA.bithyveXpub: null,
+          networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
+        } )
+        const { setupSuccessful } = yield call( AccountUtilities.setupDonationAccount, donationAccount )
+        if( !setupSuccessful ) throw new Error( 'Failed to generate donation account' )
+        return donationAccount
 
       case AccountType.SWAN_ACCOUNT:
         let defaultAccountName, defaultAccountDescription
@@ -1060,28 +1055,29 @@ export function* addNewAccount( accountType: AccountType, accountName: string, a
 //   ADD_NEW_SECONDARY_SUBACCOUNT
 // )
 
+export interface newAccountDetails {
+  name?: string,
+  description?: string,
+  is2FAEnabled?: boolean,
+  doneeName?: string,
+}
 export interface newAccountsInfo {
   accountType: AccountType,
-  accountDetails?: {
-    name?: string,
-    description?: string
-  }
+  accountDetails?: newAccountDetails
 }
 
 export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {payload: newAccountsInfo[]} ) {
   const newAccountShells: AccountShell[] = []
   const accounts = {
   }
-
   let testcoinsToAccount
+
   for ( const { accountType, accountDetails } of newAccountsInfo ){
-    const accountName = idx( accountDetails, ( _ ) => _.name )
-    const accountDescription = idx( accountDetails, ( _ ) => _.description )
-    const account: Account | MultiSigAccount = yield call(
+    const account: Account | MultiSigAccount | DonationAccount = yield call(
       addNewAccount,
       accountType,
-      accountName,
-      accountDescription
+      accountDetails || {
+      }
     )
 
     const accountShell = yield call( generateShellFromAccount, account )

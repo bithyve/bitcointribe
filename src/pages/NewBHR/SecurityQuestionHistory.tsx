@@ -91,16 +91,6 @@ const SecurityQuestionHistory = ( props ) => {
   const renderSecurityQuestionContent = useCallback( () => {
     return (
       <SecurityQuestion
-        onFocus={() => {
-          if ( Platform.OS == 'ios' )
-            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
-            showQuestionModal( true )
-        }}
-        onBlur={() => {
-          if ( Platform.OS == 'ios' )
-            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-            showQuestionModal( true )
-        }}
         onPressConfirm={async () => {
           Keyboard.dismiss()
           saveConfirmationHistory()
@@ -114,16 +104,6 @@ const SecurityQuestionHistory = ( props ) => {
     )
   }, [] )
 
-  const renderSecurityQuestionHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          // ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
-          showQuestionModal( false )
-        }}
-      />
-    )
-  }, [] )
 
   const renderHealthCheckSuccessModalContent = useCallback( () => {
     return (
@@ -146,15 +126,6 @@ const SecurityQuestionHistory = ( props ) => {
     )
   }, [] )
 
-  const renderHealthCheckSuccessModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
 
   const sortedHistory = ( history ) => {
     const currentHistory = history.filter( ( element ) => {
@@ -281,27 +252,9 @@ const SecurityQuestionHistory = ( props ) => {
       <ModalContainer visible={questionModal} closeBottomSheet={() => {}} >
         {renderSecurityQuestionContent()}
       </ModalContainer>
-      {/* <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SecurityQuestionBottomSheet as any}
-        snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
-        renderContent={renderSecurityQuestionContent}
-        renderHeader={renderSecurityQuestionHeader}
-      /> */}
       <ModalContainer visible={successModal} closeBottomSheet={() => {}} >
         {renderHealthCheckSuccessModalContent()}
       </ModalContainer>
-      {/* <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '27%' ) : hp( '35%' ),
-        ]}
-        renderContent={renderHealthCheckSuccessModalContent}
-        renderHeader={renderHealthCheckSuccessModalHeader}
-      /> */}
     </View>
   )
 }
