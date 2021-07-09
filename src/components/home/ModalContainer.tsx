@@ -58,10 +58,10 @@ const ModalContainer = ( {
       >
         <TouchableWithoutFeedback>
           <View style={{
-            width: '98%',
+            width: '100%',
             borderRadius: Platform.OS === 'ios' ? ScreenCornerRadius : wp( '4%' ),
             overflow: 'hidden',
-            marginBottom: hp( 0.5 )
+            // marginBottom: hp( 0.5 )
           }}>
 
             {children}

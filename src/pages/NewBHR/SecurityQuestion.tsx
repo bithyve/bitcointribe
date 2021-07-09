@@ -18,6 +18,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 function SecurityQuestion( props ) {
   const { security } = useSelector(
@@ -68,9 +69,14 @@ function SecurityQuestion( props ) {
   }, [ answer, errorText ] )
 
   return (
-    <View style={{
-      ...styles.modalContentContainer
-    }}>
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{
+        x: 0, y: 0
+      }}
+      scrollEnabled
+      style={{
+        ...styles.modalContentContainer
+      }}>
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{
@@ -125,8 +131,6 @@ function SecurityQuestion( props ) {
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 onSubmitEditing={( event ) => setConfirm()}
-                onFocus={() => props.onFocus()}
-                onBlur={() => props.onBlur()}
               />
               {errorText ? (
                 <Text
@@ -199,7 +203,7 @@ function SecurityQuestion( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
