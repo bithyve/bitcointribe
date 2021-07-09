@@ -217,13 +217,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ walletSetupCompleted ] )
 
-  const checkCloudLogin = () =>{
+  const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
-      const security = {
-        questionId: dropdownBoxValue.id,
-        question: dropdownBoxValue.question,
-        answer,
-      }
       dispatch( setupWallet( walletName, selectedAcc, security ) )
       // dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
@@ -285,9 +280,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     ) {
       setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
     } else {
-      setTimeout( () => {
-        setPswdError( '' )
-      }, 2 )
+      // setTimeout( () => {
+      //   setPswdError( '' )
+      // }, 2 )
     }
   }
 
@@ -350,12 +345,27 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         onPress={async () => {
           showLoader()
           if ( activeIndex === 0 ) {
-            checkCloudLogin()
+            const security = {
+              questionId: dropdownBoxValue.id,
+              question: dropdownBoxValue.question,
+              answer,
+            }
+
+            checkCloudLogin( security )
             // setIsCloudPermissionRender( true )
             // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
             dispatch( setCloudData() )
             showSecurityQue( false )
           } else {
+            const security = {
+              questionId: 0,
+              question: hintText,
+              answer: pswd,
+            }
+            checkCloudLogin( security )
+            // setIsCloudPermissionRender( true )
+            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
+            dispatch( setCloudData() )
             showEncryptionPswd( false )
           }
         }}
@@ -447,7 +457,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled={false}
+        scrollEnabled
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,
@@ -512,6 +522,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               onChangeText={( text ) => {
                 setPswd( text )
                 setPswdMasked( text )
+                // setPswdError( '' )
               }}
               onFocus={() => {
                 setShowNote( false )
@@ -520,6 +531,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                 if ( pswd.length > 0 ) {
                   setPswd( '' )
                   setPswdMasked( '' )
+                  setPswdError( '' )
                 }
               }}
               onBlur={() => {
@@ -586,6 +598,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               onChangeText={( text ) => {
                 setTempPswd( text )
                 setConfirmPswdMasked( text )
+                // setPswdError( '' )
               }}
               onFocus={() => {
                 setShowNote( false )
@@ -721,7 +734,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {(
             pswd.trim() === confirmPswd.trim() &&
             confirmPswd.trim() &&
-            pswd.trim() && pswdError.length === 0
+            pswd.trim() && pswdError.length === 0 && hintText.length > 0
           ) && (
             setButtonVisible()
           ) || null}
@@ -745,13 +758,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       // </ScrollView>
     )
   }
+
+
   const renderSecurityQuestion = () => {
     return (
       <KeyboardAwareScrollView
         resetScrollToCoords={{
           x: 0, y: 0
         }}
-        scrollEnabled={false}
+        scrollEnabled
         // style={styles.rootContainer}
         style={{
           backgroundColor: Colors.backgroundColor,

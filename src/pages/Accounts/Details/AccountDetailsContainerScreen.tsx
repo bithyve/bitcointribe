@@ -110,7 +110,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
 
   function performRefreshOnPullDown() {
     dispatch( refreshAccountShell( accountShell, {
-      autoSync: false
+      autoSync: false,
+      hardRefresh: true
     } ) )
   }
 
@@ -211,24 +212,6 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       },
     )
   }, [ presentBottomSheet, dismissBottomSheet ] )
-
-  useEffect( () => {
-    // 📝 A slight timeout is needed here in order for the refresh control to
-    // properly lay itself out above the rest of the content and become visible
-    // when the loading starts
-    if( accountShell.syncStatus===SyncStatus.PENDING )
-    // setTimeout( () => {
-    //   dispatch( refreshAccountShell( accountShell, {
-    //     autoSync: true
-    //   } ) )
-    // }, 100 )
-      requestAnimationFrame( () => {
-        dispatch( refreshAccountShell( accountShell, {
-          autoSync: true
-        } ) )
-      } )
-
-  }, [] )
 
   useEffect( () => {
     // missing fee & exchange rates patch(restore & upgrade)
