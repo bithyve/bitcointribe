@@ -229,7 +229,7 @@ export default class AccountOperations {
 
       // find tx delta(missing txs): hard vs soft refresh
       if( hardRefresh ){
-        if( txIdMap ){
+        if( account.txIdMap && txIdMap ){
           const deltaTxs = AccountUtilities.findTxDelta( account.txIdMap, txIdMap, transactions )
           if( deltaTxs.length ) txsFound.push( ...deltaTxs )
         } else txsFound.push( ...transactions )
