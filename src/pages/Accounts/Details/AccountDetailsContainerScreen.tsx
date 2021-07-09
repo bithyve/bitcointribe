@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   View,
   StyleSheet,
@@ -41,6 +41,7 @@ import { sourceAccountSelectedForSending } from '../../../store/actions/sending'
 import idx from 'idx'
 import Colors from '../../../common/Colors'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 export type Props = {
   navigation: any;
@@ -66,6 +67,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const account = useAccountByAccountShell( accountShell )
   const { averageTxFees, exchangeRates } = accountsState
+
+  const [ showMore, setShowMore ] = useState( false )
 
   const isRefreshing = useMemo( () => {
     return ( accountShell.syncStatus===SyncStatus.IN_PROGRESS )
@@ -117,20 +120,15 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     }
   }, [ navigation ] )
 
-  const showKnowMoreSheet = useCallback( () => {
-    presentBottomSheet(
+  const showKnowMoreSheet = () => {
+    return(
       <KnowMoreBottomSheet
         primarySubAccount={primarySubAccount}
         accountKind={primarySubAccount.kind}
-        onClose={dismissBottomSheet}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '95%' ],
-        handleComponent: KnowMoreBottomSheetHandle,
-      },
+        onClose={() => setShowMore( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   const showReassignmentConfirmationBottomSheet = useCallback(
     ( destinationID ) => {
@@ -254,7 +252,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
             <View style={styles.viewSectionContainer}>
               <AccountDetailsCard
                 accountShell={accountShell}
-                onKnowMorePressed={showKnowMoreSheet}
+                onKnowMorePressed={() => setShowMore( true )}
                 onSettingsPressed={navigateToAccountSettings}
               />
             </View>
@@ -331,23 +329,28 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <SectionList
-      contentContainerStyle={styles.scrollViewContainer}
-      showsVerticalScrollIndicator={false}
-      nestedScrollEnabled
-      refreshControl={
-        <RefreshControl
-          onRefresh={performRefreshOnPullDown}
-          refreshing={isRefreshing}
-          style={{
-            backgroundColor: Colors.backgroundColor,
-          }}
-        />
-      }
-      sections={sections}
-      stickySectionHeadersEnabled={false}
-      keyExtractor={sectionListItemKeyExtractor}
-    />
+    <>
+      <SectionList
+        contentContainerStyle={styles.scrollViewContainer}
+        showsVerticalScrollIndicator={false}
+        nestedScrollEnabled
+        refreshControl={
+          <RefreshControl
+            onRefresh={performRefreshOnPullDown}
+            refreshing={isRefreshing}
+            style={{
+              backgroundColor: Colors.backgroundColor,
+            }}
+          />
+        }
+        sections={sections}
+        stickySectionHeadersEnabled={false}
+        keyExtractor={sectionListItemKeyExtractor}
+      />
+      <ModalContainer visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
+        {showKnowMoreSheet()}
+      </ModalContainer>
+    </>
   )
 }
 
