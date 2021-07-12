@@ -44,9 +44,7 @@ import {
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
-  initializeTrustedContact,
   rejectTrustedContact,
-  InitTrustedContactFlowKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -226,7 +224,6 @@ interface HomePropsTypes {
   UNDER_CUSTODY: any;
   updateFCMTokens: any;
   downloadMShare: any;
-  initializeTrustedContact: any;
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
   initializeHealthSetup: any;
@@ -693,6 +690,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   createNotificationListeners = async () => {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
+      // largeIcon: 'ic_launcher',
+      // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
         this.props.getMessages()
         const { content } = notification.data
@@ -1309,41 +1308,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  onTrustedContactRequestAccepted = ( key ) => {
-    this.closeBottomSheet()
-    const { navigation } = this.props
-    const { trustedContactRequest } = this.state
-    console.log( 'trustedContactRequest', trustedContactRequest )
-    if( trustedContactRequest.isExistingContact ){
-      this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
-    } else {
-      navigation.navigate( 'ContactsListForAssociateContact', {
-        postAssociation: ( contact ) => {
-
-          this.props.initializeTrustedContact( {
-            contact,
-            flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
-            channelKey: trustedContactRequest.channelKey,
-            contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
-          } )
-
-          // TODO: navigate post approval (from within saga)
-          navigation.navigate( 'Home' )
-        }
-      } )
-    }
-  };
-
-  onTrustedContactRejected = () => {
-    this.closeBottomSheet()
-    const { trustedContactRequest } = this.state
-    this.props.rejectTrustedContact( {
-      channelKey: trustedContactRequest.channelKey,
-    } )
-  };
-
-  onPhoneNumberChange = () => {};
-
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
     switch ( menuItem.kind ) {
@@ -1655,19 +1619,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
-        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest } = this.state
-
-          return (
-            <TrustedContactRequestContent
-              trustedContactRequest={trustedContactRequest}
-              onPressAccept={this.onTrustedContactRequestAccepted}
-              onPressReject={this.onTrustedContactRejected}
-              onPhoneNumberChange={this.onPhoneNumberChange}
-              bottomSheetRef={this.bottomSheetRef}
-            />
-          )
-
         case BottomSheetKind.NOTIFICATIONS_LIST:
           return (
             <NotificationListContent
@@ -1887,7 +1838,6 @@ export default withNavigationFocus(
   connect( mapStateToProps, {
     updateFCMTokens,
     downloadMShare,
-    initializeTrustedContact,
     acceptExistingContactRequest,
     rejectTrustedContact,
     initializeHealthSetup,

@@ -24,8 +24,6 @@ import {
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
-  notificationsUpdated,
-  updateNotificationList,
   updateMessageStatusInApp,
   updateMessageStatus
 } from '../../store/actions/notifications'
@@ -43,11 +41,6 @@ import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
 import {
-  addTransferDetails,
-  fetchFeeAndExchangeRates
-} from '../../store/actions/accounts'
-import {
-  LevelHealthInterface,
   QRCodeTypes,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
@@ -70,15 +63,11 @@ export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 
 
 export enum BottomSheetKind {
-  TAB_BAR_BUY_MENU,
   CUSTODIAN_REQUEST,
   CUSTODIAN_REQUEST_REJECTED,
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
-  SWAN_STATUS_INFO,
-  WYRE_STATUS_INFO,
-  RAMP_STATUS_INFO,
   ERROR,
   CLOUD_ERROR,
   NOTIFICATION_INFO,
@@ -93,9 +82,7 @@ interface HomeStateTypes {
 
   secondaryDeviceOtp: any;
   currencyCode: string;
-  selectedContact: any[];
   notificationDataChange: boolean;
-  appState: string;
   trustedContactRequest: any;
   recoveryRequest: any;
   custodyRequest: any;
@@ -123,22 +110,14 @@ interface HomePropsTypes {
   initializeTrustedContact: any;
   acceptExistingContactRequest: any;
   rejectTrustedContact: any;
-  levelHealth: LevelHealthInterface[];
   currentLevel: number;
-  fetchFeeAndExchangeRates: any;
-  addTransferDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
-  notificationListNew: any;
-  notificationsUpdated: any;
   setCurrencyCode: any;
   currencyCode: any;
   setSecondaryDeviceAddress: any;
   regularAccount: RegularAccount;
-  database: any;
   accountShells: AccountShell[];
-  credsAuthenticated: any;
-  updateNotificationList: any;
   messages: any;
   updateMessageStatusInApp: any;
   updateMessageStatus: any;
@@ -163,9 +142,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       secondaryDeviceOtp: {
       },
       currencyCode: 'USD',
-      selectedContact: [],
       notificationDataChange: false,
-      appState: '',
       trustedContactRequest: null,
       recoveryRequest: null,
       custodyRequest: null,
@@ -187,10 +164,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.navigation.navigate( 'QRScanner', {
       onCodeScanned: this.processFAndFQR,
     } )
-  };
-
-  navigateToAddNewAccountScreen = () => {
-    this.props.navigation.navigate( 'AddNewAccount' )
   };
 
   onPressNotifications = async () => {
@@ -431,12 +404,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // Keeping autoSynn disabled
 
       this.closeBottomSheet()
-      // if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
-      //   this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
-      // }
       this.calculateNetBalance()
       this.setUpFocusListener()
-      // this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
   };
 
@@ -528,9 +497,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
 
-
   cleanupListeners() {
-
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
   }
 
@@ -626,45 +593,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.onBottomSheetClosed()
   };
 
-  onBackPress = () => {
-    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-  };
-
   onNotificationClicked = async ( value ) => {
     if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
       this.handleNotificationBottomSheetSelection( value )
   };
-
-  onPressElement = ( item ) => {
-    const { navigation } = this.props
-    if ( item.title == 'Backup Health' ) {
-      navigation.navigate( 'ManageBackupNewBHR' )
-      return
-    }
-    if ( item.title == 'Friends and Family' ) {
-      navigation.navigate( 'AddressBookContents' )
-      return
-    } else if ( item.title == 'Wallet Settings' ) {
-      navigation.navigate( 'SettingsContents' )
-      // this.settingsBottomSheetRef.current?.snapTo(1);
-      // setTimeout(() => {
-      //   this.setState({
-      //     tabBarIndex: 0,
-      //   });
-      // }, 10);
-    } else if ( item.title == 'Funding Sources' ) {
-      navigation.navigate( 'ExistingSavingMethods' )
-    } else if ( item.title === 'Hexa Community (Telegram)' ) {
-      const url = 'https://t.me/HexaWallet'
-      Linking.openURL( url )
-        .then( ( data ) => {} )
-        .catch( ( e ) => {
-          alert( 'Make sure Telegram installed on your device' )
-        } )
-      return
-    }
-  };
-
 
 
   onTrustedContactRequestAccepted = ( key ) => {
@@ -792,11 +724,7 @@ const mapStateToProps = ( state ) => {
     walletName:
       idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    database: idx( state, ( _ ) => _.storage.database ) || {
-    },
-    levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     messages: state.notifications.messages,
@@ -810,11 +738,7 @@ export default withNavigationFocus(
     initializeTrustedContact,
     acceptExistingContactRequest,
     rejectTrustedContact,
-    fetchFeeAndExchangeRates,
-    addTransferDetails,
-    notificationsUpdated,
     setCurrencyCode,
-    updateNotificationList,
     updateMessageStatusInApp,
     updateMessageStatus
   } )( Home )
