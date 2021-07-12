@@ -85,7 +85,6 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import { AccountsState } from '../reducers/accounts'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import * as bitcoinJS from 'bitcoinjs-lib'
@@ -1349,17 +1348,16 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select( ( state ) => state.storage.database )
     const s3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contact )
     let secondaryMnemonic
     const sharesArray = [ DECENTRALIZED_BACKUP.SM_SHARE ]
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     const qrDataObj = JSON.parse( qrdata )
     let currentContact: TrustedContact
     let channelKey: string
-    if( contacts ){
-      for( const ck of Object.keys( contacts ) ){
+    if( trustedContacts ){
+      for( const ck of Object.keys( trustedContacts ) ){
         channelKey=ck
-        currentContact = contacts[ ck ]
+        currentContact = trustedContacts[ ck ]
         if( currentContact.permanentChannelAddress == qrDataObj.channelId ){
           break
         }

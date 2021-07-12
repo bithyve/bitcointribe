@@ -11,17 +11,10 @@ import {
   servicesEnriched,
 } from '../actions/storage'
 import dataManager from '../../storage/database-manager'
-import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import DeviceInfo from 'react-native-device-info'
-import semver from 'semver'
 import { walletCheckIn } from '../actions/trustedContacts'
 import { updateWalletImageHealth } from '../actions/health'
-import config from '../../bitcoin/HexaConfig'
 import { servicesInitialized, INITIALIZE_SERVICES } from '../actions/storage'
 import { updateWalletImage } from '../actions/sss'
 import { clearAccountSyncCache } from '../actions/accounts'
@@ -41,7 +34,7 @@ export const initDBWatcher = createWatcher( initDBWorker, INIT_DB )
 function* initServicesWorker() {
   const { regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo } = yield call( serviceGeneratorForNewBHR )
   yield put( servicesInitialized( {
-    regularAcc, testAcc, secureAcc, s3Service, trustedContacts, keepersInfo
+    regularAcc, testAcc, secureAcc, s3Service, trustedContacts
   } ) )
 }
 
@@ -139,30 +132,10 @@ function* servicesEnricherWorker( { payload } ) {
       throw new Error( 'Database missing; services encrichment failed' )
     }
 
-    const {
-      REGULAR_ACCOUNT,
-      TEST_ACCOUNT,
-      SECURE_ACCOUNT,
-      S3_SERVICE,
-      TRUSTED_CONTACTS,
-    } = database.SERVICES
-
-
-    // 1.8.0: Nullified REGULAR_ACCOUNT, TEST_ACCOUNT, SECURE_ACCOUNT in support for new structure
-    // services = {
-    //   REGULAR_ACCOUNT: RegularAccount.fromJSON( REGULAR_ACCOUNT ),
-    //   TEST_ACCOUNT: TestAccount.fromJSON( TEST_ACCOUNT ),
-    //   SECURE_ACCOUNT: SecureAccount.fromJSON( SECURE_ACCOUNT ),
-    //   S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
-    //   TRUSTED_CONTACTS: TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
-    // }
+    const { S3_SERVICE, } = database.SERVICES
 
     const services = {
-      REGULAR_ACCOUNT: REGULAR_ACCOUNT,
-      TEST_ACCOUNT:  TEST_ACCOUNT,
-      SECURE_ACCOUNT: SECURE_ACCOUNT,
       S3_SERVICE: S3Service.fromJSON( S3_SERVICE ),
-      TRUSTED_CONTACTS: TrustedContactsService.fromJSON( TRUSTED_CONTACTS )
     }
 
     yield put( servicesEnriched( services ) )
