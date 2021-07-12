@@ -30,15 +30,11 @@ import {
   Accounts,
   AccountType,
 } from '../../bitcoin/utilities/Interface'
-import RecipientKind from '../../common/data/enums/RecipientKind'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import { insertDBWorker } from './storage'
-import { SendingState } from '../reducers/sending'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
@@ -46,7 +42,6 @@ import {  exchangeRatesCalculated, setAverageTxFee } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
-import { ServicesJSON } from '../../common/interfaces/Interfaces'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
@@ -231,7 +226,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         yield put ( existingPermanentChannelsSynched( {
           successful: true
         } ) )
-    }
+    } else throw new Error( 'Failed to sync permanent channel' )
   } catch ( err ) {
     console.log( err )
 

@@ -1,6 +1,3 @@
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { SERVICES_ENRICHED } from '../actions/storage'
-import { TRUSTED_CONTACTS } from '../../common/constants/wallet-service-types'
 import {
   SYNC_PERMANENT_CHANNELS,
   EXISTING_PERMANENT_CHANNELS_SYNCHED,
@@ -17,7 +14,6 @@ import RecipientKind from '../../common/data/enums/RecipientKind'
 import idx from 'idx'
 
 export type TrustedContactsState = {
-  service: TrustedContactsService;
   contacts: Trusted_Contacts
   loading: {
     existingPermanentChannelsSynching: boolean;
@@ -27,7 +23,6 @@ export type TrustedContactsState = {
 
 
 const initialState: TrustedContactsState = {
-  service: null,
   contacts: {
   },
   loading: {
@@ -39,22 +34,17 @@ const initialState: TrustedContactsState = {
 
 export default ( state: TrustedContactsState = initialState, action ): TrustedContactsState => {
   switch ( action.type ) {
-      case SERVICES_ENRICHED:
-        return {
-          ...state,
-          service: action.payload.services[ TRUSTED_CONTACTS ],
-          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
-            trustedContacts: action.payload.services[ TRUSTED_CONTACTS ].tc.trustedContacts,
-          } ),
-        }
-
       case UPDATE_TRUSTED_CONTACTS:
+        const updatedContacts = {
+          ...state.contacts,
+          ...action.payload.contacts
+        }
         return {
           ...state,
-          contacts: {
-            ...state.contacts,
-            ...action.payload.contacts
-          }
+          contacts: updatedContacts,
+          trustedContactRecipients: reduceTCInfoIntoRecipientDescriptions( {
+            trustedContacts: updatedContacts,
+          } ),
         }
 
       case SYNC_PERMANENT_CHANNELS:
