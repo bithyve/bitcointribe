@@ -690,6 +690,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   createNotificationListeners = async () => {
     this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
+      // largeIcon: 'ic_launcher',
+      // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
         this.props.getMessages()
         const { content } = notification.data
