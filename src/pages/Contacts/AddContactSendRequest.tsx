@@ -31,6 +31,7 @@ import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -84,13 +85,11 @@ export default function AddContactSendRequest( props ) {
   const WALLET_SETUP = useSelector(
     ( state ) => state.storage.database.WALLET_SETUP,
   )
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
-  )
+  const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
 
   const createTrustedContact = useCallback( async () => {
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id ) return
     }
@@ -112,7 +111,7 @@ export default function AddContactSendRequest( props ) {
   useEffect( () => {
     if( !Contact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 

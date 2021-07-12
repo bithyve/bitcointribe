@@ -7,7 +7,6 @@ import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { Account, AccountType, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
@@ -29,8 +28,8 @@ function* processRecipients( accountShell: AccountShell ){
     ( state ) => state.sending.selectedRecipients
   )
 
-  const trustedContacts: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
   )
 
   const recipients: [
@@ -61,7 +60,7 @@ function* processRecipients( accountShell: AccountShell ){
           break
 
         case RecipientKind.CONTACT:
-          const contact = trustedContacts.tc.trustedContacts[ ( recipient as ContactRecipientDescribing ).channelKey ]
+          const contact = trustedContacts[ ( recipient as ContactRecipientDescribing ).channelKey ]
           const paymentAddresses = idx( contact, ( _ ) => _.unencryptedPermanentChannel[ contact.streamId ].primaryData.paymentAddresses )
           if( !paymentAddresses ) throw new Error( `Payment addresses missing for: ${recipient.displayedName}` )
 
@@ -390,22 +389,21 @@ async function updateTrustedContactTxHistory( selectedContacts ) {
 
 function* sendTxNotificationWorker() {
   const sendingState: SendingState = yield select( ( state ) => state.sending )
-  const trustedContacts: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
   )
   const { walletName } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP,
   )
 
   const { selectedRecipients } = sendingState
-  const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
 
   const notifReceivers = []
   const selectedContacts = []
   selectedRecipients.forEach( ( recipient ) => {
     if ( recipient.kind === RecipientKind.CONTACT ) { // send notification to TC
       const channelKey = ( recipient as ContactRecipientDescribing ).channelKey
-      const contact = contacts[ channelKey ]
+      const contact = trustedContacts[ channelKey ]
       if ( contact && contact.walletID ){
         selectedContacts.push( contact )
         notifReceivers.push( {

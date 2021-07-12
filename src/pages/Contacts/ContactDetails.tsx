@@ -41,6 +41,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {
+  AccountType,
   QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
@@ -50,7 +51,6 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
@@ -294,7 +294,7 @@ class ContactDetails extends PureComponent<
   onPressSend = () => {
     const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.contact.id )
     this.props.sourceAccountSelectedForSending(
-      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT )
+      this.props.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
     )
     this.props.addRecipientForSending( recipient )
     this.props.recipientSelectedForAmountSetting( recipient )

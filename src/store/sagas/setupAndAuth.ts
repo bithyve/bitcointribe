@@ -67,31 +67,14 @@ function* setupWalletWorker( { payload } ) {
   yield call( dbManager.createWallet, wallet )
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
 
-  // TODO: remove legacy DB post TC service functionalization
+  // TODO: remove legacy DB post S3 service functionalization
   const initialDatabase: Database = {
     WALLET_SETUP:{
       walletName: wallet.walletName,
       security,
     },
-    DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {
-      },
-      SHARES_TRANSFER_DETAILS: {
-      },
-      UNDER_CUSTODY: {
-      },
-      DYNAMIC_NONPMDD: {
-      },
-    },
     SERVICES: {
-      REGULAR_ACCOUNT: JSON.stringify( {
-      } ),
-      TEST_ACCOUNT: JSON.stringify( {
-      } ),
-      SECURE_ACCOUNT: JSON.stringify( {
-      } ),
       S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
-      TRUSTED_CONTACTS: JSON.stringify(  new TrustedContactsService() ),
     },
     VERSION: DeviceInfo.getVersion(),
   }
@@ -111,16 +94,6 @@ function* initRecoveryWorker( { payload } ) {
   const initialDatabase: Database = {
     WALLET_SETUP: {
       walletName, security
-    },
-    DECENTRALIZED_BACKUP: {
-      RECOVERY_SHARES: {
-      },
-      SHARES_TRANSFER_DETAILS: {
-      },
-      UNDER_CUSTODY: {
-      },
-      DYNAMIC_NONPMDD: {
-      },
     },
     VERSION: DeviceInfo.getVersion(),
   }

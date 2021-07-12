@@ -29,8 +29,7 @@ import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import {
   REGULAR_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
-import { TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { TrustedContactRelationTypes, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
@@ -59,7 +58,7 @@ interface FriendsAndFamilyPropTypes {
   navigation: any;
   isFocused: boolean;
   regularAccount: RegularAccount;
-  trustedContactsService: TrustedContactsService;
+  trustedContacts: Trusted_Contacts;
   syncPermanentChannels: any;
   existingPermanentChannelsSynching: any;
   clearTrustedContactsCache: any;
@@ -125,7 +124,7 @@ class FriendsAndFamilyScreen extends PureComponent<
   componentDidUpdate( prevProps, prevState ) {
     requestAnimationFrame( () => {
       if (
-        prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
+        prevProps.trustedContacts != this.props.trustedContacts
       ) {
 
         // const { regularAccount } = this.props
@@ -155,9 +154,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       this.setState( {
         showIndicator: true
       } )
-      // this.props.syncPermanentChannels( {
-      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      // } )
     } )
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
@@ -179,15 +175,14 @@ class FriendsAndFamilyScreen extends PureComponent<
   };
 
   updateAddressBook = async () => {
-    const { trustedContactsService } = this.props
-    const contacts = trustedContactsService.tc.trustedContacts
+    const { trustedContacts } = this.props
 
     const keepers = []
     const keeping = []
     const otherContacts = []
 
-    for( const channelKey of Object.keys( contacts ) ){
-      const contact = contacts[ channelKey ]
+    for( const channelKey of Object.keys( trustedContacts ) ){
+      const contact = trustedContacts[ channelKey ]
       const isGuardian =[ TrustedContactRelationTypes.KEEPER, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
       const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
 
@@ -553,6 +548,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                 onRefresh={() => {
                   syncPermanentChannels( {
                     permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+                    metaSync: true
                   } )
                 }}
               />
@@ -838,7 +834,7 @@ class FriendsAndFamilyScreen extends PureComponent<
 const mapStateToProps = ( state ) => {
   return {
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
-    trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     existingPermanentChannelsSynching: idx(
       state,
       ( _ ) => _.trustedContacts.loading.existingPermanentChannelsSynching,
