@@ -154,9 +154,6 @@ class FriendsAndFamilyScreen extends PureComponent<
       this.setState( {
         showIndicator: true
       } )
-      // this.props.syncPermanentChannels( {
-      //   permanentChannelsSyncKind: PermanentChannelsSyncKind.NON_FINALIZED_CONTACTS,
-      // } )
     } )
     this.props.navigation.setParams( {
       toggleKnowMoreSheet: this.toggleKnowMoreSheet,
@@ -551,6 +548,7 @@ class FriendsAndFamilyScreen extends PureComponent<
                 onRefresh={() => {
                   syncPermanentChannels( {
                     permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+                    metaSync: true
                   } )
                 }}
               />
