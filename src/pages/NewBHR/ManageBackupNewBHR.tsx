@@ -1133,7 +1133,7 @@ Wallet Backup
                     const obj = {
                       id: selectedLevelId,
                       selectedKeeper: {
-                        ...selectedKeeper, name: selectedKeeper.name?selectedKeeper.name: selectedKeeperName, shareType: selectedKeeper.shareType?selectedKeeper.shareType:selectedKeeperType,
+                        ...selectedKeeper, name: name, shareType: type,
                         shareId: selectedKeeper.shareId ? selectedKeeper.shareId : selectedLevelId == 2 ? this.props.metaSharesKeeper[ 1 ] ? this.props.metaSharesKeeper[ 1 ].shareId: '' : this.props.metaSharesKeeper[ 4 ] ? this.props.metaSharesKeeper[ 4 ].shareId : ''
                       },
                       isSetup: true,
