@@ -140,19 +140,19 @@ function* initHealthWorker() {
   const randomIdForCloud = generateRandomString( 8 )
   const levelInfo = [
     {
-      shareType: 'cloud',
-      updatedAt: 0,
-      status: 'notSetup',
-      shareId: randomIdForCloud,
-      reshareVersion: 0,
-    },
-    {
       shareType: 'securityQuestion',
       updatedAt: moment( new Date() ).valueOf(),
       status: 'accessible',
       shareId: randomIdForSecurityQ,
       reshareVersion: 0,
       name: 'Security Question',
+    },
+    {
+      shareType: 'cloud',
+      updatedAt: 0,
+      status: 'notSetup',
+      shareId: randomIdForCloud,
+      reshareVersion: 0,
     },
   ]
   const obj: KeeperInfoInterface = {
@@ -393,14 +393,14 @@ function* updateHealthLevel2Worker( { payload } ) {
       }
     }
     const levelInfo = []
-    levelInfo[ 0 ] = {
+    levelInfo[ 1 ] = {
       shareType: 'cloud',
       updatedAt: 0,
       status: 'notSetup',
       shareId: metaShares[ 0 ].shareId,
       reshareVersion: 0,
     }
-    levelInfo[ 1 ] = SecurityQuestionHealth
+    levelInfo[ 0 ] = SecurityQuestionHealth
     for ( let i = 1; i < metaShares.length; i++ ) {
       const element = metaShares[ i ]
       let shareType = ''
@@ -2284,6 +2284,14 @@ function* setupHealthWorker( { payload } ) {
   if( level == 1 ){
     const levelInfo = [] = [
       {
+        shareType: 'securityQuestion',
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
+        reshareVersion: 0,
+        name: 'Security Question',
+      },
+      {
         shareType: 'cloud',
         updatedAt: moment( new Date() ).valueOf(),
         status: 'accessible',
@@ -2291,14 +2299,6 @@ function* setupHealthWorker( { payload } ) {
         reshareVersion: 0,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
       },
-      {
-        shareType: 'securityQuestion',
-        updatedAt: moment( new Date() ).valueOf(),
-        status: 'accessible',
-        shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
-        reshareVersion: 0,
-        name: 'Security Question',
-      }
     ]
     yield put( updateHealth( [ {
       level: 1,
@@ -2323,6 +2323,14 @@ function* setupHealthWorker( { payload } ) {
 
       const levelInfo: LevelInfo[] = [
         {
+          shareType: 'securityQuestion',
+          updatedAt: moment( new Date() ).valueOf(),
+          status: 'accessible',
+          shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
+          reshareVersion: 0,
+          name: 'Security Question',
+        },
+        {
           shareType: 'cloud',
           updatedAt: moment( new Date() ).valueOf(),
           status: downloadedBackupData.find( value=>value.backupData.primaryMnemonicShard.shareId == metaShares[ 0 ].shareId ) ? 'accessible': 'notAccessible',
@@ -2330,14 +2338,6 @@ function* setupHealthWorker( { payload } ) {
           reshareVersion: 0,
           name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
         },
-        {
-          shareType: 'securityQuestion',
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-          shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
-          reshareVersion: 0,
-          name: 'Security Question',
-        }
       ]
 
       for ( let i = 1; i < metaShares.length; i++ ) {

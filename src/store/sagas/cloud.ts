@@ -39,13 +39,13 @@ function* cloudWorker( { payload } ) {
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       const obj: KeeperInfoInterface = {
-        shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+        shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
-        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 0 ].shareType,
-        scheme: MetaShares && MetaShares.length && MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ).meta.scheme ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ).meta.scheme : '1of1',
+        type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
+        scheme: MetaShares && MetaShares.length && MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).meta.scheme ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares && MetaShares.length && MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ) ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 0 ].shareId ) : -1,
+        sharePosition: MetaShares && MetaShares.length && MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : -1,
         data: {
         }
       }
@@ -195,13 +195,13 @@ function* updateHealthForCloudWorker( { payload } ) {
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
     const s3Service = yield select( ( state ) => state.health.service )
 
-    let levelHealthVar = levelHealth[ 0 ].levelInfo[ 0 ]
+    let levelHealthVar = levelHealth[ 0 ].levelInfo[ 1 ]
     if (
       share &&
       !( Object.keys( share ).length === 0 && share.constructor === Object ) &&
       levelHealth.length > 0
     ) {
-      levelHealthVar = levelHealth[ levelHealth.length - 1 ].levelInfo[ 0 ]
+      levelHealthVar = levelHealth[ levelHealth.length - 1 ].levelInfo[ 1 ]
     }
     // health update for 1st upload to cloud
     if (
@@ -726,7 +726,7 @@ function* updateCloudBackupWorker( ) {
               i++
             ) {
               const element = s3Service.levelhealth.metaSharesKeeper[ i ]
-              if ( levelInfo[ 0 ].shareId == element.shareId ) {
+              if ( levelInfo[ 1 ].shareId == element.shareId ) {
                 secretShare = element
                 break
               }

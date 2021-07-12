@@ -773,7 +773,7 @@ class ManageBackupNewBHR extends Component<
   onKeeperButtonPress = ( value, keeperNumber ) =>{
     const { selectedKeeper } = this.state
     requestAnimationFrame( () => {
-      if( value.id == 1 && keeperNumber == 1 ){
+      if( value.id == 1 && keeperNumber == 2 ){
         if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
           this.props.navigation.navigate(
             'CloudBackupHistory',
@@ -784,7 +784,7 @@ class ManageBackupNewBHR extends Component<
             }
           )
         }
-      } else if( value.id == 1 && keeperNumber == 2 ) {
+      } else if( value.id == 1 && keeperNumber == 1 ) {
         this.props.navigation.navigate(
           'SecurityQuestionHistoryNewBHR',
           {

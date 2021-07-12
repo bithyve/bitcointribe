@@ -226,7 +226,7 @@ function ManageBackupCard( props ) {
                   onPressKeeper={() => props.onPressKeeper2()}
                   keeperButtonText={
                     value.id == 1
-                      ? 'Security Question'
+                      ? value.keeper2ButtonText
                       : keeperButtonText( value.keeper2ButtonText, '2' )
                   }
                   disabled={false}
