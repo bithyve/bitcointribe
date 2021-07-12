@@ -9,6 +9,7 @@ import {
   BackupStreamData,
   PrimaryStreamData,
   TrustedContactRelationTypes,
+  Trusted_Contacts,
 } from './Interface'
 import crypto from 'crypto'
 import config from '../HexaConfig'
@@ -144,6 +145,7 @@ export default class TrustedContactsOperations {
         ).encryptedData
       else if ( secondaryData === null )
         outstreamUpdates.secondaryEncryptedData = null
+      if( secondaryChannelKey ) contact.secondaryChannelKey = secondaryChannelKey // execution case: when a contact is upgraded to a keeper
 
       if ( backupData )
         outstreamUpdates.encryptedBackupData = TrustedContactsOperations.encryptData(
@@ -248,12 +250,14 @@ export default class TrustedContactsOperations {
     }[]
   ): Promise<{
     updated: boolean;
+    updatedContacts: Trusted_Contacts;
   }> => {
     try {
       const channelMapping = {
       }
       const channelOutstreams = {
       }
+
       for ( let {
         channelKey,
         streamId,
@@ -287,6 +291,7 @@ export default class TrustedContactsOperations {
         }
 
         if ( !contact.isActive ) continue // skip non-active contacts
+        if( contactsSecondaryChannelKey ) contact.contactsSecondaryChannelKey = contactsSecondaryChannelKey // execution case: when a contact is upgraded to a keeper
 
         let outstreamUpdates: StreamData
         if ( unEncryptedOutstreamUpdates )
@@ -334,8 +339,17 @@ export default class TrustedContactsOperations {
           if ( instream ) TrustedContactsOperations.cacheInstream( contact, channelKey, instream )
         }
 
+        // consolidate contact updates/creation
+        const updatedContacts = {
+        }
+        Object.keys( channelMapping ).forEach( ( permanentChannelAddress ) => {
+          const { contact, channelKey } =
+            channelMapping[ permanentChannelAddress ]
+          updatedContacts[ channelKey ] = contact
+        } )
+
         return {
-          updated: true,
+          updated: true, updatedContacts
         }
       } else throw new Error( 'No channels to update' )
     } catch ( err ) {
