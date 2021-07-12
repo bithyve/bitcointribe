@@ -373,7 +373,7 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
       </Modal>
       <View style={{
         alignItems: 'center', marginHorizontal: wp( '6%' ), marginBottom: hp( '3%' ),
-        flexDirection: 'row', backgroundColor: Colors.backgroundColor
+        flexDirection: 'row',
       }}>
         <ButtonBlue
           buttonText="Proceed"
