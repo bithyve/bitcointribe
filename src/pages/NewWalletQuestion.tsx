@@ -209,14 +209,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //     walletName,
     //   } )
     // }
-    if( walletSetupCompleted && s3service && s3service.levelhealth ){
+    if( walletSetupCompleted && s3service && s3service.levelhealth && cloudBackupStatus == CloudBackupStatus.COMPLETED && cloudPermissionGranted === true ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
     }
-  }, [ walletSetupCompleted, s3service ] )
+  }, [ walletSetupCompleted, s3service, cloudBackupStatus ] )
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
