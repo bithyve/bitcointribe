@@ -2,6 +2,7 @@
 import {
   UnecryptedStreamData,
   ContactInfo,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 
 export const SYNC_PERMANENT_CHANNELS = 'SYNC_PERMANENT_CHANNELS'
@@ -112,12 +113,22 @@ export const walletCheckIn = ( currencyCode?: string ) => {
 
 // types and action creators: dispatched by sagas
 export const EXISTING_PERMANENT_CHANNELS_SYNCHED = 'EXISTING_PERMANENT_CHANNELS_SYNCHED'
+export const UPDATE_TRUSTED_CONTACTS = 'UPDATE_TRUSTED_CONTACTS'
 
 export const existingPermanentChannelsSynched = ( { successful }: {successful: boolean} ) => {
   return {
     type: EXISTING_PERMANENT_CHANNELS_SYNCHED,
     payload: {
       successful
+    }
+  }
+}
+
+export const updateTrustedContacts = ( contacts: Trusted_Contacts ) => {
+  return {
+    type: UPDATE_TRUSTED_CONTACTS,
+    payload: {
+      contacts
     }
   }
 }
