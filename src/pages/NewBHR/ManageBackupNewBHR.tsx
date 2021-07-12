@@ -52,6 +52,7 @@ import {
   LevelData,
   LevelHealthInterface,
   MetaShare,
+  Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import ModalHeader from '../../components/ModalHeader'
@@ -159,7 +160,7 @@ interface ManageBackupNewBHRPropsTypes {
   shieldHealth: boolean;
   modifyLevelData: any;
   modifyLevelDataStatus: boolean;
-  trustedContactsService: TrustedContactsService;
+  trustedContacts: Trusted_Contacts;
   regularAccount: RegularAccount;
   createChannelAssets: any;
   setApprovalStatus: any;
@@ -253,12 +254,11 @@ class ManageBackupNewBHR extends Component<
   };
 
   updateAddressBook = async ( ) => {
-    const { trustedContactsService } = this.props
-    const contacts = trustedContactsService.tc.trustedContacts
+    const { trustedContacts } = this.props
 
     const keeping = []
-    for( const channelKey of Object.keys( contacts ) ){
-      const contact = contacts[ channelKey ]
+    for( const channelKey of Object.keys( trustedContacts ) ){
+      const contact = trustedContacts[ channelKey ]
       const isWard = [ TrustedContactRelationTypes.WARD, TrustedContactRelationTypes.KEEPER_WARD ].includes( contact.relationType )
 
       if( contact.isActive ){
@@ -361,7 +361,7 @@ class ManageBackupNewBHR extends Component<
     } = this.props
 
     if (
-      prevProps.trustedContactsService.tc.trustedContacts != this.props.trustedContactsService.tc.trustedContacts
+      prevProps.trustedContacts != this.props.trustedContacts
     ) {
       requestAnimationFrame( () => {
         this.updateAddressBook()
@@ -1269,7 +1269,7 @@ const mapStateToProps = ( state ) => {
     levelData: idx( state, ( _ ) => _.health.levelData ),
     shieldHealth: idx( state, ( _ ) => _.health.shieldHealth ),
     modifyLevelDataStatus: idx( state, ( _ ) => _.health.loading.modifyLevelDataStatus ),
-    trustedContactsService: idx( state, ( _ ) => _.trustedContacts.service ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     regularAccount: idx( state, ( _ ) => _.accounts[ REGULAR_ACCOUNT ].service ),
     approvalStatus: idx( state, ( _ ) => _.health.approvalStatus ),
     isKeeperInfoUpdated2: idx( state, ( _ ) => _.health.isKeeperInfoUpdated2 ),

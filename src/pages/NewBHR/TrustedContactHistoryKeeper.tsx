@@ -139,7 +139,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
-  const trustedContacts: TrustedContactsService = useSelector( ( state ) => state.trustedContacts.service )
+  const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const [ contacts, setContacts ] = useState( [] )
   const { WALLET_SETUP } = useSelector( ( state ) => state.storage.database )
   const index = props.navigation.getParam( 'index' )
@@ -159,7 +159,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ props.navigation.state.params ] )
 
   useEffect( () => {
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     const c = []
     for( const channelKey of Object.keys( contacts ) ){
       const contact = contacts[ channelKey ]
@@ -222,7 +222,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       const shareHistory = JSON.parse( await AsyncStorage.getItem( 'shareHistory' ) )
       if ( shareHistory ) updateHistory( shareHistory )
     } )()
-    const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
+    const trustedContactsInfo: Keepers = trustedContacts
     const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
     const trustedData = trustedContactsInfo[ contactName ]
 
@@ -654,7 +654,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   useEffect( () => {
     if( !chosenContact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
     if( contacts )

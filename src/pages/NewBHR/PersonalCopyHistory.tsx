@@ -123,8 +123,8 @@ const PersonalCopyHistory = ( props ) => {
   const MetaShares: MetaShare[] = useSelector(
     ( state ) => state.health.service.levelhealth.metaSharesKeeper,
   )
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
   )
   const [ Contact, setContact ]:[any, any] = useState( {
   } )
@@ -477,7 +477,7 @@ const PersonalCopyHistory = ( props ) => {
   useEffect( () => {
     if( !Contact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     let channelKey: string
 
     if( contacts )
