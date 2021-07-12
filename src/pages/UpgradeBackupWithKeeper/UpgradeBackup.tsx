@@ -11,10 +11,12 @@ import {
   Platform,
   ImageBackground,
   Keyboard,
-  AsyncStorage,
   PermissionsAndroid,
   RefreshControl,
+  ViewStyle,
+  StyleProp,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
@@ -25,11 +27,6 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
-import {
-  fetchEphemeralChannel,
-  trustedChannelsSetupSync,
-  updateTrustedContactsInfoLocally
-} from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
@@ -58,7 +55,7 @@ import {
 } from '../../store/actions/health'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import { LevelHealthInterface, MetaShare } from '../../bitcoin/utilities/Interface'
+import { KeeperInfoInterface, LevelHealthInterface, MetaShare, Wallet } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import PersonalNode from '../../common/data/models/PersonalNode'
 import { initNewBHRFlow } from '../../store/actions/health'
@@ -77,6 +74,7 @@ import PersonalCopyShareModal from '../NewBHR/PersonalCopyShareModal'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import QRModal from '../Accounts/QRModal'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
 
 interface UpgradeBackupStateTypes {
   selectedIds: any[];
@@ -155,14 +153,14 @@ interface UpgradeBackupPropsTypes {
   updateLevelToSetup: any;
   levelToSetup: number;
   updateAvailableKeeperData: any;
-  trustedChannelsSetupSync: any;
   confirmPDFSharedFromUpgrade: any;
   getPDFData: any;
   isUpgradeLevelInitialized: boolean;
   checkMSharesHealth: any;
-  updateTrustedContactsInfoLocally: any;
   pdfInfo: { publicKey: string; privateKey: string; filePath: string;},
-  secureAccount: SecureAccount;
+  wallet: Wallet;
+  containerStyle: StyleProp<ViewStyle>;
+  setIsPermissionGiven: any;
 }
 
 class UpgradeBackup extends Component<
@@ -256,7 +254,6 @@ class UpgradeBackup extends Component<
 
   componentDidMount = () => {
     this.props.checkMSharesHealth()
-    this.props.trustedChannelsSetupSync()
     const { trustedContactsInfo, overallHealth } = this.props
     let TotalKeeper = 1
     let keepersInfo: {shareId: string; type: string; count: number; contactDetails?: any; status?: boolean}[] = [ {
@@ -325,7 +322,7 @@ class UpgradeBackup extends Component<
     this.setState( {
       showLoader: true
     } )
-    const { levelHealth, overallHealth, secureAccount } = this.props
+    const { levelHealth, overallHealth, wallet } = this.props
     if( levelHealth[ levelToSetup-1 ] ){
       for ( let i = 0; i < keepersInfo.length; i++ ) {
         const element = keepersInfo[ i ]
@@ -445,7 +442,7 @@ class UpgradeBackup extends Component<
         showLoader: false,
         qrScannerText: 'Scan last qr from pdf or scan secondary qr from personal device.'
       } )
-      if( !secureAccount.secureHDWallet.secondaryMnemonic )
+      if( wallet.details2FA && !wallet.details2FA.bithyveXpub )
         ( this.QrBottomSheet as any ).snapTo( 1 )
       else
         this.RestoreFromICloud.current.snapTo( 1 )
@@ -615,8 +612,8 @@ class UpgradeBackup extends Component<
         this.setState( {
           isGuardianCreationClicked: true
         } )
-        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount } = this.props
-        const firstName = 'Secondary'
+        const { trustedContacts, updatedKeeperInfo, keeperProcessStatus, accountShells, addNewSecondarySubAccount, metaSharesKeeper } = this.props
+        const firstName = 'Personal'
         const lastName = 'Device1'
 
         const contactName = `${firstName} ${lastName ? lastName : ''}`
@@ -632,25 +629,27 @@ class UpgradeBackup extends Component<
         config.TC_REQUEST_EXPIRY
         // Keeper setup started
         keeperProcessStatus( KeeperProcessStatus.IN_PROGRESS )
-        updatedKeeperInfo( {
+        const obj: KeeperInfoInterface = {
           shareId: shareId,
           name: contactName,
-          uuid: '',
-          publicKey: '',
-          ephemeralAddress: '',
           type: 'device',
+          scheme: metaSharesKeeper.find( value => value.shareId == shareId ).meta.scheme,
+          currentLevel: this.props.levelToSetup,
+          createdAt: moment( new Date() ).valueOf(),
+          sharePosition: metaSharesKeeper.findIndex( value => value.shareId == shareId ),
           data: {
             name: contactName, index: 0
           }
-        } )
+        }
+        updatedKeeperInfo( obj )
 
         if ( shareExpired ) {
           this.setState( {
             secondaryQR: ''
           } )
-          this.updateTrustedContactsInfo( {
-            firstName, lastName
-          } )
+          // this.updateTrustedContactsInfo( {
+          //   firstName, lastName
+          // } )
           // dispatch( uploadEncMShareKeeper( index, selectedShareId, contactInfo, data, changeKeeper || isChange ) )
         } else {
           const hasTrustedChannel = trustedContact.symmetricKey ? true : false
@@ -693,17 +692,17 @@ class UpgradeBackup extends Component<
     }
   }
 
-  updateTrustedContactsInfo = async ( contact ) => {
-    const tcInfo = this.props.trustedContactsInfo
-    if ( tcInfo.length ) {
-      tcInfo[ 0 ] = contact
-    } else {
-      tcInfo[ 0 ] = contact
-      tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-      tcInfo[ 2 ] = undefined
-    }
-    this.props.updateTrustedContactsInfoLocally( tcInfo )
-  }
+  // updateTrustedContactsInfo = async ( contact ) => {
+  //   const tcInfo = this.props.trustedContactsInfo
+  //   if ( tcInfo.length ) {
+  //     tcInfo[ 0 ] = contact
+  //   } else {
+  //     tcInfo[ 0 ] = contact
+  //     tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+  //     tcInfo[ 2 ] = undefined
+  //   }
+  //   this.props.updateTrustedContactsInfoLocally( tcInfo )
+  // }
 
   setSecondaryDeviceQR = () => {
     try {
@@ -717,7 +716,7 @@ class UpgradeBackup extends Component<
         return
       }
 
-      const firstName = 'Secondary'
+      const firstName = 'Personal'
       let lastName = 'Device'
       if( index === 0 ) lastName = 'Device1'
       else if( index === 3 ) lastName = 'Device2'
@@ -775,11 +774,11 @@ class UpgradeBackup extends Component<
   updateShare = () => {
     const index = 0
     if( this.props.levelHealth[ this.props.levelToSetup-1 ] && this.props.levelHealth[ this.props.levelToSetup-1 ].levelInfo[ 2 ].updatedAt > 0 ) return
-    let contactName = 'Secondary Device'
-    if( index === 0 ) contactName = 'Secondary Device1'
-    else if( index === 3 ) contactName = 'Secondary Device2'
-    else contactName = 'Secondary Device3'
-    const shareArray = [
+    let contactName = 'Personal Device'
+    if( index === 0 ) contactName = 'Personal Device1'
+    else if( index === 3 ) contactName = 'Personal Device2'
+    else contactName = 'Personal Device3'
+    const shareObj =
       {
         walletId: this.props.s3Service.getWalletId().data.walletId,
         shareId: this.state.selectedShareId[ 0 ],
@@ -787,9 +786,8 @@ class UpgradeBackup extends Component<
         updatedAt: moment( new Date() ).valueOf(),
         name: contactName,
         shareType: 'device',
-      },
-    ]
-    this.props.updateMSharesHealth( shareArray )
+      }
+    this.props.updateMSharesHealth( shareObj )
   }
 
   saveInTransitHistory = async () => {
@@ -845,7 +843,6 @@ class UpgradeBackup extends Component<
           // const qrScannedData = '{"requester":"Ty","publicKey":"rWGnbT3BST5nCCIFwNScsRvh","uploadedAt":1617100785380,"type":"ReverseRecoveryQR","ver":"1.5.0"}'
           // try {
           //   if ( qrScannedData ) {
-          //     this.props.downloadSmShareForApproval( qrScannedData )
           //     this.setState( {
           //       QrBottomSheetsFlag: false
           //     } )
@@ -954,6 +951,7 @@ class UpgradeBackup extends Component<
 
   requestStoragePermission = async () => {
     try {
+      this.props.setIsPermissionGiven( true )
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
         PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE
@@ -1021,6 +1019,7 @@ class UpgradeBackup extends Component<
   }
 
   checkStoragePermission = async () =>  {
+    this.props.setIsPermissionGiven( true )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
@@ -1070,11 +1069,12 @@ class UpgradeBackup extends Component<
 
   render() {
     const { listData, contactToShow, isCloudBackupProcessing, showLoader } = this.state
-    const { navigation } = this.props
+    const { navigation, containerStyle } = this.props
     return (
-      <View style={{
+      <View style={styles.accountCardsSectionContainer}>
+        {/* <View style={{
         flex: 1, backgroundColor: Colors.backgroundColor1
-      }}>
+      }}> */}
         <SafeAreaView style={{
           flex: 0
         }} />
@@ -1521,13 +1521,12 @@ const mapStateToProps = ( state ) => {
     levelToSetup: idx( state, ( _ ) => _.upgradeToNewBhr.levelToSetup ),
     isUpgradeLevelInitialized: idx( state, ( _ ) => _.upgradeToNewBhr.isUpgradeLevelInitialized ),
     pdfInfo: idx( state, ( _ ) => _.health.pdfInfo ),
-    secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
   }
 }
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
     initializeHealthSetup,
     updateHealthForCloud,
     updateMSharesHealth,
@@ -1546,15 +1545,28 @@ export default withNavigationFocus(
     setAvailableKeeperData,
     updateLevelToSetup,
     updateAvailableKeeperData,
-    trustedChannelsSetupSync,
     confirmPDFSharedFromUpgrade,
     getPDFData,
     checkMSharesHealth,
-    updateTrustedContactsInfoLocally
+    setIsPermissionGiven
   } )( UpgradeBackup )
 )
 
 const styles = StyleSheet.create( {
+  accountCardsSectionContainer: {
+    height: hp( '68.5%' ),
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor,
+    borderTopLeftRadius: 25,
+    shadowColor: 'black',
+    shadowOpacity: 0.4,
+    shadowOffset: {
+      width: 2,
+      height: -1,
+    },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
   modalHeaderTitleView: {
     alignItems: 'center',
     flexDirection: 'row',

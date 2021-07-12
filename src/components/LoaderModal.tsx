@@ -17,7 +17,7 @@ export default function LoaderModal( props ) {
   }}>
     <View style={styles.modalContentContainer}>
       <View style={{
-        marginTop: 'auto', right: 0, bottom: 0, marginRight: -5, position: 'absolute'
+        marginTop: 'auto', right: 0, bottom: 0, position: 'absolute'
       }}>
         <Image source={require( '../assets/images/loader.gif' )} style={{
           width: wp( '30%' ), height: wp( '35%' ), marginLeft: 'auto', resizeMode: 'stretch',
@@ -30,10 +30,10 @@ export default function LoaderModal( props ) {
           marginLeft: wp( '8%' ), marginRight: wp( '8%' ), marginTop: wp( '8%' )
         }}>
           <Text style={{
-            color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansMedium
+            color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
           }}>{props.headerText}</Text>
           <Text style={{
-            marginRight: wp( '15%' ), color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' )
+            marginRight: wp( '18%' ), color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' )
           }}>{props.messageText}</Text>
           <Text style={{
             marginRight: wp( '20%' ), color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' )

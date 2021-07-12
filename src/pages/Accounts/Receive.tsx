@@ -12,10 +12,9 @@ import {
   Platform,
   TouchableWithoutFeedback,
   SafeAreaView,
-  StatusBar,
-  AsyncStorage,
-  Alert,
+  StatusBar
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { RFValue } from 'react-native-responsive-fontsize'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
@@ -31,15 +30,10 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import BottomSheet from 'reanimated-bottom-sheet'
 
 import {
-  SECURE_ACCOUNT,
-  TEST_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
-
-import {
   setReceiveHelper,
   setSavingWarning,
 } from '../../store/actions/preferences'
-import { getAccountIcon, getAccountTitle } from './Send/utils'
+import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import QRCode from 'react-native-qrcode-svg'
 import CopyThisText from '../../components/CopyThisText'
@@ -52,39 +46,32 @@ import ReceiveHelpContents from '../../components/Helper/ReceiveHelpContents'
 import idx from 'idx'
 import TwoFASetupWarningModal from './TwoFASetupWarningModal'
 import DeviceInfo from 'react-native-device-info'
+import AccountShell from '../../common/data/models/AccountShell'
+import { Account, AccountType } from '../../bitcoin/utilities/Interface'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 
 export default function Receive( props ) {
-
+  const dispatch = useDispatch()
   const [ ReceiveHelperBottomSheet ] = useState( React.createRef() )
   const [ isReceiveHelperDone, setIsReceiveHelperDone ] = useState( true )
   const isReceiveHelperDoneValue = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
   )
-
   const savingWarning = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.savingWarning ),
   )
 
   const [ SecureReceiveWarningBottomSheet ] = useState( React.createRef() )
-
   const [ amount, setAmount ] = useState( '' )
-  const [ serviceType ] = useState(
-    props.navigation.getParam( 'serviceType' )
-      ? props.navigation.getParam( 'serviceType' )
-      : '',
-  )
-  const derivativeAccountDetails =
-    props.navigation.state.params.derivativeAccountDetails
-  const dispatch = useDispatch()
-
+  const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
+  const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
 
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
   } = useBottomSheetModal()
-  const { service } = useSelector( ( state ) => state.accounts[ serviceType ] )
-
 
   const onPressTouchableWrapper = () => {
     if ( ReceiveHelperBottomSheet.current )
@@ -119,7 +106,7 @@ export default function Receive( props ) {
     if ( !isReceiveHelperDone1 ) {
       await AsyncStorage.getItem( 'isReceiveHelperDone' )
     }
-    if ( !isReceiveHelperDone1 && serviceType == TEST_ACCOUNT ) {
+    if ( !isReceiveHelperDone1 && accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ) {
       dispatch( setReceiveHelper( true ) )
       //await AsyncStorage.setItem('isReceiveHelperDone', 'true');
       setTimeout( () => {
@@ -139,7 +126,7 @@ export default function Receive( props ) {
   useEffect( () => {
     checkNShowHelperModal()
     //(async () => {
-    if ( serviceType === SECURE_ACCOUNT ) {
+    if ( accountShell.primarySubAccount.type == AccountType.SAVINGS_ACCOUNT ) {
       if ( !savingWarning ) {
         //await AsyncStorage.getItem('savingsWarning')
         // TODO: integrate w/ any of the PDF's health (if it's good then we don't require the warning modal)
@@ -156,6 +143,12 @@ export default function Receive( props ) {
     if ( SecureReceiveWarningBottomSheet.current )
       ( SecureReceiveWarningBottomSheet as any ).current.snapTo( 0 )
   }
+
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ props.navigation ] )
 
   const showReceiveAmountBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -181,19 +174,14 @@ export default function Receive( props ) {
   }, [ presentBottomSheet, dismissBottomSheet, amount ] )
 
   useEffect( () => {
-    const receivingAddress = service.getReceivingAddress(
-      derivativeAccountDetails ? derivativeAccountDetails.type : null,
-      derivativeAccountDetails ? derivativeAccountDetails.number : null,
-    )
-    let receiveAt = receivingAddress ? receivingAddress : ''
+    let receivingAddress = account.receivingAddress
     if ( amount ) {
-      receiveAt = service.getPaymentURI( receiveAt, {
+      receivingAddress = AccountUtilities.generatePaymentURI( receivingAddress, {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
     }
-    setReceivingAddress( receiveAt )
-
-  }, [ service, amount, ] )
+    setReceivingAddress( receivingAddress )
+  }, [ accountShell, amount, ] )
 
   return (
     <View style={{
@@ -232,7 +220,7 @@ export default function Receive( props ) {
                 </TouchableOpacity>
                 <Image
                   source={
-                    getAccountIcon( serviceType, derivativeAccountDetails )
+                    getAccountIconByShell( accountShell )
                   }
                   style={{
                     width: wp( '10%' ), height: wp( '10%' )
@@ -250,12 +238,12 @@ export default function Receive( props ) {
                     }}
                   >
                     {
-                      getAccountTitle( serviceType, derivativeAccountDetails )
+                      getAccountTitleByShell( accountShell )
                     }
                   </Text>
                 </View>
               </View>
-              {serviceType == TEST_ACCOUNT ? (
+              {accountShell.primarySubAccount.type == AccountType.TEST_ACCOUNT ? (
                 <KnowMoreButton
                   onpress={() => onPressKnowMore()}
                   containerStyle={{

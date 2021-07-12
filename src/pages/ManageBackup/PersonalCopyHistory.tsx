@@ -6,12 +6,11 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  AsyncStorage,
   Platform,
   Alert,
   PermissionsAndroid
 } from 'react-native'
-import * as Permissions from 'expo-permissions'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
@@ -47,6 +46,8 @@ import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
+import { setIsPermissionGiven } from '../../store/actions/preferences'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const PersonalCopyHistory = ( props ) => {
   const [ ErrorBottomSheet ] = useState( React.createRef() )
@@ -95,6 +96,8 @@ const PersonalCopyHistory = ( props ) => {
   const [
     PersonalCopyShareBottomSheet,
   ] = useState( React.createRef() )
+
+  const [ personalCopyShareModal, setPersonalCopyShareModal ] = useState( false )
 
   const secureAccount: SecureAccount = useSelector(
     ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
@@ -177,6 +180,7 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( () => {
     if ( next ) ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+    // if ( next ) setPersonalCopyShareModal( true )
   }, [ next ] )
 
   const [ pcShared, setPCShared ] = useState( false )
@@ -309,7 +313,8 @@ const PersonalCopyHistory = ( props ) => {
           'There was some error while sharing the Recovery Key, please try again',
         )
       }, 2 );
-      ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 );
+      ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+      // setPersonalCopyShareModal( false );
       ( ErrorBottomSheet as any ).current.snapTo( 1 )
       dispatch( personalCopyShared( {
         [ selectedPersonalCopy.type ]: null
@@ -351,6 +356,7 @@ const PersonalCopyHistory = ( props ) => {
 
 
   const getStoragePermission = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     // await checkStoragePermission()
     if ( Platform.OS === 'android' ) {
       const granted = await requestStoragePermission()
@@ -375,6 +381,7 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   const requestStoragePermission = async () => {
+    dispatch( setIsPermissionGiven( true ) )
     try {
       const result = await PermissionsAndroid.requestMultiple( [
         PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
@@ -397,6 +404,7 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   const checkStoragePermission = async () =>  {
+    dispatch( setIsPermissionGiven( true ) )
     if( Platform.OS==='android' ) {
       const [ read, write ] = [
         await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE ),
@@ -448,7 +456,8 @@ const PersonalCopyHistory = ( props ) => {
         selectedPersonalCopy={selectedPersonalCopy}
         personalCopyDetails={personalCopyDetails}
         onPressBack={() => {
-          ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          setPersonalCopyShareModal( false )
         }}
         onPressShare={() => { }}
         onPressConfirm={async () => {
@@ -464,6 +473,7 @@ const PersonalCopyHistory = ( props ) => {
           setPersonalCopyDetails( personalCopyDetails )
           saveInTransitHistory();
           ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          // setPersonalCopyShareModal( false )
         }}
       />
     )
@@ -474,6 +484,7 @@ const PersonalCopyHistory = ( props ) => {
       <ModalHeader
         onPressHeader={() => {
           ( PersonalCopyShareBottomSheet as any ).current.snapTo( 0 )
+          // setPersonalCopyShareModal( false )
         }}
       />
     )
@@ -534,8 +545,9 @@ const PersonalCopyHistory = ( props ) => {
             if ( restored ) {
               setPCShared( false )
               dispatch( generatePersonalCopy( selectedPersonalCopy ) )
-              saveInTransitHistory();
+              saveInTransitHistory()
               ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+              // setPersonalCopyShareModal( true )
             } else {
               Alert.alert(
                 'Invalid Exit Key',
@@ -716,13 +728,16 @@ const PersonalCopyHistory = ( props ) => {
               ( QrBottomSheet.current as any ).snapTo( 1 )
             } else {
               ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+              // setPersonalCopyShareModal( true )
             }
           }}
           onPressContinue={() => {
             ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
+            // setPersonalCopyShareModal( true )
           }}
         />
       </View>
+      {/* <ModalContainer visible={} */}
       <BottomSheet
         enabledInnerScrolling={true}
         ref={PersonalCopyShareBottomSheet as any}

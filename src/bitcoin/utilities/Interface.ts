@@ -1,7 +1,10 @@
+import { ImageSourcePropType } from 'react-native'
 import {
   DecentralizedBackup,
   ServicesJSON,
 } from '../../common/interfaces/Interfaces'
+import { networks } from 'bitcoinjs-lib'
+import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 
 export interface InputUTXOs {
   txId: string;
@@ -26,7 +29,7 @@ export interface TransactionPrerequisite {
   [txnPriority: string]: TransactionPrerequisiteElements
 }
 
-export interface TransactionDetails {
+export interface Transaction {
   txid: string;
   status: string;
   confirmations: number;
@@ -94,20 +97,34 @@ export interface TransactionDetails {
   address?: string
 }
 
+export type TransactionDetails = Transaction
+
 export interface Balances {
   confirmed: number;
   unconfirmed: number;
+}
+
+export enum TxPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CUSTOM = 'custom'
 }
 
 export interface Transactions {
   totalTransactions: number;
   confirmedTransactions: number;
   unconfirmedTransactions: number;
-  transactionDetails: Array<TransactionDetails>;
+  transactionDetails: Array<Transaction>;
 }
 
 export interface MetaShare {
-  encryptedSecret: string;
+  encryptedSecret?: string;
+  encryptedShare?: {
+    pmShare: string;
+    smShare: string;
+    bhXpub: string;
+  };
   shareId: string;
   meta: {
     version: string;
@@ -121,8 +138,8 @@ export interface MetaShare {
     question?: string;
     guardian?: string;
     encryptedKeeperInfo?: string;
+    scheme?: string,
   };
-  encryptedStaticNonPMDD?: string;
 }
 
 export interface EncDynamicNonPMDD {
@@ -176,11 +193,11 @@ export interface DerivativeAccountElements {
     balance: number;
     unconfirmedBalance: number;
   };
-  transactions?: Transactions;
+  transactions?: Transaction[];
   txIdMap?: {[txid: string]: string[]};
   addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} };
   lastBalTxSync?: number;
-  newTransactions?: TransactionDetails[];
+  newTransactions?: Transaction[];
   blindGeneration?: boolean // temporarily generated during blind refresh
 }
 
@@ -190,7 +207,8 @@ export enum DerivativeAccountTypes {
   TRUSTED_CONTACTS = 'TRUSTED_CONTACTS',
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
   WYRE = 'WYRE',
-  RAMP = 'RAMP'
+  RAMP = 'RAMP',
+  SWAN = 'SWAN'
 }
 
 // Base Dervative Account
@@ -207,9 +225,10 @@ export interface DerivativeAccount {
 
 export interface TrustedContactDerivativeAccountElements
   extends DerivativeAccountElements {
-  contactName: string;
-  contactDetails?: {
-    xpub: string;
+  channelKey: string;
+  contactDetails: ContactDetails,
+  xpubDetails: {
+    xpub?: string;
     tpub?: string;
     receivingAddress?: string;
     usedAddresses?: string[];
@@ -235,8 +254,6 @@ export interface DonationDerivativeAccountElements
   description: string;
   configuration: {
     displayBalance: boolean;
-    displayTransactions: boolean;
-    displayTxDetails: boolean;
   };
   disableAccount: boolean;
 }
@@ -295,6 +312,21 @@ export interface RampDerivativeAccount {
   [accounts: number]: RampDerivativeAccountElements;
 }
 
+export interface SwanDerivativeAccountElements
+  extends DerivativeAccountElements {
+  accountName: string;
+  accountDescription: string;
+}
+
+export interface SwanDerivativeAccount {
+  series: number;
+  instance: {
+    max: number;
+    using: number;
+  };
+  [accounts: number]: SwanDerivativeAccountElements;
+}
+
 export interface DerivativeAccounts {
   [accountType: string]:
     | DerivativeAccount
@@ -312,6 +344,14 @@ export enum notificationType {
   smUploadedForPK = 'smUploadedForPK',
   newFCM = 'newFCM',
   newKeeperInfo = 'newKeeperInfo',
+  FNF_REQUEST = 'FNF_REQUEST',
+  FNF_TRANSACTION = 'FNF_TRANSACTION',
+  RELEASE = 'RELEASE',
+  FNF_REQUEST_ACCEPTED='FNF_REQUEST_ACCEPTED',
+  FNF_REQUEST_REJECTED='FNF_REQUEST_REJECTED',
+  FNF_KEEPER_REQUEST='FNF_KEEPER_REQUEST',
+  FNF_KEEPER_REQUEST_ACCEPTED='FNF_KEEPER_REQUEST_ACCEPTED',
+  FNF_KEEPER_REQUEST_REJECTED='FNF_KEEPER_REQUEST_REJECTED',
 }
 export enum notificationTag {
   IMP = 'IMP',
@@ -342,16 +382,16 @@ export interface EphemeralDataElements {
     otp: string;
     encryptedKey: string;
   };
-  paymentDetails?: {
-    trusted?: {
-      address?: string;
-      paymentURI?: string;
-    };
-    alternate?: {
-      address?: string;
-      paymentURI?: string;
-    };
-  };
+  // paymentDetails?: {
+  //   trusted?: {
+  //     address?: string;
+  //     paymentURI?: string;
+  //   };
+  //   alternate?: {
+  //     address?: string;
+  //     paymentURI?: string;
+  //   };
+  // };
   trustedAddress?: string;
   trustedTestAddress?: string;
   restoreOf?: string;
@@ -448,6 +488,116 @@ export interface Contacts {
   [contactName: string]: ContactElements
 }
 
+export interface ContactDetails {
+  id: string,
+  contactName?: string,
+  image?: ImageSourcePropType | null,
+}
+
+export interface ChannelAssets {
+  shareId?: string,
+  primaryMnemonicShard?: any,
+  keeperInfo?: any,
+  secondaryMnemonicShard?: any,
+  bhXpub?: string
+}
+
+export interface ContactInfo  {
+  contactDetails?: ContactDetails,
+  isKeeper?: boolean,
+  channelKey?: string,
+  secondaryChannelKey?: string
+  contactsSecondaryChannelKey?: string,
+  channelAssets?: {
+    primaryMnemonicShard?: any,
+    keeperInfo?: any,
+    secondaryMnemonicShard?: any,
+    bhXpub?: string
+  },
+  flowKind?: InitTrustedContactFlowKind
+}
+export interface PrimaryStreamData {
+  walletID?: string,
+  walletName?: string,
+  relationType?: TrustedContactRelationTypes,
+  FCM?: string,
+  paymentAddresses?: {
+    [accountType: string]: string
+  },
+  contactDetails: ContactDetails
+}
+
+export interface SecondaryStreamData {
+  secondaryMnemonicShard?: any,
+  bhXpub?: string,
+}
+
+export interface BackupStreamData {
+  primaryMnemonicShard?: MetaShare,
+  keeperInfo?: KeeperInfoInterface[],
+}
+
+export interface UnecryptedStreamData {
+  streamId: string,
+  primaryData?: PrimaryStreamData,
+  secondaryData?: SecondaryStreamData,     // in/out-stream secondaryData = null
+  backupData?: BackupStreamData | null, // in/out-stream backupData = null
+  metaData?: {
+    flags?: {
+      active: boolean,
+      lastSeen: number,
+      newData: boolean,
+    },
+    version?: string
+  }
+}
+
+export type UnecryptedStreams = {
+  [streamId: string]: UnecryptedStreamData
+}
+export interface StreamData {
+  streamId: string,
+  primaryEncryptedData?: string // CH encrypted: encrypted via primary channel key
+  secondaryEncryptedData?: string // CH2 encrypted: encrypted via secondary channel key & is not stored in the app
+  encryptedBackupData?: string, // not stored in the app
+  metaData?: {
+    flags?: {
+      active: boolean,
+      lastSeen: number,
+      newData: boolean,
+    },
+    version?: string
+  }
+}
+
+export type Streams = {
+  [streamId: string]: StreamData
+}
+
+export enum TrustedContactRelationTypes {
+  CONTACT = 'CONTACT',
+  KEEPER  = 'KEEPER',
+  WARD = 'WARD',
+  KEEPER_WARD = 'KEEPER_WARD'
+}
+
+export interface TrustedContact {
+  contactDetails: ContactDetails,
+  relationType: TrustedContactRelationTypes,
+  permanentChannelAddress: string,
+  isActive: boolean, // is the channel active
+  hasNewData: boolean, // instream has new data
+  permanentChannel?: Streams, // encrypted and uploaded to Relay
+  unencryptedPermanentChannel?: UnecryptedStreams, // unecrypted retained copy
+  secondaryChannelKey?: string | null, // temporary secondaryKey(removed post successful contact setup)
+  streamId?: string, // contact's streamId
+  walletID?: string, // contact's walletId
+  contactsSecondaryChannelKey?: string, // contacts secondaryKey(stored locally)
+}
+export interface Trusted_Contacts {
+  [channelKey: string]: TrustedContact
+}
+
 export interface WalletImage {
   DECENTRALIZED_BACKUP?: DecentralizedBackup;
   SERVICES?: ServicesJSON;
@@ -523,6 +673,7 @@ export interface EphemeralDataForKeeper {
 }
 
 export interface LevelHealthInterface {
+  level?: number;
   levelInfo: LevelInfo[];
 }
 
@@ -533,6 +684,20 @@ export interface LevelInfo {
   shareId: string;
   reshareVersion?: number;
   name?: string;
+  data?: any;
+  channelKey?: string
+}
+
+export interface KeeperInfoInterface {
+  shareId: string;
+  name: string;
+  type: string;
+  scheme: string;
+  currentLevel: number;
+  createdAt: number;
+  sharePosition: number;
+  data?: any;
+  channelKey?: string;
 }
 //VersionHistory
 export interface VersionHistory {
@@ -555,4 +720,132 @@ export interface AverageTxFees {
     feePerByte: number,
     estimatedBlocks: number,
   },
+}
+
+export interface LevelDataObj {
+  shareType: string
+  updatedAt: number
+  status: string
+  shareId: string
+  reshareVersion: number
+  name: string
+  data: any;
+  uuid: string
+}
+
+export interface LevelData {
+  levelName: string
+  status: string
+  keeper1ButtonText: string
+  keeper2ButtonText: string
+  keeper1: LevelDataObj,
+  keeper2: LevelDataObj,
+  note:string
+  info:string
+  id: number
+}
+
+export enum QRCodeTypes {
+  CONTACT_REQUEST = 'CONTACT_REQUEST',
+  KEEPER_REQUEST = 'KEEPER_REQUEST',
+  RECOVERY_REQUEST = 'RECOVERY_REQUEST',
+  EXISTING_CONTACT = 'EXISTING_CONTACT'
+}
+
+export interface UTXO {
+  txId: string;
+  vout: number;
+  value: number;
+  address: string;
+  status?: any;
+}
+
+export enum NetworkType {
+  TESTNET = 'TESTNET',
+  MAINNET = 'MAINNET'
+}
+
+export interface Wallet {
+  walletId: string,
+  walletName: string,
+  primaryMnemonic: string,
+  secondaryMemonic?: string,
+  details2FA? : {
+    secondaryXpub: string,
+    bithyveXpub: string,
+    twoFAKey: string,
+  }
+  accounts: {
+    [accountType: string]: string[] // array of accountIds
+  }
+}
+
+export interface Account {
+  id: string,                           // account identifier(derived from xpub)
+  walletId: string,                     // wallet's id
+  type: AccountType,                    // type of account
+  instanceNum: number,                  // instance number of the aforementioned type
+  networkType: NetworkType,                 // testnet/mainnet
+  derivationPath: string,               // derivation path of the extended keys belonging to this account
+  xpub: string | null,                  // account's xpub (null for multi-sig accounts)
+  xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
+  accountName: string,                  // name of the account
+  accountDescription: string,           // description of the account
+  activeAddresses: string[],            // addresses used(to be synched during soft refresh)
+  receivingAddress: string,             // current external address
+  nextFreeAddressIndex: number;         // external-chain free address marker
+  nextFreeChangeAddressIndex: number;   // internal-chain free address marker
+  confirmedUTXOs: UTXO[];               // utxo set available for use
+  unconfirmedUTXOs: UTXO[];             // utxos to arrive
+  balances: Balances;                   // confirmed/unconfirmed balances
+  transactions: Transaction[];          // transactions belonging to this account
+  lastSynched: number;                  // account's last sync timestamp
+  newTransactions?: Transaction[];      // new transactions arrived during the current sync
+  txIdMap?: {[txid: string]: string[]}; // tx-mapping; tx insertion checker
+  addressQueryList?: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} }; // addresses to be synched in addition to the soft refresh range
+}
+
+export interface MultiSigAccount extends Account {
+  is2FA: boolean,                       // is2FA enabled
+  xpubs: {                              // xpub set for multi-sig
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  }
+  xprivs: {                             // xpirv set for multi-sig
+    primary: string,
+    secondary?: string,
+  }
+}
+
+export interface DonationAccount extends Account {
+  donee: string;
+  configuration: {
+    displayBalance: boolean;
+  };
+  disableAccount: boolean;
+  is2FA: boolean,                       // is2FA enabled
+  xpubs?: {                              // xpub set for multi-sig
+    primary: string,
+    secondary: string,
+    bithyve: string,
+  }
+  xprivs?: {                             // xpirv set for multi-sig
+    primary: string,
+    secondary?: string,
+  }
+}
+
+export enum AccountType {
+  TEST_ACCOUNT = 'TEST_ACCOUNT',
+  CHECKING_ACCOUNT = 'CHECKING_ACCOUNT',
+  SAVINGS_ACCOUNT = 'SAVINGS_ACCOUNT',
+  DONATION_ACCOUNT = 'DONATION_ACCOUNT',
+  RAMP_ACCOUNT = 'RAMP_ACCOUNT',
+  SWAN_ACCOUNT = 'SWAN_ACCOUNT',
+  WYRE_ACCOUNT = 'WYRE_ACCOUNT'
+}
+
+export interface Accounts {
+    [accountId: string]: Account | MultiSigAccount | DonationAccount
 }

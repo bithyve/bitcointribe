@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react'
 import { View, Text } from 'react-native'
-import { useSelector } from 'react-redux'
 import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import Colors from '../../common/Colors'
@@ -10,15 +9,11 @@ import {
   widthPercentageToDP as wp,
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { v4 as uuid } from 'uuid'
 
 const TrustedContacts = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
   const index = props.index
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
-  )
-
   const selectedContactsList = useCallback( ( list ) => {
     if ( list.length > 0 ) setContacts( [ ...list ] )
   }, [] )
@@ -38,24 +33,10 @@ const TrustedContacts = ( props ) => {
   }, [ contacts, props.onPressContinue ] )
 
   const onPressSkip = () => {
-    let { skippedContactsCount } = trustedContacts.tc
-    let data
-    if ( !skippedContactsCount ) {
-      skippedContactsCount = 1
-      data = {
-        firstName: 'F&F request',
-        lastName: `awaiting ${skippedContactsCount}`,
-        name: `F&F request awaiting ${skippedContactsCount}`,
-      }
-    } else {
-      data = {
-        firstName: 'F&F request',
-        lastName: `awaiting ${skippedContactsCount + 1}`,
-        name: `F&F request awaiting ${skippedContactsCount + 1}`,
-      }
+    const contactDummy = {
+      id: uuid(),
     }
-
-    props.onPressContinue( [ data ], index )
+    props.onPressContinue( [ contactDummy ], index )
   }
 
   const renderContactList = useCallback(

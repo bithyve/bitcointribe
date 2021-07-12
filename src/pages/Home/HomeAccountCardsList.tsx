@@ -9,10 +9,11 @@ import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBac
 import HomeAccountCardsDraggableList from '../../components/home/HomeAccountCardsDraggableList'
 import HomeAccountCardsGrid from '../../components/home/HomeAccountCardsGrid'
 import useActiveAccountShells from '../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import { useDispatch, useSelector } from 'react-redux'
 
 
 export type Props = {
-  containerStyle?: Record<string, unknown>;
+  // containerStyle?: Record<string, unknown>;
   contentContainerStyle?: Record<string, unknown>;
   onCardSelected: ( selectedAccount: AccountShell ) => void;
   onAddNewSelected: () => void;
@@ -32,7 +33,7 @@ const EditModeBottomSheetHeader: React.FC = () => {
     <View style={styles.editModeBottomSheetHeaderSection}>
 
       <View style={{
-        flex: 1 
+        flex: 1
       }}>
         <Text style={styles.editModeBottomSheetHeadingText}>Rearrange Accounts</Text>
         <Text style={styles.editModeBottomSheetSubHeadingText}>Move the accounts to reorder them</Text>
@@ -40,7 +41,7 @@ const EditModeBottomSheetHeader: React.FC = () => {
 
       <Button
         containerStyle={{
-          flex: 0 
+          flex: 0
         }}
         buttonStyle={ButtonStyles.actionButton}
         title="All Accounts"
@@ -50,8 +51,8 @@ const EditModeBottomSheetHeader: React.FC = () => {
 }
 
 const HomeAccountCardsList: React.FC<Props> = ( {
-  containerStyle = {
-  },
+  // containerStyle = {
+  // },
   contentContainerStyle = {
   },
   onCardSelected,
@@ -61,9 +62,8 @@ const HomeAccountCardsList: React.FC<Props> = ( {
 }: Props ) => {
   const accountShells = useActiveAccountShells()
   const { present, dismiss } = useBottomSheetModal()
-
+  const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   function handleAccountReordering( orderedAccounts: AccountShell[] ) {}
-
   function handleGridCardLongPress() {
     // 📝 For now, long-pressing to re-order is on the backburner
     // until we can make it WYSIWYG.
@@ -72,52 +72,19 @@ const HomeAccountCardsList: React.FC<Props> = ( {
     // onEditModeChanged(true);
   }
 
-  const EditModeBottomSheetBackground = () => {
-    return (
-      <BottomSheetBackground isVisible onPress={() => {
-        onEditModeChanged( false )
-        dismiss()
-      }} />
-    )
-  }
-
-  const EmptyView: React.FC = () => {
-    return <View />
-  }
-
-  const showEditModeBottomSheet = useCallback( () => {
-    present(
-      <View style={containerStyle}>
-        <EditModeBottomSheetHeader />
-
-        <View style={styles.editModeBottomSheetContentContainer}>
-          <HomeAccountCardsDraggableList
-            accountShells={accountShells}
-            onDragEnded={handleAccountReordering}
-          />
-        </View>
-      </View>,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '68%' ],
-        overlayComponent: EditModeBottomSheetBackground,
-        handleComponent: EmptyView,
-      },
-    )
-  }, [ present, dismiss ] )
-
 
   return (
-    <View style={containerStyle}>
-      <HomeAccountCardsGrid
-        currentLevel={currentLevel}
-        accountShells={accountShells}
-        onCardLongPressed={handleGridCardLongPress}
-        onAccountSelected={onCardSelected}
-        onAddNewSelected={onAddNewSelected}
-        contentContainerStyle={contentContainerStyle}
-      />
-    </View>
+    // <View style={containerStyle}>
+    <HomeAccountCardsGrid
+      currentLevel={currentLevel}
+      accountShells={accountShells}
+      onCardLongPressed={handleGridCardLongPress}
+      onAccountSelected={onCardSelected}
+      onAddNewSelected={onAddNewSelected}
+      contentContainerStyle={contentContainerStyle}
+      showAllAccount={showAllAccount}
+    />
+    // </View>
   )
 }
 

@@ -5,13 +5,13 @@ import {
   StatusBar,
   ImageBackground,
   Platform,
-  AsyncStorage,
   Linking,
   Alert,
   Image,
   AppState,
   InteractionManager,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,
@@ -35,39 +35,34 @@ import {
 } from '../../common/constants/wallet-service-types'
 import {
   downloadMShare,
-  uploadRequestedShare,
-  initHealthCheck,
 } from '../../store/actions/sss'
 import {
   initializeHealthSetup,
-  onApprovalStatusChange,
-  autoDownloadShareContact,
-  uploadSecondaryShareForPK,
-  downloadSMShard,
-  updateKeeperInfoToUnderCustody,
   updateCloudPermission,
+  acceptExistingContactRequest
 } from '../../store/actions/health'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
-  approveTrustedContact,
-  fetchEphemeralChannel,
-  fetchTrustedChannel,
-  clearPaymentDetails,
-  postRecoveryChannelSync,
+  rejectTrustedContact,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
-  fetchNotifications,
   notificationsUpdated,
+  setupNotificationList,
+  updateNotificationList,
+  updateMessageStatusInApp,
+  updateMessageStatus,
+  getMessages,
 } from '../../store/actions/notifications'
 import {
   setCurrencyCode,
   setCardData,
+  setIsPermissionGiven,
+  updateLastSeen
 } from '../../store/actions/preferences'
 import {
   getCurrencyImageByRegion,
-  getKeeperInfoFromShareId,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
@@ -81,6 +76,7 @@ import TrustedContactsService from '../../bitcoin/services/TrustedContactsServic
 import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
+import { v4 as uuid } from 'uuid'
 import CustomBottomTabs, {
   BottomTab,
   TAB_BAR_HEIGHT,
@@ -88,27 +84,24 @@ import CustomBottomTabs, {
 import {
   addTransferDetails,
   autoSyncShells,
-  addNewAccountShell
+  fetchFeeAndExchangeRates
 } from '../../store/actions/accounts'
 import {
-  trustedChannelActions,
+  AccountType,
   LevelHealthInterface,
-  MetaShare,
+  QRCodeTypes,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
 import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
-import { withNavigationFocus } from 'react-navigation'
+import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
-import semver from 'semver'
 import {
   updatePreference,
   setFCMToken,
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
-import { fetchKeeperTrustedChannel, updateNewFcm } from '../../store/actions/keeper'
-import S3Service from '../../bitcoin/services/sss/S3Service'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import PersonalNode from '../../common/data/models/PersonalNode'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
 import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
@@ -126,27 +119,41 @@ import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import messaging from '@react-native-firebase/messaging'
 import firebase from '@react-native-firebase/app'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import BottomSheetSwanInfo from '../../components/bottom-sheets/swan/BottomSheetSwanInfo'
 import { setVersion } from '../../store/actions/versionHistory'
+import { clearSwanCache, updateSwanStatus, createTempSwanAccountInfo } from '../../store/actions/SwanIntegration'
 import { clearRampCache } from '../../store/actions/RampIntegration'
 import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
-import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import { credsAuthenticated } from '../../store/actions/setupAndAuth'
+import { setShowAllAccount } from '../../store/actions/accounts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import Fonts from '../../common/Fonts'
+import HomeBuyCard from './HomeBuyCard'
+import HomeContainer from './HomeContainer'
+import FriendsAndFamilyScreen from '../FriendsAndFamily/FriendsAndFamilyScreen'
+import ManageBackupNewBHR from '../NewBHR/ManageBackupNewBHR'
+import UpgradeBackup from '../UpgradeBackupWithKeeper/UpgradeBackup'
+import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScreen'
+import Header from '../../navigation/stacks/Header'
+import { NotificationType } from '../../components/home/NotificationType'
+import NotificationInfoContents from '../../components/NotificationInfoContents'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
-
 export enum BottomSheetState {
   Closed,
   Open,
 }
-
 export enum BottomSheetKind {
   TAB_BAR_BUY_MENU,
   CUSTODIAN_REQUEST,
@@ -154,15 +161,17 @@ export enum BottomSheetKind {
   TRUSTED_CONTACT_REQUEST,
   ADD_CONTACT_FROM_ADDRESS_BOOK,
   NOTIFICATIONS_LIST,
+  SWAN_STATUS_INFO,
   WYRE_STATUS_INFO,
   RAMP_STATUS_INFO,
   ERROR,
   CLOUD_ERROR,
+  NOTIFICATION_INFO,
 }
 
 interface HomeStateTypes {
   notificationLoading: boolean;
-  notificationData?: any[];
+  notificationData: any[];
   CurrencyCode: string;
   netBalance: number;
   selectedBottomTab: BottomTab | null;
@@ -182,6 +191,7 @@ interface HomeStateTypes {
   custodyRequest: any;
   isLoadContacts: boolean;
   lastActiveTime: string;
+  swanDeepLinkContent: string | null;
   isBalanceLoading: boolean;
   addContactModalOpened: boolean;
   encryptedCloudDataJson: any;
@@ -191,33 +201,32 @@ interface HomeStateTypes {
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
+  notificationTitle: string | null;
+  notificationInfo: string | null;
+  notificationNote: string | null;
+  notificationAdditionalInfo: any;
+  notificationProceedText: string | null;
+  notificationIgnoreText: string | null;
+  isIgnoreButton: boolean;
+  currentMessage: any;
+  releaseNotes: string,
 }
 
 interface HomePropsTypes {
   navigation: any;
-  notificationList: any[];
+  notificationList: any;
   exchangeRates?: any[];
 
   accountsState: AccountsState;
   cloudPermissionGranted: any;
 
-  currentWyreSubAccount: ExternalServiceSubAccountInfo | null;
-  currentRampSubAccount: ExternalServiceSubAccountInfo | null;
-
-  walletName: string;
+  wallet: Wallet;
   UNDER_CUSTODY: any;
-  fetchNotifications: any;
   updateFCMTokens: any;
-  postRecoveryChannelSync: any;
   downloadMShare: any;
-  approveTrustedContact: any;
-  fetchTrustedChannel: any;
-  fetchEphemeralChannel: any;
-  uploadRequestedShare: any;
-  uploadSecondaryShareForPK: any;
-  s3Service: S3Service;
+  acceptExistingContactRequest: any;
+  rejectTrustedContact: any;
   initializeHealthSetup: any;
-  initHealthCheck: any;
   overallHealth: any;
   levelHealth: LevelHealthInterface[];
   currentLevel: number;
@@ -225,10 +234,11 @@ interface HomePropsTypes {
   autoSyncShells: any;
   clearWyreCache: any;
   clearRampCache: any;
-  addNewAccountShell: any;
+  clearSwanCache: any;
+  updateSwanStatus: any;
+  fetchFeeAndExchangeRates: any;
+  createTempSwanAccountInfo: any;
   addTransferDetails: any;
-  paymentDetails: any;
-  clearPaymentDetails: any;
   trustedContacts: TrustedContactsService;
   isFocused: boolean;
   notificationListNew: any;
@@ -241,30 +251,39 @@ interface HomePropsTypes {
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
   releaseCasesValue: any;
+  swanDeepLinkContent: string | null;
   regularAccount: RegularAccount;
   database: any;
   setCardData: any;
   cardDataProps: any;
-  fetchKeeperTrustedChannel: any;
-  keeperApproveStatus: any;
-  onApprovalStatusChange: any;
   secureAccount: any;
-  autoDownloadShareContact: any;
   accountShells: AccountShell[];
   setVersion: any;
   wyreDeepLinkContent: string | null;
   rampDeepLinkContent: string | null;
-  downloadSMShard: any;
   rampFromBuyMenu: boolean | null;
   rampFromDeepLink: boolean | null;
   wyreFromBuyMenu: boolean | null;
   wyreFromDeepLink: boolean | null;
-  updateNewFcm: any;
   setCloudData: any;
-  updateKeeperInfoToUnderCustody: any;
   newBHRFlowStarted: any;
   cloudBackupStatus: CloudBackupStatus;
   updateCloudPermission: any;
+  credsAuthenticated: any;
+  setShowAllAccount: any;
+  setIsPermissionGiven: any;
+  isPermissionSet: any;
+  updateLastSeen: any;
+  isAuthenticated: any;
+  setupNotificationList: any;
+  asyncNotificationList: any;
+  updateNotificationList: any;
+  fetchStarted: any;
+  messages: any;
+  updateMessageStatusInApp: any;
+  updateMessageStatus: any;
+  initLoader: boolean;
+  getMessages: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -274,7 +293,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   appStateListener: any;
   firebaseNotificationListener: any;
   notificationOpenedListener: any;
-
+  currentNotificationId: string;
   bottomSheetRef = createRef<BottomSheet>();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
 
@@ -282,7 +301,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   constructor( props ) {
     super( props )
-
+    this.props.setShowAllAccount( false )
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
@@ -308,6 +327,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       isLoadContacts: false,
       lastActiveTime: moment().toISOString(),
       notificationLoading: true,
+      swanDeepLinkContent: null,
       isBalanceLoading: true,
       addContactModalOpened: false,
       encryptedCloudDataJson: [],
@@ -316,8 +336,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       rampFromBuyMenu: null,
       rampFromDeepLink: null,
       wyreFromBuyMenu: null,
-      wyreFromDeepLink: null
+      wyreFromDeepLink: null,
+      notificationTitle: null,
+      notificationInfo: null,
+      notificationNote: null,
+      notificationAdditionalInfo: null,
+      notificationProceedText: null,
+      notificationIgnoreText:null,
+      isIgnoreButton: false,
+      currentMessage: null,
+      releaseNotes: '',
     }
+    this.currentNotificationId= ''
   }
 
   navigateToAddNewAccountScreen = () => {
@@ -325,28 +355,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressNotifications = async () => {
-    const notificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    const tmpList = []
-    if ( notificationList ) {
-      for ( let i = 0; i < notificationList.length; i++ ) {
-        const element = notificationList[ i ]
-        const obj = {
-          ...element,
-          read: element.isMandatory ? false : true,
-        }
-        tmpList.push( obj )
-      }
-    }
-    await AsyncStorage.setItem( 'notificationList', JSON.stringify( tmpList ) )
-    tmpList.sort( function ( left, right ) {
-      return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-    } )
-    this.setState( {
-      notificationData: tmpList,
-      notificationDataChange: !this.state.notificationDataChange,
-    } )
     setTimeout( () => {
       this.setState( {
         notificationLoading: false,
@@ -358,7 +366,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   processQRData = async ( qrData ) => {
     const { accountsState, addTransferDetails, navigation } = this.props
-
+    console.log( {
+      qrData
+    } )
     const network = Bitcoin.networkType( qrData )
     if ( network ) {
       const serviceType =
@@ -389,18 +399,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               break
 
             case ScannedAddressKind.PAYMENT_URI:
-              let address, options, donationId
+              let address, options
 
               try {
                 const res = service.decodePaymentURI( qrData )
                 address = res.address
                 options = res.options
 
-                // checking for donationId to send note
-                if ( options && options.message ) {
-                  const rawMessage = options.message
-                  donationId = rawMessage.split( ':' ).pop().trim()
-                }
               } catch ( err ) {
                 Alert.alert( 'Unable to decode payment URI' )
                 return
@@ -420,7 +425,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 bitcoinAmount: options.amount
                   ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
                   : '',
-                donationId,
               } )
               break
         }
@@ -428,11 +432,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         Toast( 'Invalid QR' )
       }
     }
-
     try {
       const scannedData = JSON.parse( qrData )
 
-      if ( scannedData.ver ) {
+      // check version compatibility
+      if ( scannedData.version ) {
         const isAppVersionCompatible = await checkAppVersionCompatibility( {
           relayCheckMethod: scannedData.type,
           version: scannedData.ver,
@@ -444,6 +448,59 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
 
       switch ( scannedData.type ) {
+          case QRCodeTypes.CONTACT_REQUEST:
+          case QRCodeTypes.KEEPER_REQUEST:
+            let trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type,
+              isExistingContact: false
+            }
+            console.log( {
+              trustedContactRequest
+            } )
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
+            break
+
+          case QRCodeTypes.EXISTING_CONTACT:
+            trustedContactRequest = {
+              walletName: scannedData.walletName,
+              channelKey: scannedData.channelKey,
+              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+              isKeeper: true,
+              isQR: true,
+              version: scannedData.version,
+              type: scannedData.type,
+              isExistingContact: true
+            }
+            console.log( {
+              trustedContactRequest
+            } )
+            this.setState( {
+              trustedContactRequest
+            },
+            () => {
+              this.openBottomSheetOnLaunch(
+                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+                1
+              )
+            }
+            )
+            break
+
           case 'trustedGuardian':
             const trustedGuardianRequest = {
               isGuardian: scannedData.isGuardian,
@@ -479,7 +536,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             break
 
           case 'secondaryDeviceGuardian':
-            console.log( 'scannedData', scannedData )
             const secondaryDeviceGuardianRequest = {
               isGuardian: scannedData.isGuardian,
               requester: scannedData.requester,
@@ -598,47 +654,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  scheduleNotification = async () => {
-    PushNotification.cancelAllLocalNotifications()
-    const channelIdRandom = moment().valueOf()
-
-    PushNotification.createChannel(
-      {
-        channelId: `${channelIdRandom}`,
-        channelName: 'reminder',
-        channelDescription: 'A channel to categorise your notifications',
-        playSound: false,
-        soundName: 'default',
-        importance: 4, // (optional) default: 4. Int value of the Android notification importance
-        vibrate: true, // (optional) default: true. Creates the default vibration patten if true.
-      },
-      ( created ) => console.log( `createChannel returned '${created}'` ) // (optional) callback returns whether the channel was created, false means it already existed.
-    )
-    const date = new Date()
-    date.setHours( date.getHours() + config.NOTIFICATION_HOUR )
-
-    //let date =  new Date(Date.now() + (3 * 60 * 1000));
-    PushNotification.localNotificationSchedule( {
-      channelId: channelIdRandom,
-      vibrate: true,
-      vibration: 300,
-      priority: 'high',
-      showWhen: true,
-      autoCancel: true,
-      soundName: 'default',
-      title: 'We have not seen you in a while!',
-      message:
-        'Opening your app regularly ensures you get all the notifications and security updates', // (required)
-      date: date,
-      repeatType: 'day',
-      allowWhileIdle: true, // (optional) set notification to work while on doze, default: false
-    } )
-
-    PushNotification.getScheduledLocalNotifications( ( notiifcations ) => {
-      console.log( 'SCHEDULE notiifcations', notiifcations )
-    } )
-  };
-
   localNotification = async ( notificationDetails ) => {
     const channelIdRandom = moment().valueOf()
     PushNotification.createChannel(
@@ -672,68 +687,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   };
 
-  bootStrapNotifications = async () => {
-    if ( Platform.OS === 'ios' ) {
-      firebase
-        .messaging()
-        .hasPermission()
-        .then( ( enabled ) => {
-          if ( enabled ) {
-            this.storeFCMToken()
-            this.scheduleNotification()
-            this.createNotificationListeners()
-          } else {
-            firebase
-              .messaging()
-              .requestPermission( {
-                provisional: true,
-              } )
-              .then( () => {
-                this.storeFCMToken()
-                this.scheduleNotification()
-                this.createNotificationListeners()
-              } )
-              .catch( () => {
-                console.log( 'Permission rejected.' )
-              } )
-          }
-        } )
-        .catch()
-    } else {
-      this.storeFCMToken()
-      this.scheduleNotification()
-      this.createNotificationListeners()
-    }
-  };
-
-  storeFCMToken = async () => {
-    const fcmToken = await messaging().getToken()
-    console.log( 'TOKEN', fcmToken )
-    const fcmArray = [ fcmToken ]
-    const fcmTokenFromAsync = this.props.fcmTokenValue
-    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
-      this.props.setFCMToken( fcmToken )
-
-      await AsyncStorage.setItem( 'fcmToken', fcmToken )
-      this.props.updateFCMTokens( fcmArray )
-      // Update FCM token to PK
-      this.props.updateNewFcm()
-      AsyncStorage.getItem( 'walletRecovered' ).then( ( recovered ) => {
-        // updates the new FCM token to channels post recovery
-        if ( recovered ) {
-          this.props.postRecoveryChannelSync()
-        }
-      } )
-    }
-  };
-
   createNotificationListeners = async () => {
+    this.props.setIsPermissionGiven( true )
     PushNotification.configure( {
+      // largeIcon: 'ic_launcher',
+      // smallIcon:'ic_notification',
       onNotification: ( notification ) => {
-        console.log( 'NOTIFICATION:', notification )
+        this.props.getMessages()
+        const { content } = notification.data
+        const notificationId = JSON.parse( content ).notificationId
+        this.currentNotificationId = notificationId
+        this.notificationCheck()
         // process the notification
         if ( notification.data ) {
-          this.props.fetchNotifications()
           this.onNotificationOpen( notification )
           // (required) Called when a remote is received or opened, or local notification is opened
           notification.finish( PushNotificationIOS.FetchResult.NoData )
@@ -742,8 +708,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
       // (optional) Called when Registered Action is pressed and invokeApp is false, if true onNotification will be called (Android)
       onAction: ( notification ) => {
-        console.log( 'ACTION:', notification.action )
-        console.log( 'NOTIFICATION:', notification )
+        console.log( 'ACTION onAction:', notification.action )
+        console.log( 'NOTIFICATION onAction:', notification )
 
         // process the action
       },
@@ -777,72 +743,40 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   onNotificationOpen = async ( item ) => {
     console.log( 'item', item )
-    const content = JSON.parse( item.data.content )
-    // let asyncNotificationList = notificationListNew;
-    let asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    if ( !asyncNotificationList ) {
-      asyncNotificationList = []
-    }
-    let readStatus = true
-    if ( content.notificationType == releaseNotificationTopic ) {
-      const releaseCases = this.props.releaseCasesValue
-      //JSON.parse(await AsyncStorage.getItem('releaseCases'));
-      if ( releaseCases.ignoreClick ) {
-        readStatus = true
-      } else if ( releaseCases.remindMeLaterClick ) {
-        readStatus = false
-      } else {
-        readStatus = false
-      }
-    }
-    const obj = {
-      type: content.notificationType,
-      isMandatory: false,
-      read: readStatus,
-      title: item.title,
-      time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
-      date: new Date(),
-      info: item.body,
-      notificationId: content.notificationId,
-    }
-    asyncNotificationList.push( obj )
-    // this.props.notificationsUpdated(asyncNotificationList);
-
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify( asyncNotificationList )
-    )
-    asyncNotificationList.sort( function ( left, right ) {
-      return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-    } )
-    this.setState( {
-      notificationData: asyncNotificationList,
-      notificationDataChange: !this.state.notificationDataChange,
-    } )
-    this.onPressNotifications()
   };
 
   onAppStateChange = async ( nextAppState ) => {
     const { appState } = this.state
+    const { isPermissionSet, setIsPermissionGiven } = this.props
     try {
       // TODO: Will this function ever be called if the state wasn't different? If not,
       // I don't think we need to be holding on to `appState` in this component's state.
       if ( appState === nextAppState ) return
+      if ( isPermissionSet ) {
+        setIsPermissionGiven( false )
+        return
+      }
       this.setState(
         {
           appState: nextAppState,
         },
         async () => {
           if ( nextAppState === 'active' ) {
-            this.scheduleNotification()
+          //this.scheduleNotification()
           }
           if ( nextAppState === 'inactive' || nextAppState == 'background' ) {
+            console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
             } )
+            this.props.updateLastSeen( new Date() )
+            this.props.navigation.dispatch( StackActions.reset( {
+              index: 0,
+              actions: [ NavigationActions.navigate( {
+                routeName: 'Intermediate'
+              } ) ],
+            } ) )
           }
         }
       )
@@ -851,166 +785,177 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  componentDidMount = () => {
+  componentDidMount = async() => {
     const {
       navigation,
-      s3Service,
       initializeHealthSetup,
-      newBHRFlowStarted
+      newBHRFlowStarted,
+      credsAuthenticated,
     } = this.props
-    const versionData = []
-    this.closeBottomSheet()
-    if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
-      this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
-    }
-    this.calculateNetBalance()
     this.appStateListener = AppState.addEventListener(
       'change',
       this.onAppStateChange
     )
-    if( newBHRFlowStarted === true )
-    {
-      const { healthCheckInitializedKeeper } = s3Service.levelhealth
-      if ( healthCheckInitializedKeeper === false ) {
-        initializeHealthSetup()
-      }
-    }
-
-    //const { healthCheckInitialized } = s3Service.sss;
-    //   console.log("healthCheckInitialized", healthCheckInitialized);
-    //   if (!healthCheckInitialized) {
-    //     initHealthCheck();
-    //   }
-    // }
-    this.bootStrapNotifications()
-    this.setUpFocusListener()
-    this.getNewTransactionNotifications()
-
-    Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-    Linking.getInitialURL().then( this.handleDeepLinking )
-
-    // call this once deeplink is detected aswell
-    this.handleDeepLinkModal()
-
-    const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
-
-    if ( unhandledDeepLinkURL ) {
-      navigation.setParams( {
-        unhandledDeepLinkURL: null,
-      } )
-      this.handleDeepLinking( unhandledDeepLinkURL )
-    }
-
-    InteractionManager.runAfterInteractions( () => {
+    requestAnimationFrame( () => {
       // This will sync balances and transactions for all account shells
       // this.props.autoSyncShells()
-      // Keeping autoSynn disabled
+      // Keeping autoSync disabled
+      credsAuthenticated( false )
+      //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
 
+      this.closeBottomSheet()
+      if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
+        this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
+      }
+      // this.calculateNetBalance()
+
+      if( newBHRFlowStarted === true )
+      {
+        if ( this.props.levelHealth.length == 0 && !this.props.initLoader ) {
+          initializeHealthSetup()
+        }
+      }
+
+      // this.bootStrapNotifications()
+      this.createNotificationListeners()
+      this.setUpFocusListener()
+      //this.getNewTransactionNotifications()
+
+      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      Linking.getInitialURL().then( this.handleDeepLinking )
+
+      // call this once deeplink is detected aswell
+      this.handleDeepLinkModal()
+
+      const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
+
+      if ( unhandledDeepLinkURL ) {
+        navigation.setParams( {
+          unhandledDeepLinkURL: null,
+        } )
+        this.handleDeepLinking( unhandledDeepLinkURL )
+      }
       this.props.setVersion()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
     } )
+
   };
 
-  getNewTransactionNotifications = async () => {
-    const newTransactions = []
-    const { accountsState } = this.props
-    const regularAccount = accountsState[ REGULAR_ACCOUNT ].service.hdWallet
-    const secureAccount = accountsState[ SECURE_ACCOUNT ].service.secureHDWallet
-    // console.log( ':regularAccount', regularAccount )
+  updateBadgeCounter = () => {
+    const { messages } = this.props
+    const unread = messages.filter( msg => msg.status === 'unread' )
+    if ( Platform.OS === 'ios' ) {
+      PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    }
+  }
 
-    const newTransactionsRegular =
-      regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
-      regularAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    const newTransactionsSecure =
-      secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ] &&
-      secureAccount.derivativeAccounts[ FAST_BITCOINS ][ 1 ].newTransactions
-    // console.log( ':newTransactionsRegular', newTransactionsRegular )
-    if ( newTransactionsRegular && newTransactionsRegular.length )
-      newTransactions.push( ...newTransactionsRegular )
-    if ( newTransactionsSecure && newTransactionsSecure.length )
-      newTransactions.push( ...newTransactionsSecure )
-
-    if ( newTransactions.length ) {
-      // let asyncNotification = notificationListNew;
-      const asyncNotification = JSON.parse(
-        await AsyncStorage.getItem( 'notificationList' )
-      )
-      let asyncNotificationList = []
-      if ( asyncNotification.length ) {
-        asyncNotificationList = []
-        for ( let i = 0; i < asyncNotification.length; i++ ) {
-          asyncNotificationList.push( asyncNotification[ i ] )
-        }
-      }
-
-      for ( let i = 0; i < newTransactions.length; i++ ) {
-        let present = false
-        for ( const tx of asyncNotificationList ) {
-          if (
-            tx.notificationsData &&
-            newTransactions[ i ].txid === tx.notificationsData.txid
-          )
-            present = true
-        }
-        if ( present ) continue
-
-        const obj = {
-          type: 'contact',
-          isMandatory: false,
-          read: false,
-          title: 'Alert from FastBitcoins',
-          time: timeFormatter( moment( new Date() ), moment( new Date() ).valueOf() ),
-          date: new Date(),
-          info: 'You have a new transaction',
-          notificationId: createRandomString( 17 ),
-          notificationsData: newTransactions[ i ],
-        }
-        asyncNotificationList.push( obj )
-        const notificationDetails = {
-          id: obj.notificationId,
-          title: obj.title,
-          body: obj.info,
-        }
-        console.log( ':asyncNotificationList', asyncNotificationList )
-
-        this.localNotification( notificationDetails )
-      }
-      //this.props.notificationsUpdated(asyncNotificationList);
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify( asyncNotificationList )
-      )
-      asyncNotificationList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
+  notificationCheck = () =>{
+    const { messages } = this.props
+    if( messages && messages.length ){
+      this.updateBadgeCounter()
+      messages.sort( function ( left, right ) {
+        return moment.utc( right.timeStamp ).unix() - moment.utc( left.timeStamp ).unix()
       } )
-      setTimeout( () => {
-        this.setState( {
-          notificationData: asyncNotificationList,
-          notificationDataChange: !this.state.notificationDataChange,
-        } )
-      }, 2 )
+      this.setState( {
+        notificationData: messages,
+        notificationDataChange: !this.state.notificationDataChange,
+      } )
+      if( this.currentNotificationId !== '' ) {
+        const message = messages.find( message => message.notificationId === this.currentNotificationId )
+        if( message ){
+          this.handleNotificationBottomSheetSelection( message )
+        }
+        this.currentNotificationId = ''
+      } else {
+        const message = messages.find( message => message.status === 'unread' )
+        if( message ){
+          this.handleNotificationBottomSheetSelection( message )
+        }
+      }
+    }
+  }
+
+  handleNotificationBottomSheetSelection = ( message ) => {
+    const storeName = Platform.OS == 'ios' ? 'App Store' : 'Play Store'
+    this.setState( {
+      currentMessage: message
+    } )
+    const statusValue = [ {
+      notificationId: message.notificationId,
+      status : 'read'
+    } ]
+    this.props.updateMessageStatus( statusValue )
+    this.props.updateMessageStatusInApp( message.notificationId )
+    switch ( message.type ) {
+        case NotificationType.FNF_REQUEST:
+        case NotificationType.FNF_REQUEST_ACCEPTED:
+        case NotificationType.FNF_REQUEST_REJECTED:
+        case NotificationType.FNF_KEEPER_REQUEST:
+        case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
+        case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
+        case NotificationType.CONTACT:
+        case NotificationType.SECURE_XPUB:
+        case NotificationType.APPROVE_KEEPER:
+        case NotificationType.UPLOAD_SEC_SHARE:
+        case NotificationType.RESHARE:
+        case NotificationType.RESHARE_RESPONSE:
+        case NotificationType.SM_UPLOADED_FOR_PK:
+        case NotificationType.NEW_KEEPER_INFO:
+          this.setState( {
+            notificationTitle: message.title,
+            notificationInfo: message.info,
+            notificationNote: '',
+            notificationAdditionalInfo: message.AdditionalInfo,
+            notificationProceedText: 'Okay',
+            notificationIgnoreText: '',
+            isIgnoreButton: false
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+          } )
+          break
+        case NotificationType.FNF_TRANSACTION:
+          this.setState( {
+            notificationTitle: message.title,
+            notificationInfo: message.info,
+            notificationNote: '',
+            notificationAdditionalInfo: message.AdditionalInfo,
+            notificationProceedText: 'Go to Account',
+            notificationIgnoreText: '',
+            isIgnoreButton: false
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+          } )
+          break
+        case NotificationType.RELEASE:
+          const current = DeviceInfo.getBuildNumber()
+          const { build, mandatoryFor } = message.additionalInfo
+          if( Number( current ) <= Number( mandatoryFor ) || Number( current ) <  Number( build ) ) {
+            this.setState( {
+              notificationTitle: message.title,
+              notificationInfo: message.info,
+              notificationNote: 'For updating you will be taken to the ' + storeName,
+              notificationAdditionalInfo: message.AdditionalInfo,
+              notificationProceedText: 'Upgrade',
+              notificationIgnoreText: Number( current ) <= Number( mandatoryFor ) ? '' : 'Remind me later',
+              isIgnoreButton: true,
+              releaseNotes: Platform.OS === 'android' ?  message.additionalInfo.notes.android : message.additionalInfo.notes.ios,
+            }, () => {
+              this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+            } )
+          }
+          break
     }
   };
+
 
   componentDidUpdate = ( prevProps, prevState ) => {
-
-    if (
-      prevProps.notificationList !== this.props.notificationList ||
-      prevProps.releaseCasesValue !== this.props.releaseCasesValue
-    ) {
-      this.setupNotificationList()
-    }
-
-    if (
-      prevProps.accountsState.accountShells !==
-      this.props.accountsState.accountShells
-    ) {
-      this.calculateNetBalance()
-      // this.getNewTransactionNotifications()
-    }
-
-    if ( prevProps.fcmTokenValue !== this.props.fcmTokenValue ) {
-      this.storeFCMToken()
-    }
+    // if (
+    //   prevProps.accountsState.accountShells !==
+    //   this.props.accountsState.accountShells
+    // ) {
+    //   this.calculateNetBalance()
+    //   // this.getNewTransactionNotifications()
+    // }
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -1018,59 +963,31 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     ) {
       this.setSecondaryDeviceAddresses()
     }
-
-    if ( this.props.paymentDetails !== null && this.props.paymentDetails ) {
-      const serviceType = REGULAR_ACCOUNT
-      const {
-        paymentDetails,
-        accountsState,
-        navigation,
-        addTransferDetails,
-        clearPaymentDetails,
-      } = this.props
-      let { address, paymentURI } = paymentDetails
-      let options: any = {
-      }
-      if ( paymentURI ) {
-        try {
-          const details = accountsState[ serviceType ].service.decodePaymentURI(
-            paymentURI
-          )
-          address = details.address
-          options = details.options
-        } catch ( err ) {
-          Alert.alert( 'Unable to decode payment URI' )
-          return
-        }
-      }
-
-      const item = {
-        id: address,
-      }
-
-      addTransferDetails( serviceType, {
-        selectedContact: item,
-      } )
-
-      clearPaymentDetails()
-
-      navigation.navigate( 'SendToContact', {
-        selectedContact: item,
-        serviceType,
-        bitcoinAmount: options.amount
-          ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-          : '',
-      } )
+    if (
+      prevProps.messages !==
+      this.props.messages
+    ) {
+      this.updateBadgeCounter()
     }
+
   };
 
   handleDeepLinkModal = () => {
-    const custodyRequest = this.props.navigation.getParam( 'custodyRequest' )
-    const recoveryRequest = this.props.navigation.getParam( 'recoveryRequest' )
-    const trustedContactRequest = this.props.navigation.getParam(
-      'trustedContactRequest'
-    )
-    const userKey = this.props.navigation.getParam( 'userKey' )
+    const custodyRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.custodyRequest : null//this.props.navigation.getParam( 'custodyRequest' )
+    const recoveryRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.recoveryRequest : null //this.props.navigation.getParam( 'recoveryRequest' )
+    const trustedContactRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.trustedContactRequest : null//this.props.navigation.getParam( 'trustedContactRequest' )
+    const userKey = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.userKey : null//this.props.navigation.getParam( 'userKey' )
+    const swanRequest = this.props.navigation.state.params && this.props.navigation.state.params.params ? this.props.navigation.state.params.params.swanRequest : null//this.props.navigation.getParam( 'swanRequest' )
+    if ( swanRequest ) {
+      this.setState( {
+        swanDeepLinkContent:swanRequest.url,
+      }, () => {
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+    }
 
     if ( custodyRequest ) {
       this.setState(
@@ -1111,7 +1028,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
 
     Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
-
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
     if ( this.firebaseNotificationListener ) {
       this.firebaseNotificationListener()
@@ -1147,6 +1063,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } else {
       this.handleDeepLinking( url )
     }
+
   };
 
   handleDeepLinking = async ( url: string | null ) => {
@@ -1154,9 +1071,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       return
     }
 
-    console.log( 'Home::handleDeepLinking::URL: ' + url )
+    console.log( 'handleDeepLinking: ' + url )
 
-    const splits = url ? url.split( '/' ) : []
+    const splits = url.split( '/' )
+    if ( splits.includes( 'swan' ) ) {
+      this.setState( {
+        swanDeepLinkContent:url,
+      }, () => {
+        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
+          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+      } )
+
+    }
 
     if ( splits.includes( 'wyre' ) ) {
       this.props.clearWyreCache()
@@ -1328,17 +1256,21 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   setUpFocusListener = () => {
+    const t0 = performance.now()
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
-      this.props.fetchNotifications()
+      this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      // this.notificationCheck()
       this.setState( {
         lastActiveTime: moment().toISOString(),
       } )
     } )
-
+    this.notificationCheck()
     this.setCurrencyCodeFromAsync()
+    const t1 = performance.now()
+    //console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   setSecondaryDeviceAddresses = async () => {
@@ -1376,82 +1308,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  calculateNetBalance = () => {
-    const { accountShells } = this.props.accountsState
-
-    let totalBalance = 0
-    accountShells.forEach( ( accountShell: AccountShell ) => {
-      if (
-        accountShell.primarySubAccount.sourceKind !==
-        SourceAccountKind.TEST_ACCOUNT
-      )
-        totalBalance += AccountShell.getTotalBalance( accountShell )
-    } )
-
-    this.setState( {
-      netBalance: totalBalance,
-    } )
-  };
-
-  onNotificationListOpen = async () => {
-    // let asyncNotificationList = notificationListNew;
-    const asyncNotificationList = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    if ( asyncNotificationList ) {
-      for ( let i = 0; i < asyncNotificationList.length; i++ ) {
-        if ( asyncNotificationList[ i ] ) {
-          asyncNotificationList[ i ].time = timeFormatter(
-            moment( new Date() ),
-            moment( asyncNotificationList[ i ].date ).valueOf()
-          )
-        }
-      }
-      // this.props.notificationsUpdated(asyncNotificationList);
-
-      await AsyncStorage.setItem(
-        'notificationList',
-        JSON.stringify( asyncNotificationList )
-      )
-      asyncNotificationList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-      } )
-
-      this.setState( {
-        notificationData: asyncNotificationList,
-        notificationDataChange: !this.state.notificationDataChange,
-      } )
-    }
-  };
-
-  onTrustedContactRequestAccepted = ( key ) => {
-    this.closeBottomSheet()
-    this.processDLRequest( key, false )
-  };
-
-  onTrustedContactRejected = () => {
-    this.closeBottomSheet()
-  };
-
-  onPhoneNumberChange = () => {};
-
-  handleBottomTabSelection = ( tab: BottomTab ) => {
-    this.setState( {
-      selectedBottomTab: tab,
-    } )
-
-    if ( tab === BottomTab.Transactions ) {
-      this.props.navigation.navigate( 'AllTransactions' )
-    } else if ( tab === BottomTab.More ) {
-      this.props.navigation.navigate( 'MoreOptions' )
-    } else if ( tab === BottomTab.QR ) {
-      this.props.navigation.navigate( 'QRScanner', {
-        onCodeScanned: this.processQRData,
-      } )
-    } else if ( tab === BottomTab.FriendsAndFamily ) {
-      this.props.navigation.navigate( 'FriendsAndFamily' )
-    }
-  };
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
     switch ( menuItem.kind ) {
@@ -1459,19 +1315,25 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          this.props.navigation.navigate( 'SwanIntegrationScreen' )
+          if( !this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length ){
+            this.props.clearSwanCache()
+            const accountDetails = {
+              name: 'Swan Account',
+              description: 'Sats purchased from Swan',
+            }
+            this.props.createTempSwanAccountInfo( accountDetails )
+            this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
+          }
+          else {
+            this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
+          }
+          this.setState( {
+            swanDeepLinkContent: null
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+          } )
           break
         case BuyMenuItemKind.RAMP:
-          if ( !this.props.currentRampSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Ramp Account',
-              defaultDescription: 'BTC purchased from Ramp',
-              serviceAccountKind: ServiceAccountKind.RAMP,
-            } )
-
-            this.props.addNewAccountShell( newSubAccount )
-          }
           this.props.clearRampCache()
           this.setState( {
             rampDeepLinkContent: null,
@@ -1482,18 +1344,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           } )
           break
         case BuyMenuItemKind.WYRE:
-          if ( !this.props.currentWyreSubAccount ) {
-            const newSubAccount = new ExternalServiceSubAccountInfo( {
-              instanceNumber: 1,
-              defaultTitle: 'Wyre Account',
-              defaultDescription: 'BTC purchased from Wyre',
-              serviceAccountKind: ServiceAccountKind.WYRE,
-            } )
-            this.props.addNewAccountShell( newSubAccount )
-            // this.props.navigation.navigate( 'NewWyreAccountDetails', {
-            //   currentSubAccount: newSubAccount,
-            // } )
-          }
           this.props.clearWyreCache()
           this.setState( {
             wyreDeepLinkContent: null,
@@ -1503,208 +1353,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
           } )
           break
-    }
-  };
-
-  processDLRequest = ( key, rejected ) => {
-    try {
-      const { trustedContactRequest, recoveryRequest } = this.state
-      let {
-        requester,
-        isGuardian,
-        approvedTC,
-        encryptedKey,
-        publicKey,
-        info,
-        isQR,
-        uploadedAt,
-        isRecovery,
-        version,
-        isFromKeeper,
-        isPrimaryKeeperRecovery,
-      } = trustedContactRequest || recoveryRequest
-      const {
-        UNDER_CUSTODY,
-        uploadRequestedShare,
-        navigation,
-        approveTrustedContact,
-        fetchTrustedChannel,
-        walletName,
-        trustedContacts,
-        uploadSecondaryShareForPK,
-      } = this.props
-
-      if ( !isRecovery ) {
-        if ( requester === walletName ) {
-          Toast( 'Cannot be your own Contact/Guardian' )
-          return
-        }
-
-        let expiry = config.TC_REQUEST_EXPIRY
-        if ( !semver.valid( version ) ) {
-          // expiry support for 0.7, 0.9 and 1.0
-          expiry = config.LEGACY_TC_REQUEST_EXPIRY
-        }
-
-        if ( uploadedAt && Date.now() - uploadedAt > expiry ) {
-          Alert.alert(
-            `${isQR ? 'QR' : 'Link'} expired!`,
-            `Please ask the sender to initiate a new ${isQR ? 'QR' : 'Link'}`
-          )
-        } else {
-          if ( isGuardian && UNDER_CUSTODY[ requester ] ) {
-            Alert.alert(
-              'Failed to accept',
-              `You already custody a share against the wallet name: ${requester}`
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-                info = key
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-                return
-              }
-            }
-
-            let existingContactName
-            Object.keys( trustedContacts.tc.trustedContacts ).forEach(
-              ( contactName ) => {
-                const contact = trustedContacts.tc.trustedContacts[ contactName ]
-                if ( contact.contactsPubKey === publicKey ) {
-                  existingContactName = contactName
-                }
-              }
-            )
-            if ( existingContactName && !approvedTC ) {
-              Toast( 'Contact already exists against this request' )
-              return
-            }
-
-            if ( publicKey && !rejected ) {
-              if ( !approvedTC ) {
-                navigation.navigate( 'ContactsListForAssociateContact', {
-                  postAssociation: ( contact ) => {
-                    let contactName = ''
-                    if ( contact ) {
-                      contactName = `${contact.firstName} ${
-                        contact.lastName ? contact.lastName : ''
-                      }`
-                        .toLowerCase()
-                        .trim()
-                    } else {
-                      // contactName = `${requester}'s Wallet`.toLowerCase();
-                      Alert.alert( 'Contact association failed' )
-                      return
-                    }
-                    if ( !semver.valid( version ) ) {
-                      // for 0.7, 0.9 and 1.0: info remains null
-                      info = null
-                    }
-
-                    const contactInfo = {
-                      contactName,
-                      info,
-                    }
-
-                    approveTrustedContact(
-                      contactInfo,
-                      publicKey,
-                      true,
-                      requester,
-                      isGuardian,
-                      isFromKeeper
-                    )
-                  },
-                  isGuardian,
-                } )
-              } else {
-                if ( !existingContactName ) {
-                  Alert.alert(
-                    'Invalid Link/QR',
-                    'You are not a valid trusted contact for approving this request'
-                  )
-                  return
-                }
-                const contactInfo = {
-                  contactName: existingContactName,
-                  info,
-                }
-
-                fetchTrustedChannel(
-                  contactInfo,
-                  trustedChannelActions.downloadShare,
-                  requester
-                )
-              }
-            } else if ( publicKey && rejected ) {
-              // don't associate; only fetch the payment details from EC
-              // fetchEphemeralChannel(null, null, publicKey);
-            }
-          }
-        }
-      } else {
-        if ( !isPrimaryKeeperRecovery ) {
-          if ( requester === walletName ) {
-            Toast( 'You do not host any key of your own' )
-            return
-          }
-
-          if ( !UNDER_CUSTODY[ requester ] ) {
-            this.setState(
-              {
-                errorMessageHeader: `You do not custody a share with the wallet name ${requester}`,
-                errorMessage:
-                  'Request your contact to send the request again with the correct wallet name or help them manually restore by going into Friends and Family > I am the Keeper of > Help Restore',
-              },
-              () => {
-                this.openBottomSheet( BottomSheetKind.ERROR )
-              }
-            )
-          } else {
-            if ( !publicKey ) {
-              try {
-                publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                  .decryptedPub
-              } catch ( err ) {
-                Alert.alert(
-                  'Invalid Number/Email',
-                  'Decryption failed due to invalid input, try again.'
-                )
-              }
-            }
-            if ( publicKey ) {
-              uploadRequestedShare( recoveryRequest.requester, publicKey )
-            }
-          }
-        } else {
-          if ( !publicKey ) {
-            try {
-              publicKey = TrustedContactsService.decryptPub( encryptedKey, key )
-                .decryptedPub
-            } catch ( err ) {
-              Alert.alert(
-                'Invalid Number/Email',
-                'Decryption failed due to invalid input, try again.'
-              )
-            }
-          }
-
-          if ( publicKey ) {
-            uploadSecondaryShareForPK(
-              recoveryRequest.requester,
-              publicKey.substring( 0, 24 )
-            )
-          }
-        }
-      }
-    } catch ( error ) {
-      console.log( 'PKRECOVERY error', error )
     }
   };
 
@@ -1724,6 +1372,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     kind: BottomSheetKind,
     snapIndex: number | null = null
   ) => {
+    // console.log( 'kind', kind )
+    // console.log( 'snapIndex', snapIndex )
+
     this.setState(
       {
         bottomSheetState: BottomSheetState.Open,
@@ -1751,75 +1402,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.onBottomSheetClosed()
   };
 
+  onBackPress = () => {
+    this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
+  };
+
   onNotificationClicked = async ( value ) => {
-    const asyncNotifications = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    console.log( 'Notification clicked Home>onNotificationClicked' )
-    console.log( 'asyncNotifications ', asyncNotifications )
-    console.log( 'notification passed ', value )
-
-    const { notificationData } = this.state
-    const { navigation, } = this.props
-    const tempNotificationData = notificationData
-    for ( let i = 0; i < tempNotificationData.length; i++ ) {
-      const element = tempNotificationData[ i ]
-      if ( element.notificationId == value.notificationId ) {
-        if (
-          asyncNotifications &&
-          asyncNotifications.length &&
-          asyncNotifications.findIndex(
-            ( item ) => item.notificationId == value.notificationId
-          ) > -1
-        ) {
-          asyncNotifications[
-            asyncNotifications.findIndex(
-              ( item ) => item.notificationId == value.notificationId
-            )
-          ].read = true
-        }
-        tempNotificationData[ i ].read = true
-      }
-    }
-
-    await AsyncStorage.setItem(
-      'notificationList',
-      JSON.stringify( asyncNotifications )
-    )
-
-    this.setState( {
-      notificationData: tempNotificationData,
-      notificationDataChange: !this.state.notificationDataChange,
-    } )
-
-    if ( value.info && value.info.includes( 'F&F request accepted by' ) ) {
-      navigation.navigate( 'FriendsAndFamily' )
-      return
-    }
-
-    if ( value.type == releaseNotificationTopic ) {
-      RelayServices.fetchReleases( value.info.split( ' ' )[ 1 ] )
-        .then( async ( res ) => {
-          if ( res.data.releases.length ) {
-            const releaseNotes = res.data.releases.length
-              ? res.data.releases.find( ( el ) => {
-                return el.build === value.info.split( ' ' )[ 1 ]
-              } )
-              : ''
-            navigation.navigate( 'UpdateApp', {
-              releaseData: [ releaseNotes ],
-              isOpenFromNotificationList: true,
-              releaseNumber: value.info.split( ' ' )[ 1 ],
-            } )
-          }
-        } )
-        .catch( ( error ) => {
-          console.error( error )
-        } )
-    }
-    if ( value.type == 'contact' ) {
-      this.closeBottomSheet()
-    }
+    if( value.status === 'unread' || value.type === NotificationType.FNF_TRANSACTION )
+      this.handleNotificationBottomSheetSelection( value )
   };
 
   onPressElement = ( item ) => {
@@ -1852,239 +1441,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  setupNotificationList = async () => {
-    const {
-      releaseCasesValue,
-      keeperApproveStatus,
-      onApprovalStatusChange,
-      s3Service,
-      levelHealth,
-      notificationList,
-      fetchKeeperTrustedChannel,
-      secureAccount,
-      UNDER_CUSTODY,
-      database,
-      updateKeeperInfoToUnderCustody
-    } = this.props
-    // let asyncNotification = notificationListNew;
-    const asyncNotification = JSON.parse(
-      await AsyncStorage.getItem( 'notificationList' )
-    )
-    let asyncNotificationList = []
-    if ( asyncNotification ) {
-      asyncNotificationList = []
-      for ( let i = 0; i < asyncNotification.length; i++ ) {
-        asyncNotificationList.push( asyncNotification[ i ] )
-      }
-    }
-    const tmpList = asyncNotificationList
-    if ( notificationList ) {
-      // console.log(
-      //   "notificationList['notifications']",
-      //   notificationList["notifications"]
-      // );
-      for ( let i = 0; i < notificationList[ 'notifications' ].length; i++ ) {
-        const element = notificationList[ 'notifications' ][ i ]
-        // console.log("element", element);
-        let readStatus = false
-        if ( element.notificationType == releaseNotificationTopic ) {
-          const releaseCases = this.props.releaseCasesValue
-          // JSON.parse(
-          //   await AsyncStorage.getItem('releaseCases'),
-          // );
-          if (
-            element.body &&
-            element.body.split( ' ' )[ 1 ] == releaseCases.build
-          ) {
-            if ( releaseCases.remindMeLaterClick ) {
-              readStatus = false
-            }
-            if ( releaseCases.ignoreClick ) {
-              readStatus = true
-            }
-          } else {
-            readStatus = true
-          }
-        }
-
-        if ( element.notificationType == 'newKeeperInfo' ) {
-          const data = JSON.parse( element.data )
-          if ( data.walletName && data.walletId ) {
-            updateKeeperInfoToUnderCustody( data.walletName, data.walletId )
-          }
-        }
-        if ( element.notificationType == 'uploadSecondaryShare' ) {
-          const data = JSON.parse( element.data )
-          if ( data.shareID == keeperApproveStatus.shareId ) {
-            onApprovalStatusChange( {
-              status: true,
-              initiatedAt: moment( new Date() ).valueOf(),
-              shareId: data.shareID,
-            } )
-          }
-        }
-        if (
-          element.notificationType == 'secureXpub' &&
-          !database.DECENTRALIZED_BACKUP.PK_SHARE
-        ) {
-          const shareId = s3Service.levelhealth.metaSharesKeeper[ 1 ].shareId
-          const share = getKeeperInfoFromShareId( levelHealth, shareId )
-          fetchKeeperTrustedChannel(
-            shareId,
-            element.notificationType,
-            share.name
-          )
-        }
-        if ( element.notificationType == 'reShare' ) {
-          // console.log('element.notificationType', element.notificationType)
-          // console.log('UNDER_CUSTODY', UNDER_CUSTODY)
-
-          let existingShares: MetaShare[]
-          if ( Object.keys( UNDER_CUSTODY ).length ) {
-            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
-            } )
-          }
-          if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
-            if (
-              existingShares.findIndex(
-                ( value ) =>
-                  value.shareId === JSON.parse( element.data ).selectedShareId
-              ) == -1
-            ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
-              this.props.autoDownloadShareContact(
-                JSON.parse( element.data ).selectedShareId,
-                JSON.parse( element.data ).walletId
-              )
-            }
-          }
-        }
-        if ( element.notificationType == 'smUploadedForPK' ) {
-          if (
-            keeperApproveStatus.shareId == 'PK_recovery' &&
-            keeperApproveStatus.transferDetails &&
-            keeperApproveStatus.transferDetails.key
-          ) {
-            const result = await S3Service.downloadSMShare(
-              keeperApproveStatus.transferDetails.key
-            )
-            if ( result && result.data ) {
-              onApprovalStatusChange( {
-                status: true,
-                initiatedAt: moment( new Date() ).valueOf(),
-                shareId: 'PK_recovery',
-                secondaryShare: result.data.metaShare,
-              } )
-            }
-          }
-
-          let existingShares: MetaShare[]
-          if ( Object.keys( UNDER_CUSTODY ).length ) {
-            existingShares = Object.keys( UNDER_CUSTODY ).map( ( tag ) => {
-              console.log( tag )
-              return UNDER_CUSTODY[ tag ].META_SHARE
-            } )
-          }
-
-          if ( existingShares.length ) {
-            console.log(
-              'existingShares.length',
-              existingShares.length,
-              existingShares
-            )
-            if (
-              existingShares.findIndex(
-                ( value ) =>
-                  value.shareId === JSON.parse( element.data ).selectedShareId
-              ) == -1
-            ) {
-              console.log(
-                'element.notificationType 1',
-                element.notificationType
-              )
-              this.props.autoDownloadShareContact(
-                JSON.parse( element.data ).selectedShareId,
-                JSON.parse( element.data ).walletId
-              )
-            }
-          }
-        }
-
-        if (
-          asyncNotificationList.findIndex(
-            ( value ) => value.notificationId == element.notificationId
-          ) > -1
-        ) {
-          const temp =
-            asyncNotificationList[
-              asyncNotificationList.findIndex(
-                ( value ) => value.notificationId == element.notificationId
-              )
-            ]
-          if ( element.notificationType != releaseNotificationTopic ) {
-            readStatus = temp.read
-          }
-
-          const obj = {
-            ...temp,
-            read: readStatus,
-            type: element.notificationType,
-            title: element.title,
-            info: element.body,
-            isMandatory: element.tag == 'mandatory' ? true : false,
-            time: timeFormatter(
-              moment( new Date() ),
-              moment( element.date ).valueOf()
-            ),
-            date: new Date( element.date ),
-          }
-          tmpList[
-            tmpList.findIndex(
-              ( value ) => value.notificationId == element.notificationId
-            )
-          ] = obj
-        } else {
-          const obj = {
-            type: element.notificationType,
-            isMandatory: element.tag == 'mandatory' ? true : false,
-            read: readStatus,
-            title: element.title,
-            time: timeFormatter(
-              moment( new Date() ),
-              moment( element.date ).valueOf()
-            ),
-            date: new Date( element.date ),
-            info: element.body,
-            notificationId: element.notificationId,
-          }
-          tmpList.push( obj )
-        }
-      }
-      //this.props.notificationsUpdated(tmpList);
-      await AsyncStorage.setItem( 'notificationList', JSON.stringify( tmpList ) )
-      tmpList.sort( function ( left, right ) {
-        return moment.utc( right.date ).unix() - moment.utc( left.date ).unix()
-      } )
-
-      this.setState( {
-        notificationData: tmpList,
-        notificationDataChange: !this.state.notificationDataChange,
-      } )
-    }
-  };
-
   getBottomSheetSnapPoints(): any[] {
     switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.SWAN_STATUS_INFO:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 70 : 65,
+            ),
+            heightPercentageToDP( 71 ),
+          ]
         case BottomSheetKind.WYRE_STATUS_INFO:
           return ( this.state.wyreFromDeepLink )
             ? [ 0, '67%' ]
@@ -2127,28 +1493,51 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case BottomSheetKind.ADD_CONTACT_FROM_ADDRESS_BOOK:
         case BottomSheetKind.NOTIFICATIONS_LIST:
           return [ -50, heightPercentageToDP( 82 ) ]
-
+        case BottomSheetKind.NOTIFICATION_INFO:
+          return [
+            -50,
+            heightPercentageToDP(
+              Platform.OS == 'ios' && DeviceInfo.hasNotch ? 75 : 80,
+            ),
+          ]
         default:
           return defaultBottomSheetConfigs.snapPoints
     }
   }
 
+  upgradeNow () {
+    const url =
+      Platform.OS == 'ios'
+        ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en'
+    Linking.canOpenURL( url ).then( ( supported ) => {
+      if ( supported ) {
+        Linking.openURL( url )
+      } else {
+        // console.log("Don't know how to open URI: " + url);
+      }
+    } )
+  }
+
   renderBottomSheetContent() {
     const { UNDER_CUSTODY, navigation } = this.props
-    const { custodyRequest } = this.state
-
+    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
+    // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
-        case BottomSheetKind.TAB_BAR_BUY_MENU:
+
+        case BottomSheetKind.SWAN_STATUS_INFO:
           return (
             <>
-              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
-
-              <BuyBitcoinHomeBottomSheet
-                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+              <BottomSheetHeader title="" onPress={this.closeBottomSheet} />
+              <BottomSheetSwanInfo
+                swanDeepLinkContent={this.state.swanDeepLinkContent}
+                onClickSetting={() => {
+                  this.closeBottomSheet()
+                }}
+                onPress={this.onBackPress}
               />
             </>
           )
-
         case BottomSheetKind.WYRE_STATUS_INFO:
           return (
             <>
@@ -2160,6 +1549,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2175,6 +1565,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -2220,76 +1611,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               />
             </>
           )
-
-        case BottomSheetKind.WYRE_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader
-                title="Buy bitcoin with Wyre"
-                onPress={this.closeBottomSheet}
-              />
-              <BottomSheetWyreInfo
-                wyreDeepLinkContent={this.state.wyreDeepLinkContent}
-                wyreFromBuyMenu={this.state.wyreFromBuyMenu}
-                wyreFromDeepLink={this.state.wyreFromDeepLink}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-              />
-            </>
-          )
-
-        case BottomSheetKind.RAMP_STATUS_INFO:
-          return (
-            <>
-              <BottomSheetHeader
-                title="Buy bitcoin with Ramp"
-                onPress={this.closeBottomSheet}
-              />
-              <BottomSheetRampInfo
-                rampDeepLinkContent={this.state.rampDeepLinkContent}
-                onClickSetting={() => {
-                  this.closeBottomSheet()
-                }}
-              />
-            </>
-          )
-
-        case BottomSheetKind.CUSTODIAN_REQUEST:
-          return (
-            <CustodianRequestModalContents
-              userName={custodyRequest.requester}
-              onPressAcceptSecret={() => {
-                this.closeBottomSheet()
-                if ( Date.now() - custodyRequest.uploadedAt > 600000 ) {
-                  Alert.alert(
-                    'Request expired!',
-                    'Please ask the sender to initiate a new request'
-                  )
-                } else {
-                  if ( UNDER_CUSTODY[ custodyRequest.requester ] ) {
-                    Alert.alert(
-                      'Failed to store',
-                      'You cannot custody multiple shares of the same user.'
-                    )
-                  } else {
-                    if ( custodyRequest.isQR ) {
-                      downloadMShare( custodyRequest.ek, custodyRequest.otp )
-                    } else {
-                      navigation.navigate( 'CustodianRequestOTP', {
-                        custodyRequest,
-                      } )
-                    }
-                  }
-                }
-              }}
-              onPressRejectSecret={() => {
-                this.closeBottomSheet()
-                this.openBottomSheet( BottomSheetKind.CUSTODIAN_REQUEST_REJECTED )
-              }}
-            />
-          )
-
         case BottomSheetKind.CUSTODIAN_REQUEST_REJECTED:
           return (
             <CustodianRequestRejectedModalContents
@@ -2298,29 +1619,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
-        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest, recoveryRequest } = this.state
-
-          return (
-            <TrustedContactRequestContent
-              trustedContactRequest={trustedContactRequest}
-              recoveryRequest={recoveryRequest}
-              onPressAccept={this.onTrustedContactRequestAccepted}
-              onPressReject={this.onTrustedContactRejected}
-              onPhoneNumberChange={this.onPhoneNumberChange}
-              bottomSheetRef={this.bottomSheetRef}
-            />
-          )
-
         case BottomSheetKind.NOTIFICATIONS_LIST:
-          const { notificationLoading, notificationData } = this.state
-
           return (
             <NotificationListContent
-              notificationLoading={notificationLoading}
-              NotificationData={notificationData}
+              notificationLoading={this.state.notificationLoading}
+              NotificationData={this.state.notificationData}
               onNotificationClicked={this.onNotificationClicked}
               onPressBack={this.closeBottomSheet}
+              bottomSheetRef={this.bottomSheetRef}
             />
           )
 
@@ -2337,6 +1643,10 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
                   navigation.navigate( 'AddContactSendRequest', {
                     SelectedContact: selectedContact,
+                    headerText:'Add a contact  ',
+                    subHeaderText:'Send a Friends and Family request',
+                    contactText:'Adding to Friends and Family:',
+                    showDone:true,
                   } )
                 }
               }}
@@ -2347,27 +1657,16 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               }}
               onPressBack={this.closeBottomSheet}
               onSkipContinue={() => {
-                let { skippedContactsCount } = this.props.trustedContacts.tc
-                let data
-                if ( !skippedContactsCount ) {
-                  skippedContactsCount = 1
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount}`,
-                    name: `F&F request awaiting ${skippedContactsCount}`,
-                  }
-                } else {
-                  data = {
-                    firstName: 'F&F request',
-                    lastName: `awaiting ${skippedContactsCount + 1}`,
-                    name: `F&F request awaiting ${skippedContactsCount + 1}`,
-                  }
-                }
-
                 this.closeBottomSheet()
-
+                const contactDummy = {
+                  id: uuid(),
+                }
                 navigation.navigate( 'AddContactSendRequest', {
-                  SelectedContact: [ data ],
+                  SelectedContact: [ contactDummy ],
+                  headerText:'Add a contact  ',
+                  subHeaderText:'Send a Friends and Family request',
+                  contactText:'Adding to Friends and Family:',
+                  showDone:true,
                 } )
               }}
             />
@@ -2409,21 +1708,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.NOTIFICATION_INFO:
+          return (
+            <NotificationInfoContents
+              title={notificationTitle}
+              info={notificationInfo ? notificationInfo : null}
+              additionalInfo={notificationAdditionalInfo}
+              onPressProceed={()=>{
+                this.closeBottomSheet()
+                if( this.state.notificationProceedText === 'Upgrade' ) {
+                  this.upgradeNow()
+                }
+              }}
+              onPressIgnore={()=> {
+                this.closeBottomSheet()
+              }}
+              onPressClose={()=>{
+                this.closeBottomSheet()
+              }}
+              proceedButtonText={notificationProceedText}
+              cancelButtonText={notificationIgnoreText}
+              isIgnoreButton={isIgnoreButton}
+              note={notificationNote}
+              bottomSheetRef={this.bottomSheetRef}
+              releaseNotes={releaseNotes}
+            />
+          )
+
         default:
           break
     }
   }
 
   render() {
-    const { netBalance, notificationData, currencyCode } = this.state
-
-    const {
-      navigation,
-      exchangeRates,
-      walletName,
-      currentLevel,
-    } = this.props
-
     return (
       <ImageBackground
         source={require( '../../assets/images/home-bg.png' )}
@@ -2437,7 +1754,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }}
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
-        <View
+        <ModalContainer
+          visible={this.state.currentBottomSheetKind != null}
+          closeBottomSheet={() => {}}
+        >
+          {this.renderBottomSheetContent()}
+        </ModalContainer>
+        <Header fromScreen={'Home'} />
+        {/* <View
           style={{
             flex: 3.8,
             paddingTop:
@@ -2449,7 +1773,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           <HomeHeader
             onPressNotifications={this.onPressNotifications}
             notificationData={notificationData}
-            walletName={walletName}
+            walletName={wallet.walletName}
             getCurrencyImageByRegion={getCurrencyImageByRegion}
             netBalance={netBalance}
             exchangeRates={exchangeRates}
@@ -2461,81 +1785,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             // navigation={this.props.navigation}
             // overallHealth={overallHealth}
           />
-        </View>
+        </View> */}
+        <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />
 
-        <HomeAccountCardsList
-          containerStyle={styles.accountCardsSectionContainer}
-          contentContainerStyle={{
-            paddingTop: 36,
-            paddingLeft: 14,
-          }}
-          currentLevel={currentLevel}
-          onAddNewSelected={this.navigateToAddNewAccountScreen}
-          onCardSelected={this.handleAccountCardSelection}
-        />
-
-        <View
-          style={styles.floatingActionButtonContainer}
-          pointerEvents="box-none"
-        >
-          <Button
-            raised
-            title="Buy"
-            icon={
-              <Image
-                source={require( '../../assets/images/icons/icon_buy.png' )}
-                style={{
-                  width: widthPercentageToDP( 8 ),
-                  height: widthPercentageToDP( 8 ),
-                  marginTop: widthPercentageToDP( -3 ),
-                  marginBottom: widthPercentageToDP( -3 ),
-                }}
-              />
-            }
-            buttonStyle={{
-              ...ButtonStyles.floatingActionButton,
-              borderRadius: 9999,
-              paddingHorizontal: widthPercentageToDP( 10 ),
-            }}
-            titleStyle={{
-              ...ButtonStyles.floatingActionButtonText,
-              marginLeft: 8,
-            }}
-            onPress={() =>
-              this.openBottomSheet( BottomSheetKind.TAB_BAR_BUY_MENU )
-            }
-          />
-        </View>
-
-        <BottomSheetBackground
-          isVisible={this.state.bottomSheetState === BottomSheetState.Open}
-          onPress={this.closeBottomSheet}
-        />
-
-        <CustomBottomTabs
-          isEnabled={this.props.navigation.isFocused()}
-          onSelect={this.handleBottomTabSelection}
-          tabBarZIndex={
-            this.state.currentBottomSheetKind ==
-              BottomSheetKind.TAB_BAR_BUY_MENU || null
-              ? 1
-              : 0
-          }
-        />
-
-        {this.state.currentBottomSheetKind != null && (
-          <BottomSheet
-            ref={this.bottomSheetRef}
-            snapPoints={this.getBottomSheetSnapPoints()}
-            initialSnapIndex={-1}
-            animationDuration={defaultBottomSheetConfigs.animationDuration}
-            animationEasing={Easing.out( Easing.back( 1 ) )}
-            handleComponent={defaultBottomSheetConfigs.handleComponent}
-            onChange={this.handleBottomSheetPositionChange}
-          >
-            <BottomSheetView>{this.renderBottomSheetContent()}</BottomSheetView>
-          </BottomSheet>
-        )}
       </ImageBackground>
     )
   }
@@ -2543,24 +1795,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 const mapStateToProps = ( state ) => {
   return {
-    notificationList: state.notifications,
+    notificationList: state.notifications.notifications,
     accountsState: state.accounts,
     cloudPermissionGranted: state.health.cloudPermissionGranted,
-    currentWyreSubAccount: state.accounts.currentWyreSubAccount,
-    currentRampSubAccount: state.accounts.currentRampSubAccount,
     exchangeRates: idx( state, ( _ ) => _.accounts.exchangeRates ),
-    walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
     UNDER_CUSTODY: idx(
       state,
       ( _ ) => _.storage.database.DECENTRALIZED_BACKUP.UNDER_CUSTODY
     ),
     cardDataProps: idx( state, ( _ ) => _.preferences.cardData ),
     secureAccount: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),
-    s3Service: idx( state, ( _ ) => _.health.service ),
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
-    paymentDetails: idx( state, ( _ ) => _.trustedContacts.paymentDetails ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
@@ -2575,55 +1822,74 @@ const mapStateToProps = ( state ) => {
     levelHealth: idx( state, ( _ ) => _.health.levelHealth ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
     keeperInfo: idx( state, ( _ ) => _.health.keeperInfo ),
-    keeperApproveStatus: idx( state, ( _ ) => _.health.keeperApproveStatus ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     newBHRFlowStarted: idx( state, ( _ ) => _.health.newBHRFlowStarted ),
     cloudBackupStatus: idx( state, ( _ ) => _.cloud.cloudBackupStatus ) || CloudBackupStatus.PENDING,
+    isPermissionSet: idx( state, ( _ ) => _.preferences.isPermissionSet ),
+    isAuthenticated: idx( state, ( _ ) => _.setupAndAuth.isAuthenticated, ),
+    asyncNotificationList: idx( state, ( _ ) => _.notifications.updatedNotificationList ),
+    fetchStarted: idx( state, ( _ ) => _.notifications.fetchStarted ),
+    messages: state.notifications.messages,
+    initLoader: idx( state, ( _ ) => _.health.loading.initLoader ),
   }
 }
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    fetchEphemeralChannel,
-    fetchNotifications,
     updateFCMTokens,
-    postRecoveryChannelSync,
     downloadMShare,
-    approveTrustedContact,
-    fetchTrustedChannel,
-    uploadRequestedShare,
-    uploadSecondaryShareForPK,
+    acceptExistingContactRequest,
+    rejectTrustedContact,
     initializeHealthSetup,
-    initHealthCheck,
     autoSyncShells,
     clearWyreCache,
     clearRampCache,
-    addNewAccountShell,
+    clearSwanCache,
+    updateSwanStatus,
+    fetchFeeAndExchangeRates,
+    createTempSwanAccountInfo,
     addTransferDetails,
-    clearPaymentDetails,
     notificationsUpdated,
     setCurrencyCode,
     updatePreference,
     setFCMToken,
     setSecondaryDeviceAddress,
     setCardData,
-    fetchKeeperTrustedChannel,
-    onApprovalStatusChange,
-    autoDownloadShareContact,
     setVersion,
-    downloadSMShard,
-    updateNewFcm,
     setCloudData,
-    updateKeeperInfoToUnderCustody,
     updateCloudPermission,
+    credsAuthenticated,
+    setShowAllAccount,
+    setIsPermissionGiven,
+    updateLastSeen,
+    setupNotificationList,
+    updateNotificationList,
+    updateMessageStatusInApp,
+    updateMessageStatus,
+    getMessages
   } )( Home )
 )
 
 const styles = StyleSheet.create( {
+  cardContainer: {
+    backgroundColor: Colors.white,
+    width: widthPercentageToDP( '95%' ),
+    // height: heightPercentageToDP( '7%' ),
+    // borderColor: Colors.borderColor,
+    // borderWidth: 1,
+    borderRadius: widthPercentageToDP( 3 ),
+    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: widthPercentageToDP( 5 ),
+    alignSelf: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: widthPercentageToDP ( 2 )
+  },
   accountCardsSectionContainer: {
-    flex: 7,
-    marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
+    height: hp( '68.5%' ),
+    // marginTop: 30,
+    backgroundColor: Colors.backgroundColor1,
     borderTopLeftRadius: 25,
     shadowColor: 'black',
     shadowOpacity: 0.4,
@@ -2631,14 +1897,16 @@ const styles = StyleSheet.create( {
       width: 2,
       height: -1,
     },
+    flexDirection: 'column',
+    justifyContent: 'space-around'
   },
 
   floatingActionButtonContainer: {
-    position: 'absolute',
-    zIndex: 0,
-    bottom: TAB_BAR_HEIGHT,
-    right: 0,
-    flexDirection: 'row',
+    // position: 'absolute',
+    // zIndex: 0,
+    // bottom: TAB_BAR_HEIGHT,
+    // right: 0,
+    // flexDirection: 'row',
     justifyContent: 'flex-end',
     alignSelf: 'flex-end',
     padding: heightPercentageToDP( 1.5 ),

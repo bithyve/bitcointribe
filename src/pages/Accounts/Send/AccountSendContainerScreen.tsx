@@ -9,12 +9,11 @@ import { clearTransfer } from '../../../store/actions/accounts'
 import { initialKnowMoreSendSheetShown } from '../../../store/actions/preferences'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import usePreferencesState from '../../../utils/hooks/state-selectors/preferences/UsePreferencesState'
-import defaultStackScreenNavigationOptions, { NavigationOptions } from '../../../navigation/options/DefaultStackScreenNavigationOptions'
+import defaultStackScreenNavigationOptions from '../../../navigation/options/DefaultStackScreenNavigationOptions'
 import SmallNavHeaderBackButton from '../../../components/navigation/SmallNavHeaderBackButton'
 import KnowMoreButton from '../../../components/KnowMoreButton'
 import { BarCodeReadEvent } from 'react-native-camera'
-import useWalletServiceForSourceAccountKind from '../../../utils/hooks/state-selectors/accounts/UseWalletServiceForSourceAccountKind'
-import { ScannedAddressKind } from '../../../bitcoin/utilities/Interface'
+import { ScannedAddressKind, Wallet } from '../../../bitcoin/utilities/Interface'
 import Toast from '../../../components/Toast'
 import { RecipientDescribing } from '../../../common/data/models/interfaces/RecipientDescribing'
 import { makeAddressRecipientDescription } from '../../../utils/sending/RecipientFactories'
@@ -24,15 +23,19 @@ import AccountSendScreen from './AccountSendScreen'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import useSendableTrustedContactRecipients from '../../../utils/hooks/state-selectors/sending/UseSendableTrustedContactRecipients'
 import useSendableAccountShells from '../../../utils/hooks/state-selectors/sending/UseSendableAccountShells'
-import { SECURE_ACCOUNT } from '../../../common/constants/wallet-service-types'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import idx from 'idx'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
 import { NavigationScreenConfig } from 'react-navigation'
 import { NavigationStackOptions } from 'react-navigation-stack'
-import ModalHeader from '../../../components/ModalHeader'
 import BottomSheetHandle from '../../../components/bottom-sheets/BottomSheetHandle'
 import Colors from '../../../common/Colors'
+import ModalContainer from '../../../components/home/ModalContainer'
+import { PermanentChannelsSyncKind, syncPermanentChannels } from '../../../store/actions/trustedContacts'
+import AccountUtilities from '../../../bitcoin/utilities/accounts/AccountUtilities'
+import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import useWalletState from '../../../utils/hooks/state-selectors/storage/useWalletState'
 
 export type Props = {
   navigation: any;
@@ -44,13 +47,21 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   const [ isShowingKnowMoreSheet, setIsShowingKnowMoreSheet ] = useState( false )
 
   const accountShell = useSourceAccountShellForSending()
+  const account = useAccountByAccountShell( accountShell )
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const sendableAccountShells = useSendableAccountShells( accountShell )
   const sendableContacts = useSendableTrustedContactRecipients()
-  const walletService = useWalletServiceForSourceAccountKind( primarySubAccount.sourceKind )
 
   const accountsState = useAccountsState()
   const sendingState = useSendingState()
+  const wallet: Wallet = useWalletState()
+
+  useEffect( ()=> {
+    dispatch( syncPermanentChannels( {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+      metaSync: true,
+    } ) )
+  }, [] )
 
   const { hasShownInitialKnowMoreSendSheet, } = usePreferencesState()
 
@@ -80,18 +91,13 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   function handlePaymentURIEntry( uri: string ) {
     let address: string
-    let donationID: string | null = null
     let amount: number | null = 0
 
     try {
-      const decodingResult = walletService.decodePaymentURI( uri )
+      const decodingResult = AccountUtilities.decodePaymentURI( uri )
 
       address = decodingResult.address
       const options = decodingResult.options
-
-      // checking for donationId to send note
-      if ( options?.message )
-        donationID = options.message.split( ':' ).pop().trim()
 
       if ( options?.amount )
         amount = options.amount
@@ -103,7 +109,6 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
     const newRecipient = makeAddressRecipientDescription( {
       address,
-      donationID,
     } )
 
     if ( isRecipientSelectedForSending( newRecipient ) == false ) {
@@ -132,7 +137,8 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
 
   function handleQRScan( { data: barcodeDataString }: BarCodeReadEvent ) {
-    const { type: scannedAddressKind }: { type: ScannedAddressKind } = walletService.addressDiff( barcodeDataString.trim() )
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+    const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( barcodeDataString.trim(), network )
     switch ( scannedAddressKind ) {
         case ScannedAddressKind.ADDRESS:
           const recipientAddress = barcodeDataString
@@ -161,6 +167,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
   }, [] )
 
   const toggleKnowMoreSheet = () => {
+    showKnowMoreBottomSheet()
     const shouldShow = !isShowingKnowMoreSheet
     setIsShowingKnowMoreSheet( shouldShow )
     if ( shouldShow ) {
@@ -168,6 +175,11 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
 
   const KnowMoreBottomSheetHandle: React.FC = () => {
@@ -176,21 +188,28 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }} />
   }
 
-  const showKnowMoreBottomSheet = useCallback( () => {
-    presentBottomSheet(
-      <SendHelpContents titleClicked={dismissBottomSheet} />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '89%' ],
-        handleComponent: KnowMoreBottomSheetHandle,
-        onChange: ( newIndex ) => {
-          if ( newIndex < 1 ) {
-            dispatch( initialKnowMoreSendSheetShown() )
-          }
-        }
-      },
+  // const showKnowMoreBottomSheet = useCallback( () => {
+  //   presentBottomSheet(
+  //     <SendHelpContents titleClicked={dismissBottomSheet} />,
+  //     {
+  //       ...defaultBottomSheetConfigs,
+  //       snapPoints: [ 0, '89%' ],
+  //       handleComponent: KnowMoreBottomSheetHandle,
+  //       onChange: ( newIndex ) => {
+  //         if ( newIndex < 1 ) {
+  //           dispatch( initialKnowMoreSendSheetShown() )
+  //         }
+  //       }
+  //     },
+  //   )
+  // }, [ presentBottomSheet, dismissBottomSheet ] )
+  const showKnowMoreBottomSheet = () => {
+    return(
+      // <ModalContainer visible={true} closeBottomSheet={() => {}}>
+      <SendHelpContents titleClicked={dismissBottomSheet} />
+      // </ModalContainer>
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   useEffect( () => {
     if ( primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT && hasShownInitialKnowMoreSendSheet == false ) {
@@ -198,13 +217,11 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
     }
   }, [ hasShownInitialKnowMoreSendSheet, primarySubAccount.kind ] )
 
-
   useEffect( () => {
     // Initiate 2FA setup flow(for savings and corresponding derivative accounts) unless setup is successfully completed
     if ( primarySubAccount.isTFAEnabled ) {
-      const twoFASetupDetails = idx( accountsState, ( _ ) => _[ primarySubAccount.sourceKind ].service.secureHDWallet.twoFASetup )
+      const twoFASetupDetails = idx( wallet, ( _ ) => _.details2FA )
       const twoFAValid = idx( accountsState, ( _ ) => _.twoFAHelpFlags.twoFAValid )
-
       if ( twoFASetupDetails && !twoFAValid )
         navigation.navigate( 'TwoFASetup', {
           twoFASetup: twoFASetupDetails,
@@ -215,7 +232,7 @@ const AccountSendContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
 
   return (
     <AccountSendScreen
-      primarySubAccount={primarySubAccount}
+      accountShell={accountShell}
       sendableContacts={sendableContacts}
       sendableAccountShells={sendableAccountShells}
       onQRScanned={handleQRScan}

@@ -2,11 +2,13 @@
 export const STORE_CREDS = 'STORE_CREDS'
 export const CREDS_AUTH = 'CREDS_AUTH'
 export const SETUP_WALLET = 'SETUP_WALLET'
+export const WALLET_SETUP_COMPLETION = 'WALLET_SETUP_COMPLETION'
 export const INIT_RECOVERY = 'INIT_RECOVERY'
 export const RE_LOGIN = 'RE_LOGIN'
 export const CHANGE_AUTH_CRED = 'CHANGE_AUTH_CRED'
 export const SWITCH_CREDS_CHANGED = 'SWITCH_CREDS_CHANGED'
 export const INIT_RECOVERY_COMPLETED = 'INIT_RECOVERY_COMPLETED'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 import * as Cipher from '../../common/encryption'
 import * as SecureStore from '../../storage/secure-store'
 
@@ -28,10 +30,19 @@ export const credsAuth = ( passcode, reLogin? ) => {
   }
 }
 
-export const setupWallet = ( walletName, security ) => {
+export const setupWallet = ( walletName: string, selectedAccounts: AccountType[], security: any ) => {
   return {
     type: SETUP_WALLET, payload: {
-      walletName, security
+      walletName, selectedAccounts, security
+    }
+  }
+}
+
+export const walletSetupCompletion = ( security ) => {
+  return {
+    type: WALLET_SETUP_COMPLETION,
+    payload: {
+      security
     }
   }
 }

@@ -1,68 +1,356 @@
-import React, { useState, useMemo } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { useDispatch } from "react-redux";
-import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells';
-import AccountShell from '../../../common/data/models/AccountShell';
-import { accountShellsOrderUpdated } from '../../../store/actions/accounts';
-import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList';
-import ButtonBlue from '../../../components/ButtonBlue';
+import React, { useState, useMemo, createRef, useCallback, useEffect } from 'react'
+import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Platform, ScrollView } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
+import AccountShell from '../../../common/data/models/AccountShell'
+import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateSubAccountSettings } from '../../../store/actions/accounts'
+import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
+import ButtonBlue from '../../../components/ButtonBlue'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import {
+  widthPercentageToDP as wp,
+  heightPercentageToDP as hp,
+} from 'react-native-responsive-screen'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
+import { RFValue } from 'react-native-responsive-fontsize'
+import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
+import { ListItem } from 'react-native-elements'
+import ListStyles from '../../../common/Styles/ListStyles'
+import ImageStyles from '../../../common/Styles/ImageStyles'
+import BottomSheet, { BottomSheetView, useBottomSheetModal } from '@gorhom/bottom-sheet'
+import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
+import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
+import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
+
 
 export type Props = {
   navigation: any;
 };
 
-const AccountManagementContainerScreen: React.FC<Props> = ({
-  navigation,
-}: Props) => {
-  const dispatch = useDispatch();
-  const originalAccountShells = useActiveAccountShells();
-  const [orderedAccountShells, setOrderedAccountShells] = useState(originalAccountShells);
-  const [hasChangedOrder, setHasChangedOrder] = useState(false);
+const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
+  const dispatch = useDispatch()
+  const originalAccountShells = useActiveAccountShells()
+  const hasAccountSettingsUpdateSucceeded = useSelector( ( state ) => state.accounts.hasAccountSettingsUpdateSucceeded )
+  const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
+  const [ orderedAccountShells, setOrderedAccountShells ] = useState( originalAccountShells )
+  const [ hiddenAccountShells, setHiddenAccountShells ] = useState( [] )
+  const [ archivedAccountShells, setArchivedAccountShells ] = useState( [] )
+  const [ accountVisibility, setAccountVisibility ] = useState( null )
+  const [ hasChangedOrder, setHasChangedOrder ] = useState( false )
+  const [ selectedAccount, setSelectedAccount ] = useState( null )
+  const getnewDraggableOrderedAccountShell = useMemo( () => {
+    const newDraggableOrderedAccountShell = []
+    if( originalAccountShells ){
+      originalAccountShells.map( ( value, index ) =>{
+        if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+          newDraggableOrderedAccountShell.push( value )
+        }
+      } )
+      setOrderedAccountShells( newDraggableOrderedAccountShell )
+    }
+    return newDraggableOrderedAccountShell
+  }, [ originalAccountShells ] )
 
-  const canSaveOrder = useMemo(() => {
-    return hasChangedOrder;
-  }, [hasChangedOrder]);
+  const getnewOrderedAccountShell = useMemo( () => {
+    if( showAllAccount === true ){
+      const newOrderedAccountShell = []
+      originalAccountShells.map( ( value, index ) =>{
+        if( value.primarySubAccount.visibility === AccountVisibility.DEFAULT ){
+          newOrderedAccountShell.push( value )
+        }
+      } )
+      setOrderedAccountShells( newOrderedAccountShell )
+      return newOrderedAccountShell
+    }
+  }, [ showAllAccount, originalAccountShells ] )
 
-  function hasNewOrder(newlyOrderedAccountShells: AccountShell[]) {
-    return orderedAccountShells.some((accountShell, index) => {
-      return accountShell.id !== newlyOrderedAccountShells[index].id;
-    });
+  const getHiddenAccountShell = useMemo( () => {
+    const newHiddenAccountShell = []
+    if( showAllAccount === true ){
+      originalAccountShells.map( ( value, index ) =>{
+        if( value.primarySubAccount.visibility === AccountVisibility.HIDDEN ){
+          newHiddenAccountShell.push( value )
+        }
+      } )
+      setHiddenAccountShells( newHiddenAccountShell )
+      return newHiddenAccountShell
+    }
+  }, [ showAllAccount, originalAccountShells ] )
+
+  const getArchivedAccountShells = useMemo( () => {
+    if( showAllAccount === true ){
+      const newArchivedAccountShells = []
+      originalAccountShells.map( ( value, index ) =>{
+        if( value.primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
+          newArchivedAccountShells.push( value )
+        }
+      } )
+      setArchivedAccountShells( newArchivedAccountShells )
+      return newArchivedAccountShells
+    }
+  }, [ showAllAccount, originalAccountShells ] )
+
+  const canSaveOrder = useMemo( () => {
+    return hasChangedOrder
+  }, [ hasChangedOrder ] )
+
+  useEffect( () => {
+    if( hasAccountSettingsUpdateSucceeded === true && selectedAccount ){
+      dispatch( resetAccountUpdateFlag() )
+      showSuccessAccountBottomSheet( selectedAccount )
+    }
+  }, [ hasAccountSettingsUpdateSucceeded, selectedAccount ] )
+
+  const {
+    present: presentBottomSheet,
+    dismiss: dismissBottomSheet,
+  } = useBottomSheetModal()
+
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
+
+  const showUnHideArchiveAccountBottomSheet = useCallback( ( primarySubAccount, visibility ) => {
+    presentBottomSheet(
+      <UnHideArchiveAccountBottomSheet
+        onProceed={()=>{
+          if( primarySubAccount && ( visibility == AccountVisibility.ARCHIVED || visibility == AccountVisibility.HIDDEN ) )
+            setAccountVisibility( visibility )
+          changeVisisbility( primarySubAccount, AccountVisibility.DEFAULT )
+          dismissBottomSheet()
+        }
+        }
+        onBack={() =>{
+          dismissBottomSheet()}
+        }
+        accountInfo={primarySubAccount}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '50%' ],
+        overlayOpacity: 0.9,
+      },
+    )
+  }, [ presentBottomSheet, dismissBottomSheet, selectedAccount ] )
+
+  const showSuccessAccountBottomSheet = useCallback( ( primarySubAccount ) => {
+    presentBottomSheet(
+      <UnHideRestoreAccountSuccessBottomSheet
+        onProceed={()=>{
+          dismissBottomSheet()}
+        }
+        accountInfo={primarySubAccount}
+        accountVisibility={accountVisibility}
+      />,
+      {
+        ...defaultBottomSheetConfigs,
+        snapPoints: [ 0, '55%' ],
+        overlayOpacity: 0.9,
+      },
+    )
+  }, [ presentBottomSheet, dismissBottomSheet, selectedAccount, accountVisibility ] )
+
+  const changeVisisbility = ( selectedAccount, visibility ) => {
+    selectedAccount.visibility = visibility
+    dispatch( updateSubAccountSettings( selectedAccount ) )
   }
 
-  function handleDragEnd(newlyOrderedAccountShells: AccountShell[]) {
-    if (hasNewOrder(newlyOrderedAccountShells)) {
-      setHasChangedOrder(true);
-      setOrderedAccountShells(newlyOrderedAccountShells);
+  function hasNewOrder( newlyOrderedAccountShells: AccountShell[] ) {
+    return orderedAccountShells.some( ( accountShell, index ) => {
+      return accountShell.id !== newlyOrderedAccountShells[ index ].id
+    } )
+  }
+
+  function handleDragEnd( newlyOrderedAccountShells: AccountShell[] ) {
+    if ( hasNewOrder( newlyOrderedAccountShells ) ) {
+      setHasChangedOrder( true )
+      setOrderedAccountShells( newlyOrderedAccountShells )
     } else {
-      setHasChangedOrder(false);
+      setHasChangedOrder( false )
     }
   }
 
   function handleProceedButtonPress() {
-    dispatch(accountShellsOrderUpdated(orderedAccountShells));
-    setHasChangedOrder(false);
+    dispatch( accountShellsOrderUpdated( orderedAccountShells ) )
+    setHasChangedOrder( false )
+  }
+
+  function renderItem( accountShell ){
+    const primarySubAccount = accountShell.primarySubAccount
+    return (
+      <ListItem
+        activeOpacity={1}
+        containerStyle={{
+          marginLeft: wp( '4%' ),
+          marginRight: wp( '4%' ),
+        }}
+        bottomDivider
+      >
+        <Image
+          source={getAvatarForSubAccount( primarySubAccount )}
+          style={ImageStyles.thumbnailImageMedium}
+          resizeMode="contain"
+        />
+
+        <ListItem.Content>
+          <ListItem.Title
+            style={ListStyles.listItemTitle}
+            numberOfLines={1}
+          >
+            {primarySubAccount.customDisplayName || primarySubAccount.defaultTitle}
+          </ListItem.Title>
+
+          <ListItem.Subtitle
+            style={ListStyles.listItemSubtitle}
+            numberOfLines={2}
+          >
+            {primarySubAccount.customDescription || primarySubAccount.defaultDescription}
+          </ListItem.Subtitle>
+
+        </ListItem.Content>
+        {primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ? <TouchableOpacity
+          style={{
+            backgroundColor: Colors.backgroundColor,
+            marginLeft: 'auto',
+            borderRadius: 5,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingLeft: 10,
+            paddingRight: 10,
+            paddingTop: 5,
+            paddingBottom: 5,
+            borderColor: Colors.borderColor,
+            borderWidth: 1,
+          }}
+          onPress={() => {
+            setTimeout( () => {
+              setSelectedAccount( primarySubAccount )
+            }, 2 )
+
+            if( primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
+              showUnHideArchiveAccountBottomSheet( primarySubAccount, primarySubAccount.visibility )
+            }
+          }}
+        >
+          <Text
+            onPress={() => {
+              setTimeout( () => {
+                setSelectedAccount( primarySubAccount )
+              }, 2 )
+              if( primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
+                showUnHideArchiveAccountBottomSheet( primarySubAccount, primarySubAccount.visibility )
+              }
+            }}
+            style={{
+              color: Colors.textColorGrey,
+              fontSize: RFValue( 12 ),
+              marginLeft: 'auto',
+            }}
+          >
+            {primarySubAccount.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}
+          </Text>
+        </TouchableOpacity> : null}
+      </ListItem>
+
+    )
   }
 
   return (
     <View style={styles.rootContainer}>
-      <ReorderAccountShellsDraggableList
-        accountShells={orderedAccountShells}
-        onDragEnded={handleDragEnd}
-      />
+      <ScrollView>
+        {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
+          accountShells={orderedAccountShells}
+          onDragEnded={handleDragEnd}
+        />}
+
+        {getnewOrderedAccountShell && <View>
+          <View style={{
+            marginBottom: 15
+          }}>
+            <View style={{
+              height: 'auto'
+            }}>
+              {orderedAccountShells.map( ( accountShell: AccountShell ) => {
+                return renderItem( accountShell )
+              } )
+              }
+              {/* <FlatList
+              style={{
+              }}
+              contentContainerStyle={{
+                paddingHorizontal: 14
+              }}
+              extraData={orderedAccountShells}
+              data={orderedAccountShells}
+              keyExtractor={listItemKeyExtractor}
+              renderItem={renderItem}
+            /> */}
+            </View>
+          </View>
+        </View>}
+
+        {getHiddenAccountShell && hiddenAccountShells.length > 0 ? <View style={{
+          marginTop: wp( '2%' ),
+        }}>
+          <View style={{
+            width: '100%',
+            backgroundColor: Colors.white
+          }}>
+            <Text style={styles.pageInfoText}>
+              Hidden Accounts
+            </Text>
+          </View>
+          <View style={{
+            marginBottom: 15
+          }}>
+            <View style={{
+              height: 'auto'
+            }}>
+              {hiddenAccountShells.map( ( accountShell: AccountShell ) => {
+                return renderItem( accountShell )
+              } )
+              }
+            </View>
+          </View>
+        </View> : null}
+
+        {getArchivedAccountShells && archivedAccountShells.length > 0 ? <View style={{
+          marginTop: wp( '2%' ),
+        }}>
+          <Text style={styles.pageInfoText}>
+              Archived Accounts
+          </Text>
+          <View style={{
+            marginBottom: 15
+          }}>
+            <View style={{
+              height: 'auto'
+            }}>
+              {archivedAccountShells.map( ( accountShell: AccountShell ) => {
+                return renderItem( accountShell )
+              } )
+              }
+            </View>
+          </View>
+        </View> : null}
+      </ScrollView>
 
       <View style={styles.proceedButtonContainer}>
         {canSaveOrder && (
           <ButtonBlue
-          buttonText="Save New Ordering"
-          handleButtonPress={handleProceedButtonPress}
-        />
+            buttonText="Save New Ordering"
+            handleButtonPress={handleProceedButtonPress}
+          />
         )}
       </View>
     </View>
-  );
-};
+  )
+}
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
   },
@@ -74,7 +362,14 @@ const styles = StyleSheet.create({
     bottom: 30,
     alignSelf: 'center',
   },
-});
+  pageInfoText: {
+    marginLeft: 30,
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 14 ),
+    fontFamily: Fonts.FiraSansRegular,
+    marginTop: 3,
+  },
+} )
 
 
-export default AccountManagementContainerScreen;
+export default AccountManagementContainerScreen

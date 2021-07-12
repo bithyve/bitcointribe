@@ -38,16 +38,11 @@ export interface DecentralizedBackup {
     };
   };
   DYNAMIC_NONPMDD: DynamicNonPMDD;
-  PK_SHARE?: MetaShare
+  SM_SHARE?: string
 }
 
 export interface ServicesJSON {
-  REGULAR_ACCOUNT: string;
-  TEST_ACCOUNT: string;
-  SECURE_ACCOUNT: string;
   S3_SERVICE: string;
-  TRUSTED_CONTACTS: string;
-  KEEPERS_INFO?: string;
 }
 
 export interface Database {
@@ -55,7 +50,12 @@ export interface Database {
     walletName: string;
     security: { question: string; answer: string };
   };
-  DECENTRALIZED_BACKUP: DecentralizedBackup;
   SERVICES?: ServicesJSON;
   VERSION?: String;
+}
+
+export enum APP_STAGE {
+  DEVELOPMENT = 'dev',
+  STAGING = 'sta',
+  PRODUCTION = 'app'
 }

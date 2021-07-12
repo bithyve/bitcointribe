@@ -1,9 +1,12 @@
 import { Action } from 'redux'
+import { Account, Accounts, ContactInfo, DonationAccount } from '../../bitcoin/utilities/Interface'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
+import { newAccountsInfo } from '../sagas/accounts'
 
 // types and action creators: dispatched by components and sagas
 export const FETCH_BALANCE_TX = 'FETCH_BALANCE_TX'
+export const SYNC_ACCOUNTS = 'SYNC_ACCOUNTS'
 export const GET_TESTCOINS = 'GET_TESTCOINS'
 export const ADD_TRANSFER_DETAILS = 'ADD_TRANSFER_DETAILS'
 export const REMOVE_TRANSFER_DETAILS = 'REMOVE_TRANSFER_DETAILS'
@@ -23,7 +26,7 @@ export const VALIDATE_TWO_FA = 'VALIDATE_TWO_FA'
 export const AVERAGE_TX_FEE = 'AVERAGE_TX_FEE'
 export const SETUP_DONATION_ACCOUNT = 'SETUP_DONATION_ACCOUNT'
 export const UPDATE_DONATION_PREFERENCES = 'UPDATE_DONATION_PREFERENCES'
-export const ADD_NEW_ACCOUNT_SHELL = 'ADD_NEW_ACCOUNT_SHELL'
+export const ADD_NEW_ACCOUNT_SHELLS = 'ADD_NEW_ACCOUNT_SHELLS'
 export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
@@ -50,6 +53,9 @@ export const CLEAR_RECEIVE_ADDRESS = 'CLEAR_RECEIVE_ADDRESS'
 export const GET_ALL_ACCOUNTS_DATA = 'GET_ALL_ACCOUNTS_DATA'
 export const SET_ALL_ACCOUNTS_DATA = 'SET_ALL_ACCOUNTS_DATA'
 export const CREATE_SM_N_RESETTFA_OR_XPRIV = 'CREATE_SM_N_RESETTFA_OR_XPRIV'
+export const SET_SHOW_ALL_ACCOUNT = 'SET_SHOW_ALL_ACCOUNT'
+export const RESET_ACCOUNT_UPDATE_FLAG = 'RESET_ACCOUNT_UPDATE_FLAG'
+export const RESET_TWO_FA_LOADER = 'RESET_TWO_FA_LOADER'
 
 export const getAllAccountsData = () => {
   return {
@@ -70,9 +76,6 @@ export const setAllAccountsData = ( accounts ) => {
 export const fetchBalanceTx = (
   serviceType: string,
   options: {
-    service?;
-    loader?: boolean;
-    derivativeAccountsToSync?: string[];
     hardRefresh?: boolean;
     blindRefresh?: boolean;
     shouldNotInsert?: boolean;
@@ -87,9 +90,26 @@ export const fetchBalanceTx = (
   }
 }
 
-export const getTestcoins = ( ) => {
+
+export const syncAccounts = (
+  accounts: Accounts,
+  options: {
+    hardRefresh?: boolean;
+    blindRefresh?: boolean;
+  } = {
+  }
+) => {
+  return {
+    type: SYNC_ACCOUNTS, payload: {
+      accounts, options
+    }
+  }
+}
+
+export const getTestcoins = ( testAccount: Account ) => {
   return {
     type: GET_TESTCOINS,
+    payload: testAccount
   }
 }
 
@@ -223,8 +243,6 @@ export const setupDonationAccount = (
   description: string,
   configuration: {
     displayBalance: boolean;
-    displayTransactions: boolean;
-    displayTxDetails: boolean;
   },
   disableAccount?: boolean
 ) => {
@@ -242,14 +260,11 @@ export const setupDonationAccount = (
 }
 
 export const updateDonationPreferences = (
-  serviceType: string,
-  accountNumber: number,
+  donationAccount: DonationAccount,
   preferences: {
     disableAccount?: boolean;
     configuration?: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
     };
     accountDetails?: {
       donee: string;
@@ -261,7 +276,7 @@ export const updateDonationPreferences = (
   return {
     type: UPDATE_DONATION_PREFERENCES,
     payload: {
-      serviceType, accountNumber, preferences
+      donationAccount, preferences
     },
   }
 }
@@ -306,21 +321,20 @@ export const accountShellRefreshStarted = ( payload: AccountShell ) => {
   }
 }
 
-export interface AddNewAccountShellAction extends Action {
-  type: typeof ADD_NEW_ACCOUNT_SHELL;
-  payload: SubAccountDescribing;
+export interface AddNewAccountShellsAction extends Action {
+  type: typeof ADD_NEW_ACCOUNT_SHELLS;
+  payload: newAccountsInfo[];
 }
 
-export const addNewAccountShell = (
-  payload: SubAccountDescribing
-): AddNewAccountShellAction => {
+export const addNewAccountShells = (
+  payload: newAccountsInfo[]
+): AddNewAccountShellsAction => {
   return {
-    type: ADD_NEW_ACCOUNT_SHELL,
-    payload,
+    type: ADD_NEW_ACCOUNT_SHELLS,
+    payload
   }
 }
 
-export interface ContactInfo  { contactName: string; info: string; isGuardian?: boolean, shareIndex?: number, shareId?: string, changeContact?: boolean, paymentDetails?: {amount: string, address: string}, legacy?: boolean}
 export const addNewSecondarySubAccount = (
   secondarySubAccount: SubAccountDescribing,
   parentShell: AccountShell,
@@ -461,7 +475,8 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
-export const NEW_ACCOUNT_SHELL_ADDED = 'NEW_ACCOUNT_SHELL_ADDED'
+export const UPDATE_ACCOUNT_SHELLS = 'UPDATE_ACCOUNT_SHELLS'
+export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
 export const RESTORED_ACCOUNT_SHELLS = 'RESTORED_ACCOUNT_SHELLS'
 export const ACCOUNT_SETTINGS_UPDATED = 'ACCOUNT_SETTINGS_UPDATED'
@@ -541,12 +556,25 @@ export const newAccountShellAddFailed = ( {
   }
 }
 
-export const newAccountShellAdded = ( { accountShell, }: {
-  accountShell: AccountShell;
+export const newAccountShellsAdded = ( { accountShells, accounts }: {
+  accountShells: AccountShell[];
+  accounts: Accounts
 } ) => {
   return {
-    type: NEW_ACCOUNT_SHELL_ADDED,
-    payload: accountShell
+    type: NEW_ACCOUNT_SHELLS_ADDED,
+    payload: {
+      accountShells,
+      accounts
+    }
+  }
+}
+
+export const updateAccountShells = ( { accounts }: { accounts: Accounts } ) => {
+  return {
+    type: UPDATE_ACCOUNT_SHELLS,
+    payload: {
+      accounts
+    }
   }
 }
 
@@ -659,5 +687,27 @@ export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, service
       QRModalHeader,
       serviceType
     },
+  }
+}
+
+export const setShowAllAccount = ( showAllAccount ) => {
+  return {
+    type: SET_SHOW_ALL_ACCOUNT, payload: {
+      showAllAccount
+    }
+  }
+}
+
+export const resetAccountUpdateFlag = () => {
+  return {
+    type: RESET_ACCOUNT_UPDATE_FLAG,
+  }
+}
+
+export const setResetTwoFALoader = ( flag ) => {
+  return {
+    type: RESET_TWO_FA_LOADER, payload:{
+      flag
+    }
   }
 }

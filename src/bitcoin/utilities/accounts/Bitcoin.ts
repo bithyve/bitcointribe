@@ -2,7 +2,6 @@ import axios, { AxiosResponse } from 'axios'
 import bip21 from 'bip21'
 import * as bip32 from 'bip32'
 import bs58check from 'bs58check'
-import Client from 'bitcoin-core'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import { TransactionDetails, Transactions, ScannedAddressKind } from '../Interface'
@@ -47,12 +46,10 @@ export default class Bitcoin {
   };
 
   public network: bitcoinJS.Network;
-  public client: Client;
   public isTest = false; // flag for test account
   constructor( network?: bitcoinJS.Network ) {
     if ( network ) this.isTest = true
     this.network = network ? network : config.NETWORK
-    this.client = config.BITCOIN_NODE
   }
 
   public getKeyPair = ( privateKey: string ): bitcoinJS.ECPairInterface =>

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
-  AsyncStorage,
   StyleSheet,
   TextInput,
   Platform,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -18,6 +18,7 @@ import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetT
 import { useSelector } from 'react-redux'
 import { ScrollView } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 function SecurityQuestion( props ) {
   const { security } = useSelector(
@@ -68,9 +69,14 @@ function SecurityQuestion( props ) {
   }, [ answer, errorText ] )
 
   return (
-    <View style={{
-      ...styles.modalContentContainer, height: '100%'
-    }}>
+    <KeyboardAwareScrollView
+      resetScrollToCoords={{
+        x: 0, y: 0
+      }}
+      scrollEnabled
+      style={{
+        ...styles.modalContentContainer
+      }}>
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{
@@ -85,7 +91,7 @@ function SecurityQuestion( props ) {
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )
               }}>
-                Select the question and specify the answer{'\n'}as you did at
+                Specify the answer{'\n'}as you did at
                 the time of setting up the wallet
               </Text>
             </View>
@@ -125,8 +131,6 @@ function SecurityQuestion( props ) {
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 onSubmitEditing={( event ) => setConfirm()}
-                onFocus={() => props.onFocus()}
-                onBlur={() => props.onBlur()}
               />
               {errorText ? (
                 <Text
@@ -199,7 +203,7 @@ function SecurityQuestion( props ) {
           </AppBottomSheetTouchableWrapper>
         </View>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   )
 }
 
@@ -207,7 +211,7 @@ export default withNavigation( SecurityQuestion )
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   modalTitleText: {

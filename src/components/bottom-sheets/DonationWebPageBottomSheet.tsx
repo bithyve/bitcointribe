@@ -26,7 +26,7 @@ export default function DonationWebPageBottomSheet( props ) {
         }}>
           <View
             style={{
-              ...styles.successModalHeaderView, flexDirection: 'row',
+              ...styles.successModalHeaderView, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start'
             }}
           >
             <View>
@@ -54,6 +54,7 @@ export default function DonationWebPageBottomSheet( props ) {
                 marginLeft: 'auto',
                 alignItems: 'center',
                 justifyContent: 'center',
+                marginTop: wp( '1.5%' ),
               }}
               onPress={() => {
                 props.onClickSetting()
@@ -88,7 +89,7 @@ export default function DonationWebPageBottomSheet( props ) {
                   : config.APP_STAGE === 'sta'
                     ? 'donate-stage'
                     : 'donate-test'
-                }/?donationid=` + props.account.id
+                }/?donationid=` + props.account.id.slice( 0, 15 )
               }
             />
           </View>
@@ -114,7 +115,7 @@ export default function DonationWebPageBottomSheet( props ) {
                 : config.APP_STAGE === 'sta'
                   ? 'donate-stage'
                   : 'donate-test'
-              }/?donationid=${props.account.id
+              }/?donationid=${props.account.id.slice( 0, 15 )
               }" width="100%" height="600" frameborder="0" style="border: 0px;"></iframe>`}
             />
           </View>

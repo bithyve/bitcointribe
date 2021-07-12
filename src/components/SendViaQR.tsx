@@ -60,15 +60,7 @@ export default function SendViaQR( props ) {
   }, [ props.serviceType ] )
 
   useEffect( () => {
-    const contactName =
-      Contact && Contact.firstName && Contact.lastName
-        ? Contact.firstName + ' ' + Contact.lastName
-        : Contact && Contact.firstName && !Contact.lastName
-          ? Contact.firstName
-          : Contact && !Contact.firstName && Contact.lastName
-            ? Contact.lastName
-            : ''
-    setContactName( contactName )
+    setContactName( contact.contactName )
   }, [ Contact ] )
 
   const renderVerticalDivider = () => {
@@ -149,6 +141,7 @@ export default function SendViaQR( props ) {
               borderRadius: 8,
               alignSelf: 'center',
             }}
+            delayPressIn={0}
           >
             <Text
               style={{
@@ -216,39 +209,22 @@ export default function SendViaQR( props ) {
                           </Text>
                         ) : null}
                         {Contact &&
-                          Contact.phoneNumbers &&
-                          Contact.phoneNumbers.length ? (
-                            <Text
-                              style={{
-                                color: Colors.textColorGrey,
-                                fontFamily: Fonts.FiraSansRegular,
-                                fontSize: RFValue( 10 ),
-                                marginLeft: 25,
-                                paddingTop: 3,
-                              }}
-                            >
-                              {setPhoneNumber()}
-                              {/* {Contact && Contact.phoneNumbers[0].digits} */}
-                            </Text>
-                          ) : Contact &&
-                            Contact.emails &&
-                            Contact.emails.length ? (
-                              <Text
-                                style={{
-                                  color: Colors.textColorGrey,
-                                  fontFamily: Fonts.FiraSansRegular,
-                                  fontSize: RFValue( 10 ),
-                                  marginLeft: 25,
-                                  paddingTop: 3,
-                                  paddingBottom: 5,
-                                }}
-                              >
-                                {Contact && Contact.emails[ 0 ].email}
-                              </Text>
-                            ) : null}
+                          Contact.connectedVia && (
+                          <Text
+                            style={{
+                              color: Colors.textColorGrey,
+                              fontFamily: Fonts.FiraSansRegular,
+                              fontSize: RFValue( 10 ),
+                              marginLeft: 25,
+                              paddingTop: 3,
+                            }}
+                          >
+                            {Contact.connectedVia}
+                          </Text>
+                        )}
                       </View>
                     </View>
-                    {Contact && Contact.imageAvailable ? (
+                    {Contact && Contact.image ? (
                       <View
                         style={{
                           position: 'absolute',
@@ -313,6 +289,7 @@ export default function SendViaQR( props ) {
                     alignItems: 'center',
                   }}
                   activeOpacity={10}
+                  delayPressIn={0}
                   onPress={() => {
                     //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
                   }}

@@ -24,7 +24,6 @@ import { withNavigationFocus } from 'react-navigation'
 import { connect } from 'react-redux'
 import {
   fetchEphemeralChannel,
-  clearPaymentDetails,
 } from '../../store/actions/trustedContacts'
 import idx from 'idx'
 import { RNCamera } from 'react-native-camera'

@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, Image, ImageSourcePropType, Alert } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
@@ -7,13 +7,10 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { TransactionDetails } from '../../../bitcoin/utilities/Interface'
-import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import AccountShellRescanningBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningBottomSheet'
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import WalletRescanningBottomSheet from '../../../components/bottom-sheets/wallet-rescanning-bottom-sheet/WalletRescanningBottomSheet'
 import AccountShellRescanningPromptBottomSheet from '../../../components/bottom-sheets/account-shell-rescanning-bottom-sheet/AccountShellRescanningPromptBottomSheet'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 export type Props = {
   navigation: any;
@@ -31,12 +28,9 @@ const versionString = `Version ${DeviceInfo.getVersion()} (${DeviceInfo.getBuild
 
 
 const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-  const {
-    present: presentBottomSheet,
-    dismiss: dismissBottomSheet,
-  } = useBottomSheetModal()
 
-
+  const [ showRescanningPrompt, setShowRescanningPrompt ] = useState( false )
+  const [ showRescanningModal, setShowRescanningModal ] = useState( false )
   const menuOptions: MenuOption[] = [
     {
       title: 'Manage Passcode',
@@ -62,11 +56,11 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
       screenName: 'VersionHistory',
     },
-  // {
-  //   title: 'Hexa Release',
-  //   subtitle: versionString,
-  //   imageSource: require( '../../../assets/images/icons/settings.png' ),
-  // },
+    // {
+    //   title: 'Hexa Release',
+    //   subtitle: versionString,
+    //   imageSource: require( '../../../assets/images/icons/settings.png' ),
+    // },
   ]
 
 
@@ -79,62 +73,64 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
   }
 
   function handleRescanListItemSelection() {
-    showRescanningPromptBottomSheet()
+    setShowRescanningPrompt( true )
   }
 
   function handleTransactionDataSelectionFromRescan( transactionData: RescannedTransactionData ) {
-    dismissBottomSheet()
-
     navigation.navigate( 'TransactionDetails', {
       transactionData: transactionData.details,
       accountShellID: transactionData.accountShell.id,
     } )
   }
 
-  const showRescanningPromptBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  useEffect( () => {
+    return () => {
+      setShowRescanningModal( false )
+      setShowRescanningPrompt( false )
+    }
+  }, [ navigation ] )
+
+  const showRescanningPromptBottomSheet = () => {
+    return (
       <AccountShellRescanningPromptBottomSheet
         onContinue={() => {
-          dismissBottomSheet()
+          setShowRescanningPrompt( false )
           setTimeout( () => {
-            showRescanningBottomSheet()
+            setShowRescanningModal( true )
           }, 800 )
         }}
-        onDismiss={dismissBottomSheet}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '33%' ],
-      },
+        onDismiss={() => setShowRescanningPrompt( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
 
-  const showRescanningBottomSheet = useCallback( () => {
-    presentBottomSheet(
+  const showRescanningBottomSheet = () => {
+    return (
       <WalletRescanningBottomSheet
-        onDismiss={dismissBottomSheet}
+        onDismiss={() => setShowRescanningModal( false )}
         onTransactionDataSelected={handleTransactionDataSelectionFromRescan}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '67%' ],
-        dismissOnScrollDown: false,
-        dismissOnOverlayPress: false,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   return (
     <View style={styles.modalContainer}>
       <ScrollView style={{
         flex: 1
       }}>
-        {menuOptions.map( ( menuOption ) => {
+        <ModalContainer visible={showRescanningPrompt} closeBottomSheet={() => { }}>
+          {showRescanningPromptBottomSheet()}
+        </ModalContainer>
+        <ModalContainer visible={showRescanningModal} closeBottomSheet={() => { }}>
+          {showRescanningBottomSheet()}
+        </ModalContainer>
+        {menuOptions.map( ( menuOption, index ) => {
           return (
             <AppBottomSheetTouchableWrapper
               onPress={() => handleOptionSelection( menuOption )}
               style={styles.selectedContactsView}
+              key={index}
             >
               <Image
                 source={menuOption.imageSource}

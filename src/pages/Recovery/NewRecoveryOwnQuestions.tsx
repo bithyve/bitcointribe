@@ -12,8 +12,8 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
-  AsyncStorage,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
@@ -54,13 +54,13 @@ export default function NewRecoveryOwnQuestions( props ) {
 
   const [ visibleButton, setVisibleButton ] = useState( false )
 
-  const { insertedIntoDB } = useSelector((state) => state.storage);
-  useEffect(() => {
-    (async () => {
-      if (insertedIntoDB) {
-        await AsyncStorage.setItem('recoveryExists', 'true');
-        props.navigation.navigate('RestoreWithICloud');
-        // props.navigation.navigate('RestoreSelectedContactsList');
+  const { insertedIntoDB } = useSelector( ( state ) => state.storage )
+  useEffect( () => {
+    ( async () => {
+      if ( insertedIntoDB ) {
+        await AsyncStorage.setItem( 'recoveryExists', 'true' )
+        //props.navigation.navigate('RestoreWithICloud');
+        props.navigation.navigate( 'RestoreSelectedContactsList' )
       }
     } )()
   }, [ insertedIntoDB ] )

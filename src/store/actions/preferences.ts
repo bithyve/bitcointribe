@@ -1,7 +1,6 @@
 import { createAction } from 'redux-actions'
 import { UPDATE_APP_PREFERENCE } from '../constants'
-import { AsyncStorage } from 'react-native'
-import { updateTrustedContactsInfoLocally } from '../actions/trustedContacts'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import CurrencyKind from '../../common/data/enums/CurrencyKind'
 import { Action } from 'redux'
 
@@ -21,6 +20,8 @@ export const INIT_ASYNC_MIGRATION_SUCCESS = 'INIT_ASYNC_MIGRATION_SUCCESS'
 export const INIT_ASYNC_MIGRATION_FAILED = 'INIT_ASYNC_MIGRATION_FAILED'
 export const UPDATE_APPLICATION_STATUS = 'UPDATE_APPLICATION_STATUS'
 export const UPDATE_LAST_SEEN = 'UPDATE_LAST_SEEN'
+export const IS_PERMISSION_SET = 'IS_PERMISSION_SET'
+export const SET_WALLET_ID = 'SET_WALLET_ID'
 
 export const setCurrencyCode = ( data ) => {
   return {
@@ -131,7 +132,7 @@ export const initMigration = () => {
     ] )
     if ( data && data[ 0 ] && data[ 0 ][ 1 ] ) {
       const trustedContacts = data[ 0 ][ 1 ]
-      dispatch( updateTrustedContactsInfoLocally( JSON.parse( trustedContacts ) ) )
+      // dispatch( updateTrustedContactsInfoLocally( JSON.parse( trustedContacts ) ) )
     }
     if ( data && data[ 1 ] ) {
       const currencyCode = JSON.parse( data[ 1 ][ 1 ] ) || 'USD'
@@ -165,7 +166,6 @@ export const updateApplicationStatus = ( data ) => {
 }
 
 export const updateLastSeen = ( data ) => {
-  AsyncStorage.setItem( 'lastSeen', String( new Date() ) )
   return {
     type: UPDATE_LAST_SEEN,
     payload: {
@@ -183,3 +183,20 @@ export const setCardData = ( data ) => {
   }
 }
 
+export const setIsPermissionGiven = ( data ) => {
+  return {
+    type: IS_PERMISSION_SET,
+    payload: {
+      isPermissionSet: data
+    }
+  }
+}
+
+export const setWalletId = ( data ) => {
+  return {
+    type: SET_WALLET_ID,
+    payload: {
+      walletId: data
+    }
+  }
+}

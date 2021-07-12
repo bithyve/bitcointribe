@@ -5,13 +5,12 @@ import {
   StatusBar,
   Linking,
   Alert,
-  AsyncStorage,
   Platform,
   AppState,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Video from 'react-native-video'
 import Colors from '../common/Colors'
-
 import { initializeDB } from '../store/actions/storage'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
@@ -20,40 +19,60 @@ import ModalHeader from '../components/ModalHeader'
 import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import config from '../bitcoin/HexaConfig'
 import { connect } from 'react-redux'
-import checkAppVersionCompatibility from '../utils/CheckAppVersionCompatibility'
 import idx from 'idx'
+import { processDL } from '../common/CommonFunctions'
+import {
+  getMessages,
+} from '../store/actions/notifications'
 
 type LaunchScreenProps = {
   initializeDB: any;
   navigation: any;
   lastSeen: any;
   databaseInitialized: Boolean;
+  getMessages: any;
+  walletId: any;
 }
 
 type LaunchScreenState = { }
 
 class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
   errorBottomSheet: any;
+  url: any;
   constructor( props ) {
     super( props )
     this.errorBottomSheet = React.createRef()
+    // console.log( ':LAUNCH' )
   }
 
-  componentDidMount = () => {
+  componentDidMount = async() => {
     AppState.addEventListener( 'change', this.handleAppStateChange )
-    Linking.addEventListener( 'url', this.handleAppStateChange )
-
+    Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+    Linking.getInitialURL().then( ( url )=> this.handleDeepLinkEvent( {
+      url
+    } ) )
     setTimeout( ()=>{
       this.postSplashScreenActions()
     }, 4000 )
   };
 
+   handleDeepLinkEvent = async ( { url } ) => {
+     this.handleDeepLinking( url )
+   }
+
+   handleDeepLinking = async ( url: string | null ) => {
+     //console.log( 'Launch::handleDeepLinkEvent::URL: ', url )
+     if ( url == null ) {
+       return
+     }
+     this.url=url
+   }
+
 
   componentWillUnmount = () => {
     AppState.removeEventListener( 'change', this.handleAppStateChange )
-    Linking.removeEventListener( 'url', this.handleAppStateChange )
+    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
   };
 
 
@@ -61,130 +80,21 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
     // no need to trigger login screen if accounts are not synced yet
     // which means user hasn't logged in yet
     const walletExists = await AsyncStorage.getItem( 'walletExists' )
-    const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
+    //const lastSeen = await AsyncStorage.getItem( 'lastSeen' )
     if ( !walletExists ) {
-      return
-    }
-
-    if ( Platform.OS === 'android' && nextAppState === 'background' ) {
-      // if no last seen don't do anything
-      if ( lastSeen ) {
-        this.props.navigation.navigate( 'Intermediate' )
-        return
-      }
-      return
-    }
-
-    if (
-      Platform.OS === 'ios' &&
-      ( nextAppState === 'inactive' || nextAppState == 'background' )
-    ) {
-      // if no last seen don't do anything
-      if ( lastSeen ) {
-        this.props.navigation.navigate( 'Intermediate' )
-        return
-      }
-
       return
     }
   };
 
-  processDL = async ( url ) => {
-    const splits = url.split( '/' )
-
-    if ( splits[ 5 ] === 'sss' ) {
-      const requester = splits[ 4 ]
-
-      if ( splits[ 6 ] === 'ek' ) {
-        const custodyRequest = {
-          requester,
-          ek: splits[ 7 ],
-          uploadedAt: splits[ 8 ],
-        }
-
-        this.props.navigation.replace( 'Login', {
-          custodyRequest
-        } )
-
-      } else if ( splits[ 6 ] === 'rk' ) {
-        const recoveryRequest = {
-          requester, rk: splits[ 7 ]
-        }
-
-        this.props.navigation.replace( 'Login', {
-          recoveryRequest
-        } )
-      }
-    } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
-      if ( splits[ 3 ] !== config.APP_STAGE ) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
-          }`,
-        )
-      } else {
-        const version = splits.pop().slice( 1 )
-
-        if ( version ) {
-          if ( !( await checkAppVersionCompatibility( {
-            relayCheckMethod: splits[ 4 ],
-            version,
-          } ) ) ) {
-            return
-          }
-        }
-
-        const trustedContactRequest = {
-          isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-          approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-          isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-          requester: splits[ 5 ],
-          encryptedKey: splits[ 6 ],
-          hintType: splits[ 7 ],
-          hint: splits[ 8 ],
-          uploadedAt: splits[ 9 ],
-          version,
-        }
-
-        this.props.navigation.replace( 'Login', {
-          trustedContactRequest,
-        } )
-      }
-    } else if ( splits[ 4 ] === 'rk' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-      }
-      this.props.navigation.replace( 'Login', {
-        recoveryRequest
-      } )
-    } else if ( splits[ 4 ] === 'rrk' ) {
-      Alert.alert(
-        'Restoration link Identified',
-        'Restoration links only works during restoration mode',
-      )
-    } else if ( url.includes( 'fastbitcoins' ) ) {
-      const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-
-      this.props.navigation.navigate( 'Login', {
-        userKey
-      } )
-    } else {
-      const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
-
-      this.props.navigation.navigate( 'SignUpDetails', {
-        EmailToken
-      } )
-    }
-  }
-
   postSplashScreenActions = async () => {
     try {
+      console.log( 'walletId', this.props.walletId )
+      if( this.props.walletId ){
+        this.props.getMessages()
+      }
       const url = await Linking.getInitialURL()
+      //console.log( 'url', url )
+
       const hasCreds = await AsyncStorage.getItem( 'hasCreds' )
 
       // initiates the SQL DB
@@ -192,15 +102,47 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
 
       // scenario based navigation
       if ( hasCreds ) {
-        if ( !url )
+        const now: any = new Date()
+        const diff = Math.abs( now - this.props.lastSeen )
+        const isHomePageOpen = Number( diff ) < Number( 20000 )
+        console.log( 'diff', diff, isHomePageOpen )
+        if( isHomePageOpen ){
+          if ( !this.url ){
+            this.props.navigation.replace( 'Home', {
+              screen: 'Home',
+            } )
+          } else {
+            const requestName = await processDL( this.url )
+            this.props.navigation.replace( 'Home', {
+              screen: 'Home',
+              params: {
+                custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+                recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+                trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+                userKey: requestName && requestName.userKey ? requestName.userKey : null,
+                swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+              }
+            } )
+          }
+        } else if ( !this.url ){
           this.props.navigation.replace( 'Login' )
-        else
-          this.processDL( url )
+        } else {
+          const requestName = await processDL( this.url )
+          this.props.navigation.replace( 'Login', {
+            custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+            recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+            trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+            userKey: requestName && requestName.userKey ? requestName.userKey : null,
+            swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+          } )
+        }
+
       } else {
         this.props.navigation.replace( 'PasscodeConfirm' )
       }
 
     } catch ( err ) {
+      console.log( 'err', err );
       ( this.errorBottomSheet as any ).current.snapTo( 1 )
     }
   };
@@ -218,6 +160,7 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
           resizeMode={'cover'}
           rate={1.0}
           ignoreSilentSwitch={'obey'}
+
         />
         <StatusBar
           backgroundColor={'white'}
@@ -273,10 +216,13 @@ const styles = StyleSheet.create( {
 
 const mapStateToProps = ( state ) => {
   return {
-    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized )
+    databaseInitialized: idx( state, ( _ ) => _.storage.databaseInitialized ),
+    lastSeen: idx( state, ( _ ) => _.preferences.lastSeen ),
+    walletId: idx( state, ( _ ) => _.preferences.walletId )
   }
 }
 
 export default connect( mapStateToProps, {
-  initializeDB
+  initializeDB,
+  getMessages
 } )( Launch )

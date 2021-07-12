@@ -14,6 +14,8 @@ import useTotalBalanceForAccountShell from '../../utils/hooks/state-selectors/ac
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountKind'
 import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import { useDispatch, useSelector } from 'react-redux'
 
 export type Props = {
   accountShell: AccountShell;
@@ -24,7 +26,7 @@ type HeaderProps = Props;
 type BodyProps = Props;
 
 
-const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled}: HeaderProps ) => {
+const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
 
@@ -64,7 +66,7 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled}: He
   )
 }
 
-const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled}: BodyProps ) => {
+const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const accountsState = useAccountsState()
   const totalBalance = AccountShell.getTotalBalance( accountShell )
@@ -101,9 +103,13 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled}: BodyPr
 }
 
 
-const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled}: Props ) => {
+const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: Props ) => {
+  const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
+  const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
   return (
-    <CardView cornerRadius={10} style={cardDisabled ? {...styles.rootContainer, opacity:0.3} : styles.rootContainer}>
+    <CardView cornerRadius={10} style={opacityChange ? {
+      ...styles.rootContainer, opacity:0.3
+    } : styles.rootContainer}>
       <HeaderSection accountShell={accountShell} cardDisabled={cardDisabled}/>
       <BodySection accountShell={accountShell} cardDisabled={cardDisabled}/>
     </CardView>
@@ -113,9 +119,9 @@ const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled}: P
 const styles = StyleSheet.create( {
   rootContainer: {
     width: widthPercentageToDP( 42.6 ),
-    height: heightPercentageToDP( 20.1 ),
-    borderColor: Colors.borderColor,
-    borderWidth: 1,
+    height: heightPercentageToDP( 19.8 ),
+    // borderColor: Colors.borderColor,
+    // borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: widthPercentageToDP( 2.5 ),
     backgroundColor: Colors.white,

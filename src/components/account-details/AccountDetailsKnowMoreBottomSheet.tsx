@@ -7,8 +7,12 @@ import SavingsAccountKnowMoreSheetContents from '../know-more-sheets/SavingsAcco
 import CheckingAccountKnowMoreSheetContents from '../know-more-sheets/CheckingAccountKnowMoreSheetContents'
 import DonationAccountKnowMoreSheetContents from '../know-more-sheets/DonationAccountKnowMoreSheetContents'
 import BottomSheetHandle from '../bottom-sheets/BottomSheetHandle'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import ServiceAccountKnowMoreSheetContents from '../know-more-sheets/ServiceAccountKnowMoreSheetContents'
 
 export type Props = {
+  primarySubAccount: any;
   accountKind: SubAccountKind;
   onClose: () => void;
 };
@@ -18,9 +22,20 @@ export const KnowMoreBottomSheetHandle: React.FC = () => {
 }
 
 const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ( {
+  primarySubAccount,
   accountKind,
   onClose,
 }: Props ) => {
+
+  const serviceBottomSheet = ( serviceKind ) => {
+    return (
+      <ServiceAccountKnowMoreSheetContents
+        serviceKind={serviceKind}
+        titleClicked={onClose}
+        containerStyle={styles.contentContainer}
+      />
+    )
+  }
   const BottomSheetContent = () => {
     switch ( accountKind ) {
         case SubAccountKind.TEST_ACCOUNT:
@@ -51,6 +66,18 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ( {
               containerStyle={styles.contentContainer}
             />
           )
+
+        case SubAccountKind.SERVICE:
+          switch( ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ){
+              case ( ServiceAccountKind.WYRE ):
+                return serviceBottomSheet( ServiceAccountKind.WYRE )
+              case ( ServiceAccountKind.RAMP ):
+                return serviceBottomSheet( ServiceAccountKind.RAMP )
+              case ( ServiceAccountKind.SWAN ):
+                return serviceBottomSheet( ServiceAccountKind.SWAN )
+          }
+
+
         default:
           return null
     }
@@ -66,7 +93,7 @@ const AccountDetailsKnowMoreBottomSheet: React.FC<Props> = ( {
 const styles = StyleSheet.create( {
   rootContainer: {
     backgroundColor: Colors.blue,
-    flex: 1,
+    // flex: 1,
   },
 
   handleContainer: {
@@ -74,7 +101,7 @@ const styles = StyleSheet.create( {
   },
 
   contentContainer: {
-    shadowOpacity: 0,
+    // shadowOpacity: 0,
   },
 } )
 

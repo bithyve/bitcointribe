@@ -6,10 +6,10 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  AsyncStorage,
   Platform,
   Alert,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import NavStyles from '../../common/Styles/NavStyles'
 import {
@@ -31,9 +31,6 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import DeviceInfo from 'react-native-device-info'
 import KnowMoreButton from '../../components/KnowMoreButton'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import {
-  updateTrustedContactsInfoLocally,
-} from '../../store/actions/trustedContacts'
 import config from '../../bitcoin/HexaConfig'
 import QRModal from '../Accounts/QRModal'
 import S3Service from '../../bitcoin/services/sss/S3Service'
@@ -165,22 +162,22 @@ const SecondaryDeviceHistory = ( props ) => {
     }
   }
 
-  const updateTrustedContactsInfo = useCallback(
-    async ( contact ) => {
-      const tcInfo = trustedContactsInfo
+  // const updateTrustedContactsInfo = useCallback(
+  //   async ( contact ) => {
+  //     const tcInfo = trustedContactsInfo
 
-      if ( tcInfo.length ) {
-        tcInfo[ 0 ] = contact
-      } else {
-        tcInfo[ 0 ] = contact
-        tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
-        tcInfo[ 2 ] = undefined
-      }
+  //     if ( tcInfo.length ) {
+  //       tcInfo[ 0 ] = contact
+  //     } else {
+  //       tcInfo[ 0 ] = contact
+  //       tcInfo[ 1 ] = undefined // securing initial 3 positions for Guardians
+  //       tcInfo[ 2 ] = undefined
+  //     }
 
-      dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
-    },
-    [ trustedContactsInfo ],
-  )
+  //     dispatch( updateTrustedContactsInfoLocally( tcInfo ) )
+  //   },
+  //   [ trustedContactsInfo ],
+  // )
 
   const createGuardian = useCallback(
     async ( changeKeeper?: boolean ) => {
@@ -200,9 +197,9 @@ const SecondaryDeviceHistory = ( props ) => {
 
       if ( changeKeeper  || shareExpired ) {
         setSecondaryQR( '' )
-        updateTrustedContactsInfo( {
-          firstName, lastName
-        } )
+        // updateTrustedContactsInfo( {
+        //   firstName, lastName
+        // } )
       } else {
         const hasTrustedChannel = trustedContact.symmetricKey ? true : false
         const isEphemeralChannelExpired = trustedContact.ephemeralChannel &&

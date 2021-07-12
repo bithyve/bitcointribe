@@ -20,19 +20,18 @@ import {
 import { useDispatch } from 'react-redux'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import SendConfirmationContent from '../SendConfirmationContent'
-import { executeSendStage3, sendDonationNote, sendTxNotification } from '../../../store/actions/sending'
+import { executeSendStage2, sendTxNotification } from '../../../store/actions/sending'
 import useSourceAccountShellForSending from '../../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
-import useAccountSendST3CompletionEffect from '../../../utils/sending/useAccountSendST3CompletionEffect'
 import useSendingState from '../../../utils/hooks/state-selectors/sending/UseSendingState'
 import {  refreshAccountShell } from '../../../store/actions/accounts'
 import { resetStackToAccountDetails } from '../../../navigation/actions/NavigationActions'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
-import useDonationIdFromSelectedRecipients from '../../../utils/hooks/state-selectors/sending/useDonationIdFromSelectedRecipients'
 
 
 export default function OTPAuthenticationScreen( { navigation } ) {
+  const txnPriority = navigation.getParam( 'txnPriority' )
   const [ Elevation, setElevation ] = useState( 10 )
   const [ token, setToken ] = useState( '' )
   const [ tokenArray, setTokenArray ] = useState( [ '' ] )
@@ -40,7 +39,6 @@ export default function OTPAuthenticationScreen( { navigation } ) {
   const sourcePrimarySubAccount = usePrimarySubAccountForShell( sourceAccountShell )
   const dispatch = useDispatch()
   const sendingState = useSendingState()
-  const donationId = useDonationIdFromSelectedRecipients()
   const {
     present: presentBottomSheet,
     dismiss: dismissBottomSheet,
@@ -61,6 +59,11 @@ export default function OTPAuthenticationScreen( { navigation } ) {
     }
   }
 
+  useEffect( () => {
+    return () => {
+      dismissBottomSheet()
+    }
+  }, [ navigation ] )
 
   const showSendSuccessBottomSheet = useCallback( () => {
     presentBottomSheet(
@@ -129,32 +132,11 @@ export default function OTPAuthenticationScreen( { navigation } ) {
   },
   [ presentBottomSheet, dismissBottomSheet ] )
 
-  useAccountSendST3CompletionEffect( {
-    onSuccess: ( txid: string | null ) => {
-      if ( txid ) {
-        dispatch( sendTxNotification() )
-
-        //dispatch donation note action during donation tx
-        const { donationNote } = sendingState.donationDetails
-        if( donationId && donationNote ){
-          dispatch( sendDonationNote( {
-            txid,
-            donationId: donationId,
-            donationNote: donationNote,
-          } ) )
-        }
-
-        showSendSuccessBottomSheet()
-      }
-    },
-    onFailure: showSendFailureBottomSheet,
-  } )
-
   useEffect( () => {
-    if ( !sendingState.sendST3.inProgress ) {
+    if ( !sendingState.sendST2.inProgress ) {
       setIsConfirmDisabled( false )
     }
-  }, [ sendingState.sendST3 ] )
+  }, [ sendingState.sendST2 ] )
 
   return (
     <SafeAreaView style={{
@@ -384,8 +366,9 @@ export default function OTPAuthenticationScreen( { navigation } ) {
                 setTimeout( () => {
                   setIsConfirmDisabled( true )
                 }, 1 )
-                dispatch( executeSendStage3( {
-                  accountShellID: sourceAccountShell.id,
+                dispatch( executeSendStage2( {
+                  accountShell: sourceAccountShell,
+                  txnPriority,
                   token: parseInt( token )
                 } ) )
               }}
@@ -397,8 +380,8 @@ export default function OTPAuthenticationScreen( { navigation } ) {
                   : Colors.blue,
               }}
             >
-              {( !isConfirmDisabled && sendingState.sendST3.inProgress ) ||
-              ( isConfirmDisabled && sendingState.sendST3.inProgress ) ? (
+              {( !isConfirmDisabled && sendingState.sendST2.inProgress ) ||
+              ( isConfirmDisabled && sendingState.sendST2.inProgress ) ? (
                   <ActivityIndicator color={Colors.white} size="small" />
                 ) : (
                   <Text style={styles.confirmButtonText}>Confirm</Text>

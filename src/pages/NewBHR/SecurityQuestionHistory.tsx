@@ -4,10 +4,10 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform,
   Keyboard,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import {
   widthPercentageToDP as wp,
@@ -30,6 +30,7 @@ import {
 } from '../../store/actions/health'
 import { useSelector } from 'react-redux'
 import HistoryHeaderComponent from './HistoryHeaderComponent'
+import ModalContainer from '../../components/home/ModalContainer'
 
 const SecurityQuestionHistory = ( props ) => {
   const [ securityQuestionsHistory, setSecuirtyQuestionHistory ] = useState( [
@@ -41,7 +42,7 @@ const SecurityQuestionHistory = ( props ) => {
     },
     {
       id: 2,
-      title: 'Security Questions confirmed',
+      title: 'Security Answer confirmed',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
@@ -57,6 +58,14 @@ const SecurityQuestionHistory = ( props ) => {
     SecurityQuestionBottomSheet,
     setSecurityQuestionBottomSheet,
   ] = useState( React.createRef() )
+  const [
+    questionModal,
+    showQuestionModal,
+  ] = useState( false )
+  const [
+    successModal,
+    showSuccessModal,
+  ] = useState( false )
   const [
     HealthCheckSuccessBottomSheet,
     setHealthCheckSuccessBottomSheet,
@@ -82,64 +91,41 @@ const SecurityQuestionHistory = ( props ) => {
   const renderSecurityQuestionContent = useCallback( () => {
     return (
       <SecurityQuestion
-        onFocus={() => {
-          if ( Platform.OS == 'ios' )
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 2 )
-        }}
-        onBlur={() => {
-          if ( Platform.OS == 'ios' )
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
-        }}
         onPressConfirm={async () => {
           Keyboard.dismiss()
           saveConfirmationHistory()
-          updateHealthForSQ();
-          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 );
-          ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 1 )
+          updateHealthForSQ()
+          // ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
+          showQuestionModal( false )
+          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 1 )
+          showSuccessModal( true )
         }}
       />
     )
   }, [] )
 
-  const renderSecurityQuestionHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
 
   const renderHealthCheckSuccessModalContent = useCallback( () => {
     return (
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
-        info={'Question Successfully Backed Up'}
+        info={'Answer backed up successfully'}
         note={''}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
         onPressProceed={() => {
-          ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
+          // ( HealthCheckSuccessBottomSheet as any ).current.snapTo( 0 )
+          showSuccessModal( false )
           dispatch( checkMSharesHealth() )
           props.navigation.goBack()
         }}
         isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/illustration.png' )}
+        bottomImage={require( '../../assets/images/icons/success.png' )}
       />
     )
   }, [] )
 
-  const renderHealthCheckSuccessModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   (HealthCheckSuccessBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
 
   const sortedHistory = ( history ) => {
     const currentHistory = history.filter( ( element ) => {
@@ -190,7 +176,7 @@ const SecurityQuestionHistory = ( props ) => {
   }
 
   useEffect( () => {
-    if ( next ) ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+    if ( next )showQuestionModal( true )
   }, [ next ] )
 
   useEffect( () => {
@@ -207,30 +193,16 @@ const SecurityQuestionHistory = ( props ) => {
 
   const updateHealthForSQ = () => {
     if ( levelHealth.length > 0 && levelHealth[ 0 ].levelInfo.length > 0 ) {
-      const levelHealthVar =
-        currentLevel == 0 || currentLevel == 1
-          ? levelHealth[ 0 ].levelInfo[ 1 ]
-          : currentLevel == 2
-            ? levelHealth[ 1 ].levelInfo[ 1 ]
-            : levelHealth[ 2 ].levelInfo[ 1 ]
-      // health update for 1st upload to cloud
-      if ( levelHealthVar.shareType == 'cloud' ) {
-        levelHealthVar.updatedAt = '' + moment( new Date() ).valueOf()
-        levelHealthVar.status = 'accessible'
-        levelHealthVar.reshareVersion = 1
-        levelHealthVar.name = 'Cloud'
-      }
-      const shareArray = [
+      const shareObj =
         {
           walletId: s3Service.getWalletId().data.walletId,
-          shareId: levelHealthVar.shareId,
-          reshareVersion: levelHealthVar.reshareVersion,
+          shareId: levelHealth[ 0 ].levelInfo[ 1 ].shareId,
+          reshareVersion: levelHealth[ 0 ].levelInfo[ 1 ].reshareVersion,
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',
-        },
-      ]
-      dispatch( updateMSharesHealth( shareArray ) )
+        }
+      dispatch( updateMSharesHealth( shareObj, true ) )
     }
   }
 
@@ -248,7 +220,6 @@ const SecurityQuestionHistory = ( props ) => {
         onPressBack={() => props.navigation.goBack()}
         selectedTitle={'Security Question'}
         selectedTime={props.navigation.state.params.selectedTime}
-        selectedStatus={props.navigation.state.params.selectedStatus}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
       />
@@ -261,7 +232,8 @@ const SecurityQuestionHistory = ( props ) => {
           type={'security'}
           IsReshare
           onPressConfirm={() => {
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            showQuestionModal( true )
           }}
           data={sortedHistory( securityQuestionsHistory )}
           confirmButtonText={'Confirm Answer'}
@@ -269,31 +241,20 @@ const SecurityQuestionHistory = ( props ) => {
           // changeButtonText={'Change Question'}
           disableChange={true}
           onPressReshare={() => {
-            ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            // ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
+            showQuestionModal( true )
           }}
           onPressChange={() => {
             props.navigation.navigate( 'NewOwnQuestions' )
           }}
         />
       </View>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={SecurityQuestionBottomSheet as any}
-        snapPoints={[ -30, hp( '75%' ), hp( '90%' ) ]}
-        renderContent={renderSecurityQuestionContent}
-        renderHeader={renderSecurityQuestionHeader}
-      />
-      <BottomSheet
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={HealthCheckSuccessBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '27%' ) : hp( '35%' ),
-        ]}
-        renderContent={renderHealthCheckSuccessModalContent}
-        renderHeader={renderHealthCheckSuccessModalHeader}
-      />
+      <ModalContainer visible={questionModal} closeBottomSheet={() => {}} >
+        {renderSecurityQuestionContent()}
+      </ModalContainer>
+      <ModalContainer visible={successModal} closeBottomSheet={() => {}} >
+        {renderHealthCheckSuccessModalContent()}
+      </ModalContainer>
     </View>
   )
 }

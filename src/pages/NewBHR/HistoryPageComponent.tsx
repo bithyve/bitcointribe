@@ -135,6 +135,7 @@ const HistoryPageComponent = ( props ) => {
               width: 'auto',
               justifyContent:'center'
             }}
+            delayPressIn={0}
             onPress={() => props.onConfirm()}
           >
             <Text
@@ -172,6 +173,7 @@ const HistoryPageComponent = ( props ) => {
                     ? Colors.lightBlue
                     : Colors.blue,
                 }}
+                delayPressIn={0}
                 disabled={props.confirmDisable ? props.confirmDisable : false}
               >
                 <Text
@@ -199,6 +201,7 @@ const HistoryPageComponent = ( props ) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
+                delayPressIn={0}
               >
                 <Text
                   style={{

@@ -13,14 +13,14 @@ import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import { Button } from 'react-native-elements'
 import ButtonStyles from '../../common/Styles/ButtonStyles'
 import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { makeAddressRecipientDescription } from '../../utils/sending/RecipientFactories'
 import { addRecipientForSending, amountForRecipientUpdated, recipientSelectedForAmountSetting, sourceAccountSelectedForSending } from '../../store/actions/sending'
 import { Satoshis } from '../../common/data/enums/UnitAliases'
-import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import { AccountType, NetworkType, ScannedAddressKind } from '../../bitcoin/utilities/Interface'
+import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { AccountsState } from '../../store/reducers/accounts'
 
 export type Props = {
   navigation: any;
@@ -38,28 +38,20 @@ const HeaderSection: React.FC = () => {
 
 const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
-  const accountsState = useSelector( ( state ) => state.accounts, )
+  const accountsState: AccountsState = useSelector( ( state ) => state.accounts, )
+  const defaultSourceAccount = accountsState.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && !shell.primarySubAccount.instanceNumber )
 
-  function handleBarcodeRecognized( { data: dataString }: { data: string } ) {
-    dispatch( clearTransfer( REGULAR_ACCOUNT ) )
-    const network = Bitcoin.networkType( dataString )
-    if ( network ) {
-      const serviceType =
-        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-      const service = accountsState[ serviceType ].service
-      const { type } = service.addressDiff( dataString )
+  function handleBarcodeRecognized( { data: scannedData }: { data: string } ) {
+    const networkType: NetworkType = AccountUtilities.networkType( scannedData )
+    if ( networkType ) {
+      const network = AccountUtilities.getNetworkByType( networkType )
+      const { type } = AccountUtilities.addressDiff( scannedData, network )
       if ( type===ScannedAddressKind.ADDRESS ) {
-        onSend( dataString, 0 )
+        onSend( scannedData, 0 )
       } else if( type===ScannedAddressKind.PAYMENT_URI )  {
-        const res = service.decodePaymentURI( dataString )
+        const res = AccountUtilities.decodePaymentURI( scannedData )
         const address = res.address
         const options = res.options
-        let donationId = null
-        // checking for donationId to send note
-        if ( options && options.message ) {
-          const rawMessage = options.message
-          donationId = rawMessage.split( ':' ).pop().trim()
-        }
 
         onSend( address, options.amount )
       }
@@ -67,11 +59,7 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     }
 
     const onCodeScanned = navigation.getParam( 'onCodeScanned' )
-    if ( typeof onCodeScanned === 'function' ) {
-      const data = getFormattedStringFromQRString( dataString )
-      onCodeScanned( data )
-    }
-
+    if ( typeof onCodeScanned === 'function' ) onCodeScanned( getFormattedStringFromQRString( scannedData ) )
     navigation.goBack( null )
   }
 
@@ -80,9 +68,8 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       address
     } )
 
-    dispatch( clearTransfer( REGULAR_ACCOUNT ) )
     dispatch( sourceAccountSelectedForSending(
-      accountsState.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.REGULAR_ACCOUNT )
+      defaultSourceAccount
     ) )
     dispatch( addRecipientForSending( recipient ) )
     dispatch( recipientSelectedForAmountSetting( recipient ) )
@@ -123,9 +110,21 @@ const HomeQRScannerScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                 margin: 0, padding: 0
               }}
               placeholder="Enter address manually"
-              sourceAccountKind={SourceAccountKind.REGULAR_ACCOUNT}
+              accountShell={defaultSourceAccount}
               onAddressEntered={( address ) => {
                 onSend( address, 0 )
+              }}
+              onPaymentURIEntered={( uri ) => {
+                const decodingResult = AccountUtilities.decodePaymentURI( uri )
+
+                const address = decodingResult.address
+                const options = decodingResult.options
+
+                let amount = 0
+                if ( options?.amount )
+                  amount = options.amount
+
+                onSend( address, amount )
               }}
             />
           </View>

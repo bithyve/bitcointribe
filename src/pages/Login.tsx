@@ -5,10 +5,12 @@ import {
   View,
   TouchableOpacity,
   StatusBar,
-  AsyncStorage,
   Platform,
-  BackHandler
+  BackHandler,
+  Alert,
+  Linking
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useDispatch, useSelector } from 'react-redux'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Colors from '../common/Colors'
@@ -27,16 +29,28 @@ import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
 import RelayServices from '../bitcoin/services/RelayService'
-import { initMigration } from '../store/actions/preferences'
+import { initMigration, updateLastSeen } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
+import { processDL } from '../common/CommonFunctions'
+import ModalContainer from '../components/home/ModalContainer'
+import firebase from '@react-native-firebase/app'
+import {
+  setIsPermissionGiven,
+  setFCMToken
+} from '../store/actions/preferences'
+import messaging from '@react-native-firebase/messaging'
+import {
+  updateFCMTokens,
+} from '../store/actions/notifications'
+import { autoSyncShells } from '../store/actions/accounts'
 
-const LOADER_MESSAGE_TIME = 2
+const LOADER_MESSAGE_TIME = 2000
 const loaderMessages = [
   {
     heading: 'Non-custodial buys',
-    text: 'Get sats directly in your wallet with FastBitcoins vouchers',
-    subText: '(*select locations)',
+    text: 'Get sats directly in your wallet with compatible exchanges vouchers',
+    subText: '',
   },
   {
     heading: 'Friends & Family',
@@ -73,7 +87,7 @@ const getRandomMessage = () => {
 }
 
 export default function Login( props ) {
-
+  const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
   const initialMessage = getRandomMessage()
   const [ message ] = useState( initialMessage.heading )
   const [ subTextMessage1 ] = useState( initialMessage.text )
@@ -84,17 +98,24 @@ export default function Login( props ) {
   const [ JailBrokenInfo, setJailBrokenInfo ] = useState( '' )
   const [ passcodeFlag ] = useState( true )
   const [ checkAuth, setCheckAuth ] = useState( false )
-  const [ loaderBottomSheet ] = useState(
-    React.createRef<BottomSheet>(),
-  )
+  // const [ loaderBottomSheet ] = useState(
+  //   React.createRef<BottomSheet>(),
+  // )
+  const [ loaderModal, setloaderModal ] = useState( false )
+  const [ errorModal, setErrorModal ] = useState( false )
+
   const [ ErrorBottomSheet ] = useState(
     React.createRef<BottomSheet>(),
   )
   const releaseCasesValue = useSelector(
     ( state ) => state.preferences.releaseCasesValue,
   )
-
+  const fcmTokenValue = useSelector(
+    ( state ) => state.preferences.fcmTokenValue,
+  )
+  const [ requestName, setRequestName ] = useState( null )
   const [ isDisabledProceed, setIsDisabledProceed ] = useState( false )
+  const [ creationFlag, setCreationFlag ] = useState( false )
 
   const onPressNumber = useCallback(
     ( text ) => {
@@ -118,11 +139,30 @@ export default function Login( props ) {
   }, [] )
 
   useEffect( () => {
+    dispatch( updateLastSeen( null ) )
+    Linking.addEventListener( 'url', handleDeepLinkEvent )
+    //Linking.getInitialURL().then( handleDeepLinking )
     BackHandler.addEventListener( 'hardwareBackPress', hardwareBackPressCustom )
     return () => {
       BackHandler.removeEventListener( 'hardwareBackPress', hardwareBackPressCustom )
+      Linking.removeEventListener( 'url', handleDeepLinkEvent )
     }
+
   }, [] )
+
+  const handleDeepLinkEvent = async ( { url } ) => {
+    handleDeepLinking( url )
+  }
+
+  const handleDeepLinking = async ( url: string | null ) => {
+    // console.log( 'Login::handleDeepLinkEvent::URL: ', url )
+    if ( url == null ) {
+      return
+    }
+    setCreationFlag( true )
+    const requestName = await processDL( url )
+    setRequestName( requestName )
+  }
 
   useEffect( () => {
     if ( passcode.length == 4 ) {
@@ -138,7 +178,8 @@ export default function Login( props ) {
 
   useEffect( () => {
     if ( JailMonkey.isJailBroken() ) {
-      ErrorBottomSheet.current.snapTo( 1 )
+      // ErrorBottomSheet.current.snapTo( 1 )
+      setErrorModal( true )
       setTimeout( () => {
         setJailBrokenTitle(
           Platform.OS == 'ios'
@@ -155,7 +196,8 @@ export default function Login( props ) {
     }
     DeviceInfo.isPinOrFingerprintSet().then( ( isPinOrFingerprintSet ) => {
       if ( !isPinOrFingerprintSet ) {
-        ErrorBottomSheet.current.snapTo( 1 )
+        // ErrorBottomSheet.current.snapTo( 1 )
+        setErrorModal( true )
         setTimeout( () => {
           setJailBrokenTitle(
             'Your phone does not have any secure entry like Pin or Biometric',
@@ -172,9 +214,7 @@ export default function Login( props ) {
       .then( async ( res ) => {
         // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
-        // JSON.parse(
-        //   await AsyncStorage.getItem('releaseCases'),
-        // );
+
         if (
           res.data.releases.length &&
           res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
@@ -182,7 +222,8 @@ export default function Login( props ) {
           if (
             releaseCases &&
             releaseCases.build == res.data.releases[ 0 ].build &&
-            releaseCases.ignoreClick
+            releaseCases.ignoreClick &&
+            releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {
@@ -197,39 +238,101 @@ export default function Login( props ) {
   }, [] )
 
 
-  const custodyRequest = props.navigation.getParam( 'custodyRequest' )
-  const recoveryRequest = props.navigation.getParam( 'recoveryRequest' )
-  const trustedContactRequest = props.navigation.getParam(
-    'trustedContactRequest',
-  )
-  const userKey = props.navigation.getParam( 'userKey' )
-  const isMigrated = useSelector( ( state ) => state.preferences.isMigrated )
-
   useEffect( () => {
     if ( isAuthenticated ) {
       // migrate async keys
       if ( !isMigrated ) {
         dispatch( initMigration() )
       }
+
+      bootStrapNotifications()
+
       AsyncStorage.getItem( 'walletExists' ).then( ( exists ) => {
         if ( exists ) {
+          dispatch( autoSyncShells() )
+
           setTimeout( () => {
-            if ( loaderBottomSheet.current ) {
-              loaderBottomSheet.current.snapTo( 0 )
+            // if ( loaderBottomSheet.current ) {
+            //   loaderBottomSheet.current.snapTo( 0 )
+            // }
+            setloaderModal( false )
+            //console.log( 'requestName**', requestName )
+            //console.log( 'creationFlag**', creationFlag )
+
+            if( !creationFlag ) {
+              props.navigation.navigate( 'Home', {
+                screen: 'Home',
+              }
+              )
+            } else if( requestName ){
+              props.navigation.navigate( 'Home', {
+                screen: 'Home',
+                params: {
+                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
+                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
+                  trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
+                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
+                  swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
+                }
+              } )
             }
-            props.navigation.navigate( 'Home', {
-              custodyRequest,
-              recoveryRequest,
-              trustedContactRequest,
-              userKey,
-            } )
           }, LOADER_MESSAGE_TIME )
         } else {
           props.navigation.replace( 'WalletInitialization' )
         }
       } )
     }
-  }, [ isAuthenticated ] )
+  }, [ isAuthenticated, requestName ] )
+
+  const bootStrapNotifications = async () => {
+    dispatch( setIsPermissionGiven( true ) )
+    const t0 = performance.now()
+    if ( Platform.OS === 'ios' ) {
+      firebase
+        .messaging()
+        .hasPermission()
+        .then( ( enabled ) => {
+          if ( enabled ) {
+            storeFCMToken()
+            //this.createNotificationListeners()
+          } else {
+            firebase
+              .messaging()
+              .requestPermission( {
+                provisional: true,
+              } )
+              .then( () => {
+                storeFCMToken()
+                // this.createNotificationListeners()
+              } )
+              .catch( () => {
+                console.log( 'Permission rejected.' )
+              } )
+          }
+        } )
+        .catch()
+    } else {
+      storeFCMToken()
+      //this.createNotificationListeners()
+    }
+    const t1 = performance.now()
+    console.log( 'Call bootStrapNotifications took ' + ( t1 - t0 ) + ' milliseconds.' )
+  }
+
+  const storeFCMToken = async () => {
+    const fcmToken = await messaging().getToken()
+    console.log( 'TOKEN', fcmToken )
+    const fcmArray = [ fcmToken ]
+    const fcmTokenFromAsync = fcmTokenValue
+    console.log( 'fcmTokenFromAsync', fcmTokenFromAsync )
+
+    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
+      dispatch( setFCMToken( fcmToken ) )
+
+      await AsyncStorage.setItem( 'fcmToken', fcmToken )
+      dispatch( updateFCMTokens( fcmArray ) )
+    }
+  }
 
   const handleLoaderMessages = ( passcode ) => {
     setTimeout( () => {
@@ -267,7 +370,8 @@ export default function Login( props ) {
   const checkPasscode = () => {
     if ( checkAuth ) {
       setTimeout( () => {
-        loaderBottomSheet.current.snapTo( 0 )
+        // loaderBottomSheet.current.snapTo( 0 )
+        setloaderModal( false )
       }, 2 )
 
       return (
@@ -281,7 +385,7 @@ export default function Login( props ) {
   }
 
   useEffect( () => {
-    if ( authenticationFailed ) {
+    if ( authenticationFailed && passcode ) {
       setCheckAuth( true )
       checkPasscode()
       setPasscode( '' )
@@ -298,7 +402,8 @@ export default function Login( props ) {
         info={JailBrokenInfo}
         proceedButtonText={'Ok'}
         onPressProceed={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
+          // ErrorBottomSheet.current.snapTo( 0 )
+          setErrorModal( false )
         }}
         isBottomImage={true}
         bottomImage={require( '../assets/images/icons/errorImage.png' )}
@@ -306,15 +411,15 @@ export default function Login( props ) {
     )
   }, [ JailBrokenTitle ] )
 
-  const renderErrorModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          ErrorBottomSheet.current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
+  // const renderErrorModalHeader = useCallback( () => {
+  //   return (
+  //     <ModalHeader
+  //       onPressHeader={() => {
+  //         ErrorBottomSheet.current.snapTo( 0 )
+  //       }}
+  //     />
+  //   )
+  // }, [] )
 
   return (
     <View style={{
@@ -480,7 +585,7 @@ export default function Login( props ) {
                     setIsDisabledProceed( true )
                     setElevation( 0 )
                   }, 2 )
-                  setTimeout( () => loaderBottomSheet.current?.snapTo( 1 ), 2 )
+                  setTimeout( () => setloaderModal( true ), 2 )
                   handleLoaderMessages( passcode )
                 }}
                 style={{
@@ -635,17 +740,14 @@ export default function Login( props ) {
             </TouchableOpacity>
           </View>
         </View>
-        <BottomSheet
-          onCloseEnd={() => { }}
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={loaderBottomSheet}
-          snapPoints={[ -50, hp( '100%' ) ]}
-          renderContent={renderLoaderModalContent}
-          renderHeader={renderLoaderModalHeader}
-        />
+        <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'}>
+          {renderLoaderModalContent()}
+        </ModalContainer>
       </View>
-      <BottomSheet
+      <ModalContainer visible={errorModal} closeBottomSheet={() => {}}>
+        {renderErrorModalContent()}
+      </ModalContainer>
+      {/* <BottomSheet
         onCloseEnd={() => {
           setElevation( 10 )
         }}
@@ -660,7 +762,7 @@ export default function Login( props ) {
         ]}
         renderContent={renderErrorModalContent}
         renderHeader={renderErrorModalHeader}
-      />
+      /> */}
     </View>
   )
 }

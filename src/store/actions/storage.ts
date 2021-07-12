@@ -1,9 +1,9 @@
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 import dataManager from '../../storage/database-manager'
 
 // types and action creators: dispatched by components and sagas
@@ -54,11 +54,21 @@ export const enrichServices = ( database ) => {
 }
 
 // types and action creators (saga): dispatched by saga workers
+export const UPDATE_WALLET = 'UPDATE_WALLET'
 export const DB_INITIALIZED = 'DB_INITIALIZED'
 export const SERVICES_INITIALIZED = 'SERVICES_INITIALIZED'
 export const DB_FETCHED = 'DB_FETCHED'
 export const DB_INSERTED = 'DB_INSERTED'
 export const SERVICES_ENRICHED = 'SERVICES_ENRICHED'
+
+export const updateWallet = ( wallet: Wallet ) => {
+  return {
+    type: UPDATE_WALLET,
+    payload: {
+      wallet
+    }
+  }
+}
 
 export const dbInitialized = ( initialized ) => {
   return {
@@ -74,7 +84,6 @@ export const servicesInitialized = ( services: {
   secureAcc: SecureAccount;
   s3Service: S3Service;
   trustedContacts: TrustedContactsService;
-  keepersInfo: KeeperService;
 } ) => {
   return {
     type: SERVICES_INITIALIZED,
@@ -131,7 +140,4 @@ export const fetchDatabase = ( key ) => {
     }
   }
 }
-
-
-// handle thunk way
 

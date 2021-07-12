@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo,  } from 'react'
 import { View, Text, StyleSheet, ImageBackground, Image, ActivityIndicator } from 'react-native'
-import { useDispatch,useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../../common/Colors'
 import SyncStatus from '../../../common/data/enums/SyncStatus'
 import AccountShell from '../../../common/data/models/AccountShell'
@@ -9,7 +9,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import usePrimarySubAccountForShell from '../../../utils/hooks/account-utils/UsePrimarySubAccountForShell'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
-import { blindRefresh, refreshAccountShell } from '../../../store/actions/accounts'
+import { blindRefresh } from '../../../store/actions/accounts'
 import { heightPercentageToDP } from 'react-native-responsive-screen'
 import { RescannedTransactionData } from '../../../store/reducers/wallet-rescanning'
 import TransactionsFoundDuringRescanList from '../account-shell-rescanning-bottom-sheet/TransactionsFoundDuringRescanList'
@@ -35,7 +35,7 @@ const ScanningProgressText: React.FC<ProgressTextProps> = ( { accountShell, }: P
 
   const syncStatus = useSyncStatusForAccountShellID( accountShell.id )
 
-  
+
 
   return (
     <View style={{
@@ -63,11 +63,10 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
   onDismiss,
   onTransactionDataSelected,
 }: Props ) => {
-  const dispatch = useDispatch();
-  const { refreshed } = useSelector(state => state.accounts)
-
+  const dispatch = useDispatch()
+  const { refreshed } = useSelector( state => state.accounts )
   useEffect( () => {
-    dispatch(blindRefresh())
+    dispatch( blindRefresh() )
   }, [] )
   const foundTransactions: RescannedTransactionData[] = useFoundTransactionsFromReScan()
   //const foundTransactions: RescannedTransactionData[] = sampleRescannedTransactionDetails
@@ -150,7 +149,7 @@ const WalletRescanningBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: Colors.white,
   },
 
@@ -163,11 +162,11 @@ const styles = StyleSheet.create( {
   mainContentContainer: {
     padding: 30,
     paddingBottom: 40,
-    flex: 1,
+    // flex: 1,
   },
 
   footerSectionContainer: {
-    marginTop: 'auto',
+    // marginTop: 'auto',
   },
 
   sectionDivider: {

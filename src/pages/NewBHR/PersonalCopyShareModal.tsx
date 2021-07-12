@@ -6,7 +6,6 @@ import {
   Image,
   FlatList,
   Platform,
-  AsyncStorage,
   TouchableOpacity,
 } from 'react-native'
 import {
@@ -127,7 +126,7 @@ export default function PersonalCopyShareModal( props ) {
           paddingBottom: hp( '1.5%' ),
           marginRight: 10,
           marginBottom: hp( '1.5%' ),
-          paddingTop: hp( '0.5%' ),
+          paddingTop: hp( '1.5%' ),
           alignItems: 'center',
           marginLeft: 20,
         }}
@@ -143,7 +142,7 @@ export default function PersonalCopyShareModal( props ) {
         </Text>
       </View>
       <View style={{
-        flex: 1
+        // flex: 1
       }}>
         <FlatList
           data={personalCopyShareOptions}
@@ -169,7 +168,7 @@ export default function PersonalCopyShareModal( props ) {
                   source={item.imageIcon}
                 />
                 <View style={{
-                  justifyContent: 'space-between', flex: 1
+                  justifyContent: 'space-between',
                 }}>
                   <Text style={styles.listElementsTitle}>{item.title}</Text>
                   <Text style={styles.listElementsInfo}>{item.info}</Text>
@@ -237,7 +236,7 @@ export default function PersonalCopyShareModal( props ) {
 
 const styles = StyleSheet.create( {
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
     width: '100%',
   },

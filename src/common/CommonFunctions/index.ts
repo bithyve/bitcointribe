@@ -1,17 +1,19 @@
-import { AsyncStorage } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import AccountShell from '../data/models/AccountShell'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
+import config from '../../bitcoin/HexaConfig'
+import { Alert } from 'react-native'
+import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
 
 export const nameToInitials = fullName => {
+  if( !fullName ) return
   const namesArray = fullName.split( ' ' )
   if ( namesArray.length === 1 ) return `${namesArray[ 0 ].charAt( 0 )}`
   else
-    return `${namesArray[ 0 ].charAt( 0 )}${namesArray[
-      namesArray.length - 1
-    ].charAt( 0 )}`
+    return `${namesArray[ 0 ].charAt( 0 )} ${namesArray[ namesArray.length - 1 ].charAt( 0 )}`
 }
 
 export const getCurrencyImageName = ( currencyCodeValue ) => {
@@ -104,7 +106,7 @@ const asyncDataToBackup = async () => {
   return ASYNC_DATA
 }
 
-function* stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) {
+export const stateDataToBackup = ( accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) => {
   // state data to backup
   const STATE_DATA = {
   }
@@ -122,6 +124,7 @@ function* stateDataToBackup( accountShells, activePersonalNode, versionHistory, 
 
   return STATE_DATA
 }
+
 export const CloudData = async ( database, accountShells, activePersonalNode, versionHistory, trustedContactsInfo ) => {
   let encryptedCloudDataJson
   const walletImage = {
@@ -148,7 +151,8 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
       walletImage.WALLET_SETUP = database.WALLET_SETUP
     walletImage.ASYNC_DATA = await asyncDataToBackup()
     walletImage.STATE_DATA = stateDataToBackup( accountShells, activePersonalNode, versionHistory, trustedContactsInfo )
-    const key = SSS.strechKey( database.WALLET_SETUP.security.answer )
+    // this has to be updated to keep the correct answer
+    const key = 'answer'//SSS.strechKey( database.WALLET_SETUP.security.answer )
     CloudDataJson = {
       walletImage,
       keeperInfo: [],
@@ -248,24 +252,6 @@ export const getCurrencyImageByRegion = (
   }
 }
 
-export const getKeeperInfoFromShareId = ( levelHealthVar: LevelHealthInterface[], shareId: string ) : {
-  shareType: string;
-  updatedAt: number;
-  status: string;
-  shareId: string;
-  reshareVersion?: number;
-  name?: string;
-} =>{
-  let index
-  for ( let i = 0; i < levelHealthVar.length; i++ ) {
-    const element = levelHealthVar[ i ]
-    index = element.levelInfo.findIndex( value=>value.shareId == shareId )
-    if( index>-1 ){
-      return element.levelInfo[ index ]
-    }
-  }
-}
-
 export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLevel: number ) : LevelInfo[] =>{
   if ( levelHealthVar[ currentLevel ] ) {
     if( levelHealthVar[ 1 ] ){
@@ -278,4 +264,98 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
     else return levelHealthVar[ 0 ].levelInfo
   }
   return levelHealthVar[ currentLevel - 1 ].levelInfo
+}
+
+export const processDL = async ( url ) =>{
+  const splits = url.split( '/' )
+
+  if ( splits.includes( 'swan' ) ) {
+    const swanRequest = {
+      url
+    }
+    return {
+      swanRequest
+    }
+  }
+
+  if ( splits[ 5 ] === 'sss' ) {
+    const requester = splits[ 4 ]
+
+    if ( splits[ 6 ] === 'ek' ) {
+      const custodyRequest = {
+        requester,
+        ek: splits[ 7 ],
+        uploadedAt: splits[ 8 ],
+      }
+      return custodyRequest
+    } else if ( splits[ 6 ] === 'rk' ) {
+      const recoveryRequest = {
+        requester, rk: splits[ 7 ]
+      }
+      return {
+        recoveryRequest
+      }
+    }
+  } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
+    if ( splits[ 3 ] !== config.APP_STAGE ) {
+      Alert.alert(
+        'Invalid deeplink',
+        `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
+          splits[ 3 ]
+        }`,
+      )
+    } else {
+      const version = splits.pop().slice( 1 )
+
+      if ( version ) {
+        if ( !( await checkAppVersionCompatibility( {
+          relayCheckMethod: splits[ 4 ],
+          version,
+        } ) ) ) {
+          return
+        }
+      }
+
+      const trustedContactRequest = {
+        isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
+        approvedTC: splits[ 4 ] === 'atcg' ? true : false,
+        isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
+        requester: splits[ 5 ],
+        encryptedKey: splits[ 6 ],
+        hintType: splits[ 7 ],
+        hint: splits[ 8 ],
+        uploadedAt: splits[ 9 ],
+        version,
+      }
+      return {
+        trustedContactRequest
+      }
+    }
+  } else if ( splits[ 4 ] === 'rk' ) {
+    const recoveryRequest = {
+      isRecovery: true,
+      requester: splits[ 5 ],
+      encryptedKey: splits[ 6 ],
+      hintType: splits[ 7 ],
+      hint: splits[ 8 ],
+    }
+    return {
+      recoveryRequest
+    }
+  } else if ( splits[ 4 ] === 'rrk' ) {
+    Alert.alert(
+      'Restoration link Identified',
+      'Restoration links only works during restoration mode',
+    )
+  } else if ( url.includes( 'fastbitcoins' ) ) {
+    const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
+    return {
+      userKey
+    }
+  } else {
+    const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
+    return {
+      EmailToken
+    }
+  }
 }

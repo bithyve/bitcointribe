@@ -282,6 +282,7 @@ export default function SendViaLink( props ) {
                 borderRadius: 8,
                 alignSelf: 'center',
               }}
+              delayPressIn={0}
             >
               <Text
                 style={{
@@ -444,6 +445,7 @@ export default function SendViaLink( props ) {
                     alignItems: 'center',
                   }}
                   activeOpacity={10}
+                  delayPressIn={0}
                   onPress={() => {
                     //setDropdownBoxOpenClose(!dropdownBoxOpenClose);
                   }}
@@ -609,6 +611,7 @@ export default function SendViaLink( props ) {
                         justifyContent: 'center',
                       }}
                       disabled={shareLink ? false : true}
+                      delayPressIn={0}
                     >
                       <View style={styles.modalElementInfoView}>
                         <View
@@ -694,7 +697,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
     alignSelf: 'center',
     width: '100%',

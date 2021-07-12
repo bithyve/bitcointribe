@@ -29,7 +29,8 @@ import {
   SUB_PRIMARY_ACCOUNT,
   SECURE_ACCOUNT,
   WYRE,
-  RAMP
+  RAMP,
+  SWAN
 } from '../../../common/constants/wallet-service-types'
 import { SIGNING_AXIOS, BH_AXIOS } from '../../../services/api'
 import _ from 'lodash'
@@ -1182,6 +1183,8 @@ export default class SecureHDWallet extends Bitcoin {
         case FAST_BITCOINS:
         case SUB_PRIMARY_ACCOUNT:
         case WYRE:
+        case RAMP:
+        case SWAN:
           const derivativeAcc: DerivativeAccount = this
             .derivativeAccounts[ accountType ]
           const inUse = derivativeAcc.instance.using
@@ -1199,25 +1202,6 @@ export default class SecureHDWallet extends Bitcoin {
           ] = updatedDervInstance
           accountId = updatedDervInstance.xpubId
           accountXpub = updatedDervInstance.xpub
-          break
-        case RAMP:
-          const rampDerivativeAcc: DerivativeAccount = this
-            .derivativeAccounts[ accountType ]
-          const rampInUse = rampDerivativeAcc.instance.using
-          accountNumber = rampInUse + 1
-          this.generateDerivativeXpub( accountType, accountNumber )
-          const rampDerivativeInstance: DerivativeAccountElements = this
-            .derivativeAccounts[ accountType ][ accountNumber ]
-          const rampUpdatedDervInstance = {
-            ...rampDerivativeInstance,
-            accountName: accountDetails.accountName,
-            accountDescription: accountDetails.accountDescription,
-          }
-          this.derivativeAccounts[ accountType ][
-            accountNumber
-          ] = rampUpdatedDervInstance
-          accountId = rampUpdatedDervInstance.xpubId
-          accountXpub = rampUpdatedDervInstance.xpub
           break
     }
 
@@ -1272,8 +1256,6 @@ export default class SecureHDWallet extends Bitcoin {
     description: string,
     configuration: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
     },
     disableAccount = false,
   ): Promise<{
@@ -1432,8 +1414,6 @@ export default class SecureHDWallet extends Bitcoin {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
-        displayTransactions: boolean;
-        displayTxDetails: boolean;
       };
       accountDetails?: {
         donee: string;

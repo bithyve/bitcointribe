@@ -8,9 +8,9 @@ import {
   TextInput,
   SafeAreaView,
   StatusBar,
-  AsyncStorage,
   Platform
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Colors from '../../common/Colors'
 import QuestionList from '../../common/QuestionList'
 import Fonts from '../../common/Fonts'
@@ -42,8 +42,8 @@ export default function RecoveryQuestionScreen( props ) {
     ( async () => {
       if ( initializeRecoveryCompleted ) {
         await AsyncStorage.setItem( 'recoveryExists', 'true' )
-        props.navigation.navigate( 'RestoreWithICloud' )
-        //props.navigation.navigate('RestoreSelectedContactsList');
+        //props.navigation.navigate( 'RestoreWithICloud' )
+        props.navigation.navigate( 'RestoreSelectedContactsList' )
       }
     } )()
   }, [ initializeRecoveryCompleted ] )

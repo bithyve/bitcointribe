@@ -171,44 +171,11 @@ export default class RelayServices {
     }
   };
 
-  public static sendDonationNote = async (
-    donationId: string,
-    txNote: { txId: string; note: string }
-  ): Promise<
-    | {
-        status: number;
-        data: {
-          added: boolean;
-        };
-        err?: undefined;
-        message?: undefined;
-      }
-    | {
-        status: number;
-        err: any;
-        message: string;
-        data?: undefined;
-      }
-  > => {
+  public static fetchFeeAndExchangeRates = async ( currencyCode ) => {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendDonationNote( donationId, txNote ),
-      }
-    } catch ( err ) {
-      return {
-        status: 0o1,
-        err: err.message,
-        message: 'Failed to deliver donation note',
-      }
-    }
-  };
-
-  public static fetchFeeAndExchangeRates = async () => {
-    try {
-      return {
-        status: config.STATUS.SUCCESS,
-        data: await Relay.fetchFeeAndExchangeRates(),
+        data: await Relay.fetchFeeAndExchangeRates( currencyCode ),
       }
     } catch ( err ) {
       return {
@@ -239,14 +206,116 @@ export default class RelayServices {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await Relay.sendKeeperNotifications(receivers, notification),
-      };
-    } catch (err) {
+        data: await Relay.sendKeeperNotifications( receivers, notification ),
+      }
+    } catch ( err ) {
       return {
         status: 0o1,
         err: err.message,
         message: 'Failed to deliver notifications',
-      };
+      }
+    }
+  };
+
+
+  public static getMessages = async (
+    walletID: string,
+    timeStamp: Date
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          messages: [];
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.getMessages( walletID, timeStamp ),
+      }
+    } catch ( err ) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to fetch notifications',
+      }
+    }
+  };
+
+  public static updateMessageStatus = async (
+    walletID: string,
+    data: []
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          updated: boolean;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.updateMessageStatus( walletID, data ),
+      }
+    } catch ( err ) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to update the FCMs on the server',
+      }
+    }
+  };
+
+  public static walletCheckIn = async (
+    currencyCode?: any,
+  ): Promise<
+    | {
+        status: number;
+        data: {
+          exchangeRates: { [currency: string]: number };
+          averageTxFees;
+        };
+        err?: undefined;
+        message?: undefined;
+      }
+    | {
+        status: number;
+        err: any;
+        message: string;
+        data?: undefined;
+      }
+  > => {
+    try {
+      return {
+        status: config.STATUS.SUCCESS,
+        data: await Relay.walletCheckIn(
+          currencyCode
+        ),
+      }
+    } catch ( err ) {
+      return {
+        status: 0o1,
+        err: err.message,
+        message: 'Failed to sync last seens',
+      }
     }
   };
 }

@@ -52,7 +52,7 @@ const AccountDetailsStack = createStackNavigator(
     },
   },
   {
-    mode: 'modal',
+    // mode: 'modal',
     initialRouteName: 'AccountDetailsRoot',
     defaultNavigationOptions: ( { navigation } ) => {
       return {

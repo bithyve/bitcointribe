@@ -1,5 +1,7 @@
+import { Platform } from 'react-native'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import { MetaShare } from '../../bitcoin/utilities/Interface'
+import { BackupStreamData, ChannelAssets, KeeperInfoInterface, LevelData, LevelInfo, MetaShare, PrimaryStreamData, SecondaryStreamData } from '../../bitcoin/utilities/Interface'
+import { LevelDataVar } from '../../common/CommonVars/commonVars'
 import { S3_SERVICE } from '../../common/constants/wallet-service-types'
 import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
@@ -8,27 +10,20 @@ import {
   GET_HEALTH_OBJECT,
   ERROR_SENDING,
   S3_LOADING_STATUS,
-  INIT_LOADING_STATUS,
-  UPDATE_MSHARE_LOADING_STATUS,
   MSHARES,
-  UPDATE_EFCHANNEL_LOADING_STATUS,
   IS_LEVEL_TWO_METASHARE,
   IS_LEVEL_THREE_METASHARE,
   IS_LEVEL2_INITIALIZED,
-  SHARE_RECEIVED,
-  DOWNLOADED_MSHARE_HEALTH,
   ERROR_RECEIVING_HEALTH,
   WALLET_RECOVERY_FAILED_HEALTH,
   WALLET_IMAGE_HEALTH_CHECKED,
   S3_LOADING_KEEPER,
   IS_LEVEL3_INITIALIZED,
   PDF_GENERATED,
-  ON_APPROVAL_STATUS_CHANGE,
   MNEMONIC_RECOVERED_HEALTH,
   DOWNLOADED_SM_SHARES,
   REMOVE_SN,
   SET_PDF_INFO,
-  DOWNLOADED_PDFSHARE_HEALTH,
   PUT_KEEPER_INFO,
   SM_META_SHARE_GENERATE,
   UPLOAD_SUCCESSFULLY_SM,
@@ -37,20 +32,13 @@ import {
   UPDATE_LEVEL_DATA,
   KEEPER_PROCESS_STATUS,
   PDF_SUCCESSFULLY_CREATED,
-  IS_LEVEL_TO_NOT_SETUP
-
+  IS_LEVEL_TO_NOT_SETUP,
+  SET_CHANNEL_ASSETS,
+  APPROVAL_STATUS,
+  DOWNLOADED_BACKUP_DATA,
+  SET_IS_KEEPER_INFO_UPDATED
 } from '../actions/health'
 import { SERVICES_ENRICHED } from '../actions/storage'
-interface obj {
-  shareType: string
-  updatedAt: number
-  status: string
-  shareId: string
-  reshareVersion: number
-  name: string
-  data: any;
-  uuid: string
-}
 
 const initialState: {
   mnemonic: string;
@@ -60,17 +48,17 @@ const initialState: {
     checkMSharesHealth: Boolean;
     initLoader: Boolean;
     updateMSharesHealth: Boolean;
-    updateEFChannelStatus: Boolean;
-    uploadMetaShare: Boolean;
-    approvalRequest: Boolean;
-    reshareWithSameKeeper: Boolean;
-    keeperSetupStatus: Boolean;
-    autoShareContact: Boolean;
+    autoShareKeepersData: Boolean;
     pdfDataProcess: Boolean;
     pdfShare: Boolean;
     pdfDataConfirm: Boolean;
-    uploadRequestedShare: Boolean;
-    downloadSmShare: boolean;
+    modifyLevelDataStatus: boolean;
+    healthExpiryStatus: boolean;
+    setToBaseStatus: boolean;
+    createChannelAssetsStatus: boolean;
+    downloadSMShareLoader: boolean;
+    downloadBackupDataStatus: boolean;
+    updateKIToChStatus: boolean;
   };
   walletRecoveryFailed: Boolean;
   walletImageChecked: Boolean;
@@ -82,68 +70,36 @@ const initialState: {
   isLevel3Initialized: Boolean;
   levelHealth: {
     level: number;
-    levelInfo: {
-      shareType: string;
-      updatedAt: string;
-      status: string;
-      shareId: string;
-      reshareVersion?: number;
-      name?: string;
-    }[];
+    levelInfo: LevelInfo[];
   }[];
-  keeperInfo: {
-    shareId: string;
-    name: string;
-    uuid: string;
-    publicKey: string;
-    ephemeralAddress: string;
-    type: string;
-    data?: any;
-  }[];
+  keeperInfo: KeeperInfoInterface[];
   shares: any;
   metaShare: MetaShare;
-  downloadedMShare: {
-    [otp: string]: { status: Boolean; err?: String };
-  };
-  downloadedPdfShare: {
-    [otp: string]: { status: Boolean; err?: String };
-  };
   errorReceiving: Boolean;
-  keeperApproveStatus: {
-    status: Boolean;
-    initiatedAt: number;
-    shareId: string;
-    secondaryShare?: MetaShare;
-    transferDetails?: {
-      key: string;
-      otp: string;
-    }
-  }
   secondaryShareDownloaded: any;
   pdfInfo: {
     filePath: string;
-    publicKey: string;
-    privateKey: string;
+    shareId: string;
     updatedAt: number;
   },
   isSmMetaSharesCreatedFlag: boolean;
   hasSMUploadedSuccessfully: Boolean;
   cloudPermissionGranted: Boolean;
   newBHRFlowStarted: boolean;
-  levelData: {
-    levelName: string
-    status: string
-    keeper1ButtonText: string
-    keeper2ButtonText: string
-    keeper1: obj,
-    keeper2: obj,
-    note:string
-    info:string
-    id: number
-  }[];
+  shieldHealth: boolean;
+  levelData: LevelData[];
   keeperProcessStatus: string;
   pdfCreatedSuccessfully: boolean;
   isLevelToNotSetupStatus: boolean;
+  channelAssets: ChannelAssets;
+  approvalStatus: boolean;
+  downloadedBackupData: {
+    primaryData?: PrimaryStreamData;
+    backupData?: BackupStreamData;
+    secondaryData?: SecondaryStreamData;
+  }[];
+  isKeeperInfoUpdated2: boolean;
+  isKeeperInfoUpdated3: boolean;
 } = {
   mnemonic: '',
   service: null,
@@ -152,17 +108,17 @@ const initialState: {
     checkMSharesHealth: false,
     initLoader: false,
     updateMSharesHealth: false,
-    updateEFChannelStatus: false,
-    uploadMetaShare: false,
-    approvalRequest: false,
-    reshareWithSameKeeper: false,
-    keeperSetupStatus: false,
-    autoShareContact: false,
+    autoShareKeepersData: false,
     pdfDataProcess: false,
     pdfShare: false,
     pdfDataConfirm: false,
-    uploadRequestedShare: false,
-    downloadSmShare: false,
+    modifyLevelDataStatus: false,
+    healthExpiryStatus: false,
+    setToBaseStatus: false,
+    createChannelAssetsStatus: false,
+    downloadSMShareLoader: false,
+    downloadBackupDataStatus: false,
+    updateKIToChStatus: false,
   },
   walletRecoveryFailed: false,
   walletImageChecked: false,
@@ -176,33 +132,28 @@ const initialState: {
   shares: null,
   keeperInfo: [],
   metaShare: null,
-  downloadedMShare: {
-  },
-  downloadedPdfShare: {
-  },
   errorReceiving: false,
-  keeperApproveStatus: {
-    status: false,
-    initiatedAt: 0,
-    shareId: '',
-    secondaryShare: null,
-    transferDetails: null
-  },
   secondaryShareDownloaded: null,
   pdfInfo: {
     filePath: '',
-    publicKey: '',
-    privateKey: '',
+    shareId: '',
     updatedAt: 0
   },
   isSmMetaSharesCreatedFlag: false,
   hasSMUploadedSuccessfully: false,
   cloudPermissionGranted: null,
   newBHRFlowStarted: false,
-  levelData: null,
+  shieldHealth: false,
+  levelData: LevelDataVar,
   keeperProcessStatus: '',
   pdfCreatedSuccessfully: false,
-  isLevelToNotSetupStatus: false
+  isLevelToNotSetupStatus: false,
+  channelAssets: {
+  },
+  approvalStatus: false,
+  downloadedBackupData: [],
+  isKeeperInfoUpdated2: false,
+  isKeeperInfoUpdated3: false,
 }
 
 export default ( state = initialState, action ) => {
@@ -253,37 +204,10 @@ export default ( state = initialState, action ) => {
           },
         }
 
-      case INIT_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            initLoader: action.payload.beingLoaded,
-          },
-        }
-
-      case UPDATE_MSHARE_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            updateMSharesHealth: action.payload.beingLoaded,
-          },
-        }
-
       case MSHARES:
         return {
           ...state,
           shares: action.payload.shares,
-        }
-
-      case UPDATE_EFCHANNEL_LOADING_STATUS:
-        return {
-          ...state,
-          loading: {
-            ...state.loading,
-            updateEFChannelStatus: action.payload.beingLoaded,
-          },
         }
 
       case IS_LEVEL_TWO_METASHARE:
@@ -314,36 +238,6 @@ export default ( state = initialState, action ) => {
         return {
           ...state,
           isLevel3Initialized: true,
-        }
-
-      case SHARE_RECEIVED:
-        return {
-          ...state,
-          metaShare: action.payload.metaShare,
-        }
-
-      case DOWNLOADED_MSHARE_HEALTH:
-        return {
-          ...state,
-          downloadedMShare: {
-            ...state.downloadedMShare,
-            [ action.payload.otp ]: {
-              status: action.payload.status,
-              err: action.payload.err,
-            },
-          },
-        }
-
-      case DOWNLOADED_PDFSHARE_HEALTH:
-        return {
-          ...state,
-          downloadedPdfShare: {
-            ...state.downloadedPdfShare,
-            [ action.payload.otp ]: {
-              status: action.payload.status,
-              err: action.payload.err,
-            },
-          },
         }
 
       case ERROR_RECEIVING_HEALTH:
@@ -390,18 +284,6 @@ export default ( state = initialState, action ) => {
           },
         }
 
-      case ON_APPROVAL_STATUS_CHANGE:
-        return {
-          ...state,
-          keeperApproveStatus: {
-            status: action.payload.status,
-            initiatedAt: action.payload.initiatedAt,
-            shareId: action.payload.shareId,
-            secondaryShare: action.payload.secondaryShare,
-            transferDetails: action.payload.transferDetails,
-          },
-        }
-
       case MNEMONIC_RECOVERED_HEALTH:
         return {
           ...state,
@@ -421,6 +303,7 @@ export default ( state = initialState, action ) => {
         }
 
       case SET_PDF_INFO:
+        console.log( 'action.payload.data', action.payload.data )
         return {
           ...state,
           pdfInfo: action.payload.data,
@@ -452,7 +335,8 @@ export default ( state = initialState, action ) => {
       case UPDATE_LEVEL_DATA:
         return {
           ...state,
-          levelData: action.payload.levelData
+          levelData: action.payload.levelData,
+          shieldHealth: action.payload.shieldHealth
         }
 
       case KEEPER_PROCESS_STATUS:
@@ -472,6 +356,32 @@ export default ( state = initialState, action ) => {
           ...state,
           isLevelToNotSetupStatus: action.payload.status
         }
+
+      case SET_CHANNEL_ASSETS:
+        return {
+          ...state,
+          channelAssets: action.payload.channelAssets
+        }
+
+      case APPROVAL_STATUS:
+        return {
+          ...state,
+          approvalStatus: action.payload.flag
+        }
+
+      case DOWNLOADED_BACKUP_DATA:
+        return {
+          ...state,
+          downloadedBackupData: action.payload.downloadedBackupData
+        }
+
+      case SET_IS_KEEPER_INFO_UPDATED:
+        return {
+          ...state,
+          isKeeperInfoUpdated2: action.payload.isKeeperInfoUpdated2 ? action.payload.isKeeperInfoUpdated2 : state.isKeeperInfoUpdated2,
+          isKeeperInfoUpdated3: action.payload.isKeeperInfoUpdated3 ? action.payload.isKeeperInfoUpdated3 : state.isKeeperInfoUpdated3
+        }
+
   }
   return state
 }

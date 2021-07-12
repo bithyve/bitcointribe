@@ -25,11 +25,10 @@ import { SafeAreaView } from 'react-navigation'
 import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import SmallNavHeaderCloseButton from '../../../components/navigation/SmallNavHeaderCloseButton'
 import { BaseNavigationProp } from '../../../navigation/Navigator'
+import { DonationAccount } from '../../../bitcoin/utilities/Interface'
 
 export type NavigationParams = {
   account: Record<string, unknown>;
-  serviceType: string;
-  accountNumber: number;
 };
 
 export type NavigationProp = {
@@ -42,16 +41,8 @@ export type Props = {
 
 const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
-  const {
-    donationAccount,
-    serviceType,
-    accountNumber,
-  } = useMemo( () => {
-    return {
-      donationAccount: navigation.getParam( 'account' ),
-      serviceType: navigation.getParam( 'serviceType' ),
-      accountNumber: navigation.getParam( 'accountNumber' ),
-    }
+  const donationAccount: DonationAccount = useMemo( () => {
+    return navigation.getParam( 'account' )
   }, [ navigation.params ] )
 
 
@@ -59,19 +50,10 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     donationAccount.configuration.displayBalance
   )
 
-  const [
-    isDonationTransactionEnable,
-    setIsDonationTransactionEnable,
-  ] = useState( donationAccount.configuration.displayTransactions )
-
-  const [ hideTxDetails, setHideTxDetails ] = useState(
-    !donationAccount.configuration.displayTxDetails,
-  )
-
   const [ disableSave, setDisableSave ] = useState( true )
   const [ doneeName, setDoneeName ] = useState( donationAccount.donee )
-  const [ description, setDescription ] = useState( donationAccount.description )
-  const [ cause, setCause ] = useState( donationAccount.subject )
+  const [ description, setDescription ] = useState( donationAccount.accountDescription )
+  const [ cause, setCause ] = useState( donationAccount.accountName )
 
   const [ isDonationPause, setIsDonationPause ] = useState(
     donationAccount.disableAccount ? donationAccount.disableAccount : false,
@@ -93,15 +75,10 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     }
 
     if (
-      isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        donationAccount.configuration.displayTransactions ||
-      !hideTxDetails !== donationAccount.configuration.displayTxDetails
+      isDonationTotalEnable !== donationAccount.configuration.displayBalance
     ) {
       const configuration = {
         displayBalance: isDonationTotalEnable,
-        displayTransactions: isDonationTransactionEnable,
-        displayTxDetails: !hideTxDetails,
       }
 
       preferences = preferences
@@ -115,13 +92,13 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
 
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.description ) ||
-      ( cause && cause !== donationAccount.subject )
+      ( description && description !== donationAccount.accountDescription ) ||
+      ( cause && cause !== donationAccount.accountName )
     ) {
       const accountDetails = {
         donee: doneeName ? doneeName : donationAccount.donee,
-        subject: cause ? cause : donationAccount.subject,
-        description: description ? description : donationAccount.description,
+        subject: cause ? cause : donationAccount.accountName,
+        description: description ? description : donationAccount.accountDescription,
       }
       preferences = preferences
         ? {
@@ -135,7 +112,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     if ( preferences ) {
       Toast( 'Your preferences would be updated shortly' )
       dispatch(
-        updateDonationPreferences( serviceType, accountNumber, preferences ),
+        updateDonationPreferences( donationAccount, preferences ),
       )
       setDisableSave( true )
     }
@@ -144,12 +121,9 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
   useEffect( () => {
     if (
       ( doneeName && doneeName !== donationAccount.donee ) ||
-      ( description && description !== donationAccount.description ) ||
-      ( cause && cause !== donationAccount.subject ) ||
+      ( description && description !== donationAccount.accountDescription ) ||
+      ( cause && cause !== donationAccount.accountName ) ||
       isDonationTotalEnable !== donationAccount.configuration.displayBalance ||
-      isDonationTransactionEnable !==
-        donationAccount.configuration.displayTransactions ||
-      !hideTxDetails !== donationAccount.configuration.displayTxDetails ||
       isDonationPause !== donationAccount.disableAccount
     ) {
       setDisableSave( false )
@@ -161,9 +135,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
     description,
     cause,
     isDonationPause,
-    hideTxDetails,
     isDonationTotalEnable,
-    isDonationTransactionEnable,
   ] )
 
   return (
@@ -178,7 +150,7 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
         <ScrollView>
 
           <View style={{
-            ...NavStyles.modalHeaderTitleView, paddingHorizontal: 0
+            ...NavStyles.modalHeaderTitleView, paddingHorizontal: 0, justifyContent: 'space-between'
           }}>
             <View style={{
               flexDirection: 'row', alignItems: 'center'
@@ -327,81 +299,6 @@ const DonationAccountWebViewSettingsScreen: React.FC<Props> = ( { navigation, }:
                   setIsDonationTotalEnable( ( prevState ) => !prevState )
                 }
                 isOn={isDonationTotalEnable}
-              />
-            </View>
-            <View style={styles.rowContainer}>
-              <Image
-                style={styles.imageStyle}
-                source={require( '../../../assets/images/icons/icon_donation_transactions.png' )}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Show Transactions</Text>
-                <Text
-                  style={{
-                    ...styles.modalInfoText,
-                    marginTop: wp( '1.2%' ),
-                    color: Colors.lightTextColor,
-                  }}
-                >
-                  Show / hide transactions on web view
-                </Text>
-              </View>
-              <CurrencyKindToggleSwitch
-                changeSettingToggle={true}
-                thumbSize={wp( '6%' )}
-                isNotImage={true}
-                trackColor={Colors.lightBlue}
-                thumbColor={
-                  isDonationTransactionEnable ? Colors.blue : Colors.white
-                }
-                onpress={() =>
-                  setIsDonationTransactionEnable( ( prevState ) => !prevState )
-                }
-                isOn={isDonationTransactionEnable}
-              />
-            </View>
-
-            <View style={styles.rowContainer}>
-              <View
-                style={{
-                  ...styles.circleShapeView,
-                  backgroundColor: Colors.lightBlue,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: 'center',
-                    fontSize: RFValue( 20 ),
-                    color: Colors.white,
-                    lineHeight: RFValue( 20 ), //... One for top and one for bottom alignment
-                  }}
-                >
-                  @
-                </Text>
-              </View>
-
-              <View style={styles.textContainer}>
-                <Text style={styles.titleTextStyle}>Hide Transaction ID</Text>
-                <Text
-                  style={{
-                    ...styles.modalInfoText,
-                    marginTop: wp( '1.2%' ),
-                    color: Colors.lightTextColor,
-                  }}
-                >
-                  Show / hide transaction ID on the web view
-                </Text>
-              </View>
-              <CurrencyKindToggleSwitch
-                changeSettingToggle={true}
-                thumbSize={wp( '6%' )}
-                isNotImage={true}
-                trackColor={Colors.lightBlue}
-                thumbColor={hideTxDetails ? Colors.blue : Colors.white}
-                onpress={() => setHideTxDetails( ( prevState ) => !prevState )}
-                isOn={hideTxDetails}
               />
             </View>
 

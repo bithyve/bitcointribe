@@ -5,6 +5,7 @@ import {
   DB_INSERTED,
   KEY_FETCHED,
   SERVICES_INITIALIZED,
+  UPDATE_WALLET,
 } from '../actions/storage'
 import { Database } from '../../common/interfaces/Interfaces'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -12,10 +13,11 @@ import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import { COMPLETED_WALLET_SETUP } from '../actions/setupAndAuth'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 const initialState: {
+  wallet: Wallet;
   databaseInitialized: Boolean;
   insertedIntoDB: Boolean;
   key: String;
@@ -28,9 +30,9 @@ const initialState: {
     secureAcc: SecureAccount;
     s3Service: S3Service;
     trustedContacts: TrustedContactsService;
-    keepersInfo: KeeperService;
   };
 } = {
+  wallet: null,
   databaseInitialized: false,
   insertedIntoDB: false,
   key: '',
@@ -45,6 +47,12 @@ const initialState: {
 
 export default ( state = initialState, action ) => {
   switch ( action.type ) {
+
+      case UPDATE_WALLET:
+        return chain( state )
+          .setIn( [ 'wallet' ], action.payload.wallet )
+          .value()
+
       case DB_INITIALIZED:
         return chain( state )
           .setIn( [ 'databaseInitialized' ], action.payload.initialized )

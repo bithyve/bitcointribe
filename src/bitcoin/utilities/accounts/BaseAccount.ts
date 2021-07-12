@@ -11,7 +11,9 @@ import {
   ScannedAddressKind,
   AverageTxFees,
   TransactionPrerequisiteElements,
+  ContactDetails,
 } from '../Interface'
+import AccountUtilities from './AccountUtilities'
 
 export default class BaseAccount {
   public hdWallet: HDSegwitWallet;
@@ -63,8 +65,8 @@ export default class BaseAccount {
       mnemonic,
       passphrase,
       dPathPurpose,
-      stateVars,
       network,
+      stateVars,
     )
   }
 
@@ -135,7 +137,7 @@ export default class BaseAccount {
     },
   ): {
     paymentURI: string;
-  } => this.hdWallet.generatePaymentURI( address, options );
+  } => AccountUtilities.generatePaymentURI( address, options );
 
   public decodePaymentURI = (
     paymentURI: string,
@@ -146,13 +148,13 @@ export default class BaseAccount {
       label?: string;
       message?: string;
     };
-  } => this.hdWallet.decodePaymentURI( paymentURI );
+  } => AccountUtilities.decodePaymentURI( paymentURI );
 
   public addressDiff = (
     scannedStr: string,
   ): {
       type: ScannedAddressKind | null;
-  } => this.hdWallet.addressDiff( scannedStr );
+  } => AccountUtilities.addressDiff( scannedStr, this.hdWallet.network );
 
   public getReceivingAddress = (
     derivativeAccountType?: string,
@@ -316,7 +318,8 @@ export default class BaseAccount {
   public setupDerivativeAccount = (
     accountType: string,
     accountDetails?: { accountName?: string; accountDescription?: string },
-    contactName?: string
+    contactDetails?: ContactDetails,
+    channelKey?: string
   ):
     | {
         status: number;
@@ -337,7 +340,7 @@ export default class BaseAccount {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactName ),
+        data: this.hdWallet.setupDerivativeAccount( accountType, accountDetails, contactDetails, channelKey ),
       }
     } catch ( err ) {
       return {
@@ -392,8 +395,6 @@ export default class BaseAccount {
     description: string,
     configuration: {
       displayBalance: boolean;
-      displayTransactions: boolean;
-      displayTxDetails: boolean;
     },
     disableAccount?: boolean,
   ): Promise<
@@ -441,8 +442,6 @@ export default class BaseAccount {
       disableAccount?: boolean;
       configuration?: {
         displayBalance: boolean;
-        displayTransactions: boolean;
-        displayTxDetails: boolean;
       };
       accountDetails?: {
         donee: string;
@@ -514,7 +513,7 @@ export default class BaseAccount {
   };
 
   public isValidAddress = ( recipientAddress: string ): boolean =>
-    this.hdWallet.isValidAddress( recipientAddress );
+    AccountUtilities.isValidAddress( recipientAddress, this.hdWallet.network );
 
   public getBalanceTransactions = async ( hardRefresh?: boolean, blindRefresh?: boolean ): Promise<
     | {
@@ -748,7 +747,7 @@ export default class BaseAccount {
 
       const txHex = signedTxb.build().toHex()
       // console.log({ txHex });
-      const { txid } = await this.hdWallet.broadcastTransaction( txHex )
+      const { txid } = await AccountUtilities.broadcastTransaction( txHex, this.hdWallet.network )
       if( txid ){
         // chip consumed utxos
         this.hdWallet.removeConsumedUTXOs( inputs, derivativeAccountDetails )

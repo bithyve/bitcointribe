@@ -8,11 +8,11 @@ import {
   StatusBar,
   Platform,
   ImageBackground,
-  AsyncStorage,
   TextInput,
   KeyboardAvoidingView,
   BackHandler,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import Fonts from '../../common/Fonts'
 import DeviceInfo from 'react-native-device-info'
 import NavStyles from '../../common/Styles/NavStyles'
@@ -233,7 +233,7 @@ const PairNewWallet = ( props ) => {
         cancelButtonText={'Back'}
         onPressIgnore={() => { }}
         isBottomImage={true}
-        bottomImage={require( '../../assets/images/icons/illustration.png' )}
+        bottomImage={require( '../../assets/images/icons/success.png' )}
       />
     )
   }, [ FBTCAccount_Data ] )

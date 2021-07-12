@@ -9,10 +9,10 @@ import {
   Text,
   Image,
   Platform,
-  AsyncStorage,
   Alert,
   RefreshControl,
 } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import Fonts from '../../common/Fonts'
@@ -484,7 +484,7 @@ export default function RestoreSelectedContactsList( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            props.navigation.navigate( 'WalletInitialization' )
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

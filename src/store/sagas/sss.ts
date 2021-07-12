@@ -68,11 +68,11 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import generatePDF from '../utils/generatePDF'
 import HealthStatus from '../../bitcoin/utilities/sss/HealthStatus'
-import { AsyncStorage, Platform, NativeModules } from 'react-native'
+import { Platform, NativeModules } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   updateEphemeralChannel,
   updateTrustedChannel,
-  updateTrustedContactsInfoLocally,
 } from '../actions/trustedContacts'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
@@ -85,7 +85,6 @@ import Toast from '../../components/Toast'
 import Mailer from 'react-native-mail'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
-import KeeperService from '../../bitcoin/services/KeeperService'
 import {
   remapAccountShells,
   restoredAccountShells,
@@ -128,8 +127,12 @@ function* generateMetaSharesWorker() {
   if ( !secondaryMnemonic || !twoFASecret ) {
     throw new Error( 'secure assets missing; staticNonPMDD' )
   }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs
-
+  let secondary = ''
+  let bh = ''
+  if ( secureAccount && secureAccount.secureHDWallet && secureAccount.secureHDWallet.xpubs ) {
+    secondary = secureAccount.secureHDWallet.xpubs.secondary
+    bh = secureAccount.secureHDWallet.xpubs.bh
+  }
   const secureAssets = {
     secondaryMnemonic,
     twoFASecret,
@@ -221,10 +224,6 @@ function* uploadEncMetaShareWorker( { payload } ) {
     )
     console.log( 'trustedContacts', trustedContacts )
 
-    const keepersInfo: KeeperService = yield select(
-      ( state ) => state.keeper.service,
-    )
-    console.log( 'keepersInfo', keepersInfo )
     const regularService: RegularAccount = yield select(
       ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
     )
@@ -348,7 +347,6 @@ function* uploadEncMetaShareWorker( { payload } ) {
         REGULAR_ACCOUNT: JSON.stringify( regularService ),
         S3_SERVICE: JSON.stringify( s3Service ),
         TRUSTED_CONTACTS: JSON.stringify( trustedContacts ),
-        KEEPERS_INFO: JSON.stringify( keepersInfo ),
       }
       console.log( 'updatedSERVICES', updatedSERVICES )
       const updatedBackup = {
@@ -741,7 +739,12 @@ function* generatePersonalCopyWorker( { payload } ) {
       'Personal copies generation failed; secondary mnemonic missing',
     )
   }
-  const { secondary, bh } = secureAccount.secureHDWallet.xpubs
+  let secondary = ''
+  let bh = ''
+  if ( secureAccount && secureAccount.secureHDWallet && secureAccount.secureHDWallet.xpubs ) {
+    secondary = secureAccount.secureHDWallet.xpubs.secondary
+    bh = secureAccount.secureHDWallet.xpubs.bh
+  }
   const secureAssets = {
     secondaryMnemonic: secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : '',
     secondaryXpub: secureAccount.secureHDWallet.xpubs && secureAccount.secureHDWallet.xpubs.secondary ? secureAccount.secureHDWallet.xpubs.secondary : '',
@@ -1837,7 +1840,7 @@ const asyncDataToBackup = async () => {
 function* stateDataToBackup() {
   // state data to backup
   const accountShells = yield select( ( state ) => state.accounts.accountShells )
-  const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
+  // const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
   const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
 
   const versionHistory = yield select(
@@ -1854,8 +1857,8 @@ function* stateDataToBackup() {
   if ( accountShells && accountShells.length )
     STATE_DATA[ 'accountShells' ] = JSON.stringify( accountShells )
 
-  if ( trustedContactsInfo && trustedContactsInfo.length )
-    STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
+  // if ( trustedContactsInfo && trustedContactsInfo.length )
+  //   STATE_DATA[ 'trustedContactsInfo' ] = JSON.stringify( trustedContactsInfo )
 
   if ( activePersonalNode )
     STATE_DATA[ 'activePersonalNode' ] = JSON.stringify( activePersonalNode )
@@ -2028,11 +2031,11 @@ function* fetchWalletImageWorker( { payload } ) {
         console.log( 'restoring to async: ', key )
         yield call( AsyncStorage.setItem, key, ASYNC_DATA[ key ] )
 
-        if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
-          // supports legacy trustedContactsInfo; backed up as a part of async data(for versions < 1.5.0)
-          const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
-          yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
-        }
+        // if ( key === 'TrustedContactsInfo' && ASYNC_DATA[ key ] ) {
+        //   // supports legacy trustedContactsInfo; backed up as a part of async data(for versions < 1.5.0)
+        //   const trustedContactsInfo = JSON.parse( ASYNC_DATA[ key ] )
+        //   yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
+        // }
       }
     }
 
@@ -2048,10 +2051,10 @@ function* fetchWalletImageWorker( { payload } ) {
               } ) )
               break
 
-            case 'trustedContactsInfo':
-              const trustedContactsInfo = JSON.parse( STATE_DATA[ key ] )
-              yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
-              break
+              // case 'trustedContactsInfo':
+              //   const trustedContactsInfo = JSON.parse( STATE_DATA[ key ] )
+              //   yield put( updateTrustedContactsInfoLocally( trustedContactsInfo ) )
+              //   break
 
             case 'activePersonalNode':
               const activePersonalNode: PersonalNode = JSON.parse( STATE_DATA[ key ] )

@@ -107,7 +107,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
   useEffect( ()=>{
     if( isSendingMax && sendMaxFee ){
       const sendMaxAmount = remainingSpendableBalance
-      const convertedFiatAmount = convertSatsToFiat( sendMaxAmount )
+      const convertedFiatAmount = convertSatsToFiat( sendMaxAmount ).toFixed( 2 )
 
       setCurrentFiatAmountTextValue( String( convertedFiatAmount ) )
       setCurrentSatsAmountTextValue( String( sendMaxAmount ) )
@@ -169,10 +169,12 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             returnKeyType="done"
             keyboardType={'numeric'}
             onChangeText={( value ) => {
-              if( isSendingMax ) setIsSendingMax( false )
-              setCurrentFiatAmountTextValue( value )
-              setCurrentSatsAmountTextValue( String( convertFiatToSats( Number( value ) ?? 0 ) ) )
-              onAmountChanged( convertFiatToSats( Number( value ) ?? 0 ) )
+              if( !isNaN( Number( value ) ) ) {
+                if( isSendingMax ) setIsSendingMax( false )
+                setCurrentFiatAmountTextValue( value.split( '.' ).map( ( el, i )=>i?el.split( '' ).slice( 0, 2 ).join( '' ):el ).join( '.' ) )
+                setCurrentSatsAmountTextValue( String( Math.round( convertFiatToSats( Number( value ) ?? 0 ) ) ) )
+                onAmountChanged( convertFiatToSats( Number( value ) ?? 0 ) )
+              }
             }}
             onFocus={() => {
               // this.setState({
@@ -257,10 +259,13 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             returnKeyType="done"
             keyboardType={'numeric'}
             onChangeText={( value ) => {
-              setIsSendingMax( false )
-              setCurrentSatsAmountTextValue( value )
-              setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ) ) )
-              onAmountChanged( Number( value ) ?? 0 )
+              const regEx = /^[0-9]+$/
+              if( regEx.test( value ) ) {
+                setIsSendingMax( false )
+                setCurrentSatsAmountTextValue( value )
+                setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ).toFixed( 2 ) ) )
+                onAmountChanged( Number( value ) ?? 0 )
+              }
             }}
             onFocus={() => {
               // this.setState({
@@ -287,7 +292,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
                   style={{
                     color: Colors.blue,
                     textAlign: 'center',
-                    paddingHorizontal: 10,
+                    paddingRight: 10,
                     fontSize: RFValue( 10 ),
                     fontFamily: Fonts.FiraSansItalic,
                   }}
@@ -329,7 +334,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
           )}
           isOn={currencyKindForEntry == CurrencyKind.BITCOIN}
           isVertical={true}
-          disabled={exchangeRates ? false : true}
+          disabled={exchangeRates && exchangeRates[ currencyCode ] ? false : true}
         />
       </View>
     </View >
@@ -362,6 +367,7 @@ const styles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansMedium,
     fontSize: RFValue( 13 ),
+    padding: 0,
   },
 
   textBoxImage: {

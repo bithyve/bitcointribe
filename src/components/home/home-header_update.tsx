@@ -39,6 +39,10 @@ import S3Service from '../../bitcoin/services/sss/S3Service'
 import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
 import KeeperProcessStatus from '../../common/data/enums/KeeperProcessStatus'
+import MaterialCurrencyCodeIcon, {
+  materialIconCurrencyCodes,
+} from '../MaterialCurrencyCodeIcon'
+import useCurrencyCode from '../../utils/hooks/state-selectors/UseCurrencyCode'
 
 function setCurrencyCodeToImage( currencyName, currencyColor ) {
   return (
@@ -59,6 +63,7 @@ function setCurrencyCodeToImage( currencyName, currencyColor ) {
 
 const HomeHeader = ( {
   onPressNotifications,
+  navigateToQRScreen,
   notificationData,
   walletName,
   netBalance,
@@ -68,6 +73,7 @@ const HomeHeader = ( {
   navigation,
   currentLevel,
 } ) => {
+  const fiatCurrencyCode = useCurrencyCode()
   const levelHealth: LevelHealthInterface[] = useSelector(
     ( state ) => state.health.levelHealth
   )
@@ -93,48 +99,34 @@ const HomeHeader = ( {
   )
 
   const getMessage = () => {
-    const { messageOne, messageTwo, isFirstMessageBold } = getMessageToShow()
-    if ( isFirstMessageBold ) {
-      return (
-        <View
+    const { messageOne, messageTwo, isFirstMessageBold, isError } = getMessageToShow()
+    return <View style={{
+      flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
+    }}>
+      <View style={{
+        backgroundColor: isError ? Colors.red : Colors.green,
+        width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
+        alignItems:'center',
+        justifyContent: 'center'
+      }}>
+        <Image
+          source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' )}
           style={{
-            flexDirection: 'row',
-            width: wp( '57%' ),
-            alignItems: 'flex-end',
+            width: wp( '4%' ), height: wp( '4%' ),
           }}
-        >
-          <Text
-            numberOfLines={1}
-            style={styles.manageBackupMessageTextHighlight}
-          >
-            {messageOne}
-          </Text>
-          <Text
-            numberOfLines={1}
-            style={{
-              ...styles.manageBackupMessageText, flex: 1
-            }}
-          >
-            {messageTwo}
-          </Text>
-        </View>
-      )
-    } else {
-      return (
-        <View
-          style={{
-            flexDirection: 'row',
-            width: wp( '57%' ),
-            alignItems: 'flex-end',
-          }}
-        >
-          <Text style={styles.manageBackupMessageText}>{messageOne}</Text>
-          <Text numberOfLines={1} style={styles.manageBackupMessageTextHighlight}>
-            {messageTwo}
-          </Text>
-        </View>
-      )
-    }
+          resizeMode={'contain'}
+        />
+      </View>
+      {isFirstMessageBold ? <Text style={{
+        color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+      }}><Text style={{
+          fontFamily: Fonts.FiraSansMediumItalic
+        }}>{messageOne}</Text>{messageTwo}</Text> : <Text style={{
+        color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+      }}>{messageOne} <Text style={{
+          fontFamily: Fonts.FiraSansMediumItalic
+        }}>{messageTwo}</Text></Text>}
+    </View>
   }
 
   useEffect( () => {
@@ -150,105 +142,43 @@ const HomeHeader = ( {
     if( levelData ){
       for ( let i = 0; i < levelData.length; i++ ) {
         const element = levelData[ i ]
-        if( element.keeper1.name && element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ){
+        if( element.keeper1.name && element.keeper1.status == 'notAccessible' ){
           return {
-            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
+            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.', isError: true
           }
         }
-        if( element.keeper2.name && element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ){
+        if( element.keeper2.name && element.keeper2.status == 'notAccessible' ){
           return {
-            isFirstMessageBold: true, messageOne: element.keeper1.name, messageTwo: ' needs your attention.'
-          }
-        }
-        if( currentLevel == 0 ){
-          return {
-            isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
-          }
-        }
-        if( currentLevel === 1 ){
-          return {
-            isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: ''
-          }
-        } else if( currentLevel === 2 ){
-          return {
-            isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: ''
-          }
-        } else if( currentLevel == 3 ){
-          return {
-            isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: ''
+            isFirstMessageBold: true, messageOne: element.keeper2.name, messageTwo: ' needs your attention.', isError: true
           }
         }
       }
-    } else
-    {
-      let name = ''
-      let message = ''
-      if ( levelHealth.length ) {
-        for ( let i = 0; i < levelHealth.length; i++ ) {
-          const element = levelHealth[ i ].levelInfo
-          let j = 0
-          if ( currentLevel == 1 && i == 1 ) j = 2
-          else if ( currentLevel == 2 && i == 2 ) j = 4
-          for ( j; j < element.length; j++ ) {
-            const item = element[ j ]
-            if ( j == 1 && item.status == 'notAccessible' ) name = 'Security Question'
-            if ( j == 2 && item.status == 'notAccessible' ) name = 'Primary Keeper'
-            if ( j == 3 && item.status == 'notAccessible' ) name = 'Second Keeper'
-            if ( j == 4 && item.status == 'notAccessible' ) name = 'Third Keeper'
-            if ( j == 5 && item.status == 'notAccessible' ) name = 'Fourth Keeper'
-            if ( item.name && item.status == 'notAccessible' ) name = item.name
-            if ( item.updatedAt == 0 && item.status == 'notAccessible' ) {
-              message = 'Add '
-            } else if ( j != 0 && item.updatedAt && item.status == 'notAccessible' ) {
-              message = ' needs your attention'
-            } else {
-              message = ''
-            }
-            if (
-              element[ j ].status == 'notAccessible' &&
-              name &&
-              message == 'Add '
-            ) {
-              return {
-                messageOne: message, messageTwo: name
-              }
-            } else if (
-              element[ j ].status == 'notAccessible' &&
-              name &&
-              message == ' needs your attention'
-            ) {
-              return {
-                messageOne: name, messageTwo: message
-              }
-            }
-            if( currentLevel == 0 ){
-              return {
-                isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
-              }
-            }
-            if( currentLevel == 1 ){
-              return {
-                isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: ''
-              }
-            } else if( currentLevel === 2 ){
-              return {
-                isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: ''
-              }
-            } else if( currentLevel == 3 ){
-              return {
-                isFirstMessageBold: true, messageOne: 'Your wallet is at full security', messageTwo: ''
-              }
-            }
-          }
-        }
-      } else {
+      if( currentLevel == 0 ){
         return {
-          isFirstMessageBold: true, messageOne: 'Manage your wallet backup', messageTwo: ''
+          isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: '', isError: true
+        }
+      } else if( currentLevel === 1 ){
+        return {
+          isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: '', isError: false
+        }
+      } else if( currentLevel === 2 ){
+        return {
+          isFirstMessageBold: false, messageOne: 'Double Backup complete, you can upgrade the backup to Level 3', messageTwo: '', isError: false
+        }
+      } else if( currentLevel == 3 ){
+        return {
+          isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: '', isError: false
         }
       }
     }
-    return {
-      isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: ''
+    if( currentLevel === 1 ){
+      return {
+        isFirstMessageBold: false, messageOne: 'Cloud Backup complete, you can upgrade the backup to Level 2', messageTwo: '', isError: false
+      }
+    } else {
+      return {
+        isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: '', isError: true
+      }
     }
   }
 
@@ -259,7 +189,8 @@ const HomeHeader = ( {
       <View style={{
         flexDirection: 'row'
       }}>
-        <CurrencyKindToggleSwitch
+        {/* <<<<<<< Updated upstream */}
+        {/* <CurrencyKindToggleSwitch
           fiatCurrencyCode={CurrencyCode}
           onpress={() => {
             dispatch(
@@ -269,6 +200,7 @@ const HomeHeader = ( {
             )
           }}
           isOn={prefersBitcoin}
+          disabled={exchangeRates && exchangeRates[ CurrencyCode ] ? false : true}
         />
         <TouchableOpacity
           onPress={onPressNotifications}
@@ -277,6 +209,149 @@ const HomeHeader = ( {
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
+          }}
+        >
+          <ImageBackground
+            source={require( '../../assets/images/icons/icon_notification.png' )}
+            style={{
+              width: wp( '6%' ), height: wp( '6%' ), marginLeft: 'auto'
+            }}
+            resizeMode={'contain'}
+          >
+            {notificationData.findIndex( ( value ) => value.status === 'unread' ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
+          </ImageBackground>
+        </TouchableOpacity>
+      </View> */}
+        <View style={{
+          flex: 1, justifyContent: 'center', alignItems: 'flex-start'
+          // =======
+        // <View style={{
+        // flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start'
+          // >>>>>>> Stashed changes
+        }}>
+          <View
+            style={{
+              marginBottom: wp( '2%' ),
+              justifyContent: 'center',
+              alignItems: 'flex-start',
+            }}
+          >
+            <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'flex-end',
+              // marginBottom: wp('3%'),
+              }}
+            >
+              {prefersBitcoin ? (
+                <Image
+                  style={{
+                    ...CommonStyles.homepageAmountImage,
+                    marginBottom: wp( '1.5%' ),
+                  }}
+                  source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                />
+              ) : materialIconCurrencyCodes.includes( fiatCurrencyCode ) ? (
+                // setCurrencyCodeToImage(
+                //   getCurrencyImageName( CurrencyCode ),
+                //   'light'
+                // )
+                <MaterialCurrencyCodeIcon
+                  currencyCode={fiatCurrencyCode}
+                  color={Colors.white}
+                  size={wp( '3.5%' )}
+                  style={{
+                    width: 20,
+                    height: 18,
+                    resizeMode: 'contain',
+                    marginTop: 0
+                  }}
+                />
+              ) : (
+                <Image
+                  style={{
+                    ...styles.cardBitCoinImage,
+                    marginBottom: wp( '1.5%' ),
+                  }}
+                  source={getCurrencyImageByRegion( fiatCurrencyCode, 'light' )}
+                />
+              )}
+              <Text style={styles.homeHeaderAmountText}>
+                {prefersBitcoin
+                  ? UsNumberFormat( netBalance )
+                  : exchangeRates && exchangeRates[ CurrencyCode ]
+                    ? (
+                      ( netBalance / SATOSHIS_IN_BTC ) *
+                    exchangeRates[ CurrencyCode ].last
+                    ).toFixed( 2 )
+                    : 0}
+              </Text>
+              <Text style={styles.homeHeaderAmountUnitText}>
+                {prefersBitcoin ? 'sats' : fiatCurrencyCode.toLocaleLowerCase()}
+              </Text>
+            </View>
+          </View>
+        </View>
+        {/* <CurrencyKindToggleSwitch
+          fiatCurrencyCode={CurrencyCode}
+          onpress={() => {
+            dispatch(
+              currencyKindSet(
+                prefersBitcoin ? CurrencyKind.FIAT : CurrencyKind.BITCOIN
+              )
+            )
+          }}
+          isOn={prefersBitcoin}
+        /> */}
+        <TouchableOpacity
+          onPress={navigateToQRScreen}
+          style={{
+            height: wp( '10%' ),
+            width: wp( '10%' ),
+            justifyContent: 'center',
+            marginLeft: 'auto',
+            marginTop: hp( 1 )
+          }}
+        >
+          <ImageBackground
+            source={require( '../../assets/images/icons/qr.png' )}
+            style={{
+              width: wp( '7%' ), height: wp( '7%' ), marginLeft: 'auto',
+            }}
+            resizeMode={'contain'}
+          >
+            {notificationData.findIndex( ( value ) => value.read == false ) > -1 ? (
+              <View
+                style={{
+                  backgroundColor: Colors.red,
+                  height: wp( '2.5%' ),
+                  width: wp( '2.5%' ),
+                  borderRadius: wp( '2.5%' ) / 2,
+                  alignSelf: 'flex-end',
+                }}
+              />
+            ) : null}
+          </ImageBackground>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={onPressNotifications}
+          style={{
+            height: wp( '10%' ),
+            width: wp( '10%' ),
+            justifyContent: 'center',
+            marginLeft: 'auto',
+            marginTop: hp( 1 )
           }}
         >
           <ImageBackground
@@ -300,63 +375,8 @@ const HomeHeader = ( {
           </ImageBackground>
         </TouchableOpacity>
       </View>
-      <View style={{
-        flex: 1, justifyContent: 'center', alignItems: 'center'
-      }}>
-        <View
-          style={{
-            marginBottom: wp( '2%' ),
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-end',
-              // marginBottom: wp('3%'),
-            }}
-          >
-            {prefersBitcoin ? (
-              <Image
-                style={{
-                  ...CommonStyles.homepageAmountImage,
-                  marginBottom: wp( '1.5%' ),
-                }}
-                source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-              />
-            ) : currencyCode.includes( CurrencyCode ) ? (
-              setCurrencyCodeToImage(
-                getCurrencyImageName( CurrencyCode ),
-                'light'
-              )
-            ) : (
-              <Image
-                style={{
-                  ...styles.cardBitCoinImage,
-                  marginBottom: wp( '1.5%' ),
-                }}
-                source={getCurrencyImageByRegion( CurrencyCode, 'light' )}
-              />
-            )}
-            <Text style={styles.homeHeaderAmountText}>
-              {prefersBitcoin
-                ? UsNumberFormat( netBalance )
-                : exchangeRates && exchangeRates[ CurrencyCode ]
-                  ? (
-                    ( netBalance / SATOSHIS_IN_BTC ) *
-                    exchangeRates[ CurrencyCode ].last
-                  ).toFixed( 2 )
-                  : 0}
-            </Text>
-            <Text style={styles.homeHeaderAmountUnitText}>
-              {prefersBitcoin ? 'sats' : CurrencyCode.toLocaleLowerCase()}
-            </Text>
-          </View>
-        </View>
-      </View>
-      <View
+
+      {/* <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -407,7 +427,8 @@ const HomeHeader = ( {
             size={17}
           />
         </TouchableOpacity>
-      </View>
+      </View> */}
+      {getMessage()}
     </View>
   )
 }
@@ -416,7 +437,7 @@ export default HomeHeader
 
 const styles = StyleSheet.create( {
   headerViewContainer: {
-    marginTop: hp( '1%' ),
+    marginTop: hp( '2%' ),
     marginLeft: 20,
     marginRight: 20,
   },

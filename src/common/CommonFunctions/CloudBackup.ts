@@ -1,4 +1,4 @@
-import { NativeModules, PermissionsAndroid, Platform } from 'react-native'
+import { NativeModules, Platform } from 'react-native'
 import moment from 'moment'
 
 const GoogleDrive = NativeModules.GoogleDrive

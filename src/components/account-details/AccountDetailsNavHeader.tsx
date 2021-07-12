@@ -67,7 +67,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
   return (
     <View>
       <SafeAreaView style={{
-        flex: 0
+        flex: 0, backgroundColor: Colors.backgroundColor
       }} />
 
       <StatusBar
@@ -75,7 +75,9 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
         barStyle="dark-content"
       />
 
-      <View style={ScreenHeaderStyles.smallHeaderContainer}>
+      <View style={[ ScreenHeaderStyles.smallHeaderContainer, {
+        backgroundColor: Colors.backgroundColor
+      } ]}>
 
         <View style={styles.mainContentContainer}>
           <TouchableOpacity
@@ -94,9 +96,9 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
             />
           </TouchableOpacity>
 
-          <Text style={styles.titleText}>
+          {/* <Text style={styles.titleText}>
             {title}
-          </Text>
+          </Text> */}
 
           <View style={styles.currencyKindToggleContainer}>
             <CurrencyKindToggleSwitch
@@ -131,7 +133,7 @@ const AccountDetailsNavHeader: React.FC<Props> = ( {
                   : showNoExchangeRateBottomSheet()
               }}
               isOn={prefersBitcoin}
-              disabled={exchangeRates ? false : true}
+              disabled={exchangeRates && exchangeRates[ currencyCode ] ? false : true}
             />
           </View>
         </View>
@@ -146,6 +148,7 @@ const styles = StyleSheet.create( {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between'
   },
 
   titleText: {

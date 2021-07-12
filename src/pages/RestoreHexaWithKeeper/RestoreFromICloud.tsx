@@ -110,7 +110,7 @@ export default function RestoreFromICloud( props ) {
 
 const styles = StyleSheet.create( {
   modalContentContainer: {
-    height: '100%',
+    // height: '100%',
     backgroundColor: Colors.white,
   },
   headerTitleText: {
