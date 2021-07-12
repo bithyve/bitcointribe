@@ -40,15 +40,7 @@ import {
   NEW_ACCOUNT_SHELLS_ADDED,
   UPDATE_ACCOUNT_SHELLS
 } from '../actions/accounts'
-import { SERVICES_ENRICHED } from '../actions/storage'
-import {
-  REGULAR_ACCOUNT,
-  TEST_ACCOUNT,
-  SECURE_ACCOUNT,
-} from '../../common/constants/wallet-service-types'
 import AccountShell from '../../common/data/models/AccountShell'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SyncStatus from '../../common/data/enums/SyncStatus'
 import { Accounts } from '../../bitcoin/utilities/Interface'
 
@@ -175,26 +167,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           ...state,
           testCoinsReceived: true
         }
-
-      case SERVICES_ENRICHED:
-        const { services } = action.payload
-        if ( action.payload.services )
-          return {
-            ...state,
-            [ REGULAR_ACCOUNT ]: {
-              ...state[ REGULAR_ACCOUNT ],
-              service: action.payload.services[ REGULAR_ACCOUNT ],
-            },
-            [ TEST_ACCOUNT ]: {
-              ...state[ TEST_ACCOUNT ],
-              service: action.payload.services[ TEST_ACCOUNT ],
-            },
-            [ SECURE_ACCOUNT ]: {
-              ...state[ SECURE_ACCOUNT ],
-              service: action.payload.services[ SECURE_ACCOUNT ],
-            },
-            servicesEnriched: true,
-          }
 
       case ACCOUNTS_SYNCHED:
         return {
