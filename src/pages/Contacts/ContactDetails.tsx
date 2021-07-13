@@ -82,7 +82,7 @@ const getImageIcon = ( item: ContactRecipientDescribing ) => {
 
 interface ContactDetailsPropTypes {
   navigation: any;
-  trustedContacts: TrustedContactsService;
+  trustedContacts: Trusted_Contacts;
   trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
   errorSending: any;
@@ -459,7 +459,7 @@ class ContactDetails extends PureComponent<
   generateQR = ( type ) => {
     const appVersion = DeviceInfo.getVersion()
     const { trustedContacts } = this.props
-    const contacts: TrustedContact = trustedContacts.tc.trustedContacts[ this.contact.channelKey ]
+    const contacts: TrustedContact = trustedContacts[ this.contact.channelKey ]
     const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
     if ( !this.contact ) {
       Alert.alert( 'contact details missing' )
@@ -508,14 +508,13 @@ class ContactDetails extends PureComponent<
 
   createDeepLink = ( contact ) => {
     const { trustedContacts, WALLET_SETUP } = this.props
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === contact.id ){
-          currentContact = contacts[ ck ]
+    if( trustedContacts )
+      for( const ck of Object.keys( trustedContacts ) ){
+        if ( trustedContacts[ ck ].contactDetails.id === contact.id ){
+          currentContact = trustedContacts[ ck ]
           channelKey = ck
           break
         }
@@ -1169,7 +1168,7 @@ const mapStateToProps = ( state ) => {
   return {
     errorSending: idx( state, ( _ ) => _.sss.errorSending ),
     uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     trustedContactRecipients: idx( state, ( _ ) => _.trustedContacts.trustedContactRecipients ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     UNDER_CUSTODY: idx(
