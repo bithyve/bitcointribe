@@ -10,6 +10,19 @@ import {
   NetworkSchema,
   XPubSchema,
   AccountIdSchema,
+  StreamsSchema,
+  StreamsMetaDataFlagsSchema,
+  StreamsMetaDataSchema,
+  BackupStreamDataSchema,
+  EncryptedShareSchema,
+  KeeperInfoSchema,
+  MetaSchema,
+  MetaShareSchema,
+  PrimaryStreamDataSchema,
+  SecondaryStreamDataSchema,
+  UnecryptedStreamDataSchema,
+  ContactDetailsSchema,
+  TrustedContactSchema
 } from './Schema'
 
 export default
@@ -24,5 +37,18 @@ export default
   NetworkSchema,
   XPubSchema,
   AccountIdSchema,
-  UTXOStatusSchema
+  UTXOStatusSchema,
+  StreamsSchema,
+  StreamsMetaDataFlagsSchema,
+  StreamsMetaDataSchema,
+  BackupStreamDataSchema,
+  EncryptedShareSchema,
+  KeeperInfoSchema,
+  MetaSchema,
+  MetaShareSchema,
+  PrimaryStreamDataSchema,
+  SecondaryStreamDataSchema,
+  UnecryptedStreamDataSchema,
+  ContactDetailsSchema,
+  TrustedContactSchema
 ]
