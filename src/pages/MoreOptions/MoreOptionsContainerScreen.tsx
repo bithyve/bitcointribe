@@ -232,9 +232,10 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 </View>
                 <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
                   style={{
-                    width: widthPercentageToDP( '2%' ),
-                    height: widthPercentageToDP( '2%' ),
-                    alignSelf: 'center'
+                    width: widthPercentageToDP( '2.5%' ),
+                    height: widthPercentageToDP( '2.5%' ),
+                    alignSelf: 'center',
+                    resizeMode: 'contain'
                   }}
                 />
 
@@ -282,10 +283,11 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             </View>
             <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
               style={{
-                width: widthPercentageToDP( '2%' ),
-                height: widthPercentageToDP( '2%' ),
+                width: widthPercentageToDP( '2.5%' ),
+                height: widthPercentageToDP( '2.5%' ),
                 alignSelf: 'center',
-                marginLeft: 'auto'
+                marginLeft: 'auto',
+                resizeMode: 'contain'
               }}
             />
           </TouchableOpacity>
