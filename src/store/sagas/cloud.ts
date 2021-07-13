@@ -109,7 +109,7 @@ function* cloudWorker( { payload } ) {
       const data = {
         levelStatus: level ? level : 1,
         shares: shares,
-        secondaryShare: DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
+        secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
         walletName: walletName,
         questionId: questionId,
