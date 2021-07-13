@@ -66,10 +66,42 @@ const updateAccount = async ( accountId, account ) => {
   }
 }
 
+const addContact = async ( contact ) => {
+  try {
+    const data = {
+      ...contact
+    }
+    const permanentChannel = []
+    const unencryptedPermanentChannel = []
+    for ( const [ key, value ] of Object.entries( contact.permanentChannel ) ) {
+      permanentChannel.push( value )
+    }
+    for ( const [ key, value ] of Object.entries( contact.unencryptedPermanentChannel ) ) {
+      unencryptedPermanentChannel.push( value )
+    }
+    data.permanentChannel = permanentChannel
+    data.unencryptedPermanentChannel = permanentChannel
+    db.create( schema.TrustedContact, data, true )
+    return true
+  } catch ( error ) {
+    return false
+    console.log( error )
+  }
+}
+
 const getWallets = () => {
   const walletsRef = db.objects( schema.Wallet )
-  const wallets =
+  const wallets = Array.from( walletsRef )
   console.log( 'wallets',  JSON.stringify( wallets ) )
+  return wallets
+}
+
+const getTrustedContacts = () => {
+  const rrustedContactRef = db.objects( schema.TrustedContact )
+  const contacts = Array.from( rrustedContactRef )
+  console.log( 'getTrustedContacts',  JSON.stringify( contacts ) )
+  return contacts
+
 }
 
 const getAccounts = () => {
@@ -77,6 +109,7 @@ const getAccounts = () => {
     const accountsRef = db.objects( schema.Account )
     const accounts = Array.from( accountsRef )
     console.log( 'accounts',  JSON.stringify( accounts ) )
+    return accounts
   } catch ( error ) {
     console.log( error )
   }
@@ -90,4 +123,6 @@ export default {
   createAccounts,
   createAccount,
   updateAccount,
+  addContact,
+  getTrustedContacts,
 }

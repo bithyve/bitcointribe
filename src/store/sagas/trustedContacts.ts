@@ -45,6 +45,7 @@ import idx from 'idx'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import dbManager from '../../storage/realm/dbManager'
 
 function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, shouldNotUpdateSERVICES?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -186,7 +187,9 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       }
 
       yield put( updateTrustedContacts( updatedContacts ) )
-      // TODO: insert updated/created contact(s) into Realm
+      for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
+        dbManager.addContact( value )
+      }
 
       if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
         const contact: TrustedContact = trustedContacts[ contactIdentifier ]

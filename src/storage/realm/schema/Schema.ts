@@ -518,11 +518,8 @@ export const ContactDetailsSchema: ObjectSchema = {
 
 export const TrustedContactSchema: ObjectSchema = {
   name: TrustedContact,
-  primaryKey: 'walletID',
+  primaryKey: 'permanentChannelAddress',
   properties: {
-    id: {
-      type: 'string', indexed: true
-    },
     contactDetails: {
       type: ContactDetails, optional: true
     },
@@ -530,7 +527,7 @@ export const TrustedContactSchema: ObjectSchema = {
       type: 'string', optional: true,
     },
     permanentChannelAddress: {
-      type: 'string', optional: true,
+      type: 'string', indexed: true,
     },
     secondaryChannelKey: {
       type: 'string', optional: true,
