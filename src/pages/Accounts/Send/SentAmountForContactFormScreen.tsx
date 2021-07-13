@@ -88,7 +88,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
 
   useEffect( ()=> {
     // refresh selected recipient's permanent channel
-    if( currentRecipient.kind === RecipientKind.CONTACT ){
+    if( currentRecipient && currentRecipient.kind === RecipientKind.CONTACT ){
       const channelUpdate = {
         contactInfo: {
           channelKey: ( currentRecipient as ContactRecipientDescribing ).channelKey,
@@ -99,7 +99,7 @@ const SentAmountForContactFormScreen: React.FC<Props> = ( { navigation }: Props 
         channelUpdates: [ channelUpdate ]
       } ) )
     }
-  }, [ ( currentRecipient as ContactRecipientDescribing ).channelKey ] )
+  }, [ ( currentRecipient as ContactRecipientDescribing )?.channelKey ] )
 
   function handleRecipientRemoval( recipient: RecipientDescribing ) {
     dispatch( recipientRemovedFromSending( recipient ) )
