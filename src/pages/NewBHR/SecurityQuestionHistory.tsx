@@ -218,7 +218,7 @@ const SecurityQuestionHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Security Question'}
+        selectedTitle={'Set Password'}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
@@ -227,8 +227,8 @@ const SecurityQuestionHistory = ( props ) => {
         flex: 1
       }}>
         <HistoryPageComponent
-          infoBoxTitle={'Security Question History'}
-          infoBoxInfo={'The history of your Security Question will appear here'}
+          infoBoxTitle={'Password History'}
+          infoBoxInfo={'The history of your Password will appear here'}
           type={'security'}
           IsReshare
           onPressConfirm={() => {

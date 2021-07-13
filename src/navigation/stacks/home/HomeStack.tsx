@@ -75,6 +75,7 @@ import TabNavigator from '../../TabNavigator'
 import Header from '../Header'
 import Login from '../../../pages/Login'
 import TransactionsFlatListItem from '../../../components/transactions/TransactionsFlatListItem'
+import NewWalletQuestion from '../../../pages/NewWalletQuestion'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -105,6 +106,7 @@ const HomeStack = createStackNavigator(
       },
     },
     Login,
+    NewWalletQuestion,
     AddNewAccount: {
       screen: AddNewAccountStack,
       navigationOptions: {

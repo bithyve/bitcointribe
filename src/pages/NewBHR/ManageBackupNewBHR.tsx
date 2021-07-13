@@ -46,7 +46,7 @@ import {
   modifyLevelData,
   setApprovalStatus,
   downloadSMShare,
-  updateKeeperInfoToChannel
+  updateKeeperInfoToChannel,
 } from '../../store/actions/health'
 import {
   LevelData,
@@ -773,6 +773,10 @@ class ManageBackupNewBHR extends Component<
   onKeeperButtonPress = ( value, keeperNumber ) =>{
     const { selectedKeeper } = this.state
     requestAnimationFrame( () => {
+      if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) {
+        this.props.setLevelCompletionError( 'Please set password', 'It seems you have not set passward to backup. Please set password first to proceed', LevelStatus.FAILED )
+        return
+      }
       if( value.id == 1 && keeperNumber == 2 ){
         if ( this.props.cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
           this.props.navigation.navigate(
@@ -1167,11 +1171,22 @@ Wallet Backup
               modalRef={this.ErrorBottomSheet as any}
               title={this.state.errorTitle}
               info={this.state.errorInfo}
-              proceedButtonText={'Got it'}
-              isIgnoreButton={false}
-              onPressProceed={() => this.setState( {
-                errorModal: false
-              } )}
+              proceedButtonText={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? 'Proceed To Password' : 'Got it'}
+              cancelButtonText={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? 'Got it' : ''}
+              isIgnoreButton={this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ? true : false}
+              onPressProceed={() => {
+                this.setState( {
+                  errorModal: false
+                } )
+                if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) this.props.navigation.navigate( 'NewWalletQuestion', {
+                  isFromManageBackup: true,
+                } )
+              }}
+              onPressIgnore={() => {
+                this.setState( {
+                  errorModal: false
+                } )
+              }}
               isBottomImage={true}
               bottomImage={require( '../../assets/images/icons/errorImage.png' )}
             />
@@ -1297,7 +1312,7 @@ export default withNavigationFocus(
     modifyLevelData,
     setApprovalStatus,
     downloadSMShare,
-    updateKeeperInfoToChannel
+    updateKeeperInfoToChannel,
   } )( ManageBackupNewBHR )
 )
 

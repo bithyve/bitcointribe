@@ -71,7 +71,9 @@ function* setupWalletWorker( { payload } ) {
   const initialDatabase: Database = {
     WALLET_SETUP:{
       walletName: wallet.walletName,
-      security,
+      security: security ? security : {
+        question: '', answer: ''
+      },
     },
     SERVICES: {
       S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
@@ -82,9 +84,10 @@ function* setupWalletWorker( { payload } ) {
   yield call( insertDBWorker, {
     payload: initialDatabase
   } )
-
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
+  if( security ) {
+    // initialize health-check schema on relay
+    yield put( initializeHealthSetup() )
+  }
 }
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 

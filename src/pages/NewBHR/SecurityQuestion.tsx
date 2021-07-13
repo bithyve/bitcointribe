@@ -86,7 +86,7 @@ function SecurityQuestion( props ) {
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Security Question
+                Health Check{'\n'}Set Password
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )

@@ -36,7 +36,7 @@ import LoaderModal from '../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
 import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/health'
+import { initNewBHRFlow, setupPassword } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
 import { clearAccountSyncCache } from '../store/actions/accounts'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
@@ -48,6 +48,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 import S3Service from '../bitcoin/services/sss/S3Service'
+import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -111,7 +112,7 @@ function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
+export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName?: any } ) => void } } ) {
   const [ message, setMessage ] = useState( 'Creating your wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
@@ -147,10 +148,12 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ hideShowHint, setHideShowHint ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
+  const [ isSkipClicked, setIsSkipClicked ] = useState( false )
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
-  const selectedAcc = props.navigation.getParam( 'selectedAcc' )
+  const selectedAcc = props.navigation.getParam( 'selectedAcc' ) ? props.navigation.getParam( 'selectedAcc' ) : ''
+  const isFromManageBackup = props.navigation.getParam( 'isFromManageBackup' )
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -172,9 +175,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const s3service: S3Service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
+  const setupPasswordStatus = useSelector( ( state ) => state.health.loading.setupPasswordStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
-  const levelHealth = useSelector( ( state ) => state.health.levelHealth )
+  const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
   const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
   const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
@@ -201,6 +205,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       keyboardDidShowListener.remove()
     }
   }, [] )
+
+  useEffect( () =>{
+    if( !setupPasswordStatus && levelHealth.length ){
+      setLoaderModal( false )
+      props.navigation.goBack()
+    }
+  }, [ setupPasswordStatus, levelHealth ] )
+
   useEffect( () => {
     // if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
     //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
@@ -209,7 +221,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //     walletName,
     //   } )
     // }
-    if( walletSetupCompleted && s3service && s3service.levelhealth && ( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.FAILED ) && cloudPermissionGranted === true ) {
+    if( walletSetupCompleted && s3service && s3service.levelhealth && ( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.FAILED || isSkipClicked ) && ( cloudPermissionGranted === true || cloudPermissionGranted === false ) ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
@@ -220,10 +232,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( setupWallet( walletName, selectedAcc, security ) )
-      // dispatch( walletSetupCompletion( security ) )
-      dispatch( initNewBHRFlow( true ) )
-      dispatch( setVersion( 'Current' ) )
+      if( isFromManageBackup ){
+        dispatch( setupPassword( security ) )
+      }else{
+        dispatch( setupWallet( walletName, selectedAcc, security ) )
+        // dispatch( walletSetupCompletion( security ) )
+        dispatch( initNewBHRFlow( true ) )
+        dispatch( setVersion( 'Current' ) )
+      }
       const current = Date.now()
       AsyncStorage.setItem(
         'SecurityAnsTimestamp',
@@ -236,16 +252,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         'securityQuestionHistory',
         JSON.stringify( securityQuestionHistory ),
       )
-
     } )
   }
 
   useEffect( ()=>{
     if( s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true ){
+      cloudPermissionGranted === true && !isSkipClicked ){
       dispatch( setCloudData() )
     }
-  }, [ s3service ] )
+  }, [ s3service, cloudPermissionGranted ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
@@ -346,30 +361,31 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     }
   }, [ confirmPswd ] )
 
-
+  const onPressProceed = ( isSkip? ) => {
+    showLoader()
+    let security = null
+    if ( activeIndex === 0 ) {
+      security = {
+        questionId: dropdownBoxValue.id,
+        question: dropdownBoxValue.question,
+        answer,
+      }
+    } else {
+      security = {
+        questionId: 0,
+        question: hintText,
+        answer: pswd,
+      }
+    }
+    if( isSkip ) security = null
+    checkCloudLogin( security )
+    showSecurityQue( false )
+  }
 
   const setButtonVisible = () => {
     return (
       <TouchableOpacity
-        onPress={async () => {
-          showLoader()
-          let security = null
-          if ( activeIndex === 0 ) {
-            security = {
-              questionId: dropdownBoxValue.id,
-              question: dropdownBoxValue.question,
-              answer,
-            }
-          } else {
-            security = {
-              questionId: 0,
-              question: hintText,
-              answer: pswd,
-            }
-          }
-          security && checkCloudLogin( security )
-          showSecurityQue( false )
-        }}
+        onPress={()=>onPressProceed()}
         style={{
           ...styles.buttonView, elevation: Elevation
         }}
@@ -1289,8 +1305,11 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         />
         <TouchableOpacity
           onPress={() => {
-            dispatch( updateCloudPermission( false ) )}
-          }
+            console.log( 'asfds' )
+            setIsSkipClicked( true )
+            dispatch( updateCloudPermission( false ) )
+            onPressProceed( true )
+          }}
         >
           <Text style={{
             color: Colors.blue,

@@ -72,6 +72,7 @@ import Launch from '../../../pages/Launch'
 import Login from '../../../pages/Login'
 import Header from '../Header'
 import QRStack from '../home/QRStack'
+import NewWalletQuestion from '../../../pages/NewWalletQuestion'
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
@@ -186,6 +187,7 @@ const SecurityStack = createStackNavigator(
     },
     RequestKeyFromContact,
     TrustedContactNewBHR,
+    NewWalletQuestion
   },
   {
     headerLayoutPreset: 'center',

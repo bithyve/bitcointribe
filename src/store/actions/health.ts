@@ -72,6 +72,7 @@ export const SETUP_HEALTH_FOR_RESTORE = 'SETUP_HEALTH_FOR_RESTORE'
 export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
+export const SETUP_PASSWORD = 'SETUP_PASSWORD'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -624,6 +625,14 @@ export const acceptExistingContactRequest = ( channelKey, contactsSecondaryChann
   return {
     type: ACCEPT_EC_REQUEST, payload:{
       channelKey, contactsSecondaryChannelKey
+    }
+  }
+}
+
+export const setupPassword = ( security ) => {
+  return {
+    type: SETUP_PASSWORD, payload:{
+      security
     }
   }
 }
