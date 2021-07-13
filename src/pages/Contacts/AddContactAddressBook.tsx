@@ -23,17 +23,14 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import RadioButton from '../../components/RadioButton'
 import * as ExpoContacts from 'expo-contacts'
 import EvilIcons from 'react-native-vector-icons/EvilIcons'
-import Contacts from 'react-native-contacts'
 import ErrorModalContents from '../../components/ErrorModalContents'
-import ModalHeader from '../../components/ModalHeader'
 import AntDesign from 'react-native-vector-icons/AntDesign'
-import BottomSheet from 'reanimated-bottom-sheet'
-import DeviceInfo from 'react-native-device-info'
 import * as Permissions from 'expo-permissions'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import Toast from '../../components/Toast'
 import { setIsPermissionGiven } from '../../store/actions/preferences'
 import ModalContainer from '../../components/home/ModalContainer'
+import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { v4 as uuid } from 'uuid'
+import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -212,27 +209,27 @@ export default function AddContactAddressBook( props ) {
     }
   }
 
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
   )
   const [ isTC, setIsTC ] = useState( false )
 
-  const isTrustedContact = useCallback(
-    ( selectedContact ) => {
-      const contactName = `${selectedContact.firstName} ${selectedContact.lastName ? selectedContact.lastName : ''
-      }`
-        .toLowerCase()
-        .trim()
+  // const isTrustedContact = useCallback(
+  //   ( selectedContact ) => {
+  //     const contactName = `${selectedContact.firstName} ${selectedContact.lastName ? selectedContact.lastName : ''
+  //     }`
+  //       .toLowerCase()
+  //       .trim()
 
-      const trustedContact = trustedContacts.tc.trustedContacts[ contactName ]
-      if ( trustedContact && trustedContact.symmetricKey ) {
-        // Trusted channel exists
-        return true
-      }
-      return false
-    },
-    [ trustedContacts ],
-  )
+  //     const trustedContact = trustedContacts[ contactName ]
+  //     if ( trustedContact && trustedContact.symmetricKey ) {
+  //       // Trusted channel exists
+  //       return true
+  //     }
+  //     return false
+  //   },
+  //   [ trustedContacts ],
+  // )
 
   async function onContactSelect( index ) {
     const contacts = filterContactData
@@ -254,11 +251,11 @@ export default function AddContactAddressBook( props ) {
     }
     setRadioOnOff( !radioOnOff )
     setFilterContactData( contacts )
-    const isTrustedC = await isTrustedContact( selectedContacts[ 0 ] )
-    setIsTC( isTrustedC )
-    if ( isTrustedC ) {
-      Toast( 'Contact already exists' )
-    }
+    // const isTrustedC = await isTrustedContact( selectedContacts[ 0 ] )
+    // setIsTC( isTrustedC )
+    // if ( isTrustedC ) {
+    //   Toast( 'Contact already exists' )
+    // }
   }
 
   async function onCancel( value ) {
@@ -321,32 +318,18 @@ export default function AddContactAddressBook( props ) {
   }
 
   const onSkipContinue= () => {
-    let { skippedContactsCount } = trustedContacts.tc
-    let data
-    if ( !skippedContactsCount ) {
-      skippedContactsCount = 1
-      data = {
-        firstName: 'F&F request',
-        lastName: `awaiting ${skippedContactsCount}`,
-        name: `F&F request awaiting ${skippedContactsCount}`,
-      }
-    } else {
-      data = {
-        firstName: 'F&F request',
-        lastName: `awaiting ${skippedContactsCount + 1}`,
-        name: `F&F request awaiting ${skippedContactsCount + 1}`,
-      }
+    const skippedContact = {
+      id: uuid(),
     }
 
     props.navigation.navigate( 'AddContactSendRequest', {
-      SelectedContact: [ data ],
+      SelectedContact: [ skippedContact ],
       headerText:'Add a contact  ',
       subHeaderText:'Send a Friends and Family request',
       contactText:'Adding to Friends and Family:',
       showDone:true,
     } )
   }
-  console.log( 'permissionModal >>>>>  value', permissionModal )
 
   return (
     <View style={styles.modalContentContainer}>
