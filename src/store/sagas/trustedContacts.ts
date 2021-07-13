@@ -193,7 +193,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
         const instream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const relationType: TrustedContactRelationTypes = idx( instream, ( _ ) => _.primaryData.relationType )
-        const temporaryContact = trustedContacts[ contactIdentifier ] // temporary trusted contact object
+        const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
 
         if( fcmToken ){
           const notification: INotification = {
