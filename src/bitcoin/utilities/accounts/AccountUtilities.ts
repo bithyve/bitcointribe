@@ -763,7 +763,7 @@ export default class AccountUtilities {
     newTxIds.forEach( ( txId ) => newTxIdMap[ txId ] = true )
 
     if( newTxIds.length ){
-      transactions.transactionDetails.forEach( tx => {
+      transactions.forEach( tx => {
         if( newTxIdMap[ tx.txid ] ) txsFound.push( tx )
       } )
     }
