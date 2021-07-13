@@ -141,10 +141,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ pswd, setPswd ] = useState( '' )
   const [ pswdMasked, setPswdMasked ] = useState( '' )
   const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
-  const [ hintMasked, setHintMasked ] = useState( '' )
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
-  const [ hideShowHint, setHideShowHint ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
 
@@ -666,7 +664,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               ref={hint}
               placeholder={'Add a hint'}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowHint ? hintMasked : hintText}
+              value={hintText}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
@@ -680,18 +678,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               }
               onChangeText={( text ) => {
                 setHint( text )
-                setHintMasked( text )
-                // setConfirmPswdMasked( text )
-              }}
-              onBlur={() => {
-                let temp = ''
-                for ( let i = 0; i < hintText.length; i++ ) {
-                  temp += '*'
-                }
-                setHintMasked( temp )
               }}
             />
-            {hintText ? (
+            {/* {hintText ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowHint( !hideShowHint )
@@ -708,7 +697,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   name={hideShowHint ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null}
+            ) : null} */}
           </View>
         </View>
         <View

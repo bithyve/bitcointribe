@@ -199,7 +199,8 @@ const Bottomtab = createBottomTabNavigator(
                 </Svg> :
                 <Image source={require( '../assets/images/tabs/f&f.png' )} style={{
                   marginBottom: 'auto',
-                  width: 20, height: 20, alignSelf: 'center',
+                  width: 23, height: 23, alignSelf: 'center',
+                  resizeMode: 'contain'
                   // backgroundColor: focused ? 'white': 'gray'
                 }} />
                 // <Svg
