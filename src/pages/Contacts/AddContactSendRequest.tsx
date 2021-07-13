@@ -128,7 +128,13 @@ export default function AddContactSendRequest( props ) {
     if ( currentContact ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
-
+      console.log( 'QR DATA', JSON.stringify( {
+        type: QRCodeTypes.CONTACT_REQUEST,
+        channelKey,
+        walletName: WALLET_SETUP.walletName,
+        secondaryChannelKey,
+        version: appVersion,
+      } ) )
       setTrustedQR(
         JSON.stringify( {
           type: QRCodeTypes.CONTACT_REQUEST,

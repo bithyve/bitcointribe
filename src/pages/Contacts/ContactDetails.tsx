@@ -41,6 +41,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {
+  AccountType,
   QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
 import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
@@ -50,7 +51,6 @@ import { ContactRecipientDescribing } from '../../common/data/models/interfaces/
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
 
@@ -82,7 +82,7 @@ const getImageIcon = ( item: ContactRecipientDescribing ) => {
 
 interface ContactDetailsPropTypes {
   navigation: any;
-  trustedContacts: TrustedContactsService;
+  trustedContacts: Trusted_Contacts;
   trustedContactRecipients: ContactRecipientDescribing[],
   accountShells: AccountShell[];
   errorSending: any;
@@ -294,7 +294,7 @@ class ContactDetails extends PureComponent<
   onPressSend = () => {
     const recipient = this.props.trustedContactRecipients.find( recipient => recipient.id ===  this.contact.id )
     this.props.sourceAccountSelectedForSending(
-      this.props.accountShells.find( shell => shell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT )
+      this.props.accountShells.find( shell => shell.primarySubAccount.type == AccountType.CHECKING_ACCOUNT && shell.primarySubAccount.instanceNumber === 0 )
     )
     this.props.addRecipientForSending( recipient )
     this.props.recipientSelectedForAmountSetting( recipient )
@@ -459,7 +459,7 @@ class ContactDetails extends PureComponent<
   generateQR = ( type ) => {
     const appVersion = DeviceInfo.getVersion()
     const { trustedContacts } = this.props
-    const contacts: TrustedContact = trustedContacts.tc.trustedContacts[ this.contact.channelKey ]
+    const contacts: TrustedContact = trustedContacts[ this.contact.channelKey ]
     const instream: StreamData = useStreamFromContact( contacts, this.props.s3Service.levelhealth.walletId, true )
     if ( !this.contact ) {
       Alert.alert( 'contact details missing' )
@@ -508,7 +508,7 @@ class ContactDetails extends PureComponent<
 
   createDeepLink = ( contact ) => {
     const { trustedContacts, WALLET_SETUP } = this.props
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 
@@ -1169,7 +1169,7 @@ const mapStateToProps = ( state ) => {
   return {
     errorSending: idx( state, ( _ ) => _.sss.errorSending ),
     uploadSuccessfull: idx( state, ( _ ) => _.sss.uploadSuccessfully ),
-    trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
+    trustedContacts: idx( state, ( _ ) => _.trustedContacts.contacts ),
     trustedContactRecipients: idx( state, ( _ ) => _.trustedContacts.trustedContactRecipients ),
     accountShells: idx( state, ( _ ) => _.accounts.accountShells ),
     UNDER_CUSTODY: idx(

@@ -4,6 +4,8 @@ import {
 } from 'react-navigation-stack'
 import Intermediate from '../../../pages/Intermediate'
 import BuyHome from '../../../pages/Buy/BuyHome'
+import Login from '../../../pages/Login'
+import ReLogin from '../../../pages/ReLogin'
 
 const BuyStack = createStackNavigator(
   {
@@ -15,6 +17,13 @@ const BuyStack = createStackNavigator(
       },
 
     },
+    ReLogin: {
+      screen: ReLogin,
+      navigationOptions: {
+        gesturesEnabled: false,
+      },
+    },
+    Login,
     Intermediate,
   },
 
@@ -27,7 +36,7 @@ const BuyStack = createStackNavigator(
 
       let tabBarVisible = false
 
-      if ( navigation.state.index === 0 && navigation.state.routes[ 0 ].routeName == 'Home' ) {
+      if ( ( navigation.state.index === 0 || navigation.state.index === 1 ) && ( navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
         tabBarVisible = true
       }
 

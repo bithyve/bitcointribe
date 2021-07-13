@@ -104,25 +104,25 @@ const HomeHeader = ( {
       flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
     }}>
       <View style={{
-        backgroundColor: Colors.white,
+        backgroundColor: isError ? Colors.red : Colors.green,
         width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
         alignItems:'center',
         justifyContent: 'center'
       }}>
         <Image
-          source={isError ? require( '../../assets/images/icons/icon_error_red.png' ) : require( '../../assets/images/icons/icon_check_green.png' )}
+          source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' )}
           style={{
-            width: wp( '5%' ), height: wp( '5%' ),
+            width: wp( '4%' ), height: wp( '4%' ),
           }}
           resizeMode={'contain'}
         />
       </View>
-      {isFirstMessageBold ? <Text style={{
-        color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+      {isFirstMessageBold ? <Text numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
       }}><Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
-        }}>{messageOne}</Text>{messageTwo}</Text> : <Text style={{
-        color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
+        }}>{messageOne}</Text>{messageTwo}</Text> : <Text numberOfLines={1} style={{
+        flex:1, color: Colors.backgroundColor1, marginLeft: wp( 2 ), fontSize: RFValue( 11 )
       }}>{messageOne} <Text style={{
           fontFamily: Fonts.FiraSansMediumItalic
         }}>{messageTwo}</Text></Text>}

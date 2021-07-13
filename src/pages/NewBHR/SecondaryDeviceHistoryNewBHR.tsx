@@ -87,7 +87,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
   const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
   const WALLET_SETUP = useSelector( ( state ) => state.storage.database.WALLET_SETUP )
-  const trustedContacts: TrustedContactsService = useSelector( ( state ) => state.trustedContacts.service )
+  const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.health.channelAssets )
@@ -181,7 +181,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   useEffect( () => {
     if( !Contact ) return
 
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+    const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
     if( contacts )
@@ -224,23 +224,22 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   useEffect( () => {
     ( async () => {
-      const trustedContactsInfo: Keepers = trustedContacts.tc.trustedContacts
       const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
-      const trustedData = trustedContactsInfo[ contactName ]
+      const trustedData = trustedContacts[ contactName ]
 
-      console.log( 'trustedData.trustedChannel', trustedData.trustedChannel.data[ 1 ] )
-      if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
-        if( trustedData.trustedChannel.data[ 1 ] && semver.lt( trustedData.trustedChannel.data[ 1 ].data.version, '1.6.0' ) ) {
-          setTimeout( () => {
-            setErrorMessageHeader( 'Error sending Recovery Key' )
-            setErrorMessage(
-              'your keeper need to update app / come online',
-            )
-            setIsVersionMismatch( true )
-          }, 2 );
-          ( ErrorBottomSheet as any ).current.snapTo( 1 )
-        }
-      }
+      // console.log( 'trustedData.trustedChannel', trustedData.trustedChannel.data[ 1 ] )
+      // if( trustedData && trustedData.trustedChannel && trustedData.trustedChannel.data.length == 2 ){
+      //   if( trustedData.trustedChannel.data[ 1 ] && semver.lt( trustedData.trustedChannel.data[ 1 ].data.version, '1.6.0' ) ) {
+      //     setTimeout( () => {
+      //       setErrorMessageHeader( 'Error sending Recovery Key' )
+      //       setErrorMessage(
+      //         'your keeper need to update app / come online',
+      //       )
+      //       setIsVersionMismatch( true )
+      //     }, 2 );
+      //     ( ErrorBottomSheet as any ).current.snapTo( 1 )
+      //   }
+      // }
 
     } )()
   }, [] )

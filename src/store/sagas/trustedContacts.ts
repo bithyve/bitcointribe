@@ -399,12 +399,10 @@ export const rejectTrustedContactWatcher = createWatcher(
 )
 
 function* removeTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {
+  const { walletName, walletId } = yield select( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
   )
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const { walletId } = regularAccount.hdWallet.getWalletId()
 
   const { channelKey } = payload
   const contact: TrustedContact = trustedContacts[ channelKey ]
@@ -436,7 +434,6 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
     channelUpdates: [ channelUpdate ]
   } ) )
 
-  const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const notifReceivers = [
     {
       walletId: contact.walletID,

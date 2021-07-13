@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { EphemeralDataElements } from '../../bitcoin/utilities/Interface'
+import { EphemeralDataElements, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import QRCode from 'react-native-qrcode-svg'
 
 export default function TrustedContactQr( props ) {
@@ -33,8 +33,8 @@ export default function TrustedContactQr( props ) {
     ( state ) => state.storage.database.WALLET_SETUP,
   )
 
-  const trustedContacts: TrustedContactsService = useSelector(
-    ( state ) => state.trustedContacts.service,
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
   )
 
   useEffect( () => {
@@ -49,7 +49,7 @@ export default function TrustedContactQr( props ) {
           .toLowerCase()
           .trim()
         const publicKey =
-          trustedContacts.tc.trustedContacts[ contactName ].publicKey
+          trustedContacts[ contactName ].publicKey
         console.log( {
           contactName
         } )
