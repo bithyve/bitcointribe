@@ -47,6 +47,7 @@ import CloudPermissionModalContents from '../components/CloudPermissionModalCont
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
+import S3Service from '../bitcoin/services/sss/S3Service'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -168,7 +169,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ securityQue, showSecurityQue ] = useState( false )
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
-  const s3service = useSelector( ( state ) => state.health.service )
+  const s3service: S3Service = useSelector( ( state ) => state.health.service )
   const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
   const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
@@ -208,14 +209,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     //     walletName,
     //   } )
     // }
-    if( walletSetupCompleted ){
+    if( walletSetupCompleted && s3service && s3service.levelhealth && cloudBackupStatus == CloudBackupStatus.COMPLETED && cloudPermissionGranted === true ) {
       // ( loaderBottomSheet as any ).current.snapTo( 0 )
       setLoaderModal( false )
       props.navigation.navigate( 'HomeNav', {
         walletName,
       } )
     }
-  }, [ walletSetupCompleted ] )
+  }, [ walletSetupCompleted, s3service, cloudBackupStatus ] )
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
@@ -235,8 +236,16 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         'securityQuestionHistory',
         JSON.stringify( securityQuestionHistory ),
       )
+
     } )
   }
+
+  useEffect( ()=>{
+    if( s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+      cloudPermissionGranted === true ){
+      dispatch( setCloudData() )
+    }
+  }, [ s3service ] )
 
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
@@ -344,30 +353,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <TouchableOpacity
         onPress={async () => {
           showLoader()
+          let security = null
           if ( activeIndex === 0 ) {
-            const security = {
+            security = {
               questionId: dropdownBoxValue.id,
               question: dropdownBoxValue.question,
               answer,
             }
-
-            checkCloudLogin( security )
-            // setIsCloudPermissionRender( true )
-            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
-            dispatch( setCloudData() )
-            showSecurityQue( false )
           } else {
-            const security = {
+            security = {
               questionId: 0,
               question: hintText,
               answer: pswd,
             }
-            checkCloudLogin( security )
-            // setIsCloudPermissionRender( true )
-            // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )
-            dispatch( setCloudData() )
-            showEncryptionPswd( false )
           }
+          security && checkCloudLogin( security )
+          showSecurityQue( false )
         }}
         style={{
           ...styles.buttonView, elevation: Elevation

@@ -140,19 +140,19 @@ function* initHealthWorker() {
   const randomIdForCloud = generateRandomString( 8 )
   const levelInfo = [
     {
-      shareType: 'cloud',
-      updatedAt: 0,
-      status: 'notSetup',
-      shareId: randomIdForCloud,
-      reshareVersion: 0,
-    },
-    {
       shareType: 'securityQuestion',
       updatedAt: moment( new Date() ).valueOf(),
       status: 'accessible',
       shareId: randomIdForSecurityQ,
       reshareVersion: 0,
       name: 'Security Question',
+    },
+    {
+      shareType: 'cloud',
+      updatedAt: 0,
+      status: 'notSetup',
+      shareId: randomIdForCloud,
+      reshareVersion: 0,
     },
   ]
   const obj: KeeperInfoInterface = {
@@ -393,14 +393,14 @@ function* updateHealthLevel2Worker( { payload } ) {
       }
     }
     const levelInfo = []
-    levelInfo[ 0 ] = {
+    levelInfo[ 1 ] = {
       shareType: 'cloud',
       updatedAt: 0,
       status: 'notSetup',
       shareId: metaShares[ 0 ].shareId,
       reshareVersion: 0,
     }
-    levelInfo[ 1 ] = SecurityQuestionHealth
+    levelInfo[ 0 ] = SecurityQuestionHealth
     for ( let i = 1; i < metaShares.length; i++ ) {
       const element = metaShares[ i ]
       let shareType = ''
@@ -1255,8 +1255,8 @@ function* getPDFDataWorker( { payload } ) {
   try {
     const { shareId, Contact, channelKey } = payload
     yield put( switchS3LoaderKeeper( 'pdfDataProcess' ) )
-    const trustedContacts: TrustedContactsService = yield select(
-      ( state ) => state.trustedContacts.service
+    const contacts: Trusted_Contacts = yield select(
+      ( state ) => state.trustedContacts.contacts
     )
     const appVersion = DeviceInfo.getVersion()
     const pdfInfo: {
@@ -1268,7 +1268,6 @@ function* getPDFDataWorker( { payload } ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
     let pdfPath = pdfInfo.filePath
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     let currentContact: TrustedContact
     let channelKeyFromCH: string
 
@@ -1592,8 +1591,8 @@ function* removeUnwantedUnderCustodySharesWorker( { payload } ) {
   // set a timelapse for auto update and enable instantaneous manual update
   yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
 
-  const trustedContactsService: TrustedContactsService = yield select(
-    ( state ) => state.trustedContacts.service,
+  const Contacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
   )
 
   const DECENTRALIZED_BACKUP = yield select(
@@ -1624,11 +1623,8 @@ function* removeUnwantedUnderCustodySharesWorker( { payload } ) {
             if ( info.walletId === UNDER_CUSTODY[ tag ].META_SHARE.meta.walletId ) {
               delete UNDER_CUSTODY[ tag ]
               removed = true
-              for ( const contactName of Object.keys(
-                trustedContactsService.tc.trustedContacts,
-              ) ) {
-                const contact =
-                    trustedContactsService.tc.trustedContacts[ contactName ]
+              for ( const contactName of Object.keys( Contacts ) ) {
+                const contact = Contacts[ contactName ]
                 if ( contact.walletID === info.walletId ) {
                   contact.isWard = false
                 }
@@ -1766,6 +1762,7 @@ function* autoShareLevel2KeepersWorker( ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
     const service: S3Service = yield select( ( state ) => state.health.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const Contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
     const walletId = service.levelhealth.walletId
@@ -1795,7 +1792,7 @@ function* autoShareLevel2KeepersWorker( ) {
           channelKey: keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ i ].shareId ).channelKey,
         }
         const primaryData: PrimaryStreamData = {
-          contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
+          contactDetails: Contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
           relationType: TrustedContactRelationTypes.KEEPER,
@@ -2022,8 +2019,7 @@ function* downloadSMShareWorker( { payload } ) {
     if( scannedData ) {
       const s3Service = yield select( ( state ) => state.health.service )
       const walletId = s3Service.levelhealth.walletId
-      const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
-      const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+      const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
       const qrDataObj = JSON.parse( scannedData )
       let currentContact: TrustedContact
       let channelKey: string
@@ -2067,7 +2063,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
     const channelAssets: ChannelAssets = yield select( ( state ) => state.health.channelAssets )
     const s3Service = yield select( ( state ) => state.health.service )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const walletId = s3Service.levelhealth.walletId
     const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
     if( MetaShares && MetaShares.length ) {
@@ -2080,7 +2076,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
           secondaryChannelKey: SSS.generateKey( config.CIPHER_SPEC.keyLength )
         }
         const primaryData: PrimaryStreamData = {
-          contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
+          contactDetails: contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
           relationType: TrustedContactRelationTypes.KEEPER,
@@ -2132,7 +2128,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
             channelKey: oldChannelKey,
           }
           const primaryData: PrimaryStreamData = {
-            contactDetails: trustedContacts.tc.trustedContacts[ oldChannelKey ].contactDetails,
+            contactDetails: contacts[ oldChannelKey ].contactDetails,
             walletID: walletId,
             walletName,
             relationType: TrustedContactRelationTypes.CONTACT,
@@ -2181,9 +2177,8 @@ function* modifyLevelDataWorker( ) {
     const currentLevel: number = yield select( ( state ) => state.health.currentLevel )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
     let levelData: LevelData[] = yield select( ( state ) => state.health.levelData )
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const s3Service = yield select( ( state ) => state.health.service )
-    const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
     console.log( 'contacts', contacts )
     let isError = false
     const abc = JSON.stringify( levelHealth )
@@ -2284,6 +2279,14 @@ function* setupHealthWorker( { payload } ) {
   if( level == 1 ){
     const levelInfo = [] = [
       {
+        shareType: 'securityQuestion',
+        updatedAt: moment( new Date() ).valueOf(),
+        status: 'accessible',
+        shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
+        reshareVersion: 0,
+        name: 'Security Question',
+      },
+      {
         shareType: 'cloud',
         updatedAt: moment( new Date() ).valueOf(),
         status: 'accessible',
@@ -2291,14 +2294,6 @@ function* setupHealthWorker( { payload } ) {
         reshareVersion: 0,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
       },
-      {
-        shareType: 'securityQuestion',
-        updatedAt: moment( new Date() ).valueOf(),
-        status: 'accessible',
-        shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
-        reshareVersion: 0,
-        name: 'Security Question',
-      }
     ]
     yield put( updateHealth( [ {
       level: 1,
@@ -2316,12 +2311,19 @@ function* setupHealthWorker( { payload } ) {
       )
     }
     if ( !isLevelInitialized ) {
-      const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
-      const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
+      const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
       const s3Service: S3Service = yield select( ( state ) => state.health.service )
       console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
 
       const levelInfo: LevelInfo[] = [
+        {
+          shareType: 'securityQuestion',
+          updatedAt: moment( new Date() ).valueOf(),
+          status: 'accessible',
+          shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
+          reshareVersion: 0,
+          name: 'Security Question',
+        },
         {
           shareType: 'cloud',
           updatedAt: moment( new Date() ).valueOf(),
@@ -2330,14 +2332,6 @@ function* setupHealthWorker( { payload } ) {
           reshareVersion: 0,
           name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
         },
-        {
-          shareType: 'securityQuestion',
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-          shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
-          reshareVersion: 0,
-          name: 'Security Question',
-        }
       ]
 
       for ( let i = 1; i < metaShares.length; i++ ) {
@@ -2403,6 +2397,7 @@ function* updateKeeperInfoToChannelWorker( ) {
     const service: S3Service = yield select( ( state ) => state.health.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
     const walletId = service.levelhealth.walletId
     const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
@@ -2416,7 +2411,7 @@ function* updateKeeperInfoToChannelWorker( ) {
         const element = levelHealth[ 0 ].levelInfo[ i ]
         const channelKey = keeperInfo.find( value=>value.shareId == element.shareId ).channelKey
         const primaryData: PrimaryStreamData = {
-          contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
+          contactDetails: contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
           relationType: TrustedContactRelationTypes.KEEPER,
@@ -2500,7 +2495,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
     }
     yield put( putKeeperInfo( keeperInfo ) )
     const service: S3Service = yield select( ( state ) => state.health.service )
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
+    const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const walletId = service.levelhealth.walletId
     const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
     const contactInfo = {
@@ -2508,7 +2503,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
       contactsSecondaryChannelKey
     }
     const primaryData: PrimaryStreamData = {
-      contactDetails: trustedContacts.tc.trustedContacts[ channelKey ].contactDetails,
+      contactDetails: contacts[ channelKey ].contactDetails,
       walletID: walletId,
       walletName,
       relationType: TrustedContactRelationTypes.KEEPER,
