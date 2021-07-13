@@ -35,7 +35,7 @@ import { REGULAR_ACCOUNT } from '../../common/constants/wallet-service-types'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import AccountShell from '../../common/data/models/AccountShell'
 import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
-import { Account, AccountType, DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts, AccountType, DerivativeAccountTypes } from '../../bitcoin/utilities/Interface'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
@@ -98,7 +98,7 @@ export function* redeemSwanCodeForTokenWorker( { payload } ) {
   yield call( createWithdrawalWalletOnSwanWorker, {
     payload: {
       data: {
-        minBtcThreshold: 0.02
+        minBtcThreshold: 0.01
       }
     }
   } )
@@ -116,11 +116,23 @@ export function* createWithdrawalWalletOnSwanWorker( { payload } ) {
   const { swanAuthenticatedToken, minBtcThreshold } = yield select(
     ( state ) => state.swanIntegration
   )
-  const { swanAccountDetails } = yield select(
-    ( state ) => state.swanIntegration
-  )
 
-  const swanXpub = swanAccountDetails.primarySubAccount.xPub
+  const accountState: AccountsState = yield select(
+    ( state ) => state.accounts
+  )
+  const accounts: Accounts = accountState.accounts
+
+  let swanAccountDetails = null
+
+  for ( const key in accounts ) {
+
+    if( accounts[ key ].type ==='SWAN_ACCOUNT' )
+
+      swanAccountDetails = accounts[ key ]
+  }
+
+  const swanXpub = swanAccountDetails.xpub
+
   let swanCreateResponse
 
   try {

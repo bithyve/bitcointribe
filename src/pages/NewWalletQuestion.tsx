@@ -38,7 +38,6 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import { initNewBHRFlow } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
-import { clearAccountSyncCache } from '../store/actions/accounts'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
@@ -195,7 +194,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         setHeight( 81 )
       }
     )
-    dispatch( clearAccountSyncCache() )
+
     return () => {
       keyboardDidHideListener.remove()
       keyboardDidShowListener.remove()

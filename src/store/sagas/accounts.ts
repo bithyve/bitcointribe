@@ -881,9 +881,9 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
   const accountShell = new AccountShell( {
     primarySubAccount,
     unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
-    displayOrder: 1,
+    displayOrder: 1
   } )
-
+  accountShell.syncStatus = SyncStatus.COMPLETED
   return accountShell
 }
 

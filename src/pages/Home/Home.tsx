@@ -1078,9 +1078,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
-        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
-          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
-          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
 
@@ -1310,18 +1308,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+
     switch ( menuItem.kind ) {
         case BuyMenuItemKind.FAST_BITCOINS:
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          if( !this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length ){
+          const swanAccountActive = false
+          if( !swanAccountActive ){
             this.props.clearSwanCache()
-            const accountDetails = {
-              name: 'Swan Account',
-              description: 'Sats purchased from Swan',
-            }
-            this.props.createTempSwanAccountInfo( accountDetails )
             this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
           }
           else {
@@ -1370,10 +1365,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   openBottomSheet = (
     kind: BottomSheetKind,
-    snapIndex: number | null = null
+    snapIndex?: number | null,
+    swanAccountClicked?: boolean | false
   ) => {
-    // console.log( 'kind', kind )
-    // console.log( 'snapIndex', snapIndex )
+    const tempMenuItem: BuyBitcoinBottomSheetMenuItem = {
+      kind: BuyMenuItemKind.SWAN
+    }
+
+    if( swanAccountClicked ) this.handleBuyBitcoinBottomSheetSelection( tempMenuItem )
 
     this.setState(
       {

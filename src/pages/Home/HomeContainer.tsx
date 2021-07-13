@@ -23,6 +23,7 @@ import { withNavigationFocus } from 'react-navigation'
 import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import { setShowAllAccount } from '../../store/actions/accounts'
+import { SwanIntegrationState } from '../../store/reducers/SwanIntegration'
 import Fonts from './../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
@@ -31,7 +32,6 @@ import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
-
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -46,10 +46,11 @@ interface HomePropsTypes {
   navigation: any;
   containerView: StyleProp<ViewStyle>;
   currentLevel: number;
+  startRegistration: boolean;
   isFocused: boolean;
   currencyCode: any;
   setShowAllAccount: any;
-  openBottomSheet: any
+  openBottomSheet: any;
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -71,27 +72,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    // this.props.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
-    if ( selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE ) {
-      switch( ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ) {
-          case ServiceAccountKind.WYRE:
-            this.props.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-            break
-          case( ServiceAccountKind.RAMP ):
-            this.props.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
-            break
-          case( ServiceAccountKind.SWAN ):
-            this.props.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
-            break
-          default:
-          // do nothing
-      }
+    if (
+      this.props.startRegistration &&
+      selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
+    ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      this.props.openBottomSheet( 6, null, true )
+
     } else {
       this.props.navigation.navigate( 'AccountDetails', {
         accountShellID: selectedAccount.id,
       } )
     }
-
   };
 
   render() {
@@ -161,11 +153,12 @@ const mapStateToProps = ( state ) => {
   return {
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
     currentLevel: idx( state, ( _ ) => _.health.currentLevel ),
+    startRegistration: idx( state, ( _ ) => _.swanIntegration.startRegistration ),
   }
 }
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    setShowAllAccount,
+    setShowAllAccount
   } )( Home )
 )
