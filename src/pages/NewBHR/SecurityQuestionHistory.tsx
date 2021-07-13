@@ -196,8 +196,8 @@ const SecurityQuestionHistory = ( props ) => {
       const shareObj =
         {
           walletId: s3Service.getWalletId().data.walletId,
-          shareId: levelHealth[ 0 ].levelInfo[ 1 ].shareId,
-          reshareVersion: levelHealth[ 0 ].levelInfo[ 1 ].reshareVersion,
+          shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+          reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',
