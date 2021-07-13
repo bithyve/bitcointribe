@@ -28,7 +28,16 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { ScrollView } from 'react-native-gesture-handler'
 import ToggleContainer from './ToggleContainer'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import SubAccountKind from '../../common/data/enums/SubAccountKind'
+import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 
+
+export enum BottomSheetKind {
+  SWAN_STATUS_INFO,
+  WYRE_STATUS_INFO,
+  RAMP_STATUS_INFO,
+}
 interface HomeStateTypes {
   currencyCode: string;
 }
@@ -40,6 +49,7 @@ interface HomePropsTypes {
   isFocused: boolean;
   currencyCode: any;
   setShowAllAccount: any;
+  openBottomSheet: any
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -61,9 +71,27 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    this.props.navigation.navigate( 'AccountDetails', {
-      accountShellID: selectedAccount.id,
-    } )
+    // this.props.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+    if ( selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE ) {
+      switch( ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind ) {
+          case ServiceAccountKind.WYRE:
+            this.props.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
+            break
+          case( ServiceAccountKind.RAMP ):
+            this.props.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
+            break
+          case( ServiceAccountKind.SWAN ):
+            this.props.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
+            break
+          default:
+          // do nothing
+      }
+    } else {
+      this.props.navigation.navigate( 'AccountDetails', {
+        accountShellID: selectedAccount.id,
+      } )
+    }
+
   };
 
   render() {

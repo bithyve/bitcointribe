@@ -1534,7 +1534,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.onBackPress}
+                onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -1549,7 +1549,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.onBackPress}
+                onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -1565,7 +1565,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.onBackPress}
+                onPress={this.closeBottomSheet}
               />
             </>
           )
