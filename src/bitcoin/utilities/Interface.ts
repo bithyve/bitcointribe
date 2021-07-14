@@ -524,7 +524,7 @@ export interface PrimaryStreamData {
   paymentAddresses?: {
     [accountType: string]: string
   },
-  contactDetails: ContactDetails
+  contactDetails?: ContactDetails
 }
 
 export interface SecondaryStreamData {
@@ -584,6 +584,7 @@ export enum TrustedContactRelationTypes {
 export interface TrustedContact {
   contactDetails: ContactDetails,
   relationType: TrustedContactRelationTypes,
+  channelKey: string,
   permanentChannelAddress: string,
   isActive: boolean, // is the channel active
   hasNewData: boolean, // instream has new data

@@ -508,14 +508,13 @@ class ContactDetails extends PureComponent<
 
   createDeepLink = ( contact ) => {
     const { trustedContacts, WALLET_SETUP } = this.props
-    const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
 
-    if( contacts )
-      for( const ck of Object.keys( contacts ) ){
-        if ( contacts[ ck ].contactDetails.id === contact.id ){
-          currentContact = contacts[ ck ]
+    if( trustedContacts )
+      for( const ck of Object.keys( trustedContacts ) ){
+        if ( trustedContacts[ ck ].contactDetails.id === contact.id ){
+          currentContact = trustedContacts[ ck ]
           channelKey = ck
           break
         }

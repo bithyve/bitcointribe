@@ -274,8 +274,7 @@ export default class TrustedContactsOperations {
             throw new Error( 'Init failed: contact details missing' )
           const newContact: TrustedContact = {
             contactDetails,
-            isActive: true,
-            hasNewData: true,
+            channelKey,
             permanentChannelAddress: crypto
               .createHash( 'sha256' )
               .update( channelKey )
@@ -286,6 +285,8 @@ export default class TrustedContactsOperations {
             ),
             secondaryChannelKey,
             contactsSecondaryChannelKey,
+            isActive: true,
+            hasNewData: true,
           }
           contact = newContact
         }
