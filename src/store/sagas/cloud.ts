@@ -39,11 +39,13 @@ function* cloudWorker( { payload } ) {
       const MetaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
+      const RK: MetaShare = MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
+
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
         type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
-        scheme: MetaShares && MetaShares.length && MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).meta.scheme ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).meta.scheme : '1of1',
+        scheme: MetaShares && MetaShares.length && RK.meta.scheme ? RK.meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares && MetaShares.length && MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : -1,
@@ -83,11 +85,7 @@ function* cloudWorker( { payload } ) {
       )
 
       let encryptedCloudDataJson
-      const shares =
-            share &&
-                !( Object.keys( share ).length === 0 && share.constructor === Object )
-              ? JSON.stringify( share )
-              : ''
+      const shares = RK ? JSON.stringify( RK ) : ''
       encryptedCloudDataJson = yield call( CloudData,
         database,
         accountShells,

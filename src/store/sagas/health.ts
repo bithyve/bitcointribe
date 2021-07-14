@@ -136,6 +136,7 @@ import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFr
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import RelayServices from '../../bitcoin/services/RelayService'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -1801,16 +1802,17 @@ function* autoShareLevel2KeepersWorker( ) {
           channelKey
         }
         yield put( updatedKeeperInfo( obj ) )
+
         const contactInfo = {
           channelKey: keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ i ].shareId ).channelKey,
         }
+
         const primaryData: PrimaryStreamData = {
           contactDetails: Contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
           relationType: TrustedContactRelationTypes.KEEPER,
         }
-
         const backupData: BackupStreamData = {
           primaryMnemonicShard: {
             ...MetaShares.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ i ].shareId ),
@@ -1822,7 +1824,6 @@ function* autoShareLevel2KeepersWorker( ) {
           },
           keeperInfo
         }
-
         const streamUpdates: UnecryptedStreamData = {
           streamId: TrustedContacts.getStreamId( walletId ),
           primaryData,
@@ -1836,32 +1837,42 @@ function* autoShareLevel2KeepersWorker( ) {
             version: DeviceInfo.getVersion()
           }
         }
-
-        channelSyncUpdates.push( {
+        // initiate permanent channel
+        const channelUpdate =  {
+          contactInfo, streamUpdates
+        }
+        console.log( 'channelUpdate', channelUpdate )
+        shareIds.push( obj )
+        const { updated, updatedContacts }: {
+          updated: boolean;
+          updatedContacts: Trusted_Contacts
+        } = yield call(
+          TrustedContactsOperations.syncPermanentChannels,
+          [ {
+            channelKey: contactInfo.channelKey,
+            streamId: streamUpdates.streamId,
+            contactDetails: Contacts[ channelKey ].contactDetails,
+            unEncryptedOutstreamUpdates: streamUpdates,
+          } ]
+        )
+        console.log( 'updated', {
           channelKey: contactInfo.channelKey,
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
         } )
-        shareIds.push( obj )
-      }
-    }
-    const res = yield call(
-      trustedContacts.syncPermanentChannels,
-      channelSyncUpdates
-    )
-    if ( res.status === 200 ) {
-      for ( let i = 0; i < shareIds.length; i++ ) {
-        const element = shareIds[ i ]
-        const shareObj = {
-          walletId: walletId,
-          shareId: element.shareId,
-          reshareVersion: MetaShares.find( value=>value.shareId == element.shareId ).meta.reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-          name: element.name,
-          shareType: element.type
+        console.log( 'updated', updated )
+        if ( updated ) {
+          const shareObj = {
+            walletId: walletId,
+            shareId: obj.shareId,
+            reshareVersion: MetaShares.find( value=>value.shareId == obj.shareId ).meta.reshareVersion,
+            updatedAt: moment( new Date() ).valueOf(),
+            status: 'accessible',
+            name: obj.name,
+            shareType: obj.type
+          }
+          yield put( updateMSharesHealth( shareObj, false ) )
         }
-        yield put( updateMSharesHealth( shareObj, false ) )
       }
     }
     yield put( switchS3LoaderKeeper( 'autoShareKeepersData' ) )

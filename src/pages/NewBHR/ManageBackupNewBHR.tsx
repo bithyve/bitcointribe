@@ -410,7 +410,9 @@ class ManageBackupNewBHR extends Component<
     }
 
     if( this.props.currentLevel == 3 ) {
-      this.loaderBottomSheet.snapTo( 0 )
+      this.setState( {
+        loaderModal: false
+      } )
     }
 
     if (
@@ -656,7 +658,9 @@ class ManageBackupNewBHR extends Component<
         levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
         this.props.updateCloudData()
-        this.loaderBottomSheet.snapTo( 1 )
+        this.setState( {
+          loaderModal: true
+        } )
       }
     }
   }
