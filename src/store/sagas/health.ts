@@ -154,7 +154,7 @@ function* initHealthWorker() {
       status: security && security.answer ? 'accessible' : 'notSetup',
       shareId: randomIdForSecurityQ,
       reshareVersion: 0,
-      name: 'Set Password',
+      name: security && security.answer ? 'Encryption Password' : 'Set Password',
     },
     {
       shareType: 'cloud',
@@ -166,7 +166,7 @@ function* initHealthWorker() {
   ]
   const obj: KeeperInfoInterface = {
     shareId: randomIdForSecurityQ,
-    name: 'Set Password',
+    name: security && security.answer ? 'Encryption Password' : 'Set Password',
     type: 'securityQuestion',
     scheme: '1of1',
     currentLevel: 0,
@@ -402,7 +402,7 @@ function* updateHealthLevel2Worker( { payload } ) {
         status: security && security.answer ? 'accessible' : 'notSetup',
         shareId: randomIdForSecurityQ,
         reshareVersion: 0,
-        name: 'Set Password',
+        name: security && security.answer ? 'Encryption Password' : 'Set Password',
       }
     }
     const levelInfo = []
@@ -2323,7 +2323,7 @@ function* setupHealthWorker( { payload } ) {
         status: security && security.answer ? 'accessible' : 'notSetup',
         shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
         reshareVersion: 0,
-        name: 'Set Password',
+        name: security && security.answer ? 'Encryption Password' : 'Set Password',
       },
       {
         shareType: 'cloud',
@@ -2361,7 +2361,7 @@ function* setupHealthWorker( { payload } ) {
           status: security && security.answer ? 'accessible' : 'notSetup',
           shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
           reshareVersion: 0,
-          name: 'Set Password',
+          name: security && security.answer ? 'Encryption Password' : 'Set Password',
         },
         {
           shareType: 'cloud',
@@ -2613,6 +2613,7 @@ function* setupPasswordWorker( { payload } ) {
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',
+          name: 'Encryption Password'
         }
     yield put( updateMSharesHealth( shareObj, true ) )
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )

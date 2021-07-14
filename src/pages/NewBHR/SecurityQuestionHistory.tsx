@@ -42,7 +42,7 @@ const SecurityQuestionHistory = ( props ) => {
     },
     {
       id: 2,
-      title: 'Security Answer confirmed',
+      title: 'Security Password confirmed',
       date: null,
       info:
         'consectetur adipiscing Lorem ipsum dolor sit amet, consectetur sit amet',
@@ -110,7 +110,7 @@ const SecurityQuestionHistory = ( props ) => {
       <ErrorModalContents
         modalRef={HealthCheckSuccessBottomSheet}
         title={'Health Check Successful'}
-        info={'Answer backed up successfully'}
+        info={'Password backed up successfully'}
         note={''}
         proceedButtonText={'View Health'}
         isIgnoreButton={false}
@@ -201,6 +201,7 @@ const SecurityQuestionHistory = ( props ) => {
           updatedAt: moment( new Date() ).valueOf(),
           status: 'accessible',
           shareType: 'securityQuestion',
+          name: 'Encryption Password'
         }
       dispatch( updateMSharesHealth( shareObj, true ) )
     }
@@ -218,7 +219,7 @@ const SecurityQuestionHistory = ( props ) => {
       <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
       <HistoryHeaderComponent
         onPressBack={() => props.navigation.goBack()}
-        selectedTitle={'Set Password'}
+        selectedTitle={'Encryption Password'}
         selectedTime={props.navigation.state.params.selectedTime}
         moreInfo={''}
         headerImage={require( '../../assets/images/icons/icon_question_bold.png' )}
@@ -236,8 +237,8 @@ const SecurityQuestionHistory = ( props ) => {
             showQuestionModal( true )
           }}
           data={sortedHistory( securityQuestionsHistory )}
-          confirmButtonText={'Confirm Answer'}
-          reshareButtonText={'Confirm Answer'}
+          confirmButtonText={'Confirm Password'}
+          reshareButtonText={'Confirm Password'}
           // changeButtonText={'Change Question'}
           disableChange={true}
           onPressReshare={() => {
