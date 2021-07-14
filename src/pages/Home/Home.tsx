@@ -45,6 +45,8 @@ import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   rejectTrustedContact,
+  syncPermanentChannels,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -70,6 +72,8 @@ import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import RelayServices from '../../bitcoin/services/RelayService'
+import dbManager from '../../storage/realm/dbManager'
+
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import config from '../../bitcoin/HexaConfig'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -284,6 +288,7 @@ interface HomePropsTypes {
   updateMessageStatus: any;
   initLoader: boolean;
   getMessages: any;
+  syncPermanentChannels: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -296,7 +301,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   currentNotificationId: string;
   bottomSheetRef = createRef<BottomSheet>();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
-
+  syncPermanantChannelTime: any
   static whyDidYouRender = true;
 
   constructor( props ) {
@@ -305,7 +310,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
-
+    this.syncPermanantChannelTime = null
     this.state = {
       notificationData: [],
       CurrencyCode: 'USD',
@@ -802,7 +807,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // Keeping autoSync disabled
       credsAuthenticated( false )
       //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
-
+      this.syncChannel()
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
@@ -846,6 +851,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const unread = messages.filter( msg => msg.status === 'unread' )
     if ( Platform.OS === 'ios' ) {
       PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    }
+  }
+
+  syncChannel= () => {
+    if( this.syncPermanantChannelTime === null ) {
+      this.syncPermanantChannelTime = new Date()
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
+      } )
+    } else {
+      const now: any = new Date()
+      const diff = Math.abs( now - this.syncPermanantChannelTime )
+      if( diff > 300000 ) {
+        this.syncPermanantChannelTime = null
+        this.syncChannel()
+      }
     }
   }
 
@@ -1262,6 +1284,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      this.syncChannel()
       // this.notificationCheck()
       this.setState( {
         lastActiveTime: moment().toISOString(),
@@ -1866,7 +1889,8 @@ export default withNavigationFocus(
     updateNotificationList,
     updateMessageStatusInApp,
     updateMessageStatus,
-    getMessages
+    getMessages,
+    syncPermanentChannels,
   } )( Home )
 )
 
