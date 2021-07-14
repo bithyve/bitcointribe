@@ -81,11 +81,13 @@ const CloudBackupHistory = ( props ) => {
       }
     }
     console.log( 'share', share )
-    dispatch( setCloudData(
-      keeperInfo,
-      currentLevel === 0 ? currentLevel + 1 : currentLevel,
-      share
-    ) )
+    if( levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+      dispatch( setCloudData(
+        keeperInfo,
+        currentLevel === 0 ? currentLevel + 1 : currentLevel,
+        share
+      ) )
+    }
   }
 
   const sortedHistory = ( history ) => {

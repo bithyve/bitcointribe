@@ -768,6 +768,9 @@ export enum NetworkType {
 export interface Wallet {
   walletId: string,
   walletName: string,
+  question: string,
+  questionId: number,
+  answer: string,
   primaryMnemonic: string,
   secondaryMemonic?: string,
   details2FA? : {

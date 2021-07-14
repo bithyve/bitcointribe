@@ -1692,7 +1692,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
               note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
               onPressProceed={()=>{
-                this.props.setCloudData()
+                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+                  this.props.setCloudData()
+                }
                 this.closeBottomSheet()
               }}
               onPressIgnore={()=> {

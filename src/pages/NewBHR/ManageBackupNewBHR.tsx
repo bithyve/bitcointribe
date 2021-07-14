@@ -402,7 +402,8 @@ class ManageBackupNewBHR extends Component<
         this.props.levelHealth.length == 1 &&
         prevProps.levelHealth.length == 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-        this.props.cloudPermissionGranted === true
+        this.props.cloudPermissionGranted === true &&
+        this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup'
       ) {
         this.props.setCloudData( )
       }
@@ -1178,7 +1179,7 @@ Wallet Backup
                 this.setState( {
                   errorModal: false
                 } )
-                if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) this.props.navigation.navigate( 'NewWalletQuestion', {
+                if( this.props.currentLevel == 0 && this.props.levelHealth[ 0 ].levelInfo[ 0 ].status == 'notSetup' ) this.props.navigation.navigate( 'SetNewPassword', {
                   isFromManageBackup: true,
                 } )
               }}

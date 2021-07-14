@@ -32,8 +32,9 @@ const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[]
 function* cloudWorker( { payload } ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
-    if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-      const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
+
       const s3Service: S3Service = yield select( ( state ) => state.health.service )
       const MetaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )

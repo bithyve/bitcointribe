@@ -142,7 +142,7 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   // console.log("DATABASE", database);
   let CloudDataJson = {
   }
-  if ( !isEmpty( database ) ) {
+  if ( database && database.SERVICES ) {
     if ( database.SERVICES )
       walletImage.SERVICES = database.SERVICES
     if ( database.DECENTRALIZED_BACKUP )

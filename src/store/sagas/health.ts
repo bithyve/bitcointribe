@@ -90,11 +90,14 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
   BackupStreamData,
   ContactDetails,
+  INotification,
   KeeperInfoInterface,
   LevelData,
   LevelHealthInterface,
   LevelInfo,
   MetaShare,
+  notificationTag,
+  notificationType,
   PrimaryStreamData,
   QRCodeTypes,
   SecondaryStreamData,
@@ -132,6 +135,7 @@ import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
+import RelayServices from '../../bitcoin/services/RelayService'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -2121,6 +2125,28 @@ function* createOrChangeGuardianWorker( { payload } ) {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         } ) )
+        const temporaryContact = contacts[ channelKey ] // temporary trusted contact object
+        const instream = useStreamFromContact( temporaryContact, walletId, true )
+        const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+        const notification: INotification = {
+          notificationType: notificationType.FNF_KEEPER_REQUEST,
+          title: 'Friends and Family Request',
+          body: `You have new keeper request ${temporaryContact.contactDetails.contactName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+        const notifReceivers = []
+        notifReceivers.push( {
+          walletId: walletId,
+          FCMs: [ fcmToken ],
+        } )
+        if( notifReceivers.length )
+          yield call(
+            RelayServices.sendNotifications,
+            notifReceivers,
+            notification,
+          )
       } else {
         yield put( initializeTrustedContact( {
           contact: contact,
@@ -2558,7 +2584,8 @@ function* setupPasswordWorker( { payload } ) {
     console.log( 'UPDATE KEEPER INFO' )
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
     const { security } = payload
-
+    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
     const updatedWALLET_SETUP = {
       ...WALLET_SETUP,
@@ -2566,6 +2593,8 @@ function* setupPasswordWorker( { payload } ) {
         question: '', answer: ''
       },
     }
+    console.log( 'security', security )
+    console.log( 'updatedWALLET_SETUP', updatedWALLET_SETUP )
     yield call( insertDBWorker, {
       payload: {
         WALLET_SETUP: updatedWALLET_SETUP
@@ -2576,10 +2605,20 @@ function* setupPasswordWorker( { payload } ) {
       yield put( initializeHealthSetup() )
     }
 
+    const shareObj =
+        {
+          walletId: s3Service.getWalletId().data.walletId,
+          shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+          reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          status: 'accessible',
+          shareType: 'securityQuestion',
+        }
+    yield put( updateMSharesHealth( shareObj, true ) )
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
-    console.log( 'Error autoShareLevel2KeepersWorker', error )
+    console.log( 'Error setupPasswordStatus', error )
   }
 }
 
