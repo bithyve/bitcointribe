@@ -13,11 +13,14 @@ import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import BottomSheet from 'reanimated-bottom-sheet'
 import { editTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
 import deviceInfoModule, { getUniqueId } from 'react-native-device-info'
+import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 
 
 export type Props = {
-	navigation: any;
+  navigation: any;
+  closeModal: () => void;
+  contact: ContactRecipientDescribing
 };
 
 interface MenuOption {
@@ -49,8 +52,7 @@ interface MenuOption {
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title
 
-const EditContactScreen: React.FC<Props> = ( { navigation, }: Props ) => {
-
+const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }: Props ) => {
   const [ name, setName ] = useState( '' )
   const [ isLoadContacts, setIsLoadContacts ] = useState( false )
   const [ selectedContact, setSelectedContact ] = useState( '' )
@@ -70,7 +72,10 @@ const EditContactScreen: React.FC<Props> = ( { navigation, }: Props ) => {
       screenName: 'NodeSettings',
       onOptionPressed: () => {
         setIsLoadContacts( true )
-        addContactAddressBookBottomSheetRef.current.snapTo( 1 )
+        navigation.navigate( 'AddContact', {
+          fromScreen: 'Edit', contactToEdit: contact
+        } )
+        closeModal()
       },
     },
   ]
@@ -185,7 +190,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 								    fontFamily: Fonts.FiraSansMedium,
 								     marginTop: 15, marginBottom: hp( '1%' )
 								  }}
-								  placeholder={'Enter Names'}
+								  placeholder={'Enter Name'}
 								  placeholderTextColor={Colors.borderColor}
 								  value={name}
 								  textContentType='none'
@@ -198,13 +203,27 @@ const EditContactScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 								  onChangeText={( text ) => {
 								    setName( text )
 								  }}
-								// onSubmitEditing={
-								// 	(event) => (setConfirm(event.nativeEvent))
-								// }
+								  onSubmitEditing={
+								    () => {
+								      contact.displayedName = name
+								    }
+								  }
 								/>
             }
-            <TouchableOpacity onPress={() => {}}>
-              <Text> Proceed</Text>
+            <TouchableOpacity style={{
+              alignSelf: 'center'
+            }} onPress={() => {
+              closeModal()
+              navigation.navigate( 'AddContactSendRequest', {
+                SelectedContact: [ contact ],
+                headerText:'Add a contact  ',
+                subHeaderText:'Send a Friends and Family request',
+                contactText:'Adding to Friends and Family:',
+                showDone:true,
+                fromEdit: 'fromEdit'
+              } )
+            }}>
+              <Text style={styles.addModalTitleText}>Proceed</Text>
             </TouchableOpacity>
             {/* {menuOption.title === 'Edit Name' && errorText ?
 								<Text style={{ marginLeft: 'auto', color: Colors.red, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMediumItalic, }}>{errorText}</Text> : null

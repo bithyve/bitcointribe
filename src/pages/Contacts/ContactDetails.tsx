@@ -53,7 +53,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
-// import EditContactScreen from './EditContact'
+import EditContactScreen from './EditContact'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -1120,11 +1120,13 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderExitKeyQRContents}
           renderHeader={this.renderExitKeyQRHeader}
         />
-        {/* <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
+        <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
         } )}>
-          <EditContactScreen navigation/>
-        </ModalContainer> */}
+          <EditContactScreen navigation={navigation} contact={this.contact} closeModal={() => this.setState( {
+            edit: false
+          } )} />
+        </ModalContainer>
         <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
         } )}>
