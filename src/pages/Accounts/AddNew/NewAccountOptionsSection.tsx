@@ -52,6 +52,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
           return false
         case SubAccountKind.FULLY_IMPORTED_WALLET:
           return false
+        case SubAccountKind.FNF_ACCOUNT:
+          return true
         default:
           return false
     }
@@ -69,6 +71,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
     switch ( serviceAccountKind ) {
         case ServiceAccountKind.FAST_BITCOINS:
           return false
+        case ServiceAccountKind.FNF_ACCOUNT:
+          return true
         case ServiceAccountKind.SWAN:
           return currentSwanSubAccount == null
         case ServiceAccountKind.WYRE:
@@ -98,6 +102,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
           return 'COMING SOON'
         case SubAccountKind.DONATION_ACCOUNT:
           return 'NEW'
+        case SubAccountKind.FNF_ACCOUNT:
+          return 'NEW'
         case SubAccountKind.SERVICE:
           return specialTagForServiceChoice( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
         case SubAccountKind.WATCH_ONLY_IMPORTED_WALLET:
@@ -113,6 +119,8 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
     switch ( serviceAccountKind ) {
         case ServiceAccountKind.FAST_BITCOINS:
           return 'COMING SOON'
+        case ServiceAccountKind.FNF_ACCOUNT:
+          return 'NEW'
         case ServiceAccountKind.SWAN:
           return 'NEW'
         case ServiceAccountKind.WYRE:
