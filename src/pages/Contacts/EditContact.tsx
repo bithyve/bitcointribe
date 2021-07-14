@@ -64,6 +64,19 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
       imageSource: require( '../../assets/images/icons/icon_phonebook.png' ),
       subtitle: 'Show all account on the Home Screen',
       screenName: 'AccountManagement',
+      onOptionPressed: () => {
+        if ( name.length > 0 ) {
+          closeModal()
+          navigation.navigate( 'AddContactSendRequest', {
+            SelectedContact: [ contact ],
+            headerText:'Add a contact  ',
+            subHeaderText:'Send a Friends and Family request',
+            contactText:'Adding to Friends and Family:',
+            showDone:true,
+            fromEdit: 'fromEdit'
+          } )
+        }
+      },
     },
     {
       title: 'Associate a Contact',
@@ -81,11 +94,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
   ]
 
   function handleOptionSelection( menuOption: MenuOption ) {
-    if ( typeof menuOption.onOptionPressed === 'function' ) {
-      menuOption.onOptionPressed()
-    } else if ( menuOption.screenName !== undefined ) {
-      navigation.navigate( menuOption.screenName )
-    }
+    menuOption.onOptionPressed()
   }
   //   const editTrustedContact = useCallback( async () => {
   //     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
@@ -210,9 +219,12 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
 								  }
 								/>
             }
+            {menuOption.title === 'Edit Name' &&
             <TouchableOpacity style={{
               alignSelf: 'center'
-            }} onPress={() => {
+            }}
+            disabled={name.length === 0}
+            onPress={() => {
               closeModal()
               navigation.navigate( 'AddContactSendRequest', {
                 SelectedContact: [ contact ],
@@ -225,6 +237,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
             }}>
               <Text style={styles.addModalTitleText}>Proceed</Text>
             </TouchableOpacity>
+            }
             {/* {menuOption.title === 'Edit Name' && errorText ?
 								<Text style={{ marginLeft: 'auto', color: Colors.red, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMediumItalic, }}>{errorText}</Text> : null
 							} */}
