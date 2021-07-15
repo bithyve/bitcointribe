@@ -140,10 +140,10 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-  const { WALLET_SETUP } = yield select(
-    ( state ) => state.storage.database
+  const wallet: Wallet = yield select(
+    ( state ) => state.storage.wallet
   )
-  const { security } = WALLET_SETUP
+  const { security } = wallet
   if ( levelHealth && levelHealth.length ) return
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
   const randomIdForSecurityQ = generateRandomString( 8 )

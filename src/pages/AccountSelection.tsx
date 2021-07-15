@@ -85,7 +85,7 @@ const accountOptions: AccountOption[] = [
   }
 ]
 
-export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any, selectedAcc: AccountType[] } ) => void } } ) {
+export default function AccountSelection( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
   const [ processing, showProcessing ] = useState( false )
   const [ knowMore, showKnowMore ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
@@ -98,9 +98,8 @@ export default function AccountSelection( props: { navigation: { getParam: ( arg
   const onProceed = useCallback( () => {
     props.navigation.navigate( 'NewWalletQuestion', {
       walletName,
-      selectedAcc
     } )
-  }, [ selectedAcc ] )
+  }, [] )
 
   const selectAccount = useCallback( ( accountType: AccountType ) => {
     if( accountType === AccountType.CHECKING_ACCOUNT ) return // obligating checking account
