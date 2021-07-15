@@ -779,7 +779,8 @@ export interface Wallet {
   }
   accounts: {
     [accountType: string]: string[] // array of accountIds
-  }
+  },
+  version: string
 }
 
 export interface Account {
