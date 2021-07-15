@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { View, Text, StyleSheet, Linking, FlatList, Image, SafeAreaView, ImageSourcePropType, Platform, TouchableOpacity } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
@@ -11,11 +11,11 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import ModalHeader from '../../components/ModalHeader'
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import BottomSheet from 'reanimated-bottom-sheet'
-import { editTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
+import { editTrustedContact } from '../../store/actions/trustedContacts'
 import deviceInfoModule, { getUniqueId } from 'react-native-device-info'
 import { ContactRecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
-
-
+import { useDispatch, useSelector } from 'react-redux'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
@@ -57,7 +57,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
   const [ isLoadContacts, setIsLoadContacts ] = useState( false )
   const [ selectedContact, setSelectedContact ] = useState( '' )
   const [ addContactAddressBookBottomSheetRef ] = useState( React.createRef() )
-
+  const dispatch = useDispatch()
   const menuOptions: MenuOption[] = [
     {
       title: 'Edit Name',
@@ -96,16 +96,14 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
   function handleOptionSelection( menuOption: MenuOption ) {
     menuOption.onOptionPressed()
   }
-  //   const editTrustedContact = useCallback( async () => {
-  //     const contacts: Trusted_Contacts = trustedContacts.tc.trustedContacts
-  //     for ( const contact of Object.values( contacts ) ) {
-  //       if ( contact.contactDetails.id === Contact.id ) return
-  //     }
-  //     dispatch( initializeTrustedContact( {
-  //       contact: Contact,
-  //       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
-  //     } ) )
-  //   }, [ Contact ] )
+  const editContact = useCallback( async () => {
+
+    dispatch( editTrustedContact( {
+      channelKey: contact.channelKey,
+      contactName: name,
+    } ) )
+    navigation.popToTop()
+  }, [ contact, name ] )
 
   const renderAddContactFriendsAndFamily = () => {
     // const { isLoadContacts, selectedContact } = this.state
@@ -151,6 +149,20 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
       backgroundColor: Colors.white,
       justifyContent: 'space-between',
     }}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => closeModal()}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+        // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
       <FlatList
         data={menuOptions}
         keyExtractor={listItemKeyExtractor}
@@ -214,7 +226,7 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
 								  }}
 								  onSubmitEditing={
 								    () => {
-								      contact.displayedName = name
+								      // contact.displayedName = name
 								    }
 								  }
 								/>
@@ -226,14 +238,15 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
             disabled={name.length === 0}
             onPress={() => {
               closeModal()
-              navigation.navigate( 'AddContactSendRequest', {
-                SelectedContact: [ contact ],
-                headerText:'Add a contact  ',
-                subHeaderText:'Send a Friends and Family request',
-                contactText:'Adding to Friends and Family:',
-                showDone:true,
-                fromEdit: 'fromEdit'
-              } )
+              editContact()
+              // navigation.navigate( 'AddContactSendRequest', {
+              //   SelectedContact: [ contact ],
+              //   headerText:'Add a contact  ',
+              //   subHeaderText:'Send a Friends and Family request',
+              //   contactText:'Adding to Friends and Family:',
+              //   showDone:true,
+              //   fromEdit: 'fromEdit'
+              // } )
             }}>
               <Text style={styles.addModalTitleText}>Proceed</Text>
             </TouchableOpacity>

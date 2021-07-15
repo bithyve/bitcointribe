@@ -237,9 +237,6 @@ export default function AddContactAddressBook( props ) {
     if ( contacts[ index ].checked ) {
       selectedContacts = []
     } else {
-      if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
-        contacts[ index ].id = props.navigation.state.params?.contactToEdit.id
-      }
       selectedContacts[ 0 ] = contacts[ index ]
     }
     setSelectedContacts( selectedContacts )
@@ -306,6 +303,10 @@ export default function AddContactAddressBook( props ) {
 
   const onPressContinue= () => {
     if ( selectedContacts && selectedContacts.length ) {
+      if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
+        selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
+        selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
+      }
       props.navigation.navigate( 'AddContactSendRequest', {
         SelectedContact: selectedContacts,
         headerText:'Add a contact  ',
@@ -533,7 +534,7 @@ export default function AddContactAddressBook( props ) {
                 onPress={() => onPressContinue()}
                 style={styles.bottomButtonView}
               >
-                <Text style={styles.buttonText}>Confirm & Proceed..</Text>
+                <Text style={styles.buttonText}>Confirm & Proceed</Text>
               </AppBottomSheetTouchableWrapper>
             </View>
           )}

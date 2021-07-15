@@ -830,7 +830,8 @@ class ContactDetails extends PureComponent<
                     } )
                   }}
                   style={[ styles.resendContainer, {
-                    alignSelf: 'center'
+                    alignSelf: 'center',
+                    marginTop: 10
                   } ]}
                 >
                   {this.contact.lastSeenActive ? (

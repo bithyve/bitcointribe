@@ -30,7 +30,7 @@ import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import { editTrustedContact, initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 
 export default function AddContactSendRequest( props ) {
@@ -95,10 +95,19 @@ export default function AddContactSendRequest( props ) {
     for( const contact of Object.values( contacts ) ){
       if ( contact.contactDetails.id === Contact.id && fromEdit == undefined ) return
     }
-    dispatch( initializeTrustedContact( {
-      contact: Contact,
-      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
-    } ) )
+    if ( fromEdit ) {
+      dispatch( editTrustedContact( {
+        channelKey: Contact.channelKey,
+        contactName: Contact.name,
+        image: Contact.image
+      } ) )
+    } else {
+      dispatch( initializeTrustedContact( {
+        contact: Contact,
+        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
+      } ) )
+    }
+
   }, [ Contact ] )
 
   useEffect( ()=> {

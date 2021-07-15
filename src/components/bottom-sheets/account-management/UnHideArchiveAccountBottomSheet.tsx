@@ -130,14 +130,14 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
 
 const styles = StyleSheet.create( {
   rootContainer: {
-    flex: 1,
+    // flex: 1,
     backgroundColor: Colors.white,
   },
 
   mainContentContainer: {
     padding: 30,
     paddingBottom: 20,
-    flex: 1,
+    // flex: 1,
   },
 
   footerSectionContainer: {
