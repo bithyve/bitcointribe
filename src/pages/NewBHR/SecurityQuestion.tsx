@@ -31,7 +31,6 @@ function SecurityQuestion( props ) {
   const [ answer, setAnswer ] = useState( '' )
   const [ errorText, setErrorText ] = useState( '' )
   const [ isDisabled, setIsDisabled ] = useState( true )
-
   const setConfirm = () => {
     if ( answer.length > 0 && answer != securityAnswer ) {
       if ( AnswerCounter < 2 ) {
@@ -86,7 +85,7 @@ function SecurityQuestion( props ) {
               flex: 1, justifyContent: 'center'
             }}>
               <Text style={styles.modalTitleText}>
-                Health Check{'\n'}Security Question
+                Health Check{'\n'}Confirm Password
               </Text>
               <Text style={{
                 ...styles.modalInfoText, marginTop: wp( '1.5%' )

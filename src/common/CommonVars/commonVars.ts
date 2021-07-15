@@ -45,7 +45,7 @@ export const LevelDataVar = [
   {
     levelName: 'Level 1',
     status: 'notSetup',
-    keeper1ButtonText: 'Security Question',
+    keeper1ButtonText: 'Set Password',
     keeper2ButtonText: Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive',
     keeper1: obj,
     keeper2: obj,

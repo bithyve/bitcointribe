@@ -32,17 +32,20 @@ const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[]
 function* cloudWorker( { payload } ) {
   try{
     const cloudBackupStatus = yield select( ( state ) => state.cloud.cloudBackupStatus )
-    if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ) {
-      const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    if ( cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ) {
+
       const s3Service: S3Service = yield select( ( state ) => state.health.service )
       const MetaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
+      const RK: MetaShare = MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
+
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
         type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
-        scheme: MetaShares && MetaShares.length && MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).meta.scheme ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ).meta.scheme : '1of1',
+        scheme: MetaShares && MetaShares.length && RK.meta.scheme ? RK.meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares && MetaShares.length && MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : -1,
@@ -82,11 +85,7 @@ function* cloudWorker( { payload } ) {
       )
 
       let encryptedCloudDataJson
-      const shares =
-            share &&
-                !( Object.keys( share ).length === 0 && share.constructor === Object )
-              ? JSON.stringify( share )
-              : ''
+      const shares = RK ? JSON.stringify( RK ) : ''
       encryptedCloudDataJson = yield call( CloudData,
         database,
         accountShells,

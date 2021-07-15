@@ -627,7 +627,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         data: {
           ...Contact, index
         },
-        channelKey: channelKey
+        channelKey: channelKeyTemp
       }
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )

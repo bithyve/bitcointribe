@@ -228,6 +228,7 @@ export default class TrustedContacts {
         // initialize contact
           if( !contactDetails ) throw new Error( 'Init failed: contact details missing' )
           const newContact: TrustedContact = {
+            channelKey,
             contactDetails,
             isActive: true,
             hasNewData: true,

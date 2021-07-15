@@ -66,7 +66,9 @@ import {
   setupHealth,
   UPDATE_KEEPER_INFO_TO_CHANNEL,
   setIsKeeperInfoUpdated,
-  ACCEPT_EC_REQUEST
+  ACCEPT_EC_REQUEST,
+  SETUP_PASSWORD,
+  initializeHealthSetup
 } from '../actions/health'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { updateHealth } from '../actions/health'
@@ -88,11 +90,14 @@ import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import {
   BackupStreamData,
   ContactDetails,
+  INotification,
   KeeperInfoInterface,
   LevelData,
   LevelHealthInterface,
   LevelInfo,
   MetaShare,
+  notificationTag,
+  notificationType,
   PrimaryStreamData,
   QRCodeTypes,
   SecondaryStreamData,
@@ -130,10 +135,15 @@ import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
+import RelayServices from '../../bitcoin/services/RelayService'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-
+  const { WALLET_SETUP } = yield select(
+    ( state ) => state.storage.database
+  )
+  const { security } = WALLET_SETUP
   if ( levelHealth && levelHealth.length ) return
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
   const randomIdForSecurityQ = generateRandomString( 8 )
@@ -141,11 +151,11 @@ function* initHealthWorker() {
   const levelInfo = [
     {
       shareType: 'securityQuestion',
-      updatedAt: moment( new Date() ).valueOf(),
-      status: 'accessible',
+      updatedAt: security && security.answer ? moment( new Date() ).valueOf() : 0,
+      status: security && security.answer ? 'accessible' : 'notSetup',
       shareId: randomIdForSecurityQ,
       reshareVersion: 0,
-      name: 'Security Question',
+      name: security && security.answer ? 'Encryption Password' : 'Set Password',
     },
     {
       shareType: 'cloud',
@@ -157,7 +167,7 @@ function* initHealthWorker() {
   ]
   const obj: KeeperInfoInterface = {
     shareId: randomIdForSecurityQ,
-    name: 'Security Question',
+    name: security && security.answer ? 'Encryption Password' : 'Set Password',
     type: 'securityQuestion',
     scheme: '1of1',
     currentLevel: 0,
@@ -373,6 +383,10 @@ function* updateHealthLevel2Worker( { payload } ) {
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const Health: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const { WALLET_SETUP } = yield select(
+      ( state ) => state.storage.database
+    )
+    const { security } = WALLET_SETUP
     const levelHealth: LevelHealthInterface[] = [ ...Health ]
     console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
     let SecurityQuestionHealth
@@ -385,11 +399,11 @@ function* updateHealthLevel2Worker( { payload } ) {
     else {
       SecurityQuestionHealth = {
         shareType: 'securityQuestion',
-        updatedAt: moment( new Date() ).valueOf(),
-        status: 'accessible',
+        updatedAt: security && security.answer ? moment( new Date() ).valueOf() : 0,
+        status: security && security.answer ? 'accessible' : 'notSetup',
         shareId: randomIdForSecurityQ,
         reshareVersion: 0,
-        name: 'Security Question',
+        name: security && security.answer ? 'Encryption Password' : 'Set Password',
       }
     }
     const levelInfo = []
@@ -1788,16 +1802,17 @@ function* autoShareLevel2KeepersWorker( ) {
           channelKey
         }
         yield put( updatedKeeperInfo( obj ) )
+
         const contactInfo = {
           channelKey: keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ i ].shareId ).channelKey,
         }
+
         const primaryData: PrimaryStreamData = {
           contactDetails: Contacts[ channelKey ].contactDetails,
           walletID: walletId,
           walletName,
           relationType: TrustedContactRelationTypes.KEEPER,
         }
-
         const backupData: BackupStreamData = {
           primaryMnemonicShard: {
             ...MetaShares.find( value=>value.shareId == levelHealth[ 1 ].levelInfo[ i ].shareId ),
@@ -1809,7 +1824,6 @@ function* autoShareLevel2KeepersWorker( ) {
           },
           keeperInfo
         }
-
         const streamUpdates: UnecryptedStreamData = {
           streamId: TrustedContacts.getStreamId( walletId ),
           primaryData,
@@ -1823,32 +1837,42 @@ function* autoShareLevel2KeepersWorker( ) {
             version: DeviceInfo.getVersion()
           }
         }
-
-        channelSyncUpdates.push( {
+        // initiate permanent channel
+        const channelUpdate =  {
+          contactInfo, streamUpdates
+        }
+        console.log( 'channelUpdate', channelUpdate )
+        shareIds.push( obj )
+        const { updated, updatedContacts }: {
+          updated: boolean;
+          updatedContacts: Trusted_Contacts
+        } = yield call(
+          TrustedContactsOperations.syncPermanentChannels,
+          [ {
+            channelKey: contactInfo.channelKey,
+            streamId: streamUpdates.streamId,
+            contactDetails: Contacts[ channelKey ].contactDetails,
+            unEncryptedOutstreamUpdates: streamUpdates,
+          } ]
+        )
+        console.log( 'updated', {
           channelKey: contactInfo.channelKey,
           streamId: streamUpdates.streamId,
           unEncryptedOutstreamUpdates: streamUpdates,
         } )
-        shareIds.push( obj )
-      }
-    }
-    const res = yield call(
-      trustedContacts.syncPermanentChannels,
-      channelSyncUpdates
-    )
-    if ( res.status === 200 ) {
-      for ( let i = 0; i < shareIds.length; i++ ) {
-        const element = shareIds[ i ]
-        const shareObj = {
-          walletId: walletId,
-          shareId: element.shareId,
-          reshareVersion: MetaShares.find( value=>value.shareId == element.shareId ).meta.reshareVersion,
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
-          name: element.name,
-          shareType: element.type
+        console.log( 'updated', updated )
+        if ( updated ) {
+          const shareObj = {
+            walletId: walletId,
+            shareId: obj.shareId,
+            reshareVersion: MetaShares.find( value=>value.shareId == obj.shareId ).meta.reshareVersion,
+            updatedAt: moment( new Date() ).valueOf(),
+            status: 'accessible',
+            name: obj.name,
+            shareType: obj.type
+          }
+          yield put( updateMSharesHealth( shareObj, false ) )
         }
-        yield put( updateMSharesHealth( shareObj, false ) )
       }
     }
     yield put( switchS3LoaderKeeper( 'autoShareKeepersData' ) )
@@ -2112,6 +2136,28 @@ function* createOrChangeGuardianWorker( { payload } ) {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         } ) )
+        const temporaryContact = contacts[ channelKey ] // temporary trusted contact object
+        const instream = useStreamFromContact( temporaryContact, walletId, true )
+        const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
+        const notification: INotification = {
+          notificationType: notificationType.FNF_KEEPER_REQUEST,
+          title: 'Friends and Family Request',
+          body: `You have new keeper request ${temporaryContact.contactDetails.contactName}`,
+          data: {
+          },
+          tag: notificationTag.IMP,
+        }
+        const notifReceivers = []
+        notifReceivers.push( {
+          walletId: walletId,
+          FCMs: [ fcmToken ],
+        } )
+        if( notifReceivers.length )
+          yield call(
+            RelayServices.sendNotifications,
+            notifReceivers,
+            notification,
+          )
       } else {
         yield put( initializeTrustedContact( {
           contact: contact,
@@ -2269,6 +2315,10 @@ function* setupHealthWorker( { payload } ) {
   }[] = yield select( ( state ) => state.health.downloadedBackupData )
   const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
   const initLoader = yield select( ( state ) => state.health.loading.initLoader )
+  const { WALLET_SETUP } = yield select(
+    ( state ) => state.storage.database
+  )
+  const { security } = WALLET_SETUP
   if( initLoader ) return
   const { level }: { level: number } = payload
   console.log( 'level', level )
@@ -2280,11 +2330,11 @@ function* setupHealthWorker( { payload } ) {
     const levelInfo = [] = [
       {
         shareType: 'securityQuestion',
-        updatedAt: moment( new Date() ).valueOf(),
-        status: 'accessible',
+        updatedAt: security && security.answer ? moment( new Date() ).valueOf() : 0,
+        status: security && security.answer ? 'accessible' : 'notSetup',
         shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
         reshareVersion: 0,
-        name: 'Security Question',
+        name: security && security.answer ? 'Encryption Password' : 'Set Password',
       },
       {
         shareType: 'cloud',
@@ -2318,11 +2368,11 @@ function* setupHealthWorker( { payload } ) {
       const levelInfo: LevelInfo[] = [
         {
           shareType: 'securityQuestion',
-          updatedAt: moment( new Date() ).valueOf(),
-          status: 'accessible',
+          updatedAt: security && security.answer ? moment( new Date() ).valueOf() : 0,
+          status: security && security.answer ? 'accessible' : 'notSetup',
           shareId: keeperInfo.find( value=>value.type == 'securityQuestion' ) ? keeperInfo.find( value=>value.type == 'securityQuestion' ).shareId : randomIdForSecurityQ,
           reshareVersion: 0,
-          name: 'Security Question',
+          name: security && security.answer ? 'Encryption Password' : 'Set Password',
         },
         {
           shareType: 'cloud',
@@ -2538,4 +2588,53 @@ function* acceptExistingContactRequestWorker( { payload } ) {
 export const acceptExistingContactRequestWatcher = createWatcher(
   acceptExistingContactRequestWorker,
   ACCEPT_EC_REQUEST
+)
+
+function* setupPasswordWorker( { payload } ) {
+  try {
+    console.log( 'UPDATE KEEPER INFO' )
+    yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
+    const { security } = payload
+    const s3Service: S3Service = yield select( ( state ) => state.health.service )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
+    const updatedWALLET_SETUP = {
+      ...WALLET_SETUP,
+      security: security ? security : {
+        question: '', answer: ''
+      },
+    }
+    console.log( 'security', security )
+    console.log( 'updatedWALLET_SETUP', updatedWALLET_SETUP )
+    yield call( insertDBWorker, {
+      payload: {
+        WALLET_SETUP: updatedWALLET_SETUP
+      }
+    } )
+    if( security ) {
+      // initialize health-check schema on relay
+      yield put( initializeHealthSetup() )
+    }
+
+    const shareObj =
+        {
+          walletId: s3Service.getWalletId().data.walletId,
+          shareId: levelHealth[ 0 ].levelInfo[ 0 ].shareId,
+          reshareVersion: levelHealth[ 0 ].levelInfo[ 0 ].reshareVersion,
+          updatedAt: moment( new Date() ).valueOf(),
+          status: 'accessible',
+          shareType: 'securityQuestion',
+          name: 'Encryption Password'
+        }
+    yield put( updateMSharesHealth( shareObj, true ) )
+    yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
+  } catch ( error ) {
+    yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
+    console.log( 'Error setupPasswordStatus', error )
+  }
+}
+
+export const setupPasswordWatcher = createWatcher(
+  setupPasswordWorker,
+  SETUP_PASSWORD
 )

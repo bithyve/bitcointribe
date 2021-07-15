@@ -65,7 +65,7 @@ function MBKeeperButton( props ) {
       {keeper.shareType == 'securityQuestion'?
         value.status == 'notSetup'
           ? <Image
-            source={require( '../../assets/images/icons/questionMark.png' )}
+            source={require( '../../assets/images/icons/icon_password.png' )}
             style={{
               ...styles.resetImage,
               position: 'relative',
@@ -73,7 +73,7 @@ function MBKeeperButton( props ) {
             }}
           /> :
           <ImageBackground
-            source={require( '../../assets/images/icons/questionMark.png' )}
+            source={require( '../../assets/images/icons/icon_password_light.png' )}
             style={{
               ...styles.resetImage,
               position: 'relative',
