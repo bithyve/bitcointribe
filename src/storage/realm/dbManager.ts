@@ -6,17 +6,29 @@ const initDb = ( key ) => {
 }
 
 const createWallet = async ( wallet ) => {
-  const accountIds = []
-  for ( const [ key, value ] of Object.entries( wallet.accounts ) ) {
-    accountIds.push( {
-      derivationPath: key,
-      accountId: value
-    } )  }
+  const data = {
+    walletId: wallet.walletId,
+    walletName: wallet.walletName,
+    primaryMnemonic: wallet.primaryMnemonic,
+  }
+  if( Object.entries( wallet.accounts ).length > 0 ) {
+    let accountIds = []
+    for ( const [ key, value ] of Object.entries( wallet.accounts ) ) {
+      accountIds  = [ ...accountIds, ...value ]
+    }
+    data.accountIds = accountIds
+    if( wallet.details2FA ) {
+      data.details2FA = wallet.details2FA
+    }
+    if( wallet.security ) {
+      data.security = wallet.security
+    }
+    if( wallet.version ) {
+      data.version = wallet.version
+    }
+  }
   try {
-    db.create( schema.Wallet, {
-      ...wallet,
-      accountIds,
-    }, true )
+    db.create( schema.Wallet, data, true )
     return true
   } catch ( error ) {
     return false
@@ -66,7 +78,7 @@ const updateAccount = async ( accountId, account ) => {
   }
 }
 
-const addContact = async ( contact ) => {
+const updateContact = async ( contact ) => {
   try {
     const data = {
       ...contact
@@ -123,6 +135,6 @@ export default {
   createAccounts,
   createAccount,
   updateAccount,
-  addContact,
+  updateContact,
   getTrustedContacts,
 }

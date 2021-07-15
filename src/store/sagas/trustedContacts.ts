@@ -190,7 +190,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
 
       yield put( updateTrustedContacts( updatedContacts ) )
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
-        dbManager.addContact( value )
+        dbManager.updateContact( value )
       }
 
       if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
@@ -417,7 +417,7 @@ function* editTrustedContactWorker( { payload }: { payload: { channelKey: string
     [ contactToUpdate.channelKey ]: contactToUpdate
   }
   yield put( updateTrustedContacts( updatedContacts ) )
-  dbManager.addContact( contactToUpdate )
+  dbManager.updateContact( contactToUpdate )
 }
 
 export const editTrustedContactWatcher = createWatcher(

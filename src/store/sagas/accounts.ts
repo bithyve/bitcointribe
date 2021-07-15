@@ -1106,10 +1106,8 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accountShells: newAccountShells,
     accounts,
   } ) )
-
-  // TODO: insert the new accounts & wallet into Realm
   yield call( dbManager.createAccounts, accounts )
-  yield call( dbManager.createWallet, wallet )
+  yield call( dbManager.createWallet, updatedWallet )
 
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
