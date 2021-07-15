@@ -82,6 +82,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 
   function handleProceedButtonPress() {
     switch ( selectedChoice.kind ) {
+        case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
           navigation.navigate( 'NewHexaAccountDetails', {

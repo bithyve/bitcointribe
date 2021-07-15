@@ -47,6 +47,7 @@ import {
   SYNC_ACCOUNTS,
   updateAccountShells,
   getTestcoins,
+  refreshAccountShell,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -488,16 +489,16 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
 
   if( !txid ) console.log( 'Failed to get testcoins' )
   else{
-    // const accountsState: AccountsState = yield select( ( state ) => state.accounts )
-    // let testShell: AccountShell
-    // accountsState.accountShells.forEach( ( shell )=>{
-    //   if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
-    // } )
-    // // auto-sync test account
-    // const options = {
-    //   autoSync: true
-    // }
-    // if( testShell ) yield put( refreshAccountShell( testShell, options ) )
+    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+    let testShell: AccountShell
+    accountsState.accountShells.forEach( ( shell )=>{
+      if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
+    } )
+    // auto-sync test account
+    const options = {
+      autoSync: true
+    }
+    if( testShell ) yield put( refreshAccountShell( testShell, options ) )
   }
 }
 
