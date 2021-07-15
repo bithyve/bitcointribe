@@ -823,7 +823,7 @@ class ContactDetails extends PureComponent<
                         : 'Resend Request'}
                   </Text>
                 </TouchableOpacity>
-                {/* <TouchableOpacity
+                <TouchableOpacity
                   disabled={isSendDisabled}
                   onPress={() => {
                     this.setState( {
@@ -843,7 +843,7 @@ class ContactDetails extends PureComponent<
                   <Text style={styles.sendTextStyle}>
                     Edit
                   </Text>
-                </TouchableOpacity> */}
+                </TouchableOpacity>
               </View>
             </View>
           </View>
