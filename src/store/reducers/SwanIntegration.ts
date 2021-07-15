@@ -36,21 +36,19 @@ export type SwanIntegrationState = {
   hasRedeemSwanCodeForTokenCompleted: boolean | null,
   hasRedeemSwanCodeForTokenInitiated: boolean | null,
 
-  minBtcThreshold: number | 0.0005,
+  minBtcThreshold: number | 0.01,
 
   hasCreateWithdrawalWalletOnSwanSucceeded: boolean | null,
   hasCreateWithdrawalWalletOnSwanCompleted: boolean | null,
   hasCreateWithdrawalWalletOnSwanInitiated: boolean | null,
 
-  // TODO:: Create temperory swan account in hexa
   hasSwanAccountCreationInitiated: boolean | null,
   hasSwanAccountCreationCompleted: boolean | null,
   hasSwanAccountCreationSucceeded: boolean | null,
   swanAccountDetails: AccountShell, // temperory swan account shell object
 
-  // TODO:: Reducers for linking Hexa Wallet with Swan Withdrawal Wallet
-
-
+  // indicator for swan registration
+  startRegistration: boolean | true
 
   // The below values are currently not being used
   swanAuthenticatedToken: string | null,
@@ -96,12 +94,14 @@ const INITIAL_STATE: SwanIntegrationState = {
   hasRedeemSwanCodeForTokenCompleted: false,
   hasRedeemSwanCodeForTokenInitiated: false,
 
-  minBtcThreshold: 0.02,
+  minBtcThreshold: 0.01,
   hasSwanAccountCreationSucceeded: false,
   hasSwanAccountCreationCompleted: false,
   hasSwanAccountCreationInitiated: false,
 
   swanAccountDetails: null,
+
+  startRegistration: true,
 
   hasCreateWithdrawalWalletOnSwanSucceeded: false,
   hasCreateWithdrawalWalletOnSwanCompleted: false,
@@ -189,7 +189,7 @@ const reducer = ( state = INITIAL_STATE, action ) => {
       case CREATE_WITHDRAWAL_WALLET_ON_SWAN_STARTED:
         return {
           ...state,
-          minBtcThreshold: action.payload.data || 0.02,
+          minBtcThreshold: action.payload.data || 0.01,
           hasCreateWithdrawalWalletOnSwanInitiated: true,
         }
 
@@ -199,7 +199,8 @@ const reducer = ( state = INITIAL_STATE, action ) => {
           swanAccountCreationStatus: SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY,
           hasCreateWithdrawalWalletOnSwanSucceeded: true,
           hasCreateWithdrawalWalletOnSwanCompleted: true,
-          swanWalletId: action.payload.data.swanWalletId
+          swanWalletId: action.payload.data.swanWalletId,
+          startRegistration: false
         }
 
       case TEMP_SWAN_ACCOUNT_INFO_SAVED:

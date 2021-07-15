@@ -15,7 +15,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../AppBottomSheetTouchableWrapper'
-import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken, createTempSwanAccountInfo, updateSwanStatus } from '../../../store/actions/SwanIntegration'
+import { fetchSwanAuthenticationUrl, redeemSwanCodeForToken } from '../../../store/actions/SwanIntegration'
 import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accounts/UseSwanIntegrationState'
 import openLink from '../../../utils/OpenLink'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
@@ -23,7 +23,7 @@ import { ListItem } from 'react-native-elements'
 import { addNewAccountShells } from '../../../store/actions/accounts'
 import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
-let swanAccountCount = 0
+const swanAccountCount = 0
 
 type Props = {
   swanDeepLinkContent: string | null;
@@ -49,10 +49,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
     }
   }
 
-  function handleThresholdAmount() {
-    dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
-  }
-
   useEffect( ()=>{
     if( ( swanAccountCreationStatus == SwanAccountCreationStatus.BUY_MENU_CLICKED ) && hasFetchSwanAuthenticationUrlSucceeded && swanAuthenticationUrl ) {
       openLink( swanAuthenticationUrl )
@@ -62,6 +58,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   if( !hasRedeemSwanCodeForTokenInitiated && swanAccountCreationStatus == SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS ) {
     dispatch( redeemSwanCodeForToken( swanDeepLinkContent ) )
   }
+
   const renderFooter = () => {
     switch ( swanAccountCreationStatus ) {
         case SwanAccountCreationStatus.ERROR:
@@ -84,17 +81,6 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           break
 
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
-          if( swanAccountCount<1 ) {
-            const accountInfo: newAccountsInfo = {
-              accountType: AccountType.SWAN_ACCOUNT,
-              accountDetails: {
-                name: swanAccountDetails.customDisplayName || swanAccountDetails.defaultTitle,
-                description: swanAccountDetails.customDescription || swanAccountDetails.defaultDescription,
-              }
-            }
-            dispatch( addNewAccountShells( [ accountInfo ] ) )
-            swanAccountCount++
-          }
           return renderSuccessButton()
         case SwanAccountCreationStatus.ACCOUNT_CREATED:
           return renderSuccessButton()
@@ -117,8 +103,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         case SwanAccountCreationStatus.WALLET_LINKED_SUCCESSFULLY:
           swanMessage = 'Sats in your Swan withdrawal wallet will be transfered to Hexa Wallet.\nSwan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
           swanTitle = 'Successfully linked Hexa Wallet to your Swan Account'
-          accountName = swanAccountDetails.customDisplayName || swanAccountDetails.defaultTitle
-          accountDescription = swanAccountDetails.customDescription || swanAccountDetails.defaultDescription
+          accountName = 'Swan Bitcoin'
+          accountDescription = 'Stack sats with Swan'
           break
         case SwanAccountCreationStatus.ACCOUNT_CREATED:
           swanMessage = 'Swan will transfer once 0.02 BTC accumulate in your Swan withdrawal wallet\n'
@@ -243,7 +229,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           ...styles.successModalButtonView
         }}
       >
-        <Text style={styles.proceedButtonText}>{'Buy Bitcoin'}</Text>
+        <Text style={styles.proceedButtonText}>{'Done'}</Text>
       </AppBottomSheetTouchableWrapper>
       {/* <Image
         source={require( '../../../assets/images/icons/success.png' )
