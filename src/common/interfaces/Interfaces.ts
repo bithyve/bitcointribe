@@ -46,12 +46,7 @@ export interface ServicesJSON {
 }
 
 export interface Database {
-  WALLET_SETUP?: {
-    walletName: string;
-    security: { question: string; answer: string };
-  };
   SERVICES?: ServicesJSON;
-  VERSION?: String;
 }
 
 export enum APP_STAGE {

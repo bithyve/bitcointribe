@@ -10,6 +10,7 @@ import {
   PermanentChannelsSyncKind,
   REJECT_TRUSTED_CONTACT,
   updateTrustedContacts,
+  EDIT_TRUSTED_CONTACT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -46,6 +47,7 @@ import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFr
 import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import dbManager from '../../storage/realm/dbManager'
+import { ImageSourcePropType } from 'react-native'
 
 function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -399,6 +401,29 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
 export const rejectTrustedContactWatcher = createWatcher(
   rejectTrustedContactWorker,
   REJECT_TRUSTED_CONTACT,
+)
+
+function* editTrustedContactWorker( { payload }: { payload: { channelKey: string, contactName?: string, image?: ImageSourcePropType }} ) {
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
+  )
+
+  const { channelKey, contactName, image } = payload
+  const contactToUpdate: TrustedContact = trustedContacts[ channelKey ]
+
+  if( contactName ) contactToUpdate.contactDetails.contactName = contactName
+  if( image ) contactToUpdate.contactDetails.image = image
+
+  const updatedContacts = {
+    [ contactToUpdate.channelKey ]: contactToUpdate
+  }
+  yield put( updateTrustedContacts( updatedContacts ) )
+  dbManager.addContact( contactToUpdate )
+}
+
+export const editTrustedContactWatcher = createWatcher(
+  editTrustedContactWorker,
+  EDIT_TRUSTED_CONTACT,
 )
 
 function* removeTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {

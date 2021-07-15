@@ -69,9 +69,6 @@ function* cloudWorker( { payload } ) {
       }
       console.log( 'CLOUD keeperInfo', keeperInfo )
       yield put( putKeeperInfo( keeperInfo ) )
-      const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
-      const questionId = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.questionId )
-      const question = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.question )
       const regularAccount = yield select( ( state ) => state.accounts[ REGULAR_ACCOUNT ].service )
       const database = yield select( ( state ) => state.storage.database )
       const accountShells = yield select( ( state ) => state.accounts.accountShells )
@@ -110,9 +107,9 @@ function* cloudWorker( { payload } ) {
         shares: shares,
         secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
         encryptedCloudDataJson: encryptedCloudDataJson,
-        walletName: walletName,
-        questionId: questionId,
-        question: questionId === '0' ? question: '',
+        walletName: wallet.walletName,
+        questionId: wallet.security.questionId,
+        question: wallet.security.questionId === '0' ? wallet.security.question: '',
         regularAccount: regularAccount,
         keeperData: kpInfo ? JSON.stringify( kpInfo ) : JSON.stringify( keeperData ),
         bhXpub,

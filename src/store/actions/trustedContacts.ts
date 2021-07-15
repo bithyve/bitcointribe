@@ -1,4 +1,5 @@
 // types and action creators: dispatched by components and sagas
+import { ImageSourcePropType } from 'react-native'
 import {
   UnecryptedStreamData,
   ContactInfo,
@@ -8,6 +9,7 @@ import {
 export const SYNC_PERMANENT_CHANNELS = 'SYNC_PERMANENT_CHANNELS'
 export const INITIALIZE_TRUSTED_CONTACT = 'INITIALIZE_TRUSTED_CONTACT'
 export const REJECT_TRUSTED_CONTACT = 'REJECT_TRUSTED_CONTACT'
+export const EDIT_TRUSTED_CONTACT = 'EDIT_TRUSTED_CONTACT'
 export const REMOVE_TRUSTED_CONTACT = 'REMOVE_TRUSTED_CONTACT'
 export const WALLET_CHECK_IN = 'WALLET_CHECK_IN'
 
@@ -89,6 +91,17 @@ export const rejectTrustedContact = ( { channelKey } : {channelKey: string} ) =>
     type: REJECT_TRUSTED_CONTACT,
     payload: {
       channelKey
+    },
+  }
+}
+
+export const editTrustedContact = ( { channelKey, contactName, image } : {channelKey: string, contactName?: string, image?: ImageSourcePropType} ) => {
+  return {
+    type: EDIT_TRUSTED_CONTACT,
+    payload: {
+      channelKey,
+      contactName,
+      image,
     },
   }
 }
