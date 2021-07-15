@@ -17,7 +17,7 @@ import CopyThisText from '../../components/CopyThisText'
 import Colors from '../../common/Colors'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { RFValue } from 'react-native-responsive-fontsize'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import { authenticator } from 'otplib'
 
 const TwoFASetup = props => {

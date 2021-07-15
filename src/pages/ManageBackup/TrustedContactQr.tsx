@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 
 export default function TrustedContactQr( props ) {
   const [ trustedContactQR, setTrustedContactQR ] = useState( '' )

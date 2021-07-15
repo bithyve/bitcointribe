@@ -20,7 +20,7 @@ import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { EphemeralDataElements, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 
 export default function TrustedContactQr( props ) {
   const [ trustedContactQR, setTrustedContactQR ] = useState( '' )
