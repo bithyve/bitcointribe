@@ -45,6 +45,8 @@ import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   rejectTrustedContact,
+  syncPermanentChannels,
+  PermanentChannelsSyncKind,
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -70,6 +72,8 @@ import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
 import RelayServices from '../../bitcoin/services/RelayService'
+import dbManager from '../../storage/realm/dbManager'
+
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'
 import config from '../../bitcoin/HexaConfig'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
@@ -284,6 +288,7 @@ interface HomePropsTypes {
   updateMessageStatus: any;
   initLoader: boolean;
   getMessages: any;
+  syncPermanentChannels: any;
 }
 
 const releaseNotificationTopic = getEnvReleaseTopic()
@@ -296,7 +301,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   currentNotificationId: string;
   bottomSheetRef = createRef<BottomSheet>();
   openBottomSheetOnLaunchTimeout: null | ReturnType<typeof setTimeout>;
-
+  syncPermanantChannelTime: any
   static whyDidYouRender = true;
 
   constructor( props ) {
@@ -305,7 +310,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = null
     this.appStateListener = null
     this.openBottomSheetOnLaunchTimeout = null
-
+    this.syncPermanantChannelTime = null
     this.state = {
       notificationData: [],
       CurrencyCode: 'USD',
@@ -802,7 +807,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // Keeping autoSync disabled
       credsAuthenticated( false )
       //console.log( 'isAuthenticated*****', this.props.isAuthenticated )
-
+      this.syncChannel()
       this.closeBottomSheet()
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
@@ -846,6 +851,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const unread = messages.filter( msg => msg.status === 'unread' )
     if ( Platform.OS === 'ios' ) {
       PushNotificationIOS.setApplicationIconBadgeNumber( unread.length )
+    }
+  }
+
+  syncChannel= () => {
+    if( this.syncPermanantChannelTime === null ) {
+      this.syncPermanantChannelTime = new Date()
+      this.props.syncPermanentChannels( {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.EXISTING_CONTACTS,
+        metaSync: true,
+      } )
+    } else {
+      const now: any = new Date()
+      const diff = Math.abs( now - this.syncPermanantChannelTime )
+      if( diff > 300000 ) {
+        this.syncPermanantChannelTime = null
+        this.syncChannel()
+      }
     }
   }
 
@@ -1078,9 +1100,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
-        this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length
-          ? this.props.updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED )
-          : this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
+        this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
 
@@ -1262,6 +1282,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.focusListener = navigation.addListener( 'didFocus', () => {
       this.setCurrencyCodeFromAsync()
       this.props.fetchFeeAndExchangeRates( this.props.currencyCode )
+      this.syncChannel()
       // this.notificationCheck()
       this.setState( {
         lastActiveTime: moment().toISOString(),
@@ -1310,18 +1331,15 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
 
   handleBuyBitcoinBottomSheetSelection = ( menuItem: BuyBitcoinBottomSheetMenuItem ) => {
+
     switch ( menuItem.kind ) {
         case BuyMenuItemKind.FAST_BITCOINS:
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
-          if( !this.props.wallet.accounts[ AccountType.SWAN_ACCOUNT ]?.length ){
+          const swanAccountActive = false
+          if( !swanAccountActive ){
             this.props.clearSwanCache()
-            const accountDetails = {
-              name: 'Swan Account',
-              description: 'Sats purchased from Swan',
-            }
-            this.props.createTempSwanAccountInfo( accountDetails )
             this.props.updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED )
           }
           else {
@@ -1370,10 +1388,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   openBottomSheet = (
     kind: BottomSheetKind,
-    snapIndex: number | null = null
+    snapIndex?: number | null,
+    swanAccountClicked?: boolean | false
   ) => {
-    // console.log( 'kind', kind )
-    // console.log( 'snapIndex', snapIndex )
+    const tempMenuItem: BuyBitcoinBottomSheetMenuItem = {
+      kind: BuyMenuItemKind.SWAN
+    }
+
+    if( swanAccountClicked ) this.handleBuyBitcoinBottomSheetSelection( tempMenuItem )
 
     this.setState(
       {
@@ -1534,7 +1556,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.onBackPress}
+                onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -1549,7 +1571,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.onBackPress}
+                onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -1565,7 +1587,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.onBackPress}
+                onPress={this.closeBottomSheet}
               />
             </>
           )
@@ -1692,7 +1714,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               info={'We could not backup your wallet on the cloud. This may be due to: \n1) A network issue\n2) Inadequate space in your cloud storage\n3) A bug on our part'}
               note={'Please try again in some time. In case the error persists, please reach out to us on: \nTwitter: @HexaWallet\nTelegram: https://t.me/HexaWallet\nEmail: hello@bithyve.com'}
               onPressProceed={()=>{
-                this.props.setCloudData()
+                if( this.props.levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
+                  this.props.setCloudData()
+                }
                 this.closeBottomSheet()
               }}
               onPressIgnore={()=> {
@@ -1866,7 +1890,8 @@ export default withNavigationFocus(
     updateNotificationList,
     updateMessageStatusInApp,
     updateMessageStatus,
-    getMessages
+    getMessages,
+    syncPermanentChannels,
   } )( Home )
 )
 

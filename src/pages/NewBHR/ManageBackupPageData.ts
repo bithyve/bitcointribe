@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'
 import { KeeperInfoInterface, LevelData, LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
 
 export const modifyLevelStatus = (
@@ -161,7 +162,7 @@ const getLevelInfoStatus = ( levelDataTemp ) => {
     ( element.keeper1.status == 'notAccessible' && element.keeper2.status == 'notAccessible' ) ){
       let name1 = ''; let name2 = ''
       if( element.keeper1.updatedAt > 0 ) levelData[ i ].keeper1ButtonText = element.keeper1.name ? element.keeper1.name : ''
-      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : ''
+      if( element.keeper2.updatedAt > 0 ) levelData[ i ].keeper2ButtonText = element.keeper2.name ? element.keeper2.name : i == 0 && !element.keeper2.name ? Platform.OS == 'ios' ? 'Backup on iCloud' : 'Backup on Google Drive' : ''
       if( element.keeper1.updatedAt > 0 && element.keeper1.status == 'notAccessible' ) name1 = element.keeper1.name
       else name1 = 'Recovery Key 1'
       if( element.keeper2.updatedAt > 0 && element.keeper2.status == 'notAccessible' ) name2 = element.keeper2.name

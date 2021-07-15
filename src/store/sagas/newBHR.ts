@@ -3,12 +3,14 @@ import LevelStatus from '../../common/data/enums/LevelStatus'
 import { generateMetaShare } from '../actions/health'
 import { navigateToHistoryPage, ON_PRESS_KEEPER, setIsKeeperTypeBottomSheetOpen, setLevelCompletionError } from '../actions/newBHR'
 import { createWatcher } from '../utils/utilities'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 function* onPressKeeperChannelWorker( { payload } ) {
   try {
     const { value, number } = payload
     console.log( 'value, number', value, number )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
+    const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const isLevelThreeMetaShareCreated = yield select( ( state ) => state.health.isLevelThreeMetaShareCreated )
     const isLevel3Initialized = yield select( ( state ) => state.health.isLevel3Initialized )
     const isLevelTwoMetaShareCreated = yield select( ( state ) => state.health.isLevelTwoMetaShareCreated )
@@ -16,7 +18,11 @@ function* onPressKeeperChannelWorker( { payload } ) {
     const metaSharesKeeper = yield select( ( state ) => state.health.service.levelhealth.metaSharesKeeper )
     console.log( 'currentLevel', currentLevel )
 
-    if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){
+    if( currentLevel === 0 && value.id === 1 && levelHealth[ 0 ].levelInfo[ 0 ].status=='notSetup' ){
+      yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
+      return
+    }
+    else if( currentLevel === 0 && ( value.id === 2 || value.id === 3 ) ){
       yield put( setLevelCompletionError( 'Please complete Level 1', 'It seems you have not backed up your wallet on the cloud. Please complete Level 1 to proceed', LevelStatus.FAILED ) )
       return
     } else if (

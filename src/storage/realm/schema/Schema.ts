@@ -11,6 +11,19 @@ const Bip32 = 'Bip32'
 const Network = 'Network'
 const XPUB = 'XPUB'
 const AccountId = 'AccountId'
+const ContactDetails = 'ContactDetails'
+const TrustedContact = 'TrustedContact'
+const Streams = 'Streams'
+const StreamsMetaData = 'StreamsMetaData'
+const StreamsMetaDataFlags = 'StreamsMetaDataFlags'
+const UnecryptedStreamData = 'UnecryptedStreamData'
+const PrimaryStreamData = 'PrimaryStreamData'
+const SecondaryStreamData = 'SecondaryStreamData'
+const BackupStreamData = 'BackupStreamData'
+const MetaShare = 'MetaShare'
+const EncryptedShare = 'EncryptedShare'
+const Meta = 'Meta'
+const KeeperInfo = 'KeeperInfo'
 
 export const AccountSchema: ObjectSchema = {
   name: Account,
@@ -265,6 +278,284 @@ export const Details2FASchema: ObjectSchema = {
   },
 }
 
+export const PrimaryStreamDataSchema: ObjectSchema = {
+  name: PrimaryStreamData,
+  primaryKey: 'walletID',
+  properties: {
+    walletID: {
+      type: 'string', indexed: true
+    },
+    walletName: {
+      type: 'string', optional: true
+    },
+    FCM : {
+      type: 'string', optional: true
+    },
+    paymentAddresses: {
+      type: 'string?[]', optional: true
+    },
+    contactDetails: {
+      type: ContactDetails, optional: true
+    },
+  },
+}
+
+
+export const MetaSchema: ObjectSchema = {
+  name: Meta,
+  properties: {
+    version: {
+      type: 'string', optional: true
+    },
+    validator: {
+      type: 'string', optional: true
+    },
+    index: {
+      type: 'int', optional: true
+    },
+    walletId: {
+      type: 'string', optional: true
+    },
+    timestamp: {
+      type: 'string', optional: true
+    },
+    reshareVersion: {
+      type: 'int', optional: true
+    },
+    questionId: {
+      type: 'string', optional: true
+    },
+    question: {
+      type: 'string', optional: true
+    },
+    guardian: {
+      type: 'string', optional: true
+    },
+    encryptedKeeperInfo: {
+      type: 'string', optional: true
+    },
+    scheme: {
+      type: 'string', optional: true
+    }
+  },
+}
+
+export const EncryptedShareSchema: ObjectSchema = {
+  name: EncryptedShare,
+  properties: {
+    pmShare: {
+      type: 'string', optional: true
+    },
+    smShare: {
+      type: 'string', optional: true
+    },
+    bhXpub: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const MetaShareSchema: ObjectSchema = {
+  name: MetaShare,
+  properties: {
+    encryptedSecret: {
+      type: 'string', optional: true
+    },
+    encryptedShare: {
+      type: EncryptedShare, optional: true
+    },
+    shareId: {
+      type: 'string', optional: true
+    },
+    meta: {
+      type: Meta, optional: true
+    }
+  },
+}
+
+export const KeeperInfoSchema: ObjectSchema = {
+  name: KeeperInfo,
+  properties: {
+    shareId: {
+      type: 'string', optional: true
+    },
+    name: {
+      type: 'string', optional: true
+    },
+    type: {
+      type: 'string', optional: true
+    },
+    scheme: {
+      type: 'string', optional: true
+    },
+    currentLevel: {
+      type: 'int', optional: true
+    },
+    createdAt: {
+      type: 'int', optional: true
+    },
+    sharePosition: {
+      type: 'int', optional: true
+    },
+    // data: { TODO add type
+    //   type: 'int', optional: true
+    // },
+    channelKey: {
+      type: 'string', optional: true
+    }
+  },
+}
+
+export const BackupStreamDataSchema: ObjectSchema = {
+  name: BackupStreamData,
+  properties: {
+    primaryMnemonicShard: {
+      type: MetaShare, optional: true
+    },
+    keeperInfo: {
+      type: 'list', objectType: KeeperInfo, default: []
+    },
+  },
+}
+
+export const SecondaryStreamDataSchema: ObjectSchema = {
+  name: SecondaryStreamData,
+  properties: {
+    // secondaryMnemonicShard: { TODO add type
+    //   type: 'string', optional: true
+    // },
+    bhXpub: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const UnecryptedStreamDataSchema: ObjectSchema = {
+  name: UnecryptedStreamData,
+  primaryKey: 'streamId',
+  properties: {
+    streamId: {
+      type: 'string', indexed: true
+    },
+    primaryData: {
+      type: PrimaryStreamData, optional: true
+    }, secondaryData: {
+      type: SecondaryStreamData, optional: true
+    },
+    backupData: {
+      type: BackupStreamData, optional: true
+    },
+    metaData: {
+      type: StreamsMetaData, optional: true
+    }
+  },
+}
+
+export const StreamsMetaDataFlagsSchema: ObjectSchema = {
+  name: StreamsMetaDataFlags,
+  properties: {
+    active: {
+      type: 'bool', optional: true
+    },
+    lastSeen: {
+      type: 'int', optional: true
+    },
+    newData: {
+      type: 'bool', optional: true
+    }
+  },
+}
+
+export const StreamsMetaDataSchema: ObjectSchema = {
+  name: StreamsMetaData,
+  properties: {
+    flags: {
+      type: StreamsMetaDataFlags, optional: true
+    },
+    version: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const StreamsSchema: ObjectSchema = {
+  name: Streams,
+  primaryKey: 'streamId',
+  properties: {
+    streamId: {
+      type: 'string', indexed: true
+    },
+    primaryEncryptedData: {
+      type: 'string', optional: true,
+    },
+    secondaryEncryptedData: {
+      type: 'string', optional: true,
+    },
+    encryptedBackupData: {
+      type: 'string', optional: true,
+    },
+    metaData: {
+      type: StreamsMetaData, optional: true
+    }
+  },
+}
+
+export const ContactDetailsSchema: ObjectSchema = {
+  name: ContactDetails,
+  primaryKey: 'id',
+  properties: {
+    id: {
+      type: 'string', indexed: true
+    },
+    contactName: {
+      type: 'string', optional: true,
+    },
+    image: {
+      type: 'string', optional: true,
+    },
+  },
+}
+
+export const TrustedContactSchema: ObjectSchema = {
+  name: TrustedContact,
+  primaryKey: 'permanentChannelAddress',
+  properties: {
+    contactDetails: {
+      type: ContactDetails, optional: true
+    },
+    relationType: {
+      type: 'string', optional: true,
+    },
+    permanentChannelAddress: {
+      type: 'string', indexed: true,
+    },
+    secondaryChannelKey: {
+      type: 'string', optional: true,
+    },
+    streamId: {
+      type: 'string', optional: true,
+    },
+    walletID: {
+      type: 'string', optional: true,
+    },
+    permanentChannel: {
+      type: 'list', objectType: Streams, default: []
+    },
+    unencryptedPermanentChannel: {
+      type: 'list', objectType: UnecryptedStreamData, default: []
+    },
+    contactsSecondaryChannelKey: {
+      type: 'string', optional: true,
+    },
+    isActive: {
+      type: 'bool', optional: true,
+    },
+    hasNewData: {
+      type: 'bool', optional: true,
+    },
+  },
+}
+
 export default {
   Wallet,
   UTXO,
@@ -276,4 +567,16 @@ export default {
   Network,
   XPUB,
   AccountId,
+  ContactDetails,
+  TrustedContact,
+  Streams,
+  StreamsMetaData,
+  UnecryptedStreamData,
+  PrimaryStreamData,
+  SecondaryStreamData,
+  BackupStreamData,
+  MetaShare,
+  EncryptedShare,
+  Meta,
+  KeeperInfo
 }

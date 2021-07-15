@@ -45,8 +45,9 @@ import idx from 'idx'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import dbManager from '../../storage/realm/dbManager'
 
-function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, shouldNotUpdateSERVICES?: boolean }} ) {
+function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -154,10 +155,10 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
     )
 
     if ( updated ) {
-      const { shouldNotUpdateSERVICES }  = payload
-      if( shouldNotUpdateSERVICES ){
+      const { skipDatabaseUpdate }  = payload
+      if( skipDatabaseUpdate ){
         if( flowKind === InitTrustedContactFlowKind.REJECT_TRUSTED_CONTACT ){
-          const temporaryContact = trustedContacts[ contactIdentifier ] // temporary trusted contact object
+          const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
           const instream = useStreamFromContact( temporaryContact, walletId, true )
           const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
           if( fcmToken ){
@@ -186,14 +187,16 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       }
 
       yield put( updateTrustedContacts( updatedContacts ) )
-      // TODO: insert updated/created contact(s) into Realm
+      for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
+        dbManager.addContact( value )
+      }
 
       if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
-        const contact: TrustedContact = trustedContacts[ contactIdentifier ]
+        const contact: TrustedContact = updatedContacts[ contactIdentifier ]
         const instream: UnecryptedStreamData = useStreamFromContact( contact, walletId, true )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const relationType: TrustedContactRelationTypes = idx( instream, ( _ ) => _.primaryData.relationType )
-        const temporaryContact = trustedContacts[ contactIdentifier ] // temporary trusted contact object
+        const temporaryContact = updatedContacts[ contactIdentifier ] // temporary trusted contact object
 
         if( fcmToken ){
           const notification: INotification = {
@@ -389,7 +392,7 @@ function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: stri
   yield put( syncPermanentChannels( {
     permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
     channelUpdates: [ channelUpdate ],
-    shouldNotUpdateSERVICES: true
+    skipDatabaseUpdate: true
   } ) )
 }
 

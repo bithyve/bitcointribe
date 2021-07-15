@@ -27,7 +27,7 @@ import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import * as bip39 from 'bip39'
@@ -53,12 +53,27 @@ function* setupWalletWorker( { payload } ) {
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
 
   const accountsInfo: newAccountsInfo[] = []
+
   selectedAccounts.forEach( ( accountType ) => {
     const accountInfo: newAccountsInfo = {
       accountType
     }
     accountsInfo.push( accountInfo )
   } )
+
+  // Adding swan account creation at wallet initialisation
+
+  const swanAccountInfo: newAccountsInfo = {
+    accountType: AccountType.SWAN_ACCOUNT,
+    accountDetails: {
+      name: 'Swan Bitcoin',
+      description: 'Stack sats with Swan'
+    }
+  }
+
+  accountsInfo.push( swanAccountInfo )
+
+  // End of swan account creation changes at wallet initialisation
 
   yield call( addNewAccountShellsWorker, {
     payload: accountsInfo
@@ -71,7 +86,9 @@ function* setupWalletWorker( { payload } ) {
   const initialDatabase: Database = {
     WALLET_SETUP:{
       walletName: wallet.walletName,
-      security,
+      security: security ? security : {
+        question: '', answer: ''
+      },
     },
     SERVICES: {
       S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
@@ -82,9 +99,10 @@ function* setupWalletWorker( { payload } ) {
   yield call( insertDBWorker, {
     payload: initialDatabase
   } )
-
-  // initialize health-check schema on relay
-  yield put( initializeHealthSetup() )
+  if( security ) {
+    // initialize health-check schema on relay
+    yield put( initializeHealthSetup() )
+  }
 }
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 

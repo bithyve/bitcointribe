@@ -7,47 +7,41 @@ import {
   ScrollView,
   StatusBar,
   Text,
-  KeyboardAvoidingView,
   Platform,
   Keyboard,
   TouchableWithoutFeedback,
   TextInput,
-  Image,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import Fonts from '../common/Fonts'
-import Colors from '../common/Colors'
-import QuestionList from '../common/QuestionList'
-import CommonStyles from '../common/Styles/Styles'
+import Fonts from '../../common/Fonts'
+import Colors from '../../common/Colors'
+import QuestionList from '../../common/QuestionList'
+import CommonStyles from '../../common/Styles/Styles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Feather from 'react-native-vector-icons/Feather'
 import { RFValue } from 'react-native-responsive-fontsize'
-import HeaderTitle from '../components/HeaderTitle'
-import BottomInfoBox from '../components/BottomInfoBox'
+import HeaderTitle from '../../components/HeaderTitle'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 import { useDispatch, useSelector } from 'react-redux'
 import BottomSheet from 'reanimated-bottom-sheet'
-import LoaderModal from '../components/LoaderModal'
+import LoaderModal from '../../components/LoaderModal'
 import DeviceInfo from 'react-native-device-info'
-import { walletCheckIn } from '../store/actions/trustedContacts'
-import { setVersion } from '../store/actions/versionHistory'
-import { initNewBHRFlow } from '../store/actions/health'
-import {  setCloudData } from '../store/actions/cloud'
-import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
-import ModalContainer from '../components/home/ModalContainer'
-import ButtonBlue from '../components/ButtonBlue'
-import { updateCloudPermission } from '../store/actions/health'
-import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
+import { setupPassword } from '../../store/actions/health'
+import {  setCloudData } from '../../store/actions/cloud'
+import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
+import ModalContainer from '../../components/home/ModalContainer'
+import ButtonBlue from '../../components/ButtonBlue'
+import { updateCloudPermission } from '../../store/actions/health'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import CardWithRadioBtn from '../components/CardWithRadioBtn'
-import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
-import S3Service from '../bitcoin/services/sss/S3Service'
-import { LevelHealthInterface } from '../bitcoin/utilities/Interface'
+import CardWithRadioBtn from '../../components/CardWithRadioBtn'
+import S3Service from '../../bitcoin/services/sss/S3Service'
+import { LevelHealthInterface } from '../../bitcoin/utilities/Interface'
 
 export enum BottomSheetKind {
   CLOUD_PERMISSION,
@@ -60,62 +54,15 @@ export enum BottomSheetState {
 
 // only admit lowercase letters and digits
 const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
-let messageIndex = 0
-const LOADER_MESSAGE_TIME = 2000
-const loaderMessages = [
-  {
-    heading: 'Bootstrapping Accounts',
-    text: 'Hexa has a multi-account model which lets you better manage your bitcoin (sats)',
-    subText: '',
-  },
-  {
-    heading: 'Filling Test Account with test sats',
-    text:
-      'Preloaded Test Account is the best place to start your Bitcoin journey',
-    subText: '',
-  },
-  {
-    heading: 'Generating Recovery Keys',
-    text: 'Recovery Keys help you restore your Hexa wallet in case your phone is lost',
-    subText: '',
-  },
-  {
-    heading: 'Manage Backup',
-    text:
-      'You can backup your wallet at 3 different levels of security\nAutomated cloud backup | Double backup | Multi-key backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 1 - Automated Cloud Backup',
-    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
-    subText: '',
-  },
-  {
-    heading: 'Level 2 - Double Backup',
-    text: 'Starting to hodl sats and bitcoin? Ensure that you backup your wallet atleast to Level 2 backup called Double Backup',
-    subText: '',
-  },
-  {
-    heading: 'Level 3 - Multi-key Backup',
-    text: 'For hardcore Bitcoiners who understand Bitcoin, stack large amounts of sats or bitcoin and care for utmost security of their wallet',
-    subText: '',
-  }
-]
 
-const getNextMessage = () => {
-  if ( messageIndex == ( loaderMessages.length ) ) messageIndex = 0
-  return loaderMessages[ messageIndex++ ]
-}
 
 function validateAllowedCharacters( answer: string ): boolean {
   return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
 }
 
-export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Creating your wallet' )
-  const [ subTextMessage, setSubTextMessage ] = useState(
-    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
-  )
+export default function SetNewPassword( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName?: any } ) => void, goBack: () => any; } } ) {
+  const message = 'Setting Up password'
+  const subTextMessage = 'Setting Up password for backup encryption'
   const [ Elevation, setElevation ] = useState( 10 )
   const [ height, setHeight ] = useState( 81 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
@@ -141,15 +88,15 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ pswd, setPswd ] = useState( '' )
   const [ pswdMasked, setPswdMasked ] = useState( '' )
   const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
+  const [ hintMasked, setHintMasked ] = useState( '' )
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
+  const [ hideShowHint, setHideShowHint ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
   const [ isSkipClicked, setIsSkipClicked ] = useState( false )
 
   const dispatch = useDispatch()
-  const walletName = props.navigation.getParam( 'walletName' )
-  const selectedAcc = props.navigation.getParam( 'selectedAcc' ) ? props.navigation.getParam( 'selectedAcc' ) : ''
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -169,17 +116,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ encryptionPswd, showEncryptionPswd ] = useState( false )
   const [ activeIndex, setActiveIndex ] = useState( 0 )
   const s3service: S3Service = useSelector( ( state ) => state.health.service )
-  const accounts = useSelector( ( state: { accounts: any } ) => state.accounts )
   const cloudBackupStatus = useSelector( ( state ) => state.cloud.cloudBackupStatus )
-  const walletSetupCompleted = useSelector( ( state ) => state.setupAndAuth.walletSetupCompleted )
+  const setupPasswordStatus = useSelector( ( state ) => state.health.loading.setupPasswordStatus )
   const cloudPermissionGranted = useSelector( ( state ) => state.health.cloudPermissionGranted )
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const [ currentBottomSheetKind, setCurrentBottomSheetKind ]: [BottomSheetKind, any] = useState( null )
-  const [ bottomSheetState, setBottomSheetState ]: [BottomSheetState, any] = useState( BottomSheetState.Closed )
-  const [ cloud ] = useState( Platform.OS == 'ios' ? 'iCloud' : 'Google Drive' )
-  const bottomSheetRef = createRef<BottomSheet>()
-  const [ isCloudPermissionRender, setIsCloudPermissionRender ] = useState( false )
-
 
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
@@ -194,37 +134,24 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         setHeight( 81 )
       }
     )
-
+    // dispatch( clearAccountSyncCache() )
     return () => {
       keyboardDidHideListener.remove()
       keyboardDidShowListener.remove()
     }
   }, [] )
 
-  useEffect( () => {
-    // if( cloudBackupStatus === CloudBackupStatus.COMPLETED || cloudBackupStatus === CloudBackupStatus.FAILED ){
-    //   // ( loaderBottomSheet as any ).current.snapTo( 0 )
-    //   setLoaderModal( false )
-    //   props.navigation.navigate( 'HomeNav', {
-    //     walletName,
-    //   } )
-    // }
-    if( walletSetupCompleted && s3service && s3service.levelhealth && ( cloudBackupStatus == CloudBackupStatus.COMPLETED || cloudBackupStatus == CloudBackupStatus.FAILED || isSkipClicked ) && ( cloudPermissionGranted === true || cloudPermissionGranted === false ) ) {
-      // ( loaderBottomSheet as any ).current.snapTo( 0 )
+  useEffect( () =>{
+    if( !setupPasswordStatus && levelHealth.length && levelHealth[ 0 ].levelInfo[ 0 ].status !=='notSetup' ){
       setLoaderModal( false )
-      props.navigation.navigate( 'HomeNav', {
-        walletName,
-      } )
+      props.navigation.goBack()
     }
-  }, [ walletSetupCompleted, s3service, cloudBackupStatus ] )
+  }, [ setupPasswordStatus, levelHealth ] )
 
-  const checkCloudLogin = ( security ) =>{
+  const setPassword = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( setupWallet( walletName, selectedAcc, security ) )
-      // dispatch( walletSetupCompletion( security ) )
-      dispatch( initNewBHRFlow( true ) )
-      dispatch( setVersion( 'Current' ) )
-
+      dispatch( updateCloudPermission( true ) )
+      dispatch( setupPassword( security ) )
       const current = Date.now()
       AsyncStorage.setItem(
         'SecurityAnsTimestamp',
@@ -241,16 +168,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   }
 
   useEffect( ()=>{
-    if( levelHealth.length && s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
-      cloudPermissionGranted === true && !isSkipClicked ){
+    if( s3service && s3service.levelhealth && cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS &&
+      cloudPermissionGranted === true && !isSkipClicked && levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
       dispatch( setCloudData() )
     }
   }, [ s3service, cloudPermissionGranted, levelHealth ] )
 
   const showLoader = () => {
-    // ( loaderBottomSheet as any ).current.snapTo( 1 )
     setLoaderModal( true )
-    setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -294,23 +219,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       // }, 2 )
     }
   }
-
-
-  const handleHintSubmit = () => {
-    if ( pswd && confirmPswd && confirmPswd != pswd ) {
-      setPswdError( 'Password do not match' )
-    } else if (
-      validateAllowedCharacters( pswd ) == false ||
-      validateAllowedCharacters( tempPswd ) == false
-    ) {
-      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
-    } else {
-      setTimeout( () => {
-        setPswdError( '' )
-      }, 2 )
-    }
-  }
-
 
   useEffect( () => {
     if ( answer.trim() == confirmAnswer.trim() && answer && confirmAnswer && answerError.length == 0 ) {
@@ -363,7 +271,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       }
     }
     if( isSkip ) security = null
-    checkCloudLogin( security )
+    setPassword( security )
     showSecurityQue( false )
     showEncryptionPswd( false )
   }
@@ -385,58 +293,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     )
   }
 
-  const setLoaderMessages = () => {
-    setTimeout( () => {
-      const newMessage = getNextMessage()
-      setMessage( newMessage.heading )
-      setSubTextMessage( newMessage.text )
-      setTimeout( () => {
-        const newMessage = getNextMessage()
-        setMessage( newMessage.heading )
-        setSubTextMessage( newMessage.text )
-        setTimeout( () => {
-          const newMessage = getNextMessage()
-          setMessage( newMessage.heading )
-          setSubTextMessage( newMessage.text )
-          setTimeout( () => {
-            const newMessage = getNextMessage()
-            setMessage( newMessage.heading )
-            setSubTextMessage( newMessage.text )
-            setTimeout( () => {
-              const newMessage = getNextMessage()
-              setMessage( newMessage.heading )
-              setSubTextMessage( newMessage.text )
-              setTimeout( () => {
-                const newMessage = getNextMessage()
-                setMessage( newMessage.heading )
-                setSubTextMessage( newMessage.text )
-              }, LOADER_MESSAGE_TIME )
-            }, LOADER_MESSAGE_TIME )
-          }, LOADER_MESSAGE_TIME )
-        }, LOADER_MESSAGE_TIME )
-      }, LOADER_MESSAGE_TIME )
-    }, LOADER_MESSAGE_TIME )
-  }
-
   const renderLoaderModalContent = useCallback( () => {
     return <LoaderModal headerText={message} messageText={subTextMessage} />
   }, [ message, subTextMessage ] )
-
-  const renderLoaderModalHeader = () => {
-    return (
-      <View
-        style={{
-          marginTop: 'auto',
-          flex: 1,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          height: hp( '75%' ),
-          zIndex: 9999,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      />
-    )
-  }
 
   const confirmAction = () => {
     dispatch( updateCloudPermission( true ) )
@@ -668,7 +527,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               ref={hint}
               placeholder={'Add a hint'}
               placeholderTextColor={Colors.borderColor}
-              value={hintText}
+              value={hideShowHint ? hintMasked : hintText}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
@@ -682,9 +541,18 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               }
               onChangeText={( text ) => {
                 setHint( text )
+                setHintMasked( text )
+                // setConfirmPswdMasked( text )
+              }}
+              onBlur={() => {
+                let temp = ''
+                for ( let i = 0; i < hintText.length; i++ ) {
+                  temp += '*'
+                }
+                setHintMasked( temp )
               }}
             />
-            {/* {hintText ? (
+            {hintText ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowHint( !hideShowHint )
@@ -701,7 +569,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   name={hideShowHint ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null} */}
+            ) : null}
           </View>
         </View>
         <View
@@ -1053,38 +921,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </Text>
           </View>
 
-          {/* <TouchableOpacity
-            style={{
-              flexDirection: 'row',
-              marginLeft: 25,
-              marginRight: 25,
-              paddingBottom: 10,
-              paddingTop: 10,
-            }}
-            onPress={() =>
-              props.navigation.navigate( 'NewOwnQuestions', {
-                walletName,
-              } )
-            }
-          >
-            <Text
-              style={{
-                fontFamily: Fonts.FiraSansMediumItalic,
-                fontWeight: 'bold',
-                fontStyle: 'italic',
-                fontSize: RFValue( 12 ),
-                color: Colors.blue,
-              }}
-              onPress={() =>
-                props.navigation.navigate( 'NewOwnQuestions', {
-                  walletName,
-                } )
-              }
-            >
-        Or choose your own question
-            </Text>
-          </TouchableOpacity> */}
-
           {showNote ? <View style={{
             ...styles.bottomButtonView,
           }}>
@@ -1115,67 +951,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       </KeyboardAwareScrollView>
     )
   }
-
-  const openBottomSheet = (
-    kind: BottomSheetKind,
-    snapIndex: number | null = null
-  ) => {
-    setBottomSheetState( BottomSheetState.Open )
-    setCurrentBottomSheetKind( kind )
-
-    if ( snapIndex == null ) {
-      bottomSheetRef.current?.expand()
-    } else {
-      bottomSheetRef.current?.snapTo( snapIndex )
-    }
-  }
-
-  const onBottomSheetClosed =()=> {
-    setBottomSheetState( BottomSheetState.Closed )
-    setCurrentBottomSheetKind( null )
-  }
-
-  const closeBottomSheet = () => {
-    setIsCloudPermissionRender( false )
-    // bottomSheetRef.current.snapTo( 0 )
-    setCurrentBottomSheetKind( null )
-    onBottomSheetClosed()
-  }
-
-  // const renderBottomSheetContent = () =>{
-
-  //   switch ( currentBottomSheetKind ) {
-  //       case BottomSheetKind.CLOUD_PERMISSION:
-  //         return (
-  //           <CloudPermissionModalContents
-  //             title={'Automated Cloud Backup'}
-  //             info={'This is the first level of security of your wallet and we encourage you to proceed with this step while setting up the wallet'}
-  //             note={''}
-  //             onPressProceed={( flag )=>{
-  //               dispatch( updateCloudPermission( flag ) )
-  //               closeBottomSheet()
-  //               console.log( 'updateCloudPermission', flag )
-  //               props.navigation.navigate( 'NewWalletQuestion', {
-  //                 walletName,
-  //               } )
-  //             }}
-  //             onPressIgnore={( flag )=> {
-  //               closeBottomSheet()
-  //               console.log( 'updateCloudPermission', flag )
-  //               dispatch( updateCloudPermission( flag ) )
-  //               props.navigation.navigate( 'NewWalletQuestion', {
-  //                 walletName,
-  //               } )
-  //             }}
-  //             isRendered={isCloudPermissionRender}
-  //             bottomImage={require( '../assets/images/icons/cloud_ilustration.png' )}
-  //           />
-  //         )
-
-  //       default:
-  //         break
-  //   }
-  // }
 
   return (
     <View style={{
@@ -1231,7 +1006,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               step={''}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
+              icon={activeIndex === 0 ? require( '../../assets/images/icons/icon_questions.png' ) : require( '../../assets/images/icons/question_inactive.png' )}
               mainText={'Answer to a Security Question'}
               subText={'Easier to remember. Recommended'}
               isSelected={activeIndex === 0}
@@ -1239,7 +1014,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               index={0}
             />
             <CardWithRadioBtn
-              icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
+              icon={activeIndex === 1 ? require( '../../assets/images/icons/icon_password_active.png' ) : require( '../../assets/images/icons/icon_password.png' )}
               mainText={'Use your own encryption password'}
               subText={'Choose any password. Make sure you remember and keep it safe'}
               isSelected={activeIndex === 1}
@@ -1282,10 +1057,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         />
         <TouchableOpacity
           onPress={() => {
-            console.log( 'asfds' )
-            setIsSkipClicked( true )
-            dispatch( updateCloudPermission( false ) )
-            onPressProceed( true )
+            props.navigation.goBack()
           }}
         >
           <Text style={{
@@ -1293,7 +1065,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontFamily: Fonts.FiraSansMedium,
             alignSelf: 'center',
             marginLeft: wp( '5%' )
-          }}>Skip Backup</Text>
+          }}>Cancel</Text>
         </TouchableOpacity>
       </View>
       {/* <ModalContainer visible={currentBottomSheetKind != null} closeBottomSheet={() => {}} >
@@ -1308,15 +1080,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
       <ModalContainer visible={loaderModal} closeBottomSheet={() => {}} background={'rgba(42,42,42,0.4)'} >
         {renderLoaderModalContent()}
       </ModalContainer>
-      {/* <BottomSheet
-        onCloseEnd={() => { }}
-        enabledGestureInteraction={false}
-        enabledInnerScrolling={true}
-        ref={loaderBottomSheet}
-        snapPoints={[ -50, hp( '100%' ) ]}
-        renderContent={renderLoaderModalContent}
-        renderHeader={renderLoaderModalHeader}
-      /> */}
 
     </View>
   )
