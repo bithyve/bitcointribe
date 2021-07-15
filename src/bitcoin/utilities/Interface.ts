@@ -610,6 +610,24 @@ export interface WalletImage {
   };
 }
 
+export interface NewWalletImage {
+  walletId: string;
+  name: string;
+  accounts: {
+    [accountId: string]: {
+      encryptedData: string
+    }
+  },
+  details2FA : {
+    secondaryXpub: string,
+    bithyveXpub: string,
+    twoFAKey: string,
+  };
+  contacts:string[];
+  versionHistory: string;
+  SM_share: string,
+}
+
 export interface EncryptedImage {
   // Encrypted Wallet Image
   DECENTRALIZED_BACKUP?: string;
