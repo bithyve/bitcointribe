@@ -255,7 +255,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
-  const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { walletId } = wallet
@@ -305,7 +304,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
-    walletName,
+    walletName: wallet.walletName,
     relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : contactInfo.contactsSecondaryChannelKey ? TrustedContactRelationTypes.WARD : TrustedContactRelationTypes.CONTACT,
     FCM,
     paymentAddresses,
