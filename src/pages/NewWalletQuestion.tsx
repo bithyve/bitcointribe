@@ -151,7 +151,6 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
-  const selectedAcc = props.navigation.getParam( 'selectedAcc' ) ? props.navigation.getParam( 'selectedAcc' ) : ''
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -222,7 +221,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( setupWallet( walletName, selectedAcc, security ) )
+      dispatch( setupWallet( walletName, security ) )
       // dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
