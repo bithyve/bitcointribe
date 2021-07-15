@@ -45,7 +45,8 @@ function* setupWalletWorker( { payload } ) {
     security,
     primaryMnemonic,
     accounts: {
-    }
+    },
+    version: DeviceInfo.getVersion()
   }
 
   yield put( updateWallet( wallet ) )
