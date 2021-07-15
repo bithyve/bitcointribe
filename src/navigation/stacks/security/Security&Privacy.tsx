@@ -195,7 +195,6 @@ const SecurityStack = createStackNavigator(
       header: null
     },
     navigationOptions: ( { navigation } ) => {
-
       let tabBarVisible = false
       if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
         tabBarVisible = true

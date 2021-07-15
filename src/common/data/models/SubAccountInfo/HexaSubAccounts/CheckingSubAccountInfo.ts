@@ -46,7 +46,7 @@ implements HexaSubAccountDescribing {
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Checking Account',
-    defaultSubTitle= 'Fast and easy',
+    defaultSubTitle= 'On-chain wallet',
     balances = {
       confirmed: 0, unconfirmed: 0
     },

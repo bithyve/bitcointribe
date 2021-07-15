@@ -74,7 +74,6 @@ import Home from '../../../pages/Home/Home'
 import TabNavigator from '../../TabNavigator'
 import Header from '../Header'
 import Login from '../../../pages/Login'
-import TransactionsFlatListItem from '../../../components/transactions/TransactionsFlatListItem'
 
 const MODAL_ROUTES = [
   'AllTransactions',
@@ -251,7 +250,7 @@ const HomeStack = createStackNavigator(
       header: null
     },
     navigationOptions: ( { navigation } ) => {
-      let tabBarVisible = TransactionsFlatListItem
+      let tabBarVisible = false
       if ( ( navigation.state.index === 0  && navigation.state.routes[ 0 ].routeName === 'Home' || navigation.state.index === 1 && navigation.state.routes[ 1 ]?.routeName === 'Home' ) ) {
         tabBarVisible = true
       }
@@ -259,8 +258,43 @@ const HomeStack = createStackNavigator(
       return {
         tabBarVisible,
       }
+    //   return {
+    //     ...defaultStackScreenNavigationOptions,
+    //     headerLeft: () => {
+    //       return <SmallNavHeaderCloseButton onPress={() => { navigation.pop() }} />
+    //     },
+    //   }
     },
+    // transitionConfig: ( transitionProps, prevTransitionProps ) => {
+    //   const previousRouteName = prevTransitionProps?.scene.route.routeName
+    //   const newRouteName = transitionProps.scene.route.routeName
+
+    //   // 📝 Override the default presentation mode for screens that we
+    //   // want to present modally
+    //   const isModal = MODAL_ROUTES.some(
+    //     ( screenName ) => [ previousRouteName, newRouteName ].includes( screenName )
+    //   )
+
+    //   return StackViewTransitionConfigs.defaultTransitionConfig(
+    //     transitionProps,
+    //     prevTransitionProps,
+    //     isModal,
+    //   )
+    // },
   },
 )
+
+// HomeStack.navigationOptions = ( { navigation } ) => {
+//   let tabBarVisible = true
+//   console.log( 'navigation.state.index', navigation.state.index )
+
+//   if ( navigation.state.index > 0 ) {
+//     tabBarVisible = false
+//   }
+
+//   return {
+//     tabBarVisible,
+//   }
+// }
 
 export default HomeStack

@@ -92,7 +92,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       height: hp( 9 ),
       backgroundColor: Colors.white,
       alignItems: 'center',
-      marginBottom: wp( 2 ),
+      marginBottom: wp( 4 ),
       borderRadius: wp( 2 ),
       elevation: 10,
       shadowColor: Colors.borderColor,
@@ -117,7 +117,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           style={ListStyles.infoHeaderSubtitleText}
           numberOfLines={1}
         >
-            bitcoin will be transferred to
+            Bitcoin will be transferred to
         </ListItem.Subtitle>
 
         <ListItem.Title
@@ -162,7 +162,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
           style={ListStyles.infoHeaderSubtitleText}
           numberOfLines={1}
         >
-            bitcoin will be transferred to
+            Bitcoin will be transferred to
         </ListItem.Subtitle>
 
         <ListItem.Title
@@ -196,6 +196,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         alignContent: 'center',
         marginTop: hp( '1.5' ),
         marginRight: wp( '5%' ),
+        marginBottom: hp( '2%' )
       }}>
         <Text style={{
           fontStyle: 'italic',
@@ -279,9 +280,11 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '3%' ),
     marginRight: wp( '6%' ),
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
-    textAlign: 'justify'
+    textAlign: 'justify',
+    letterSpacing: 0.6,
+    lineHeight: 18
   },
   successModalButtonView: {
     minHeight: 50,

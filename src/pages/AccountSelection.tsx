@@ -79,8 +79,8 @@ const accountOptions: AccountOption[] = [
   {
     id: 6,
     title: 'Exchange Account',
-    type: AccountType.WYRE_ACCOUNT,
-    imageSource: require( '../assets/images/accIcons/boughtbtc.png' ),
+    type: AccountType.EXCHNGE_ACCOUNT,
+    imageSource: require( '../assets/images/accIcons/deposit_account.png' ),
     subtitle: 'A separate wallet where your newly bought bitcoin/ sats land',
   }
 ]

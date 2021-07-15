@@ -53,6 +53,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { resetStackToSend } from '../../navigation/actions/NavigationActions'
 import ContactTrustKind from '../../common/data/enums/ContactTrustKind'
+import EditContactScreen from './EditContact'
 
 const getImageIcon = ( item: ContactRecipientDescribing ) => {
   if ( Object.keys( item ).length ) {
@@ -121,6 +122,7 @@ interface ContactDetailsStateTypes {
   qrModalTitle: string;
   reshareModal: boolean;
   showQRCode: boolean;
+  edit: boolean;
 }
 
 class ContactDetails extends PureComponent<
@@ -192,6 +194,7 @@ class ContactDetails extends PureComponent<
       ],
       qrModalTitle: '',
       reshareModal: false,
+      edit: false
     }
 
     this.contact = this.props.navigation.state.params.contact
@@ -700,7 +703,7 @@ class ContactDetails extends PureComponent<
     return (
       <ErrorModalContents
         modalRef={this.ReshareBottomSheet}
-        title={'Reshare Recovery Ke,,,\nwith Keeper'}
+        title={'Reshare Recovery Ke \nwith Keeper'}
         info={'Did your Keeper not receive the Recovery Key?'}
         note={'You can reshare the Recovery Key with your Keeper'}
         proceedButtonText={'Reshare'}
@@ -736,7 +739,8 @@ class ContactDetails extends PureComponent<
       encryptedExitKey,
       isSendDisabled,
       trustedContactHistory,
-      reshareModal
+      reshareModal,
+      edit
     } = this.state
     return (
       <View style={{
@@ -786,35 +790,60 @@ class ContactDetails extends PureComponent<
                   </Text>
                 ) : null} */}
               </View>
-              <TouchableOpacity
-                disabled={isSendDisabled}
-                onPress={() => {
-                  this.setState( {
-                    isSendDisabled: true,
-                  } )
+              <View style={{
+                alignSelf: 'center'
+              }}>
+                <TouchableOpacity
+                  disabled={isSendDisabled}
+                  onPress={() => {
+                    this.setState( {
+                      isSendDisabled: true,
+                    } )
 
-                  this.contact.lastSeenActive
-                    ? this.onPressSend()
-                    : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName )
-                      ? this.onPressResendRequest()
-                      : null
-                }}
-                style={styles.resendContainer}
-              >
-                {this.contact.lastSeenActive ? (
-                  <Image
-                    source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
-                    style={styles.bitcoinIconStyle}
-                  />
-                ) : null}
-                <Text style={styles.sendTextStyle}>
-                  {this.contact.lastSeenActive
-                    ? 'Send'
-                    : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
-                      ? 'Reshare'
-                      : 'Resend Request'}
-                </Text>
-              </TouchableOpacity>
+                    this.contact.lastSeenActive
+                      ? this.onPressSend()
+                      : ![ 'Personal Device', 'Personal Device1', 'Personal Device2', 'Personal Device3' ].includes( this.contact.displayedName )
+                        ? this.onPressResendRequest()
+                        : null
+                  }}
+                  style={styles.resendContainer}
+                >
+                  {this.contact.lastSeenActive ? (
+                    <Image
+                      source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                      style={styles.bitcoinIconStyle}
+                    />
+                  ) : null}
+                  <Text style={styles.sendTextStyle}>
+                    {this.contact.lastSeenActive
+                      ? 'Send'
+                      : this.contact.trustKind === ContactTrustKind.KEEPER_OF_USER
+                        ? 'Reshare'
+                        : 'Resend Request'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  disabled={isSendDisabled}
+                  onPress={() => {
+                    this.setState( {
+                      edit: true
+                    } )
+                  }}
+                  style={[ styles.resendContainer, {
+                    alignSelf: 'center'
+                  } ]}
+                >
+                  {this.contact.lastSeenActive ? (
+                    <Image
+                      source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
+                      style={styles.bitcoinIconStyle}
+                    />
+                  ) : null}
+                  <Text style={styles.sendTextStyle}>
+                    Edit
+                  </Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
           {Loading ? (
@@ -1090,6 +1119,13 @@ class ContactDetails extends PureComponent<
           renderContent={this.renderExitKeyQRContents}
           renderHeader={this.renderExitKeyQRHeader}
         />
+        <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
+          edit: false
+        } )}>
+          <EditContactScreen navigation={navigation} contact={this.contact} closeModal={() => this.setState( {
+            edit: false
+          } )} />
+        </ModalContainer>
         <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
         } )}>

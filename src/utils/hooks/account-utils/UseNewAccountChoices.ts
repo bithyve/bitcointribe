@@ -76,13 +76,36 @@ export default function useNewAccountChoices() {
       ].sort( sortHexaAccountChoices ),
 
       serviceAccounts: [
+        // new ExternalServiceSubAccountInfo( {
+        //   instanceNumber: 1,
+        //   defaultTitle: 'Collaborative Custody',
+        //   defaultDescription: 'Multi-sig Vault with a co-signer',
+        //   serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
+        //   type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
+        // } ),
         new ExternalServiceSubAccountInfo( {
           instanceNumber: 1,
-          defaultTitle: 'Collaborative Custody',
+          defaultTitle: 'F&F Account',
           defaultDescription: 'Multi-sig Vault with a co-signer',
-          serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
+          serviceAccountKind: ServiceAccountKind.FNF_ACCOUNT,
+          type: AccountType.FNF_ACCOUNT, // TODO: assign appropriate type once activated
+        } ),
+        new ExternalServiceSubAccountInfo( {
+          instanceNumber: 1,
+          defaultTitle: 'Joint Account',
+          defaultDescription: 'Multi-sig Vault with a co-signer',
+          serviceAccountKind: ServiceAccountKind.JOINT_ACCOUNT,
           type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
         } ),
+        new ExternalServiceSubAccountInfo( {
+          instanceNumber: 1,
+          defaultTitle: 'Community Account',
+          defaultDescription: 'Multi-sig Vault with a co-signer',
+          serviceAccountKind: ServiceAccountKind.COMMUNITY_ACCOUNT,
+          type: AccountType.FNF_ACCOUNT, // TODO: assign appropriate type once activated
+        } ),
+
+
       ],
 
       importedWalletAccounts: [

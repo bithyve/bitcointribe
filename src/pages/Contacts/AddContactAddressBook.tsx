@@ -34,6 +34,7 @@ import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
+  const [ editedContacts, setEditedContacts ] = useState( [ props.navigation.state.params?.contactToEdit ] )
   const [ searchName, setSearchName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ filterContactData, setFilterContactData ] = useState( [] )
@@ -236,6 +237,9 @@ export default function AddContactAddressBook( props ) {
     if ( contacts[ index ].checked ) {
       selectedContacts = []
     } else {
+      if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
+        contacts[ index ].id = props.navigation.state.params?.contactToEdit.id
+      }
       selectedContacts[ 0 ] = contacts[ index ]
     }
     setSelectedContacts( selectedContacts )
@@ -308,6 +312,7 @@ export default function AddContactAddressBook( props ) {
         subHeaderText:'Send a Friends and Family request',
         contactText:'Adding to Friends and Family:',
         showDone:true,
+        fromEdit: props.navigation.state.params?.fromScreen
       } )
     }
   }

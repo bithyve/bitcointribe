@@ -270,7 +270,7 @@ const styles = StyleSheet.create( {
     // flex: 1.7
   },
   modalTitleText: {
-    marginBottom: wp( '5%' ),
+    marginBottom: wp( '4%' ),
     color: Colors.blue,
     fontSize: RFValue( 18 ),
     fontFamily: Fonts.FiraSansRegular,
@@ -282,7 +282,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-    marginTop: wp( 1.5 ),
+    // marginTop: wp( 1 ),
     marginBottom: wp( 10 ),
     marginRight: wp( 5 ),
     lineHeight: 18,
