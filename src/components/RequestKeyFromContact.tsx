@@ -11,7 +11,7 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import FontAwesome from 'react-native-vector-icons/FontAwesome'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { ScrollView } from 'react-native-gesture-handler'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from './QRCode'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,
@@ -135,7 +135,10 @@ export default function RequestKeyFromContact( props ) {
             {!props.QR ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
             ) : (
-              <QRCode value={props.QR} size={hp( '27%' )} />
+              <QRCode
+                title="F&F Request"
+                value={props.QR}
+                size={hp( '27%' )} />
             )}
           </View>
           <CopyThisText
@@ -173,6 +176,22 @@ const styles = StyleSheet.create( {
     marginLeft: 20,
     marginRight: 20,
     alignItems: 'center',
+  },
+  containerQrCode: {
+    backgroundColor: 'gray',
+    borderBottomLeftRadius: 5,
+    borderBottomRightRadius: 5,
+  },
+  textQr: {
+    color: 'white',
+    fontSize: 17,
+    textAlign: 'center',
+    paddingVertical: 5,
+  },
+  containerTextQr: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5, paddingHorizontal:5,
   },
   mainContainer: {
     marginLeft: 20,

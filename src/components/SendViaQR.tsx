@@ -11,7 +11,7 @@ import BottomInfoBox from './BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import { nameToInitials } from '../common/CommonFunctions'
 import { ScrollView } from 'react-native-gesture-handler'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from './QRCode'
 import {
   REGULAR_ACCOUNT,
   TEST_ACCOUNT,

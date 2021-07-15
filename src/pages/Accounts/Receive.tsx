@@ -35,7 +35,7 @@ import {
 } from '../../store/actions/preferences'
 import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
 import KnowMoreButton from '../../components/KnowMoreButton'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import CopyThisText from '../../components/CopyThisText'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'

@@ -33,7 +33,7 @@ import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import config from '../../bitcoin/HexaConfig'
 
 export default function RestoreWalletBySecondaryDevice( props ) {

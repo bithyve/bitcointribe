@@ -5,7 +5,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import Fonts from '../../common/Fonts'
 import Colors from '../../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
