@@ -29,7 +29,7 @@ import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
-import { QRCodeTypes, TrustedContact, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 
@@ -84,8 +84,8 @@ export default function AddContactSendRequest( props ) {
     },
   )
 
-  const WALLET_SETUP = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
   const trustedContacts: Trusted_Contacts = useTrustedContacts()
   const dispatch = useDispatch()
@@ -133,7 +133,7 @@ export default function AddContactSendRequest( props ) {
       console.log( 'QR DATA', JSON.stringify( {
         type: QRCodeTypes.CONTACT_REQUEST,
         channelKey,
-        walletName: WALLET_SETUP.walletName,
+        walletName: wallet.walletName,
         secondaryChannelKey,
         version: appVersion,
       } ) )
@@ -141,7 +141,7 @@ export default function AddContactSendRequest( props ) {
         JSON.stringify( {
           type: QRCodeTypes.CONTACT_REQUEST,
           channelKey,
-          walletName: WALLET_SETUP.walletName,
+          walletName: wallet.walletName,
           secondaryChannelKey,
           version: appVersion,
         } )
@@ -173,7 +173,7 @@ export default function AddContactSendRequest( props ) {
           contactText={contactText}
           contact={Contact ? Contact : null}
           infoText={`Click here to accept contact request from ${
-            WALLET_SETUP.walletName
+            wallet.walletName
           }' Hexa wallet - link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`}
