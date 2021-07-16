@@ -21,10 +21,10 @@ import S3Service from '../../bitcoin/services/sss/S3Service'
 import { insertDBWorker } from './storage'
 import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import RelayServices from '../../bitcoin/services/RelayService'
 import { setCloudData } from '../actions/cloud'
 import semver from 'semver'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
+import Relay from '../../bitcoin/utilities/Relay'
 
 function* initLevelsWorker( { payload } ) {
   try {
@@ -181,8 +181,8 @@ function* autoShareSecondaryWorker( { payload } ) {
         tag: notificationTag.IMP,
         date: new Date(),
       }
-      const ress = yield fork(
-        RelayServices.sendNotifications,
+      yield fork(
+        Relay.sendNotifications,
         [ {
           walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
         } ],
@@ -297,8 +297,8 @@ function* autoShareContactKeeperWorker( { payload } ) {
           tag: notificationTag.IMP,
           date: new Date(),
         }
-        const ress = yield fork(
-          RelayServices.sendNotifications,
+        yield fork(
+          Relay.sendNotifications,
           [ {
             walletId: oldKeeperInfo.walletID, FCMs: oldKeeperInfo.FCMs
           } ],

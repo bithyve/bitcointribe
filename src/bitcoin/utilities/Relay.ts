@@ -1,6 +1,6 @@
 import { AxiosResponse } from 'axios'
 import config from '../HexaConfig'
-import { INotification, EncryptedImage } from './Interface'
+import { INotification, EncryptedImage, NewWalletImage } from './Interface'
 import { BH_AXIOS } from '../../services/api'
 import idx from 'idx'
 
@@ -278,6 +278,50 @@ export default class Relay {
     return {
       exchangeRates,
       averageTxFees,
+    }
+  };
+
+  public updateWalletImage = async (
+    walletImage: NewWalletImage,
+  ): Promise<{
+    updated: boolean;
+  }> => {
+    try {
+      const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
+        HEXA_ID,
+        walletID: walletImage.walletId,
+        walletImage,
+      } )
+
+      const { updated } = res.data
+      return {
+        updated
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to update Wallet Image' )
+    }
+  };
+
+  public fetchWalletImage = async ( walletId: string ): Promise<{
+    walletImage: NewWalletImage;
+  }> => {
+    try {
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'v2/fetchWalletImage', {
+          HEXA_ID,
+          walletID: walletId,
+        } )
+      } catch ( err ) {
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      const { walletImage } = res.data
+      return {
+        walletImage
+      }
+    } catch ( err ) {
+      throw new Error( 'Failed to fetch Wallet Image' )
     }
   };
 }
