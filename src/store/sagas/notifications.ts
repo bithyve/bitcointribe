@@ -15,8 +15,8 @@ import {
   UPDATE_MESSAGES_STATUS
 } from '../actions/notifications'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import RelayServices from '../../bitcoin/services/RelayService'
 import moment from 'moment'
+import Relay from '../../bitcoin/utilities/Relay'
 
 
 function* updateFCMTokensWorker( { payload } ) {
@@ -32,20 +32,12 @@ function* updateFCMTokensWorker( { payload } ) {
     const { data } = yield call( service.getWalletId )
     console.log( 'data updateFCMTokensWorker', data )
 
-    const res = yield call(
-      RelayServices.updateFCMTokens,
+    const { updated } = yield call(
+      Relay.updateFCMTokens,
       data.walletId,
       payload.FCMs,
     )
-
-    if ( res.status === 200 ) {
-      const { updated } = res.data
-      console.log( {
-        updated
-      } )
-    } else {
-      console.log( 'Failed to update FCMs on the server' )
-    }
+    if ( !updated ) console.log( 'Failed to update FCMs on the server' )
   } catch( err ){
     console.log( 'err', err )
   }
@@ -65,20 +57,13 @@ export function* fetchNotificationsWorker() {
   const { data } = yield call( service.getWalletId )
   console.log( 'data', data )
 
-  const res = yield call( RelayServices.fetchNotifications, data.walletId )
-  if ( res.status === 200 ) {
-    const { notifications, DHInfos } = res.data
-    yield call( AsyncStorage.setItem, 'DHInfos', JSON.stringify( DHInfos ) )
-    const payload = {
-      notifications
-    }
-    yield call( notificationsFetched, notifications )
-    //yield call( setupNotificationListWorker )
-    yield put( fetchNotificationStarted( false ) )
-
-  } else {
-    console.log( 'Failed to fetch notification' )
+  const { notifications } = yield call( Relay.fetchNotifications, data.walletId )
+  const payload = {
+    notifications
   }
+  yield call( notificationsFetched, notifications )
+  //yield call( setupNotificationListWorker )
+  yield put( fetchNotificationStarted( false ) )
 }
 
 export const fetchNotificationsWatcher = createWatcher(
@@ -98,22 +83,15 @@ export function* getMessageWorker() {
   )
   console.log( 'messages timeStamp', timeStamp )
 
-  const res = yield call( RelayServices.getMessages, walletId, timeStamp )
-  console.log( 'res', res )
-  if ( res.status === 200 ) {
-    const { messages } = res.data
-    if( !storedMessages ) return
-    const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
-    console.log( 'newMessageArray', newMessageArray )
+  const { messages } = yield call( Relay.getMessages, walletId, timeStamp )
+  if( !storedMessages ) return
+  const newMessageArray = storedMessages.concat( messages.filter( ( { notificationId } ) => !storedMessages.find( f => f.notificationId == notificationId ) ) )
+  console.log( 'newMessageArray', newMessageArray )
 
-    yield put( messageFetched( newMessageArray ) )
-    yield put( storeMessagesTimeStamp() )
+  yield put( messageFetched( newMessageArray ) )
+  yield put( storeMessagesTimeStamp() )
 
-    yield put( fetchNotificationStarted( false ) )
-  } else {
-    console.log( 'Failed to fetch notification' )
-  }
-
+  yield put( fetchNotificationStarted( false ) )
 }
 
 export const getMessageWatcher = createWatcher(
@@ -149,23 +127,13 @@ export function* updateMessageStatusWorker( { payload } ) {
       throw new Error( 'No data found' )
     }
     const walletId = yield select( ( state ) => state.preferences.walletId, )
-
-    console.log( 'data updateFCMTokensWorker', data )
-
-    const res = yield call(
-      RelayServices.updateMessageStatus,
+    const { updated } = yield call(
+      Relay.updateMessageStatus,
       walletId,
       data,
     )
+    if ( !updated ) console.log( 'Failed to update messageStatus on the server' )
 
-    if ( res.status === 200 ) {
-      const { updated } = res.data
-      console.log( {
-        updated
-      } )
-    } else {
-      console.log( 'Failed to update messageStatus on the server' )
-    }
   } catch( err ){
     console.log( 'err', err )
   }

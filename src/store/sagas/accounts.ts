@@ -70,7 +70,6 @@ import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../..
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import RelayServices from '../../bitcoin/services/RelayService'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -105,6 +104,7 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
+import Relay from '../../bitcoin/utilities/Relay'
 
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
@@ -557,28 +557,21 @@ function* feeAndExchangeRatesWorker() {
     ( state ) => state.preferences.currencyCode
   )
   try {
-    const res = yield call( RelayServices.fetchFeeAndExchangeRates, currencyCode )
-    console.log( {
-      res
-    } )
-    if ( res.status === 200 ) {
-      const { exchangeRates, averageTxFees } = res.data
+    const { exchangeRates, averageTxFees } = yield call( Relay.fetchFeeAndExchangeRates, currencyCode )
+    if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
+    else {
+      if (
+        JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
+      )
+        yield put( exchangeRatesCalculated( exchangeRates ) )
+    }
 
-      if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
-      else {
-        if (
-          JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
-        )
-          yield put( exchangeRatesCalculated( exchangeRates ) )
-      }
-
-      if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-      else {
-        if (
-          JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees )
-        )
-          yield put( setAverageTxFee( averageTxFees ) )
-      }
+    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
+    else {
+      if (
+        JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees )
+      )
+        yield put( setAverageTxFee( averageTxFees ) )
     }
   } catch ( err ) {
     console.log( {

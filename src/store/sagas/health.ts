@@ -135,8 +135,8 @@ import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
 import SSS from '../../bitcoin/utilities/sss/SSS'
-import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Relay from '../../bitcoin/utilities/Relay'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -2154,7 +2154,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
         } )
         if( notifReceivers.length )
           yield call(
-            RelayServices.sendNotifications,
+            Relay.sendNotifications,
             notifReceivers,
             notification,
           )
