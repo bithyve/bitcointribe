@@ -44,7 +44,7 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   function handleSaveButtonPress() {
     primarySubAccount.visibility = selectedVisibility
     dispatch( updateSubAccountSettings( primarySubAccount ) )
-    navigation.goBack()
+    navigation.navigate( 'Home' )
   }
 
   function onDismiss() {

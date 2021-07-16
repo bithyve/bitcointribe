@@ -31,6 +31,7 @@ import ModalContainer from '../../components/home/ModalContainer'
 import { Trusted_Contacts } from '../../bitcoin/utilities/Interface'
 import { v4 as uuid } from 'uuid'
 import { SKIPPED_CONTACT_NAME } from '../../store/reducers/trustedContacts'
+import { editTrustedContact } from '../../store/actions/trustedContacts'
 
 export default function AddContactAddressBook( props ) {
   let [ selectedContacts, setSelectedContacts ] = useState( [] )
@@ -237,9 +238,6 @@ export default function AddContactAddressBook( props ) {
     if ( contacts[ index ].checked ) {
       selectedContacts = []
     } else {
-      if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
-        contacts[ index ].id = props.navigation.state.params?.contactToEdit.id
-      }
       selectedContacts[ 0 ] = contacts[ index ]
     }
     setSelectedContacts( selectedContacts )
@@ -306,14 +304,30 @@ export default function AddContactAddressBook( props ) {
 
   const onPressContinue= () => {
     if ( selectedContacts && selectedContacts.length ) {
-      props.navigation.navigate( 'AddContactSendRequest', {
-        SelectedContact: selectedContacts,
-        headerText:'Add a contact  ',
-        subHeaderText:'Send a Friends and Family request',
-        contactText:'Adding to Friends and Family:',
-        showDone:true,
-        fromEdit: props.navigation.state.params?.fromScreen
-      } )
+      if ( props.navigation.state.params?.fromScreen === 'Edit' )  {
+        selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
+        selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
+        selectedContacts[ 0 ].displayedName = selectedContacts[ 0 ].name
+        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.navigation.state.params?.contactToEdit.avatarImageSource
+        dispatch( editTrustedContact( {
+          channelKey: props.navigation.state.params?.contactToEdit.channelKey,
+          contactName: selectedContacts[ 0 ].name,
+          image: selectedContacts[ 0 ].image
+        } ) )
+        props.navigation.navigate( 'ContactDetails', {
+          contact: selectedContacts[ 0 ],
+        } )
+
+      } else {
+        props.navigation.navigate( 'AddContactSendRequest', {
+          SelectedContact: selectedContacts,
+          headerText:'Add a contact  ',
+          subHeaderText:'Send a Friends and Family request',
+          contactText:'Adding to Friends and Family:',
+          showDone:true,
+        } )
+      }
+
     }
   }
 
@@ -533,7 +547,7 @@ export default function AddContactAddressBook( props ) {
                 onPress={() => onPressContinue()}
                 style={styles.bottomButtonView}
               >
-                <Text style={styles.buttonText}>Confirm & Proceed..</Text>
+                <Text style={styles.buttonText}>Confirm & Proceed</Text>
               </AppBottomSheetTouchableWrapper>
             </View>
           )}

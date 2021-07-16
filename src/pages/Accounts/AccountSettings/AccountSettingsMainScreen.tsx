@@ -185,7 +185,7 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   function handleAccountArchive() {
     primarySubAccount.visibility = AccountVisibility.ARCHIVED
     dispatch( updateSubAccountSettings( primarySubAccount ) )
-    navigation.goBack()
+    navigation.navigate( 'Home' )
   }
 
 

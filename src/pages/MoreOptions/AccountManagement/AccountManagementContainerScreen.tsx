@@ -22,6 +22,7 @@ import BottomSheet, { BottomSheetView, useBottomSheetModal } from '@gorhom/botto
 import defaultBottomSheetConfigs from '../../../common/configs/BottomSheetConfigs'
 import UnHideArchiveAccountBottomSheet from '../../../components/bottom-sheets/account-management/UnHideArchiveAccountBottomSheet'
 import UnHideRestoreAccountSuccessBottomSheet from '../../../components/bottom-sheets/account-management/UnHideRestoreAccountSuccessBottomSheet'
+import ModalContainer from '../../../components/home/ModalContainer'
 
 
 export type Props = {
@@ -39,6 +40,12 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   const [ accountVisibility, setAccountVisibility ] = useState( null )
   const [ hasChangedOrder, setHasChangedOrder ] = useState( false )
   const [ selectedAccount, setSelectedAccount ] = useState( null )
+  const [ unHideArchiveModal, showUnHideArchiveModal ] = useState( false )
+  const [ restorerchiveModal, showRestoreArchiveModal ] = useState( false )
+
+  const [ primarySubAccount, showPrimarySubAccount ] = useState( {
+  } )
+
   const getnewDraggableOrderedAccountShell = useMemo( () => {
     const newDraggableOrderedAccountShell = []
     if( originalAccountShells ){
@@ -109,49 +116,41 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
   useEffect( () => {
     return () => {
-      dismissBottomSheet()
+      showUnHideArchiveModal( false )
     }
   }, [ navigation ] )
 
-  const showUnHideArchiveAccountBottomSheet = useCallback( ( primarySubAccount, visibility ) => {
-    presentBottomSheet(
+  const showUnHideArchiveAccountBottomSheet = useCallback( () => {
+
+    return(
       <UnHideArchiveAccountBottomSheet
         onProceed={()=>{
-          if( primarySubAccount && ( visibility == AccountVisibility.ARCHIVED || visibility == AccountVisibility.HIDDEN ) )
-            setAccountVisibility( visibility )
+          if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
+            setAccountVisibility( primarySubAccount.visibility )
           changeVisisbility( primarySubAccount, AccountVisibility.DEFAULT )
-          dismissBottomSheet()
+          showUnHideArchiveModal( false )
         }
         }
         onBack={() =>{
-          dismissBottomSheet()}
+          showUnHideArchiveModal( false )
+        }
         }
         accountInfo={primarySubAccount}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '50%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, selectedAccount ] )
+  }, [ primarySubAccount ] )
 
   const showSuccessAccountBottomSheet = useCallback( ( primarySubAccount ) => {
-    presentBottomSheet(
+    return(
       <UnHideRestoreAccountSuccessBottomSheet
         onProceed={()=>{
           dismissBottomSheet()}
         }
         accountInfo={primarySubAccount}
         accountVisibility={accountVisibility}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '55%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, selectedAccount, accountVisibility ] )
+  }, [ accountVisibility ] )
 
   const changeVisisbility = ( selectedAccount, visibility ) => {
     selectedAccount.visibility = visibility
@@ -229,21 +228,13 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
             setTimeout( () => {
               setSelectedAccount( primarySubAccount )
             }, 2 )
-
             if( primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
-              showUnHideArchiveAccountBottomSheet( primarySubAccount, primarySubAccount.visibility )
+              showPrimarySubAccount( primarySubAccount )
+              showUnHideArchiveModal( true )
             }
           }}
         >
           <Text
-            onPress={() => {
-              setTimeout( () => {
-                setSelectedAccount( primarySubAccount )
-              }, 2 )
-              if( primarySubAccount.visibility === AccountVisibility.HIDDEN || primarySubAccount.visibility === AccountVisibility.ARCHIVED ){
-                showUnHideArchiveAccountBottomSheet( primarySubAccount, primarySubAccount.visibility )
-              }
-            }}
             style={{
               color: Colors.textColorGrey,
               fontSize: RFValue( 12 ),
@@ -254,12 +245,14 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           </Text>
         </TouchableOpacity> : null}
       </ListItem>
-
     )
   }
 
   return (
     <View style={styles.rootContainer}>
+      <ModalContainer visible={unHideArchiveModal} closeBottomSheet={() => { showUnHideArchiveModal( false ) }} >
+        {showUnHideArchiveAccountBottomSheet()}
+      </ModalContainer>
       <ScrollView>
         {getnewDraggableOrderedAccountShell && !showAllAccount && <ReorderAccountShellsDraggableList
           accountShells={orderedAccountShells}
