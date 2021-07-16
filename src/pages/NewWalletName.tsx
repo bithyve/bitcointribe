@@ -239,8 +239,8 @@ export default function NewWalletName( props ) {
                 <TouchableOpacity
                   onPress={() => {
                     Keyboard.dismiss()
-                    props.navigation.navigate( 'AccountSelection', {
-                      walletName
+                    props.navigation.navigate( 'NewWalletQuestion', {
+                      walletName,
                     } )
                     // setIsCloudPermissionRender( true )
                     // openBottomSheet( BottomSheetKind.CLOUD_PERMISSION )

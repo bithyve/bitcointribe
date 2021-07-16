@@ -72,18 +72,18 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
-    if (
-      this.props.startRegistration &&
-      selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
-    ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
-    ) {
-      this.props.openBottomSheet( 6, null, true )
+    // if (
+    //   this.props.startRegistration &&
+    //   selectedAccount.primarySubAccount.kind === SubAccountKind.SERVICE &&
+    // ( selectedAccount.primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    // ) {
+    //   this.props.openBottomSheet( 6, null, true )
 
-    } else {
-      this.props.navigation.navigate( 'AccountDetails', {
-        accountShellID: selectedAccount.id,
-      } )
-    }
+    // } else {
+    this.props.navigation.navigate( 'AccountDetails', {
+      accountShellID: selectedAccount.id,
+    } )
+    // }
   };
 
   render() {

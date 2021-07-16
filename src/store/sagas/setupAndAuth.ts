@@ -32,6 +32,7 @@ import S3Service from '../../bitcoin/services/sss/S3Service'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
 
 function* setupWalletWorker( { payload } ) {
   const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
@@ -64,6 +65,7 @@ function* setupWalletWorker( { payload } ) {
   yield call( addNewAccountShellsWorker, {
     payload: accountsInfo
   } )
+  yield put( newAccountShellCreationCompleted() )
   yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )

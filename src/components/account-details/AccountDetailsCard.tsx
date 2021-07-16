@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   View,
   Text,
@@ -22,6 +22,10 @@ import { subAccountSettingsUpdateCompleted } from '../../store/actions/accounts'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
+import { AccountType } from '../../bitcoin/utilities/Interface'
+import { useSelector } from 'react-redux'
+import ModalContainer from '../home/ModalContainer'
+import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
 
 export type Props = {
   accountShell: AccountShell;
@@ -85,6 +89,17 @@ const AccountDetailsCard: React.FC<Props> = ( {
   onSettingsPressed,
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
+  const [ swanModal, showSwanModal ] = useState( false )
+  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  useEffect( () => {
+    if (
+      startRegistration &&
+        primarySubAccount.kind === SubAccountKind.SERVICE &&
+      ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
+    ) {
+      showSwanModal( true )
+    }
+  }, [] )
 
   const rootContainerStyle = useMemo( () => {
     return {
@@ -153,8 +168,9 @@ const AccountDetailsCard: React.FC<Props> = ( {
           bitcoinIconColor="light"
           textColor={Colors.white}
         />
-
+        { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
         <KnowMoreButton />
+        }
       </View>
     )
   }
@@ -195,6 +211,15 @@ const AccountDetailsCard: React.FC<Props> = ( {
 
   return (
     <View style={rootContainerStyle}>
+      <ModalContainer visible={swanModal} closeBottomSheet={() => {}} >
+        <BottomSheetSwanInfo
+          swanDeepLinkContent={''}
+          onClickSetting={() => {
+            showSwanModal( false )
+          }}
+          onPress={() => showSwanModal( false )}
+        />
+      </ModalContainer>
       <ImageBackground
         source={backgroundImageForAccountKind( primarySubAccount )}
         style={{
