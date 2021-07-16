@@ -61,8 +61,6 @@ export default function AddContactSendRequest( props ) {
     ? props.navigation.getParam( 'SelectedContact' )
     : []
 
-  const fromEdit = props.navigation.getParam( 'fromEdit' )
-
   const headerText = props.navigation.getParam( 'headerText' )
     ? props.navigation.getParam( 'headerText' )
     : ''
@@ -93,12 +91,21 @@ export default function AddContactSendRequest( props ) {
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
-      if ( contact.contactDetails.id === Contact.id && fromEdit == undefined ) return
+      if ( contact.contactDetails.id === Contact.id ) return
     }
+    // if ( fromEdit ) {
+    //   dispatch( editTrustedContact( {
+    //     channelKey: Contact.channelKey,
+    //     contactName: Contact.name,
+    //     image: Contact.image
+    //   } ) )
+    // } else {
     dispatch( initializeTrustedContact( {
       contact: Contact,
       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
     } ) )
+    // }
+
   }, [ Contact ] )
 
   useEffect( ()=> {

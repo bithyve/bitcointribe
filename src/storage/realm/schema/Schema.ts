@@ -3,6 +3,7 @@ import { ObjectSchema } from 'realm'
 const UTXO = 'UTXO'
 const UTXOStatus = 'UTXOStatus'
 const Wallet = 'Wallet'
+const WalletSecurity = 'WalletSecurity'
 const Account = 'Account'
 const Transaction = 'Transaction'
 const Details2FA = 'Details2FA'
@@ -129,13 +130,13 @@ export const BalancesSchema: ObjectSchema = {
   },
 }
 
-export const AccountIdSchema: ObjectSchema = {
-  name: AccountId,
-  properties: {
-    derivationPath: 'string',
-    accountId: 'string',
-  },
-}
+// export const AccountIdSchema: ObjectSchema = {
+//   name: AccountId,
+//   properties: {
+//     derivationPath: 'string',
+//     accountId: 'string',
+//   },
+// }
 
 export const XPubSchema: ObjectSchema = {
   name: XPUB,
@@ -243,6 +244,21 @@ export const UTXOStatusSchema: ObjectSchema = {
   },
 }
 
+export const WalletSecuritySchema: ObjectSchema = {
+  name: WalletSecurity,
+  properties: {
+    questionId: {
+      type: 'string', optional: true,
+    },
+    question: {
+      type: 'string', optional: true,
+    },
+    answer: {
+      type: 'string', optional: true,
+    },
+  },
+}
+
 export const WalletSchema: ObjectSchema = {
   name: Wallet,
   primaryKey: 'walletId',
@@ -257,10 +273,17 @@ export const WalletSchema: ObjectSchema = {
       type: 'string', optional: true,
     },
     details2FA: {
-      type: Details2FA
+      type: Details2FA, optional: true
     },
     accountIds: {
-      type: 'list', objectType: AccountId, default: []
+      type: 'string?[]',
+      optional: true
+    },
+    security: {
+      type: WalletSecurity, optional: true
+    },
+    version: {
+      type: 'string', optional: true
     },
     tags: {
       type: 'string?[]',
@@ -518,8 +541,11 @@ export const ContactDetailsSchema: ObjectSchema = {
 
 export const TrustedContactSchema: ObjectSchema = {
   name: TrustedContact,
-  primaryKey: 'permanentChannelAddress',
+  primaryKey: 'channelKey',
   properties: {
+    channelKey: {
+      type: 'string', indexed: true,
+    },
     contactDetails: {
       type: ContactDetails, optional: true
     },
@@ -527,7 +553,7 @@ export const TrustedContactSchema: ObjectSchema = {
       type: 'string', optional: true,
     },
     permanentChannelAddress: {
-      type: 'string', indexed: true,
+      type: 'string', optional: true,
     },
     secondaryChannelKey: {
       type: 'string', optional: true,
@@ -578,5 +604,6 @@ export default {
   MetaShare,
   EncryptedShare,
   Meta,
-  KeeperInfo
+  KeeperInfo,
+  WalletSecurity,
 }

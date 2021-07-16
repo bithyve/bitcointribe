@@ -9,7 +9,6 @@ import {
   Bip32Schema,
   NetworkSchema,
   XPubSchema,
-  AccountIdSchema,
   StreamsSchema,
   StreamsMetaDataFlagsSchema,
   StreamsMetaDataSchema,
@@ -22,12 +21,14 @@ import {
   SecondaryStreamDataSchema,
   UnecryptedStreamDataSchema,
   ContactDetailsSchema,
-  TrustedContactSchema
+  TrustedContactSchema,
+  WalletSecuritySchema,
 } from './Schema'
 
 export default
 [
   WalletSchema,
+  WalletSecuritySchema,
   AccountSchema,
   TransactionSchema,
   UTXOSchema,
@@ -36,7 +37,6 @@ export default
   Bip32Schema,
   NetworkSchema,
   XPubSchema,
-  AccountIdSchema,
   UTXOStatusSchema,
   StreamsSchema,
   StreamsMetaDataFlagsSchema,
@@ -50,5 +50,5 @@ export default
   SecondaryStreamDataSchema,
   UnecryptedStreamDataSchema,
   ContactDetailsSchema,
-  TrustedContactSchema
+  TrustedContactSchema,
 ]

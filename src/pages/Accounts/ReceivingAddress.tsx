@@ -33,7 +33,7 @@ import TestAccountHelperModalContents from '../../components/Helper/TestAccountH
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import { setReceiveHelper, setSavingWarning } from '../../store/actions/preferences'
 import idx from 'idx'
 

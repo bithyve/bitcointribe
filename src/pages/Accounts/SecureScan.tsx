@@ -27,7 +27,7 @@ import DeviceInfo from 'react-native-device-info'
 import BottomSheet from 'reanimated-bottom-sheet'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 
 
 const SecureScan = props => {
