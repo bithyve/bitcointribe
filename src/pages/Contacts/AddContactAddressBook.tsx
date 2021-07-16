@@ -308,9 +308,11 @@ export default function AddContactAddressBook( props ) {
         selectedContacts[ 0 ].id = props.navigation.state.params?.contactToEdit.id
         selectedContacts[ 0 ].channelKey = props.navigation.state.params?.contactToEdit.channelKey
         selectedContacts[ 0 ].displayedName = selectedContacts[ 0 ].name
+        selectedContacts[ 0 ].avatarImageSource = selectedContacts[ 0 ].image ? selectedContacts[ 0 ].image : props.navigation.state.params?.contactToEdit.avatarImageSource
         dispatch( editTrustedContact( {
           channelKey: props.navigation.state.params?.contactToEdit.channelKey,
           contactName: selectedContacts[ 0 ].name,
+          image: selectedContacts[ 0 ].image
         } ) )
         props.navigation.navigate( 'ContactDetails', {
           contact: selectedContacts[ 0 ],
@@ -323,7 +325,6 @@ export default function AddContactAddressBook( props ) {
           subHeaderText:'Send a Friends and Family request',
           contactText:'Adding to Friends and Family:',
           showDone:true,
-          fromEdit: props.navigation.state.params?.fromScreen
         } )
       }
 

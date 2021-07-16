@@ -30,7 +30,7 @@ import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import { editTrustedContact, initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 
 export default function AddContactSendRequest( props ) {
@@ -60,8 +60,6 @@ export default function AddContactSendRequest( props ) {
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
     : []
-
-  const fromEdit = props.navigation.getParam( 'fromEdit' )
 
   const headerText = props.navigation.getParam( 'headerText' )
     ? props.navigation.getParam( 'headerText' )
@@ -93,20 +91,20 @@ export default function AddContactSendRequest( props ) {
   const createTrustedContact = useCallback( async () => {
     const contacts: Trusted_Contacts = trustedContacts
     for( const contact of Object.values( contacts ) ){
-      if ( contact.contactDetails.id === Contact.id && fromEdit == undefined ) return
+      if ( contact.contactDetails.id === Contact.id ) return
     }
-    if ( fromEdit ) {
-      dispatch( editTrustedContact( {
-        channelKey: Contact.channelKey,
-        contactName: Contact.name,
-        image: Contact.image
-      } ) )
-    } else {
-      dispatch( initializeTrustedContact( {
-        contact: Contact,
-        flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
-      } ) )
-    }
+    // if ( fromEdit ) {
+    //   dispatch( editTrustedContact( {
+    //     channelKey: Contact.channelKey,
+    //     contactName: Contact.name,
+    //     image: Contact.image
+    //   } ) )
+    // } else {
+    dispatch( initializeTrustedContact( {
+      contact: Contact,
+      flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT
+    } ) )
+    // }
 
   }, [ Contact ] )
 
