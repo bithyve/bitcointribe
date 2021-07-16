@@ -19,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome'
 
 export type Props = {
   navigation: any;
-  closeModal: () => void;
+  closeModal: ( name: string ) => void;
   contact: ContactRecipientDescribing
 };
 
@@ -27,7 +27,6 @@ interface MenuOption {
 	title: string;
 	subtitle: string;
 	imageSource: ImageSourcePropType;
-	screenName?: string;
 	onOptionPressed?: () => void;
 }
 
@@ -63,46 +62,32 @@ const EditContactScreen: React.FC<Props> = ( { navigation, closeModal, contact }
       title: 'Edit Name',
       imageSource: require( '../../assets/images/icons/icon_phonebook.png' ),
       subtitle: 'Show all account on the Home Screen',
-      screenName: 'AccountManagement',
-      onOptionPressed: () => {
-        if ( name.length > 0 ) {
-          closeModal()
-          navigation.navigate( 'AddContactSendRequest', {
-            SelectedContact: [ contact ],
-            headerText:'Add a contact  ',
-            subHeaderText:'Send a Friends and Family request',
-            contactText:'Adding to Friends and Family:',
-            showDone:true,
-            fromEdit: 'fromEdit'
-          } )
-        }
-      },
     },
     {
       title: 'Associate a Contact',
       imageSource: require( '../../assets/images/icons/icon_phonebook.png' ),
       subtitle: 'Connect Hexa wallet to your own Bitcoin node',
-      screenName: 'NodeSettings',
       onOptionPressed: () => {
         setIsLoadContacts( true )
         navigation.navigate( 'AddContact', {
           fromScreen: 'Edit', contactToEdit: contact
         } )
-        closeModal()
+        closeModal( '' )
       },
     },
   ]
 
   function handleOptionSelection( menuOption: MenuOption ) {
-    menuOption.onOptionPressed()
+    if ( menuOption.title === 'Associate a Contact' ) {
+      menuOption.onOptionPressed()
+    }
   }
   const editContact = useCallback( async () => {
-
     dispatch( editTrustedContact( {
       channelKey: contact.channelKey,
       contactName: name,
     } ) )
-    navigation.popToTop()
+    closeModal( name )
   }, [ contact, name ] )
 
   const renderAddContactFriendsAndFamily = () => {

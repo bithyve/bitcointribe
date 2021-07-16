@@ -205,9 +205,12 @@ class ContactDetails extends PureComponent<
     this.setIsSendDisabledListener = this.props.navigation.addListener(
       'didFocus',
       () => {
+        this.contact = this.props.navigation.state.params.contact
+        this.forceUpdate()
         this.setState( {
           isSendDisabled: false,
         } )
+
       }
     )
 
@@ -1123,9 +1126,14 @@ class ContactDetails extends PureComponent<
         <ModalContainer visible={edit} closeBottomSheet={() => this.setState( {
           edit: false
         } )}>
-          <EditContactScreen navigation={navigation} contact={this.contact} closeModal={() => this.setState( {
-            edit: false
-          } )} />
+          <EditContactScreen navigation={navigation} contact={this.contact} closeModal={( name ) => {
+            if ( name !== '' ) {
+              this.contact.displayedName = name
+            }
+            this.setState( {
+              edit: false
+            } )
+          } } />
         </ModalContainer>
         <ModalContainer visible={reshareModal} closeBottomSheet={() => this.setState( {
           reshareModal: false
