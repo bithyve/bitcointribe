@@ -17,6 +17,7 @@ import defaultBottomSheetConfigs from './src/common/configs/BottomSheetConfigs'
 import getActiveRouteName from './src/utils/navigation/GetActiveRouteName'
 import { LogBox } from 'react-native'
 import ModalContainer from './src/components/home/ModalContainer'
+import { RootSiblingParent } from 'react-native-root-siblings'
 
 LogBox.ignoreAllLogs( true )
 
@@ -46,11 +47,14 @@ export default function AppWrapper() {
   }, [] )
 
   return (
-    <Provider store={store} uriPrefix={URI_PREFIX}>
-      <BottomSheetModalProvider>
-        <AppContent />
-      </BottomSheetModalProvider>
-    </Provider>
+    <RootSiblingParent>
+      <Provider store={store} uriPrefix={URI_PREFIX}>
+        <BottomSheetModalProvider>
+          <AppContent />
+        </BottomSheetModalProvider>
+      </Provider>
+    </RootSiblingParent>
+
   )
 }
 

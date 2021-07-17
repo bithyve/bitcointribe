@@ -28,7 +28,6 @@ import JailMonkey from 'jail-monkey'
 import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../components/ErrorModalContents'
 import ModalHeader from '../components/ModalHeader'
-import RelayServices from '../bitcoin/services/RelayService'
 import { initMigration, updateLastSeen } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
@@ -44,6 +43,7 @@ import {
   updateFCMTokens,
 } from '../store/actions/notifications'
 import { autoSyncShells } from '../store/actions/accounts'
+import Relay from '../bitcoin/utilities/Relay'
 
 const LOADER_MESSAGE_TIME = 2000
 const loaderMessages = [
@@ -210,24 +210,24 @@ export default function Login( props ) {
       }
     } )
 
-    RelayServices.fetchReleases( DeviceInfo.getBuildNumber() )
+    Relay.fetchReleases( DeviceInfo.getBuildNumber() )
       .then( async ( res ) => {
         // console.log('Release note', res.data.releases);
         const releaseCases = releaseCasesValue
 
         if (
-          res.data.releases.length &&
-          res.data.releases[ 0 ].build > DeviceInfo.getBuildNumber()
+          res.releases.length &&
+          res.releases[ 0 ].build > DeviceInfo.getBuildNumber()
         ) {
           if (
             releaseCases &&
-            releaseCases.build == res.data.releases[ 0 ].build &&
+            releaseCases.build == res.releases[ 0 ].build &&
             releaseCases.ignoreClick &&
             releaseCases.reminderLimit < 0
           )
             return
           props.navigation.navigate( 'UpdateApp', {
-            releaseData: res.data.releases,
+            releaseData: res.releases,
           } )
         }
         return

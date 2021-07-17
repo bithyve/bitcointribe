@@ -232,18 +232,19 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
                 </View>
                 <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
                   style={{
-                    width: widthPercentageToDP( '2%' ),
-                    height: widthPercentageToDP( '2%' ),
-                    alignSelf: 'center'
+                    width: widthPercentageToDP( '2.5%' ),
+                    height: widthPercentageToDP( '2.5%' ),
+                    alignSelf: 'center',
+                    resizeMode: 'contain'
                   }}
                 />
 
               </AppBottomSheetTouchableWrapper>
             }}
           />
-          {/* <TouchableOpacity
+          <TouchableOpacity
             onPress={() => {
-              Linking.openURL( 'https://t.me/HexaWallet' )
+              Linking.openURL( 'https://HexaWallet.io' )
                 .then( ( _data ) => { } )
                 .catch( ( _error ) => {
                   alert( 'Make sure Telegram installed on your device' )
@@ -258,12 +259,13 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               borderRadius: widthPercentageToDP( '2' ),
               backgroundColor: Colors.white,
               paddingVertical: heightPercentageToDP( 2 ),
-              paddingHorizontal: widthPercentageToDP( 4 ),
-              marginTop: heightPercentageToDP( '10%' )
+              paddingHorizontal: widthPercentageToDP( 5 ),
+              marginTop: heightPercentageToDP( '10%' ),
+              alignItems: 'center'
             }}
           >
             <Image
-              source={require( '../../assets/images/icons/telegram.png' )}
+              source={require( '../../assets/images/icons/question_active.png' )}
               style={{
                 width: widthPercentageToDP( 8 ),
                 height: widthPercentageToDP( 8 ),
@@ -273,13 +275,22 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               marginLeft: 10
             }}>
               <Text style={styles.addModalTitleText}>
-              App Info
+              FAQ
               </Text>
               <Text style={styles.addModalInfoText}>
-              Questions, feedback and more
+              Your questions answered
               </Text>
             </View>
-          </TouchableOpacity> */}
+            <Image source={require( '../../assets/images/icons/icon_arrow.png' )}
+              style={{
+                width: widthPercentageToDP( '2.5%' ),
+                height: widthPercentageToDP( '2.5%' ),
+                alignSelf: 'center',
+                marginLeft: 'auto',
+                resizeMode: 'contain'
+              }}
+            />
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={() => {
               Linking.openURL( 'https://t.me/HexaWallet' )
@@ -298,14 +309,16 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               backgroundColor: Colors.white,
               paddingVertical: heightPercentageToDP( 2 ),
               paddingHorizontal: widthPercentageToDP( 4 ),
-              marginTop: heightPercentageToDP( '18%' )
+              marginTop: heightPercentageToDP( '1%' ),
+              alignItems: 'center'
             }}
           >
             <Image
-              source={require( '../../assets/images/icons/telegram.png' )}
+              source={require( '../../assets/images/icons/icon_telegram.png' )}
               style={{
-                width: widthPercentageToDP( 8 ),
-                height: widthPercentageToDP( 8 ),
+                width: widthPercentageToDP( 7 ),
+                height: widthPercentageToDP( 7 ),
+                resizeMode: 'contain'
               }}
             />
             <View style={{
@@ -317,7 +330,17 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
               <Text style={styles.addModalInfoText}>
               Questions, feedback and more
               </Text>
+
             </View>
+            <Image
+              source={require( '../../assets/images/icons/link.png' )}
+              style={{
+                width: widthPercentageToDP( 4 ),
+                height: widthPercentageToDP( 4 ),
+                resizeMode: 'contain',
+                marginLeft: 'auto'
+              }}
+            />
           </TouchableOpacity>
           {/* </View> */}
 

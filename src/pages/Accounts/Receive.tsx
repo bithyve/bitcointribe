@@ -35,7 +35,7 @@ import {
 } from '../../store/actions/preferences'
 import { getAccountIconByShell, getAccountTitleByShell } from './Send/utils'
 import KnowMoreButton from '../../components/KnowMoreButton'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 import CopyThisText from '../../components/CopyThisText'
 import ReceiveAmountContent from '../../components/home/ReceiveAmountContent'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
@@ -50,10 +50,13 @@ import AccountShell from '../../common/data/models/AccountShell'
 import { Account, AccountType } from '../../bitcoin/utilities/Interface'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
+import ModalContainer from '../../components/home/ModalContainer'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
-  const [ ReceiveHelperBottomSheet ] = useState( React.createRef() )
+  const [ receiveHelper, showReceiveHelper ] = useState( false )
+  const [ receiveModal, setReceiveModal ] = useState( false )
   const [ isReceiveHelperDone, setIsReceiveHelperDone ] = useState( true )
   const isReceiveHelperDoneValue = useSelector( ( state ) =>
     idx( state, ( _ ) => _.preferences.isReceiveHelperDoneValue ),
@@ -74,8 +77,7 @@ export default function Receive( props ) {
   } = useBottomSheetModal()
 
   const onPressTouchableWrapper = () => {
-    if ( ReceiveHelperBottomSheet.current )
-      ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
+    showReceiveHelper( false )
   }
 
   const onPressBack = () => {
@@ -84,21 +86,7 @@ export default function Receive( props ) {
 
   const onPressKnowMore = () => {
     dispatch( setReceiveHelper( true ) )
-    if ( ReceiveHelperBottomSheet.current )
-      ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
-  }
-
-  const onPressReceiveHelperHeader = () => {
-    if ( isReceiveHelperDone ) {
-      if ( ReceiveHelperBottomSheet.current )
-        ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
-      setTimeout( () => {
-        setIsReceiveHelperDone( false )
-      }, 10 )
-    } else {
-      if ( ReceiveHelperBottomSheet.current )
-        ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
-    }
+    showReceiveHelper( true )
   }
 
   const checkNShowHelperModal = async () => {
@@ -113,8 +101,7 @@ export default function Receive( props ) {
         setIsReceiveHelperDone( true )
       }, 10 )
       setTimeout( () => {
-        if ( ReceiveHelperBottomSheet.current )
-          ( ReceiveHelperBottomSheet as any ).current.snapTo( 1 )
+        showReceiveHelper( true )
       }, 1000 )
     } else {
       setTimeout( () => {
@@ -151,27 +138,23 @@ export default function Receive( props ) {
   }, [ props.navigation ] )
 
   const showReceiveAmountBottomSheet = useCallback( () => {
-    presentBottomSheet(
+    return(
+
       <ReceiveAmountContent
         title={'Receive sats'}
         message={'Receive sats into the selected account'}
         onPressConfirm={( amount ) => {
           setAmount( amount )
-          dismissBottomSheet()
+          setReceiveModal( false )
         }}
         selectedAmount={amount}
         onPressBack={() => {
-          dismissBottomSheet()
+          setReceiveModal( false )
         }
         }
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '50%' ],
-        overlayOpacity: 0.9,
-      },
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet, amount ] )
+  }, [ amount ] )
 
   useEffect( () => {
     let receivingAddress = account.receivingAddress
@@ -256,7 +239,7 @@ export default function Receive( props ) {
             </View>
             <ScrollView>
               <View style={styles.QRView}>
-                <QRCode value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
+                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet Address' : 'Bitcoin Address'} value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
               </View>
 
               <CopyThisText
@@ -265,7 +248,7 @@ export default function Receive( props ) {
               />
 
               <AppBottomSheetTouchableWrapper
-                onPress={() => { showReceiveAmountBottomSheet() }}
+                onPress={() => { setReceiveModal( true ) }}
                 style={styles.selectedView}
               >
                 <View
@@ -299,27 +282,16 @@ export default function Receive( props ) {
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
 
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ReceiveHelperBottomSheet as any}
-        snapPoints={[ -50, hp( '89%' ) ]}
-        renderContent={() => (
-          <ReceiveHelpContents
-            titleClicked={() => {
-              if ( ReceiveHelperBottomSheet.current )
-                ( ReceiveHelperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            borderColor={Colors.blue}
-            backgroundColor={Colors.blue}
-            onPressHeader={() => onPressReceiveHelperHeader()}
-          />
-        )}
-      />
-
+      <ModalContainer visible={receiveHelper} closeBottomSheet={() => {showReceiveHelper( false )}} >
+        <ReceiveHelpContents
+          titleClicked={() => {
+            showReceiveHelper( false )
+          }}
+        />
+      </ModalContainer>
+      <ModalContainer visible={receiveModal} closeBottomSheet={() => {setReceiveModal( false )} } >
+        {showReceiveAmountBottomSheet()}
+      </ModalContainer>
       <BottomSheet
         enabledInnerScrolling={true}
         enabledGestureInteraction={false}

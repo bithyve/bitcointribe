@@ -109,10 +109,11 @@ import {
 } from './sagas/notifications'
 
 import {
-  removeTrustedContactWatcher,
   walletCheckInWatcher,
   syncPermanentChannelsWatcher,
   initializeTrustedContactWatcher,
+  editTrustedContactWatcher,
+  removeTrustedContactWatcher,
   rejectTrustedContactWatcher,
 } from './sagas/trustedContacts'
 
@@ -279,6 +280,7 @@ const rootSaga = function* () {
     // Trusted Contacts
     initializeTrustedContactWatcher,
     rejectTrustedContactWatcher,
+    editTrustedContactWatcher,
     removeTrustedContactWatcher,
     walletCheckInWatcher,
     syncPermanentChannelsWatcher,

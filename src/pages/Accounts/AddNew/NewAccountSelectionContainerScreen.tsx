@@ -41,7 +41,7 @@ function titleForSectionSubHeader( kind: SectionKind ) {
       case SectionKind.ADD_NEW_HEXA_ACCOUNT:
         return 'Your keys, your coins, manage them your way'
       case SectionKind.ADD_NEW_SERVICE_ACCOUNT:
-        return 'Bitcoin is for everyone, share an account with your Friends & Family'
+        return 'Bitcoin is for everyone, share an account'
       case SectionKind.IMPORT_WALLET:
         return 'Have your sats somewhere else? Import it in Hexa'
   }
@@ -82,6 +82,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
 
   function handleProceedButtonPress() {
     switch ( selectedChoice.kind ) {
+        case SubAccountKind.TEST_ACCOUNT:
         case SubAccountKind.REGULAR_ACCOUNT:
         case SubAccountKind.SECURE_ACCOUNT:
           navigation.navigate( 'NewHexaAccountDetails', {

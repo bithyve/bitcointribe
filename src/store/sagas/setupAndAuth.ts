@@ -27,16 +27,15 @@ import config from '../../bitcoin/HexaConfig'
 import { initializeHealthSetup } from '../actions/health'
 import dbManager from '../../storage/realm/dbManager'
 import { setWalletId } from '../actions/preferences'
-import { Wallet } from '../../bitcoin/utilities/Interface'
+import { AccountType, Wallet } from '../../bitcoin/utilities/Interface'
 import S3Service from '../../bitcoin/services/sss/S3Service'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import * as bip39 from 'bip39'
 import crypto from 'crypto'
-import { addNewAccountShells } from '../actions/accounts'
 import { addNewAccountShellsWorker, newAccountsInfo } from './accounts'
+import { newAccountShellCreationCompleted } from '../actions/accounts'
 
 function* setupWalletWorker( { payload } ) {
-  const { walletName, selectedAccounts, security } = payload
+  const { walletName, security }: { walletName: string, security: { questionId: string, question: string, answer: string } } = payload
   const primaryMnemonic = bip39.generateMnemonic( 256 )
   const primarySeed = bip39.mnemonicToSeedSync( primaryMnemonic )
   const walletId = crypto.createHash( 'sha256' ).update( primarySeed ).digest( 'hex' )
@@ -44,16 +43,19 @@ function* setupWalletWorker( { payload } ) {
   const wallet: Wallet = {
     walletId,
     walletName,
+    security,
     primaryMnemonic,
     accounts: {
-    }
+    },
+    version: DeviceInfo.getVersion()
   }
 
   yield put( updateWallet( wallet ) )
   yield put ( setWalletId( ( wallet as Wallet ).walletId ) )
 
-  const accountsInfo: newAccountsInfo[] = []
-  selectedAccounts.forEach( ( accountType ) => {
+  // prepare default accounts for the wallet
+  const accountsInfo: newAccountsInfo[] = [];
+  [ AccountType.CHECKING_ACCOUNT, AccountType.SAVINGS_ACCOUNT, AccountType.SWAN_ACCOUNT ].forEach( ( accountType ) => {
     const accountInfo: newAccountsInfo = {
       accountType
     }
@@ -63,42 +65,28 @@ function* setupWalletWorker( { payload } ) {
   yield call( addNewAccountShellsWorker, {
     payload: accountsInfo
   } )
+  yield put( newAccountShellCreationCompleted() )
   yield put( completedWalletSetup( ) )
   yield call( dbManager.createWallet, wallet )
   yield call( AsyncStorage.setItem, 'walletExists', 'true' )
 
   // TODO: remove legacy DB post S3 service functionalization
   const initialDatabase: Database = {
-    WALLET_SETUP:{
-      walletName: wallet.walletName,
-      security: security ? security : {
-        question: '', answer: ''
-      },
-    },
     SERVICES: {
       S3_SERVICE: JSON.stringify( new S3Service( wallet.primaryMnemonic ) ),
     },
-    VERSION: DeviceInfo.getVersion(),
   }
 
   yield call( insertDBWorker, {
     payload: initialDatabase
   } )
-  if( security ) {
-    // initialize health-check schema on relay
-    yield put( initializeHealthSetup() )
-  }
+  if( security ) yield put( initializeHealthSetup() )  // initialize health-check schema on relay
 }
+
 export const setupWalletWatcher = createWatcher( setupWalletWorker, SETUP_WALLET )
 
 function* initRecoveryWorker( { payload } ) {
-  const { walletName, security } = payload
-
   const initialDatabase: Database = {
-    WALLET_SETUP: {
-      walletName, security
-    },
-    VERSION: DeviceInfo.getVersion(),
   }
 
   yield call( insertDBWorker, {

@@ -44,14 +44,14 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     disabled: false,
     hasButton: false,
   },
-  {
-    title: 'Swan Bitcoin',
-    subtitle: 'Stack sats with Swan Bitcoin',
-    kind: BuyMenuItemKind.SWAN,
-    imageSource: require( '../../assets/images/icons/swan.png' ),
-    disabled: false,
-    hasButton: false,
-  }
+  // {
+  //   title: 'Swan Bitcoin',
+  //   subtitle: 'Stack sats with Swan Bitcoin',
+  //   kind: BuyMenuItemKind.SWAN,
+  //   imageSource: require( '../../assets/images/icons/swan.png' ),
+  //   disabled: false,
+  //   hasButton: false,
+  // }
   // {
   //   title: 'Set up automatic buys',
   //   subtitle: 'Stack sats with Swan Bitcoin',

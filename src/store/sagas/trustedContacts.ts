@@ -10,6 +10,7 @@ import {
   PermanentChannelsSyncKind,
   REJECT_TRUSTED_CONTACT,
   updateTrustedContacts,
+  EDIT_TRUSTED_CONTACT,
 } from '../actions/trustedContacts'
 import { createWatcher } from '../utils/utilities'
 import {
@@ -43,9 +44,10 @@ import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import dbManager from '../../storage/realm/dbManager'
+import { ImageSourcePropType } from 'react-native'
+import Relay from '../../bitcoin/utilities/Relay'
 
 function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -177,7 +179,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
             } )
             if( notifReceivers.length )
               yield call(
-                RelayServices.sendNotifications,
+                Relay.sendNotifications,
                 notifReceivers,
                 notification,
               )
@@ -188,7 +190,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
 
       yield put( updateTrustedContacts( updatedContacts ) )
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
-        dbManager.addContact( value )
+        dbManager.updateContact( value )
       }
 
       if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
@@ -214,7 +216,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
           } )
           if( notifReceivers.length )
             yield call(
-              RelayServices.sendNotifications,
+              Relay.sendNotifications,
               notifReceivers,
               notification,
             )
@@ -253,7 +255,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
-  const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { walletId } = wallet
@@ -303,7 +304,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
 
   const primaryData: PrimaryStreamData = {
     walletID: walletId,
-    walletName,
+    walletName: wallet.walletName,
     relationType: contactInfo.isKeeper ? TrustedContactRelationTypes.KEEPER : contactInfo.contactsSecondaryChannelKey ? TrustedContactRelationTypes.WARD : TrustedContactRelationTypes.CONTACT,
     FCM,
     paymentAddresses,
@@ -401,6 +402,29 @@ export const rejectTrustedContactWatcher = createWatcher(
   REJECT_TRUSTED_CONTACT,
 )
 
+function* editTrustedContactWorker( { payload }: { payload: { channelKey: string, contactName?: string, image?: ImageSourcePropType }} ) {
+  const trustedContacts: Trusted_Contacts = yield select(
+    ( state ) => state.trustedContacts.contacts,
+  )
+
+  const { channelKey, contactName, image } = payload
+  const contactToUpdate: TrustedContact = trustedContacts[ channelKey ]
+
+  if( contactName ) contactToUpdate.contactDetails.contactName = contactName
+  if( image ) contactToUpdate.contactDetails.image = image
+
+  const updatedContacts = {
+    [ contactToUpdate.channelKey ]: contactToUpdate
+  }
+  yield put( updateTrustedContacts( updatedContacts ) )
+  dbManager.updateContact( contactToUpdate )
+}
+
+export const editTrustedContactWatcher = createWatcher(
+  editTrustedContactWorker,
+  EDIT_TRUSTED_CONTACT,
+)
+
 function* removeTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {
   const { walletName, walletId } = yield select( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = yield select(
@@ -452,7 +476,7 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
     tag: notificationTag.IMP,
   }
   yield call(
-    RelayServices.sendNotifications,
+    Relay.sendNotifications,
     notifReceivers,
     notification,
   )
@@ -473,27 +497,21 @@ function* walletCheckInWorker( { payload } ) {
 
   try{
     const { currencyCode } = payload
-    const res = yield call(
-      RelayServices.walletCheckIn,
+    const { exchangeRates, averageTxFees }  = yield call(
+      Relay.walletCheckIn,
       currencyCode
     )
+    if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
+    } ) )
+    else {
+      if ( JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates ) )
+        yield put( exchangeRatesCalculated( exchangeRates ) )
+    }
 
-    if ( res.status === 200 ) {
-      const { exchangeRates, averageTxFees } = res.data
-      if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
-      } ) )
-      else {
-        if ( JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates ) )
-          yield put( exchangeRatesCalculated( exchangeRates ) )
-      }
-
-      if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-      else {
-        if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
-          yield put( setAverageTxFee( averageTxFees ) )
-      }
-    } else {
-      console.log( 'Check-In failed', res.err )
+    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
+    else {
+      if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
+        yield put( setAverageTxFee( averageTxFees ) )
     }
   } catch( err ){
     console.log( 'Wallet Check-In failed w/ the following err: ', err )

@@ -1,17 +1,17 @@
 //
-//  RecentViewController.m
+//  BackgroundViewController.m
 //  HEXA
 //
-//  Created by Shashank Shinde on 08/06/21.
+//  Created by Shashank Shinde on 15/07/21.
 //
 
-#import "RecentViewController.h"
+#import "BackgroundViewController.h"
 
-@interface RecentViewController ()
+@interface BackgroundViewController ()
 
 @end
 
-@implementation RecentViewController
+@implementation BackgroundViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];

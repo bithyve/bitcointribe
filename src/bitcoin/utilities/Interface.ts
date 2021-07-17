@@ -610,6 +610,24 @@ export interface WalletImage {
   };
 }
 
+export interface NewWalletImage {
+  walletId: string;
+  name: string;
+  accounts: {
+    [accountId: string]: {
+      encryptedData: string
+    }
+  },
+  details2FA : {
+    secondaryXpub: string,
+    bithyveXpub: string,
+    twoFAKey: string,
+  };
+  contacts:string[];
+  versionHistory: string;
+  SM_share: string,
+}
+
 export interface EncryptedImage {
   // Encrypted Wallet Image
   DECENTRALIZED_BACKUP?: string;
@@ -769,9 +787,7 @@ export enum NetworkType {
 export interface Wallet {
   walletId: string,
   walletName: string,
-  question: string,
-  questionId: number,
-  answer: string,
+  security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
   secondaryMemonic?: string,
   details2FA? : {
@@ -781,7 +797,8 @@ export interface Wallet {
   }
   accounts: {
     [accountType: string]: string[] // array of accountIds
-  }
+  },
+  version: string
 }
 
 export interface Account {
@@ -847,7 +864,9 @@ export enum AccountType {
   DONATION_ACCOUNT = 'DONATION_ACCOUNT',
   RAMP_ACCOUNT = 'RAMP_ACCOUNT',
   SWAN_ACCOUNT = 'SWAN_ACCOUNT',
-  WYRE_ACCOUNT = 'WYRE_ACCOUNT'
+  WYRE_ACCOUNT = 'WYRE_ACCOUNT',
+  EXCHNGE_ACCOUNT = 'EXCHNGE_ACCOUNT',
+  FNF_ACCOUNT = 'FNF_ACCOUNT'
 }
 
 export interface Accounts {

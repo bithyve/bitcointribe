@@ -38,7 +38,6 @@ import { walletCheckIn } from '../store/actions/trustedContacts'
 import { setVersion } from '../store/actions/versionHistory'
 import { initNewBHRFlow } from '../store/actions/health'
 import {  setCloudData } from '../store/actions/cloud'
-import { clearAccountSyncCache } from '../store/actions/accounts'
 import CloudBackupStatus from '../common/data/enums/CloudBackupStatus'
 import ModalContainer from '../components/home/ModalContainer'
 import ButtonBlue from '../components/ButtonBlue'
@@ -142,17 +141,14 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ pswd, setPswd ] = useState( '' )
   const [ pswdMasked, setPswdMasked ] = useState( '' )
   const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
-  const [ hintMasked, setHintMasked ] = useState( '' )
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
-  const [ hideShowHint, setHideShowHint ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
   const [ isSkipClicked, setIsSkipClicked ] = useState( false )
 
   const dispatch = useDispatch()
   const walletName = props.navigation.getParam( 'walletName' )
-  const selectedAcc = props.navigation.getParam( 'selectedAcc' ) ? props.navigation.getParam( 'selectedAcc' ) : ''
 
   const [ answerError, setAnswerError ] = useState( '' )
   const [ pswdError, setPswdError ] = useState( '' )
@@ -197,7 +193,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         setHeight( 81 )
       }
     )
-    dispatch( clearAccountSyncCache() )
+
     return () => {
       keyboardDidHideListener.remove()
       keyboardDidShowListener.remove()
@@ -223,7 +219,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
 
   const checkCloudLogin = ( security ) =>{
     requestAnimationFrame( () => {
-      dispatch( setupWallet( walletName, selectedAcc, security ) )
+      dispatch( setupWallet( walletName, security ) )
       // dispatch( walletSetupCompletion( security ) )
       dispatch( initNewBHRFlow( true ) )
       dispatch( setVersion( 'Current' ) )
@@ -671,7 +667,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               ref={hint}
               placeholder={'Add a hint'}
               placeholderTextColor={Colors.borderColor}
-              value={hideShowHint ? hintMasked : hintText}
+              value={hintText}
               autoCompleteType="off"
               textContentType="none"
               returnKeyType="next"
@@ -685,18 +681,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               }
               onChangeText={( text ) => {
                 setHint( text )
-                setHintMasked( text )
-                // setConfirmPswdMasked( text )
-              }}
-              onBlur={() => {
-                let temp = ''
-                for ( let i = 0; i < hintText.length; i++ ) {
-                  temp += '*'
-                }
-                setHintMasked( temp )
               }}
             />
-            {hintText ? (
+            {/* {hintText ? (
               <TouchableWithoutFeedback
                 onPress={() => {
                   setHideShowHint( !hideShowHint )
@@ -713,7 +700,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   name={hideShowHint ? 'eye-off' : 'eye'}
                 />
               </TouchableWithoutFeedback>
-            ) : null}
+            ) : null} */}
           </View>
         </View>
         <View

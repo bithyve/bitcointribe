@@ -251,7 +251,6 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         }
 
       case NEW_ACCOUNT_SHELLS_ADDED:
-        // TODO: restrict wyre/ramp/swan to single instance(disable add)
         return {
           ...state,
           isGeneratingNewAccountShell: false,

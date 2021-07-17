@@ -36,7 +36,7 @@ export default class AccountShell {
    * Indicates if the account has completed syncing this happens once per session.
    * A sync icon is diplayed on the home screen tile if this has not be done
    */
-  syncStatus: SyncStatus | null;
+  syncStatus: SyncStatus | SyncStatus.COMPLETED;
 
   primarySubAccount: SubAccountDescribing;
   secondarySubAccounts: { [id: string]: SubAccountDescribing };

@@ -62,6 +62,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
 
+  const [ webView, showWebView ] = useState( false )
+
   const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
@@ -197,21 +199,18 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
     },
   } )
 
-  const showDonationWebViewSheet = useCallback( () => {
-    presentBottomSheet(
+  const showDonationWebViewSheet = () => {
+    return(
       <DonationWebPageBottomSheet
         account={account}
         onClickSetting={() => {
-          dismissBottomSheet()
+          showWebView( false )
           navigateToDonationAccountWebViewSettings( account )
         }}
-      />,
-      {
-        ...defaultBottomSheetConfigs,
-        snapPoints: [ 0, '65%' ],
-      },
+        closeModal={() => showWebView( false )}
+      />
     )
-  }, [ presentBottomSheet, dismissBottomSheet ] )
+  }
 
   useEffect( () => {
     // missing fee & exchange rates patch(restore & upgrade)
@@ -299,11 +298,12 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                       buttonStyle={ButtonStyles.floatingActionButton}
                       title="Donation Webpage"
                       titleStyle={ButtonStyles.actionButtonText}
-                      onPress={showDonationWebViewSheet}
+                      onPress={() => showWebView( true )}
                     />
                   </View>
                 )}
               </View>
+
             </View>
           )
         },
@@ -332,6 +332,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       />
       <ModalContainer visible={showMore} closeBottomSheet={() => {setShowMore( false )}}>
         {showKnowMoreSheet()}
+      </ModalContainer>
+      <ModalContainer visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
+        {showDonationWebViewSheet()}
       </ModalContainer>
     </>
   )

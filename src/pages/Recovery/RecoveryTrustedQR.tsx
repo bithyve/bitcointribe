@@ -14,7 +14,7 @@ import {
 import { RFValue } from 'react-native-responsive-fontsize'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
-import QRCode from 'react-native-qrcode-svg'
+import QRCode from '../../components/QRCode'
 
 
 export default function RecoveryTrustedQR( props ) {
@@ -30,11 +30,11 @@ export default function RecoveryTrustedQR( props ) {
     >
       <View style={NavStyles.modalHeaderTitleView}>
         <View style={{
-          flexDirection: 'row' 
+          flexDirection: 'row'
         }}>
           <View
             style={{
-              alignSelf: 'center', flex: 1, justifyContent: 'center' 
+              alignSelf: 'center', flex: 1, justifyContent: 'center'
             }}
           >
             <Text style={NavStyles.modalHeaderTitleText}>
@@ -46,7 +46,7 @@ export default function RecoveryTrustedQR( props ) {
       <View style={NavStyles.modalContentView}>
         {!props.trustedQR ? (
           <View style={{
-            height: hp( '27%' ), justifyContent: 'center' 
+            height: hp( '27%' ), justifyContent: 'center'
           }}>
             <ActivityIndicator size="large" />
           </View>

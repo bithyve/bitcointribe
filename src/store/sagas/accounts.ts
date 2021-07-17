@@ -47,6 +47,7 @@ import {
   SYNC_ACCOUNTS,
   updateAccountShells,
   getTestcoins,
+  refreshAccountShell,
 } from '../actions/accounts'
 import {
   TEST_ACCOUNT,
@@ -69,7 +70,6 @@ import SubAccountDescribing, { ExternalServiceSubAccountDescribing } from '../..
 import AccountShell from '../../common/data/models/AccountShell'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import RelayServices from '../../bitcoin/services/RelayService'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import BaseAccount from '../../bitcoin/utilities/accounts/BaseAccount'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -104,6 +104,7 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
+import Relay from '../../bitcoin/utilities/Relay'
 
 
 function* fetchBalanceTxWorker( { payload }: {payload: {
@@ -488,16 +489,16 @@ function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
 
   if( !txid ) console.log( 'Failed to get testcoins' )
   else{
-    // const accountsState: AccountsState = yield select( ( state ) => state.accounts )
-    // let testShell: AccountShell
-    // accountsState.accountShells.forEach( ( shell )=>{
-    //   if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
-    // } )
-    // // auto-sync test account
-    // const options = {
-    //   autoSync: true
-    // }
-    // if( testShell ) yield put( refreshAccountShell( testShell, options ) )
+    const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+    let testShell: AccountShell
+    accountsState.accountShells.forEach( ( shell )=>{
+      if( shell.primarySubAccount.id === testAccount.id ) testShell = shell
+    } )
+    // auto-sync test account
+    const options = {
+      autoSync: true
+    }
+    if( testShell ) yield put( refreshAccountShell( testShell, options ) )
   }
 }
 
@@ -556,28 +557,21 @@ function* feeAndExchangeRatesWorker() {
     ( state ) => state.preferences.currencyCode
   )
   try {
-    const res = yield call( RelayServices.fetchFeeAndExchangeRates, currencyCode )
-    console.log( {
-      res
-    } )
-    if ( res.status === 200 ) {
-      const { exchangeRates, averageTxFees } = res.data
+    const { exchangeRates, averageTxFees } = yield call( Relay.fetchFeeAndExchangeRates, currencyCode )
+    if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
+    else {
+      if (
+        JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
+      )
+        yield put( exchangeRatesCalculated( exchangeRates ) )
+    }
 
-      if ( !exchangeRates ) console.log( 'Failed to fetch exchange rates' )
-      else {
-        if (
-          JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates )
-        )
-          yield put( exchangeRatesCalculated( exchangeRates ) )
-      }
-
-      if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-      else {
-        if (
-          JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees )
-        )
-          yield put( setAverageTxFee( averageTxFees ) )
-      }
+    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
+    else {
+      if (
+        JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees )
+      )
+        yield put( setAverageTxFee( averageTxFees ) )
     }
   } catch ( err ) {
     console.log( {
@@ -881,9 +875,9 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
   const accountShell = new AccountShell( {
     primarySubAccount,
     unit: AccountType.TEST_ACCOUNT? BitcoinUnit.TSATS: BitcoinUnit.SATS,
-    displayOrder: 1,
+    displayOrder: 1
   } )
-
+  accountShell.syncStatus = SyncStatus.COMPLETED
   return accountShell
 }
 
@@ -1106,10 +1100,8 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accountShells: newAccountShells,
     accounts,
   } ) )
-
-  // TODO: insert the new accounts & wallet into Realm
   yield call( dbManager.createAccounts, accounts )
-  yield call( dbManager.createWallet, wallet )
+  yield call( dbManager.createWallet, updatedWallet )
 
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }

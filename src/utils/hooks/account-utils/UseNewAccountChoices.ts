@@ -10,6 +10,8 @@ import SubAccountDescribing from '../../../common/data/models/SubAccountInfo/Int
 import useActiveAccountShells from '../state-selectors/accounts/UseActiveAccountShells'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import TestSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
+import useWallet from '../state-selectors/UseWallet'
 
 type Choices = {
   hexaAccounts: SubAccountDescribing[];
@@ -21,6 +23,7 @@ type Counts = Record<string, number>;
 
 export default function useNewAccountChoices() {
   const accountShells = useActiveAccountShells()
+  const wallet = useWallet()
 
   const hexaAccountCounts: Counts = {
     [ SubAccountKind.SECURE_ACCOUNT ]: 0,
@@ -57,42 +60,76 @@ export default function useNewAccountChoices() {
   }, [ accountShells ] )
 
   return useMemo( () => {
+    let hexaAccounts = [
+      new CheckingSubAccountInfo( {
+        defaultTitle: 'Checking Account',
+        defaultDescription: 'User Checking Account'
+      } ),
+      new SavingsSubAccountInfo( {
+        defaultTitle: 'Savings Account',
+        defaultDescription: 'User Savings Account'
+      } ),
+      new DonationSubAccountInfo( {
+        defaultTitle: 'Donation Account',
+        defaultDescription: 'Accept donations',
+        doneeName: '',
+        causeName: '',
+      } ),
+    ]
+
+    // Add test account option only if there is no existing test account
+    if( !wallet.accounts[ AccountType.TEST_ACCOUNT ] ) hexaAccounts = [
+      new TestSubAccountInfo( {
+        defaultTitle: 'Test Account',
+        defaultDescription: 'Learn Bitcoin'
+      } ),
+      ...hexaAccounts
+    ]
+
+    const serviceAccounts = [
+      // new ExternalServiceSubAccountInfo( {
+      //   instanceNumber: 1,
+      //   defaultTitle: 'Collaborative Custody',
+      //   defaultDescription: 'Multi-sig Vault with a co-signer',
+      //   serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
+      //   type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
+      // } ),
+      new ExternalServiceSubAccountInfo( {
+        instanceNumber: 1,
+        defaultTitle: 'F&F Account',
+        defaultDescription: 'Multi-sig Vault with a co-signer',
+        serviceAccountKind: ServiceAccountKind.FNF_ACCOUNT,
+        type: AccountType.FNF_ACCOUNT, // TODO: assign appropriate type once activated
+      } ),
+      new ExternalServiceSubAccountInfo( {
+        instanceNumber: 1,
+        defaultTitle: 'Joint Account',
+        defaultDescription: 'Multi-sig Vault with a co-signer',
+        serviceAccountKind: ServiceAccountKind.JOINT_ACCOUNT,
+        type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
+      } ),
+      new ExternalServiceSubAccountInfo( {
+        instanceNumber: 1,
+        defaultTitle: 'Community Account',
+        defaultDescription: 'Multi-sig Vault with a co-signer',
+        serviceAccountKind: ServiceAccountKind.COMMUNITY_ACCOUNT,
+        type: AccountType.FNF_ACCOUNT, // TODO: assign appropriate type once activated
+      } ),
+    ]
+
+    const importedWalletAccounts = [
+      new WatchOnlyImportedWalletSubAccountInfo( {
+        instanceNumber: 1,
+      } ),
+      new FullyImportedWalletSubAccountInfo( {
+        instanceNumber: 1,
+      } ),
+    ]
+
     return {
-      hexaAccounts: [
-        new CheckingSubAccountInfo( {
-          defaultTitle: 'Checking Account',
-          defaultDescription: 'User Checking Account'
-        } ),
-        new SavingsSubAccountInfo( {
-          defaultTitle: 'Savings Account',
-          defaultDescription: 'User Savings Account'
-        } ),
-        new DonationSubAccountInfo( {
-          defaultTitle: 'Donation Account',
-          defaultDescription: 'Accept donations',
-          doneeName: '',
-          causeName: '',
-        } ),
-      ].sort( sortHexaAccountChoices ),
-
-      serviceAccounts: [
-        new ExternalServiceSubAccountInfo( {
-          instanceNumber: 1,
-          defaultTitle: 'Collaborative Custody',
-          defaultDescription: 'Multi-sig Vault with a co-signer',
-          serviceAccountKind: ServiceAccountKind.COLLABORATIVE_CUSTODY,
-          type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
-        } ),
-      ],
-
-      importedWalletAccounts: [
-        new WatchOnlyImportedWalletSubAccountInfo( {
-          instanceNumber: 1,
-        } ),
-        new FullyImportedWalletSubAccountInfo( {
-          instanceNumber: 1,
-        } ),
-      ],
+      hexaAccounts: hexaAccounts.sort( sortHexaAccountChoices ),
+      serviceAccounts,
+      importedWalletAccounts,
     }
-  }, [] )
+  }, [ wallet ] )
 }

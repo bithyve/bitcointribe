@@ -10,6 +10,7 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import useFormattedUnitText from '../../utils/hooks/formatting/UseFormattedUnitText'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import BitcoinUnit from '../../common/data/enums/BitcoinUnit'
+import { widthPercentageToDP } from 'react-native-responsive-screen'
 
 export interface Props {
   subAccountInfo: SubAccountDescribing;
@@ -159,10 +160,11 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: 35,
-    height: 35,
+    width: widthPercentageToDP( 8 ),
+    height: widthPercentageToDP( 8 ),
     marginBottom: 5,
-    marginTop: 5
+    marginTop: 5,
+    resizeMode: 'contain'
   },
 
   cardContainer: {

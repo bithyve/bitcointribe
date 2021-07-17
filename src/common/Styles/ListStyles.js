@@ -24,7 +24,7 @@ const ListStyles = StyleSheet.create( {
   },
 
   listItemTitle: {
-    color: Colors.blue,
+    color: Colors.black,
     fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
   },
