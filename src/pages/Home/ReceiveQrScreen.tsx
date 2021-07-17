@@ -101,7 +101,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     <View style={styles.rootContainer}>
       <ScrollView>
         <View style={styles.QRView}>
-          <QRCode value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
+          <QRCode title="Bitcoin Address" value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
         </View>
 
         <CopyThisText
