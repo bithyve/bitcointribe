@@ -1524,7 +1524,7 @@ function* confirmPDFSharedWorker( { payload } ) {
         shareId: shareId,
         reshareVersion: metaShare[ shareIndex ].meta.reshareVersion,
         updatedAt: moment( new Date() ).valueOf(),
-        name: 'Keeper PDF',
+        name: 'Personal Copy',
         shareType: 'pdf',
         status: 'accessible',
       }
@@ -1777,16 +1777,10 @@ function* autoShareLevel2KeepersWorker( ) {
     const service: S3Service = yield select( ( state ) => state.health.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const Contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
-    const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
     const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
     const walletId = service.levelhealth.walletId
     const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
     const shareIds = []
-    const channelSyncUpdates: {
-      channelKey: string,
-      streamId: string,
-      unEncryptedOutstreamUpdates?: UnecryptedStreamData,
-    }[] = []
     if( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.length == 6 ) {
       for ( let i = 2; i < levelHealth[ 1 ].levelInfo.length - 2; i++ ) {
         const channelKey = keeperInfo.find( value=>value.shareId == levelHealth[ 0 ].levelInfo[ i ].shareId ).channelKey
@@ -1956,7 +1950,7 @@ function* setHealthStatusWorker( ) {
     const shareArray = []
     if( currentLevel && levelHealth[ 0 ] && levelHealth[ 0 ].levelInfo ){
       const element = levelHealth[ 0 ]
-      for ( let i = 1; i < element.levelInfo.length; i++ ) {
+      for ( let i = 0; i < element.levelInfo.length; i++ ) {
         const element2 = element.levelInfo[ i ]
         if( element2.updatedAt > 0 && element2.status == 'accessible' ) {
           const delta = Math.abs( Date.now() - element2.updatedAt )
@@ -2084,6 +2078,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
+    console.log( 'payload', payload )
     const channelAssets: ChannelAssets = yield select( ( state ) => state.health.channelAssets )
     const s3Service = yield select( ( state ) => state.health.service )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
@@ -2168,8 +2163,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
         } ) )
 
         if( isChange ) {
-
-          const { SERVICES } = yield select( ( state ) => state.storage.database )
           const contactInfo = {
             channelKey: oldChannelKey,
           }
@@ -2197,6 +2190,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
           const channelUpdate =  {
             contactInfo, streamUpdates
           }
+          console.log( 'on CHange channelUpdate', channelUpdate )
           yield put( syncPermanentChannels( {
             permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
             channelUpdates: [ channelUpdate ],
@@ -2239,7 +2233,7 @@ function* modifyLevelDataWorker( ) {
           const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
           console.log( 'instream', instream )
           if( instream ){
-            levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'accessible' : levelInfo[ j ].status
+            levelInfo[ j ].status = levelInfo[ j ].updatedAt == 0 ? 'notAccessible' : Math.round( Math.abs( Date.now() - instream.metaData.flags.lastSeen ) / ( 60 * 1000 ) ) > config.HEALTH_STATUS.TIME_SLOTS.SHARE_SLOT2 ? 'notAccessible' : 'accessible'
             levelInfo[ j ].updatedAt = instream.metaData.flags.lastSeen
           }
         }
