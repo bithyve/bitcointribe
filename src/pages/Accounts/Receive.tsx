@@ -239,7 +239,7 @@ export default function Receive( props ) {
             </View>
             <ScrollView>
               <View style={styles.QRView}>
-                <QRCode value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
+                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet Address' : 'Bitcoin Address'} value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
               </View>
 
               <CopyThisText
