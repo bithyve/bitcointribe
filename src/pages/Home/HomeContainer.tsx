@@ -51,6 +51,7 @@ interface HomePropsTypes {
   currencyCode: any;
   setShowAllAccount: any;
   openBottomSheet: any;
+  swanDeepLinkContent: string | null
 }
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
@@ -82,6 +83,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     // } else {
     this.props.navigation.navigate( 'AccountDetails', {
       accountShellID: selectedAccount.id,
+      swanDeepLinkContent: this.props.swanDeepLinkContent
     } )
     // }
   };

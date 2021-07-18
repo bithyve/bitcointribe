@@ -36,7 +36,6 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
     return secondarySubAccounts
       .map( subAccount => getAvatarForSubAccount( subAccount ) )
   }, [ secondarySubAccounts ] )
-  console.log( 'startRegistration', startRegistration )
 
   return (
     <View style={styles.headerSectionContainer}>

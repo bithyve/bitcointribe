@@ -63,7 +63,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ navigation ] )
 
   const [ webView, showWebView ] = useState( false )
-
+  const swanDeepLinkContent = navigation.getParam( 'swanDeepLinkContent' )
   const accountShell = useAccountShellFromNavigation( navigation )
   const accountsState = useAccountsState()
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
@@ -236,6 +236,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                 accountShell={accountShell}
                 onKnowMorePressed={() => setShowMore( true )}
                 onSettingsPressed={navigateToAccountSettings}
+                swanDeepLinkContent={swanDeepLinkContent}
               />
             </View>
           )

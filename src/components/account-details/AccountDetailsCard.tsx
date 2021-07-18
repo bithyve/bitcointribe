@@ -31,6 +31,7 @@ export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
+  swanDeepLinkContent: string | null;
 };
 
 function backgroundImageForAccountKind(
@@ -87,6 +88,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   accountShell,
   onKnowMorePressed,
   onSettingsPressed,
+  swanDeepLinkContent,
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
@@ -213,7 +215,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
     <View style={rootContainerStyle}>
       <ModalContainer visible={swanModal} closeBottomSheet={() => {}} >
         <BottomSheetSwanInfo
-          swanDeepLinkContent={''}
+          swanDeepLinkContent={swanDeepLinkContent}
           onClickSetting={() => {
             showSwanModal( false )
           }}

@@ -1810,7 +1810,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             // overallHealth={overallHealth}
           />
         </View> */}
-        <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} />
+        <HomeContainer containerView={styles.accountCardsSectionContainer} openBottomSheet={this.openBottomSheet} swanDeepLinkContent={this.state.swanDeepLinkContent} />
 
       </ImageBackground>
     )
