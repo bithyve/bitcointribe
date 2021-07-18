@@ -11,13 +11,13 @@ import { ContactRecipientDescribing, RecipientDescribing } from '../../common/da
 import RecipientKind from '../../common/data/enums/RecipientKind'
 import { SendingState } from '../reducers/sending'
 import idx from 'idx'
-import RelayServices from '../../bitcoin/services/RelayService'
 import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import moment from 'moment'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { updateAccountShells } from '../actions/accounts'
 import dbManager from '../../storage/realm/dbManager'
+import Relay from '../../bitcoin/utilities/Relay'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -425,7 +425,7 @@ function* sendTxNotificationWorker() {
 
   if( notifReceivers.length )
     yield call(
-      RelayServices.sendNotifications,
+      Relay.sendNotifications,
       notifReceivers,
       notification,
     )

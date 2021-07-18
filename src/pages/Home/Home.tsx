@@ -71,7 +71,6 @@ import Toast from '../../components/Toast'
 import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
 import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import RelayServices from '../../bitcoin/services/RelayService'
 import dbManager from '../../storage/realm/dbManager'
 
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'

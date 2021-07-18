@@ -89,7 +89,6 @@ import {
   remapAccountShells,
   restoredAccountShells,
 } from '../actions/accounts'
-import RelayServices from '../../bitcoin/services/RelayService'
 import AccountShell from '../../common/data/models/AccountShell'
 import TestAccount from '../../bitcoin/services/accounts/TestAccount'
 import PersonalNode from '../../common/data/models/PersonalNode'
@@ -97,6 +96,7 @@ import { restorePersonalNodeConfiguration } from '../actions/nodeSettings'
 import { restoredVersionHistory } from '../actions/versionHistory'
 import versionHistory from '../reducers/versionHistory'
 import { getVersions } from '../../common/utilities'
+import Relay from '../../bitcoin/utilities/Relay'
 
 const sendNotification = ( recipient, notification ) => {
   const receivers = []
@@ -107,7 +107,7 @@ const sendNotification = ( recipient, notification ) => {
     } )
 
   if ( receivers.length )
-    RelayServices.sendNotifications( receivers, notification ).then( console.log )
+    Relay.sendNotifications( receivers, notification ).then( console.log )
 }
 
 function* generateMetaSharesWorker() {

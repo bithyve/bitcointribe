@@ -1566,25 +1566,26 @@ export default class LevelHealth {
   ): Promise<{
     updated: boolean;
   }> => {
+    // disabled legacy WI update; use WI update from Relay.ts
     try {
-      let res: AxiosResponse
-      try {
-        const { encryptedImage } = this.encryptWI( walletImage )
+      // let res: AxiosResponse
+      // try {
+      //   const { encryptedImage } = this.encryptWI( walletImage )
 
-        res = await BH_AXIOS.post( 'updateWalletImage', {
-          HEXA_ID,
-          walletID: this.walletId,
-          encryptedImage,
-        } )
-      } catch ( err ) {
-        if ( err.response ) throw new Error( err.response.data.err )
-        if ( err.code ) throw new Error( err.code )
-      }
-      const { updated } = res.data
-      if ( !updated ) throw new Error()
+      //   res = await BH_AXIOS.post( 'updateWalletImage', {
+      //     HEXA_ID,
+      //     walletID: this.walletId,
+      //     encryptedImage,
+      //   } )
+      // } catch ( err ) {
+      //   if ( err.response ) throw new Error( err.response.data.err )
+      //   if ( err.code ) throw new Error( err.code )
+      // }
+      // const { updated } = res.data
+      // if ( !updated ) throw new Error()
 
       return {
-        updated
+        updated: true
       }
     } catch ( err ) {
       throw new Error( 'Failed to update Wallet Image' )
@@ -1594,26 +1595,28 @@ export default class LevelHealth {
   public fetchWalletImage = async (): Promise<{
     walletImage: WalletImage;
   }> => {
+    // disabled legacy WI fetch; use WI fetch from Relay.ts
     try {
-      let res: AxiosResponse
-      try {
-        res = await BH_AXIOS.post( 'fetchWalletImage', {
-          HEXA_ID,
-          walletID: this.walletId,
-        } )
-      } catch ( err ) {
-        if ( err.response ) throw new Error( err.response.data.err )
-        if ( err.code ) throw new Error( err.code )
-      }
-      const { encryptedImage } = res.data
-      if ( !encryptedImage ) throw new Error()
+      // let res: AxiosResponse
+      // try {
+      //   res = await BH_AXIOS.post( 'fetchWalletImage', {
+      //     HEXA_ID,
+      //     walletID: this.walletId,
+      //   } )
+      // } catch ( err ) {
+      //   if ( err.response ) throw new Error( err.response.data.err )
+      //   if ( err.code ) throw new Error( err.code )
+      // }
+      // const { encryptedImage } = res.data
+      // if ( !encryptedImage ) throw new Error()
 
-      const { walletImage } = this.decryptWI( encryptedImage )
-      console.log( {
-        walletImage
-      } )
+      // const { walletImage } = this.decryptWI( encryptedImage )
+      // console.log( {
+      //   walletImage
+      // } )
       return {
-        walletImage
+        walletImage: {
+        }
       }
     } catch ( err ) {
       throw new Error( 'Failed to fetch Wallet Image' )

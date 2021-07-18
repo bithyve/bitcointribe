@@ -44,10 +44,10 @@ import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
-import RelayServices from '../../bitcoin/services/RelayService'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
+import Relay from '../../bitcoin/utilities/Relay'
 
 function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -179,7 +179,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
             } )
             if( notifReceivers.length )
               yield call(
-                RelayServices.sendNotifications,
+                Relay.sendNotifications,
                 notifReceivers,
                 notification,
               )
@@ -216,7 +216,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
           } )
           if( notifReceivers.length )
             yield call(
-              RelayServices.sendNotifications,
+              Relay.sendNotifications,
               notifReceivers,
               notification,
             )
@@ -476,7 +476,7 @@ function* removeTrustedContactWorker( { payload }: { payload: { channelKey: stri
     tag: notificationTag.IMP,
   }
   yield call(
-    RelayServices.sendNotifications,
+    Relay.sendNotifications,
     notifReceivers,
     notification,
   )
@@ -497,27 +497,21 @@ function* walletCheckInWorker( { payload } ) {
 
   try{
     const { currencyCode } = payload
-    const res = yield call(
-      RelayServices.walletCheckIn,
+    const { exchangeRates, averageTxFees }  = yield call(
+      Relay.walletCheckIn,
       currencyCode
     )
+    if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
+    } ) )
+    else {
+      if ( JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates ) )
+        yield put( exchangeRatesCalculated( exchangeRates ) )
+    }
 
-    if ( res.status === 200 ) {
-      const { exchangeRates, averageTxFees } = res.data
-      if ( !exchangeRates ) yield put( exchangeRatesCalculated( {
-      } ) )
-      else {
-        if ( JSON.stringify( exchangeRates ) !== JSON.stringify( storedExchangeRates ) )
-          yield put( exchangeRatesCalculated( exchangeRates ) )
-      }
-
-      if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
-      else {
-        if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
-          yield put( setAverageTxFee( averageTxFees ) )
-      }
-    } else {
-      console.log( 'Check-In failed', res.err )
+    if ( !averageTxFees ) console.log( 'Failed to fetch fee rates' )
+    else {
+      if ( JSON.stringify( averageTxFees ) !== JSON.stringify( storedAverageTxFees ) )
+        yield put( setAverageTxFee( averageTxFees ) )
     }
   } catch( err ){
     console.log( 'Wallet Check-In failed w/ the following err: ', err )
