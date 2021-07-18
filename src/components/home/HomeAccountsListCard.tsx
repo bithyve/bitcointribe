@@ -16,6 +16,7 @@ import getAvatarForSubAccount from '../../utils/accounts/GetAvatarForSubAccountK
 import getAccountSyncIcon from '../../utils/accounts/GetAccountSyncIcon'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   accountShell: AccountShell;
@@ -29,6 +30,7 @@ type BodyProps = Props;
 const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: HeaderProps ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const secondarySubAccounts = useSecondarySubAccountsForShell( accountShell )
+  const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
 
   const secondarySubAccountBadgeIcons: ImageSourcePropType[] = useMemo( () => {
     return secondarySubAccounts
@@ -61,6 +63,21 @@ const HeaderSection: React.FC<HeaderProps> = ( { accountShell, cardDisabled }: H
         {primarySubAccount.isTFAEnabled && (
           <Text style={styles.tfaIndicatorText}>2FA</Text>
         )}
+        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && startRegistration &&
+        <Text style={styles.tfaIndicatorText}>Claim $10</Text>
+        }
+
+        {primarySubAccount.type === AccountType.SWAN_ACCOUNT && !startRegistration &&
+        <View style={{
+          backgroundColor: Colors.lightBlue, borderRadius: widthPercentageToDP( '1%' )
+        }}>
+          <Text style={{
+            margin: heightPercentageToDP( 0.5 ), color: Colors.white, fontSize: RFValue( 10 ),
+          }}>
+            Sats Back
+          </Text>
+        </View>
+        }
       </View>
     </View>
   )
@@ -106,6 +123,7 @@ const BodySection: React.FC<BodyProps> = ( { accountShell, cardDisabled }: BodyP
 const HomeAccountsListCard: React.FC<Props> = ( { accountShell, cardDisabled }: Props ) => {
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   const opacityChange = cardDisabled || ( accountShell.primarySubAccount.visibility !== AccountVisibility.DEFAULT && showAllAccount === true )  ? true : false
+
   return (
     <CardView cornerRadius={10} style={opacityChange ? {
       ...styles.rootContainer, opacity:0.3

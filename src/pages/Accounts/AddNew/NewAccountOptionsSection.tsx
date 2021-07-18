@@ -37,7 +37,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
   function isSubAccountCreationSupported( subAccount: SubAccountDescribing ): boolean {
     switch ( subAccount.kind ) {
         case SubAccountKind.TEST_ACCOUNT:
-          return true
+          return isServiceSubAccountCreationSupported( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
         case SubAccountKind.REGULAR_ACCOUNT:
           return true
         case SubAccountKind.SECURE_ACCOUNT:

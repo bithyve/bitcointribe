@@ -12,6 +12,7 @@ import SubAccountKind from '../../../common/data/enums/SubAccountKind'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
 import TestSubAccountInfo from '../../../common/data/models/SubAccountInfo/HexaSubAccounts/TestSubAccountInfo'
 import useWallet from '../state-selectors/UseWallet'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 
 type Choices = {
   hexaAccounts: SubAccountDescribing[];
@@ -60,7 +61,7 @@ export default function useNewAccountChoices() {
   }, [ accountShells ] )
 
   return useMemo( () => {
-    let hexaAccounts = [
+    const hexaAccounts = [
       new CheckingSubAccountInfo( {
         defaultTitle: 'Checking Account',
         defaultDescription: 'User Checking Account'
@@ -75,16 +76,21 @@ export default function useNewAccountChoices() {
         doneeName: '',
         causeName: '',
       } ),
+      new TestSubAccountInfo( {
+        defaultTitle: 'Test Account',
+        defaultDescription: 'Learn Bitcoin',
+        visibility: wallet.accounts[ AccountType.TEST_ACCOUNT ] ? AccountVisibility.HIDDEN : AccountVisibility.DEFAULT
+      } ),
     ]
 
     // Add test account option only if there is no existing test account
-    if( !wallet.accounts[ AccountType.TEST_ACCOUNT ] ) hexaAccounts = [
-      new TestSubAccountInfo( {
-        defaultTitle: 'Test Account',
-        defaultDescription: 'Learn Bitcoin'
-      } ),
-      ...hexaAccounts
-    ]
+    // if( !wallet.accounts[ AccountType.TEST_ACCOUNT ] ) hexaAccounts = [
+    //   new TestSubAccountInfo( {
+    //     defaultTitle: 'Test Account',
+    //     defaultDescription: 'Learn Bitcoin'
+    //   } ),
+    //   ...hexaAccounts
+    // ]
 
     const serviceAccounts = [
       // new ExternalServiceSubAccountInfo( {

@@ -86,6 +86,11 @@ const loaderMessages = [
     subText: '',
   },
   {
+    heading: 'Swan Bitcoin',
+    text: 'Register with Swan Bitcoin to get $10',
+    subText: '',
+  },
+  {
     heading: 'Level 1 - Automated Cloud Backup',
     text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
     subText: '',
