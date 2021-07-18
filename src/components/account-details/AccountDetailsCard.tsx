@@ -26,6 +26,9 @@ import { AccountType } from '../../bitcoin/utilities/Interface'
 import { useSelector } from 'react-redux'
 import ModalContainer from '../home/ModalContainer'
 import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
+import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
+import { useDispatch } from 'react-redux'
+import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
 
 export type Props = {
   accountShell: AccountShell;
@@ -92,6 +95,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
+  const dispatch = useDispatch()
   const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
   useEffect( () => {
     if (
@@ -99,6 +103,14 @@ const AccountDetailsCard: React.FC<Props> = ( {
         primarySubAccount.kind === SubAccountKind.SERVICE &&
       ( primarySubAccount as ExternalServiceSubAccountInfo ).serviceAccountKind === ServiceAccountKind.SWAN
     ) {
+      const swanAccountActive = false
+      if( !swanAccountActive ){
+        dispatch( clearSwanCache() )
+        dispatch( updateSwanStatus( SwanAccountCreationStatus.BUY_MENU_CLICKED ) )
+      }
+      else {
+        dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
+      }
       showSwanModal( true )
     }
   }, [] )
