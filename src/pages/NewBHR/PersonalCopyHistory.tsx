@@ -106,7 +106,7 @@ const PersonalCopyHistory = ( props ) => {
   const [ selectedKeeper, setSelectedKeeper ] = useState(
     props.navigation.state.params.selectedKeeper
   )
-  const [ isReshare, setIsReshare ] = useState(
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false :
     props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
   )
   const levelHealth = useSelector( ( state ) => state.health.levelHealth )
@@ -119,7 +119,7 @@ const PersonalCopyHistory = ( props ) => {
   const pdfDataConfirm = useSelector( ( state ) => state.health.loading.pdfDataConfirm )
   const pdfCreatedSuccessfully = useSelector( ( state ) => state.health.pdfCreatedSuccessfully )
   const [ confirmDisable, setConfirmDisable ] = useState( true )
-  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperAllow' ) )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const MetaShares: MetaShare[] = useSelector(
     ( state ) => state.health.service.levelhealth.metaSharesKeeper,
   )
@@ -139,7 +139,7 @@ const PersonalCopyHistory = ( props ) => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
     setIsReshare(
-      props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
+      props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
     )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
@@ -154,11 +154,11 @@ const PersonalCopyHistory = ( props ) => {
   ] )
 
   useEffect( ()=>{
-    const Contact = selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : {
+    const Contact = {
       id: uuid(),
       name: 'Personal Copy'
     }
-    setContact( Contact )
+    setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
   }, [ ] )
 
   useEffect( ()=>  {
@@ -236,9 +236,12 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   useEffect( () => {
+    console.log( 'dsfsd pdfCreatedSuccessfully', pdfCreatedSuccessfully )
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
+
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
+        console.log( 'INSIDE IF dsfsd' )
         // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
         setPersonalCopyShareModal( true )
       }
@@ -247,6 +250,7 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( () => {
     if( pdfInfo.filePath ){
+      console.log( 'INSIDE IF cdf' )
       setConfirmDisable( false )
     }
   }, [ pdfInfo ] )
@@ -445,10 +449,11 @@ const PersonalCopyHistory = ( props ) => {
       setIsGuardianCreationClicked( true )
       const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKey )
+      console.log( 'Contact', Contact )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
-        name: Contact && Contact.name ? Contact.name : '',
+        name: 'Personal Copy',
         type: 'pdf',
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme,
         currentLevel: currentLevel,
@@ -459,7 +464,7 @@ const PersonalCopyHistory = ( props ) => {
         },
         channelKey: channelKey
       }
-
+      console.log( 'obj', obj )
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
@@ -468,6 +473,7 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
+      console.log( 'useEffect Contact', Contact )
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
       } ) )
@@ -559,7 +565,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ){
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Aa","channelId":"88ed885f562644b2c31a71e1298bdd01bb8287a9e00a634e4d2f658c4f46ca1a","streamId":"1763f468d","channelKey":"F0WfMxo5EyhhjH9Z6pQSzfEa","secondaryChannelKey":"b2RayHpnNM7ACm16QRYXOKgm","version":"1.7.5","encryptedKey":"6ddf6dd857796349f11f8b5e881e110585ef0fc1038f97117bdd8a1c157cb690cf8efa21d036acb66028f80232b4844e468a014ee88ff07999d94d34f723ef3aca5f02232dfd2a7cb0dc8704c8094161"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Swqe","channelId":"ee82c873208353a017789863e76ef585b20dab744e54f18b3b046fdaa48746ed","streamId":"0142fea8b","channelKey":"gkY6Nnf4fE3FgtjE1JWpXV2t","secondaryChannelKey":"HBzhoR9S7u9Fid6MRJwJPW13","version":"1.8.0","walletId":"8e49f3a86c991040dd9f3ae7b75f3561eefbf3c50ea773d3a8a35c6caab49a0b","encryptedKey":"ac10a94cc22a1bf5634648bf5b6a1af67d050d811a7d41f910d3f8e2fa98221c87574661d19e17de147f0609d5cb9651fd8a6ebc864b56012dc16b46a770883651e23a5b46f5861400e1edc45d28e031"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -580,6 +586,7 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=>{
     if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+      console.log( 'APPROVe' )
       // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       setApprovePrimaryKeeperModal( true )
       // ( QrBottomSheet as any ).current.snapTo( 0 )
@@ -687,7 +694,7 @@ const PersonalCopyHistory = ( props ) => {
       <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
         {renderQrContent()}
       </ModalContainer>
-      <ModalContainer visible={errorModal} closeBottomSheet={() => {}} >
+      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={() => {}} >
         <ApproveSetup
           isContinueDisabled={false}
           onPressContinue={() => {

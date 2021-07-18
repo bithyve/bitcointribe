@@ -112,6 +112,7 @@ interface ManageBackupNewBHRStateTypes {
   listModal: boolean;
   errorModal: boolean;
   showQRModal: boolean;
+  isLevel3Started: boolean;
   approvePrimaryKeeper: boolean;
   loaderModal: boolean;
   knwowMoreModal: boolean;
@@ -222,6 +223,7 @@ class ManageBackupNewBHR extends Component<
       listModal: false,
       errorModal: false,
       showQRModal: false,
+      isLevel3Started: false,
       approvePrimaryKeeper: false,
       loaderModal: false,
       knwowMoreModal: false,
@@ -522,7 +524,8 @@ class ManageBackupNewBHR extends Component<
       } )
     }
 
-    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus ) {
+    if( prevProps.approvalStatus != this.props.approvalStatus && this.props.approvalStatus && this.state.isLevel3Started ) {
+      console.log( 'APPROVe MB' )
       this.setState( {
         showQRModal: false
       },
@@ -667,8 +670,10 @@ class ManageBackupNewBHR extends Component<
 
   sendApprovalRequestToPK = ( ) => {
     this.setState( {
-      showQRModal: true
+      showQRModal: true,
+      isLevel3Started: true
     } )
+
     // ( this.keeperTypeBottomSheet as any ).snapTo( 0 )
     this.setState( {
       listModal: false

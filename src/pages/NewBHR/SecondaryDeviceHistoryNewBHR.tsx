@@ -81,6 +81,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
     ? props.navigation.state.params.isChangeKeeperType
     : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
+  // const [ isChangeClicked, setIsChangeClicked ] = useState( false )
 
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.health.keeperInfo )
   const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
@@ -240,7 +241,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       //     ( ErrorBottomSheet as any ).current.snapTo( 1 )
       //   }
       // }
-
+      return () => console.log( 'unmounting...' )
     } )()
   }, [] )
 
@@ -494,6 +495,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
+          // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
           dispatch( setApprovalStatus( false ) )
           dispatch( downloadSMShare( qrScannedData ) )
           setQrBottomSheetsFlag( false )
@@ -503,8 +505,9 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"erds","channelId":"28cc7e44b3ca629fe98450412f750d29fcf93d2de5057e841a665e8e73e98cfb","streamId":"b83dea121","secondaryChannelKey":"FLPy5dqRHTFCGqhZibhW9SLH","version":"1.8.0","walletId":"23887039bd673cfaa6fdc5ab9786aa130e010e9bbbc6731890361240ed83a55a"}'
           dispatch( setApprovalStatus( false ) )
+          // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
           dispatch( downloadSMShare( qrScannedData ) )
           setQrBottomSheetsFlag( false )
         }}
@@ -525,6 +528,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    // setIsChangeClicked( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -542,6 +546,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
     if ( type == 'pdf' ) {
+      console.log( 'type', type )
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
         ...props.navigation.state.params,
         selectedTitle: name,
@@ -551,7 +556,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( approvalStatus ){
+    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId  ){
+      console.log( 'APPROVe SD' );
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
@@ -744,6 +750,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )
               sendApprovalRequestToPK( )
+              // setIsChangeClicked( true )
             }}
             onPressBack={() =>
               ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
@@ -768,7 +775,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         ]}
         renderContent={() => (
           <ApproveSetup
-            isContinueDisabled={!approvalStatus}
+            isContinueDisabled={approvalStatus}
             onPressContinue={() => {
               onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
               ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
