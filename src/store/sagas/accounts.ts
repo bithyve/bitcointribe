@@ -444,6 +444,19 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
         break
 
       case AccountType.SWAN_ACCOUNT:
+      case AccountType.DEPOSIT_ACCOUNT:
+
+        let serviceAccountKind: ServiceAccountKind
+        switch( account.type ){
+            case AccountType.SWAN_ACCOUNT:
+              serviceAccountKind = ServiceAccountKind.SWAN
+              break
+
+            case AccountType.DEPOSIT_ACCOUNT:
+              serviceAccountKind = ServiceAccountKind.DEPOSIT_ACCOUNT
+              break
+        }
+
         primarySubAccount = new ExternalServiceSubAccountInfo( {
           id: account.id,
           xPub: ( account as MultiSigAccount ).is2FA? null: yield call( AccountUtilities.generateYpub, account.xpub, network ),
@@ -451,11 +464,10 @@ export function* generateShellFromAccount ( account: Account | MultiSigAccount )
           type: account.type,
           customDisplayName: account.accountName,
           customDescription: account.accountDescription,
-          serviceAccountKind: ServiceAccountKind.SWAN,
+          serviceAccountKind,
         } )
         break
   }
-
 
   const accountShell = new AccountShell( {
     primarySubAccount,
@@ -541,11 +553,17 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         return donationAccount
 
       case AccountType.SWAN_ACCOUNT:
+      case AccountType.DEPOSIT_ACCOUNT:
         let defaultAccountName, defaultAccountDescription
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
               defaultAccountDescription = 'Stack sats with Swan'
+              break
+
+            case AccountType.DEPOSIT_ACCOUNT:
+              defaultAccountName = 'Deposit Account'
+              defaultAccountDescription = 'Stack sats'
               break
         }
 
