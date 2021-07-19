@@ -58,7 +58,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           accountType: AccountType.DEPOSIT_ACCOUNT,
         }
         dispatch( addNewAccountShells( [ accountsInfo ] ) )
-      }
+      } else setPickReceiveAddressFrom( AccountType.DEPOSIT_ACCOUNT )
     }
   }, [ pickReceiveAddressFrom, wallet ] )
 
