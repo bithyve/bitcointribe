@@ -7,8 +7,7 @@ import {
 import Clipboard from '@react-native-clipboard/clipboard'
 import Colors from '../common/Colors'
 import { RFValue } from 'react-native-responsive-fontsize'
-// import Toast from '../components/Toast'
-import Toast from 'react-native-simple-toast'
+import Toast from '../components/Toast'
 import { AppBottomSheetTouchableWrapper } from './AppBottomSheetTouchableWrapper'
 import {
   widthPercentageToDP as wp,
@@ -18,7 +17,7 @@ import {
 export default function CopyThisText( props ) {
   function writeToClipboard() {
     Clipboard.setString( props.text )
-    Toast.show( 'Copied Successfully', Toast.LONG )
+    Toast( 'Copied Successfully' )
   }
 
   return (

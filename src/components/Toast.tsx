@@ -13,8 +13,5 @@ export default ( message ) => {
     opacity: 0.9,
     backgroundColor: 'rgba(0, 108, 180, 0.5)',
     textColor: Colors.white,
-    textStyle: {
-      lineHeight:20
-    },
   } )
 }
