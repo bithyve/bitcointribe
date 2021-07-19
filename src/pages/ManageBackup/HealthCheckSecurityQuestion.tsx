@@ -28,7 +28,7 @@ import SmallHeaderModal from '../../components/SmallHeaderModal'
 
 function HealthCheckSecurityQuestion( props ) {
   const { security } = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
+    ( state ) => state.storage.wallet,
   )
   const [ QuestionCounter, setQuestionCounter ] = useState( 0 )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )

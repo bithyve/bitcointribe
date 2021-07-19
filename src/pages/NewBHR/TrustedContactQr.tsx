@@ -19,7 +19,7 @@ import { useSelector } from 'react-redux'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import { EphemeralDataElements, Trusted_Contacts } from '../../bitcoin/utilities/Interface'
+import { EphemeralDataElements, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import QRCode from '../../components/QRCode'
 
 export default function TrustedContactQr( props ) {
@@ -29,8 +29,8 @@ export default function TrustedContactQr( props ) {
     ( state ) =>
       state.storage.database.DECENTRALIZED_BACKUP.SHARES_TRANSFER_DETAILS,
   )
-  const WALLET_SETUP = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
 
   const trustedContacts: Trusted_Contacts = useSelector(
@@ -57,7 +57,7 @@ export default function TrustedContactQr( props ) {
         setTrustedContactQR(
           JSON.stringify( {
             isGuardian: true,
-            requester: WALLET_SETUP.walletName,
+            requester: wallet.walletName,
             publicKey,
             uploadedAt: SHARES_TRANSFER_DETAILS[ props.index ].UPLOADED_AT,
             type: 'trustedGuardian',

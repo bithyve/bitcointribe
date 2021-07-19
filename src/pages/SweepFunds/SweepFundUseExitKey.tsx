@@ -481,7 +481,7 @@ const mapStateToProps = ( state ) => {
     keeper: idx( state, ( _ ) => _.keeper.service ),
     decentralizedBackup: idx( state, ( _ ) => _.storage.database.DECENTRALIZED_BACKUP ),
     secondaryShareDownloaded: idx( state, ( _ ) => _.health.secondaryShareDownloaded ),
-    security: idx( state, ( _ ) => _.storage.database.WALLET_SETUP.security ) || '',
+    security: idx( state, ( _ ) => _.storage.wallet.security ) || '',
     mnemonic: idx( state, ( _ ) => _.health.mnemonic ),
     twoFAHelpFlags: idx( state, ( _ ) => _.accounts.twoFAHelpFlags ),
     service: idx( state, ( _ ) => _.accounts[ SECURE_ACCOUNT ].service ),

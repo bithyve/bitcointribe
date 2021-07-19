@@ -393,7 +393,7 @@ function* sendTxNotificationWorker() {
     ( state ) => state.trustedContacts.contacts,
   )
   const { walletName } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP,
+    ( state ) => state.storage.wallet,
   )
 
   const { selectedRecipients } = sendingState

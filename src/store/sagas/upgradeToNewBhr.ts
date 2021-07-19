@@ -19,7 +19,7 @@ import { generateRandomString } from '../../common/CommonFunctions'
 import moment from 'moment'
 import S3Service from '../../bitcoin/services/sss/S3Service'
 import { insertDBWorker } from './storage'
-import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements } from '../../bitcoin/utilities/Interface'
+import { INotification, KeeperInfoInterface, Keepers, LevelHealthInterface, MetaShare, notificationTag, notificationType, TrustedDataElements, Wallet } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { setCloudData } from '../actions/cloud'
 import semver from 'semver'
@@ -127,9 +127,10 @@ function* autoShareSecondaryWorker( { payload } ) {
     }
     yield put( updatedKeeperInfo( obj ) )
     const walletId = s3Service.getWalletId().data.walletId
-    const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
+    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
@@ -235,9 +236,10 @@ function* autoShareContactKeeperWorker( { payload } ) {
       yield put( updatedKeeperInfo( obj ) )
     }
     const walletId = s3Service.getWalletId().data.walletId
-    const { WALLET_SETUP, SERVICES } = yield select( ( state ) => state.storage.database )
+    const { SERVICES } = yield select( ( state ) => state.storage.database )
+    const wallet: Wallet = yield select( ( state ) => state.storage.database )
     const keeperInfo = yield select( ( state ) => state.health.keeperInfo )
-    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, WALLET_SETUP.security.answer )
+    const response = yield call( s3Service.updateKeeperInfoToMetaShare, keeperInfo, wallet.security.answer )
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const secondaryMetaShares: MetaShare[] = s3Service.levelhealth.SMMetaSharesKeeper
     const trustedContacts: TrustedContactsService = yield select( ( state ) => state.trustedContacts.service )
@@ -363,7 +365,7 @@ function* confirmPDFSharedFromUpgradeWorker( { payload } ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const walletId = s3Service.levelhealth.walletId
-    const answer = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.answer )
+    const answer = yield select( ( state ) => state.storage.wallet.security.answer )
     let shareIndex = 3
     if (
       shareId &&

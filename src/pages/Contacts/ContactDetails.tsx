@@ -42,7 +42,7 @@ import SendViaQR from '../../components/SendViaQR'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import {
   AccountType,
-  QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts,
+  QRCodeTypes, StreamData, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet,
 } from '../../bitcoin/utilities/Interface'
 import { PermanentChannelsSyncKind, removeTrustedContact, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import AccountShell from '../../common/data/models/AccountShell'
@@ -90,7 +90,7 @@ interface ContactDetailsPropTypes {
   uploadSuccessfull: any;
   UNDER_CUSTODY: any;
   DECENTRALIZED_BACKUP: any;
-  WALLET_SETUP: any;
+  wallet: Wallet;
   updateEphemeralChannelLoader: any;
   ErrorSending: any;
   sourceAccountSelectedForSending: any;
@@ -513,7 +513,7 @@ class ContactDetails extends PureComponent<
   };
 
   createDeepLink = ( contact ) => {
-    const { trustedContacts, WALLET_SETUP } = this.props
+    const { trustedContacts, wallet } = this.props
     let currentContact: TrustedContact
     let channelKey: string
 
@@ -534,7 +534,7 @@ class ContactDetails extends PureComponent<
         trustedQR: JSON.stringify( {
           type: QRCodeTypes.CONTACT_REQUEST,
           channelKey,
-          walletName: WALLET_SETUP.walletName,
+          walletName: wallet.walletName,
           secondaryChannelKey,
           version: appVersion,
         } )
@@ -1224,7 +1224,7 @@ const mapStateToProps = ( state ) => {
       state,
       ( _ ) => _.storage.database.DECENTRALIZED_BACKUP
     ),
-    WALLET_SETUP: idx( state, ( _ ) => _.storage.database.WALLET_SETUP ),
+    wallet: idx( state, ( _ ) => _.storage.wallet ),
     updateEphemeralChannelLoader: idx(
       state,
       ( _ ) => _.trustedContacts.loading.updateEphemeralChannel

@@ -35,6 +35,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import QRCode from '../../components/QRCode'
 import config from '../../bitcoin/HexaConfig'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 export default function RestoreWalletBySecondaryDevice( props ) {
   const [ secondaryQR, setSecondaryQR ] = useState( '' )
@@ -44,8 +45,11 @@ export default function RestoreWalletBySecondaryDevice( props ) {
   const isErrorReceivingFailed = useSelector(
     ( state ) => state.sss.errorReceiving,
   )
-  const { WALLET_SETUP, DECENTRALIZED_BACKUP } = useSelector(
+  const { DECENTRALIZED_BACKUP } = useSelector(
     ( state ) => state.storage.database,
+  )
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
@@ -59,7 +63,7 @@ export default function RestoreWalletBySecondaryDevice( props ) {
     ? setSecondaryQR(
       JSON.stringify( {
         ...REQUEST_DETAILS,
-        requester: WALLET_SETUP.walletName,
+        requester: wallet.walletName,
         type: 'recoveryQR',
         ver: DeviceInfo.getVersion(),
       } ),
