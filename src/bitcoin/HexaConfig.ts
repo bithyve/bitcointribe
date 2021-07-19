@@ -146,7 +146,11 @@ class HexaConfig {
     [ AccountType.SWAN_ACCOUNT ]: {
       series: 30,
       upperBound: 10,
-    }
+    },
+    [ AccountType.DEPOSIT_ACCOUNT ]: {
+      series: 40,
+      upperBound: 10,
+    },
   }
 
   public BITHYVE_ESPLORA_API_ENDPOINTS = {
