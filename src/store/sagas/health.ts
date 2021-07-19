@@ -1545,6 +1545,13 @@ function* updatedKeeperInfoWorker( { payload } ) {
   try {
     const { keeperData } = payload
     const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
+    console.log( 'keeperInfo && keeperInfo.length > 0', keeperInfo && keeperInfo.length > 0 )
+    if( keeperInfo && keeperInfo.length > 0 ) {
+      console.log( 'INSIDE IF keeperInfo && keeperInfo.length > 0', keeperInfo && keeperInfo.length > 0 )
+      if( keeperInfo.find( value=>value && value.shareId == keeperData.shareId ) && keeperInfo.find( value=>value && value.shareId == keeperData.shareId ).type == 'pdf' && keeperData.type != 'pdf' ) yield put( setPDFInfo( {
+        filePath: '', updatedAt: 0, shareId: ''
+      } ) )
+    }
     let flag = false
     if ( keeperInfo.length > 0 ) {
       for ( let i = 0; i < keeperInfo.length; i++ ) {
@@ -2038,6 +2045,9 @@ function* downloadSMShareWorker( { payload } ) {
       const walletId = s3Service.levelhealth.walletId
       const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
       const qrDataObj = JSON.parse( scannedData )
+      console.log( 'contacts', contacts )
+
+      console.log( 'qrDataObj', qrDataObj )
       let currentContact: TrustedContact
       let channelKey: string
       if( contacts ){
@@ -2054,11 +2064,14 @@ function* downloadSMShareWorker( { payload } ) {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
+      console.log( 'res', res )
       if( res.secondaryData.secondaryMnemonicShard ) {
+        console.log( 'res.secondaryData.secondaryMnemonicShard', res.secondaryData.secondaryMnemonicShard )
         yield put( secondaryShareDownloaded( res.secondaryData.secondaryMnemonicShard ) )
         yield put( setApprovalStatus( true ) )
       }
     }
+
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
   } catch ( error ) {
     yield put( switchS3LoaderKeeper( 'downloadSMShareLoader' ) )
@@ -2088,6 +2101,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       console.log( 'existingContact', existingContact )
       console.log( 'channelKey', channelKey )
+      console.log( 'oldChannelKey', oldChannelKey )
       if( existingContact ){
         const contactInfo = {
           channelKey: channelKey,
@@ -2160,7 +2174,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
           channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
           shareId: shareId
         } ) )
-
+        console.log( 'keeperInfo.find( value=>value.shareId == shareId ).channelKey', keeperInfo.find( value=>value.shareId == shareId ).channelKey )
         if( isChange ) {
           const contactInfo = {
             channelKey: oldChannelKey,

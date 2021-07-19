@@ -558,6 +558,7 @@ class ManageBackupNewBHR extends Component<
 
   goToHistory = ( value ) => {
     const { id, selectedKeeper, isSetup, isPrimaryKeeper, isChangeKeeperAllow } = value
+    console.log( 'value', value )
     this.setState( {
       showLoader: false
     } )
@@ -614,9 +615,10 @@ class ManageBackupNewBHR extends Component<
       } )
     } else if ( selectedKeeper.shareType == 'pdf' ) {
       this.props.navigation.navigate(
-        'PersonalCopyHistoryNewBHR',
-        navigationParams,
-        isChangeKeeperAllow
+        'PersonalCopyHistoryNewBHR', {
+          ...navigationParams,
+          isChangeKeeperAllow
+        }
       )
     }
   };

@@ -99,6 +99,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ reshareModal, setReshareModal ] = useState( false )
+  const [ isChangeClicked, setIsChangeClicked ] = useState( false )
   const [ ReshareBottomSheet, setReshareBottomSheet ] = useState(
     React.createRef(),
   )
@@ -117,7 +118,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ isVersionMismatch, setIsVersionMismatch ] = useState( false )
   const [ isGuardianCreationClicked, setIsGuardianCreationClicked ] = useState( false )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
+  )
   const [ selectedTitle, setSelectedTitle ] = useState( props.navigation.getParam( 'selectedTitle' ) )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
@@ -144,13 +146,13 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ contacts, setContacts ] = useState( [] )
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const index = props.navigation.getParam( 'index' )
-  const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
   const dispatch = useDispatch()
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
+    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
         ? props.navigation.getParam( 'isChangeKeeperType' )
@@ -686,6 +688,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    setIsChangeClicked( false )
     if ( type == 'contact' ) {
       ( ChangeBottomSheet as any ).current.snapTo( 1 )
     }
@@ -715,7 +718,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={true}
+        isFromKeeperDeviceHistory={false}
         QRModalHeader={'QR scanner'}
         title={'Note'}
         infoText={
@@ -734,7 +737,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           if ( QrBottomSheet ) ( QrBottomSheet as any ).current.snapTo( 0 )
         }}
         onPressContinue={async() => {
-          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Ad","channelId":"8b36253cb6617c4aca8920989e4972211b91f1bce1c6d4fb97e287d58f4089ac","streamId":"7bbc75b34","secondaryChannelKey":"oWc5slgN5vjOt4EnmpKAxE0O","version":"1.8.0","walletId":"792147b59b185ab15f324f19d723517da4d39f169377865d04afe69d1606f9a8"}'
+          const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
           dispatch( setApprovalStatus( false ) )
           // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
           dispatch( downloadSMShare( qrScannedData ) )
@@ -756,7 +759,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
+    console.log( 'approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId', approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId )
+    console.log( 'channelAssets', channelAssets )
+    console.log( 'selectedKeeper', selectedKeeper )
+    if( approvalStatus && isChangeClicked ){
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
     }
@@ -1067,6 +1073,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )
               sendApprovalRequestToPK( )
+              setIsChangeClicked( true )
               // onPressChangeKeeperType(type, name);
               // (keeperTypeBottomSheet as any).current.snapTo(0);
             }}

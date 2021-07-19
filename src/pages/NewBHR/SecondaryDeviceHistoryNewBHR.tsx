@@ -77,12 +77,13 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const [ secondaryDeviceHistory, setSecondaryDeviceHistory ] = useState( historyArray )
   const [ selectedLevelId, setSelectedLevelId ] = useState( props.navigation.getParam( 'selectedLevelId' ) )
   const [ selectedKeeper, setSelectedKeeper ] = useState( props.navigation.getParam( 'selectedKeeper' ) )
-  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
+  const [ isReshare, setIsReshare ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true
+  )
   const [ isChange, setIsChange ] = useState( props.navigation.state.params.isChangeKeeperType
     ? props.navigation.state.params.isChangeKeeperType
     : false )
   const [ Contact, setContact ]: [any, any] = useState( null )
-  // const [ isChangeClicked, setIsChangeClicked ] = useState( false )
+  const [ isChangeClicked, setIsChangeClicked ] = useState( false )
 
   const keeperInfo: KeeperInfoInterface[] = useSelector( ( state ) => state.health.keeperInfo )
   const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
@@ -98,13 +99,14 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const dispatch = useDispatch()
 
   const index = props.navigation.getParam( 'index' )
-  const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
+  const [ isChangeKeeperAllow, setIsChangeKeeperAllow ] = useState( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'isChangeKeeperAllow' ) )
+
   const next = props.navigation.getParam( 'next' )
 
   useEffect( () => {
     setSelectedLevelId( props.navigation.getParam( 'selectedLevelId' ) )
     setSelectedKeeper( props.navigation.getParam( 'selectedKeeper' ) )
-    setIsReshare( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
+    setIsReshare( props.navigation.getParam( 'isChangeKeeperType' ) ? false : props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ? false : true )
     setIsChange(
       props.navigation.getParam( 'isChangeKeeperType' )
         ? props.navigation.getParam( 'isChangeKeeperType' )
@@ -529,7 +531,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
-    // setIsChangeClicked( false )
+    setIsChangeClicked( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -557,7 +559,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   }
 
   useEffect( ()=>{
-    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId  ){
+    if( approvalStatus && isChangeClicked ){
       console.log( 'APPROVe SD' );
       ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
       ( QrBottomSheet as any ).current.snapTo( 0 )
@@ -751,7 +753,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
               setSelectedKeeperType( type )
               setSelectedKeeperName( name )
               sendApprovalRequestToPK( )
-              // setIsChangeClicked( true )
+              setIsChangeClicked( true )
             }}
             onPressBack={() =>
               ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
