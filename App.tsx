@@ -47,13 +47,13 @@ export default function AppWrapper() {
   }, [] )
 
   return (
-    <RootSiblingParent>
-      <Provider store={store} uriPrefix={URI_PREFIX}>
-        <BottomSheetModalProvider>
-          <AppContent />
-        </BottomSheetModalProvider>
-      </Provider>
-    </RootSiblingParent>
+    // <RootSiblingParent>
+    <Provider store={store} uriPrefix={URI_PREFIX}>
+      <BottomSheetModalProvider>
+        <AppContent />
+      </BottomSheetModalProvider>
+    </Provider>
+    // </RootSiblingParent>
 
   )
 }

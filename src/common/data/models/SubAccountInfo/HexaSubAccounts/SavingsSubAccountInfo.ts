@@ -45,7 +45,7 @@ export default class SavingsSubAccountInfo implements HexaSubAccountDescribing {
     accountShellID = null,
     instanceNumber = null,
     defaultTitle = 'Savings Account',
-    defaultSubTitle= 'MultiSig wallet',
+    defaultSubTitle= '2 of 3 MultiSig bitcoin wallet',
     balances = {
       confirmed: 0, unconfirmed: 0
     },

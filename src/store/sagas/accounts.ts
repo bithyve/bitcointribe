@@ -894,7 +894,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.TEST_ACCOUNT,
           instanceNum: testInstanceCount,
           accountName: accountName? accountName: 'Test Account',
-          accountDescription: accountDescription? accountDescription: 'Learn Bitcoin',
+          accountDescription: 'Testnet Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstanceCount ),
           networkType: NetworkType.TESTNET,
@@ -908,7 +908,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.CHECKING_ACCOUNT,
           instanceNum: checkingInstanceCount,
           accountName: accountName? accountName: 'Checking Account',
-          accountDescription: accountDescription? accountDescription: 'Fast and easy',
+          accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
@@ -924,7 +924,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.SAVINGS_ACCOUNT,
           instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
-          accountDescription: accountDescription? accountDescription: 'Multi-factor security',
+          accountDescription: accountDescription? accountDescription: 'MultiSig Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
@@ -942,7 +942,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: accountType,
           instanceNum: donationInstanceCount,
           accountName: accountName? accountName: 'Donation Account',
-          accountDescription: accountDescription? accountDescription: 'Accept donations',
+          accountDescription: accountDescription? accountDescription: 'Receive Donations',
           donee: doneeName? doneeName: wallet.walletName,
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
@@ -960,7 +960,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
-              defaultAccountDescription = 'Stack sats with Swan'
+              defaultAccountDescription = 'Withdrawal Wallet'
               break
         }
 

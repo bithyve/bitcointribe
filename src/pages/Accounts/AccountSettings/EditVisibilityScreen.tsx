@@ -26,7 +26,7 @@ export type Props = {
 const HeaderSection: React.FC = () => {
   return (
     <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderSubtitleText}>Choose when and if you want this Account to appear on your Home Screen</Text>
+      <Text style={ListStyles.infoHeaderSubtitleText}>Choose when and if you want this account to appear on your Home Screen</Text>
     </View>
   )
 }
