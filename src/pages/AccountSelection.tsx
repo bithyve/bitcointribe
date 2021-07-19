@@ -79,7 +79,7 @@ const accountOptions: AccountOption[] = [
   {
     id: 6,
     title: 'Exchange Account',
-    type: AccountType.EXCHNGE_ACCOUNT,
+    type: AccountType.EXCHANGE_ACCOUNT,
     imageSource: require( '../assets/images/accIcons/deposit_account.png' ),
     subtitle: 'A separate wallet where your newly bought bitcoin/ sats land',
   }

@@ -42,7 +42,7 @@ export default function SecondaryDeviceModelContents( props ) {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={props.secondaryQR} size={hp( '27%' )} />
+          <QRCode title="Keeper Request" value={props.secondaryQR} size={hp( '27%' )} />
         )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}

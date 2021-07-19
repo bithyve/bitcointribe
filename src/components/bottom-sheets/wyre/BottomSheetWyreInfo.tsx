@@ -16,6 +16,9 @@ import openLink from '../../../utils/OpenLink'
 import { ListItem } from 'react-native-elements'
 import useReceivingAddressFromAccount from '../../../utils/hooks/account-utils/UseReceivingAddressFromAccount'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
+import { newAccountsInfo } from '../../../store/sagas/accounts'
+import { addNewAccountShells } from '../../../store/actions/accounts'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -28,6 +31,7 @@ type Props = {
 const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBuyMenu, wyreFromDeepLink, onClickSetting, onPress }: Props ) => {
   const dispatch = useDispatch()
   const { wyreHostedUrl } = useWyreIntegrationState()
+  const wallet = useWallet()
   const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
   const wyreReceiveAddress = useReceivingAddressFromAccount( AccountType.WYRE_ACCOUNT, pickReceiveAddressFrom )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
@@ -44,6 +48,18 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       setHasButtonBeenPressed( true )
     }
   } )
+
+  useEffect( ()=> {
+    if( pickReceiveAddressFrom === AccountType.DEPOSIT_ACCOUNT ){
+      if( !wallet.accounts[ AccountType.DEPOSIT_ACCOUNT ] ){
+      // create deposit account if an instance doesn't exist
+        const accountsInfo: newAccountsInfo = {
+          accountType: AccountType.DEPOSIT_ACCOUNT,
+        }
+        dispatch( addNewAccountShells( [ accountsInfo ] ) )
+      }
+    }
+  }, [ pickReceiveAddressFrom, wallet ] )
 
   // eslint-disable-next-line quotes
   let wyreMessage = `Wyre enables BTC purchases using Apple Pay, debit card, bank transfer as well as easy transfers using open banking where available. Payment methods available may vary based on your country. \n\nBy proceeding, you understand that Wyre will process the payment and transfer for the purchased bitcoin.`

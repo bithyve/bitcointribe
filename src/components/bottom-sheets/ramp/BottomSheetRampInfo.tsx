@@ -16,6 +16,9 @@ import openLink from '../../../utils/OpenLink'
 import { ListItem } from 'react-native-elements'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
 import useReceivingAddressFromAccount from '../../../utils/hooks/account-utils/UseReceivingAddressFromAccount'
+import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
+import { newAccountsInfo } from '../../../store/sagas/accounts'
+import { addNewAccountShells } from '../../../store/actions/accounts'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -29,7 +32,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   const dispatch = useDispatch()
   const { rampHostedUrl } = useRampIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-
+  const wallet = useWallet()
   const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
   const rampReceiveAddress = useReceivingAddressFromAccount( AccountType.RAMP_ACCOUNT, pickReceiveAddressFrom )
 
@@ -46,6 +49,18 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       setHasButtonBeenPressed( true )
     }
   } )
+
+  useEffect( ()=> {
+    if( pickReceiveAddressFrom === AccountType.DEPOSIT_ACCOUNT ){
+      if( !wallet.accounts[ AccountType.DEPOSIT_ACCOUNT ] ){
+      // create deposit account if an instance doesn't exist
+        const accountsInfo: newAccountsInfo = {
+          accountType: AccountType.DEPOSIT_ACCOUNT,
+        }
+        dispatch( addNewAccountShells( [ accountsInfo ] ) )
+      } else setPickReceiveAddressFrom( AccountType.DEPOSIT_ACCOUNT )
+    }
+  }, [ pickReceiveAddressFrom, wallet ] )
 
   // eslint-disable-next-line quotes
   let rampMessage = 'Ramp enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Ramp will process the payment and transfer for the purchased bitcoin.'

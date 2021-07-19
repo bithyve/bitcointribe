@@ -33,7 +33,7 @@ const XPubDetailsScreen: React.FC<Props> = ( { navigation }: Props ) => {
 
       <View>
         <View style={styles.qrCodeContainer}>
-          <QRCode value={xPub} size={heightPercentageToDP( 33 )} />
+          <QRCode title="xPub" value={xPub} size={heightPercentageToDP( 33 )} />
         </View>
 
         <CopyThisText text={xPub} />
