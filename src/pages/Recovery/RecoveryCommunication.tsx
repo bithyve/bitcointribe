@@ -32,6 +32,7 @@ import RecoveryTrustedQR from './RecoveryTrustedQR'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import Toast from '../../components/Toast'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 export default function RecoveryCommunication( props ) {
   const contact = props.navigation.getParam( 'contact' )
@@ -74,8 +75,11 @@ export default function RecoveryCommunication( props ) {
     }
   }
 
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+  const { DECENTRALIZED_BACKUP } = useSelector(
     ( state ) => state.storage.database,
+  )
+  const wallet: Wallet = useSelector(
+    ( state ) => state.storage.wallet,
   )
   const { RECOVERY_SHARES } = DECENTRALIZED_BACKUP
 
@@ -126,7 +130,7 @@ export default function RecoveryCommunication( props ) {
     ? setTrustedQR(
       JSON.stringify( {
         ...REQUEST_DETAILS,
-        requester: WALLET_SETUP.walletName,
+        requester: wallet.walletName,
         type: 'recoveryQR',
         ver: DeviceInfo.getVersion(),
       } ),
@@ -134,7 +138,7 @@ export default function RecoveryCommunication( props ) {
     : null
 
   const communicate = async ( selectedContactMode ) => {
-    const requester = WALLET_SETUP.walletName
+    const requester = wallet.walletName
     const appVersion = DeviceInfo.getVersion()
     switch ( selectedContactMode.type ) {
         case 'number':
@@ -157,7 +161,7 @@ export default function RecoveryCommunication( props ) {
           `/v${appVersion}`
 
           const smsInfoText = `Click here to help ${
-            WALLET_SETUP.walletName
+            wallet.walletName
           } restore their Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`
@@ -191,7 +195,7 @@ export default function RecoveryCommunication( props ) {
           `/v${appVersion}`
 
           const emailInfoText = `Click here to help ${
-            WALLET_SETUP.walletName
+            wallet.walletName
           } restore their Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`

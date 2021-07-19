@@ -137,6 +137,7 @@ import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannels
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
+import { updateWallet } from '../actions/storage'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -196,12 +197,12 @@ export const initHealthWatcher = createWatcher(
 function* generateMetaSharesWorker( { payload } ) {
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const { walletName } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP
+    ( state ) => state.storage.wallet
   )
   const appVersion = DeviceInfo.getVersion()
   const { level, SM, isUpgrade } = payload
   const { answer, questionId, question } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP.security
+    ( state ) => state.storage.wallet.security
   )
   const wallet: Wallet = yield select(
     ( state ) => state.storage.wallet
@@ -383,10 +384,10 @@ function* updateHealthLevel2Worker( { payload } ) {
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const Health: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
-    const { WALLET_SETUP } = yield select(
-      ( state ) => state.storage.database
+    const wallet: Wallet = yield select(
+      ( state ) => state.storage.wallet
     )
-    const { security } = WALLET_SETUP
+    const { security } = wallet
     const levelHealth: LevelHealthInterface[] = [ ...Health ]
     console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
     let SecurityQuestionHealth
@@ -453,7 +454,6 @@ function* recoverWalletFromIcloudWorker( { payload } ) {
   yield put( switchS3LoadingStatus( 'restoreWallet' ) )
   const {
     SERVICES,
-    WALLET_SETUP,
     DECENTRALIZED_BACKUP,
     ASYNC_DATA,
   } = payload.icloudData.walletImage
@@ -653,8 +653,8 @@ function* recoverWalletWorker( { payload } ) {
   const { keeperData, decryptedCloudDataJson, level } = payload
   console.log( 'KEEPERDATA', keeperData )
   try {
-    const { WALLET_SETUP } = yield select(
-      ( state ) => state.storage.database
+    const wallet: Wallet = yield select(
+      ( state ) => state.storage.wallet
     )
     const downloadedBackupData: {
       primaryData?: PrimaryStreamData;
@@ -662,7 +662,7 @@ function* recoverWalletWorker( { payload } ) {
       secondaryData?: SecondaryStreamData;
     }[] = yield select( ( state ) => state.health.downloadedBackupData )
 
-    const { security } = WALLET_SETUP
+    const { security } = wallet
 
     const mappedMetaShares: { [walletId: string]: MetaShare[] } = {
     }
@@ -1118,7 +1118,7 @@ function* generatePDFWorker( { payload } ) {
   }
 
   const { security, walletName } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP
+    ( state ) => state.storage.wallet
   )
 
   try {
@@ -1278,7 +1278,7 @@ function* getPDFDataWorker( { payload } ) {
       shareId: string;
       updatedAt: number;
     } = yield select( ( state ) => state.health.pdfInfo )
-    const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
     let pdfPath = pdfInfo.filePath
@@ -1296,7 +1296,7 @@ function* getPDFDataWorker( { payload } ) {
     if( channelKeyFromCH && channelKeyFromCH == channelKey && currentContact ) {
       const recoveryData = {
         type: QRCodeTypes.RECOVERY_REQUEST,
-        walletName: WALLET_SETUP.walletName,
+        walletName: wallet.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         channelKey: channelKey,
@@ -1305,12 +1305,12 @@ function* getPDFDataWorker( { payload } ) {
         walletId,
         encryptedKey: LevelHealth.encryptWithAnswer(
           shareId,
-          WALLET_SETUP.security.answer
+          wallet.security.answer
         ).encryptedString,
       }
       const secondaryData = {
         type: QRCodeTypes.RECOVERY_REQUEST,
-        walletName: WALLET_SETUP.walletName,
+        walletName: wallet.walletName,
         channelId: currentContact.permanentChannelAddress,
         streamId: TrustedContacts.getStreamId( walletId ),
         secondaryChannelKey: currentContact.secondaryChannelKey,
@@ -1329,8 +1329,8 @@ function* getPDFDataWorker( { payload } ) {
       pdfPath = yield call(
         generatePDFKeeper,
         pdfData,
-        `Hexa_Recovery_Key_${WALLET_SETUP.walletName}.pdf`,
-        `Hexa Recovery Key for ${WALLET_SETUP.walletName}'s Wallet`
+        `Hexa_Recovery_Key_${wallet.walletName}.pdf`,
+        `Hexa Recovery Key for ${wallet.walletName}'s Wallet`
       )
       yield put( setPDFInfo( {
         filePath: pdfPath, updatedAt: moment( new Date() ).valueOf(), shareId
@@ -1356,13 +1356,12 @@ function* sharePDFWorker( { payload } ) {
     publicKey: string;
     privateKey: string;
   } = yield select( ( state ) => state.health.pdfInfo )
-  const walletName = yield select( ( state ) => state.storage.database.WALLET_SETUP.walletName )
   try {
     console.log( 'pdfInfo', pdfInfo )
     if ( !pdfInfo.filePath ) throw new Error( 'Personal copy not found/generated' )
 
-    const { security } = yield select(
-      ( state ) => state.storage.database.WALLET_SETUP
+    const { security, walletName } = yield select(
+      ( state ) => state.storage.wallet
     )
 
     switch ( shareVia ) {
@@ -1497,7 +1496,7 @@ function* confirmPDFSharedWorker( { payload } ) {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const metaShare: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     const walletId = s3Service.levelhealth.walletId
-    const answer = yield select( ( state ) => state.storage.database.WALLET_SETUP.security.answer )
+    const answer = yield select( ( state ) => state.storage.wallet.security.answer )
     let shareIndex = 3
     if (
       shareId &&
@@ -1686,11 +1685,11 @@ function* generateSMMetaSharesWorker( { payload } ) {
   console.log( 'PAYLOAD SM', SM )
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const { walletName } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP
+    ( state ) => state.storage.wallet
   )
   const appVersion = DeviceInfo.getVersion()
   const { answer, questionId, question } = yield select(
-    ( state ) => state.storage.database.WALLET_SETUP.security
+    ( state ) => state.storage.wallet.security
   )
 
   const wallet: Wallet = yield select(
@@ -1779,7 +1778,7 @@ function* autoShareLevel2KeepersWorker( ) {
     const Contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
     const walletId = service.levelhealth.walletId
-    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+    const { walletName } = yield select( ( state ) => state.storage.wallet )
     const shareIds = []
     if( levelHealth[ 1 ] && levelHealth[ 1 ].levelInfo.length == 6 ) {
       for ( let i = 2; i < levelHealth[ 1 ].levelInfo.length - 2; i++ ) {
@@ -2084,7 +2083,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const walletId = s3Service.levelhealth.walletId
-    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+    const { walletName } = yield select( ( state ) => state.storage.wallet )
     if( MetaShares && MetaShares.length ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       console.log( 'existingContact', existingContact )
@@ -2309,10 +2308,10 @@ function* setupHealthWorker( { payload } ) {
   }[] = yield select( ( state ) => state.health.downloadedBackupData )
   const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
   const initLoader = yield select( ( state ) => state.health.loading.initLoader )
-  const { WALLET_SETUP } = yield select(
+  const wallet: Wallet = yield select(
     ( state ) => state.storage.database
   )
-  const { security } = WALLET_SETUP
+  const { security } = wallet
   if( initLoader ) return
   const { level }: { level: number } = payload
   console.log( 'level', level )
@@ -2444,7 +2443,7 @@ function* updateKeeperInfoToChannelWorker( ) {
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const MetaShares: MetaShare[] = service.levelhealth.metaSharesKeeper
     const walletId = service.levelhealth.walletId
-    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+    const { walletName } = yield select( ( state ) => state.storage.wallet )
     const channelSyncUpdates: {
       channelKey: string,
       streamId: string,
@@ -2541,7 +2540,7 @@ function* acceptExistingContactRequestWorker( { payload } ) {
     const service: S3Service = yield select( ( state ) => state.health.service )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const walletId = service.levelhealth.walletId
-    const { walletName } = yield select( ( state ) => state.storage.database.WALLET_SETUP )
+    const { walletName } = yield select( ( state ) => state.storage.wallet )
     const contactInfo = {
       channelKey,
       contactsSecondaryChannelKey
@@ -2591,20 +2590,16 @@ function* setupPasswordWorker( { payload } ) {
     const { security } = payload
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    const { WALLET_SETUP } = yield select( ( state ) => state.storage.database )
-    const updatedWALLET_SETUP = {
-      ...WALLET_SETUP,
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+    const updatedWallet: Wallet = {
+      ...wallet,
       security: security ? security : {
         question: '', answer: ''
       },
     }
+    yield put( updateWallet( updatedWallet ) )
     console.log( 'security', security )
-    console.log( 'updatedWALLET_SETUP', updatedWALLET_SETUP )
-    yield call( insertDBWorker, {
-      payload: {
-        WALLET_SETUP: updatedWALLET_SETUP
-      }
-    } )
+    console.log( 'updatedWallet', updatedWallet )
     if( security ) {
       // initialize health-check schema on relay
       yield put( initializeHealthSetup() )

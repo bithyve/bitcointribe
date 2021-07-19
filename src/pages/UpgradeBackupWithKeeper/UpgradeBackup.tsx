@@ -1490,7 +1490,7 @@ const mapStateToProps = ( state ) => {
   return {
     accounts: state.accounts || [],
     walletName:
-      idx( state, ( _ ) => _.storage.database.WALLET_SETUP.walletName ) || '',
+      idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
     overallHealth: idx( state, ( _ ) => _.sss.overallHealth ),
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     s3Service: idx( state, ( _ ) => _.health.service ),

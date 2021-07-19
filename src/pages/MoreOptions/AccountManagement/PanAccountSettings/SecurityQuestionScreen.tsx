@@ -25,7 +25,7 @@ import { setShowAllAccount } from '../../../../store/actions/accounts'
 
 export default function SecurityQuestionScreen( props ) {
   const { security } = useSelector(
-    ( state ) => state.storage.database.WALLET_SETUP,
+    ( state ) => state.storage.wallet,
   )
   let [ AnswerCounter, setAnswerCounter ] = useState( 0 )
   const securityQuestion = security.question

@@ -28,6 +28,7 @@ import BottomSheet from 'reanimated-bottom-sheet'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import ModalHeader from '../../components/ModalHeader'
 import QRCode from '../../components/QRCode'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 
 const SecureScan = props => {
@@ -43,8 +44,11 @@ const SecureScan = props => {
     ? props.navigation.state.params.carouselIndex
     : null
   const serviceType = props.navigation.getParam( 'serviceType' )
-  const { DECENTRALIZED_BACKUP, WALLET_SETUP } = useSelector(
+  const { DECENTRALIZED_BACKUP } = useSelector(
     state => state.storage.database,
+  )
+  const wallet: Wallet = useSelector(
+    state => state.storage.wallet,
   )
   const { loading } = useSelector( state => state.sss )
   const [ selectedStatus, setSelectedStatus ] = useState( 'Ugly' ) // for preserving health of this entity
@@ -60,7 +64,7 @@ const SecureScan = props => {
     : null
 
   const deepLink = SHARES_TRANSFER_DETAILS[ 0 ]
-    ? `https://hexawallet.io/app/${WALLET_SETUP.walletName}/sss/ek/` +
+    ? `https://hexawallet.io/app/${wallet.walletName}/sss/ek/` +
     SHARES_TRANSFER_DETAILS[ 0 ].ENCRYPTED_KEY
     : ''
   const dispatch = useDispatch()

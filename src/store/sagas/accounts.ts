@@ -1337,7 +1337,8 @@ export const fetchReceiveAddressWatcher = createWatcher(
 function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, serviceType: string } } ) {
   try {
     const { qrdata, QRModalHeader } = payload
-    const { DECENTRALIZED_BACKUP, WALLET_SETUP } = yield select( ( state ) => state.storage.database )
+    const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
+    const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const s3Service = yield select( ( state ) => state.health.service )
     const walletId = s3Service.levelhealth.walletId
     const trustedContacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contact )
@@ -1364,7 +1365,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     sharesArray.push( shard )
 
     if( sharesArray.length>1 ){
-      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, WALLET_SETUP.security.answer )
+      secondaryMnemonic = LevelHealth.getSecondaryMnemonics( sharesArray, wallet.security.answer )
     }
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )

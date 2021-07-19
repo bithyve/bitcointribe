@@ -57,7 +57,8 @@ import {
   TrustedContact,
   Trusted_Contacts,
   ChannelAssets,
-  TrustedContactRelationTypes
+  TrustedContactRelationTypes,
+  Wallet
 } from '../../bitcoin/utilities/Interface'
 import config from '../../bitcoin/HexaConfig'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
@@ -141,7 +142,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const [ contacts, setContacts ] = useState( [] )
-  const { WALLET_SETUP } = useSelector( ( state ) => state.storage.database )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const index = props.navigation.getParam( 'index' )
   const isChangeKeeperAllow = props.navigation.getParam( 'isChangeKeeperAllow' )
   const dispatch = useDispatch()
@@ -588,7 +589,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
       console.log( 'QR DATA', JSON.stringify( {
         type: QRCodeTypes.KEEPER_REQUEST,
         channelKey,
-        walletName: WALLET_SETUP.walletName,
+        walletName: wallet.walletName,
         secondaryChannelKey,
         version: appVersion,
       } ) )
@@ -596,7 +597,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         JSON.stringify( {
           type: selectedKeeper.shareType == 'existingContact' ? QRCodeTypes.EXISTING_CONTACT : QRCodeTypes.KEEPER_REQUEST,
           channelKey,
-          walletName: WALLET_SETUP.walletName,
+          walletName: wallet.walletName,
           secondaryChannelKey,
           version: appVersion,
         } ),
@@ -628,7 +629,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           contact={chosenContact ? chosenContact : null}
           contactEmail={''}
           infoText={`Click here to accept Keeper request for ${
-            WALLET_SETUP.walletName
+            wallet.walletName
           } Hexa wallet- link will expire in ${
             config.TC_REQUEST_EXPIRY / ( 60000 * 60 )
           } hours`}

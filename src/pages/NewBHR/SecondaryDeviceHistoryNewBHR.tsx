@@ -31,6 +31,7 @@ import {
   QRCodeTypes,
   TrustedContact,
   Trusted_Contacts,
+  Wallet,
 } from '../../bitcoin/utilities/Interface'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
@@ -87,7 +88,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
   const keeperProcessStatusFlag = useSelector( ( state ) => state.health.keeperProcessStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.health.errorSending )
   const approvalStatus = useSelector( ( state ) => state.health.approvalStatus )
-  const WALLET_SETUP = useSelector( ( state ) => state.storage.database.WALLET_SETUP )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const trustedContacts: Trusted_Contacts = useSelector( ( state ) => state.trustedContacts.contacts )
   const levelHealth:LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
   const currentLevel = useSelector( ( state ) => state.health.currentLevel )
@@ -202,7 +203,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         JSON.stringify( {
           type: QRCodeTypes.KEEPER_REQUEST,
           channelKey,
-          walletName: WALLET_SETUP.walletName,
+          walletName: wallet.walletName,
           secondaryChannelKey,
           version: appVersion,
         } ),
