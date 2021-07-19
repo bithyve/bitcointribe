@@ -93,7 +93,7 @@ export default function TrustedContactQr( props ) {
             <ActivityIndicator size="large" />
           </View>
         ) : (
-          <QRCode value={trustedContactQR} size={hp( '27%' )} />
+          <QRCode title="Keeper Request" value={trustedContactQR} size={hp( '27%' )} />
         )}
         <AppBottomSheetTouchableWrapper
           onPress={() => props.onPressOk()}
