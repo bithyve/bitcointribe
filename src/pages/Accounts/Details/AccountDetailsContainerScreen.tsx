@@ -42,6 +42,7 @@ import idx from 'idx'
 import Colors from '../../../common/Colors'
 import useAccountByAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../../components/home/ModalContainer'
+import { RootSiblingParent } from 'react-native-root-siblings'
 
 export type Props = {
   navigation: any;
@@ -335,7 +336,9 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
         {showKnowMoreSheet()}
       </ModalContainer>
       <ModalContainer visible={webView} closeBottomSheet={() => { showWebView( false ) }} >
-        {showDonationWebViewSheet()}
+        <RootSiblingParent>
+          {showDonationWebViewSheet()}
+        </RootSiblingParent>
       </ModalContainer>
     </>
   )

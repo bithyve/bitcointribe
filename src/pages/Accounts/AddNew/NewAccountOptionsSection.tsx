@@ -10,6 +10,7 @@ import ServiceAccountKind from '../../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import useAccountsState from '../../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import Toast from '../../../components/Toast'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 
 export interface Props {
   choices: SubAccountDescribing[];
@@ -37,7 +38,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
   function isSubAccountCreationSupported( subAccount: SubAccountDescribing ): boolean {
     switch ( subAccount.kind ) {
         case SubAccountKind.TEST_ACCOUNT:
-          return isServiceSubAccountCreationSupported( ( subAccount as ExternalServiceSubAccountInfo ).serviceAccountKind )
+          return true
         case SubAccountKind.REGULAR_ACCOUNT:
           return true
         case SubAccountKind.SECURE_ACCOUNT:
@@ -142,7 +143,7 @@ const NewAccountOptionsSection: React.FC<Props> = ( {
         data={choices}
         extraData={[ selectedChoice ]}
         renderItem={( { item: subAccountInfo }: { item: SubAccountDescribing } ) => {
-          const isDisabled = isSubAccountCreationSupported( subAccountInfo ) == false
+          const isDisabled = isSubAccountCreationSupported( subAccountInfo ) == false || subAccountInfo.visibility === AccountVisibility.HIDDEN
 
           return (
             <View style={styles.cardShadowContainer}>
