@@ -86,7 +86,8 @@ const PersonalCopyHistory = ( props ) => {
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
   const [ blockReshare, setBlockReshare ] = useState( '' )
   const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
-
+  const [ isChangeClicked, setIsChangeClicked ] = useState( false )
+  const [ ApprovePrimaryKeeperBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ personalCopyHistory, setPersonalCopyHistory ] = useState( historyArray )
   // const [
   //   PersonalCopyShareBottomSheet,
@@ -501,6 +502,7 @@ const PersonalCopyHistory = ( props ) => {
 
   const onPressChangeKeeperType = ( type, name ) => {
     const changeIndex = getIndex( levelHealth, type, selectedKeeper, keeperInfo )
+    setIsChangeClicked( false )
     if ( type == 'contact' ) {
       props.navigation.navigate( 'TrustedContactHistoryNewBHR', {
         ...props.navigation.state.params,
@@ -565,7 +567,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ){
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Swqe","channelId":"ee82c873208353a017789863e76ef585b20dab744e54f18b3b046fdaa48746ed","streamId":"0142fea8b","channelKey":"gkY6Nnf4fE3FgtjE1JWpXV2t","secondaryChannelKey":"HBzhoR9S7u9Fid6MRJwJPW13","version":"1.8.0","walletId":"8e49f3a86c991040dd9f3ae7b75f3561eefbf3c50ea773d3a8a35c6caab49a0b","encryptedKey":"ac10a94cc22a1bf5634648bf5b6a1af67d050d811a7d41f910d3f8e2fa98221c87574661d19e17de147f0609d5cb9651fd8a6ebc864b56012dc16b46a770883651e23a5b46f5861400e1edc45d28e031"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sa","channelId":"a85fd6227108147e408287250b904adfffa0a293fc61218ec26bba19502c2443","streamId":"99571ac29","channelKey":"zHYq0hQ0fPZGvhXePbOxxhKD","secondaryChannelKey":"UF9Dok3H9x9B9JW8ZsCNiANG","version":"1.8.0","walletId":"f6209e8810cb8306eb40d3059d61461b4c4b3192a999c4bb3fd6720675df04c6","encryptedKey":"4e2bf59de728383d723b84728fe34e002071de3d3f098a2bdeb2698b9669761e5e701d84a3c40556d22add022d5ce556724bee30b2f979502a63b89bdc3553745a890abf44daa526dedfd3b060baf96a"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {
@@ -573,7 +575,11 @@ const PersonalCopyHistory = ( props ) => {
             } )
             props.navigation.dispatch( popAction )
           } else {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sfsf","channelId":"fd237d38f5ae70cd3afdf6b6d497ff11515bc3ff39bfe6e26e05575c31f302d8","streamId":"2b014b778","secondaryChannelKey":"Mjs8x1vCLF5XuOWbAgU0oJq2","version":"1.7.5"}'
+            // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
+            setQRModal( false )
+            // setApprovePrimaryKeeperModal( true )
+            console.log( 'ELD' )
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
             dispatch( setApprovalStatus( false ) )
             dispatch( downloadSMShare( qrScannedData ) )
             setQrBottomSheetsFlag( false )
@@ -585,10 +591,10 @@ const PersonalCopyHistory = ( props ) => {
 
 
   useEffect( ()=>{
-    if( approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId ){
-      console.log( 'APPROVe' )
-      // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 );
-      setApprovePrimaryKeeperModal( true )
+    if( approvalStatus && isChangeClicked ){
+      console.log( 'APPROVe' );
+      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
+      // setApprovePrimaryKeeperModal( true )
       // ( QrBottomSheet as any ).current.snapTo( 0 )
       setQRModal( false )
     }
@@ -685,6 +691,7 @@ const PersonalCopyHistory = ( props ) => {
             setSelectedKeeperType( type )
             setSelectedKeeperName( name )
             sendApprovalRequestToPK( )
+            setIsChangeClicked( true )
           }}
           onPressBack={() => setKeeperTypeModal( false )}
           selectedLevelId={selectedLevelId}
@@ -694,16 +701,31 @@ const PersonalCopyHistory = ( props ) => {
       <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
         {renderQrContent()}
       </ModalContainer>
-      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={() => {}} >
-        <ApproveSetup
-          isContinueDisabled={false}
-          onPressContinue={() => {
-            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
-            // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            setApprovePrimaryKeeperModal( false )
-          }}
-        />
-      </ModalContainer>
+      <BottomSheet
+        enabledInnerScrolling={true}
+        ref={ApprovePrimaryKeeperBottomSheet as any}
+        snapPoints={[
+          -50,
+          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
+        ]}
+        renderContent={() => (
+          <ApproveSetup
+            isContinueDisabled={false}
+            onPressContinue={() => {
+              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
+              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
+              // setApprovePrimaryKeeperModal( false )
+            }}
+          /> )}
+        renderHeader={() => (
+          <SmallHeaderModal
+            onPressHeader={() => {
+              ( keeperTypeBottomSheet as any ).current.snapTo( 1 );
+              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
+            }}
+          />
+        )}
+      />
       <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>

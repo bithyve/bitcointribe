@@ -506,6 +506,7 @@ class ContactDetails extends PureComponent<
         walletId: contacts.unencryptedPermanentChannel[ instream.streamId ].primaryData.walletID
       } )
     }
+    console.log( 'Secondarey QR', qrString )
     this.setState( {
       trustedQR: qrString
     } );
