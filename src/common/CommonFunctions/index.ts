@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
+import { DeepLinkHintType, DeepLinkKind, LevelHealthInterface, LevelInfo, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import AccountShell from '../data/models/AccountShell'
 import { encrypt } from '../encryption'
@@ -7,6 +7,7 @@ import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import { Alert } from 'react-native'
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -264,6 +265,50 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
     else return levelHealthVar[ 0 ].levelInfo
   }
   return levelHealthVar[ currentLevel - 1 ].levelInfo
+}
+
+export const generateDeepLink = ( selectedContact: any, correspondingTrustedContact: TrustedContact, walletName: string ) => {
+  if ( selectedContact.phoneNumbers && selectedContact.phoneNumbers.length ){
+    const phoneNumber = selectedContact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    const numHintType = DeepLinkHintType.NUMBER
+    const numHint = number[ 0 ] + number.slice( number.length - 2 )
+    const numberEncChannelKey = TrustedContactsOperations.encryptData(
+      correspondingTrustedContact.channelKey,
+      number,
+    ).encryptedData
+
+    let deepLinkKind: DeepLinkKind
+    switch( correspondingTrustedContact.relationType ){
+        case TrustedContactRelationTypes.CONTACT:
+          deepLinkKind = DeepLinkKind.CONTACT
+          break
+
+        case TrustedContactRelationTypes.KEEPER:
+          deepLinkKind = DeepLinkKind.KEEPER
+          break
+
+        case TrustedContactRelationTypes.KEEPER_WARD:
+          deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
+          break
+    }
+
+    const appType = config.APP_STAGE
+    const appVersion = DeviceInfo.getVersion()
+
+    const deepLink =
+      `https://hexawallet.io
+      /${appType}
+      /${deepLinkKind}` +
+      `/${walletName}` +
+      `/${numberEncChannelKey}` +
+      `/${numHintType}` +
+      `/${numHint}` +
+      `/v${appVersion}`
+
+    return deepLink
+  }
 }
 
 export const processDL = async ( url ) =>{

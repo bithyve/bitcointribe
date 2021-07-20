@@ -21,61 +21,16 @@ import NavStyles from '../../common/Styles/NavStyles'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import SendViaLink from '../../components/SendViaLink'
-import { isEmpty } from '../../common/CommonFunctions'
+import { generateDeepLink, isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
-import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
-import { DeepLinkHintType, DeepLinkKind, QRCodeTypes, TrustedContact, TrustedContactRelationTypes, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
-
-export const generateDeepLink = ( selectedContact: any, correspondingTrustedContact: TrustedContact, walletName: string ) => {
-  if ( selectedContact.phoneNumbers && selectedContact.phoneNumbers.length ){
-    const phoneNumber = selectedContact.phoneNumbers[ 0 ].number
-    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-    number = number.slice( number.length - 10 ) // last 10 digits only
-    const numHintType = DeepLinkHintType.NUMBER
-    const numHint = number[ 0 ] + number.slice( number.length - 2 )
-    const numberEncChannelKey = TrustedContactsOperations.encryptData(
-      correspondingTrustedContact.channelKey,
-      number,
-    ).encryptedData
-
-    let deepLinkKind: DeepLinkKind
-    switch( correspondingTrustedContact.relationType ){
-        case TrustedContactRelationTypes.CONTACT:
-          deepLinkKind = DeepLinkKind.CONTACT
-          break
-
-        case TrustedContactRelationTypes.KEEPER:
-          deepLinkKind = DeepLinkKind.KEEPER
-          break
-
-        case TrustedContactRelationTypes.KEEPER_WARD:
-          deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
-          break
-    }
-
-    const appType = config.APP_STAGE
-    const appVersion = DeviceInfo.getVersion()
-
-    const deepLink =
-      `https://hexawallet.io
-      /${appType}
-      /${deepLinkKind}` +
-      `/${walletName}` +
-      `/${numberEncChannelKey}` +
-      `/${numHintType}` +
-      `/${numHint}` +
-      `/v${appVersion}`
-
-    return deepLink
-  }
-}
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
