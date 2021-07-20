@@ -881,6 +881,6 @@ export enum DeepLinkKind {
 }
 
 export enum DeepLinkHintType {
-  NUMBER = 'NUMBER',
+  NUMBER = 'NUM',
   OTP = 'OTP'
 }
