@@ -107,28 +107,12 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       <Text style={{
         ...styles.modalInfoText,
         marginTop: wp( 1.5 ),
-        marginBottom: wp( 5 ),
+        marginBottom: wp( 3 ),
       }}>{rampMessage}</Text>
     </View>
     <TouchableOpacity
       onPress={() => showDropdown( true )}
-      style={{
-        flexDirection: 'row',
-        marginLeft: wp( '3%' ),
-        // alignSelf: 'center',
-        width: wp( '90%' ),
-        height: hp( 9 ),
-        backgroundColor: Colors.white,
-        alignItems: 'center',
-        marginBottom: wp( 4 ),
-        borderRadius: wp( 2 ),
-        elevation: 10,
-        shadowColor: Colors.borderColor,
-        shadowOpacity: 10,
-        shadowOffset: {
-          width: 2, height: 2
-        },
-      }}>
+      style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -140,16 +124,16 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       </View>
 
       <ListItem.Content style={{
-        flex: 1,
+        height: wp( '14%' )
       }}>
         <ListItem.Subtitle
-          style={ListStyles.infoHeaderSubtitleText}
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            // alignSelf: 'flex-start'
+          } ]}
           numberOfLines={1}
         >
               Account Type
         </ListItem.Subtitle>
-
-
         <ListItem.Title
           style={styles.destinationTitleText}
           numberOfLines={1}
@@ -163,23 +147,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
     ) : null}
-    <View style={{
-      flexDirection: 'row',
-      marginLeft: wp( '3%' ),
-      // alignSelf: 'center',
-      width: wp( '90%' ),
-      height: hp( 9 ),
-      backgroundColor: Colors.white,
-      alignItems: 'center',
-      marginBottom: wp( 4 ),
-      borderRadius: wp( 2 ),
-      elevation: 10,
-      shadowColor: Colors.borderColor,
-      shadowOpacity: 10,
-      shadowOffset: {
-        width: 2, height: 2
-      },
-    }}>
+    <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -191,7 +159,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       </View>
 
       <ListItem.Content style={{
-        flex: 1,
+        height: wp( '14%' )
       }}>
         <ListItem.Subtitle
           style={ListStyles.infoHeaderSubtitleText}
@@ -206,27 +174,18 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         >
               Ramp Account
         </ListItem.Title>
+        <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
+          } ]}
+          numberOfLines={1}
+        >
+              Lorem ipsum dolor amet
+        </ListItem.Subtitle>
       </ListItem.Content>
     </View>
 
-    <View style={{
-      flexDirection: 'row',
-      // alignSelf: 'center',
-      marginLeft: wp( '3%' ),
-      // alignSelf: 'center',
-      width: wp( '90%' ),
-      height: hp( 9 ),
-      backgroundColor: Colors.white,
-      alignItems: 'center',
-      marginBottom: wp( 2 ),
-      borderRadius: wp( 2 ),
-      elevation: 10,
-      shadowColor: Colors.borderColor,
-      shadowOpacity: 10,
-      shadowOffset: {
-        width: 2, height: 2
-      },
-    }}>
+    <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -237,7 +196,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         </View>
       </View>
       <ListItem.Content style={{
-        flex: 1
+        height: wp( '14%' )
       }}>
         <ListItem.Subtitle
           style={ListStyles.infoHeaderSubtitleText}
@@ -252,11 +211,19 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         >
           {rampReceiveAddress}
         </ListItem.Title>
+        <ListItem.Subtitle
+          style={[ ListStyles.infoHeaderSubtitleText, {
+            alignSelf: 'baseline', color: Colors.blue, fontFamily: Fonts.FiraSansMediumItalic
+          } ]}
+          numberOfLines={1}
+        >
+              Lorem ipsum dolor amet
+        </ListItem.Subtitle>
       </ListItem.Content>
     </View>
 
     <View style={{
-      flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto', marginBottom: hp( '1%' )
+      flexDirection: 'column', alignItems: 'flex-start', marginTop: 'auto'
     }} >
       <AppBottomSheetTouchableWrapper
         disabled={rampFromBuyMenu ? hasButtonBeenPressed : false}
@@ -302,6 +269,23 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
 }
 
 const styles = StyleSheet.create( {
+  containerStyle: {
+    flexDirection: 'row',
+    marginLeft: wp( '3%' ),
+    // alignSelf: 'center',
+    width: wp( '90%' ),
+    height: hp( '11%' ),
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    marginBottom: wp( 4 ),
+    borderRadius: wp( 2 ),
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 10,
+    // shadowOffset: {
+    //   width: 2, height: 2
+    // },
+  },
   headerImageView: {
     width: wp( '15%' ),
     height: wp( '15%' ),
@@ -344,6 +328,8 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 20 ),
     color: Colors.black,
+    alignContent: 'center',
+    marginVertical: hp( 0.3 )
   },
   successModalHeaderView: {
     marginRight: wp( '10%' ),
@@ -367,12 +353,10 @@ const styles = StyleSheet.create( {
     lineHeight: 18
   },
   successModalButtonView: {
-    minHeight: 50,
-    minWidth: 144,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '43%' ),
+    width: wp( '36%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
