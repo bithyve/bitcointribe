@@ -112,23 +112,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     </View>
     <TouchableOpacity
       onPress={() => showDropdown( true )}
-      style={{
-        flexDirection: 'row',
-        marginLeft: wp( '3%' ),
-        // alignSelf: 'center',
-        width: wp( '90%' ),
-        height: hp( 9 ),
-        backgroundColor: Colors.white,
-        alignItems: 'center',
-        marginBottom: wp( 4 ),
-        borderRadius: wp( 2 ),
-        elevation: 10,
-        shadowColor: Colors.borderColor,
-        shadowOpacity: 10,
-        shadowOffset: {
-          width: 2, height: 2
-        },
-      }}>
+      style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -163,22 +147,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
     ) : null}
-    <View style={{
-      flexDirection: 'row',
-      alignSelf: 'center',
-      width: wp( '90%' ),
-      height: hp( 9 ),
-      backgroundColor: Colors.white,
-      alignItems: 'center',
-      marginBottom: wp( 4 ),
-      borderRadius: wp( 2 ),
-      elevation: 10,
-      shadowColor: Colors.borderColor,
-      shadowOpacity: 10,
-      shadowOffset: {
-        width: 2, height: 2
-      },
-    }}>
+    <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -207,23 +176,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       </ListItem.Content>
     </View>
 
-    <View style={{
-      flexDirection: 'row',
-      // marginLeft: wp( '1.5%' ),
-      alignSelf: 'center',
-      width: wp( '90%' ),
-      height: hp( 9 ),
-      backgroundColor: Colors.white,
-      alignItems: 'center',
-      marginBottom: wp( 2 ),
-      borderRadius: wp( 2 ),
-      elevation: 10,
-      shadowColor: Colors.borderColor,
-      shadowOpacity: 10,
-      shadowOffset: {
-        width: 2, height: 2
-      },
-    }}>
+    <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -253,7 +206,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     </View>
 
     <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start', marginBottom: hp( '1%' )
+      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start',
     }} >
       <AppBottomSheetTouchableWrapper
         disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
@@ -299,6 +252,23 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
 }
 
 const styles = StyleSheet.create( {
+  containerStyle: {
+    flexDirection: 'row',
+    marginLeft: wp( '3%' ),
+    // alignSelf: 'center',
+    width: wp( '90%' ),
+    height: hp( '11%' ),
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    marginBottom: wp( 2 ),
+    borderRadius: wp( 2 ),
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 10,
+    // shadowOffset: {
+    //   width: 2, height: 2
+    // },
+  },
   headerImageView: {
     width: wp( '15%' ),
     height: wp( '15%' ),
@@ -366,11 +336,11 @@ const styles = StyleSheet.create( {
   },
   successModalButtonView: {
     minHeight: 50,
-    minWidth: 144,
+    minWidth: 110,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '43%' ),
+    width: wp( '36%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,
