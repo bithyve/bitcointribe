@@ -1,4 +1,3 @@
-import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import React, { useCallback } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Button } from 'react-native-elements'
@@ -61,7 +60,6 @@ const HomeAccountCardsList: React.FC<Props> = ( {
   onEditModeChanged = ( _ ) => { },
 }: Props ) => {
   const accountShells = useActiveAccountShells()
-  const { present, dismiss } = useBottomSheetModal()
   const showAllAccount = useSelector( ( state ) => state.accounts.showAllAccount )
   function handleAccountReordering( orderedAccounts: AccountShell[] ) {}
   function handleGridCardLongPress() {

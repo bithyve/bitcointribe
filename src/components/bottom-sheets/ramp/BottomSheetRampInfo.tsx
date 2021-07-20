@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, StyleSheet, Text, Image, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native'
 import { useDispatch } from 'react-redux'
 import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
@@ -19,6 +19,7 @@ import useReceivingAddressFromAccount from '../../../utils/hooks/account-utils/U
 import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
 import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
+import DropDown from '../../../utils/Dropdown'
 
 type Props = {
   rampDeepLinkContent: string | null;
@@ -35,7 +36,15 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
   const wallet = useWallet()
   const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
   const rampReceiveAddress = useReceivingAddressFromAccount( AccountType.RAMP_ACCOUNT, pickReceiveAddressFrom )
-
+  const [ dropdown, showDropdown ] = useState( false )
+  const dropdownBoxList = [ {
+    id: 1,
+    type: AccountType.CHECKING_ACCOUNT
+  },
+  {
+    id: 2,
+    type: AccountType.DEPOSIT_ACCOUNT
+  } ]
   function handleProceedButtonPress() {
     if( !hasButtonBeenPressed && rampFromBuyMenu ){dispatch( fetchRampReservation() )}
     setHasButtonBeenPressed( true )
@@ -101,6 +110,59 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         marginBottom: wp( 5 ),
       }}>{rampMessage}</Text>
     </View>
+    <TouchableOpacity
+      onPress={() => showDropdown( true )}
+      style={{
+        flexDirection: 'row',
+        marginLeft: wp( '3%' ),
+        // alignSelf: 'center',
+        width: wp( '90%' ),
+        height: hp( 9 ),
+        backgroundColor: Colors.white,
+        alignItems: 'center',
+        marginBottom: wp( 4 ),
+        borderRadius: wp( 2 ),
+        elevation: 10,
+        shadowColor: Colors.borderColor,
+        shadowOpacity: 10,
+        shadowOffset: {
+          width: 2, height: 2
+        },
+      }}>
+      <View style={styles.headerImageView}>
+        <View style={styles.headerImageInitials}>
+          <Image
+            source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+            style={styles.headerImage}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
+
+      <ListItem.Content style={{
+        flex: 1,
+      }}>
+        <ListItem.Subtitle
+          style={ListStyles.infoHeaderSubtitleText}
+          numberOfLines={1}
+        >
+              Account Type
+        </ListItem.Subtitle>
+
+
+        <ListItem.Title
+          style={styles.destinationTitleText}
+          numberOfLines={1}
+        >
+          {pickReceiveAddressFrom}
+        </ListItem.Title>
+      </ListItem.Content>
+    </TouchableOpacity>
+    {dropdown ? (
+      <DropDown onClose={( value ) => { setPickReceiveAddressFrom( value.type )
+        showDropdown( false ) }}
+      dropdownBoxList={dropdownBoxList} />
+    ) : null}
     <View style={{
       flexDirection: 'row',
       marginLeft: wp( '3%' ),
