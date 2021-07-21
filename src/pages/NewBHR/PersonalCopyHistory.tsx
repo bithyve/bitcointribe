@@ -536,12 +536,10 @@ const PersonalCopyHistory = ( props ) => {
   const renderQrContent = () => {
     return (
       <QRModal
-        isFromKeeperDeviceHistory={false}
+        isFromKeeperDeviceHistory={true}
         QRModalHeader={'QR scanner'}
         title={'Note'}
-        infoText={
-          'Open your PDF copy and scan the first QR for approval.'
-        }
+        infoText={'Open your PDF copy and scan the first QR for approval.'}
         modalRef={QrBottomSheet}
         isOpenedFlag={QrBottomSheetsFlag}
         onQrScan={async( qrScannedData ) => {
@@ -567,7 +565,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ){
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sa","channelId":"a85fd6227108147e408287250b904adfffa0a293fc61218ec26bba19502c2443","streamId":"99571ac29","channelKey":"zHYq0hQ0fPZGvhXePbOxxhKD","secondaryChannelKey":"UF9Dok3H9x9B9JW8ZsCNiANG","version":"1.8.0","walletId":"f6209e8810cb8306eb40d3059d61461b4c4b3192a999c4bb3fd6720675df04c6","encryptedKey":"4e2bf59de728383d723b84728fe34e002071de3d3f098a2bdeb2698b9669761e5e701d84a3c40556d22add022d5ce556724bee30b2f979502a63b89bdc3553745a890abf44daa526dedfd3b060baf96a"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Tdfr","channelId":"5df0b46f32f67b3799a53754e4c64b87541842d231365e100ef3764d026342e8","streamId":"627398d36","channelKey":"A0nnrYGB1JMuBwE5ioNkbs6q","secondaryChannelKey":"zH2r23uf0HjAn0CNz82Vb9yL","version":"1.8.0","walletId":"5901c6f52244708653425e87155e20ded9f93f0382b36306ac60e46a2dc648c8","encryptedKey":"2a658026da48159cc698a1630acb696e79b8eaa7f0e25ddbd6ea4baa012df4c947dfc344c9a586a83d2261f149a8492294eca22af9f38e2ce18a947fe6fd4f79bb2b64c86b3a740dff4a702716577e38"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {

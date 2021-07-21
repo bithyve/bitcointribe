@@ -10,7 +10,6 @@ export const INIT_HEALTH_CHECK = 'INIT_HEALTH_CHECK'
 export const S3_LOADING_STATUS = 'S3_LOADING_STATUS'
 export const PREPARE_MSHARES = 'PREPARE_MSHARES'
 export const UPDATE_HEALTH = 'UPDATE_HEALTH'
-export const GET_HEALTH_OBJECT = 'GET_HEALTH_OBJECT'
 export const CHECK_SHARES_HEALTH = 'CHECK_SHARES_HEALTH'
 export const ERROR_SENDING = 'ERROR_SENDING'
 export const UPDATE_SHARES_HEALTH = 'UPDATE_SHARES_HEALTH'
@@ -94,10 +93,10 @@ export const initializeHealthSetup = () => {
   }
 }
 
-export const updateHealth = ( health, currentLevel ) => {
+export const updateHealth = ( health, currentLevel, location ) => {
   return {
     type: HEALTH_UPDATE, payload: {
-      health, currentLevel
+      health, currentLevel, location
     }
   }
 }
@@ -147,12 +146,6 @@ export const healthCheckInitialized = () => {
 export const prepareMShares = () => {
   return {
     type: PREPARE_MSHARES
-  }
-}
-
-export const getHealth = () => {
-  return {
-    type: GET_HEALTH_OBJECT
   }
 }
 
