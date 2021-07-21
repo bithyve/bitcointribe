@@ -266,6 +266,9 @@ export const WalletSchema: ObjectSchema = {
     walletId: {
       type: 'string', indexed: true
     },
+    walletName: {
+      type: 'string', optional: true,
+    },
     primaryMnemonic: {
       type: 'string', optional: true,
     },
