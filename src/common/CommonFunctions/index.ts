@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { LevelHealthInterface, LevelInfo } from '../../bitcoin/utilities/Interface'
+import { DeepLinkHintType, DeepLinkKind, LevelHealthInterface, LevelInfo, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import AccountShell from '../data/models/AccountShell'
 import { encrypt } from '../encryption'
@@ -7,6 +7,8 @@ import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import { Alert } from 'react-native'
 import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import Toast from '../../components/Toast'
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -266,37 +268,54 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
   return levelHealthVar[ currentLevel - 1 ].levelInfo
 }
 
-export const processDL = async ( url ) =>{
-  const splits = url.split( '/' )
+export const generateDeepLink = ( selectedContact: any, correspondingTrustedContact: TrustedContact, walletName: string ) => {
+  if ( selectedContact.phoneNumbers && selectedContact.phoneNumbers.length ){
+    const phoneNumber = selectedContact.phoneNumbers[ 0 ].number
+    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+    number = number.slice( number.length - 10 ) // last 10 digits only
+    const hintType = DeepLinkHintType.NUMBER
+    const hint = number[ 0 ] + number.slice( number.length - 2 )
+    const encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+      correspondingTrustedContact.channelKey + ';' + correspondingTrustedContact.secondaryChannelKey,
+      number
+    )
 
-  if ( splits.includes( 'swan' ) ) {
-    const swanRequest = {
-      url
+    let deepLinkKind: DeepLinkKind
+    switch( correspondingTrustedContact.relationType ){
+        case TrustedContactRelationTypes.CONTACT:
+          deepLinkKind = DeepLinkKind.CONTACT
+          break
+
+        case TrustedContactRelationTypes.KEEPER:
+          deepLinkKind = DeepLinkKind.KEEPER
+          break
+
+        case TrustedContactRelationTypes.KEEPER_WARD:
+          deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
+          break
     }
-    return {
-      swanRequest
-    }
+
+    const appType = config.APP_STAGE
+    const appVersion = DeviceInfo.getVersion()
+
+    const deepLink =
+      `https://hexawallet.io
+      /${appType}
+      /${deepLinkKind}` +
+      `/${walletName}` +
+      `/${encryptedChannelKeys}` +
+      `/${hintType}` +
+      `/${hint}` +
+      `/v${appVersion}`
+
+    return deepLink
   }
+}
 
-  if ( splits[ 5 ] === 'sss' ) {
-    const requester = splits[ 4 ]
+export const processDeepLink = async ( deepLink: string ) =>{
+  const splits = deepLink.split( '/' )
 
-    if ( splits[ 6 ] === 'ek' ) {
-      const custodyRequest = {
-        requester,
-        ek: splits[ 7 ],
-        uploadedAt: splits[ 8 ],
-      }
-      return custodyRequest
-    } else if ( splits[ 6 ] === 'rk' ) {
-      const recoveryRequest = {
-        requester, rk: splits[ 7 ]
-      }
-      return {
-        recoveryRequest
-      }
-    }
-  } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
+  if ( [ DeepLinkKind.CONTACT, DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ) ) {
     if ( splits[ 3 ] !== config.APP_STAGE ) {
       Alert.alert(
         'Invalid deeplink',
@@ -306,56 +325,86 @@ export const processDL = async ( url ) =>{
       )
     } else {
       const version = splits.pop().slice( 1 )
-
-      if ( version ) {
-        if ( !( await checkAppVersionCompatibility( {
-          relayCheckMethod: splits[ 4 ],
-          version,
-        } ) ) ) {
-          return
-        }
-      }
+      // disabled compatibility check
+      // if ( version ) {
+      //   if ( !( await checkAppVersionCompatibility( {
+      //     relayCheckMethod: splits[ 4 ],
+      //     version,
+      //   } ) ) ) {
+      //     return
+      //   }
+      // }
 
       const trustedContactRequest = {
-        isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-        approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-        isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
+        walletName: splits[ 5 ],
+        encryptedChannelKeys: splits[ 6 ],
+        isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
+        isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
         hintType: splits[ 7 ],
         hint: splits[ 8 ],
-        uploadedAt: splits[ 9 ],
+        isQR: false,
         version,
       }
       return {
         trustedContactRequest
       }
     }
-  } else if ( splits[ 4 ] === 'rk' ) {
-    const recoveryRequest = {
-      isRecovery: true,
-      requester: splits[ 5 ],
-      encryptedKey: splits[ 6 ],
-      hintType: splits[ 7 ],
-      hint: splits[ 8 ],
-    }
+  } else if ( splits.includes( 'swan' ) )
     return {
-      recoveryRequest
+      swanRequest: {
+        deepLink
+      }
     }
-  } else if ( splits[ 4 ] === 'rrk' ) {
-    Alert.alert(
-      'Restoration link Identified',
-      'Restoration links only works during restoration mode',
-    )
-  } else if ( url.includes( 'fastbitcoins' ) ) {
-    const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-    return {
-      userKey
+}
+
+export const processFriendsAndFamilyQR = async ( qrData: string ) => {
+  try {
+    const scannedData = JSON.parse( qrData )
+    // disabled check version compatibility
+    // if ( scannedData.version ) {
+    //   const isAppVersionCompatible = await checkAppVersionCompatibility( {
+    //     relayCheckMethod: scannedData.type,
+    //     version: scannedData.ver,
+    //   } )
+
+    //   if ( !isAppVersionCompatible ) {
+    //     return
+    //   }
+    // }
+
+    let trustedContactRequest
+    switch ( scannedData.type ) {
+        case QRCodeTypes.CONTACT_REQUEST:
+        case QRCodeTypes.KEEPER_REQUEST:
+          trustedContactRequest = {
+            walletName: scannedData.walletName,
+            channelKey: scannedData.channelKey,
+            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
+            isQR: true,
+            version: scannedData.version,
+            type: scannedData.type,
+            isExistingContact: false
+          }
+          break
+
+        case QRCodeTypes.EXISTING_CONTACT:
+          trustedContactRequest = {
+            walletName: scannedData.walletName,
+            channelKey: scannedData.channelKey,
+            contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
+            isKeeper: true,
+            isQR: true,
+            version: scannedData.version,
+            type: scannedData.type,
+            isExistingContact: true
+          }
+          break
     }
-  } else {
-    const EmailToken = url.substr( url.lastIndexOf( '/' ) + 1 )
-    return {
-      EmailToken
-    }
+
+    return trustedContactRequest
+  } catch ( err ) {
+    console.log( err )
+    Toast( 'Invalid QR code' )
   }
 }

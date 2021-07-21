@@ -48,7 +48,7 @@ import {
   rejectTrustedContact,
   syncPermanentChannels,
   PermanentChannelsSyncKind,
-  InitTrustedContactFlowKind,
+  InitTrustedContactFlowKind
 } from '../../store/actions/trustedContacts'
 import {
   updateFCMTokens,
@@ -66,7 +66,7 @@ import {
   updateLastSeen
 } from '../../store/actions/preferences'
 import {
-  getCurrencyImageByRegion,
+  getCurrencyImageByRegion, processDeepLink,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
@@ -153,6 +153,8 @@ import Header from '../../navigation/stacks/Header'
 import { NotificationType } from '../../components/home/NotificationType'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
 import ModalContainer from '../../components/home/ModalContainer'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import SSS from '../../bitcoin/utilities/sss/SSS'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -221,7 +223,7 @@ interface HomePropsTypes {
   navigation: any;
   notificationList: any;
   exchangeRates?: any[];
-  initializeTrustedContact,
+  initializeTrustedContact: any;
   accountsState: AccountsState;
   cloudPermissionGranted: any;
 
@@ -368,296 +370,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }, 500 )
 
     this.openBottomSheetOnLaunch( BottomSheetKind.NOTIFICATIONS_LIST )
-  };
-
-  processQRData = async ( qrData ) => {
-    const { accountsState, addTransferDetails, navigation } = this.props
-    console.log( {
-      qrData
-    } )
-    const network = Bitcoin.networkType( qrData )
-    if ( network ) {
-      const serviceType =
-        network === 'MAINNET' ? REGULAR_ACCOUNT : TEST_ACCOUNT // default service type
-
-      const service = accountsState[ serviceType ].service
-      const { type } = service.addressDiff( qrData )
-
-      if ( type ) {
-        let item
-
-        switch ( type ) {
-            case ScannedAddressKind.ADDRESS:
-              const recipientAddress = qrData
-
-              item = {
-                id: recipientAddress
-              }
-
-              addTransferDetails( serviceType, {
-                selectedContact: item,
-              } )
-
-              navigation.navigate( 'SendToContact', {
-                selectedContact: item,
-                serviceType,
-              } )
-              break
-
-            case ScannedAddressKind.PAYMENT_URI:
-              let address, options
-
-              try {
-                const res = service.decodePaymentURI( qrData )
-                address = res.address
-                options = res.options
-
-              } catch ( err ) {
-                Alert.alert( 'Unable to decode payment URI' )
-                return
-              }
-
-              item = {
-                id: address
-              }
-
-              addTransferDetails( serviceType, {
-                selectedContact: item,
-              } )
-
-              navigation.navigate( 'SendToContact', {
-                selectedContact: item,
-                serviceType,
-                bitcoinAmount: options.amount
-                  ? `${Math.round( options.amount * SATOSHIS_IN_BTC )}`
-                  : '',
-              } )
-              break
-        }
-      } else {
-        Toast( 'Invalid QR' )
-      }
-    }
-    try {
-      const scannedData = JSON.parse( qrData )
-
-      // check version compatibility
-      if ( scannedData.version ) {
-        const isAppVersionCompatible = await checkAppVersionCompatibility( {
-          relayCheckMethod: scannedData.type,
-          version: scannedData.ver,
-        } )
-
-        if ( !isAppVersionCompatible ) {
-          return
-        }
-      }
-
-      switch ( scannedData.type ) {
-          case QRCodeTypes.CONTACT_REQUEST:
-          case QRCodeTypes.KEEPER_REQUEST:
-            let trustedContactRequest = {
-              walletName: scannedData.walletName,
-              channelKey: scannedData.channelKey,
-              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
-              isKeeper: scannedData.type === QRCodeTypes.KEEPER_REQUEST,
-              isQR: true,
-              version: scannedData.version,
-              type: scannedData.type,
-              isExistingContact: false
-            }
-            console.log( {
-              trustedContactRequest
-            } )
-            this.setState( {
-              trustedContactRequest
-            },
-            () => {
-              this.openBottomSheetOnLaunch(
-                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                1
-              )
-            }
-            )
-            break
-
-          case QRCodeTypes.EXISTING_CONTACT:
-            trustedContactRequest = {
-              walletName: scannedData.walletName,
-              channelKey: scannedData.channelKey,
-              contactsSecondaryChannelKey: scannedData.secondaryChannelKey,
-              isKeeper: true,
-              isQR: true,
-              version: scannedData.version,
-              type: scannedData.type,
-              isExistingContact: true
-            }
-            console.log( {
-              trustedContactRequest
-            } )
-            this.setState( {
-              trustedContactRequest
-            },
-            () => {
-              this.openBottomSheetOnLaunch(
-                BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                1
-              )
-            }
-            )
-            break
-
-          case 'trustedGuardian':
-            const trustedGuardianRequest = {
-              isGuardian: scannedData.isGuardian,
-              approvedTC: scannedData.approvedTC,
-              requester: scannedData.requester,
-              publicKey: scannedData.publicKey,
-              info: scannedData.info,
-              uploadedAt: scannedData.uploadedAt,
-              type: scannedData.type,
-              isQR: true,
-              version: scannedData.ver,
-              isFromKeeper: scannedData.isFromKeeper
-                ? scannedData.isFromKeeper
-                : false,
-            }
-            this.setState(
-              {
-                secondaryDeviceOtp: trustedGuardianRequest,
-                trustedContactRequest: trustedGuardianRequest,
-                recoveryRequest: null,
-                isLoadContacts: true,
-              },
-              () => {
-                navigation.goBack()
-
-                this.openBottomSheetOnLaunch(
-                  BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1
-                )
-              }
-            )
-
-            break
-
-          case 'secondaryDeviceGuardian':
-            const secondaryDeviceGuardianRequest = {
-              isGuardian: scannedData.isGuardian,
-              requester: scannedData.requester,
-              publicKey: scannedData.publicKey,
-              info: scannedData.info,
-              uploadedAt: scannedData.uploadedAt,
-              type: scannedData.type,
-              isQR: true,
-              version: scannedData.ver,
-              isFromKeeper: true,
-            }
-
-            this.setState(
-              {
-                secondaryDeviceOtp: secondaryDeviceGuardianRequest,
-                trustedContactRequest: secondaryDeviceGuardianRequest,
-                recoveryRequest: null,
-              },
-              () => {
-                this.openBottomSheetOnLaunch(
-                  BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1
-                )
-              }
-            )
-
-            break
-
-          case 'trustedContactQR':
-            const tcRequest = {
-              requester: scannedData.requester,
-              publicKey: scannedData.publicKey,
-              info: scannedData.info,
-              type: scannedData.type,
-              isQR: true,
-              version: scannedData.ver,
-            }
-
-            this.setState(
-              {
-                secondaryDeviceOtp: tcRequest,
-                trustedContactRequest: tcRequest,
-                recoveryRequest: null,
-              },
-              () => {
-                this.openBottomSheetOnLaunch(
-                  BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1
-                )
-              }
-            )
-
-            break
-
-          case 'paymentTrustedContactQR':
-            const paymentTCRequest = {
-              isPaymentRequest: true,
-              requester: scannedData.requester,
-              publicKey: scannedData.publicKey,
-              info: scannedData.info,
-              type: scannedData.type,
-              isQR: true,
-              version: scannedData.ver,
-            }
-
-            this.setState(
-              {
-                secondaryDeviceOtp: paymentTCRequest,
-                trustedContactRequest: paymentTCRequest,
-                recoveryRequest: null,
-              },
-              () => {
-                this.openBottomSheetOnLaunch(
-                  BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1
-                )
-              }
-            )
-
-            break
-
-          case 'recoveryQR':
-            const recoveryRequest = {
-              isRecovery: true,
-              requester: scannedData.requester,
-              publicKey: scannedData.KEY,
-              isQR: true,
-            }
-            this.setState(
-              {
-                recoveryRequest: recoveryRequest,
-                trustedContactRequest: null,
-              },
-              () => {
-                this.openBottomSheetOnLaunch(
-                  BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-                  1
-                )
-              }
-            )
-            break
-
-          case 'ReverseRecoveryQR':
-            Alert.alert(
-              'Restoration QR Identified',
-              'Restoration QR only works during restoration mode'
-            )
-            break
-
-          default:
-            break
-      }
-    } catch ( err ) {
-      console.log( err )
-      Toast( 'Invalid QR' )
-    }
   };
 
   localNotification = async ( notificationDetails ) => {
@@ -1071,210 +783,42 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    console.log( 'Home::handleDeepLinkEvent::URL: ', url )
-
     const { navigation, isFocused } = this.props
-
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
-    if ( !isFocused ) {
+    if ( !isFocused )
       navigation.dispatch(
         resetToHomeAction( {
           unhandledDeepLinkURL: url,
         } )
       )
-    } else {
-      this.handleDeepLinking( url )
-    }
-
+    else this.handleDeepLinking( url )
   };
 
-  handleDeepLinking = async ( url: string | null ) => {
-    if ( url == null ) {
-      return
+  handleDeepLinking = async ( url ) => {
+    if ( url === null ) return
+    const { trustedContactRequest, swanRequest } = await processDeepLink( url )
+    if( trustedContactRequest ){
+      this.setState( {
+        trustedContactRequest
+      },
+      () => {
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+          1
+        )
+      }
+      )
     }
-
-    console.log( 'handleDeepLinking: ' + url )
-
-    const splits = url.split( '/' )
-    if ( splits.includes( 'swan' ) ) {
+    else if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
         this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
-
     }
-
-    if ( splits.includes( 'wyre' ) ) {
-      this.props.clearWyreCache()
-      this.setState( {
-        wyreDeepLinkContent:url,
-        wyreFromBuyMenu: false,
-        wyreFromDeepLink: true
-      }, () => {
-        this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-      } )
-    }
-    if ( splits.includes( 'ramp' ) ) {
-      this.props.clearRampCache()
-      this.setState( {
-        rampDeepLinkContent:url,
-        rampFromBuyMenu: false,
-        rampFromDeepLink: true
-      }, () => {
-        this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
-      } )
-    }
-    if ( splits[ 5 ] === 'sss' ) {
-      const requester = splits[ 4 ]
-
-      if ( splits[ 6 ] === 'ek' ) {
-        const custodyRequest = {
-          requester,
-          ek: splits[ 7 ],
-          uploadedAt: splits[ 8 ],
-        }
-
-        this.setState(
-          {
-            custodyRequest,
-          },
-          () => {
-            this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-          }
-        )
-      } else if ( splits[ 6 ] === 'rk' ) {
-        const recoveryRequest = {
-          requester,
-          rk: splits[ 7 ],
-        }
-
-        this.setState(
-          {
-            recoveryRequest,
-            trustedContactRequest: null,
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
-          }
-        )
-      }
-    } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
-      if ( splits[ 3 ] !== config.APP_STAGE ) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
-          }`
-        )
-      } else {
-        const version = splits.pop().slice( 1 )
-
-        if ( version ) {
-          const isAppVersionCompatible = await checkAppVersionCompatibility( {
-            relayCheckMethod: splits[ 4 ],
-            version,
-          } )
-
-          if ( !isAppVersionCompatible ) {
-            return
-          }
-        }
-        let hint = splits[ 8 ]
-        let isFromKeeper = false
-        if ( splits[ 8 ].includes( '_' ) ) {
-          const hintStr = splits[ 8 ].split( '_' )
-          hint = hintStr[ 0 ]
-          isFromKeeper = hintStr[ 1 ] == 'keeper' ? true : false
-        }
-
-        const trustedContactRequest = {
-          isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-          approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-          isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-          requester: splits[ 5 ],
-          encryptedKey: splits[ 6 ],
-          hintType: splits[ 7 ],
-          hint,
-          uploadedAt: splits[ 9 ],
-          version,
-          isFromKeeper,
-        }
-
-        this.setState(
-          {
-            trustedContactRequest,
-            recoveryRequest: null,
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
-          }
-        )
-      }
-    } else if ( splits[ 4 ] === 'rk' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-      }
-
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest: null,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( splits[ 4 ] === 'scns' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-        isPrimaryKeeperRecovery: true,
-      }
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest: null,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( splits[ 4 ] === 'rrk' ) {
-      Alert.alert(
-        'Restoration link Identified',
-        'Restoration links only works during restoration mode'
-      )
-    }
-
-    if ( url && url.includes( 'fastbitcoins' ) ) {
-      const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-      this.props.navigation.navigate( 'VoucherScanner', {
-        userKey
-      } )
-    }
-  };
+  }
 
   setUpFocusListener = () => {
     const t0 = performance.now()
@@ -1413,6 +957,50 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     )
   };
 
+  onTrustedContactRequestAccepted = ( key ) => {
+    this.closeBottomSheet()
+    const { navigation } = this.props
+    const { trustedContactRequest } = this.state
+    if( !trustedContactRequest.isQR ){
+      try{
+        const channelKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+        const channelKeysArray = channelKeys.split( ';' )
+        trustedContactRequest.channelKey = channelKeysArray[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeysArray[ 1 ]
+      } catch( err ){
+        Toast( 'Invalid key' )
+        return
+      }
+    }
+
+    if( trustedContactRequest.isExistingContact ){
+      this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
+    } else {
+      navigation.navigate( 'ContactsListForAssociateContact', {
+        postAssociation: ( contact ) => {
+          this.props.initializeTrustedContact( {
+            contact,
+            flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
+            channelKey: trustedContactRequest.channelKey,
+            contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
+          } )
+          // TODO: navigate post approval (from within saga)
+          navigation.navigate( 'Home' )
+        }
+      } )
+    }
+  };
+
+  onTrustedContactRejected = () => {
+    this.closeBottomSheet()
+    const { trustedContactRequest } = this.state
+    this.props.rejectTrustedContact( {
+      channelKey: trustedContactRequest.channelKey,
+    } )
+  };
+
+  onPhoneNumberChange = () => {};
+
   onBottomSheetClosed() {
     this.setState( {
       bottomSheetState: BottomSheetState.Closed,
@@ -1542,38 +1130,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
   }
 
-  onTrustedContactRequestAccepted = ( key ) => {
-    this.closeBottomSheet()
-    const { navigation } = this.props
-    const { trustedContactRequest } = this.state
-    if( trustedContactRequest.isExistingContact ){
-      this.props.acceptExistingContactRequest( trustedContactRequest.channelKey, trustedContactRequest.contactsSecondaryChannelKey )
-    } else {
-      navigation.navigate( 'ContactsListForAssociateContact', {
-        postAssociation: ( contact ) => {
-          this.props.initializeTrustedContact( {
-            contact,
-            flowKind: InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT,
-            channelKey: trustedContactRequest.channelKey,
-            contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
-          } )
-          // TODO: navigate post approval (from within saga)
-          navigation.navigate( 'Home' )
-        }
-      } )
-    }
-  };
-
-  onTrustedContactRejected = () => {
-    this.closeBottomSheet()
-    const { trustedContactRequest } = this.state
-    this.props.rejectTrustedContact( {
-      channelKey: trustedContactRequest.channelKey,
-    } )
-  };
-
-  onPhoneNumberChange = () => {};
-
   renderBottomSheetContent() {
     const { UNDER_CUSTODY, navigation } = this.props
     const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
@@ -1674,6 +1230,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
+          const { trustedContactRequest } = this.state
+
+          return (
+            <TrustedContactRequestContent
+              trustedContactRequest={trustedContactRequest}
+              onPressAccept={this.onTrustedContactRequestAccepted}
+              onPressReject={this.onTrustedContactRejected}
+              onPhoneNumberChange={this.onPhoneNumberChange}
+              bottomSheetRef={this.bottomSheetRef}
+            />
+          )
+
         case BottomSheetKind.NOTIFICATIONS_LIST:
           return (
             <NotificationListContent
@@ -1765,18 +1334,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
-        case BottomSheetKind.TRUSTED_CONTACT_REQUEST:
-          const { trustedContactRequest } = this.state
-
-          return (
-            <TrustedContactRequestContent
-              trustedContactRequest={trustedContactRequest}
-              onPressAccept={this.onTrustedContactRequestAccepted}
-              onPressReject={this.onTrustedContactRejected}
-              onPhoneNumberChange={this.onPhoneNumberChange}
-              bottomSheetRef={this.bottomSheetRef}
-            />
-          )
 
         case BottomSheetKind.NOTIFICATION_INFO:
           return (

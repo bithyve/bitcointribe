@@ -8,7 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   getMessages,
 } from '../../store/actions/notifications'
-import { processDL } from '../../common/CommonFunctions'
+import { processDeepLink } from '../../common/CommonFunctions'
 
 interface IntermediatePropsTypes {
   initializeDB: any;
@@ -98,14 +98,11 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
                 screen: 'Home',
               } )
             } else {
-              const requestName = await processDL( this.url )
+              const requestName = await processDeepLink( this.url )
               this.props.navigation.replace( 'Home', {
                 screen: 'Home',
                 params: {
-                  custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                  recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
                   trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                  userKey: requestName && requestName.userKey ? requestName.userKey : null,
                   swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
                 }
               } )
@@ -113,12 +110,9 @@ class Intermediate extends Component<IntermediatePropsTypes, IntermediateStateTy
           } else if ( !this.url ){
             this.props.navigation.replace( 'Login' )
           } else {
-            const requestName = await processDL( this.url )
+            const requestName = await processDeepLink( this.url )
             this.props.navigation.replace( 'Login', {
-              custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-              recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
               trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-              userKey: requestName && requestName.userKey ? requestName.userKey : null,
               swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
             } )
           }

@@ -1,6 +1,7 @@
 import React from 'react'
 import TrustedContactRequest from '../Contacts/TrustedContactRequest'
 import BottomSheet from '@gorhom/bottom-sheet'
+import { DeepLinkHintType } from '../../bitcoin/utilities/Interface'
 
 export interface Props {
   bottomSheetRef: React.RefObject<BottomSheet>;
@@ -24,7 +25,7 @@ const TrustedContactRequestContent: React.FC<Props> = ( {
     <TrustedContactRequest
       isQR={isQR}
       inputType={
-        hintType === 'num' ? 'phone' : hintType === 'eml' ? 'email' : null
+        hintType === DeepLinkHintType.NUMBER ? 'phone' : hintType === DeepLinkHintType.OTP ? 'email' : null
       }
       isGuardian={isKeeper}
       isRecovery={false}

@@ -21,7 +21,7 @@ import {
 } from 'react-native-responsive-screen'
 import { connect } from 'react-redux'
 import idx from 'idx'
-import { processDL } from '../common/CommonFunctions'
+import { processDeepLink } from '../common/CommonFunctions'
 import {
   getMessages,
 } from '../store/actions/notifications'
@@ -112,14 +112,11 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
               screen: 'Home',
             } )
           } else {
-            const requestName = await processDL( this.url )
+            const requestName = await processDeepLink( this.url )
             this.props.navigation.replace( 'Home', {
               screen: 'Home',
               params: {
-                custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-                recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
                 trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-                userKey: requestName && requestName.userKey ? requestName.userKey : null,
                 swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
               }
             } )
@@ -127,12 +124,9 @@ class Launch extends Component<LaunchScreenProps, LaunchScreenState> {
         } else if ( !this.url ){
           this.props.navigation.replace( 'Login' )
         } else {
-          const requestName = await processDL( this.url )
+          const requestName = await processDeepLink( this.url )
           this.props.navigation.replace( 'Login', {
-            custodyRequest: requestName && requestName.custodyRequest ? requestName.custodyRequest : null,
-            recoveryRequest: requestName && requestName.recoveryRequest ? requestName.recoveryRequest : null,
             trustedContactRequest: requestName && requestName.trustedContactRequest ? requestName.trustedContactRequest : null,
-            userKey: requestName && requestName.userKey ? requestName.userKey : null,
             swanRequest: requestName && requestName.swanRequest ? requestName.swanRequest : null,
           } )
         }
