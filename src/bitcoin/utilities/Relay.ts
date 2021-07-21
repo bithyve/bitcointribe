@@ -281,7 +281,7 @@ export default class Relay {
     }
   };
 
-  public updateWalletImage = async (
+  public static updateWalletImage = async (
     walletImage: NewWalletImage,
   ): Promise<{
     updated: boolean;
@@ -292,7 +292,7 @@ export default class Relay {
         walletID: walletImage.walletId,
         walletImage,
       } )
-
+      console.log( 'updateWalletImage', res.data )
       const { updated } = res.data
       return {
         updated
@@ -302,7 +302,7 @@ export default class Relay {
     }
   };
 
-  public fetchWalletImage = async ( walletId: string ): Promise<{
+  public static fetchWalletImage = async ( walletId: string ): Promise<{
     walletImage: NewWalletImage;
   }> => {
     try {

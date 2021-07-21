@@ -101,26 +101,22 @@ const updateContact = async ( contact ) => {
   }
 }
 
-const getWallets = () => {
+const getWallet = () => {
   const walletsRef = db.objects( schema.Wallet )
   const wallets = Array.from( walletsRef )
-  console.log( 'wallets',  JSON.stringify( wallets ) )
-  return wallets
+  return wallets[ 0 ]
 }
 
 const getTrustedContacts = () => {
   const rrustedContactRef = db.objects( schema.TrustedContact )
   const contacts = Array.from( rrustedContactRef )
-  console.log( 'getTrustedContacts',  JSON.stringify( contacts ) )
   return contacts
-
 }
 
 const getAccounts = () => {
   try {
     const accountsRef = db.objects( schema.Account )
     const accounts = Array.from( accountsRef )
-    console.log( 'accounts',  JSON.stringify( accounts ) )
     return accounts
   } catch ( error ) {
     console.log( error )
@@ -130,7 +126,7 @@ const getAccounts = () => {
 export default {
   initDb,
   createWallet,
-  getWallets,
+  getWallet,
   getAccounts,
   createAccounts,
   createAccount,
