@@ -7,6 +7,8 @@ import {
   Platform,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import FontAwesome from 'react-native-vector-icons/FontAwesome'
+
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -16,7 +18,7 @@ import {
 } from 'react-native-responsive-screen'
 import { AppBottomSheetTouchableWrapper } from '../../components/AppBottomSheetTouchableWrapper'
 import { useSelector } from 'react-redux'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -76,6 +78,20 @@ function SecurityQuestion( props ) {
       style={{
         ...styles.modalContentContainer
       }}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={props.onClose}
+        style={{
+          width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
+          alignSelf: 'flex-end',
+          backgroundColor: Colors.lightBlue, alignItems: 'center', justifyContent: 'center',
+          marginTop: wp( 3 ), marginRight: wp( 3 )
+        }}
+      >
+        <FontAwesome name="close" color={Colors.white} size={19} style={{
+          // marginTop: hp( 0.5 )
+        }} />
+      </TouchableOpacity>
       <View style={styles.modalContentContainer}>
         <View>
           <View style={{

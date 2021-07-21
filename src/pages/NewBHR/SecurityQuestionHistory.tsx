@@ -91,6 +91,7 @@ const SecurityQuestionHistory = ( props ) => {
   const renderSecurityQuestionContent = useCallback( () => {
     return (
       <SecurityQuestion
+        onClose={() => showQuestionModal( false )}
         onPressConfirm={async () => {
           Keyboard.dismiss()
           saveConfirmationHistory()

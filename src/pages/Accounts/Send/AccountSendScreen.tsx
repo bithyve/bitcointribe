@@ -1,6 +1,6 @@
 import React, { ReactElement, useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { heightPercentageToDP } from 'react-native-responsive-screen'
+import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
 import { RFValue } from 'react-native-responsive-fontsize'
 import HeadingStyles from '../../../common/Styles/HeadingStyles'
 import BottomInfoBox from '../../../components/BottomInfoBox'
@@ -97,7 +97,8 @@ const AccountSendScreen: React.FC<Props> = ( {
               <View style={styles.viewSectionContainer}>
                 <RecipientAddressTextInputSection
                   containerStyle={{
-                    ...styles.viewSectionContentContainer, margin: 0
+                    width: widthPercentageToDP( 95 ),
+                    alignSelf: 'center'
                   }}
                   placeholder="Enter address manually"
                   accountShell={accountShell}
@@ -192,7 +193,7 @@ const styles = StyleSheet.create( {
   },
 
   viewSectionContentContainer: {
-    paddingHorizontal: 22,
+    paddingHorizontal: 20,
   },
 
   listSectionHeading: {
@@ -203,8 +204,8 @@ const styles = StyleSheet.create( {
   },
 
   qrScannerContainer: {
-    width: '100%',
-    maxWidth: qrScannerHeight * ( 1.31 ),
+    // width: '100%',
+    // maxWidth: qrScannerHeight * ( 1.40 ),
     height: qrScannerHeight,
     marginBottom: 9,
   },

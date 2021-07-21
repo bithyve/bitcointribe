@@ -527,7 +527,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   : 'visible-password'
               }
               onChangeText={( text ) => {
-                setPswd( text )
+                setPswd( text.toLowerCase() )
                 setPswdMasked( text )
                 // setPswdError( '' )
               }}
