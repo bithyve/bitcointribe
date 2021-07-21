@@ -72,7 +72,7 @@ export default function useNewAccountChoices() {
       } ),
       new DonationSubAccountInfo( {
         defaultTitle: 'Donation Account',
-        defaultDescription: 'Accept donations',
+        defaultDescription: 'Receive bitcoin donations',
         doneeName: '',
         causeName: '',
       } ),
@@ -103,21 +103,21 @@ export default function useNewAccountChoices() {
       new ExternalServiceSubAccountInfo( {
         instanceNumber: 1,
         defaultTitle: 'F&F Account',
-        defaultDescription: 'Multi-sig Vault with a co-signer',
+        defaultDescription: 'Account for your contacts',
         serviceAccountKind: ServiceAccountKind.FNF_ACCOUNT,
         type: AccountType.FNF_ACCOUNT, // TODO: assign appropriate type once activated
       } ),
       new ExternalServiceSubAccountInfo( {
         instanceNumber: 1,
         defaultTitle: 'Joint Account',
-        defaultDescription: 'Multi-sig Vault with a co-signer',
+        defaultDescription: 'MultiSig account with a contact',
         serviceAccountKind: ServiceAccountKind.JOINT_ACCOUNT,
         type: AccountType.SWAN_ACCOUNT, // TODO: assign appropriate type once activated
       } ),
       new ExternalServiceSubAccountInfo( {
         instanceNumber: 1,
         defaultTitle: 'Community Account',
-        defaultDescription: 'Multi-sig Vault with a co-signer',
+        defaultDescription: 'MultiSig Account for a group',
         serviceAccountKind: ServiceAccountKind.COMMUNITY_ACCOUNT,
         type: AccountType.FNF_ACCOUNT, // TODO: assign appropriate type once activated
       } ),

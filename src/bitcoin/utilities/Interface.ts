@@ -5,6 +5,7 @@ import {
 } from '../../common/interfaces/Interfaces'
 import { networks } from 'bitcoinjs-lib'
 import { InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
 export interface InputUTXOs {
   txId: string;
@@ -812,6 +813,7 @@ export interface Account {
   xpriv: string | null,                 // account's xpriv (null for multi-sig accounts)
   accountName: string,                  // name of the account
   accountDescription: string,           // description of the account
+  accountVisibility: AccountVisibility, // visibility of the account
   activeAddresses: string[],            // addresses used(to be synched during soft refresh)
   receivingAddress: string,             // current external address
   nextFreeAddressIndex: number;         // external-chain free address marker
@@ -872,4 +874,15 @@ export enum AccountType {
 
 export interface Accounts {
     [accountId: string]: Account | MultiSigAccount | DonationAccount
+}
+
+export enum DeepLinkKind {
+  CONTACT = 'CONTACT',
+  KEEPER = 'KEEPER',
+  RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
+}
+
+export enum DeepLinkHintType {
+  NUMBER = 'NUM',
+  OTP = 'OTP'
 }

@@ -7,7 +7,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import ButtonBlue from '../../../components/ButtonBlue'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import Colors from '../../../common/Colors'
@@ -26,7 +26,7 @@ export type Props = {
 const HeaderSection: React.FC = () => {
   return (
     <View style={ListStyles.infoHeaderSection}>
-      <Text style={ListStyles.infoHeaderSubtitleText}>Choose when and if you want this Account to appear on your Home Screen</Text>
+      <Text style={ListStyles.infoHeaderSubtitleText}>Choose when and if you want this account to appear on your Home Screen</Text>
     </View>
   )
 }
@@ -42,8 +42,12 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   }
 
   function handleSaveButtonPress() {
-    primarySubAccount.visibility = selectedVisibility
-    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    const settings = {
+      visibility: selectedVisibility
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
     navigation.navigate( 'Home' )
   }
 

@@ -48,6 +48,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
+import { updateWalletImageHealth } from '../actions/health'
 
 function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
@@ -192,6 +193,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
       for ( const [ key, value ] of Object.entries( updatedContacts ) ) {
         dbManager.updateContact( value )
       }
+      yield put( updateWalletImageHealth() )
 
       if( permanentChannelsSyncKind === PermanentChannelsSyncKind.SUPPLIED_CONTACTS && flowKind === InitTrustedContactFlowKind.APPROVE_TRUSTED_CONTACT ){
         const contact: TrustedContact = updatedContacts[ contactIdentifier ]
@@ -418,6 +420,8 @@ function* editTrustedContactWorker( { payload }: { payload: { channelKey: string
   }
   yield put( updateTrustedContacts( updatedContacts ) )
   dbManager.updateContact( contactToUpdate )
+  yield put( updateWalletImageHealth() )
+
 }
 
 export const editTrustedContactWatcher = createWatcher(

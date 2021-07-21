@@ -29,12 +29,14 @@ import BottomSheetSwanInfo from '../bottom-sheets/swan/BottomSheetSwanInfo'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import { useDispatch } from 'react-redux'
 import { clearSwanCache, updateSwanStatus } from '../../store/actions/SwanIntegration'
+import { withNavigation } from 'react-navigation'
 
 export type Props = {
   accountShell: AccountShell;
   onKnowMorePressed: () => void;
   onSettingsPressed: () => void;
   swanDeepLinkContent: string | null;
+  navigation: any
 };
 
 function backgroundImageForAccountKind(
@@ -92,6 +94,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
   onKnowMorePressed,
   onSettingsPressed,
   swanDeepLinkContent,
+  navigation
 }: Props ) => {
   const primarySubAccount = usePrimarySubAccountForShell( accountShell )
   const [ swanModal, showSwanModal ] = useState( false )
@@ -111,7 +114,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
       else {
         dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
       }
-      showSwanModal( true )
+      setTimeout( () => {
+        showSwanModal( true )
+      }, 600 )
+
     }
   }, [] )
 
@@ -231,7 +237,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           onClickSetting={() => {
             showSwanModal( false )
           }}
-          onPress={() => showSwanModal( false )}
+          onPress={() => {showSwanModal( false ); navigation.pop()}}
         />
       </ModalContainer>
       <ImageBackground
@@ -345,4 +351,4 @@ const styles = StyleSheet.create( {
   },
 } )
 
-export default AccountDetailsCard
+export default withNavigation( AccountDetailsCard )

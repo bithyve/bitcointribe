@@ -183,7 +183,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           contentContainerStyle={{
             paddingVertical: 25
           }}
-          ListFooterComponent={<ListFooter />}
+          // ListFooterComponent={<ListFooter />}
           extraData={[ selectedChoice ]}
           sections={[
             {
@@ -236,6 +236,7 @@ const NewAccountSelectionContainerScreen: React.FC<Props> = ( { navigation }: Pr
           renderSectionHeader={renderSectionHeader}
           stickySectionHeadersEnabled={false}
         ></SectionList>
+        {<ListFooter />}
       </View>
     </SafeAreaView>
   )
@@ -257,8 +258,8 @@ const styles = StyleSheet.create( {
   },
 
   listFooterSection: {
-    paddingHorizontal: 30,
-    paddingBottom: 40,
+    paddingHorizontal: wp( 5 ),
+    paddingBottom: hp( 1 ),
     alignItems: 'flex-start',
   },
 } )

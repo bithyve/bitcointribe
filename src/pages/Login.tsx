@@ -31,7 +31,7 @@ import ModalHeader from '../components/ModalHeader'
 import { initMigration, updateLastSeen } from '../store/actions/preferences'
 import openLink from '../utils/OpenLink'
 import content from '../common/content'
-import { processDL } from '../common/CommonFunctions'
+import { processDeepLink } from '../common/CommonFunctions'
 import ModalContainer from '../components/home/ModalContainer'
 import firebase from '@react-native-firebase/app'
 import {
@@ -160,7 +160,7 @@ export default function Login( props ) {
       return
     }
     setCreationFlag( true )
-    const requestName = await processDL( url )
+    const requestName = await processDeepLink( url )
     setRequestName( requestName )
   }
 

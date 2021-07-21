@@ -92,7 +92,7 @@ const loaderMessages = [
   },
   {
     heading: 'Level 1 - Automated Cloud Backup',
-    text: 'Allow Hexa to automatically backup your wallet to your cloud storage and we’ll ensure you easily recover your wallet in case your phone gets lost',
+    text: 'Allow Hexa to automatically backup your wallet to your cloud storage. It ensures you can easily recover your wallet in case your phone gets lost',
     subText: '',
   },
   {
@@ -1245,7 +1245,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
               mainText={'Use your own encryption password'}
-              subText={'Choose any password. Make sure you remember and keep it safe'}
+              subText={'Choose any password. Keep it safe'}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
@@ -1269,7 +1269,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the '}
+            infoText={'Backup lets you restore your wallet even if you lose your phone. Manage from '}
             italicText={'Security Centre'}
             backgroundColor={Colors.white}
           />

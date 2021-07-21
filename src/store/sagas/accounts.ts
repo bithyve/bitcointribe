@@ -34,7 +34,13 @@ import {
   updateAccountShells,
   getTestcoins,
   refreshAccountShell,
+  UPDATE_ACCOUNT_SETTINGS,
+  accountSettingsUpdated,
+  accountSettingsUpdateFailed,
 } from '../actions/accounts'
+import {
+  updateWalletImageHealth
+} from '../actions/health'
 import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
@@ -78,6 +84,7 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
 
 function* syncAccountsWorker( { payload }: {payload: {
@@ -320,9 +327,9 @@ function* refreshAccountShellWorker( { payload } ) {
     accounts: synchedAccounts
   } ) )
 
-  Object.values( synchedAccounts ).forEach( ( synchedAcc: Account | MultiSigAccount )=> {
-    accounts[ synchedAcc.id ] = synchedAcc
-  } )
+  for( const synchedAcc of synchedAccounts ){
+    yield call( dbManager.updateAccount, synchedAcc.id, synchedAcc )
+  }
 
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {
@@ -333,7 +340,6 @@ function* refreshAccountShellWorker( { payload } ) {
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
 
-  // TODO: insert into Realm database
   yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
@@ -491,7 +497,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.TEST_ACCOUNT,
           instanceNum: testInstanceCount,
           accountName: accountName? accountName: 'Test Account',
-          accountDescription: accountDescription? accountDescription: 'Learn Bitcoin',
+          accountDescription: 'Testnet Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.TESTNET, AccountType.TEST_ACCOUNT, testInstanceCount ),
           networkType: NetworkType.TESTNET,
@@ -505,7 +511,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.CHECKING_ACCOUNT,
           instanceNum: checkingInstanceCount,
           accountName: accountName? accountName: 'Checking Account',
-          accountDescription: accountDescription? accountDescription: 'Fast and easy',
+          accountDescription: accountDescription? accountDescription: 'Bitcoin Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, checkingInstanceCount ),
           networkType: config.APP_STAGE === APP_STAGE.DEVELOPMENT? NetworkType.TESTNET: NetworkType.MAINNET,
@@ -521,7 +527,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: AccountType.SAVINGS_ACCOUNT,
           instanceNum: savingsInstanceCount,
           accountName: accountName? accountName: 'Savings Account',
-          accountDescription: accountDescription? accountDescription: 'Multi-factor security',
+          accountDescription: accountDescription? accountDescription: 'MultiSig Wallet',
           mnemonic: primaryMnemonic,
           derivationPath: AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.SAVINGS_ACCOUNT, savingsInstanceCount ),
           secondaryXpub: wallet.details2FA.secondaryXpub,
@@ -539,7 +545,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
           type: accountType,
           instanceNum: donationInstanceCount,
           accountName: accountName? accountName: 'Donation Account',
-          accountDescription: accountDescription? accountDescription: 'Accept donations',
+          accountDescription: accountDescription? accountDescription: 'Receive Donations',
           donee: doneeName? doneeName: wallet.walletName,
           mnemonic: primaryMnemonic,
           derivationPath: yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, accountType, donationInstanceCount ),
@@ -558,7 +564,7 @@ export function* addNewAccount( accountType: AccountType, accountDetails: newAcc
         switch( accountType ){
             case AccountType.SWAN_ACCOUNT:
               defaultAccountName = 'Swan Bitcoin'
-              defaultAccountDescription = 'Stack sats with Swan'
+              defaultAccountDescription = 'Withdrawal Wallet'
               break
 
             case AccountType.DEPOSIT_ACCOUNT:
@@ -634,8 +640,10 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accounts,
   } ) )
   yield call( dbManager.createAccounts, accounts )
-  yield call( dbManager.createWallet, updatedWallet )
 
+  // TODO: we need an updateWallet call on the dbManager
+  yield call( dbManager.createWallet, updatedWallet )
+  yield put( updateWalletImageHealth() )
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
@@ -644,53 +652,44 @@ export const addNewAccountShellsWatcher = createWatcher(
   ADD_NEW_ACCOUNT_SHELLS
 )
 
-// function* updateAccountSettings( { payload: account, }: {
-//   payload: SubAccountDescribing;
-// } ) {
-//   try {
-//     const service = yield select(
-//       ( state ) => state.accounts[ account.sourceKind ].service
-//     )
-//     const result = yield call(
-//       service.updateAccountDetails,
-//       {
-//         // for accounts of subAccountKind as SERVICE we need to know which specific
-//         // service the account belongs to, this is serviceAccountKind of ExternalServiceSubAccountDescribing
-//         kind: account.kind === SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
-//         instanceNumber: account.instanceNumber,
-//         customDisplayName: account.customDisplayName,
-//         customDescription: account.customDescription,
-//         visibility: account.visibility,
-//       }
-//     )
-//     console.log( 'result', result )
-//     if ( result.status === 200 ) {
-//       const { SERVICES } = yield select( ( state ) => state.storage.database )
-//       const updatedSERVICES = {
-//         ...SERVICES,
-//         [ account.sourceKind ]: JSON.stringify( service ),
-//       }
-//       yield call( insertDBWorker, {
-//         payload: {
-//           SERVICES: updatedSERVICES
-//         }
-//       } )
+function* updateAccountSettingsWorker( { payload }: {
+  payload: {
+    accountShell: AccountShell,
+    settings: {
+      accountName?: string,
+      accountDescription?: string,
+      visibility?: AccountVisibility,
+    },
+}} ) {
 
-//       yield put( accountSettingsUpdated( {
-//         account
-//       } ) )
-//     }
-//   } catch ( error ) {
-//     yield put( accountSettingsUpdateFailed( {
-//       account, error
-//     } ) )
-//   }
-// }
+  const { accountShell, settings } = payload
+  const { accountName, accountDescription, visibility } = settings
 
-// export const updateAccountSettingsWatcher = createWatcher(
-//   updateAccountSettings,
-//   UPDATE_SUB_ACCOUNT_SETTINGS
-// )
+  try {
+    const account: Account = yield select( state => state.accounts.accounts[ accountShell.primarySubAccount.id ] )
+    if( accountName ) account.accountName = accountName
+    if( accountDescription ) account.accountDescription = accountDescription
+    if( visibility ) account.accountVisibility = visibility
+
+    yield put( updateAccountShells( {
+      accounts: {
+        [ account.id ]: account
+      }
+    } ) )
+    yield call( dbManager.updateAccount, account.id, account )
+    yield put( accountSettingsUpdated() )
+
+  } catch ( error ) {
+    yield put( accountSettingsUpdateFailed( {
+      error
+    } ) )
+  }
+}
+
+export const updateAccountSettingsWatcher = createWatcher(
+  updateAccountSettingsWorker,
+  UPDATE_ACCOUNT_SETTINGS
+)
 
 function* reassignTransactions( { payload: { transactionIDs, sourceID, destinationID }, }: {
   payload: ReassignTransactionsActionPayload;

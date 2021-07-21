@@ -136,15 +136,17 @@ export default class AccountShell {
       accountName?: string,
       accountDescription?: string,
       accountXpub?: string,
+      accountVisibility?: AccountVisibility
     }
   ) {
     shell.primarySubAccount.balances = newbalance
     shell.primarySubAccount.transactions = newTransactions
     if( accountDetails ){
-      const { accountName, accountDescription, accountXpub } = accountDetails
+      const { accountName, accountDescription, accountXpub, accountVisibility } = accountDetails
       if( accountName ) shell.primarySubAccount.customDisplayName = accountName
       if( accountDescription ) shell.primarySubAccount.customDescription = accountDescription
       if( accountXpub ) shell.primarySubAccount.xPub = accountXpub
+      if( accountVisibility ) shell.primarySubAccount.visibility = accountVisibility
     }
   }
 

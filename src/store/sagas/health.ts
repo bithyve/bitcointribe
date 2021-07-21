@@ -4,6 +4,7 @@ import {
   requestTimedout,
   serviceGeneratorForNewBHR,
 } from '../utils/utilities'
+import * as bip39 from 'bip39'
 import {
   INIT_HEALTH_SETUP,
   CHECK_SHARES_HEALTH,
@@ -109,6 +110,7 @@ import {
   VersionHistory,
   Wallet,
   WalletImage,
+  NewWalletImage
 } from '../../bitcoin/utilities/Interface'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
 import moment from 'moment'
@@ -138,6 +140,7 @@ import SSS from '../../bitcoin/utilities/sss/SSS'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWallet } from '../actions/storage'
+import dbManager from '../../storage/realm/dbManager'
 
 function* initHealthWorker() {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
@@ -871,9 +874,46 @@ const asyncDataToBackup = async () => {
 }
 
 function* updateWalletImageWorker() {
+  //console.log( 'Update Wallet Image' )
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
-
-  let walletImage: WalletImage = {
+  const wallet = yield call( dbManager.getWallet )
+  const contacts = yield call( dbManager.getTrustedContacts )
+  const accounts = yield call( dbManager.getAccounts )
+  const encKey = LevelHealth.getDerivedKey(
+    bip39.mnemonicToSeedSync( wallet.primaryMnemonic ).toString( 'hex' ),
+  )
+  const cipher = crypto.createCipheriv(
+    LevelHealth.cipherSpec.algorithm,
+    encKey,
+    LevelHealth.cipherSpec.iv,
+  )
+  const acc = {
+  }
+  accounts.forEach( account => {
+    let encrypted = cipher.update(
+      JSON.stringify( account ),
+      'utf8',
+      'hex',
+    )
+    encrypted += cipher.final( 'hex' )
+    acc[ account.id ] = {
+      encryptedData: encrypted
+    }
+  } )
+  const channelIds = []
+  contacts.forEach( contact => {
+    channelIds.push( contact.channelKey )
+  } )
+  const STATE_DATA = yield call( stateDataToBackup )
+  const image : NewWalletImage = {
+    name: wallet.walletName,
+    walletId : wallet.walletId,
+    contacts : channelIds,
+    accounts : acc,
+    versionHistory: STATE_DATA.versionHistory
+  }
+  //console.log( image )
+  /*let walletImage: WalletImage = {
   }
   const { DECENTRALIZED_BACKUP, SERVICES } = yield select(
     ( state ) => state.storage.database,
@@ -957,11 +997,12 @@ function* updateWalletImageWorker() {
     return
   }
   // console.log( 'walletImage', walletImage )
-
-  const res = yield call( s3Service.updateWalletImageKeeper, walletImage )
+*/
+  const res = yield call( s3Service.updateWalletImageKeeper, image )
+  //const getWI = yield call( s3Service.fetchWalletImage )
   if ( res.status === 200 ) {
     if ( res.data.updated ) console.log( 'Wallet Image updated' )
-    yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
+    //yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
     console.log( {
       err: res.err

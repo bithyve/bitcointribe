@@ -44,7 +44,7 @@ implements ImportedWalletSubAccountDescribing {
     xPub = null,
     accountShellID = null,
     instanceNumber = null,
-    defaultTitle = 'Watch-Only',
+    defaultTitle = 'View Only Account',
     balances = {
       confirmed: 0, unconfirmed: 0
     },

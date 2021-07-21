@@ -31,7 +31,7 @@ export default class TestSubAccountInfo implements HexaSubAccountDescribing {
 
   defaultTitle: string;
   defaultSubTitle: string;
-  defaultDescription = 'Learn Bitcoin';
+  defaultDescription = 'Preloaded Testnet wallet';
   customDisplayName: string | null;
   customDescription: string | null;
 

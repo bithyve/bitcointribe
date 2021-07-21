@@ -20,9 +20,7 @@ import useSwanIntegrationState from '../../../utils/hooks/state-selectors/accoun
 import openLink from '../../../utils/OpenLink'
 import SwanAccountCreationStatus from '../../../common/data/enums/SwanAccountCreationStatus'
 import { ListItem } from 'react-native-elements'
-import { addNewAccountShells } from '../../../store/actions/accounts'
-import { newAccountsInfo } from '../../../store/sagas/accounts'
-import { AccountType } from '../../../bitcoin/utilities/Interface'
+
 const swanAccountCount = 0
 
 type Props = {
@@ -35,8 +33,8 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   const dispatch = useDispatch()
   const { swanAccountCreationStatus, hasFetchSwanAuthenticationUrlInitiated, hasFetchSwanAuthenticationUrlSucceeded, swanAccountDetails, swanAuthenticationUrl, hasRedeemSwanCodeForTokenInitiated  } = useSwanIntegrationState()
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
-  let swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
-  let swanTitle = 'Buy bitcoin\n with Swan..'
+  let swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country.\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration.'
+  let swanTitle = 'Stack Sats\n with Swan'
   let accountName = ''
   let accountDescription = ''
   function handleProceedButtonPress() {
@@ -114,12 +112,12 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           // accountDescription = currentSwanSubAccount.defaultDescription
           break
         default:
-          swanMessage = 'Swan enables BTC purchases using Apple Pay, Debit/Credit card, Bank Transfer and open banking where available. Payment methods available may vary based on your country.\n\n\n\nBy proceeding, you understand that Swan will process the payment and transfer for the purchased bitcoin.'
-          swanTitle = 'Buy bitcoin\nwith Swan'
+          swanMessage = 'Register with Swan Bitcoin and start stacking sats regularly. You also get an initial $10 cash back when you complete the process. BTC can be purchased on Swan Bitcoin using different payment methods as available in your country.\n\n\nBy proceeding you understand that you will be taken to the Swan Bitcoin platform to complete registration'
+          swanTitle = 'Stack Sats\nwith Swan'
     }
     return (
       <>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           activeOpacity={1}
           onPress={onPress}
           style={{
@@ -132,7 +130,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
           <FontAwesome name="close" color={Colors.white} size={19} style={{
             // marginTop: hp( 0.5 )
           }} />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <View style={styles.successModalHeaderView}>
 
           <Text style={styles.modalTitleText}>{swanTitle}</Text>
@@ -184,7 +182,7 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
   }
   const renderProceedButton = () => {
     return ( <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start'
+      flexDirection: 'row', marginTop: 'auto', alignItems: 'flex-start'
     }} >
       <AppBottomSheetTouchableWrapper
         disabled={hasButtonBeenPressed? true : false}
@@ -194,6 +192,25 @@ const BottomSheetSwanInfo: React.FC<Props> = ( { swanDeepLinkContent, onClickSet
         }}
       >
         <Text style={styles.proceedButtonText}>{'Buy Bitcoin'}</Text>
+      </AppBottomSheetTouchableWrapper>
+      <AppBottomSheetTouchableWrapper
+        onPress={() => {onPress()}}
+        style={{
+          height: wp( '15%' ),
+          width: wp( '36%' ),
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingLeft: wp( '8%' ),
+        }}
+      >
+        <Text
+          style={{
+            fontFamily: Fonts.FiraSansMedium,
+            color: Colors.blue
+          }}
+        >
+          {'Not Now'}
+        </Text>
       </AppBottomSheetTouchableWrapper>
       {/* <View style={{
         flexDirection: 'row',
@@ -266,7 +283,7 @@ const styles = StyleSheet.create( {
   successModalHeaderView: {
     marginRight: wp( '10%' ),
     marginLeft: wp( '4%' ),
-    // marginTop: wp( '5%' ),
+    marginTop: wp( '5%' ),
     // flex: 1.7
   },
   modalTitleText: {

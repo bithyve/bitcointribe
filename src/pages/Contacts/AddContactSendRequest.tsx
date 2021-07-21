@@ -21,9 +21,8 @@ import NavStyles from '../../common/Styles/NavStyles'
 import BottomSheet from 'reanimated-bottom-sheet'
 import DeviceInfo from 'react-native-device-info'
 import SendViaLink from '../../components/SendViaLink'
-import { isEmpty } from '../../common/CommonFunctions'
+import { generateDeepLink, isEmpty } from '../../common/CommonFunctions'
 import SendViaQR from '../../components/SendViaQR'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import config from '../../bitcoin/HexaConfig'
 import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
@@ -137,13 +136,6 @@ export default function AddContactSendRequest( props ) {
     if ( currentContact ) {
       const { secondaryChannelKey } = currentContact
       const appVersion = DeviceInfo.getVersion()
-      console.log( 'QR DATA', JSON.stringify( {
-        type: QRCodeTypes.CONTACT_REQUEST,
-        channelKey,
-        walletName: wallet.walletName,
-        secondaryChannelKey,
-        version: appVersion,
-      } ) )
       setTrustedQR(
         JSON.stringify( {
           type: QRCodeTypes.CONTACT_REQUEST,
@@ -153,8 +145,9 @@ export default function AddContactSendRequest( props ) {
           version: appVersion,
         } )
       )
-    }
 
+      setTrustedLink( generateDeepLink( Contact, currentContact, wallet.walletName ) )
+    }
   }, [ Contact, trustedContacts ] )
 
   // const openTimer = async () => {
