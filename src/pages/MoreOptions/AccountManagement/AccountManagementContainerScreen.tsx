@@ -3,7 +3,7 @@ import { StyleSheet, View, Text, FlatList, Image, TouchableOpacity, Platform, Sc
 import { useDispatch, useSelector } from 'react-redux'
 import useActiveAccountShells from '../../../utils/hooks/state-selectors/accounts/UseActiveAccountShells'
 import AccountShell from '../../../common/data/models/AccountShell'
-import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateSubAccountSettings } from '../../../store/actions/accounts'
+import { accountShellsOrderUpdated, resetAccountUpdateFlag, updateAccountSettings } from '../../../store/actions/accounts'
 import ReorderAccountShellsDraggableList from '../../../components/more-options/account-management/ReorderAccountShellsDraggableList'
 import ButtonBlue from '../../../components/ButtonBlue'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
@@ -153,8 +153,15 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
   }, [ accountVisibility ] )
 
   const changeVisisbility = ( selectedAccount, visibility ) => {
-    selectedAccount.visibility = visibility
-    dispatch( updateSubAccountSettings( selectedAccount ) )
+    // selectedAccount.visibility = visibility
+    // dispatch( updateSubAccountSettings( selectedAccount ) )
+
+    // const settings = {
+    //   visibility: visibility
+    // }
+    // dispatch( updateAccountSettings( {
+    //   accountShell, settings
+    // } ) )
   }
 
   function hasNewOrder( newlyOrderedAccountShells: AccountShell[] ) {

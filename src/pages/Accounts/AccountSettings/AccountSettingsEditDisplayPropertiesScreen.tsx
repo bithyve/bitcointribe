@@ -52,8 +52,6 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   } )
 
   function handleSaveButtonPress() {
-    primarySubAccount.customDisplayName = accountName
-    primarySubAccount.customDescription = accountDescription
     const settings = {
       accountName,
       accountDescription,
