@@ -7,7 +7,7 @@ import ListStyles from '../../../common/Styles/ListStyles'
 
 import VisibilityOptionsList from '../../../components/account-settings/visibility/VisibilityOptionsList'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
-import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import ButtonBlue from '../../../components/ButtonBlue'
 import ButtonStyles from '../../../common/Styles/ButtonStyles'
 import Colors from '../../../common/Colors'
@@ -42,8 +42,12 @@ const AccountSettingsEditVisibilityScreen: React.FC<Props> = ( { navigation, }: 
   }
 
   function handleSaveButtonPress() {
-    primarySubAccount.visibility = selectedVisibility
-    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    const settings = {
+      visibility: selectedVisibility
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
     navigation.navigate( 'Home' )
   }
 

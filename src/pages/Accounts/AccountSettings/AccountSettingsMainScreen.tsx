@@ -10,7 +10,7 @@ import useAccountShellForID from '../../../utils/hooks/state-selectors/accounts/
 import AccountArchiveModal from './AccountArchiveModal'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 import { useDispatch, useSelector } from 'react-redux'
-import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import ModalContainer from '../../../components/home/ModalContainer'
 
 
@@ -183,8 +183,12 @@ const AccountSettingsMainScreen: React.FC<Props> = ( { navigation, }: Props ) =>
   }
 
   function handleAccountArchive() {
-    primarySubAccount.visibility = AccountVisibility.ARCHIVED
-    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    const settings = {
+      visibility: AccountVisibility.ARCHIVED
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
     navigation.navigate( 'Home' )
   }
 

@@ -1,6 +1,7 @@
 import { Account, AccountType, DonationAccount, MultiSigAccount, NetworkType } from '../Interface'
 import crypto from 'crypto'
 import AccountUtilities from './AccountUtilities'
+import AccountVisibility from '../../../common/data/enums/AccountVisibility'
 
 export function generateAccount(
   {
@@ -42,6 +43,7 @@ export function generateAccount(
     xpriv,
     accountName,
     accountDescription,
+    accountVisibility: AccountVisibility.DEFAULT,
     activeAddresses: [],
     receivingAddress: initialRecevingAddress,
     nextFreeAddressIndex: 0,
@@ -126,6 +128,7 @@ export function generateMultiSigAccount(
     xprivs,
     accountName,
     accountDescription,
+    accountVisibility: AccountVisibility.DEFAULT,
     activeAddresses: [],
     receivingAddress: initialRecevingAddress,
     nextFreeAddressIndex: 0,
