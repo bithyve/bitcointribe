@@ -438,7 +438,7 @@ export default function TrustedContactRequest( props ) {
               flexDirection: 'row',
               marginTop: 'auto',
               alignItems: 'center',
-              marginBottom: hp( '2%' )
+              marginVertical: hp( '4%' )
             }}
           >
             <AppBottomSheetTouchableWrapper
