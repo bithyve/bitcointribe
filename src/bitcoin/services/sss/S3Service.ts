@@ -7,11 +7,13 @@ import {
   SocialStaticNonPMDD,
   EncryptedImage,
   WalletImage,
+  NewWalletImage
 } from '../../utilities/Interface'
 import SSS from '../../utilities/sss/SSS'
 import LevelHealth from '../../utilities/LevelHealth/LevelHealth'
 import HDSegwitWallet from '../../utilities/accounts/HDSegwitWallet'
 import SecureHDWallet from '../../utilities/accounts/SecureHDWallet'
+import Relay from '../../utilities/Relay'
 
 export default class S3Service {
   public static fromJSON = ( json: string ) => {
@@ -1417,7 +1419,7 @@ export default class S3Service {
   };
 
   public updateWalletImageKeeper = async (
-    walletImage: WalletImage,
+    walletImage: NewWalletImage,
   ): Promise<
     | {
         status: number;
@@ -1437,7 +1439,7 @@ export default class S3Service {
     try {
       return {
         status: config.STATUS.SUCCESS,
-        data: await this.levelhealth.updateWalletImage( walletImage ),
+        data: await Relay.updateWalletImage( walletImage ),
       }
     } catch ( err ) {
       return {
