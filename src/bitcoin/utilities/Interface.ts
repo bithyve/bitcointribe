@@ -875,3 +875,14 @@ export enum AccountType {
 export interface Accounts {
     [accountId: string]: Account | MultiSigAccount | DonationAccount
 }
+
+export enum DeepLinkKind {
+  CONTACT = 'CONTACT',
+  KEEPER = 'KEEPER',
+  RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
+}
+
+export enum DeepLinkHintType {
+  NUMBER = 'NUM',
+  OTP = 'OTP'
+}

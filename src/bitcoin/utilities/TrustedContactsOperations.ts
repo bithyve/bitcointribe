@@ -29,6 +29,37 @@ export default class TrustedContactsOperations {
   static getStreamId = ( walletId: string ): string =>
     crypto.createHash( 'sha256' ).update( walletId ).digest( 'hex' ).slice( 0, 9 );
 
+   static deriveStandardKey = ( psuedoKey: string ): string => {
+     let key = psuedoKey
+     const hash = crypto.createHash( 'sha512' )
+     key = hash.update( key ).digest( 'hex' )
+     return key.slice( key.length - TrustedContactsOperations.cipherSpec.keyLength )
+   };
+
+   static encryptViaPsuedoKey = ( plainText: string, psuedoKey: string ): string => {
+     const key = TrustedContactsOperations.deriveStandardKey( psuedoKey )
+     const cipher = crypto.createCipheriv(
+       TrustedContactsOperations.cipherSpec.algorithm,
+       key,
+       TrustedContactsOperations.cipherSpec.iv
+     )
+     let encrypted = cipher.update( plainText, 'utf8', 'hex' )
+     encrypted += cipher.final( 'hex' )
+     return encrypted
+   }
+
+   static decryptViaPsuedoKey = ( encryptedText: string, psuedoKey: string ): string => {
+     const key = TrustedContactsOperations.deriveStandardKey( psuedoKey )
+     const decipher = crypto.createDecipheriv(
+       TrustedContactsOperations.cipherSpec.algorithm,
+       key,
+       TrustedContactsOperations.cipherSpec.iv
+     )
+     let decrypted = decipher.update( encryptedText, 'hex', 'utf8' )
+     decrypted += decipher.final( 'utf8' )
+     return decrypted
+   }
+
   static encryptData = ( key: string, dataPacket: any ) => {
     key = key.slice(
       key.length - TrustedContactsOperations.cipherSpec.keyLength
