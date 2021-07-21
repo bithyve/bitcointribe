@@ -184,7 +184,7 @@ function* initHealthWorker() {
   yield put( updateHealth( [ {
     level: 1,
     levelInfo: levelInfo,
-  } ], 0 ) )
+  } ], 0, 'checkSharesHealthWatcher' ) )
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
   yield call( modifyLevelDataWorker )
 }
@@ -295,7 +295,7 @@ function* checkSharesHealthWorker() {
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
     const res = yield call( s3Service.checkHealthKeeper )
     if ( res.status === 200 ) {
-      yield put( updateHealth( res.data.levels, res.data.currentLevel ) )
+      yield put( updateHealth( res.data.levels, res.data.currentLevel, 'checkSharesHealthWatcher' ) )
     } else {
       if ( res.err === 'ECONNABORTED' ) requestTimedout()
     }
@@ -318,11 +318,15 @@ function* updateSharesHealthWorker( { payload } ) {
     payload.shares
     let currentLevel = yield select( ( state ) => state.health.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
+    console.log( 'UPDATE SHARE levelHealth', [ ...yield select( ( state ) => state.health.levelHealth ) ] )
     for ( let i = 0; i < levelHealth.length; i++ ) {
       const levelInfo = levelHealth[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
         if( element.shareId == payload.shares.shareId ){
+          console.log( 'UPDATE SHARE payload.shares.shareId', payload.shares.shareId )
+          console.log( 'UPDATE SHARE element.shareId', element.shareId )
+          console.log( 'UPDATE SHARE i', i )
           levelHealth[ i ].levelInfo[ j ].updatedAt = payload.shares.updatedAt ? moment( new Date() ).valueOf() : levelHealth[ i ].levelInfo[ j ].updatedAt
           levelHealth[ i ].levelInfo[ j ].name = payload.shares.name ? payload.shares.name : levelHealth[ i ].levelInfo[ j ].name ? levelHealth[ i ].levelInfo[ j ].name : ''
           levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
@@ -330,10 +334,11 @@ function* updateSharesHealthWorker( { payload } ) {
           if( payload.shares.status ){
             levelHealth[ i ].levelInfo[ j ].status = payload.shares.status
           }
+          console.log( 'UPDATE SHARE element.shareId', element.shareId )
         }
       }
     }
-
+    console.log( 'UPDATE SHARE levelHealth', levelHealth )
     const tempLevelHealth = []
     const levelHealthForCurrentLevel = []
     levelHealthForCurrentLevel[ 0 ] = levelHealth[ 0 ]
@@ -353,7 +358,8 @@ function* updateSharesHealthWorker( { payload } ) {
     yield put(
       updateHealth(
         tempLevelHealth.length ? tempLevelHealth : levelHealth,
-        currentLevel
+        currentLevel,
+        'updateSharesHealthWatcher'
       )
     )
     yield put( switchS3LoaderKeeper( 'updateMSharesHealth' ) )
@@ -433,7 +439,7 @@ function* updateHealthLevel2Worker( { payload } ) {
       levelInfo, level
     } )
     console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
-    yield put( updateHealth( levelHealth, currentLevel ) )
+    yield put( updateHealth( levelHealth, currentLevel, 'updateHealthLevel2Watcher' ) )
     if ( level == 2 ) yield put( isLevel2InitializedStatus() )
     if ( level == 3 ) yield put( isLevel3InitializedStatus() )
     yield put( switchS3LoaderKeeper( 'initLoader' ) )
@@ -2146,6 +2152,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
         } ) )
         const temporaryContact = contacts[ channelKey ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
+        console.log( 'EXISTING CONTACT instream', instream )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,
@@ -2157,7 +2164,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
         }
         const notifReceivers = []
         notifReceivers.push( {
-          walletId: walletId,
+          walletId: instream.primaryData.walletID,
           FCMs: [ fcmToken ],
         } )
         if( notifReceivers.length )
@@ -2256,7 +2263,7 @@ function* modifyLevelDataWorker( ) {
     if ( levelData.findIndex( ( value ) => value.status == 'bad' ) > -1 ) {
       isError = true
     }
-    yield put( updateHealth( levelHealthVar, currentLevel ) )
+    yield put( updateHealth( levelHealthVar, currentLevel, 'modifyLevelDataWatcher' ) )
     const levelDataUpdated = getLevelInfoStatus( levelData )
     yield put ( updateLevelData( levelDataUpdated, isError ) )
     yield put( switchS3LoaderKeeper( 'modifyLevelDataStatus' ) )
@@ -2334,7 +2341,7 @@ function* setupHealthWorker( { payload } ) {
   const randomIdForSecurityQ = generateRandomString( 8 )
   const randomIdForCloud = generateRandomString( 8 )
   if( level == 1 ){
-    const levelInfo = [] = [
+    const levelInfo = [
       {
         shareType: 'securityQuestion',
         updatedAt: security && security.answer ? moment( new Date() ).valueOf() : 0,
@@ -2355,7 +2362,7 @@ function* setupHealthWorker( { payload } ) {
     yield put( updateHealth( [ {
       level: 1,
       levelInfo: levelInfo,
-    } ], level ) )
+    } ], level, 'setupHealthWatcher' ) )
     console.log( 'setupHealthWorker levelInfo', levelInfo )
   } else {
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
@@ -2417,7 +2424,7 @@ function* setupHealthWorker( { payload } ) {
       } )
 
       console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
-      yield put( updateHealth( levelHealth, level ) )
+      yield put( updateHealth( levelHealth, level, 'setupHealthWatcher' ) )
       if ( level == 2 ) yield put( isLevel2InitializedStatus() )
       if ( level == 3 ) {
         yield put( isLevel3InitializedStatus() ); yield put( isLevel2InitializedStatus() )
@@ -2508,7 +2515,7 @@ function* updateKeeperInfoToChannelWorker( ) {
       }
     }
     const res = yield call(
-      trustedContacts.syncPermanentChannels,
+      TrustedContactsOperations.syncPermanentChannels,
       channelSyncUpdates
     )
     if ( res.status === 200 ) {

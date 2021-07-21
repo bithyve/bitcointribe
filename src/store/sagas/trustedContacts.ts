@@ -174,7 +174,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
             }
             const notifReceivers = []
             notifReceivers.push( {
-              walletId: walletId,
+              walletId: walletId, //instream.primaryData.walletID,
               FCMs: [ fcmToken ],
             } )
             if( notifReceivers.length )
@@ -211,7 +211,7 @@ function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannel
           }
           const notifReceivers = []
           notifReceivers.push( {
-            walletId: walletId,
+            walletId: walletId, //instream.primaryData.walletID,
             FCMs: [ fcmToken ],
           } )
           if( notifReceivers.length )
