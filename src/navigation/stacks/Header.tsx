@@ -187,8 +187,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       this.calculateNetBalance()
       this.setUpFocusListener()
 
-      Linking.addEventListener( 'url', this.handleDeepLinkEvent )
-      Linking.getInitialURL().then( this.handleDeepLinking )
+      // Linking.addEventListener( 'url', this.handleDeepLinkEvent )
+      // Linking.getInitialURL().then( this.handleDeepLinking )
     } )
   };
 
@@ -278,39 +278,39 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
-  handleDeepLinking = async ( url ) => {
-    const { trustedContactRequest } = await processDeepLink( url )
-    if( trustedContactRequest )
-      this.setState( {
-        trustedContactRequest
-      },
-      () => {
-        this.openBottomSheetOnLaunch(
-          BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-          1
-        )
-      }
-      )
-  }
+  // handleDeepLinking = async ( url ) => {
+  //   const { trustedContactRequest } = await processDeepLink( url )
+  //   if( trustedContactRequest )
+  //     this.setState( {
+  //       trustedContactRequest
+  //     },
+  //     () => {
+  //       this.openBottomSheetOnLaunch(
+  //         BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+  //         1
+  //       )
+  //     }
+  //     )
+  // }
 
-  handleDeepLinkEvent = async ( { url } ) => {
-    const { navigation, isFocused } = this.props
-    // If the user is on one of Home's nested routes, and a
-    // deep link is opened, we will navigate back to Home first.
-    if ( !isFocused ) {
-      navigation.dispatch(
-        resetToHomeAction( {
-          unhandledDeepLinkURL: url,
-        } )
-      )
-    } else {
-      this.handleDeepLinking( url )
-    }
-  };
+  // handleDeepLinkEvent = async ( { url } ) => {
+  //   const { navigation, isFocused } = this.props
+  //   // If the user is on one of Home's nested routes, and a
+  //   // deep link is opened, we will navigate back to Home first.
+  //   if ( !isFocused ) {
+  //     navigation.dispatch(
+  //       resetToHomeAction( {
+  //         unhandledDeepLinkURL: url,
+  //       } )
+  //     )
+  //   } else {
+  //     this.handleDeepLinking( url )
+  //   }
+  // };
 
   cleanupListeners() {
     clearTimeout( this.openBottomSheetOnLaunchTimeout )
-    Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
+    // Linking.removeEventListener( 'url', this.handleDeepLinkEvent )
   }
 
   componentWillUnmount() {
