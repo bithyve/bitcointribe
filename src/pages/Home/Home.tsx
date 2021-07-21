@@ -1334,6 +1334,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             />
           )
 
+
         case BottomSheetKind.NOTIFICATION_INFO:
           return (
             <NotificationInfoContents
@@ -1462,8 +1463,8 @@ const mapStateToProps = ( state ) => {
 
 export default withNavigationFocus(
   connect( mapStateToProps, {
-    initializeTrustedContact,
     updateFCMTokens,
+    initializeTrustedContact,
     downloadMShare,
     acceptExistingContactRequest,
     rejectTrustedContact,

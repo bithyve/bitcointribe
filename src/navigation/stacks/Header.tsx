@@ -46,6 +46,7 @@ import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { NotificationType } from '../../components/home/NotificationType'
 import ModalContainer from '../../components/home/ModalContainer'
 import { acceptExistingContactRequest } from '../../store/actions/health'
+import NotificationInfoContents from '../../components/NotificationInfoContents'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import { resetToHomeAction } from '../actions/NavigationActions'
@@ -68,7 +69,6 @@ interface HomeStateTypes {
   CurrencyCode: string;
   netBalance: number;
   currentBottomSheetKind: BottomSheetKind | null;
-
   secondaryDeviceOtp: any;
   currencyCode: string;
   notificationDataChange: boolean;
@@ -220,7 +220,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.props.updateMessageStatus( statusValue )
     this.props.updateMessageStatusInApp( message.notificationId )
     switch ( message.type ) {
-        case NotificationType.FNF_REQUEST || NotificationType.FNF_REQUEST_ACCEPTED || NotificationType.FNF_REQUEST_REJECTED || NotificationType.FNF_KEEPER_REQUEST || NotificationType.FNF_KEEPER_REQUEST_ACCEPTED || NotificationType.FNF_KEEPER_REQUEST_REJECTED:
+        case NotificationType.FNF_REQUEST:
+        case NotificationType.FNF_REQUEST_ACCEPTED:
+        case NotificationType.FNF_REQUEST_REJECTED:
+        case NotificationType.FNF_KEEPER_REQUEST:
+        case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
+        case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
+        case NotificationType.CONTACT:
+        case NotificationType.SECURE_XPUB:
+        case NotificationType.APPROVE_KEEPER:
+        case NotificationType.UPLOAD_SEC_SHARE:
+        case NotificationType.RESHARE:
+        case NotificationType.RESHARE_RESPONSE:
+        case NotificationType.SM_UPLOADED_FOR_PK:
+        case NotificationType.NEW_KEEPER_INFO:
           this.setState( {
             notificationTitle: message.title,
             notificationInfo: message.info,
@@ -345,6 +358,20 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     }
   };
 
+  upgradeNow () {
+    const url =
+      Platform.OS == 'ios'
+        ? 'https://apps.apple.com/us/app/hexa-simple-bitcoin-wallet/id1490205837'
+        : 'https://play.google.com/store/apps/details?id=io.hexawallet.hexa&hl=en'
+    Linking.canOpenURL( url ).then( ( supported ) => {
+      if ( supported ) {
+        Linking.openURL( url )
+      } else {
+        // console.log("Don't know how to open URI: " + url);
+      }
+    } )
+  }
+
   calculateNetBalance = () => {
     const { accountShells } = this.props.accountsState
 
@@ -453,7 +480,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   onPhoneNumberChange = () => {};
 
   renderBottomSheetContent() {
-    const { custodyRequest } = this.state
+    const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
+
     switch ( this.state.currentBottomSheetKind ) {
         case BottomSheetKind.NOTIFICATIONS_LIST:
           const { notificationLoading, notificationData } = this.state
@@ -486,6 +514,34 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               bottomSheetRef={this.bottomSheetRef}
             />
           )
+
+        case BottomSheetKind.NOTIFICATION_INFO:
+          return (
+            <NotificationInfoContents
+              title={notificationTitle}
+              info={notificationInfo ? notificationInfo : null}
+              additionalInfo={notificationAdditionalInfo}
+              onPressProceed={()=>{
+                this.closeBottomSheet()
+                if( this.state.notificationProceedText === 'Upgrade' ) {
+                  this.upgradeNow()
+                }
+              }}
+              onPressIgnore={()=> {
+                this.closeBottomSheet()
+              }}
+              onPressClose={()=>{
+                this.closeBottomSheet()
+              }}
+              proceedButtonText={notificationProceedText}
+              cancelButtonText={notificationIgnoreText}
+              isIgnoreButton={isIgnoreButton}
+              note={notificationNote}
+              bottomSheetRef={this.bottomSheetRef}
+              releaseNotes={releaseNotes}
+            />
+          )
+
 
         default:
           break
