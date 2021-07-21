@@ -34,6 +34,9 @@ import {
   updateAccountShells,
   getTestcoins,
   refreshAccountShell,
+  UPDATE_ACCOUNT_SETTINGS,
+  accountSettingsUpdated,
+  accountSettingsUpdateFailed,
 } from '../actions/accounts'
 import {
   SECURE_ACCOUNT,
@@ -78,6 +81,7 @@ import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountIn
 import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
 
 function* syncAccountsWorker( { payload }: {payload: {
@@ -320,9 +324,9 @@ function* refreshAccountShellWorker( { payload } ) {
     accounts: synchedAccounts
   } ) )
 
-  Object.values( synchedAccounts ).forEach( ( synchedAcc: Account | MultiSigAccount )=> {
-    accounts[ synchedAcc.id ] = synchedAcc
-  } )
+  for( const synchedAcc of synchedAccounts ){
+    yield call( dbManager.updateAccount, synchedAcc.id, synchedAcc )
+  }
 
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {
@@ -333,7 +337,6 @@ function* refreshAccountShellWorker( { payload } ) {
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
 
-  // TODO: insert into Realm database
   yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
@@ -634,6 +637,8 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accounts,
   } ) )
   yield call( dbManager.createAccounts, accounts )
+
+  // TODO: we need an updateWallet call on the dbManager
   yield call( dbManager.createWallet, updatedWallet )
 
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
@@ -644,53 +649,44 @@ export const addNewAccountShellsWatcher = createWatcher(
   ADD_NEW_ACCOUNT_SHELLS
 )
 
-// function* updateAccountSettings( { payload: account, }: {
-//   payload: SubAccountDescribing;
-// } ) {
-//   try {
-//     const service = yield select(
-//       ( state ) => state.accounts[ account.sourceKind ].service
-//     )
-//     const result = yield call(
-//       service.updateAccountDetails,
-//       {
-//         // for accounts of subAccountKind as SERVICE we need to know which specific
-//         // service the account belongs to, this is serviceAccountKind of ExternalServiceSubAccountDescribing
-//         kind: account.kind === SubAccountKind.SERVICE ? ( ( account as ExternalServiceSubAccountDescribing ).serviceAccountKind ) : account.kind,
-//         instanceNumber: account.instanceNumber,
-//         customDisplayName: account.customDisplayName,
-//         customDescription: account.customDescription,
-//         visibility: account.visibility,
-//       }
-//     )
-//     console.log( 'result', result )
-//     if ( result.status === 200 ) {
-//       const { SERVICES } = yield select( ( state ) => state.storage.database )
-//       const updatedSERVICES = {
-//         ...SERVICES,
-//         [ account.sourceKind ]: JSON.stringify( service ),
-//       }
-//       yield call( insertDBWorker, {
-//         payload: {
-//           SERVICES: updatedSERVICES
-//         }
-//       } )
+function* updateAccountSettingsWorker( { payload }: {
+  payload: {
+    accountShell: AccountShell,
+    settings: {
+      accountName?: string,
+      accountDescription?: string,
+      visibility?: AccountVisibility,
+    },
+}} ) {
 
-//       yield put( accountSettingsUpdated( {
-//         account
-//       } ) )
-//     }
-//   } catch ( error ) {
-//     yield put( accountSettingsUpdateFailed( {
-//       account, error
-//     } ) )
-//   }
-// }
+  const { accountShell, settings } = payload
+  const { accountName, accountDescription, visibility } = settings
 
-// export const updateAccountSettingsWatcher = createWatcher(
-//   updateAccountSettings,
-//   UPDATE_SUB_ACCOUNT_SETTINGS
-// )
+  try {
+    const account: Account = yield select( state => state.accounts[ accountShell.primarySubAccount.id ] )
+    if( accountName ) account.accountName = accountName
+    if( accountDescription ) account.accountDescription = accountDescription
+    if( visibility ) account.accountVisibility = visibility
+
+    yield put( updateAccountShells( {
+      accounts: {
+        [ account.id ]: account
+      }
+    } ) )
+    yield call( dbManager.updateAccount, account.id, account )
+    yield put( accountSettingsUpdated() )
+
+  } catch ( error ) {
+    yield put( accountSettingsUpdateFailed( {
+      error
+    } ) )
+  }
+}
+
+export const updateAccountSettingsWatcher = createWatcher(
+  updateAccountSettingsWorker,
+  UPDATE_ACCOUNT_SETTINGS
+)
 
 function* reassignTransactions( { payload: { transactionIDs, sourceID, destinationID }, }: {
   payload: ReassignTransactionsActionPayload;

@@ -1,5 +1,6 @@
 import { Action } from 'redux'
 import { Account, Accounts, ContactInfo, DonationAccount } from '../../bitcoin/utilities/Interface'
+import AccountVisibility from '../../common/data/enums/AccountVisibility'
 import AccountShell from '../../common/data/models/AccountShell'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
 import { newAccountsInfo } from '../sagas/accounts'
@@ -30,7 +31,7 @@ export const ADD_NEW_ACCOUNT_SHELLS = 'ADD_NEW_ACCOUNT_SHELLS'
 export const ADD_NEW_SECONDARY_SUBACCOUNT = 'ADD_NEW_SECONDARY_SUBACCOUNT'
 export const ADD_NEW_ACCOUNT_SHELL_COMPLETED =
   'ADD_NEW_ACCOUNT_SHELL_COMPLETED'
-export const UPDATE_SUB_ACCOUNT_SETTINGS = 'UPDATE_SUB_ACCOUNT_SETTINGS'
+export const UPDATE_ACCOUNT_SETTINGS = 'UPDATE_ACCOUNT_SETTINGS'
 export const SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED =
   'SUB_ACCOUNT_SETTINGS_UPDATE_COMPLETED'
 export const REASSIGN_TRANSACTIONS = 'REASSIGN_TRANSACTIONS'
@@ -358,16 +359,30 @@ export const newAccountShellCreationCompleted = (): AddNewAccountShellCompletion
   }
 }
 
-export interface UpdateSubAccountSettingsAction extends Action {
-  type: typeof UPDATE_SUB_ACCOUNT_SETTINGS;
-  payload: SubAccountDescribing;
+export interface UpdateAccountSettingsAction extends Action {
+  type: typeof UPDATE_ACCOUNT_SETTINGS;
+  payload: {
+    accountShell: AccountShell,
+    settings: {
+      accountName?: string,
+      accountDescription?: string,
+      visibility?: AccountVisibility,
+    },
+  };
 }
 
-export const updateSubAccountSettings = (
-  payload: SubAccountDescribing
-): UpdateSubAccountSettingsAction => {
+export const updateAccountSettings = (
+  payload: {
+    accountShell: AccountShell,
+    settings: {
+      accountName?: string,
+      accountDescription?: string,
+      visibility?: AccountVisibility,
+    },
+  }
+): UpdateAccountSettingsAction => {
   return {
-    type: UPDATE_SUB_ACCOUNT_SETTINGS, payload
+    type: UPDATE_ACCOUNT_SETTINGS, payload
   }
 }
 
@@ -588,25 +603,19 @@ export const restoredAccountShells = ( { accountShells, }: {
   }
 }
 
-export const accountSettingsUpdateFailed = ( {
-  account,
-  error,
-}: {
-  account: SubAccountDescribing;
+export const accountSettingsUpdateFailed = ( {  error, }: {
   error: Error;
 } ) => {
   return {
     type: ACCOUNT_SETTINGS_UPDATE_FAILED, payload: {
-      account, error
+      error
     }
   }
 }
 
-export const accountSettingsUpdated = ( { account, }: {
-  account: SubAccountDescribing;
-} ) => {
+export const accountSettingsUpdated = ( ) => {
   return {
-    type: ACCOUNT_SETTINGS_UPDATED, payload: account
+    type: ACCOUNT_SETTINGS_UPDATED,
   }
 }
 
