@@ -66,7 +66,7 @@ import {
   updateLastSeen
 } from '../../store/actions/preferences'
 import {
-  getCurrencyImageByRegion,
+  getCurrencyImageByRegion, processDeepLink,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
@@ -782,210 +782,42 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   handleDeepLinkEvent = async ( { url } ) => {
-    console.log( 'Home::handleDeepLinkEvent::URL: ', url )
-
     const { navigation, isFocused } = this.props
-
     // If the user is on one of Home's nested routes, and a
     // deep link is opened, we will navigate back to Home first.
-    if ( !isFocused ) {
+    if ( !isFocused )
       navigation.dispatch(
         resetToHomeAction( {
           unhandledDeepLinkURL: url,
         } )
       )
-    } else {
-      this.handleDeepLinking( url )
-    }
-
+    else this.handleDeepLinking( url )
   };
 
-  handleDeepLinking = async ( url: string | null ) => {
-    if ( url == null ) {
-      return
+  handleDeepLinking = async ( url ) => {
+    if ( url === null ) return
+    const { trustedContactRequest, swanRequest } = await processDeepLink( url )
+    if( trustedContactRequest ){
+      this.setState( {
+        trustedContactRequest
+      },
+      () => {
+        this.openBottomSheetOnLaunch(
+          BottomSheetKind.TRUSTED_CONTACT_REQUEST,
+          1
+        )
+      }
+      )
     }
-
-    console.log( 'handleDeepLinking: ' + url )
-
-    const splits = url.split( '/' )
-    if ( splits.includes( 'swan' ) ) {
+    else if ( swanRequest ) {
       this.setState( {
         swanDeepLinkContent:url,
       }, () => {
         this.props.updateSwanStatus( SwanAccountCreationStatus.AUTHENTICATION_IN_PROGRESS )
         this.openBottomSheet( BottomSheetKind.SWAN_STATUS_INFO )
       } )
-
     }
-
-    if ( splits.includes( 'wyre' ) ) {
-      this.props.clearWyreCache()
-      this.setState( {
-        wyreDeepLinkContent:url,
-        wyreFromBuyMenu: false,
-        wyreFromDeepLink: true
-      }, () => {
-        this.openBottomSheet( BottomSheetKind.WYRE_STATUS_INFO )
-      } )
-    }
-    if ( splits.includes( 'ramp' ) ) {
-      this.props.clearRampCache()
-      this.setState( {
-        rampDeepLinkContent:url,
-        rampFromBuyMenu: false,
-        rampFromDeepLink: true
-      }, () => {
-        this.openBottomSheet( BottomSheetKind.RAMP_STATUS_INFO )
-      } )
-    }
-    if ( splits[ 5 ] === 'sss' ) {
-      const requester = splits[ 4 ]
-
-      if ( splits[ 6 ] === 'ek' ) {
-        const custodyRequest = {
-          requester,
-          ek: splits[ 7 ],
-          uploadedAt: splits[ 8 ],
-        }
-
-        this.setState(
-          {
-            custodyRequest,
-          },
-          () => {
-            this.openBottomSheetOnLaunch( BottomSheetKind.CUSTODIAN_REQUEST )
-          }
-        )
-      } else if ( splits[ 6 ] === 'rk' ) {
-        const recoveryRequest = {
-          requester,
-          rk: splits[ 7 ],
-        }
-
-        this.setState(
-          {
-            recoveryRequest,
-            trustedContactRequest: null,
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
-          }
-        )
-      }
-    } else if ( [ 'tc', 'tcg', 'atcg', 'ptc' ].includes( splits[ 4 ] ) ) {
-      if ( splits[ 3 ] !== config.APP_STAGE ) {
-        Alert.alert(
-          'Invalid deeplink',
-          `Following deeplink could not be processed by Hexa:${config.APP_STAGE.toUpperCase()}, use Hexa:${
-            splits[ 3 ]
-          }`
-        )
-      } else {
-        const version = splits.pop().slice( 1 )
-
-        if ( version ) {
-          const isAppVersionCompatible = await checkAppVersionCompatibility( {
-            relayCheckMethod: splits[ 4 ],
-            version,
-          } )
-
-          if ( !isAppVersionCompatible ) {
-            return
-          }
-        }
-        let hint = splits[ 8 ]
-        let isFromKeeper = false
-        if ( splits[ 8 ].includes( '_' ) ) {
-          const hintStr = splits[ 8 ].split( '_' )
-          hint = hintStr[ 0 ]
-          isFromKeeper = hintStr[ 1 ] == 'keeper' ? true : false
-        }
-
-        const trustedContactRequest = {
-          isGuardian: [ 'tcg', 'atcg' ].includes( splits[ 4 ] ),
-          approvedTC: splits[ 4 ] === 'atcg' ? true : false,
-          isPaymentRequest: splits[ 4 ] === 'ptc' ? true : false,
-          requester: splits[ 5 ],
-          encryptedKey: splits[ 6 ],
-          hintType: splits[ 7 ],
-          hint,
-          uploadedAt: splits[ 9 ],
-          version,
-          isFromKeeper,
-        }
-
-        this.setState(
-          {
-            trustedContactRequest,
-            recoveryRequest: null,
-          },
-          () => {
-            this.openBottomSheetOnLaunch(
-              BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-              1
-            )
-          }
-        )
-      }
-    } else if ( splits[ 4 ] === 'rk' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-      }
-
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest: null,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( splits[ 4 ] === 'scns' ) {
-      const recoveryRequest = {
-        isRecovery: true,
-        requester: splits[ 5 ],
-        encryptedKey: splits[ 6 ],
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
-        isPrimaryKeeperRecovery: true,
-      }
-      this.setState(
-        {
-          recoveryRequest,
-          trustedContactRequest: null,
-        },
-        () => {
-          this.openBottomSheetOnLaunch(
-            BottomSheetKind.TRUSTED_CONTACT_REQUEST,
-            1
-          )
-        }
-      )
-    } else if ( splits[ 4 ] === 'rrk' ) {
-      Alert.alert(
-        'Restoration link Identified',
-        'Restoration links only works during restoration mode'
-      )
-    }
-
-    if ( url && url.includes( 'fastbitcoins' ) ) {
-      const userKey = url.substr( url.lastIndexOf( '/' ) + 1 )
-      this.props.navigation.navigate( 'VoucherScanner', {
-        userKey
-      } )
-    }
-  };
+  }
 
   setUpFocusListener = () => {
     const t0 = performance.now()
@@ -1134,6 +966,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         trustedContactRequest.channelKey = TrustedContactsOperations.decryptData( key, trustedContactRequest.encryptedencryptedChannelKeys ).data
       } catch( err ){
         Toast( 'Invalid key' )
+        return
       }
     }
 
