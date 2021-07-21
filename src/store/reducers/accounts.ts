@@ -42,7 +42,7 @@ import {
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
-import { Accounts } from '../../bitcoin/utilities/Interface'
+import { Account, Accounts } from '../../bitcoin/utilities/Interface'
 
 export type AccountVars = {
   service: any;
@@ -282,13 +282,14 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
         const accounts = action.payload.accounts
         const shells = state.accountShells
         shells.forEach( ( shell )=>{
-          const account = accounts[ shell.primarySubAccount.id ]
+          const account: Account = accounts[ shell.primarySubAccount.id ]
           if( !account ) return shell
 
           const accountDetails = {
             accountName: account.accountName,
             accountDescription: account.accountDescription,
-            accountXpub: account.xpub
+            accountXpub: account.xpub,
+            accountVisibility: account.accountVisibility,
           }
           AccountShell.updatePrimarySubAccountDetails(
             shell,

@@ -5,7 +5,7 @@ import Colors from '../../../common/Colors'
 import Fonts from '../../../common/Fonts'
 import FormStyles from '../../../common/Styles/FormStyles'
 import { RFValue } from 'react-native-responsive-fontsize'
-import { updateSubAccountSettings } from '../../../store/actions/accounts'
+import { updateAccountSettings } from '../../../store/actions/accounts'
 import useAccountSettingsUpdatedEffect from '../../../utils/hooks/account-effects/UseAccountSettingsUpdatedEffect'
 import useAccountShellFromNavigation from '../../../utils/hooks/state-selectors/accounts/UseAccountShellFromNavigation'
 import { useDispatch } from 'react-redux'
@@ -54,8 +54,13 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
   function handleSaveButtonPress() {
     primarySubAccount.customDisplayName = accountName
     primarySubAccount.customDescription = accountDescription
-
-    dispatch( updateSubAccountSettings( primarySubAccount ) )
+    const settings = {
+      accountName,
+      accountDescription,
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
   }
 
   return (

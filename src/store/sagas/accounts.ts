@@ -663,7 +663,7 @@ function* updateAccountSettingsWorker( { payload }: {
   const { accountName, accountDescription, visibility } = settings
 
   try {
-    const account: Account = yield select( state => state.accounts[ accountShell.primarySubAccount.id ] )
+    const account: Account = yield select( state => state.accounts.accounts[ accountShell.primarySubAccount.id ] )
     if( accountName ) account.accountName = accountName
     if( accountDescription ) account.accountDescription = accountDescription
     if( visibility ) account.accountVisibility = visibility
