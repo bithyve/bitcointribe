@@ -105,14 +105,14 @@ const HomeHeader = ( {
     }}>
       <View style={{
         backgroundColor: isError ? Colors.red : Colors.green,
-        width: wp( '5%' ), height: wp( '5%' ), borderRadius: wp( '2.5%' ),
+        width: wp( '5.5%' ), height: wp( '5.5%' ), borderRadius: wp( '5.5/2%' ),
         alignItems:'center',
         justifyContent: 'center'
       }}>
         <Image
-          source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/icon_error_white.png' )}
+          source={isError ? require( '../../assets/images/icons/icon_error_white.png' ) : require( '../../assets/images/icons/check_white.png' )}
           style={{
-            width: wp( '4%' ), height: wp( '4%' ),
+            width: wp( '3.5%' ), height: wp( '3.5%' ),
           }}
           resizeMode={'contain'}
         />

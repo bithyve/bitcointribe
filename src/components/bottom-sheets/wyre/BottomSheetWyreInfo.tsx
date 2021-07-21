@@ -19,6 +19,7 @@ import { AccountType } from '../../../bitcoin/utilities/Interface'
 import useWallet from '../../../utils/hooks/state-selectors/UseWallet'
 import { newAccountsInfo } from '../../../store/sagas/accounts'
 import { addNewAccountShells } from '../../../store/actions/accounts'
+import DropDown from '../../../utils/Dropdown'
 
 type Props = {
   wyreFromDeepLink: boolean | null;
@@ -32,6 +33,15 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
   const dispatch = useDispatch()
   const { wyreHostedUrl } = useWyreIntegrationState()
   const wallet = useWallet()
+  const [ dropdown, showDropdown ] = useState( false )
+  const dropdownBoxList = [ {
+    id: 1,
+    type: AccountType.CHECKING_ACCOUNT
+  },
+  {
+    id: 2,
+    type: AccountType.DEPOSIT_ACCOUNT
+  } ]
   const [ pickReceiveAddressFrom, setPickReceiveAddressFrom ] = useState( AccountType.CHECKING_ACCOUNT )
   const wyreReceiveAddress = useReceivingAddressFromAccount( AccountType.WYRE_ACCOUNT, pickReceiveAddressFrom )
   const [ hasButtonBeenPressed, setHasButtonBeenPressed ] = useState<boolean | false>()
@@ -88,7 +98,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       }}
     >
       <FontAwesome name="close" color={Colors.white} size={19} style={{
-        // marginTop: hp( 0.5 )
+      // marginTop: hp( 0.5 )
       }} />
     </TouchableOpacity>
     {/* <Text style={styles.modalTitleText}>{wyreTitle}</Text> */}
@@ -100,23 +110,44 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
         marginBottom: wp( 5 ),
       }}>{wyreMessage}</Text>
     </View>
+    <TouchableOpacity
+      onPress={() => showDropdown( true )}
+      style={styles.containerStyle}>
+      <View style={styles.headerImageView}>
+        <View style={styles.headerImageInitials}>
+          <Image
+            source={require( '../../../assets/images/icons/ramp_logo_notext.png' )}
+            style={styles.headerImage}
+            resizeMode="contain"
+          />
+        </View>
+      </View>
 
-    <View style={{
-      flexDirection: 'row',
-      alignSelf: 'center',
-      width: wp( '90%' ),
-      height: hp( 9 ),
-      backgroundColor: Colors.white,
-      alignItems: 'center',
-      marginBottom: wp( 4 ),
-      borderRadius: wp( 2 ),
-      elevation: 10,
-      shadowColor: Colors.borderColor,
-      shadowOpacity: 10,
-      shadowOffset: {
-        width: 2, height: 2
-      },
-    }}>
+      <ListItem.Content style={{
+        flex: 1,
+      }}>
+        <ListItem.Subtitle
+          style={ListStyles.infoHeaderSubtitleText}
+          numberOfLines={1}
+        >
+              Account Type
+        </ListItem.Subtitle>
+
+
+        <ListItem.Title
+          style={styles.destinationTitleText}
+          numberOfLines={1}
+        >
+          {pickReceiveAddressFrom}
+        </ListItem.Title>
+      </ListItem.Content>
+    </TouchableOpacity>
+    {dropdown ? (
+      <DropDown onClose={( value ) => { setPickReceiveAddressFrom( value.type )
+        showDropdown( false ) }}
+      dropdownBoxList={dropdownBoxList} />
+    ) : null}
+    <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -145,23 +176,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
       </ListItem.Content>
     </View>
 
-    <View style={{
-      flexDirection: 'row',
-      // marginLeft: wp( '1.5%' ),
-      alignSelf: 'center',
-      width: wp( '90%' ),
-      height: hp( 9 ),
-      backgroundColor: Colors.white,
-      alignItems: 'center',
-      marginBottom: wp( 2 ),
-      borderRadius: wp( 2 ),
-      elevation: 10,
-      shadowColor: Colors.borderColor,
-      shadowOpacity: 10,
-      shadowOffset: {
-        width: 2, height: 2
-      },
-    }}>
+    <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
           <Image
@@ -191,7 +206,7 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
     </View>
 
     <View style={{
-      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start', marginBottom: hp( '1%' )
+      flexDirection: 'column', marginTop: 'auto', alignItems: 'flex-start',
     }} >
       <AppBottomSheetTouchableWrapper
         disabled={wyreFromBuyMenu ? hasButtonBeenPressed : false}
@@ -237,6 +252,23 @@ const BottomSheetWyreInfo: React.FC<Props> = ( { wyreDeepLinkContent, wyreFromBu
 }
 
 const styles = StyleSheet.create( {
+  containerStyle: {
+    flexDirection: 'row',
+    marginLeft: wp( '3%' ),
+    // alignSelf: 'center',
+    width: wp( '90%' ),
+    height: hp( '11%' ),
+    backgroundColor: Colors.white,
+    alignItems: 'center',
+    marginBottom: wp( 2 ),
+    borderRadius: wp( 2 ),
+    // elevation: 10,
+    // shadowColor: Colors.borderColor,
+    // shadowOpacity: 10,
+    // shadowOffset: {
+    //   width: 2, height: 2
+    // },
+  },
   headerImageView: {
     width: wp( '15%' ),
     height: wp( '15%' ),
@@ -304,11 +336,11 @@ const styles = StyleSheet.create( {
   },
   successModalButtonView: {
     minHeight: 50,
-    minWidth: 144,
+    minWidth: 110,
     paddingHorizontal: wp( 4 ),
     paddingVertical: wp( 3 ),
     height: wp( '13%' ),
-    width: wp( '43%' ),
+    width: wp( '36%' ),
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 11,

@@ -114,7 +114,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
       else {
         dispatch( updateSwanStatus( SwanAccountCreationStatus.ACCOUNT_CREATED ) )
       }
-      showSwanModal( true )
+      setTimeout( () => {
+        showSwanModal( true )
+      }, 600 )
+
     }
   }, [] )
 
