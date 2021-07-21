@@ -59,7 +59,8 @@ import {
   feeAndExchangeRatesWatcher,
   autoSyncShellsWatcher,
   validateTwoFAWatcher,
-  createSmNResetTFAOrXPrivWatcher
+  createSmNResetTFAOrXPrivWatcher,
+  updateAccountSettingsWatcher
 } from './sagas/accounts'
 
 import {
@@ -220,6 +221,7 @@ const rootSaga = function* () {
     autoSyncShellsWatcher,
     validateTwoFAWatcher,
     createSmNResetTFAOrXPrivWatcher,
+    updateAccountSettingsWatcher,
 
     // sss watchers
     initHCWatcher,
