@@ -154,6 +154,7 @@ import { NotificationType } from '../../components/home/NotificationType'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
 import ModalContainer from '../../components/home/ModalContainer'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import SSS from '../../bitcoin/utilities/sss/SSS'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -960,10 +961,12 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.closeBottomSheet()
     const { navigation } = this.props
     const { trustedContactRequest } = this.state
-
     if( !trustedContactRequest.isQR ){
       try{
-        trustedContactRequest.channelKey = TrustedContactsOperations.decryptData( key, trustedContactRequest.encryptedencryptedChannelKeys ).data
+        const channelKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+        const channelKeysArray = channelKeys.split( ';' )
+        trustedContactRequest.channelKey = channelKeysArray[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeysArray[ 1 ]
       } catch( err ){
         Toast( 'Invalid key' )
         return

@@ -275,10 +275,10 @@ export const generateDeepLink = ( selectedContact: any, correspondingTrustedCont
     number = number.slice( number.length - 10 ) // last 10 digits only
     const hintType = DeepLinkHintType.NUMBER
     const hint = number[ 0 ] + number.slice( number.length - 2 )
-    const encryptedChannelKeys = TrustedContactsOperations.encryptData(
+    const encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
       correspondingTrustedContact.channelKey + ';' + correspondingTrustedContact.secondaryChannelKey,
-      number,
-    ).encryptedData
+      number
+    )
 
     let deepLinkKind: DeepLinkKind
     switch( correspondingTrustedContact.relationType ){
