@@ -36,6 +36,9 @@ import {
   refreshAccountShell,
 } from '../actions/accounts'
 import {
+  updateWalletImageHealth
+} from '../actions/health'
+import {
   SECURE_ACCOUNT,
 } from '../../common/constants/wallet-service-types'
 import {
@@ -635,7 +638,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
   } ) )
   yield call( dbManager.createAccounts, accounts )
   yield call( dbManager.createWallet, updatedWallet )
-
+  yield put( updateWalletImageHealth() )
   if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
