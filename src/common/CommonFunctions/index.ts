@@ -276,7 +276,7 @@ export const generateDeepLink = ( selectedContact: any, correspondingTrustedCont
     const hintType = DeepLinkHintType.NUMBER
     const hint = number[ 0 ] + number.slice( number.length - 2 )
     const encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
-      correspondingTrustedContact.channelKey + ';' + correspondingTrustedContact.secondaryChannelKey,
+      correspondingTrustedContact.channelKey + ';' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' ),
       number
     )
 
