@@ -253,7 +253,7 @@ interface HomePropsTypes {
   setCurrencyCode: any;
   currencyCode: any;
   updatePreference: any;
-  fcmTokenValue: any;
+  existingFCMToken: any;
   setFCMToken: any;
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
@@ -545,6 +545,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // call this once deeplink is detected aswell
       this.handleDeepLinkModal()
 
+      // set FCM token(if haven't already)
+      this.storeFCMToken()
+
       const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
       if ( unhandledDeepLinkURL ) {
@@ -558,6 +561,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
   };
+
+   storeFCMToken = async () => {
+     const fcmToken = await messaging().getToken()
+     if ( !this.props.existingFCMToken || this.props.existingFCMToken != fcmToken ) {
+       this.props.setFCMToken( fcmToken )
+       this.props.updateFCMTokens( [ fcmToken ] )
+     }
+   }
 
   updateBadgeCounter = () => {
     const { messages } = this.props
@@ -1437,7 +1448,7 @@ const mapStateToProps = ( state ) => {
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
+    existingFCMToken: idx( state, ( _ ) => _.preferences.existingFCMToken ),
     secondaryDeviceAddressValue: idx(
       state,
       ( _ ) => _.preferences.secondaryDeviceAddressValue
