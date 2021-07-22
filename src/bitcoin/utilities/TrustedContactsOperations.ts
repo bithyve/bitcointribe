@@ -253,19 +253,22 @@ export default class TrustedContactsOperations {
       ( unencryptedInstream as UnecryptedStreamData ).primaryData,
       ( _ ) => _.relationType
     )
-    if (
-      [
-        TrustedContactRelationTypes.WARD,
-        TrustedContactRelationTypes.KEEPER_WARD,
-      ].includes( contact.relationType ) &&
-      [ TrustedContactRelationTypes.CONTACT ].includes( relationshipType )
-    )
-      delete contact.contactsSecondaryChannelKey
-    if ( relationshipType === TrustedContactRelationTypes.KEEPER )
-      contact.relationType = TrustedContactRelationTypes.WARD
-    else if ( relationshipType === TrustedContactRelationTypes.WARD )
-      contact.relationType = TrustedContactRelationTypes.KEEPER
-    else contact.relationType = relationshipType
+
+    if( relationshipType ){
+      if (
+        [
+          TrustedContactRelationTypes.WARD,
+          TrustedContactRelationTypes.KEEPER_WARD,
+        ].includes( contact.relationType ) &&
+        [ TrustedContactRelationTypes.CONTACT ].includes( relationshipType )
+      )
+        delete contact.contactsSecondaryChannelKey
+      if ( relationshipType === TrustedContactRelationTypes.KEEPER )
+        contact.relationType = TrustedContactRelationTypes.WARD
+      else if ( relationshipType === TrustedContactRelationTypes.WARD )
+        contact.relationType = TrustedContactRelationTypes.KEEPER
+      else contact.relationType = relationshipType
+    }
   };
 
   static syncPermanentChannels = async (
