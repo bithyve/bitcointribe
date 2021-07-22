@@ -327,9 +327,7 @@ function* refreshAccountShellWorker( { payload } ) {
     accounts: synchedAccounts
   } ) )
 
-  for( const synchedAcc of synchedAccounts ){
-    yield call( dbManager.updateAccount, synchedAcc.id, synchedAcc )
-  }
+  // TODO: insert updated accounts into Realm
 
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {
