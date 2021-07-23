@@ -595,6 +595,10 @@ export interface TrustedContact {
   streamId?: string, // contact's streamId
   walletID?: string, // contact's walletId
   contactsSecondaryChannelKey?: string, // contacts secondaryKey(stored locally)
+  deepLinkConfig?: {
+    encryptionType: DeepLinkEncryptionType,
+    encryptionKey: string | null,
+  }
 }
 export interface Trusted_Contacts {
   [channelKey: string]: TrustedContact

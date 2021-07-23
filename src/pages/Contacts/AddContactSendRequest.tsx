@@ -29,8 +29,11 @@ import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
 import { DeepLinkEncryptionType, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
-import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
+import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels, updateTrustedContacts } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
+import idx from 'idx'
+import Toast from '../../components/Toast'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -118,8 +121,8 @@ export default function AddContactSendRequest( props ) {
   }, [ Contact ] )
 
   useEffect( () => {
+    // capture the contact
     if( !Contact ) return
-
     const contacts: Trusted_Contacts = trustedContacts
     let currentContact: TrustedContact
     let channelKey: string
@@ -133,34 +136,58 @@ export default function AddContactSendRequest( props ) {
           break
         }
       }
+    if ( !currentContact ) return
 
-    if ( currentContact ) {
-      const { secondaryChannelKey } = currentContact
-      const appVersion = DeviceInfo.getVersion()
-      setTrustedQR(
-        JSON.stringify( {
-          type: QRCodeTypes.CONTACT_REQUEST,
-          channelKey,
-          walletName: wallet.walletName,
-          secondaryChannelKey,
-          version: appVersion,
-        } )
-      )
+    // generate deep link & QR for the contact
+    let encryption_key: string
+    if( currentContact.deepLinkConfig ){
+      const { encryptionType, encryptionKey } = currentContact.deepLinkConfig
+      if( encryptLinkWith === encryptionType ) encryption_key = encryptionKey
+    }
 
-      let encryptionKey: string
+    if( !encryption_key )
       switch( encryptLinkWith ){
           case DeepLinkEncryptionType.NUMBER:
-            const phoneNumber = Contact.phoneNumbers[ 0 ].number
-            const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-            encryptionKey = number.slice( number.length - 10 ) // last 10 digits only
+            const phoneNumber = idx( Contact, ( _ ) => _.phoneNumbers[ 0 ].number )
+            if( phoneNumber ){
+              const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+              encryption_key = number.slice( number.length - 10 ) // last 10 digits only
+            } else { Toast( 'F&F contact number missing' ); return }
             break
 
           case DeepLinkEncryptionType.OTP:
+            encryption_key = TrustedContactsOperations.generateKey( 6 )
+            setOTP( encryption_key )
+            setIsOTPType( true )
+            shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
             break
       }
 
-      setTrustedLink( generateDeepLink( encryptLinkWith, encryptionKey, currentContact, wallet.walletName ) )
-    }
+    setTrustedLink( generateDeepLink( encryptLinkWith, encryption_key, currentContact, wallet.walletName ) )
+    const { secondaryChannelKey } = currentContact
+    const appVersion = DeviceInfo.getVersion()
+    setTrustedQR(
+      JSON.stringify( {
+        type: QRCodeTypes.CONTACT_REQUEST,
+        channelKey,
+        walletName: wallet.walletName,
+        secondaryChannelKey,
+        version: appVersion,
+      } )
+    )
+
+    // update deeplink configuration for the contact
+    if( !currentContact.deepLinkConfig || currentContact.deepLinkConfig.encryptionType !== encryptLinkWith )
+      dispatch( updateTrustedContacts( {
+        [ currentContact.channelKey ]: {
+          ...currentContact,
+          deepLinkConfig: {
+            encryptionType: encryptLinkWith,
+            encryptionKey: encryption_key,
+          }
+        }
+      } ) )
+
   }, [ Contact, trustedContacts, encryptLinkWith ] )
 
   // const openTimer = async () => {
@@ -330,13 +357,6 @@ export default function AddContactSendRequest( props ) {
       />
     )
   }, [] )
-
-  const setPhoneNumber = () => {
-    const phoneNumber = Contact.phoneNumbers[ 0 ].number
-    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-    number = number.slice( number.length - 10 ) // last 10 digits only
-    return number
-  }
 
   const renderShareOtpWithTrustedContactContent = useCallback( () => {
     return (
