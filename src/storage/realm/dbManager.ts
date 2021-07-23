@@ -61,7 +61,19 @@ const updateAccount = async ( accountId, account ) => {
   try {
     let acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
     const data = {
-      ...account, txIdMap: [],
+      ...account,
+    }
+    if( data.txIdMap.length === 0 ) {
+      delete data.txIdMap
+    } else {
+      const map = []
+      for ( const [ key, value ] of Object.entries( data.txIdMap ) ) {
+        map.push( {
+          id: key,
+          txIds: value
+        } )
+      }
+      data.txIdMap = map
     }
     for ( let i = 0; i < data.transactions.length; i++ ) {
       if( !data.transactions[ i ].senderAddresses ) {
@@ -73,7 +85,8 @@ const updateAccount = async ( accountId, account ) => {
     }
     data.addressQueryList = []
     acccountRef = data
-    db.create( schema.Account, acccountRef, true )  } catch ( error ) {
+    db.create( schema.Account, acccountRef, true )  }
+  catch ( error ) {
     console.log( error )
   }
 }
