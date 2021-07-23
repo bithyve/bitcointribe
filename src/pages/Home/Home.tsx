@@ -936,13 +936,13 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       try{
         switch( trustedContactRequest.encryptionType ){
             case DeepLinkEncryptionType.DEFAULT:
-              channelKeys = trustedContactRequest.encryptedChannelKeys.split( ';' )
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
               break
 
             case DeepLinkEncryptionType.NUMBER:
             case DeepLinkEncryptionType.OTP:
               const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
-              channelKeys = decryptedKeys.split( ';' )
+              channelKeys = decryptedKeys.split( '-' )
               break
         }
 

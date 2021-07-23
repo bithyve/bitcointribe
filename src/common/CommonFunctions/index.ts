@@ -266,7 +266,7 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
 }
 
 export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryptionKey: string, correspondingTrustedContact: TrustedContact, walletName: string ) => {
-  const keysToEncrypt = correspondingTrustedContact.channelKey + ';' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
+  const keysToEncrypt = correspondingTrustedContact.channelKey + '-' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
   let encryptedChannelKeys: string
   let encryptionHint: string
   switch ( encryptionType ) {
