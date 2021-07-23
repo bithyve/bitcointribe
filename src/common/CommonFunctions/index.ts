@@ -354,7 +354,7 @@ export const processDeepLink = async ( deepLink: string ) =>{
     }
 }
 
-export const processFriendsAndFamilyQR = async ( qrData: string ) => {
+export const processFriendsAndFamilyQR = ( qrData: string ) => {
   try {
     const scannedData = JSON.parse( qrData )
     // disabled check version compatibility
