@@ -22,6 +22,13 @@ import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import { withNavigation } from 'react-navigation'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
+
+const ALLOWED_CHARACTERS_REGEXP = /^[0-9a-z]+$/
+
+function validateAllowedCharacters( answer: string ): boolean {
+  return answer == '' || ALLOWED_CHARACTERS_REGEXP.test( answer )
+}
+
 function SecurityQuestion( props ) {
   const { security } = useSelector(
     ( state ) => state.storage.wallet,
@@ -142,6 +149,11 @@ function SecurityQuestion( props ) {
                 onChangeText={( text ) => {
                   setAnswer( text )
                 }}
+                onBlur={() => {
+                  if ( validateAllowedCharacters( answer ) == false ) {
+                    setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
+                  }
+                }}
                 keyboardType={
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
@@ -202,6 +214,8 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm()
                 } )
+              } else if ( validateAllowedCharacters( answer ) == false ) {
+                setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }

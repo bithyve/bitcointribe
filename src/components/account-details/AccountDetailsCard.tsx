@@ -100,6 +100,10 @@ const AccountDetailsCard: React.FC<Props> = ( {
   const [ swanModal, showSwanModal ] = useState( false )
   const dispatch = useDispatch()
   const startRegistration = useSelector( ( state ) => state.swanIntegration.startRegistration )
+  const isTestAccount = useMemo( () => {
+    return accountShell.primarySubAccount.kind == SubAccountKind.TEST_ACCOUNT
+  }, [ accountShell.primarySubAccount.kind ] )
+
   useEffect( () => {
     if (
       startRegistration &&
@@ -187,6 +191,7 @@ const AccountDetailsCard: React.FC<Props> = ( {
           currencyImageStyle={styles.balanceCurrencyIcon}
           bitcoinIconColor="light"
           textColor={Colors.white}
+          isTestAccount={isTestAccount}
         />
         { accountShell.primarySubAccount.type !== AccountType.SWAN_ACCOUNT &&
         <KnowMoreButton />

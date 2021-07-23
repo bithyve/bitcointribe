@@ -11,6 +11,7 @@ import TransactionKind from '../../common/data/enums/TransactionKind'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import useCurrencyKind from '../../utils/hooks/state-selectors/UseCurrencyKind'
 import LabeledBalanceDisplay from '../LabeledBalanceDisplay'
+import { AccountType } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   transaction: TransactionDescribing;
@@ -87,6 +88,7 @@ const TransactionListItemContent: React.FC<Props> = ( {
           iconSpacing={2}
           bitcoinIconColor="gray"
           textColor="gray"
+          isTestAccount={transaction.accountType === AccountType.TEST_ACCOUNT}
         />
       </ListItem.Content>
 

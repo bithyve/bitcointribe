@@ -29,6 +29,7 @@ export type Props = {
   onReceivePressed: () => void;
   averageTxFees: any;
   network: NetworkKind;
+  isTestAccount: boolean;
 };
 
 const FooterButton: React.FC<FooterButtonProps> = ( {
@@ -65,6 +66,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
   onReceivePressed,
   averageTxFees,
   network,
+  isTestAccount
 } ) => {
   const currencyKind = useCurrencyKind()
   const currencyCode = useCurrencyCode()
@@ -101,7 +103,7 @@ const SendAndReceiveButtonsFooter: React.FC<Props> = ( {
         title="Send"
         subtitle={`Tran Fee: ~${
           averageTxFees ? averageTxFees[ network ].low.averageTxFee : 0
-        } (${transactionFeeUnitText})`}
+        } (${isTestAccount ? 't-sats' : transactionFeeUnitText})`}
         imageSource={require( '../../../assets/images/icons/icon_send.png' )}
       />
       <FooterButton
