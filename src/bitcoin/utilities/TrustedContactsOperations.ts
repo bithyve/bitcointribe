@@ -26,8 +26,19 @@ export default class TrustedContactsOperations {
     keyLength: number;
   } = config.CIPHER_SPEC;
 
-  static getStreamId = ( walletId: string ): string =>
-    crypto.createHash( 'sha256' ).update( walletId ).digest( 'hex' ).slice( 0, 9 );
+   static getStreamId = ( walletId: string ): string =>
+     crypto.createHash( 'sha256' ).update( walletId ).digest( 'hex' ).slice( 0, 9 );
+
+   static generateKey = ( length: number ): string => {
+     let result = ''
+     const characters =
+     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+     const charactersLength = characters.length
+     for ( let itr = 0; itr < length; itr++ ) {
+       result += characters.charAt( Math.floor( Math.random() * charactersLength ) )
+     }
+     return result
+   };
 
    static deriveStandardKey = ( psuedoKey: string ): string => {
      let key = psuedoKey
