@@ -998,7 +998,7 @@ function* updateWalletImageWorker() {
   }
   // console.log( 'walletImage', walletImage )
 */
-  const res = yield call( s3Service.updateWalletImageKeeper, image )
+  const res = yield call( Relay.updateWalletImage, image )
   //const getWI = yield call( s3Service.fetchWalletImage )
   if ( res.status === 200 ) {
     if ( res.data.updated ) console.log( 'Wallet Image updated' )
