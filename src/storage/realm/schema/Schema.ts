@@ -11,6 +11,7 @@ const Balances = 'Balances'
 const Bip32 = 'Bip32'
 const Network = 'Network'
 const XPUB = 'XPUB'
+const TxIdMap = 'TxIdMap'
 const AccountId = 'AccountId'
 const ContactDetails = 'ContactDetails'
 const TrustedContact = 'TrustedContact'
@@ -89,7 +90,7 @@ export const AccountSchema: ObjectSchema = {
       type: 'list', objectType: Transaction, default: []
     },
     txIdMap: {
-      type: 'string?[]', optional: true
+      type: 'list', objectType: TxIdMap, default: []
     },
     addressQueryList: {
       type: 'string?[]', optional: true
@@ -100,6 +101,18 @@ export const AccountSchema: ObjectSchema = {
     lastSynched: {
       type: 'int', optional: true
     }
+  },
+}
+
+export const TxIdMapSchema: ObjectSchema = {
+  name: TxIdMap,
+  properties: {
+    id: {
+      type: 'string',
+    },
+    txIds: {
+      type: 'string?[]', optional: true
+    },
   },
 }
 

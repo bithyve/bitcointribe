@@ -284,18 +284,24 @@ export default class Relay {
   public static updateWalletImage = async (
     walletImage: NewWalletImage,
   ): Promise<{
-    updated: boolean;
-  }> => {
+
+      status: number;
+      data: {
+        updated: boolean;
+      };
+      err?: undefined;
+      message?: undefined;
+    }  > => {
     try {
       const res: AxiosResponse = await BH_AXIOS.post( 'v2/updateWalletImage', {
         HEXA_ID,
         walletID: walletImage.walletId,
         walletImage,
       } )
-      console.log( 'updateWalletImage', res.data )
       const { updated } = res.data
       return {
-        updated
+        status: res.status,
+        data: updated
       }
     } catch ( err ) {
       throw new Error( 'Failed to update Wallet Image' )

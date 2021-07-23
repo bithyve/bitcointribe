@@ -168,10 +168,9 @@ function* executeSendStage2( { payload }: {payload: {
     yield put( updateAccountShells( {
       accounts
     } ) )
-    //TODO: save accounts object into realm
-    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-    tempDB.accounts[ account.id ] = account
-    yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
+    // const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
+    // tempDB.accounts[ account.id ] = account
+    // yield call ( AsyncStorage.setItem, 'tempDB', JSON.stringify( tempDB ) )
     yield call( dbManager.updateAccount, account.id, account )
   } else
     yield put( sendStage2Executed( {
