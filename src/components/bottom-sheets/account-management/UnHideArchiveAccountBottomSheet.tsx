@@ -12,9 +12,10 @@ import { RFValue } from 'react-native-responsive-fontsize'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'
 import getAvatarForSubAccount from '../../../utils/accounts/GetAvatarForSubAccountKind'
 import AccountVisibility from '../../../common/data/enums/AccountVisibility'
+import useAccountShell from '../../../utils/hooks/state-selectors/accounts/UseAccountShell'
 
 export type Props = {
-  onProceed: () => void;
+  onProceed: ( accountShell ) => void;
   onBack: () => void;
   accountInfo: any;
 };
@@ -78,6 +79,8 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
   onBack,
   accountInfo
 }: Props ) => {
+  const accountShell = useAccountShell( accountInfo.accountShellID )
+
   return (
     <View style={styles.rootContainer}>
 
@@ -100,7 +103,7 @@ const UnHideArchiveAccountBottomSheet: React.FC<Props> = ( {
         <View style={styles.footerSectionContainer}>
           <View style={styles.actionButtonContainer}>
             <TouchableOpacity
-              onPress={onProceed}
+              onPress={( ) => onProceed( accountShell )}
               style={ButtonStyles.primaryActionButton}
             >
               <Text style={ButtonStyles.actionButtonText}>{accountInfo.visibility === AccountVisibility.HIDDEN ? 'Unhide' : 'Restore'}</Text>

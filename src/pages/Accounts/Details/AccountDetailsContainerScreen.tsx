@@ -288,6 +288,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
                       ? NetworkKind.TESTNET
                       : NetworkKind.MAINNET
                   }
+                  isTestAccount={primarySubAccount.sourceKind === SourceAccountKind.TEST_ACCOUNT}
                 />
 
                 {isShowingDonationButton && (
