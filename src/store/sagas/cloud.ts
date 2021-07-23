@@ -39,32 +39,30 @@ function* cloudWorker( { payload } ) {
       const MetaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
       yield put( setCloudBackupStatus( CloudBackupStatus.IN_PROGRESS ) )
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
-      const RK: MetaShare = MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.find( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
+      console.log( 'CLOUD CALL PAYLOAD', payload )
+      const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
+      console.log( 'CLOUD CALL PAYLOAD', index )
+      const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
 
       const obj: KeeperInfoInterface = {
         shareId: share ? share.shareId : levelHealth[ 0 ].levelInfo[ 1 ].shareId,
         name: Platform.OS == 'ios' ? 'iCloud' : 'Google Drive',
         type: share ? share.shareType : levelHealth[ 0 ].levelInfo[ 1 ].shareType,
-        scheme: MetaShares && MetaShares.length && RK.meta.scheme ? RK.meta.scheme : '1of1',
+        scheme: MetaShares && MetaShares.length && RK && RK.meta.scheme ? RK.meta.scheme : '1of1',
         currentLevel: level,
         createdAt: moment( new Date() ).valueOf(),
-        sharePosition: MetaShares && MetaShares.length && MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : -1,
+        sharePosition: index != null ? index : -1,
         data: {
         }
       }
       console.log( 'CLOUD obj', obj )
       const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
-      let flag = false
       for ( let i = 0; i < keeperInfo.length; i++ ) {
-        const element = keeperInfo[ i ]
-        if ( element.shareId != obj.shareId ) {
-          flag = flag ? flag : false
-          if( level == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = level
-          else if( level == 2 && keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = level
-          else if( level == 3 && keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = level
-        } else flag = true
+        if( level == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = level
+        else if( level == 2 && keeperInfo[ i ].scheme == '2of3' ) keeperInfo[ i ].currentLevel = level
+        else if( level == 3 && keeperInfo[ i ].scheme == '3of5' ) keeperInfo[ i ].currentLevel = level
       }
-      if ( flag ) {
+      if ( !keeperInfo.find( value=>value.shareId == obj.shareId ) ) {
         keeperInfo.push( obj )
       }
       console.log( 'CLOUD keeperInfo', keeperInfo )
@@ -90,16 +88,8 @@ function* cloudWorker( { payload } ) {
         versionHistory,
         trustedContactsInfo
       )
+      console.log( 'CLOUD shares', shares )
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
-
-      const keeperData = [
-        {
-          shareId: '',
-          KeeperType: 'cloud',
-          updated: '',
-          reshareVersion: 0,
-        },
-      ]
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
 
       const data = {
@@ -111,7 +101,7 @@ function* cloudWorker( { payload } ) {
         questionId: wallet.security.questionId,
         question: wallet.security.questionId === '0' ? wallet.security.question: '',
         regularAccount: regularAccount,
-        keeperData: kpInfo ? JSON.stringify( kpInfo ) : JSON.stringify( keeperData ),
+        keeperData: JSON.stringify( keeperInfo ),
         bhXpub,
       }
 
@@ -154,7 +144,7 @@ export const cloudWatcher = createWatcher(
 )
 
 function* updateHealthForCloudStatusWorker( { payload } ) {
-  console.log( 'setCloudBackupStatusWorker', payload )
+  console.log( 'updateHealthForCloudStatusWorker', payload )
   try {
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
 
@@ -187,6 +177,7 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
+    console.log( 'updateHealthForCloudWorker payload', payload )
     const levelHealth = yield select( ( state ) => state.health.levelHealth )
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
     const s3Service = yield select( ( state ) => state.health.service )
@@ -200,28 +191,28 @@ function* updateHealthForCloudWorker( { payload } ) {
       levelHealthVar = levelHealth[ levelHealth.length - 1 ].levelInfo[ 1 ]
     }
     // health update for 1st upload to cloud
-    if (
-      levelHealth.length &&
-      levelHealthVar.status != 'accessible'
-    ) {
-      if ( levelHealthVar.shareType == 'cloud' ) {
-        levelHealthVar.updatedAt = moment( new Date() ).valueOf()
-        levelHealthVar.status = 'accessible'
-        levelHealthVar.reshareVersion = 0
-        levelHealthVar.name = Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
-      }
-      const shareObj = {
-        walletId: s3Service.getWalletId().data.walletId,
-        shareId: levelHealthVar.shareId,
-        reshareVersion: levelHealthVar.reshareVersion,
-        updatedAt: moment( new Date() ).valueOf(),
-        status: 'accessible',
-        shareType: 'cloud',
-        name: levelHealthVar.name
-      }
-
-      yield put( updateMSharesHealth( shareObj ) )
+    // if (
+    //   levelHealth.length &&
+    //   levelHealthVar.status != 'accessible'
+    // ) {
+    if ( levelHealthVar.shareType == 'cloud' ) {
+      levelHealthVar.updatedAt = moment( new Date() ).valueOf()
+      levelHealthVar.status = 'accessible'
+      levelHealthVar.reshareVersion = 0
+      levelHealthVar.name = Platform.OS == 'ios' ? 'iCloud' : 'Google Drive'
     }
+    const shareObj = {
+      walletId: s3Service.getWalletId().data.walletId,
+      shareId: levelHealthVar.shareId,
+      reshareVersion: levelHealthVar.reshareVersion,
+      updatedAt: moment( new Date() ).valueOf(),
+      status: 'accessible',
+      shareType: 'cloud',
+      name: levelHealthVar.name
+    }
+    console.log( 'updateHealthForCloudStatusWorker shareObj', shareObj )
+    yield put( updateMSharesHealth( shareObj ) )
+    // }
   }
   catch ( error ) {
     yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )

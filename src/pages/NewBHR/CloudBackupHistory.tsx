@@ -62,7 +62,7 @@ const CloudBackupHistory = ( props ) => {
   const keeperInfo = useSelector( ( state ) => state.health.keeperInfo )
 
   const levelHealth: LevelHealthInterface[] = useSelector( ( state ) => state.health.levelHealth )
-  const currentLevel = useSelector( ( state ) => state.health.currentLevel )
+  let currentLevel = useSelector( ( state ) => state.health.currentLevel )
 
   const next = props.navigation.getParam( 'next' )
   const dispatch = useDispatch()
@@ -76,11 +76,13 @@ const CloudBackupHistory = ( props ) => {
     } else if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
       if( levelHealth[ 1 ].levelInfo.length == 4 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 ){
         share = levelHealth[ 1 ].levelInfo[ 1 ]
+        currentLevel = 2
       } else if( levelHealth[ 1 ].levelInfo.length == 6 && levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 && levelHealth[ 1 ].levelInfo[ 5 ].updatedAt > 0 ){
         share = levelHealth[ 1 ].levelInfo[ 1 ]
+        currentLevel = 3
       }
     }
-    console.log( 'share', share )
+    console.log( 'CLOUD updateCloudData share', share )
     if( levelHealth[ 0 ].levelInfo[ 0 ].status != 'notSetup' ){
       dispatch( setCloudData(
         keeperInfo,

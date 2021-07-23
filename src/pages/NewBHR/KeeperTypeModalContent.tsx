@@ -73,14 +73,14 @@ export default function KeeperTypeModalContents( props ) {
         if (
           props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'contact' &&
+          ( element2.shareType == 'contact' || element2.shareType == 'existingContact' ) &&
           props.keeper.shareId != element2.shareId
         ) {
           contactCount++
         } else if (
           !props.keeper &&
           levelhealth[ i ] &&
-          element2.shareType == 'contact'
+          ( element2.shareType == 'contact' || element2.shareType == 'existingContact' )
         )
           contactCount++
         if (
@@ -114,7 +114,11 @@ export default function KeeperTypeModalContents( props ) {
     }
     if ( contactCount >= 2 ) completedKeeperType.push( 'contact' )
     if ( pdfCount >= 1 ) completedKeeperType.push( 'pdf' )
-    if ( deviceCount >= 2 ) completedKeeperType.push( 'device' )
+    if ( deviceCount >= 3 ) completedKeeperType.push( 'device' )
+    console.log( 'contactCount', contactCount )
+    console.log( 'pdfCount', pdfCount )
+    console.log( 'deviceCount', deviceCount )
+
     setCompletedKeeperType( completedKeeperType )
   }
 

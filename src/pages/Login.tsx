@@ -110,7 +110,7 @@ export default function Login( props ) {
   const releaseCasesValue = useSelector(
     ( state ) => state.preferences.releaseCasesValue,
   )
-  const fcmTokenValue = useSelector(
+  const existingFCMToken = useSelector(
     ( state ) => state.preferences.fcmTokenValue,
   )
   const [ requestName, setRequestName ] = useState( null )
@@ -321,16 +321,9 @@ export default function Login( props ) {
 
   const storeFCMToken = async () => {
     const fcmToken = await messaging().getToken()
-    console.log( 'TOKEN', fcmToken )
-    const fcmArray = [ fcmToken ]
-    const fcmTokenFromAsync = fcmTokenValue
-    console.log( 'fcmTokenFromAsync', fcmTokenFromAsync )
-
-    if ( !fcmTokenFromAsync || fcmTokenFromAsync != fcmToken ) {
+    if ( !existingFCMToken || existingFCMToken != fcmToken ) {
       dispatch( setFCMToken( fcmToken ) )
-
-      await AsyncStorage.setItem( 'fcmToken', fcmToken )
-      dispatch( updateFCMTokens( fcmArray ) )
+      dispatch( updateFCMTokens( [ fcmToken ] ) )
     }
   }
 

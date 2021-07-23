@@ -119,7 +119,8 @@ function MBKeeperButton( props ) {
             getImageIcon( keeper.data )
           ) : keeper.shareType == 'pdf' && keeper.status == 'accessible' ? (
             <Image
-              source={require( '../../assets/images/icons/doc.png' )}
+              source={value.status == 'notSetup'
+                ? require( '../../assets/images/icons/doc-blue.png' ) : require( '../../assets/images/icons/doc.png' )}
               style={{
                 width: wp( '5%' ),
                 height: wp( '6%' ),

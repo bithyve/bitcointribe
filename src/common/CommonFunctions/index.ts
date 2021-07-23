@@ -1,12 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DeepLinkHintType, DeepLinkKind, LevelHealthInterface, LevelInfo, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
-import SSS from '../../bitcoin/utilities/sss/SSS'
-import AccountShell from '../data/models/AccountShell'
+import { DeepLinkEncryptionType, DeepLinkKind, LevelHealthInterface, LevelInfo, QRCodeTypes, TrustedContact, TrustedContactRelationTypes } from '../../bitcoin/utilities/Interface'
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
 import { Alert } from 'react-native'
-import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 
@@ -268,48 +265,54 @@ export const getLevelInfo = ( levelHealthVar: LevelHealthInterface[], currentLev
   return levelHealthVar[ currentLevel - 1 ].levelInfo
 }
 
-export const generateDeepLink = ( selectedContact: any, correspondingTrustedContact: TrustedContact, walletName: string ) => {
-  if ( selectedContact.phoneNumbers && selectedContact.phoneNumbers.length ){
-    const phoneNumber = selectedContact.phoneNumbers[ 0 ].number
-    let number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
-    number = number.slice( number.length - 10 ) // last 10 digits only
-    const hintType = DeepLinkHintType.NUMBER
-    const hint = number[ 0 ] + number.slice( number.length - 2 )
-    const encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
-      correspondingTrustedContact.channelKey + ';' + correspondingTrustedContact.secondaryChannelKey,
-      number
-    )
+export const generateDeepLink = ( encryptionType: DeepLinkEncryptionType, encryptionKey: string, correspondingTrustedContact: TrustedContact, walletName: string ) => {
+  const keysToEncrypt = correspondingTrustedContact.channelKey + '-' + ( correspondingTrustedContact.secondaryChannelKey ? correspondingTrustedContact.secondaryChannelKey : '' )
+  let encryptedChannelKeys: string
+  let encryptionHint: string
+  switch ( encryptionType ) {
+      case DeepLinkEncryptionType.DEFAULT:
+        encryptionHint = ''
+        encryptedChannelKeys = keysToEncrypt
+        break
 
-    let deepLinkKind: DeepLinkKind
-    switch( correspondingTrustedContact.relationType ){
-        case TrustedContactRelationTypes.CONTACT:
-          deepLinkKind = DeepLinkKind.CONTACT
-          break
+      case DeepLinkEncryptionType.NUMBER:
+      case DeepLinkEncryptionType.OTP:
+        encryptionHint = encryptionKey[ 0 ] + encryptionKey.slice( encryptionKey.length - 2 )
+        encryptedChannelKeys = TrustedContactsOperations.encryptViaPsuedoKey(
+          keysToEncrypt,
+          encryptionKey
+        )
+        break
+  }
 
-        case TrustedContactRelationTypes.KEEPER:
-          deepLinkKind = DeepLinkKind.KEEPER
-          break
+  let deepLinkKind: DeepLinkKind
+  switch( correspondingTrustedContact.relationType ){
+      case TrustedContactRelationTypes.CONTACT:
+        deepLinkKind = DeepLinkKind.CONTACT
+        break
 
-        case TrustedContactRelationTypes.KEEPER_WARD:
-          deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
-          break
-    }
+      case TrustedContactRelationTypes.KEEPER:
+        deepLinkKind = DeepLinkKind.KEEPER
+        break
 
-    const appType = config.APP_STAGE
-    const appVersion = DeviceInfo.getVersion()
+      case TrustedContactRelationTypes.KEEPER_WARD:
+        deepLinkKind = DeepLinkKind.RECIPROCAL_KEEPER
+        break
+  }
 
-    const deepLink =
+  const appType = config.APP_STAGE
+  const appVersion = DeviceInfo.getVersion()
+
+  const deepLink =
       `https://hexawallet.io
       /${appType}
       /${deepLinkKind}` +
       `/${walletName}` +
       `/${encryptedChannelKeys}` +
-      `/${hintType}` +
-      `/${hint}` +
+      `/${encryptionType}-${encryptionHint}` +
       `/v${appVersion}`
 
-    return deepLink
-  }
+  return deepLink
 }
 
 export const processDeepLink = async ( deepLink: string ) =>{
@@ -325,23 +328,17 @@ export const processDeepLink = async ( deepLink: string ) =>{
       )
     } else {
       const version = splits.pop().slice( 1 )
-      // disabled compatibility check
-      // if ( version ) {
-      //   if ( !( await checkAppVersionCompatibility( {
-      //     relayCheckMethod: splits[ 4 ],
-      //     version,
-      //   } ) ) ) {
-      //     return
-      //   }
-      // }
+      const encryptionMetaSplits = splits[ 7 ].split( '-' )
+      const encryptionType = encryptionMetaSplits[ 0 ] as DeepLinkEncryptionType
+      const encryptionHint = encryptionMetaSplits[ 1 ]
 
       const trustedContactRequest = {
         walletName: splits[ 5 ],
         encryptedChannelKeys: splits[ 6 ],
         isKeeper: [ DeepLinkKind.KEEPER, DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
         isExistingContact: [ DeepLinkKind.RECIPROCAL_KEEPER ].includes( ( splits[ 4 ] as DeepLinkKind ) ),
-        hintType: splits[ 7 ],
-        hint: splits[ 8 ],
+        encryptionType,
+        encryptionHint,
         isQR: false,
         version,
       }
@@ -357,7 +354,7 @@ export const processDeepLink = async ( deepLink: string ) =>{
     }
 }
 
-export const processFriendsAndFamilyQR = async ( qrData: string ) => {
+export const processFriendsAndFamilyQR = ( qrData: string ) => {
   try {
     const scannedData = JSON.parse( qrData )
     // disabled check version compatibility

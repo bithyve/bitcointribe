@@ -7,7 +7,6 @@ import {
   HEALTH_CHECK_INITIALIZED_KEEPER,
   HEALTH_CHECK_INITIALIZE,
   HEALTH_UPDATE,
-  GET_HEALTH_OBJECT,
   ERROR_SENDING,
   S3_LOADING_STATUS,
   MSHARES,
@@ -183,12 +182,6 @@ export default ( state = initialState, action ) => {
           ...state,
           levelHealth: action.payload.health,
           currentLevel: action.payload.currentLevel,
-        }
-
-      case GET_HEALTH_OBJECT:
-        return {
-          ...state,
-          levelHealth: action.payload.health,
         }
 
       case ERROR_SENDING:

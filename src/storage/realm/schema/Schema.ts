@@ -37,6 +37,9 @@ export const AccountSchema: ObjectSchema = {
     accountDescription: {
       type: 'string', optional: true
     },
+    accountVisibility: {
+      type: 'string', default: 'DEFAULT',
+    },
     type: {
       type: 'string', optional: true
     },

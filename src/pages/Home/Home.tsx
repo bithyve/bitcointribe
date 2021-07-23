@@ -1,18 +1,13 @@
 import React, { createRef, PureComponent } from 'react'
 import {
-  View,
   StyleSheet,
   StatusBar,
   ImageBackground,
   Platform,
   Linking,
   Alert,
-  Image,
   AppState,
-  InteractionManager,
 } from 'react-native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { Easing } from 'react-native-reanimated'
 import {
   heightPercentageToDP,
   widthPercentageToDP,
@@ -20,18 +15,14 @@ import {
 import DeviceInfo from 'react-native-device-info'
 import CustodianRequestRejectedModalContents from '../../components/CustodianRequestRejectedModalContents'
 import * as RNLocalize from 'react-native-localize'
-import { BottomSheetView } from '@gorhom/bottom-sheet'
 import Colors from '../../common/Colors'
-import ButtonStyles from '../../common/Styles/ButtonStyles'
 import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import {
-  TEST_ACCOUNT,
   REGULAR_ACCOUNT,
   SECURE_ACCOUNT,
-  FAST_BITCOINS,
 } from '../../common/constants/wallet-service-types'
 import {
   downloadMShare,
@@ -41,7 +32,6 @@ import {
   updateCloudPermission,
   acceptExistingContactRequest
 } from '../../store/actions/health'
-import { createRandomString } from '../../common/CommonFunctions/timeFormatter'
 import { connect } from 'react-redux'
 import {
   initializeTrustedContact,
@@ -66,25 +56,19 @@ import {
   updateLastSeen
 } from '../../store/actions/preferences'
 import {
-  getCurrencyImageByRegion, processDeepLink,
+  processDeepLink,
 } from '../../common/CommonFunctions/index'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import Toast from '../../components/Toast'
 import PushNotification from 'react-native-push-notification'
 import NotificationListContent from '../../components/NotificationListContent'
-import { timeFormatter } from '../../common/CommonFunctions/timeFormatter'
-import dbManager from '../../storage/realm/dbManager'
-
 import AddContactAddressBook from '../Contacts/AddContactAddressBook'
-import config from '../../bitcoin/HexaConfig'
 import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
-import HomeHeader from '../../components/home/home-header_update'
 //import HomeHeader from '../../components/home/home-header'
 import idx from 'idx'
 import { v4 as uuid } from 'uuid'
-import CustomBottomTabs, {
+import {
   BottomTab,
-  TAB_BAR_HEIGHT,
 } from '../../components/home/custom-bottom-tabs'
 import {
   addTransferDetails,
@@ -93,11 +77,10 @@ import {
 } from '../../store/actions/accounts'
 import {
   AccountType,
+  DeepLinkEncryptionType,
   LevelHealthInterface,
-  QRCodeTypes,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
-import { ScannedAddressKind } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
 import { NavigationActions, StackActions, withNavigationFocus } from 'react-navigation'
 import CustodianRequestModalContents from '../../components/CustodianRequestModalContents'
@@ -107,29 +90,18 @@ import {
   setSecondaryDeviceAddress,
 } from '../../store/actions/preferences'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
-import Bitcoin from '../../bitcoin/utilities/accounts/Bitcoin'
 import TrustedContactRequestContent from './TrustedContactRequestContent'
-import BottomSheetBackground from '../../components/bottom-sheets/BottomSheetBackground'
 import BottomSheetHeader from '../Accounts/BottomSheetHeader'
-import { Button } from 'react-native-elements'
-import checkAppVersionCompatibility from '../../utils/CheckAppVersionCompatibility'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import BottomSheet from '@gorhom/bottom-sheet'
 import { resetToHomeAction } from '../../navigation/actions/NavigationActions'
 import { Milliseconds } from '../../common/data/typealiases/UnitAliases'
-import { SATOSHIS_IN_BTC } from '../../common/constants/Bitcoin'
-import { getEnvReleaseTopic } from '../../utils/geEnvSpecificParams'
 import { AccountsState } from '../../store/reducers/accounts'
-import HomeAccountCardsList from './HomeAccountCardsList'
 import AccountShell from '../../common/data/models/AccountShell'
 import PushNotificationIOS from '@react-native-community/push-notification-ios'
-import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
-import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import CloudBackupStatus from '../../common/data/enums/CloudBackupStatus'
 import SwanAccountCreationStatus from '../../common/data/enums/SwanAccountCreationStatus'
 import messaging from '@react-native-firebase/messaging'
-import firebase from '@react-native-firebase/app'
-import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
 import BuyBitcoinHomeBottomSheet, { BuyBitcoinBottomSheetMenuItem, BuyMenuItemKind } from '../../components/home/BuyBitcoinHomeBottomSheet'
 import BottomSheetWyreInfo from '../../components/bottom-sheets/wyre/BottomSheetWyreInfo'
 import BottomSheetRampInfo from '../../components/bottom-sheets/ramp/BottomSheetRampInfo'
@@ -141,20 +113,12 @@ import { clearWyreCache } from '../../store/actions/WyreIntegration'
 import { setCloudData } from '../../store/actions/cloud'
 import { credsAuthenticated } from '../../store/actions/setupAndAuth'
 import { setShowAllAccount } from '../../store/actions/accounts'
-import { RFValue } from 'react-native-responsive-fontsize'
-import Fonts from '../../common/Fonts'
-import HomeBuyCard from './HomeBuyCard'
 import HomeContainer from './HomeContainer'
-import FriendsAndFamilyScreen from '../FriendsAndFamily/FriendsAndFamilyScreen'
-import ManageBackupNewBHR from '../NewBHR/ManageBackupNewBHR'
-import UpgradeBackup from '../UpgradeBackupWithKeeper/UpgradeBackup'
-import MoreOptionsContainerScreen from '../MoreOptions/MoreOptionsContainerScreen'
 import Header from '../../navigation/stacks/Header'
 import { NotificationType } from '../../components/home/NotificationType'
 import NotificationInfoContents from '../../components/NotificationInfoContents'
 import ModalContainer from '../../components/home/ModalContainer'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
-import SSS from '../../bitcoin/utilities/sss/SSS'
 
 export const BOTTOM_SHEET_OPENING_ON_LAUNCH_DELAY: Milliseconds = 800
 export enum BottomSheetState {
@@ -253,7 +217,7 @@ interface HomePropsTypes {
   setCurrencyCode: any;
   currencyCode: any;
   updatePreference: any;
-  fcmTokenValue: any;
+  existingFCMToken: any;
   setFCMToken: any;
   setSecondaryDeviceAddress: any;
   secondaryDeviceAddressValue: any;
@@ -293,8 +257,6 @@ interface HomePropsTypes {
   getMessages: any;
   syncPermanentChannels: any;
 }
-
-const releaseNotificationTopic = getEnvReleaseTopic()
 
 class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   focusListener: any;
@@ -545,6 +507,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       // call this once deeplink is detected aswell
       this.handleDeepLinkModal()
 
+      // set FCM token(if haven't already)
+      this.storeFCMToken()
+
       const unhandledDeepLinkURL = navigation.getParam( 'unhandledDeepLinkURL' )
 
       if ( unhandledDeepLinkURL ) {
@@ -558,6 +523,14 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
 
   };
+
+   storeFCMToken = async () => {
+     const fcmToken = await messaging().getToken()
+     if ( !this.props.existingFCMToken || this.props.existingFCMToken != fcmToken ) {
+       this.props.setFCMToken( fcmToken )
+       this.props.updateFCMTokens( [ fcmToken ] )
+     }
+   }
 
   updateBadgeCounter = () => {
     const { messages } = this.props
@@ -821,7 +794,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   }
 
   setUpFocusListener = () => {
-    const t0 = performance.now()
     const { navigation } = this.props
 
     this.focusListener = navigation.addListener( 'didFocus', () => {
@@ -835,8 +807,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     } )
     this.notificationCheck()
     this.setCurrencyCodeFromAsync()
-    const t1 = performance.now()
-    //console.log( 'setUpFocusListener ' + ( t1 - t0 ) + ' milliseconds.' )
   };
 
   setSecondaryDeviceAddresses = async () => {
@@ -962,11 +932,22 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { navigation } = this.props
     const { trustedContactRequest } = this.state
     if( !trustedContactRequest.isQR ){
+      let channelKeys: string[]
       try{
-        const channelKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
-        const channelKeysArray = channelKeys.split( ';' )
-        trustedContactRequest.channelKey = channelKeysArray[ 0 ]
-        trustedContactRequest.contactsSecondaryChannelKey = channelKeysArray[ 1 ]
+        switch( trustedContactRequest.encryptionType ){
+            case DeepLinkEncryptionType.DEFAULT:
+              channelKeys = trustedContactRequest.encryptedChannelKeys.split( '-' )
+              break
+
+            case DeepLinkEncryptionType.NUMBER:
+            case DeepLinkEncryptionType.OTP:
+              const decryptedKeys = TrustedContactsOperations.decryptViaPsuedoKey( trustedContactRequest.encryptedChannelKeys, key )
+              channelKeys = decryptedKeys.split( '-' )
+              break
+        }
+
+        trustedContactRequest.channelKey = channelKeys[ 0 ]
+        trustedContactRequest.contactsSecondaryChannelKey = channelKeys[ 1 ]
       } catch( err ){
         Toast( 'Invalid key' )
         return
@@ -1437,7 +1418,7 @@ const mapStateToProps = ( state ) => {
     trustedContacts: idx( state, ( _ ) => _.trustedContacts.service ),
     notificationListNew: idx( state, ( _ ) => _.notifications.notificationListNew ),
     currencyCode: idx( state, ( _ ) => _.preferences.currencyCode ),
-    fcmTokenValue: idx( state, ( _ ) => _.preferences.fcmTokenValue ),
+    existingFCMToken: idx( state, ( _ ) => _.preferences.existingFCMToken ),
     secondaryDeviceAddressValue: idx(
       state,
       ( _ ) => _.preferences.secondaryDeviceAddressValue
