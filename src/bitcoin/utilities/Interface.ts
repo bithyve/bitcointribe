@@ -595,6 +595,10 @@ export interface TrustedContact {
   streamId?: string, // contact's streamId
   walletID?: string, // contact's walletId
   contactsSecondaryChannelKey?: string, // contacts secondaryKey(stored locally)
+  deepLinkConfig?: {
+    encryptionType: DeepLinkEncryptionType,
+    encryptionKey: string | null,
+  }
 }
 export interface Trusted_Contacts {
   [channelKey: string]: TrustedContact
@@ -882,7 +886,8 @@ export enum DeepLinkKind {
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
 }
 
-export enum DeepLinkHintType {
+export enum DeepLinkEncryptionType {
+  DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
   OTP = 'OTP'
 }

@@ -124,10 +124,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
 
     return(
       <UnHideArchiveAccountBottomSheet
-        onProceed={()=>{
+        onProceed={( accounShell )=>{
           if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
             setAccountVisibility( primarySubAccount.visibility )
-          changeVisisbility( primarySubAccount, AccountVisibility.DEFAULT )
+          changeVisisbility( accounShell, AccountVisibility.DEFAULT )
           showUnHideArchiveModal( false )
         }
         }
@@ -152,16 +152,17 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
     )
   }, [ accountVisibility ] )
 
-  const changeVisisbility = ( selectedAccount, visibility ) => {
+  const changeVisisbility = ( accountShell, visibility ) => {
+
     // selectedAccount.visibility = visibility
     // dispatch( updateSubAccountSettings( selectedAccount ) )
 
-    // const settings = {
-    //   visibility: visibility
-    // }
-    // dispatch( updateAccountSettings( {
-    //   accountShell, settings
-    // } ) )
+    const settings = {
+      visibility: visibility
+    }
+    dispatch( updateAccountSettings( {
+      accountShell, settings
+    } ) )
   }
 
   function hasNewOrder( newlyOrderedAccountShells: AccountShell[] ) {
