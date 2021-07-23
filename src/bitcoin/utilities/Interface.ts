@@ -882,7 +882,8 @@ export enum DeepLinkKind {
   RECIPROCAL_KEEPER = 'RECIPROCAL_KEEPER'
 }
 
-export enum DeepLinkHintType {
+export enum DeepLinkEncryptionType {
+  DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
   OTP = 'OTP'
 }
