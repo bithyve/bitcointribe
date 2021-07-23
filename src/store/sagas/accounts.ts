@@ -326,9 +326,10 @@ function* refreshAccountShellWorker( { payload } ) {
   yield put( updateAccountShells( {
     accounts: synchedAccounts
   } ) )
-
-  // TODO: insert updated accounts into Realm
-
+  yield put( accountShellRefreshCompleted( accountShell ) )
+  for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
+    yield call( dbManager.updateAccount, synchedAcc.id, synchedAcc )
+  }
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {
   //   rescanTxs.push( {
@@ -337,8 +338,6 @@ function* refreshAccountShellWorker( { payload } ) {
   //   } )
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
-
-  yield put( accountShellRefreshCompleted( accountShell ) )
 }
 
 export const refreshAccountShellWatcher = createWatcher(
