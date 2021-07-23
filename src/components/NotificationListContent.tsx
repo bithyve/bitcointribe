@@ -124,7 +124,8 @@ export default function NotificationListContent( props ) {
 const styles = StyleSheet.create( {
   modalContainer: {
     backgroundColor: Colors.white,
-    maxHeight: height - 120,
+    // maxHeight: height - 120,
+    height:hp( 63 )
   },
   modalHeaderTitleView: {
     borderBottomWidth: 1,

@@ -572,9 +572,9 @@ export default function AddContactAddressBook( props ) {
           <ModalContainer visible={permissionModal} closeBottomSheet={() => { setModal( false ) }}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
-              title={'Hexa needs access to your address book.'}
+              title={'Why do we need access\nto your address book?'}
               info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-              otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
+              otherText={'Don’t worry these details don’t leave your phone and are for your eyes'}
               proceedButtonText={'Continue'}
               isIgnoreButton={false}
               onPressProceed={() => {

@@ -24,7 +24,8 @@ export default function ErrorModalContents( props ) {
                 ? props.headerTextColor
                 : Colors.blue,
               fontSize: RFValue( 18 ),
-              fontFamily: Fonts.FiraSansMedium,
+              fontFamily: Fonts.FiraSansRegular,
+              // width: wp( 65 )
             }}
           >
             {props.title}
@@ -36,6 +37,7 @@ export default function ErrorModalContents( props ) {
                 ...styles.modalInfoText,
                 marginTop: wp( '1.5%' ),
                 color: Colors.lightTextColor,
+                marginRight: wp( 10 )
               }}
             >
               {props.info}
@@ -152,8 +154,9 @@ const styles = StyleSheet.create( {
   },
   modalInfoText: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
+    letterSpacing: 0.6
   },
   successModalAmountView: {
     justifyContent: 'center',
@@ -178,11 +181,12 @@ const styles = StyleSheet.create( {
     marginLeft: wp( '8%' ),
   },
   successModalImage: {
-    width: wp( '30%' ),
+    width: wp( '35%' ),
     height: wp( '35%' ),
     marginLeft: 'auto',
     resizeMode: 'stretch',
-    marginRight: -5,
+    marginRight: -15,
+    marginBottom: -15
   },
   proceedButtonText: {
     color: Colors.white,

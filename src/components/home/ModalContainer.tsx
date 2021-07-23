@@ -52,7 +52,8 @@ const ModalContainer = ( {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           // alignItems: 'center',
-          // paddingBottom: Platform.OS === 'ios' ? hp( '0%' ) : hp( `${height}%` )
+          paddingBottom: Platform.OS === 'ios' ? hp( '6%' ) : hp( `${height}%` ),
+          paddingHorizontal: wp( '2%' ),
           // borderRadius: 20
         }}
         resetScrollToCoords={{
@@ -73,9 +74,9 @@ const ModalContainer = ( {
 
             <View style={{
               width: '100%',
-              borderRadius: Platform.OS === 'ios' ? ScreenCornerRadius : wp( '4%' ),
+              borderRadius: wp( '4%' ),
               overflow: 'hidden',
-            // marginBottom: hp( 0.5 )
+              // marginBottom: hp( 0.5 )
             }}>
 
               {children}
