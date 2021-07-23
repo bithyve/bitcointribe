@@ -28,7 +28,7 @@ import ModalHeader from '../../components/ModalHeader'
 import TimerModalContents from './TimerModalContents'
 import RequestKeyFromContact from '../../components/RequestKeyFromContact'
 import ShareOtpWithContact from '../ManageBackup/ShareOTPWithContact'
-import { QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
+import { DeepLinkEncryptionType, QRCodeTypes, TrustedContact, Trusted_Contacts, Wallet } from '../../bitcoin/utilities/Interface'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../../store/actions/trustedContacts'
 import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contacts/UseTrustedContacts'
 
@@ -55,6 +55,7 @@ export default function AddContactSendRequest( props ) {
   const [ trustedLink, setTrustedLink ] = useState( '' )
   const [ trustedQR, setTrustedQR ] = useState( '' )
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
+  const [ encryptLinkWith, setEncryptLinkWith ] = useState( DeepLinkEncryptionType.DEFAULT )
 
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
     ? props.navigation.getParam( 'SelectedContact' )
@@ -146,9 +147,21 @@ export default function AddContactSendRequest( props ) {
         } )
       )
 
-      setTrustedLink( generateDeepLink( Contact, currentContact, wallet.walletName ) )
+      let encryptionKey: string
+      switch( encryptLinkWith ){
+          case DeepLinkEncryptionType.NUMBER:
+            const phoneNumber = Contact.phoneNumbers[ 0 ].number
+            const number = phoneNumber.replace( /[^0-9]/g, '' ) // removing non-numeric characters
+            encryptionKey = number.slice( number.length - 10 ) // last 10 digits only
+            break
+
+          case DeepLinkEncryptionType.OTP:
+            break
+      }
+
+      setTrustedLink( generateDeepLink( encryptLinkWith, encryptionKey, currentContact, wallet.walletName ) )
     }
-  }, [ Contact, trustedContacts ] )
+  }, [ Contact, trustedContacts, encryptLinkWith ] )
 
   // const openTimer = async () => {
   //   setTimeout( () => {
