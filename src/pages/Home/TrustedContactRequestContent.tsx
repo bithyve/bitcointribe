@@ -23,7 +23,7 @@ const TrustedContactRequestContent: React.FC<Props> = ( {
 
   return (
     <TrustedContactRequest
-      requiresInput={isQR || encryptionType === DeepLinkEncryptionType.DEFAULT }
+      inputNotRequired={isQR || encryptionType === DeepLinkEncryptionType.DEFAULT }
       inputType={encryptionType}
       isGuardian={isKeeper}
       isRecovery={false}

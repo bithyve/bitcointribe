@@ -365,7 +365,7 @@ export default function TrustedContactRequest( props ) {
               marginBottom: hp( '3%' ),
             }}
           />
-          {!props.requiresInput ? (
+          {props.inputNotRequired ? null: (
             <Text
               style={{
                 ...styles.modalTitleText,
@@ -379,8 +379,8 @@ export default function TrustedContactRequest( props ) {
                   ? 'Confirm your email address'
                   : null}
             </Text>
-          ) : null}
-          {!props.requiresInput ? (
+          )}
+          {props.inputNotRequired ? null: (
             <Text
               style={{
                 ...styles.modalInfoText,
@@ -419,9 +419,9 @@ export default function TrustedContactRequest( props ) {
                   : null}
               </Text> */}
             </Text>
-          ) : null}
+          )}
 
-          {!props.requiresInput ? (
+          {props.inputNotRequired ? null: (
             <View style={{
               marginLeft: wp( '8%' ), marginRight: wp( '8%' )
             }}>
@@ -432,7 +432,7 @@ export default function TrustedContactRequest( props ) {
               </View>
               {getInputBox()}
             </View>
-          ) : null}
+          )}
 
           <View
             style={{
