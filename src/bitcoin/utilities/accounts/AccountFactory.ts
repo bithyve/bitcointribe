@@ -44,7 +44,8 @@ export function generateAccount(
     accountName,
     accountDescription,
     accountVisibility: AccountVisibility.DEFAULT,
-    activeAddresses: [],
+    activeAddresses: {
+    },
     receivingAddress: initialRecevingAddress,
     nextFreeAddressIndex: 0,
     nextFreeChangeAddressIndex: 0,
@@ -129,7 +130,8 @@ export function generateMultiSigAccount(
     accountName,
     accountDescription,
     accountVisibility: AccountVisibility.DEFAULT,
-    activeAddresses: [],
+    activeAddresses: {
+    },
     receivingAddress: initialRecevingAddress,
     nextFreeAddressIndex: 0,
     nextFreeChangeAddressIndex: 0,

@@ -784,6 +784,13 @@ export interface UTXO {
   status?: any;
 }
 
+export interface ActiveAddresses {
+  [address: string]: {
+    index: number,
+    assignedTo: AccountType,
+  }
+}
+
 export enum NetworkType {
   TESTNET = 'TESTNET',
   MAINNET = 'MAINNET'
@@ -818,7 +825,7 @@ export interface Account {
   accountName: string,                  // name of the account
   accountDescription: string,           // description of the account
   accountVisibility: AccountVisibility, // visibility of the account
-  activeAddresses: string[],            // addresses used(to be synched during soft refresh)
+  activeAddresses: ActiveAddresses,     // addresses being actively used by this account
   receivingAddress: string,             // current external address
   nextFreeAddressIndex: number;         // external-chain free address marker
   nextFreeChangeAddressIndex: number;   // internal-chain free address marker

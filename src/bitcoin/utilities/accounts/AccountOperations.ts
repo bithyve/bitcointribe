@@ -18,6 +18,20 @@ import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
 export default class AccountOperations {
 
+  static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: AccountType ): string => {
+    let receivingAddress
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+    if( ( account as MultiSigAccount ).is2FA ) receivingAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex, false ).address
+    else receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
+
+    account.activeAddresses[ receivingAddress ] = {
+      index: account.nextFreeAddressIndex,
+      assignedTo: requester? requester: account.type
+    }
+    account.nextFreeAddressIndex++
+    return receivingAddress
+  }
+
   static syncGapLimit = async ( account: Account | MultiSigAccount ) => {
     let tryAgain = false
     const hardGapLimit = 10
@@ -51,7 +65,7 @@ export default class AccountOperations {
     }
   };
 
-  static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean, blindRefresh?: boolean  ): Promise<{
+  static syncAccounts = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
     txsFound: Transaction[]
   }> => {
