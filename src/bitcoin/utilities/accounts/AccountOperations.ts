@@ -264,11 +264,11 @@ export default class AccountOperations {
     }
   };
 
-  static syncAccountsByActiveAddresses = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean  ): Promise<{
+  static syncAccountsByActiveAddresses = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
     txsFound: Transaction[]
   }> => {
-
+    hardRefresh = true // defaulting to true for active-address based sync
     const accountInstances: {
       [id: string]: {
         externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
@@ -353,19 +353,14 @@ export default class AccountOperations {
         else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
         internalAddresses[ address ] = itr
         ownedAddresses.push( address )
-        // if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
+        if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
       }
 
       // garner cached params for bal-tx sync
       let cachedUTXOs =  [ ...account.confirmedUTXOs, ...account.unconfirmedUTXOs ]
       let cachedTxIdMap = account.txIdMap
       let cachedTxs = account.transactions
-      // let cachedAQL = account.addressQueryList
-      let cachedAQL = {
-        external: {
-        }, internal: {
-        }
-      }
+      let cachedAQL = account.addressQueryList
 
       if( hardRefresh ){
         cachedUTXOs = []
@@ -452,12 +447,12 @@ export default class AccountOperations {
       else account.receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
 
       // find tx delta(missing txs): hard vs soft refresh
-      if( hardRefresh ){
-        if( account.txIdMap && txIdMap ){
-          const deltaTxs = AccountUtilities.findTxDelta( account.txIdMap, txIdMap, transactions )
-          if( deltaTxs.length ) txsFound.push( ...deltaTxs )
-        } else txsFound.push( ...transactions )
-      }
+      // if( hardRefresh ){
+      //   if( account.txIdMap && txIdMap ){
+      //     const deltaTxs = AccountUtilities.findTxDelta( account.txIdMap, txIdMap, transactions )
+      //     if( deltaTxs.length ) txsFound.push( ...deltaTxs )
+      //   } else txsFound.push( ...transactions )
+      // }
       const { newTransactions, lastSynched } = AccountUtilities.setNewTransactions( transactions, account.lastSynched )
 
       account.transactions = transactions

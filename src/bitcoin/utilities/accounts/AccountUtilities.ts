@@ -14,7 +14,7 @@ import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 
 
 const { REQUEST_TIMEOUT } = config
-let accAxios: AxiosInstance = axios.create( {
+const accAxios: AxiosInstance = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 
@@ -440,10 +440,6 @@ export default class AccountUtilities {
               }
             }
           } else upToDateTxs.push( tx )
-
-          if( !cachedTxIdMap[ tx.txid ] ) // backward compatibility (for versions w/o txIdMaps)
-            cachedTxIdMap[ tx.txid ] = [ tx.address ]
-
         } )
 
         accountsTemp[ accountId ] = {
@@ -462,9 +458,6 @@ export default class AccountUtilities {
       }
 
       let usedFallBack = false
-      accAxios = axios.create( {
-        timeout: 7 * REQUEST_TIMEOUT // accounting for blind refresh
-      } )
       try{
         if ( network === bitcoinJS.networks.testnet ) {
           res = await accAxios.post(
@@ -572,12 +565,6 @@ export default class AccountUtilities {
             if ( addressInfo.TotalTransactions === 0 ) {
               continue
             }
-            // TODO: remove totalTransactions, confirmedTransactions & unconfirmedTransactions
-            // transactions.totalTransactions += addressInfo.TotalTransactions
-            // transactions.confirmedTransactions +=
-            //   addressInfo.ConfirmedTransactions
-            // transactions.unconfirmedTransactions +=
-            //   addressInfo.UnconfirmedTransactions
 
             addressInfo.Transactions.forEach( ( tx ) => {
               if ( !txIdMap[ tx.txid ] ) {
@@ -623,7 +610,7 @@ export default class AccountUtilities {
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
                   }
-                  // console.log({ outgoingTx, incomingTx });
+
                   newTxs.push(
                     ...[ outgoingTx, incomingTx ],
                   )

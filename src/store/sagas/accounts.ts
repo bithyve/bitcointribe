@@ -125,7 +125,7 @@ function* syncAccountsWorker( { payload }: {payload: {
     }
   } else {
     const { synchedAccounts, txsFound } = yield call(
-      AccountOperations.syncAccounts,
+      AccountOperations.syncAccountsByActiveAddresses,
       accounts,
       network,
       options.hardRefresh )
