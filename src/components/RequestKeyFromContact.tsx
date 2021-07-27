@@ -19,6 +19,8 @@ import {
 } from '../common/constants/wallet-service-types'
 import CopyThisText from '../components/CopyThisText'
 import UserDetails from './UserDetails'
+import BottomInfoBox from './BottomInfoBox'
+import HeaderTitle from './HeaderTitle'
 
 export default function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
@@ -78,10 +80,11 @@ export default function RequestKeyFromContact( props ) {
 
   return (
     <View style={styles.modalContainer}>
-      <View
-        style={styles.mainView}
-      >
-        {props.isModal &&
+      <ScrollView>
+        {/* <View
+          style={styles.mainView}
+        > */}
+        {/* {props.isModal &&
           <View style={styles.topSubView}>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -108,9 +111,9 @@ export default function RequestKeyFromContact( props ) {
               }
             </View>
           </View>
-        }
-      </View>
-      <View style={[ styles.topContainer, {
+        } */}
+        {/* </View> */}
+        {/* <View style={[ styles.topContainer, {
         marginTop: !props.isModal ? 0 : hp( '1.7%' ),
         marginBottom: !props.isModal ? 0 : hp( '1.7%' ),
       } ]}>
@@ -118,10 +121,15 @@ export default function RequestKeyFromContact( props ) {
           titleStyle={styles.titleStyle}
           contactText={props.contactText}
           Contact={Contact} />
-      </View>
-      <ScrollView contentContainerStyle={{
-        flex: 1
-      }}>
+      </View> */}
+        <HeaderTitle
+          firstLineTitle={'Scan QR'}
+          secondLineTitle={'With your contacts Hexa app'}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
         <View
           style={[ styles.mainContainer,
             {
@@ -130,7 +138,7 @@ export default function RequestKeyFromContact( props ) {
             } ]}
         >
           <View style={[ styles.qrContainer, {
-            marginTop: !props.isModal ? 0 : hp( '4%' )
+            marginVertical: hp( '4%' )
           } ]}>
             {!props.QR ? (
               <ActivityIndicator size="large" color={Colors.babyGray} />
@@ -141,12 +149,36 @@ export default function RequestKeyFromContact( props ) {
                 size={hp( '27%' )} />
             )}
           </View>
-          <CopyThisText
-            openLink={shareLink ? shareOption : () => { }}
-            backgroundColor={Colors.backgroundColor1}
-            text={shareLink ? shareLink : 'Creating Link....'}
+
+        </View>
+        <HeaderTitle
+          firstLineTitle={'or Share link'}
+          secondLineTitle={'With the contact'}
+          infoTextNormal={''}
+          infoTextBold={''}
+          infoTextNormal1={''}
+          step={''}
+        />
+        <CopyThisText
+          openLink={shareLink ? shareOption : () => { }}
+          backgroundColor={Colors.white}
+          text={shareLink ? shareLink : 'Creating Link....'}
+          width={'22%'}
+          height={'22%'}
+        />
+
+        <View style={{
+          marginVertical: hp( 2 )
+        }}>
+          <BottomInfoBox
+            title={'Secure with 2FA'}
+            infoText={
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid'
+            }
+            backgroundColor={Colors.white}
           />
         </View>
+
       </ScrollView>
 
     </View>
@@ -166,7 +198,7 @@ const styles = StyleSheet.create( {
   },
   modalContainer: {
     height: '100%',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.backgroundColor,
     alignSelf: 'center',
     width: '100%',
   },
