@@ -66,7 +66,9 @@ export default function DonationWebPageBottomSheet( props ) {
             />
           </AppBottomSheetTouchableWrapper>
         </View>
-        <View style={styles.infoTextContainer}>
+        <View style={[ styles.infoTextContainer, {
+          marginTop: hp( 1 )
+        } ]}>
           <Text style={styles.titleTextStyle}>Donation Link</Text>
           <Text style={styles.modalInfoText}>
               When someone wants to donate, they can simply click on this link
@@ -75,7 +77,7 @@ export default function DonationWebPageBottomSheet( props ) {
         </View>
         <View
           style={{
-            marginTop: -20,
+            // marginTop: -20,
             alignItems: 'center',
             justifyContent: 'center',
             marginLeft: 40,
@@ -102,7 +104,7 @@ export default function DonationWebPageBottomSheet( props ) {
         </View>
         <View
           style={{
-            marginTop: -20,
+            // marginTop: -20,
             alignItems: 'center',
             justifyContent: 'center',
             marginLeft: 40,
@@ -156,7 +158,7 @@ const styles = StyleSheet.create( {
     marginHorizontal: hp( '1.2%' ),
   },
   infoTextContainer: {
-    marginTop: 20,
+    // marginTop: hp( 1 ),
     marginHorizontal: hp( '1.5%' ),
   },
   buttonStyle: {
