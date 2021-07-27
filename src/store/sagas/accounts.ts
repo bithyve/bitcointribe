@@ -37,6 +37,7 @@ import {
   UPDATE_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
+  updateAccounts,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -86,6 +87,16 @@ import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
+export function getNextFreeAddress( dispatch:any, account: Account | MultiSigAccount, requester?: AccountType ) {
+  const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
+  dispatch( updateAccounts( {
+    accounts: {
+      [ updatedAccount.id ]: updatedAccount
+    }
+  } ) )
+  dbManager.updateAccount( ( updatedAccount as Account ).id, updatedAccount )
+  return receivingAddress
+}
 
 function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
@@ -117,8 +128,7 @@ function* syncAccountsWorker( { payload }: {payload: {
       AccountOperations.syncAccounts,
       accounts,
       network,
-      options.hardRefresh,
-      options.blindRefresh )
+      options.hardRefresh )
 
     return {
       synchedAccounts, txsFound
@@ -328,7 +338,7 @@ function* refreshAccountShellWorker( { payload } ) {
   } ) )
   yield put( accountShellRefreshCompleted( accountShell ) )
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
-    yield call( dbManager.updateAccount, synchedAcc.id, synchedAcc )
+    yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
   }
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {

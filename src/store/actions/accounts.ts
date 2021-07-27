@@ -490,6 +490,7 @@ export const SECONDARY_XPRIV_GENERATED = 'SECONDARY_XPRIV_GENERATED'
 export const TWO_FA_VALID = 'TWO_FA_VALID'
 export const TWO_FA_RESETTED = 'TWO_FA_RESETTED'
 export const SETTED_DONATION_ACC = 'SETTED_DONATION_ACC'
+export const UPDATE_ACCOUNTS = 'UPDATE_ACCOUNTS'
 export const UPDATE_ACCOUNT_SHELLS = 'UPDATE_ACCOUNT_SHELLS'
 export const NEW_ACCOUNT_SHELLS_ADDED = 'NEW_ACCOUNT_SHELLS_ADDED'
 export const NEW_ACCOUNT_ADD_FAILED = 'NEW_ACCOUNT_ADD_FAILED'
@@ -579,6 +580,15 @@ export const newAccountShellsAdded = ( { accountShells, accounts }: {
     type: NEW_ACCOUNT_SHELLS_ADDED,
     payload: {
       accountShells,
+      accounts
+    }
+  }
+}
+
+export const updateAccounts = ( { accounts }: { accounts: Accounts } ) => {
+  return {
+    type: UPDATE_ACCOUNTS,
+    payload: {
       accounts
     }
   }
