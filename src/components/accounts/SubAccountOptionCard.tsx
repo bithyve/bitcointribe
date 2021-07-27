@@ -68,6 +68,7 @@ const SubAccountOptionCard: React.FC<Props> = ( {
       ...styles.descriptionTextContainer,
       flex: isDisabled ? 0 : 1,
       marginBottom: isDisabled ? -8 : 8,
+      // backgroundColor: 'red',
     }
   }, [ isSelected ] )
 
@@ -160,9 +161,9 @@ const styles = StyleSheet.create( {
   },
 
   image: {
-    width: widthPercentageToDP( 8 ),
-    height: widthPercentageToDP( 8 ),
-    marginBottom: 5,
+    width: widthPercentageToDP( 5.4 ),
+    height: widthPercentageToDP( 5.4 ),
+    marginBottom: 10,
     marginTop: 5,
     resizeMode: 'contain'
   },
@@ -190,7 +191,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 10 ),
     fontWeight: '600',
     textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 4,
   },
 
   subtitleText: {
@@ -198,6 +199,8 @@ const styles = StyleSheet.create( {
     fontWeight: '500',
     textAlign: 'center',
     marginBottom: 2,
+    flex: 1,
+    alignSelf: 'center'
   },
 
   selectionIndicatorContainer: {
