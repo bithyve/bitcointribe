@@ -10,7 +10,7 @@ const ModalContainer = ( {
   background = 'rgba(0,0,0,0.5)',
   children
 } ) => {
-  const [ height, setHeight ] = useState( 9 )
+  const [ height, setHeight ] = useState( 6 )
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -21,7 +21,7 @@ const ModalContainer = ( {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 9 )
+        setHeight( 6 )
       }
     )
 

@@ -40,7 +40,7 @@ const TransactionPreviewHeader: React.FC<Props> = ( {
       <Text style={{
         ...ListStyles.listItemTitle, marginBottom: 12
       }}>
-        Available to Spend: {formattedBalanceText} {formattedUnitText}
+        Available to spend: {formattedBalanceText} {formattedUnitText}
       </Text>
 
       <View style={styles.viewMoreLinkRow}>

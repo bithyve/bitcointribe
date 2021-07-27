@@ -198,7 +198,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setHeight( 72 )
+        setHeight( 82 )
       }
     )
     const keyboardDidHideListener = Keyboard.addListener(
@@ -662,7 +662,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
               {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              No number or special characters allowed
+              Numbers or special characters are not supported
             </Text>
           )}
           <View
@@ -804,7 +804,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Answer to {'\n'}a Security Question</Text>
+          }} >Answer{'\n'}a Security Question</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -1119,7 +1119,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>
             <BottomInfoBox
               title={'Note'}
-              infoText={'The Answer is used to encrypt the backup. The security Question acts as a hint to remember the same'}
+              infoText={'The Answer is used to encrypt the backup. The Security Question acts as a hint to remember the same'}
               italicText={''}
               backgroundColor={Colors.white}
             />
@@ -1254,7 +1254,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
               mainText={'Use your own encryption password'}
-              subText={'Choose any password. Keep it safe'}
+              subText={'Choose any password'}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}

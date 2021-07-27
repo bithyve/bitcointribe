@@ -508,7 +508,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
               {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              No number or special characters allowed
+              Numbers or special characters are not supported
             </Text>
           )}
           <View
@@ -659,7 +659,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Answer to {'\n'}a Security Question</Text>
+          }} >Answer{'\n'}a Security Question</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -1007,7 +1007,7 @@ export default function SetNewPassword( props: { navigation: { getParam: ( arg0:
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../../assets/images/icons/icon_questions.png' ) : require( '../../assets/images/icons/question_inactive.png' )}
-              mainText={'Answer to a Security Question'}
+              mainText={'Answer a Security Question'}
               subText={'Easier to remember. Recommended'}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}

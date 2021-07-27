@@ -13,7 +13,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal( props ) {
   return ( <View style={{
-    backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   }}>
     <View style={styles.modalContentContainer}>
       <View style={{
@@ -35,16 +35,17 @@ export default function LoaderModal( props ) {
           <Text style={{
             marginRight: wp( '10%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
           }}>{props.messageText}</Text>
+          {props.subPoints &&
           <View style={{
             marginVertical: hp( 4 )
           }}>
-            {props.subPoints && props.subPoints.map( ( item, index ) => {
+            {props.subPoints.map( ( item, index ) => {
               return(
                 <View key={index} style={{
-                  flexDirection: 'row', paddingVertical: hp( 1 ), alignItems: 'center'
+                  flexDirection: 'row', paddingVertical: hp( 1 ), alignItems: 'center',
                 }}>
                   <View style={{
-                    height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4
+                    height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4, alignSelf: 'center'
                   }}/>
                   <Text style={{
                     color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginLeft: wp( 2 )
@@ -55,6 +56,7 @@ export default function LoaderModal( props ) {
               )
             } )}
           </View>
+          }
           {props.bottomText &&
           <Text style={{
             marginRight: wp( '20%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), width: '65%'
@@ -82,7 +84,8 @@ const styles = StyleSheet.create( {
     borderTopColor: Colors.white,
     borderTopWidth: 1,
     // height: '100%',
-    position: 'relative'
+    position: 'relative',
+    minHeight: hp( 25 )
   },
   successModalImage: {
     width: wp( '80%' ),

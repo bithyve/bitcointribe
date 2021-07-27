@@ -7,6 +7,7 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
+  SafeAreaView
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useSelector, useDispatch } from 'react-redux'
@@ -352,6 +353,7 @@ export default function AddContactAddressBook( props ) {
 
   return (
     <View style={styles.modalContentContainer}>
+      <SafeAreaView />
       <View style={styles.modalHeaderTitleView}>
         <View style={{
           flexDirection: 'row'
@@ -607,7 +609,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '4%' ),
     marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),
