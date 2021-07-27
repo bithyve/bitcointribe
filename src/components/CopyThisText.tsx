@@ -23,13 +23,14 @@ export default function CopyThisText( props ) {
   return (
     <View
       style={{
-        marginVertical: hp( 2 ),
-        // paddingLeft: 25,
-        // paddingRight: 25,
-        // marginLeft:25, marginRight:25,
+        marginVertical: hp( 3 ),
+        // marginTop: 30,
+        paddingLeft: 25,
+        paddingRight: 25,
+        marginLeft:25, marginRight:25,
         alignItems:'center', justifyContent:'center',
-        flex: 1,
-        width: '90%',
+        // flex: 1,
+        // width: '90%',
         alignSelf: 'center'
       }}
     >
@@ -41,12 +42,12 @@ export default function CopyThisText( props ) {
       >
         <View
           style={{
-            flex: 1,
-            width:wp( '78%' ),
+            // flex: 1,
+            width:wp( '70%' ),
             backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.backgroundColor,
             borderBottomLeftRadius: wp( 3 ),
             borderTopLeftRadius: wp( 3 ),
-            height: wp( '22%' ),
+            height: wp( props.height ? props.height : '13%' ),
             paddingLeft: 15,
             paddingRight: 15,
             justifyContent: 'center',
@@ -64,8 +65,8 @@ export default function CopyThisText( props ) {
         </View>
         <View
           style={{
-            width: wp( '22%' ),
-            height: wp( '22%' ),
+            width: wp( props.width ? props.width : '12%' ),
+            height: wp( props.height ? props.height : '13%' ),
             backgroundColor: Colors.borderColor,
             borderTopRightRadius: wp( 3 ),
             borderBottomRightRadius: wp( 3 ),
@@ -75,7 +76,7 @@ export default function CopyThisText( props ) {
         >
           <Image
             style={{
-              width: props.openLink ? wp( 6 ) : 20, height: props.openLink ? wp( 6 ) : 20
+              width: props.openLink ? wp( 6 ) : 18, height: props.openLink ? wp( 6 ) : 20
             }}
             source={
               props.openLink

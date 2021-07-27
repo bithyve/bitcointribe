@@ -163,6 +163,8 @@ export default function RequestKeyFromContact( props ) {
           openLink={shareLink ? shareOption : () => { }}
           backgroundColor={Colors.white}
           text={shareLink ? shareLink : 'Creating Link....'}
+          width={'22%'}
+          height={'22%'}
         />
 
         <View style={{
