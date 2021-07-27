@@ -80,7 +80,7 @@ const HomeBuyCard = ( {
               BTC to USD today
         </Text>
         <View style={{
-          flexDirection: 'row', marginTop: hp( '1' ), alignSelf: 'flex-end'
+          flexDirection: 'row', marginTop: hp( '1' ), alignSelf: 'flex-start'
         }}>
           <Text>$</Text>
           <Text> {amount}</Text>

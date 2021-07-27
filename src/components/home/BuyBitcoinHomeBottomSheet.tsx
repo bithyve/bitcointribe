@@ -21,7 +21,7 @@ export enum BuyMenuItemKind {
 export type BuyBitcoinBottomSheetMenuItem = {
   title: string;
   subtitle: string;
-  kind: BuyMenuItemKind;
+  kind: BuyMenuItemKind | '';
   imageSource: ImageSourcePropType;
   disabled: boolean;
   hasButton: boolean;
@@ -41,6 +41,22 @@ const menuItems: BuyBitcoinBottomSheetMenuItem[] = [
     subtitle: 'Buy any amount',
     kind: BuyMenuItemKind.WYRE,
     imageSource: require( '../../assets/images/icons/wyre_notext_small.png' ),
+    disabled: false,
+    hasButton: false,
+  },
+  {
+    title: Platform.OS == 'ios' ? 'FastBitcoins' : 'FastBitcoins',
+    subtitle: 'Scan FastBitcoin vouchers',
+    kind: BuyMenuItemKind.FAST_BITCOINS,
+    imageSource: require( '../../assets/images/icons/fastbitcoins.png' ),
+    disabled: false,
+    hasButton: false,
+  },
+  {
+    title: 'GetBittr',
+    subtitle: 'Buy any amount',
+    kind: '',
+    imageSource: require( '../../assets/images/icons/icon_getbitter.png' ),
     disabled: false,
     hasButton: false,
   },
@@ -152,12 +168,17 @@ const BuyBitcoinHomeBottomSheet: React.FC<Props> = ( { onMenuItemSelected, }: Pr
   }
 
   return (
-    <FlatList
+    <View style={{
+      backgroundColor: Colors.white
+    }}>
+      <FlatList
       // style={styles.rootContainer}
-      data={menuItems}
-      keyExtractor={listItemKeyExtractor}
-      renderItem={renderItem}
-    />
+        data={menuItems}
+        keyExtractor={listItemKeyExtractor}
+        renderItem={renderItem}
+      />
+    </View>
+
   )
 }
 
