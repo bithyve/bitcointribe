@@ -32,6 +32,7 @@ import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
 import ServiceAccountKind from '../../common/data/enums/ServiceAccountKind'
 import ExternalServiceSubAccountInfo from '../../common/data/models/SubAccountInfo/ExternalServiceSubAccountInfo'
+import HomeBuyCard from './HomeBuyCard'
 
 export enum BottomSheetKind {
   SWAN_STATUS_INFO,
@@ -145,6 +146,23 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             onAddNewSelected={this.navigateToAddNewAccountScreen}
             onCardSelected={this.handleAccountCardSelection}
           />
+          <HomeBuyCard
+            cardContainer={{
+              backgroundColor: 'white',
+              marginHorizontal: wp( 4 ),
+              height: hp( '9%' ),
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: hp( 1 ),
+              borderRadius: wp( 2 ),
+              padding: hp( '1.5%' ),
+              flexDirection: 'row',
+            }}
+            amount={1000}
+            incramount={'10'}
+            percentIncr={'5%'}
+            asset={'../../assets/images/HomePageIcons/graph.png'}
+            openBottomSheet={( type ) => this.props.openBottomSheet( type )} />
         </ScrollView>
       </View>
     )
