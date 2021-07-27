@@ -560,6 +560,48 @@ export default class AccountOperations {
     }
   }
 
+  static updateActiveAddresses = ( account: Account, consumedUTXOs: {[txid: string]: InputUTXOs} ) => {
+    const network = AccountUtilities.getNetworkByType( account.networkType )
+
+    for( const consumedUTXO of Object.values( consumedUTXOs ) ){
+      let found = false
+      // is out of bound external address?
+      for ( let itr = 0; itr < account.nextFreeAddressIndex; itr++ ) {
+        let address: string
+        if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, false ).address
+        else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
+
+        if( consumedUTXO.address === address ){
+          if( !account.activeAddresses[ address ] )
+            account.activeAddresses[ address ] = {
+              index: itr,
+              assignedTo: account.type,
+            } // include out of bound(soft-refresh range) ext address
+          found = true
+          break
+        }
+      }
+
+      // is out of bound internal address?
+      if( !found )
+        for ( let itr = 0; itr < account.nextFreeChangeAddressIndex; itr++ ) {
+          let address: string
+          if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, true ).address
+          else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
+
+          if( consumedUTXO.address === address ){
+            if( !account.activeAddresses[ address ] ) // TODO: should internal addresses use the same active address list?
+              account.activeAddresses[ address ] = {
+                index: itr,
+                assignedTo: account.type,
+              } // include out of bound(soft-refresh range) int address
+            found = true
+            break
+          }
+        }
+    }
+  }
+
   static removeConsumedUTXOs= ( account: Account | MultiSigAccount, inputs: InputUTXOs[] ) => {
     const consumedUTXOs: {[txid: string]: InputUTXOs} = {
     }
@@ -584,6 +626,7 @@ export default class AccountOperations {
     account.confirmedUTXOs = updatedUTXOSet
 
     // AccountOperations.updateQueryList( account, consumedUTXOs )
+    AccountOperations.updateActiveAddresses( account, consumedUTXOs )
   }
 
   static calculateSendMaxFee = (
