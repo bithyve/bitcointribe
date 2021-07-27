@@ -63,18 +63,22 @@ const updateAccount = async ( accountId, account ) => {
     const data = {
       ...account,
     }
-    if( data.txIdMap.length === 0 ) {
-      delete data.txIdMap
-    } else {
-      const map = []
-      for ( const [ key, value ] of Object.entries( data.txIdMap ) ) {
-        map.push( {
-          id: key,
-          txIds: value
-        } )
+
+    if( data.txIdMap ){
+      if( Object.keys( data.txIdMap ).length === 0 ) {
+        delete data.txIdMap
+      } else {
+        const map = []
+        for ( const [ key, value ] of Object.entries( data.txIdMap ) ) {
+          map.push( {
+            id: key,
+            txIds: value
+          } )
+        }
+        data.txIdMap = map
       }
-      data.txIdMap = map
     }
+
     for ( let i = 0; i < data.transactions.length; i++ ) {
       if( !data.transactions[ i ].senderAddresses ) {
         data.transactions[ i ].senderAddresses = []
