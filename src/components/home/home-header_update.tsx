@@ -101,7 +101,7 @@ const HomeHeader = ( {
   const getMessage = () => {
     const { messageOne, messageTwo, isFirstMessageBold, isError } = getMessageToShow()
     return <View style={{
-      flexDirection: 'row', marginTop: hp( 1 ), alignItems: 'center'
+      flexDirection: 'row', alignItems: 'center'
     }}>
       <View style={{
         backgroundColor: isError ? Colors.red : Colors.green,
@@ -258,7 +258,7 @@ const HomeHeader = ( {
                 <Image
                   style={{
                     ...CommonStyles.homepageAmountImage,
-                    marginBottom: wp( '1.5%' ),
+                    marginBottom: wp( '1.4%' ),
                   }}
                   source={require( '../../assets/images/icons/icon_bitcoin_light.png' )}
                 />
@@ -317,11 +317,11 @@ const HomeHeader = ( {
         <TouchableOpacity
           onPress={navigateToQRScreen}
           style={{
-            height: wp( '10%' ),
+            height: wp( '9%' ),
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
-            marginTop: hp( 1 )
+            // marginTop: hp( 1 )
           }}
         >
           <ImageBackground
@@ -347,11 +347,11 @@ const HomeHeader = ( {
         <TouchableOpacity
           onPress={onPressNotifications}
           style={{
-            height: wp( '10%' ),
+            height: wp( '9%' ),
             width: wp( '10%' ),
             justifyContent: 'center',
             marginLeft: 'auto',
-            marginTop: hp( 1 )
+            // marginTop: hp( 1 )
           }}
         >
           <ImageBackground
@@ -445,11 +445,11 @@ const styles = StyleSheet.create( {
     color: Colors.white,
     fontFamily: Fonts.FiraSansRegular,
     fontSize: RFValue( 25 ),
-    marginBottom: wp( '2%' ),
+    marginBottom: wp( '1%' ),
   },
   cardBitCoinImage: {
-    width: wp( '3%' ),
-    height: wp( '3%' ),
+    width: wp( '3.5%' ),
+    height: wp( '3.5%' ),
     marginRight: 5,
     resizeMode: 'contain',
     marginBottom: wp( '0.7%' ),

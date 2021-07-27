@@ -73,6 +73,8 @@ import Login from '../../../pages/Login'
 import Header from '../Header'
 import QRStack from '../home/QRStack'
 import SetNewPassword from '../../../pages/NewBHR/SetNewPassword'
+import  FNFToKeeper from '../../../pages/NewBHR/FNFToKeeper'
+import AddContactAddressBook from '../../../pages/Contacts/AddContactAddressBook'
 
 const MODAL_ROUTES = [
   'SecondaryDevice',
@@ -152,6 +154,13 @@ const SecurityStack = createStackNavigator(
     TrustedContactHistoryNewBHR,
     // KeeperDeviceHistory,
     // PersonalCopyHistoryKeeper,
+    FNFToKeeper,
+    AddContact: {
+      screen: AddContactAddressBook,
+      navigationOptions: {
+        header: null,
+      },
+    },
     PersonalCopyHistoryNewBHR,
     CloudBackupHistory,
     NewOwnQuestions,

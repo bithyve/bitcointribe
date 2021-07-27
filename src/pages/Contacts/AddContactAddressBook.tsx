@@ -7,6 +7,7 @@ import {
   Platform,
   PermissionsAndroid,
   Linking,
+  SafeAreaView
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useSelector, useDispatch } from 'react-redux'
@@ -352,6 +353,7 @@ export default function AddContactAddressBook( props ) {
 
   return (
     <View style={styles.modalContentContainer}>
+      <SafeAreaView />
       <View style={styles.modalHeaderTitleView}>
         <View style={{
           flexDirection: 'row'
@@ -572,9 +574,9 @@ export default function AddContactAddressBook( props ) {
           <ModalContainer visible={permissionModal} closeBottomSheet={() => { setModal( false ) }}>
             <ErrorModalContents
               // modalRef={contactPermissionBottomSheet}
-              title={'Hexa needs access to your address book.'}
+              title={'Why do we need access\nto your address book?'}
               info={'If you want to associate an address book contact with your Friends & Family in Hexa, you will need to give access to your address book \n\nIt is a good way to remember who the contacts are with their name and image'}
-              otherText={'Don’t worry these details don’t leave your phone and are for your eyes or people you share it with'}
+              otherText={'Don’t worry these details don’t leave your phone and are for your eyes'}
               proceedButtonText={'Continue'}
               isIgnoreButton={false}
               onPressProceed={() => {
@@ -607,7 +609,6 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     flexDirection: 'row',
     paddingBottom: hp( '2%' ),
-    paddingTop: hp( '4%' ),
     marginBottom: wp( '5%' ),
     marginLeft: wp( '4%' ),
     marginRight: wp( '4%' ),

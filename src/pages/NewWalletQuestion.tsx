@@ -117,12 +117,21 @@ function validateAllowedCharacters( answer: string ): boolean {
 }
 
 export default function NewWalletQuestion( props: { navigation: { getParam: ( arg0: string ) => any; navigate: ( arg0: string, arg1: { walletName: any } ) => void } } ) {
-  const [ message, setMessage ] = useState( 'Creating your wallet' )
+  const [ message, setMessage ] = useState( 'Creating and initializing\nyour wallet' )
   const [ subTextMessage, setSubTextMessage ] = useState(
-    'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
+    'Your friend will be prompted to enter the same while accepting the Recovery Share',
   )
+  const [ bottomTextMessage, setBottomTextMessage ] = useState(
+    'Hexa uses the passcode and answer to the security question to encrypt different parts of your wallet',
+  )
+  const subPoints = [
+    'Setting up multi-accounts',
+    'Fetching test sats & balances',
+    'Generating shares for back-up',
+    'Getting the latest details'
+  ]
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ height, setHeight ] = useState( 81 )
+  const [ height, setHeight ] = useState( 65 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -189,13 +198,13 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setHeight( 85 )
+        setHeight( 82 )
       }
     )
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 81 )
+        setHeight( 65 )
       }
     )
 
@@ -254,7 +263,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const showLoader = () => {
     // ( loaderBottomSheet as any ).current.snapTo( 1 )
     setLoaderModal( true )
-    setLoaderMessages()
+    // setLoaderMessages()
     setTimeout( () => {
       setElevation( 0 )
     }, 0.2 )
@@ -389,41 +398,41 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     )
   }
 
-  const setLoaderMessages = () => {
-    setTimeout( () => {
-      const newMessage = getNextMessage()
-      setMessage( newMessage.heading )
-      setSubTextMessage( newMessage.text )
-      setTimeout( () => {
-        const newMessage = getNextMessage()
-        setMessage( newMessage.heading )
-        setSubTextMessage( newMessage.text )
-        setTimeout( () => {
-          const newMessage = getNextMessage()
-          setMessage( newMessage.heading )
-          setSubTextMessage( newMessage.text )
-          setTimeout( () => {
-            const newMessage = getNextMessage()
-            setMessage( newMessage.heading )
-            setSubTextMessage( newMessage.text )
-            setTimeout( () => {
-              const newMessage = getNextMessage()
-              setMessage( newMessage.heading )
-              setSubTextMessage( newMessage.text )
-              setTimeout( () => {
-                const newMessage = getNextMessage()
-                setMessage( newMessage.heading )
-                setSubTextMessage( newMessage.text )
-              }, LOADER_MESSAGE_TIME )
-            }, LOADER_MESSAGE_TIME )
-          }, LOADER_MESSAGE_TIME )
-        }, LOADER_MESSAGE_TIME )
-      }, LOADER_MESSAGE_TIME )
-    }, LOADER_MESSAGE_TIME )
-  }
+  // const setLoaderMessages = () => {
+  //   setTimeout( () => {
+  //     const newMessage = getNextMessage()
+  //     setMessage( newMessage.heading )
+  //     setSubTextMessage( newMessage.text )
+  //     setTimeout( () => {
+  //       const newMessage = getNextMessage()
+  //       setMessage( newMessage.heading )
+  //       setSubTextMessage( newMessage.text )
+  //       setTimeout( () => {
+  //         const newMessage = getNextMessage()
+  //         setMessage( newMessage.heading )
+  //         setSubTextMessage( newMessage.text )
+  //         setTimeout( () => {
+  //           const newMessage = getNextMessage()
+  //           setMessage( newMessage.heading )
+  //           setSubTextMessage( newMessage.text )
+  //           setTimeout( () => {
+  //             const newMessage = getNextMessage()
+  //             setMessage( newMessage.heading )
+  //             setSubTextMessage( newMessage.text )
+  //             setTimeout( () => {
+  //               const newMessage = getNextMessage()
+  //               setMessage( newMessage.heading )
+  //               setSubTextMessage( newMessage.text )
+  //             }, LOADER_MESSAGE_TIME )
+  //           }, LOADER_MESSAGE_TIME )
+  //         }, LOADER_MESSAGE_TIME )
+  //       }, LOADER_MESSAGE_TIME )
+  //     }, LOADER_MESSAGE_TIME )
+  //   }, LOADER_MESSAGE_TIME )
+  // }
 
   const renderLoaderModalContent = useCallback( () => {
-    return <LoaderModal headerText={message} messageText={subTextMessage} />
+    return <LoaderModal headerText={message} messageText={subTextMessage} bottomText={bottomTextMessage} subPoints={subPoints} />
   }, [ message, subTextMessage ] )
 
   const renderLoaderModalHeader = () => {
@@ -653,7 +662,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
               {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
-              No number or special characters allowed
+              Numbers or special characters are not supported
             </Text>
           )}
           <View
@@ -795,7 +804,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             fontSize: RFValue( 18 ),
             fontFamily: Fonts.FiraSansRegular,
             marginLeft: wp( '6%' )
-          }} >Answer to {'\n'}a Security Question</Text>
+          }} >Answer{'\n'}a Security Question</Text>
           <TouchableOpacity
             activeOpacity={10}
             style={
@@ -1110,7 +1119,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           }}>
             <BottomInfoBox
               title={'Note'}
-              infoText={'The Answer is used to encrypt the backup. The security Question acts as a hint to remember the same'}
+              infoText={'The Answer is used to encrypt the backup. The Security Question acts as a hint to remember the same'}
               italicText={''}
               backgroundColor={Colors.white}
             />
@@ -1245,7 +1254,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
               mainText={'Use your own encryption password'}
-              subText={'Choose any password. Keep it safe'}
+              subText={'Choose any password'}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}

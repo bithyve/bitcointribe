@@ -220,7 +220,7 @@ export default function NewWalletName( props ) {
                 fontFamily: Fonts.FiraSansItalic, color: Colors.textColorGrey,
                 alignSelf: 'flex-end'
               }}>
-                  No numbers or special characters allowed</Text>
+                  Numbers or special characters are not supported</Text>
             </View>
           </ScrollView>
 

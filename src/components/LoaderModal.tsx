@@ -13,7 +13,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 
 export default function LoaderModal( props ) {
   return ( <View style={{
-    height: hp( '25%' ), backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   }}>
     <View style={styles.modalContentContainer}>
       <View style={{
@@ -30,11 +30,38 @@ export default function LoaderModal( props ) {
           marginLeft: wp( '8%' ), marginRight: wp( '8%' ), marginTop: wp( '8%' )
         }}>
           <Text style={{
-            color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular
+            color: Colors.blue, fontSize: RFValue( 18 ), fontFamily: Fonts.FiraSansRegular, letterSpacing: 0.54
           }}>{props.headerText}</Text>
           <Text style={{
-            marginRight: wp( '18%' ), color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' )
+            marginRight: wp( '10%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), letterSpacing: 0.6
           }}>{props.messageText}</Text>
+          {props.subPoints &&
+          <View style={{
+            marginVertical: hp( 4 )
+          }}>
+            {props.subPoints.map( ( item, index ) => {
+              return(
+                <View key={index} style={{
+                  flexDirection: 'row', paddingVertical: hp( 1 ), alignItems: 'center',
+                }}>
+                  <View style={{
+                    height: 6, width: 6, borderRadius: 3, backgroundColor: Colors.gray4, alignSelf: 'center'
+                  }}/>
+                  <Text style={{
+                    color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginLeft: wp( 2 )
+                  }}>
+                    {item}
+                  </Text>
+                </View>
+              )
+            } )}
+          </View>
+          }
+          {props.bottomText &&
+          <Text style={{
+            marginRight: wp( '20%' ), color: Colors.textColorGrey, fontSize: RFValue( 12 ), letterSpacing: 0.6, fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' ), width: '65%'
+          }}>{props.bottomText}</Text>
+          }
           <Text style={{
             marginRight: wp( '20%' ), color: Colors.textColorGrey, fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, marginTop: wp( '3%' )
           }}>{props.messageText2 ? props.messageText2 : ''}</Text>
@@ -56,8 +83,9 @@ const styles = StyleSheet.create( {
     borderRightWidth: 1,
     borderTopColor: Colors.white,
     borderTopWidth: 1,
-    height: '100%',
-    position: 'relative'
+    // height: '100%',
+    position: 'relative',
+    minHeight: hp( 25 )
   },
   successModalImage: {
     width: wp( '80%' ),
