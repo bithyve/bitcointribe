@@ -23,11 +23,14 @@ export default function CopyThisText( props ) {
   return (
     <View
       style={{
-        marginTop: 30,
-        paddingLeft: 25,
-        paddingRight: 25,
-        marginLeft:25, marginRight:25,
-        alignItems:'center', justifyContent:'center'
+        marginVertical: hp( 2 ),
+        // paddingLeft: 25,
+        // paddingRight: 25,
+        // marginLeft:25, marginRight:25,
+        alignItems:'center', justifyContent:'center',
+        flex: 1,
+        width: '90%',
+        alignSelf: 'center'
       }}
     >
       <AppBottomSheetTouchableWrapper
@@ -38,11 +41,12 @@ export default function CopyThisText( props ) {
       >
         <View
           style={{
+            flex: 1,
             width:wp( '78%' ),
             backgroundColor: props.backgroundColor ? props.backgroundColor : Colors.backgroundColor,
-            borderBottomLeftRadius: 8,
-            borderTopLeftRadius: 8,
-            height: wp( '13%' ),
+            borderBottomLeftRadius: wp( 3 ),
+            borderTopLeftRadius: wp( 3 ),
+            height: wp( '22%' ),
             paddingLeft: 15,
             paddingRight: 15,
             justifyContent: 'center',
@@ -60,18 +64,18 @@ export default function CopyThisText( props ) {
         </View>
         <View
           style={{
-            width: wp( '12%' ),
-            height: wp( '13%' ),
+            width: wp( '22%' ),
+            height: wp( '22%' ),
             backgroundColor: Colors.borderColor,
-            borderTopRightRadius: 8,
-            borderBottomRightRadius: 8,
+            borderTopRightRadius: wp( 3 ),
+            borderBottomRightRadius: wp( 3 ),
             justifyContent: 'center',
             alignItems: 'center',
           }}
         >
           <Image
             style={{
-              width: 18, height: props.openLink ? 18 : 20
+              width: props.openLink ? wp( 6 ) : 20, height: props.openLink ? wp( 6 ) : 20
             }}
             source={
               props.openLink

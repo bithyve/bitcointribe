@@ -13,6 +13,7 @@ import {
   widthPercentageToDP as wp,
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import CommonStyles from '../../common/Styles/Styles'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
 import { RFValue } from 'react-native-responsive-fontsize'
@@ -34,12 +35,11 @@ import useTrustedContacts from '../../utils/hooks/state-selectors/trusted-contac
 import idx from 'idx'
 import Toast from '../../components/Toast'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
+import ModalContainer from '../../components/home/ModalContainer'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
-  const [
-    shareOtpWithTrustedContactBottomSheet,
-  ] = useState( React.createRef<BottomSheet>() )
+  const [ shareOtpWithTrustedContactModel, setShareOtpWithTrustedContactModel ] = useState( false )
   const [ OTP, setOTP ] = useState( '' )
   const [ SendViaLinkBottomSheet ] = useState(
     React.createRef(),
@@ -50,9 +50,7 @@ export default function AddContactSendRequest( props ) {
   const [ ContactRequestBottomSheet ] = useState(
     React.createRef(),
   )
-  const [ TimerModalBottomSheet ] = useState(
-    React.createRef(),
-  )
+  const [ timerModal, setTimerModal ] = useState( false )
   const [ renderTimer, setRenderTimer ] = useState( false )
 
   const [ trustedLink, setTrustedLink ] = useState( '' )
@@ -159,7 +157,7 @@ export default function AddContactSendRequest( props ) {
             encryption_key = TrustedContactsOperations.generateKey( 6 )
             setOTP( encryption_key )
             setIsOTPType( true )
-            shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+            setShareOtpWithTrustedContactModel( true )
             break
       }
 
@@ -228,7 +226,7 @@ export default function AddContactSendRequest( props ) {
               setRenderTimer( true )
             }, 2 )
             if ( isOTPType ) {
-              shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+              setShareOtpWithTrustedContactModel( true )
             } else {
               // openTimer()
             }
@@ -276,7 +274,7 @@ export default function AddContactSendRequest( props ) {
             setRenderTimer( true )
           }, 2 )
           if ( isOTPType ) {
-            shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
+            setShareOtpWithTrustedContactModel( true )
           } else {
             // openTimer()
           }
@@ -320,43 +318,22 @@ export default function AddContactSendRequest( props ) {
     )
   }, [ renderTimer ] )
 
-  const renderTimerModalHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        // backgroundColor={'transparent'}
-      // onPressHeader={() => {
-      //   if (TimerModalBottomSheet.current)
-      //     (TimerModalBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
-  const renderContactRequestHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   if (SendViaQRBottomSheet.current)
-      //     (SendViaQRBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
 
   const onContinueWithTimer = () => {
-    ( TimerModalBottomSheet as any ).current.snapTo( 0 )
+    setTimerModal( false )
     props.navigation.goBack()
   }
 
-  const renderSendViaQRHeader = useCallback( () => {
-    return (
-      <ModalHeader
-      // onPressHeader={() => {
-      //   if (SendViaQRBottomSheet.current)
-      //     (SendViaQRBottomSheet as any).current.snapTo(0);
-      // }}
-      />
-    )
-  }, [] )
+  // const renderSendViaQRHeader = useCallback( () => {
+  //   return (
+  //     <ModalHeader
+  //     // onPressHeader={() => {
+  //     //   if (SendViaQRBottomSheet.current)
+  //     //     (SendViaQRBottomSheet as any).current.snapTo(0);
+  //     // }}
+  //     />
+  //   )
+  // }, [] )
 
   const renderShareOtpWithTrustedContactContent = useCallback( () => {
     return (
@@ -364,34 +341,42 @@ export default function AddContactSendRequest( props ) {
         renderTimer={renderTimer}
         onPressOk={() => {
           setRenderTimer( false )
-          shareOtpWithTrustedContactBottomSheet.current.snapTo( 0 )
+          setShareOtpWithTrustedContactModel( false )
           props.navigation.goBack()
         }}
         onPressBack={() => {
-          shareOtpWithTrustedContactBottomSheet.current.snapTo( 0 )
+          setShareOtpWithTrustedContactModel( false )
         }}
         OTP={OTP}
       />
     )
   }, [ OTP, renderTimer ] )
 
-  const renderShareOtpWithTrustedContactHeader = useCallback( () => {
-    return (
-      <ModalHeader
-        onPressHeader={() => {
-          shareOtpWithTrustedContactBottomSheet.current.snapTo( 0 )
-        }}
-      />
-    )
-  }, [] )
-
   return (
     <SafeAreaView style={{
-      flex: 1
+      flex: 1, backgroundColor: Colors.backgroundColor
     }}>
-      <StatusBar backgroundColor={Colors.white} barStyle="dark-content" />
-      <View style={NavStyles.modalContainer}>
-        <View
+      <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
+      {/* <View style={NavStyles.modalContainer}> */}
+      <View style={[ CommonStyles.headerContainer, {
+        backgroundColor: Colors.backgroundColor
+      } ]}>
+        <TouchableOpacity
+          style={CommonStyles.headerLeftIconContainer}
+          onPress={() => {
+            props.navigation.goBack()
+          }}
+        >
+          <View style={CommonStyles.headerLeftIconInnerContainer}>
+            <FontAwesome
+              name="long-arrow-left"
+              color={Colors.blue}
+              size={17}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+      {/* <View
           style={{
             alignItems: 'center',
             flexDirection: 'row',
@@ -486,34 +471,34 @@ export default function AddContactSendRequest( props ) {
             </TouchableOpacity>
             }
           </View>
-        </View>
-        <RequestKeyFromContact
-          isModal={false}
-          // headerText={'Request Recovery Secret from trusted contact'}
-          // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
-          contactText={'Adding to Friends and Family:'}
-          contact={Contact}
-          QR={trustedQR}
-          link={trustedLink}
-          contactEmail={''}
-          onPressBack={() => {
-            props.navigation.goBack()
-          }}
-          onPressDone={() => {
+        </View> */}
+      <RequestKeyFromContact
+        isModal={false}
+        // headerText={'Request Recovery Secret from trusted contact'}
+        // subHeaderText={`Request share from trusted Contact, you can change${'\n'}your trusted contact, or either primary mode of context`}
+        contactText={'Adding to Friends and Family:'}
+        contact={Contact}
+        QR={trustedQR}
+        link={trustedLink}
+        contactEmail={''}
+        onPressBack={() => {
+          props.navigation.goBack()
+        }}
+        onPressDone={() => {
+          // openTimer()
+        }}
+        onPressShare={() => {
+          setTimeout( () => {
+            setRenderTimer( true )
+          }, 2 )
+          if ( isOTPType ) {
+            setShareOtpWithTrustedContactModel( true )
+          } else {
             // openTimer()
-          }}
-          onPressShare={() => {
-            setTimeout( () => {
-              setRenderTimer( true )
-            }, 2 )
-            if ( isOTPType ) {
-              shareOtpWithTrustedContactBottomSheet.current.snapTo( 1 )
-            } else {
-              // openTimer()
-            }
-          }}
-        />
-        {/* <View style={{
+          }
+        }}
+      />
+      {/* <View style={{
           marginTop: 'auto'
         }}>
           <View style={{
@@ -526,7 +511,7 @@ export default function AddContactSendRequest( props ) {
               }
             />
           </View> */}
-        {/* <View
+      {/* <View
             style={{
               flexDirection: 'row',
               backgroundColor: Colors.blue,
@@ -578,8 +563,8 @@ export default function AddContactSendRequest( props ) {
               <Text style={styles.buttonText}>QR</Text>
             </TouchableOpacity>
           </View> */}
-        {/* </View> */}
-        <BottomSheet
+      {/* </View> */}
+      {/* <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={SendViaLinkBottomSheet as any}
@@ -604,8 +589,8 @@ export default function AddContactSendRequest( props ) {
           ]}
           renderContent={renderSendViaQRContents}
           renderHeader={renderSendViaQRHeader}
-        />
-        {/* <BottomSheet
+        /> */}
+      {/* <BottomSheet
           enabledGestureInteraction={false}
           enabledInnerScrolling={true}
           ref={ContactRequestBottomSheet as any}
@@ -618,32 +603,13 @@ export default function AddContactSendRequest( props ) {
           renderContent={renderContactRequest}
           renderHeader={renderContactRequestHeader}
         /> */}
-        <BottomSheet
-          enabledGestureInteraction={false}
-          enabledInnerScrolling={true}
-          ref={TimerModalBottomSheet as any}
-          snapPoints={[
-            -50,
-            Platform.OS == 'ios' && DeviceInfo.hasNotch()
-              ? hp( '50%' )
-              : hp( '55%' ),
-          ]}
-          renderContent={renderTimerModalContents}
-          renderHeader={renderTimerModalHeader}
-        />
-        <BottomSheet
-          onCloseEnd={() => {
-            if ( SelectedContact.length > 0 ) {
-              setRenderTimer( false )
-            }
-          }}
-          enabledInnerScrolling={true}
-          ref={shareOtpWithTrustedContactBottomSheet}
-          snapPoints={[ -30, hp( '65%' ) ]}
-          renderContent={renderShareOtpWithTrustedContactContent}
-          renderHeader={renderShareOtpWithTrustedContactHeader}
-        />
-      </View>
+      <ModalContainer visible={timerModal }  closeBottomSheet={() => {}} >
+        {renderTimerModalContents()}
+      </ModalContainer>
+      <ModalContainer visible={shareOtpWithTrustedContactModel }  closeBottomSheet={() => {}} >
+        {renderShareOtpWithTrustedContactContent()}
+      </ModalContainer>
+      {/* </View> */}
     </SafeAreaView>
   )
 }
