@@ -70,10 +70,10 @@ export default StyleSheet.create( {
   },
 
   homepageAmountImage: {
-    width: widthPercentageToDP( 3 ),
-    height: widthPercentageToDP( 3 ),
+    width: widthPercentageToDP( 3.5 ),
+    height: widthPercentageToDP( 3.5 ),
     marginRight: 5,
-    marginBottom: widthPercentageToDP( 1 ),
+    // marginBottom: widthPercentageToDP( 1 ),
     resizeMode: 'contain'
   },
 
