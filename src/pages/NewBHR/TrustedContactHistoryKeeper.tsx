@@ -183,7 +183,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
         setLoadContacts( true )
       }, 2 )
       // setTrustedContactModal( true )
-      if( selectedKeeper.shareType === 'existingContact' ){ setShowFNFList( true ) }
+      if( selectedKeeper.shareType === 'existingContact' ){
+        props.navigation.navigate( 'FNFToKeeper', {
+          ...props.navigation.state.params,
+          selectContact:selectContact
+        } ) }
       else {
         props.navigation.navigate( 'TrustedContactNewBHR', {
           LoadContacts: true,
@@ -911,8 +915,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
             }, 2 )
             // ( trustedContactsBottomSheet as any ).current.snapTo( 1 )
             // setTrustedContactModal( true )
-            console.log( 'selectedKeeper.shareType', selectedKeeper.shareType )
-            if( selectedKeeper.shareType === 'existingContact' ){
+            setNavigation( false )
+            if ( selectedKeeper.shareType === 'existingContact' ) {
               props.navigation.navigate( 'FNFToKeeper', {
                 ...props.navigation.state.params,
                 selectContact: selectContact

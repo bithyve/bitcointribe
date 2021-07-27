@@ -30,7 +30,7 @@ const FNFToKeeper = ( props ) => {
     const c = []
     for ( const channelKey of Object.keys( contacts ) ) {
       const contact = contacts[ channelKey ]
-      if ( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) {
+      if ( ( contact.relationType === TrustedContactRelationTypes.CONTACT || contact.relationType === TrustedContactRelationTypes.WARD ) && contact.contactDetails.contactName ) {
         c.push( {
           ...contact, channelKey
         } )
@@ -157,17 +157,24 @@ const FNFToKeeper = ( props ) => {
               }}>Add new contact</Text>
             </TouchableOpacity>
             {( contacts.length && contacts.map( ( item, index ) => {
-              if ( !item.contactDetails.contactName ) {
-                return
-              }
+              // if ( !item.contactDetails.contactName ) {
+              //   return
+              // }
               return renderContactListItem( {
                 contactDescription: item,
                 index,
                 contactsType: 'Other Contacts',
               } )
-            } ) ) || <View style={{
-              height: wp( '22%' ) + 30
-            }} />}
+            } ) ) ||
+            <View style={{
+              height: wp( '22%' ) + 30, alignSelf: 'center', marginTop: hp( 4 ),
+            }} >
+              <Text style={{
+                color: Colors.gray2,
+              }}>
+              No contacts</Text>
+            </View>
+            }
           </View>
         </View>
       </ScrollView>
