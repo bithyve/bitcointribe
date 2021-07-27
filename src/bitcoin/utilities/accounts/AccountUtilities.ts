@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses } from '../Interface'
 import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -384,6 +384,7 @@ export default class AccountUtilities {
     cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
+    activeAddresses: ActiveAddresses,
     accountType: string,
     contactName?: string,
     primaryAccType?: string,
@@ -407,6 +408,7 @@ export default class AccountUtilities {
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
+      activeAddresses: ActiveAddresses;
     }
    }
   }> => {
@@ -432,13 +434,13 @@ export default class AccountUtilities {
         cachedTxs.forEach( ( tx ) => {
           if( tx.confirmations <= 6 ){
             txsToUpdate.push( tx )
-            if( tx.address ){
-              // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
-              if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
-                if( externalAddresses[ tx.address ] !== undefined ) cachedAQL.external[ tx.address ] = true
-                else cachedAQL.internal[ tx.address ] = true
-              }
-            }
+            // if( tx.address ){
+            //   // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
+            //   if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
+            //     if( externalAddresses[ tx.address ] !== undefined ) cachedAQL.external[ tx.address ] = true
+            //     else cachedAQL.internal[ tx.address ] = true
+            //   }
+            // }
           } else upToDateTxs.push( tx )
         } )
 
@@ -497,7 +499,7 @@ export default class AccountUtilities {
       const synchedAccounts = {
       }
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
         const UTXOs = cachedUTXOs
@@ -668,8 +670,9 @@ export default class AccountUtilities {
           if( tx.confirmations > 6 ){
             const addresses = txIdMap[ tx.txid ]
             addresses.forEach( address => {
-              if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
-              else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+              // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
+              // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+              delete activeAddresses[ address ]
             } )
           }
         } )
@@ -687,6 +690,7 @@ export default class AccountUtilities {
           addressQueryList: cachedAQL,
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+          activeAddresses,
         }
       }
 

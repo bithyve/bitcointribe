@@ -127,8 +127,7 @@ function* syncAccountsWorker( { payload }: {payload: {
     const { synchedAccounts, txsFound } = yield call(
       AccountOperations.syncAccountsByActiveAddresses,
       accounts,
-      network,
-      options.hardRefresh )
+      network )
 
     return {
       synchedAccounts, txsFound
@@ -175,7 +174,7 @@ export const generateSecondaryXprivWatcher = createWatcher(
 )
 
 function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
-  const receivingAddress = testAccount.receivingAddress
+  const { receivingAddress } = AccountOperations.getNextFreeExternalAddress( testAccount )
   const network = AccountUtilities.getNetworkByType( testAccount.networkType )
 
   const { txid } = yield call( AccountUtilities.getTestcoins, receivingAddress, network )
