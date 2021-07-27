@@ -59,6 +59,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
     dispatch( updateAccountSettings( {
       accountShell, settings
     } ) )
+    navigation.navigate( 'Home' )
   }
 
   return (
@@ -80,7 +81,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
           inputStyle={FormStyles.inputText}
           placeholder={'Enter an account name'}
           placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
+          // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountName}
           maxLength={24}
           numberOfLines={1}
@@ -94,7 +95,7 @@ const AccountSettingsEditDisplayPropertiesScreen: React.FC<Props> = ( { navigati
           inputStyle={FormStyles.inputText}
           placeholder={'Enter A Description'}
           placeholderTextColor={FormStyles.placeholderText.color}
-          underlineColorAndroid={FormStyles.placeholderText.color}
+          // underlineColorAndroid={FormStyles.placeholderText.color}
           value={accountDescription}
           numberOfLines={2}
           onChangeText={setAccountDescription}

@@ -10,7 +10,7 @@ const ModalContainer = ( {
   background = 'rgba(0,0,0,0.5)',
   children
 } ) => {
-  const [ height, setHeight ] = useState( 9 )
+  const [ height, setHeight ] = useState( 6 )
   useEffect( ()=>{
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
@@ -21,7 +21,7 @@ const ModalContainer = ( {
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 9 )
+        setHeight( 6 )
       }
     )
 
@@ -52,7 +52,8 @@ const ModalContainer = ( {
           flexDirection: 'column',
           justifyContent: 'flex-end',
           // alignItems: 'center',
-          // paddingBottom: Platform.OS === 'ios' ? hp( '0%' ) : hp( `${height}%` )
+          paddingBottom: Platform.OS === 'ios' ? hp( '6%' ) : hp( `${height}%` ),
+          paddingHorizontal: wp( '2%' ),
           // borderRadius: 20
         }}
         resetScrollToCoords={{
@@ -73,9 +74,9 @@ const ModalContainer = ( {
 
             <View style={{
               width: '100%',
-              borderRadius: Platform.OS === 'ios' ? ScreenCornerRadius : wp( '4%' ),
+              borderRadius: wp( '4%' ),
               overflow: 'hidden',
-            // marginBottom: hp( 0.5 )
+              // marginBottom: hp( 0.5 )
             }}>
 
               {children}

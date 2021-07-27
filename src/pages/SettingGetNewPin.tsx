@@ -175,7 +175,7 @@ export default function SettingGetNewPin( props ) {
       }}>
         <View style={{
         }}>
-          <View style={styles.modalHeaderTitleView}>
+          {/* <View style={styles.modalHeaderTitleView}>
             <View style={{
               flexDirection: 'row', alignItems: 'center'
             }}>
@@ -198,7 +198,7 @@ export default function SettingGetNewPin( props ) {
                 {'Manage Passcode'}
               </Text>
             </View>
-          </View>
+          </View> */}
           {/* <Text style={ styles.headerTitleText }>Hello!</Text> */}
           <View>
             <Text style={styles.headerInfoText}>

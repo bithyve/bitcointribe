@@ -260,7 +260,7 @@ const BalanceEntryFormGroup: React.FC<Props> = ( {
             keyboardType={'numeric'}
             onChangeText={( value ) => {
               const regEx = /^[0-9]+$/
-              if( regEx.test( value ) ) {
+              if( regEx.test( value ) || value === '' ) {
                 setIsSendingMax( false )
                 setCurrentSatsAmountTextValue( value )
                 setCurrentFiatAmountTextValue( String( convertSatsToFiat( Number( value ) ?? 0 ).toFixed( 2 ) ) )
