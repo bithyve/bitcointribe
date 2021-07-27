@@ -32,7 +32,7 @@ const RecipientAddressTextInputSection: React.FC<Props> = ( {
 
   function handleTextChange( newValue: string ) {
     const { type: scannedAddressKind }: { type: ScannedAddressKind } = AccountUtilities.addressDiff( newValue.trim(), network )
-
+    setRecipientAddress( newValue )
     switch ( scannedAddressKind ) {
         case ScannedAddressKind.ADDRESS:
           onAddressEntered( newValue )
