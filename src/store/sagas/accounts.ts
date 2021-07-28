@@ -37,6 +37,7 @@ import {
   UPDATE_ACCOUNT_SETTINGS,
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
+  updateAccounts,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -86,6 +87,16 @@ import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
+export function getNextFreeAddress( dispatch:any, account: Account | MultiSigAccount, requester?: AccountType ) {
+  const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
+  dispatch( updateAccounts( {
+    accounts: {
+      [ updatedAccount.id ]: updatedAccount
+    }
+  } ) )
+  dbManager.updateAccount( ( updatedAccount as Account ).id, updatedAccount )
+  return receivingAddress
+}
 
 function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
@@ -114,11 +125,9 @@ function* syncAccountsWorker( { payload }: {payload: {
     }
   } else {
     const { synchedAccounts, txsFound } = yield call(
-      AccountOperations.syncAccounts,
+      AccountOperations.syncAccountsByActiveAddresses,
       accounts,
-      network,
-      options.hardRefresh,
-      options.blindRefresh )
+      network )
 
     return {
       synchedAccounts, txsFound
@@ -165,7 +174,7 @@ export const generateSecondaryXprivWatcher = createWatcher(
 )
 
 function* testcoinsWorker( { payload: testAccount }: { payload: Account } ) {
-  const receivingAddress = testAccount.receivingAddress
+  const { receivingAddress } = AccountOperations.getNextFreeExternalAddress( testAccount )
   const network = AccountUtilities.getNetworkByType( testAccount.networkType )
 
   const { txid } = yield call( AccountUtilities.getTestcoins, receivingAddress, network )
@@ -328,7 +337,7 @@ function* refreshAccountShellWorker( { payload } ) {
   } ) )
   yield put( accountShellRefreshCompleted( accountShell ) )
   for ( const [ key, synchedAcc ] of Object.entries( synchedAccounts ) ) {
-    yield call( dbManager.updateAccount, synchedAcc.id, synchedAcc )
+    yield call( dbManager.updateAccount, ( synchedAcc as Account ).id, synchedAcc )
   }
   // const rescanTxs: RescannedTransactionData[] = []
   // deltaTxs.forEach( ( deltaTx ) => {

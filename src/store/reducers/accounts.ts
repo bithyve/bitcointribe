@@ -38,7 +38,8 @@ import {
   RESET_ACCOUNT_UPDATE_FLAG,
   RESET_TWO_FA_LOADER,
   NEW_ACCOUNT_SHELLS_ADDED,
-  UPDATE_ACCOUNT_SHELLS
+  UPDATE_ACCOUNT_SHELLS,
+  UPDATE_ACCOUNTS
 } from '../actions/accounts'
 import AccountShell from '../../common/data/models/AccountShell'
 import SyncStatus from '../../common/data/enums/SyncStatus'
@@ -276,6 +277,15 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           isGeneratingNewAccountShell: false,
           hasNewAccountShellGenerationSucceeded: false,
           hasNewAccountShellGenerationFailed: false,
+        }
+
+      case UPDATE_ACCOUNTS:
+        return {
+          ...state,
+          accounts: {
+            ...state.accounts,
+            ...action.payload.accounts,
+          },
         }
 
       case UPDATE_ACCOUNT_SHELLS:

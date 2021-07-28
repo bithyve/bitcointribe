@@ -52,6 +52,7 @@ import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import useAccountByAccountShell from '../../utils/hooks/state-selectors/accounts/UseAccountByAccountShell'
 import ModalContainer from '../../components/home/ModalContainer'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { getNextFreeAddress } from '../../store/sagas/accounts'
 
 export default function Receive( props ) {
   const dispatch = useDispatch()
@@ -70,6 +71,7 @@ export default function Receive( props ) {
   const accountShell: AccountShell = props.navigation.getParam( 'accountShell' )
   const account: Account = useAccountByAccountShell( accountShell )
   const [ receivingAddress, setReceivingAddress ] = useState( null )
+  const [ paymentURI, setPaymentURI ] = useState( null )
 
   const {
     present: presentBottomSheet,
@@ -156,15 +158,20 @@ export default function Receive( props ) {
     )
   }, [ amount ] )
 
+
   useEffect( () => {
-    let receivingAddress = account.receivingAddress
+    const receivingAddress = getNextFreeAddress( dispatch, account )
+    setReceivingAddress( receivingAddress )
+  }, [] )
+
+  useEffect( () => {
     if ( amount ) {
-      receivingAddress = AccountUtilities.generatePaymentURI( receivingAddress, {
+      const newPaymentURI = AccountUtilities.generatePaymentURI( receivingAddress, {
         amount: parseInt( amount ) / SATOSHIS_IN_BTC,
       } ).paymentURI
-    }
-    setReceivingAddress( receivingAddress )
-  }, [ accountShell, amount, ] )
+      setPaymentURI( newPaymentURI )
+    } else if( paymentURI ) setPaymentURI( null )
+  }, [ amount ] )
 
   return (
     <View style={{
@@ -239,12 +246,12 @@ export default function Receive( props ) {
             </View>
             <ScrollView>
               <View style={styles.QRView}>
-                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet Address' : 'Bitcoin Address'} value={receivingAddress ? receivingAddress : 'eert'} size={hp( '27%' )} />
+                <QRCode title={getAccountTitleByShell( accountShell ) === 'Test Account' ? 'Testnet Address' : 'Bitcoin Address'} value={paymentURI? paymentURI: receivingAddress? receivingAddress: 'null'} size={hp( '27%' )} />
               </View>
 
               <CopyThisText
                 backgroundColor={Colors.white}
-                text={receivingAddress}
+                text={paymentURI? paymentURI: receivingAddress}
               />
 
               <AppBottomSheetTouchableWrapper

@@ -6,7 +6,7 @@ import bs58check from 'bs58check'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import config from '../../HexaConfig'
 import _ from 'lodash'
-import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount } from '../Interface'
+import { Transaction, ScannedAddressKind, Balances, MultiSigAccount, Account, NetworkType, AccountType, DonationAccount, ActiveAddresses } from '../Interface'
 import { DONATION_ACCOUNT, SUB_PRIMARY_ACCOUNT, } from '../../../common/constants/wallet-service-types'
 import Toast from '../../../components/Toast'
 import { SATOSHIS_IN_BTC } from '../../../common/constants/Bitcoin'
@@ -14,7 +14,7 @@ import { BH_AXIOS, SIGNING_AXIOS } from '../../../services/api'
 
 
 const { REQUEST_TIMEOUT } = config
-let accAxios: AxiosInstance = axios.create( {
+const accAxios: AxiosInstance = axios.create( {
   timeout: REQUEST_TIMEOUT
 } )
 
@@ -367,8 +367,7 @@ export default class AccountUtilities {
 
   static fetchBalanceTransactionsByAccounts = async (
     accounts: {[id: string]: {
-    externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
-    internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
+    activeAddresses: ActiveAddresses,
     externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
     internalAddresses:  {[address: string]: number},  // all internal addresses(till nextFreeChangeAddressIndex)
     ownedAddresses: string[],
@@ -407,6 +406,7 @@ export default class AccountUtilities {
       addressQueryList: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
+      activeAddresses: ActiveAddresses;
     }
    }
   }> => {
@@ -423,7 +423,7 @@ export default class AccountUtilities {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
+        const { activeAddresses, ownedAddresses, cachedTxs } = accounts[ accountId ]
         const upToDateTxs: Transaction[] = []
         const txsToUpdate: Transaction[] = []
         const newTxs : Transaction[] = []
@@ -432,27 +432,26 @@ export default class AccountUtilities {
         cachedTxs.forEach( ( tx ) => {
           if( tx.confirmations <= 6 ){
             txsToUpdate.push( tx )
-            if( tx.address ){
-              // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
-              if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
-                if( externalAddresses[ tx.address ] !== undefined ) cachedAQL.external[ tx.address ] = true
-                else cachedAQL.internal[ tx.address ] = true
-              }
-            }
+            // if( tx.address ){
+            //   // update address query list to include out of bound addresses if the range set has moved while corresponding txs doesn't have 6+ confs
+            //   if( externalAddressSet[ tx.address ] === undefined && internalAddressSet[ tx.address ] === undefined ){
+            //     if( externalAddresses[ tx.address ] !== undefined ) cachedAQL.external[ tx.address ] = true
+            //     else cachedAQL.internal[ tx.address ] = true
+            //   }
+            // }
           } else upToDateTxs.push( tx )
-
-          if( !cachedTxIdMap[ tx.txid ] ) // backward compatibility (for versions w/o txIdMaps)
-            cachedTxIdMap[ tx.txid ] = [ tx.address ]
-
         } )
 
         accountsTemp[ accountId ] = {
           upToDateTxs, txsToUpdate, newTxs
         }
 
-        const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
-        const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
-        const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
+        // const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
+        // const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
+        // const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
+        const externalArray = Object.keys( activeAddresses.external )
+        const internalArray = Object.keys( activeAddresses.internal )
+        const ownedArray = ownedAddresses
 
         accountToAddressMapping[ accountId ] = {
           External: externalArray,
@@ -462,9 +461,6 @@ export default class AccountUtilities {
       }
 
       let usedFallBack = false
-      accAxios = axios.create( {
-        timeout: 7 * REQUEST_TIMEOUT // accounting for blind refresh
-      } )
       try{
         if ( network === bitcoinJS.networks.testnet ) {
           res = await accAxios.post(
@@ -504,7 +500,7 @@ export default class AccountUtilities {
       const synchedAccounts = {
       }
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
         const UTXOs = cachedUTXOs
@@ -530,7 +526,6 @@ export default class AccountUtilities {
               } )
 
               if( include )
-              {
                 UTXOs.push( {
                   txId: txid,
                   vout,
@@ -538,7 +533,6 @@ export default class AccountUtilities {
                   address: Address,
                   status,
                 } )
-              }
             }
           }
 
@@ -554,7 +548,7 @@ export default class AccountUtilities {
 
           if ( utxo.status && utxo.status.confirmed ) balances.confirmed += utxo.value
           else if (
-            internalAddressSet[ utxo.address ] !== undefined
+            internalAddresses[ utxo.address ] !== undefined
           )
             balances.confirmed += utxo.value
           else balances.unconfirmed += utxo.value
@@ -562,8 +556,7 @@ export default class AccountUtilities {
 
         // process txs
         const addressesInfo = Txs
-        const txIdMap = cachedTxIdMap? cachedTxIdMap: {
-        }
+        const txIdMap = cachedTxIdMap
         let { lastUsedAddressIndex, lastUsedChangeAddressIndex } = accounts[ accountId ]
         const { upToDateTxs, txsToUpdate, newTxs } = accountsTemp[ accountId ]
 
@@ -572,12 +565,6 @@ export default class AccountUtilities {
             if ( addressInfo.TotalTransactions === 0 ) {
               continue
             }
-            // TODO: remove totalTransactions, confirmedTransactions & unconfirmedTransactions
-            // transactions.totalTransactions += addressInfo.TotalTransactions
-            // transactions.confirmedTransactions +=
-            //   addressInfo.ConfirmedTransactions
-            // transactions.unconfirmedTransactions +=
-            //   addressInfo.UnconfirmedTransactions
 
             addressInfo.Transactions.forEach( ( tx ) => {
               if ( !txIdMap[ tx.txid ] ) {
@@ -623,7 +610,7 @@ export default class AccountUtilities {
                     senderAddresses: tx.SenderAddresses,
                     blockTime: tx.Status.block_time? tx.Status.block_time: Date.now(),
                   }
-                  // console.log({ outgoingTx, incomingTx });
+
                   newTxs.push(
                     ...[ outgoingTx, incomingTx ],
                   )
@@ -681,8 +668,10 @@ export default class AccountUtilities {
           if( tx.confirmations > 6 ){
             const addresses = txIdMap[ tx.txid ]
             addresses.forEach( address => {
-              if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
-              else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+              // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
+              // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
+              if( activeAddresses.external[ address ] ) delete activeAddresses.external[ address ]
+              else if( activeAddresses.internal[ address ] ) delete activeAddresses.internal[ address ]
             } )
           }
         } )
@@ -700,6 +689,7 @@ export default class AccountUtilities {
           addressQueryList: cachedAQL,
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
+          activeAddresses,
         }
       }
 
