@@ -557,8 +557,7 @@ export default class AccountUtilities {
 
         // process txs
         const addressesInfo = Txs
-        const txIdMap = cachedTxIdMap? cachedTxIdMap: {
-        }
+        const txIdMap = cachedTxIdMap
         let { lastUsedAddressIndex, lastUsedChangeAddressIndex } = accounts[ accountId ]
         const { upToDateTxs, txsToUpdate, newTxs } = accountsTemp[ accountId ]
 
@@ -672,7 +671,8 @@ export default class AccountUtilities {
             addresses.forEach( address => {
               // if( cachedAQL.external[ address ] ) delete cachedAQL.external[ address ]
               // else if( cachedAQL.internal[ address ] ) delete cachedAQL.internal[ address ]
-              delete activeAddresses[ address ]
+              if( activeAddresses.external[ address ] ) delete activeAddresses.external[ address ]
+              else if( activeAddresses.internal[ address ] ) delete activeAddresses.internal[ address ]
             } )
           }
         } )

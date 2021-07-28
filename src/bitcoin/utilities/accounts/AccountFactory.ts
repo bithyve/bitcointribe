@@ -45,6 +45,10 @@ export function generateAccount(
     accountDescription,
     accountVisibility: AccountVisibility.DEFAULT,
     activeAddresses: {
+      external: {
+      },
+      internal: {
+      },
     },
     receivingAddress: initialRecevingAddress,
     nextFreeAddressIndex: 0,
@@ -57,6 +61,8 @@ export function generateAccount(
     },
     transactions: [],
     lastSynched: 0,
+    txIdMap: {
+    },
     addressQueryList: {
       external: {
       },
@@ -131,6 +137,10 @@ export function generateMultiSigAccount(
     accountDescription,
     accountVisibility: AccountVisibility.DEFAULT,
     activeAddresses: {
+      external: {
+      },
+      internal: {
+      },
     },
     receivingAddress: initialRecevingAddress,
     nextFreeAddressIndex: 0,
@@ -143,6 +153,8 @@ export function generateMultiSigAccount(
     },
     transactions: [],
     lastSynched: 0,
+    txIdMap: {
+    },
     addressQueryList: {
       external: {
       },

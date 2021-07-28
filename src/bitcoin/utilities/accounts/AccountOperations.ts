@@ -25,7 +25,7 @@ export default class AccountOperations {
     if( ( account as MultiSigAccount ).is2FA ) receivingAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex, false ).address
     else receivingAddress = AccountUtilities.getAddressByIndex( account.xpub, false, account.nextFreeAddressIndex, network )
 
-    account.activeAddresses[ receivingAddress ] = {
+    account.activeAddresses.external[ receivingAddress ] = {
       index: account.nextFreeAddressIndex,
       assignedTo: requester? requester: account.type
     }
@@ -338,8 +338,9 @@ export default class AccountOperations {
       }
 
       // pick up external addresses to scan from active addresses
-      for( const address of Object.keys( account.activeAddresses ) ){
-        externalAddressSet[ address ] = account.activeAddresses[ address ].index
+      const activeExternalAddresses = account.activeAddresses.external
+      for( const address of Object.keys( activeExternalAddresses ) ){
+        externalAddressSet[ address ] = activeExternalAddresses[ address ].index
       }
 
       const internalAddresses :{[address: string]: number}  = {
@@ -353,7 +354,12 @@ export default class AccountOperations {
         internalAddresses[ address ] = itr
         ownedAddresses.push( address )
         // if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
-        internalAddressSet[ address ] = itr
+      }
+
+      // pick up external addresses to scan from active addresses
+      const activeInternalAddresses = account.activeAddresses.internal
+      for( const address of Object.keys( activeInternalAddresses ) ){
+        internalAddressSet[ address ] = activeInternalAddresses[ address ].index
       }
 
       // garner cached params for bal-tx sync
@@ -563,6 +569,8 @@ export default class AccountOperations {
   static updateActiveAddresses = ( account: Account, consumedUTXOs: {[txid: string]: InputUTXOs} ) => {
     const network = AccountUtilities.getNetworkByType( account.networkType )
 
+    const activeExternalAddresses = account.activeAddresses.external
+    const activeInternalAddresses = account.activeAddresses.internal
     for( const consumedUTXO of Object.values( consumedUTXOs ) ){
       let found = false
       // is out of bound external address?
@@ -572,8 +580,8 @@ export default class AccountOperations {
         else address = AccountUtilities.getAddressByIndex( account.xpub, false, itr, network )
 
         if( consumedUTXO.address === address ){
-          if( !account.activeAddresses[ address ] )
-            account.activeAddresses[ address ] = {
+          if( !activeExternalAddresses[ address ] )
+            activeExternalAddresses[ address ] = {
               index: itr,
               assignedTo: account.type,
             } // include out of bound(soft-refresh range) ext address
@@ -590,8 +598,8 @@ export default class AccountOperations {
           else address = AccountUtilities.getAddressByIndex( account.xpub, true, itr, network )
 
           if( consumedUTXO.address === address ){
-            if( !account.activeAddresses[ address ] ) // TODO: should internal addresses use the same active address list?
-              account.activeAddresses[ address ] = {
+            if( !activeInternalAddresses[ address ] )
+              activeInternalAddresses[ address ] = {
                 index: itr,
                 assignedTo: account.type,
               } // include out of bound(soft-refresh range) int address

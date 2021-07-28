@@ -785,9 +785,17 @@ export interface UTXO {
 }
 
 export interface ActiveAddresses {
-  [address: string]: {
-    index: number,
-    assignedTo: AccountType,
+  external: {
+    [address: string]: {
+      index: number,
+      assignedTo: AccountType,
+    }
+  }
+  internal: {
+    [address: string]: {
+      index: number,
+      assignedTo: AccountType,
+    }
   }
 }
 
