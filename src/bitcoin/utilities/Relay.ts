@@ -73,10 +73,7 @@ export default class Relay {
         if ( err.response ) throw new Error( err.response.data.err )
         if ( err.code ) throw new Error( err.code )
       }
-      const { updated } = res.data
-      return {
-        updated
-      }
+      return res.data
     } catch ( err ) {
       throw new Error( 'Failed to fetch GetBittr Details' )
     }
