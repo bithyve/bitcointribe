@@ -65,10 +65,10 @@ android {
         multiDexEnabled true
         resValue "string", "build_config_package", "io.hexawallet.hexa"
     }
-    // lintOptions {
-    //     disable 'InvalidPackage'
-    //     checkReleaseBuilds false
-    // }
+    lintOptions {
+        disable 'InvalidPackage'
+        checkReleaseBuilds false
+    }
 
      signingConfigs {
         release {
