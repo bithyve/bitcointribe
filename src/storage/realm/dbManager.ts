@@ -135,7 +135,7 @@ const updateContact = async ( contact ) => {
 const getWallet = () => {
   const walletsRef = db.objects( schema.Wallet )
   const wallets = Array.from( walletsRef )
-  return wallets
+  return wallets[ 0 ]
 }
 
 const getTrustedContacts = () => {
