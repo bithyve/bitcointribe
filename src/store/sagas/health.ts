@@ -405,9 +405,9 @@ function* updateHealthLevel2Worker( { payload } ) {
     console.log( 'INIT_LEVEL_TWO levelHealth', levelHealth )
     let SecurityQuestionHealth
     const randomIdForSecurityQ = generateRandomString( 8 )
-    if( Health[ 0 ] && Health[ 0 ].levelInfo && Health[ 0 ].levelInfo[ 1 ] ){
+    if( Health[ 0 ] && Health[ 0 ].levelInfo && Health[ 0 ].levelInfo[ 0 ] ){
       SecurityQuestionHealth = {
-        ...Health[ 0 ].levelInfo[ 1 ], shareId: randomIdForSecurityQ,
+        ...Health[ 0 ].levelInfo[ 0 ], shareId: randomIdForSecurityQ,
       }
     }
     else {
@@ -432,7 +432,7 @@ function* updateHealthLevel2Worker( { payload } ) {
     for ( let i = 1; i < metaShares.length; i++ ) {
       const element = metaShares[ i ]
       let shareType = ''
-      if ( i == 0 ) shareType = 'cloud'
+      if ( i == 1 ) shareType = 'cloud'
       const obj = {
         shareType: shareType,
         updatedAt: 0,

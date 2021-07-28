@@ -570,7 +570,7 @@ const PersonalCopyHistory = ( props ) => {
         }}
         onPressContinue={async() => {
           if( isConfirm ) {
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"eff","channelId":"06bfdf43e9dc0c8112fd1714856c96a10355a6e97d93fe744bee8cbdaaa6be1d","streamId":"b9bc9870b","channelKey":"QLw84QYaENvyvpmXkC5WV4do","secondaryChannelKey":"pq25Wz9BcZr9UwEY0RwXwKXe","version":"1.8.5","walletId":"2068c4796652611b04802ff38aecaf1f3a0f974b735046bcf25ff383f6f0936a","encryptedKey":"5ead557f0aebcef4c13080eb302e6a8d0e5c85a48801ed70fd67f0c092ba0043b097121d9e4f543dbfbf9b9d9de52d63f457c8d871423922c3d7a5903cc0ebdff73be424f3490e091fa8c5ede8b48870"}'
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"sas","channelId":"acd93b9dc1ed80ad0e0b0dc997e3375efff3e943d2f7b16fab314d40cd8908fa","streamId":"9ac2d678e","channelKey":"LkidfBLLgY5sWG272zqVvXrW","secondaryChannelKey":"pcYV5kMTFM3VDvCJevWlb25c","version":"1.8.5","walletId":"41b18c3f78b9b5e43ac200f47baef8f2613dcb1674f6407de196adc8da914bdb","encryptedKey":"68a2110634e053657687cc06e4dfe456142e34cdb2469145a398ceff9573f3cece4b7fd53b935c0c05d41ddac8e17653f0744ae3a5da10b38d553e18bf653c5e5646e5ab3e1e460b6c3beb632cac2ab1"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {

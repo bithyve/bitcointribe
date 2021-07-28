@@ -230,7 +230,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             trustedContactRequest: {
               ...message.additionalInfo,
               isExistingContact: true,
-              isQR: false,
+              isQR: true,
               type: QRCodeTypes.EXISTING_CONTACT,
               isKeeper: true,
             }
