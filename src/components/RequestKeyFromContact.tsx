@@ -77,6 +77,7 @@ export default function RequestKeyFromContact( props ) {
 
     }
   }
+  console.log( 'props.QR', props.QR )
 
   return (
     <View style={styles.modalContainer}>

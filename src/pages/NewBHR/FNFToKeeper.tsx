@@ -68,7 +68,8 @@ const FNFToKeeper = ( props ) => {
         name: contactDescription.contactDetails.contactName,
         imageAvailable: contactDescription.contactDetails.imageAvailable ? true : false,
         image: contactDescription.contactDetails.imageAvailable,
-        id: contactDescription.contactDetails.id
+        id: contactDescription.contactDetails.id,
+        channelKey: contactDescription.channelKey
       }
       props.navigation.state.params.selectContact( 'ExistingContact', obj )
       props.navigation.goBack()

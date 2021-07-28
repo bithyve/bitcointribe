@@ -603,9 +603,9 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
           console.log( 'FNF_KEEPER_REQUEST message', message )
           this.setState( {
             trustedContactRequest: {
-              ...message.AdditionalInfo,
+              ...message.additionalInfo,
               isExistingContact: true,
-              isQR: false,
+              isQR: true,
               type: QRCodeTypes.EXISTING_CONTACT,
               isKeeper: true,
             }
