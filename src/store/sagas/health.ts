@@ -268,6 +268,9 @@ function* generateMetaSharesWorker( { payload } ) {
           ...DECENTRALIZED_BACKUP,
           SM_SHARE: res.data.encryptedSMSecrets[ 0 ]
         }
+        dbManager.updateWallet( {
+          smShare: res.data.encryptedSMSecrets[ 0 ]
+        } )
         yield call( insertDBWorker, {
           payload: {
             SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP
@@ -910,7 +913,8 @@ function* updateWalletImageWorker() {
     walletId : wallet.walletId,
     contacts : channelIds,
     accounts : acc,
-    versionHistory: STATE_DATA.versionHistory
+    versionHistory: STATE_DATA.versionHistory,
+    SM_share: wallet.smShare
   }
   //console.log( image )
   /*let walletImage: WalletImage = {
@@ -1001,7 +1005,7 @@ function* updateWalletImageWorker() {
   const res = yield call( Relay.updateWalletImage, image )
   //const getWI = yield call( s3Service.fetchWalletImage )
   if ( res.status === 200 ) {
-    if ( res.data.updated ) console.log( 'Wallet Image updated' )
+    if ( res.data ) console.log( 'Wallet Image updated' )
     //yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
     console.log( {

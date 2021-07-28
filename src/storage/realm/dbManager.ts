@@ -47,6 +47,20 @@ const createAccounts = accounts => {
   }
 }
 
+const updateWallet = async ( newWalletProps ) => {
+  try {
+    const walletsRef = db.objects( schema.Wallet )
+    const wallet = walletsRef[ 0 ]
+    for ( const [ key, value ] of Object.entries( newWalletProps ) ) {
+      db.write( () => {
+        wallet[ key ] = value
+      } )
+    }
+  } catch ( error ) {
+    console.log( error )
+  }
+}
+
 const createAccount = async ( account ) => {
   try {
     db.create( schema.Account, {
@@ -149,5 +163,6 @@ export default {
   createAccount,
   updateAccount,
   updateContact,
+  updateWallet,
   getTrustedContacts,
 }
