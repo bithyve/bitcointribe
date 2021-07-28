@@ -161,10 +161,10 @@ const styles = StyleSheet.create( {
   },
 
   headerAccountImage: {
-    width: widthPercentageToDP( 10 ),
-    height: widthPercentageToDP( 10 ),
-    marginTop: 0
-
+    width: widthPercentageToDP( 9 ),
+    height: widthPercentageToDP( 9 ),
+    marginTop: 0,
+    resizeMode: 'contain'
   },
 
   headerBadgeContainer: {
