@@ -268,6 +268,9 @@ function* generateMetaSharesWorker( { payload } ) {
           ...DECENTRALIZED_BACKUP,
           SM_SHARE: res.data.encryptedSMSecrets[ 0 ]
         }
+        dbManager.updateWallet( {
+          smShare: res.data.encryptedSMSecrets[ 0 ]
+        } )
         yield call( insertDBWorker, {
           payload: {
             SERVICES: updatedSERVICES, DECENTRALIZED_BACKUP: updatedDECENTRALIZED_BACKUP
