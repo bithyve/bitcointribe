@@ -78,6 +78,14 @@ export default function AddContactSendRequest( props ) {
     ? props.navigation.getParam( 'showDone' )
     : false
 
+  const isKeeper = props.navigation.getParam( 'isKeeper' )
+    ? props.navigation.getParam( 'isKeeper' )
+    : false
+
+  const existingContact = props.navigation.getParam( 'existingContact' )
+    ? props.navigation.getParam( 'existingContact' )
+    : false
+
   const [ Contact ] = useState(
     SelectedContact ? SelectedContact[ 0 ] : {
     },
@@ -166,7 +174,7 @@ export default function AddContactSendRequest( props ) {
     const appVersion = DeviceInfo.getVersion()
     setTrustedQR(
       JSON.stringify( {
-        type: QRCodeTypes.CONTACT_REQUEST,
+        type: existingContact ? QRCodeTypes.EXISTING_CONTACT : isKeeper ? QRCodeTypes.KEEPER_REQUEST : QRCodeTypes.CONTACT_REQUEST,
         channelKey,
         walletName: wallet.walletName,
         secondaryChannelKey,
