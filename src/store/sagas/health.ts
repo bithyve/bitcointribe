@@ -2196,7 +2196,7 @@ function* createOrChangeGuardianWorker( { payload } ) {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         } ) )
-        const temporaryContact = contacts[ channelKey ] // temporary trusted contact object
+        const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
         console.log( 'EXISTING CONTACT instream', instream )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
@@ -2205,6 +2205,9 @@ function* createOrChangeGuardianWorker( { payload } ) {
           title: 'Friends and Family Request',
           body: `You have new keeper request ${temporaryContact.contactDetails.contactName}`,
           data: {
+            walletName: walletName,
+            channelKey: channelKey,
+            contactsSecondaryChannelKey: temporaryContact.secondaryChannelKey,
           },
           tag: notificationTag.IMP,
         }
