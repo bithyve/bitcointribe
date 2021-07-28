@@ -1040,8 +1040,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
             props.navigation.goBack()
           }}
           onPressDone={() => {
+            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+              props.navigation.pop( 2 )
+            } else {
+              props.navigation.pop( 1 )
+            }
             // ( shareBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
           }}
           onPressShare={() => {
             if ( isOTPType ) {

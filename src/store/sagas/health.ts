@@ -329,10 +329,10 @@ function* updateSharesHealthWorker( { payload } ) {
       const levelInfo = levelHealth[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
-        if( element.shareId == payload.shares.shareId ){
+        if( element.shareId === payload.shares.shareId ){
           console.log( 'UPDATE SHARE payload.shares.shareId', payload.shares.shareId )
           console.log( 'UPDATE SHARE element.shareId', element.shareId )
-          console.log( 'UPDATE SHARE i', i )
+          console.log( 'UPDATE SHARE i, j', i, j )
           levelHealth[ i ].levelInfo[ j ].updatedAt = payload.shares.updatedAt ? moment( new Date() ).valueOf() : levelHealth[ i ].levelInfo[ j ].updatedAt
           levelHealth[ i ].levelInfo[ j ].name = payload.shares.name ? payload.shares.name : levelHealth[ i ].levelInfo[ j ].name ? levelHealth[ i ].levelInfo[ j ].name : ''
           levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
@@ -341,6 +341,7 @@ function* updateSharesHealthWorker( { payload } ) {
             levelHealth[ i ].levelInfo[ j ].status = payload.shares.status
           }
           console.log( 'UPDATE SHARE element.shareId', element.shareId )
+          break
         }
       }
     }
@@ -2226,41 +2227,41 @@ function* createOrChangeGuardianWorker( { payload } ) {
           channelKey: keeperInfo.find( value=>value.shareId == shareId ).channelKey,
           shareId: shareId
         } ) )
-        console.log( 'keeperInfo.find( value=>value.shareId == shareId ).channelKey', keeperInfo.find( value=>value.shareId == shareId ).channelKey )
-        if( isChange ) {
-          const contactInfo = {
-            channelKey: oldChannelKey,
-          }
-          const primaryData: PrimaryStreamData = {
-            contactDetails: contacts[ oldChannelKey ].contactDetails,
-            walletID: walletId,
-            walletName,
-            relationType: TrustedContactRelationTypes.CONTACT,
-          }
-          const streamUpdates: UnecryptedStreamData = {
-            streamId: TrustedContacts.getStreamId( walletId ),
-            primaryData,
-            secondaryData: null,
-            backupData: null,
-            metaData: {
-              flags:{
-                active: true,
-                newData: true,
-                lastSeen: Date.now(),
-              },
-              version: DeviceInfo.getVersion()
-            }
-          }
-          // initiate permanent channel
-          const channelUpdate =  {
-            contactInfo, streamUpdates
-          }
-          console.log( 'on CHange channelUpdate', channelUpdate )
-          yield put( syncPermanentChannels( {
-            permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-            channelUpdates: [ channelUpdate ],
-          } ) )
+      }
+      console.log( 'keeperInfo.find( value=>value.shareId == shareId ).channelKey', keeperInfo.find( value=>value.shareId == shareId ).channelKey )
+      if( isChange ) {
+        const contactInfo = {
+          channelKey: oldChannelKey,
         }
+        const primaryData: PrimaryStreamData = {
+          contactDetails: contacts[ oldChannelKey ].contactDetails,
+          walletID: walletId,
+          walletName,
+          relationType: TrustedContactRelationTypes.CONTACT,
+        }
+        const streamUpdates: UnecryptedStreamData = {
+          streamId: TrustedContacts.getStreamId( walletId ),
+          primaryData,
+          secondaryData: null,
+          backupData: null,
+          metaData: {
+            flags:{
+              active: true,
+              newData: true,
+              lastSeen: Date.now(),
+            },
+            version: DeviceInfo.getVersion()
+          }
+        }
+        // initiate permanent channel
+        const channelUpdate =  {
+          contactInfo, streamUpdates
+        }
+        console.log( 'on CHange channelUpdate', channelUpdate )
+        yield put( syncPermanentChannels( {
+          permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+          channelUpdates: [ channelUpdate ],
+        } ) )
       }
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
     }
@@ -2288,6 +2289,7 @@ function* modifyLevelDataWorker( ) {
     let isError = false
     const abc = JSON.stringify( levelHealth )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ), contacts ) ]
+    console.log( 'levelHealthVar', levelHealthVar )
     for ( let i = 0; i < levelHealthVar.length; i++ ) {
       const levelInfo = levelHealthVar[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
