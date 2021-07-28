@@ -25,16 +25,12 @@ function* updateFCMTokensWorker( { payload } ) {
     if ( FCMs.length === 0 ) {
       throw new Error( 'No FCM token found' )
     }
-
-    const service: RegularAccount = yield select(
-      ( state ) => state.accounts[ REGULAR_ACCOUNT ].service,
+    const { walletId } = yield select(
+      ( state ) => state.storage.wallet,
     )
-    const { data } = yield call( service.getWalletId )
-    console.log( 'data updateFCMTokensWorker', data )
-
     const { updated } = yield call(
       Relay.updateFCMTokens,
-      data.walletId,
+      walletId,
       payload.FCMs,
     )
     if ( !updated ) console.log( 'Failed to update FCMs on the server' )

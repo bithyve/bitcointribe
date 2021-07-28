@@ -30,6 +30,7 @@ export default class AccountOperations {
       assignedTo: requester? requester: account.type
     }
     account.nextFreeAddressIndex++
+    account.receivingAddress = receivingAddress
     return {
       updatedAccount: account, receivingAddress
     }
