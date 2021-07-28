@@ -367,8 +367,7 @@ export default class AccountUtilities {
 
   static fetchBalanceTransactionsByAccounts = async (
     accounts: {[id: string]: {
-    externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
-    internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
+    activeAddresses: ActiveAddresses,
     externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
     internalAddresses:  {[address: string]: number},  // all internal addresses(till nextFreeChangeAddressIndex)
     ownedAddresses: string[],
@@ -384,7 +383,6 @@ export default class AccountUtilities {
     cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
     lastUsedAddressIndex: number,
     lastUsedChangeAddressIndex: number,
-    activeAddresses: ActiveAddresses,
     accountType: string,
     contactName?: string,
     primaryAccType?: string,
@@ -425,7 +423,7 @@ export default class AccountUtilities {
       } = {
       }
       for( const accountId of Object.keys( accounts ) ){
-        const { externalAddressSet, internalAddressSet, externalAddresses, ownedAddresses, cachedAQL, cachedTxs, cachedTxIdMap } = accounts[ accountId ]
+        const { activeAddresses, ownedAddresses, cachedTxs } = accounts[ accountId ]
         const upToDateTxs: Transaction[] = []
         const txsToUpdate: Transaction[] = []
         const newTxs : Transaction[] = []
@@ -448,9 +446,12 @@ export default class AccountUtilities {
           upToDateTxs, txsToUpdate, newTxs
         }
 
-        const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
-        const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
-        const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
+        // const externalArray = [ ...Object.keys( externalAddressSet ), ...Object.keys( cachedAQL.external ) ]
+        // const internalArray = [ ...Object.keys( internalAddressSet ), ...Object.keys( cachedAQL.internal ) ]
+        // const ownedArray = [ ...ownedAddresses, ...Object.keys( cachedAQL.external ), ...Object.keys( cachedAQL.internal ) ]
+        const externalArray = Object.keys( activeAddresses.external )
+        const internalArray = Object.keys( activeAddresses.internal )
+        const ownedArray = ownedAddresses
 
         accountToAddressMapping[ accountId ] = {
           External: externalArray,
@@ -499,7 +500,7 @@ export default class AccountUtilities {
       const synchedAccounts = {
       }
       for( const accountId of Object.keys( accountToResponseMapping ) ){
-        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddressSet, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
+        const { cachedUTXOs, externalAddresses, activeAddresses, internalAddresses, cachedTxIdMap, cachedAQL, accountType, primaryAccType, accountName } = accounts[ accountId ]
         const { Utxos, Txs } = accountToResponseMapping[ accountId ]
 
         const UTXOs = cachedUTXOs
@@ -525,7 +526,6 @@ export default class AccountUtilities {
               } )
 
               if( include )
-              {
                 UTXOs.push( {
                   txId: txid,
                   vout,
@@ -533,7 +533,6 @@ export default class AccountUtilities {
                   address: Address,
                   status,
                 } )
-              }
             }
           }
 
@@ -549,7 +548,7 @@ export default class AccountUtilities {
 
           if ( utxo.status && utxo.status.confirmed ) balances.confirmed += utxo.value
           else if (
-            internalAddressSet[ utxo.address ] !== undefined
+            internalAddresses[ utxo.address ] !== undefined
           )
             balances.confirmed += utxo.value
           else balances.unconfirmed += utxo.value

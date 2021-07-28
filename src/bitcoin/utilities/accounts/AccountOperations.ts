@@ -271,8 +271,7 @@ export default class AccountOperations {
   }> => {
     const accountInstances: {
       [id: string]: {
-        externalAddressSet:  {[address: string]: number}, // external range set (soft/hard)
-        internalAddressSet:  {[address: string]: number}, // internal range set (soft/hard)
+        activeAddresses: ActiveAddresses,
         externalAddresses: {[address: string]: number},  // all external addresses(till nextFreeAddressIndex)
         internalAddresses:  {[address: string]: number},  // all internal addresses(till nextFreeChangeAddressIndex)
         ownedAddresses: string[],
@@ -288,7 +287,6 @@ export default class AccountOperations {
         cachedAQL: {external: {[address: string]: boolean}, internal: {[address: string]: boolean} },
         lastUsedAddressIndex: number,
         lastUsedChangeAddressIndex: number,
-        activeAddresses: ActiveAddresses,
         accountType: string,
         contactName?: string,
         primaryAccType?: string,
@@ -326,8 +324,6 @@ export default class AccountOperations {
 
       const externalAddresses :{[address: string]: number}  = {
       }// all external addresses(till closingExtIndex)
-      const externalAddressSet:{[address: string]: number}= {
-      } // external address range set w/ query list
       for ( let itr = 0; itr < closingExtIndex; itr++ ) {
         let address: string
         if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, false ).address
@@ -337,16 +333,8 @@ export default class AccountOperations {
         // if( itr >= startingExtIndex ) externalAddressSet[ address ] = itr
       }
 
-      // pick up external addresses to scan from active addresses
-      const activeExternalAddresses = account.activeAddresses.external
-      for( const address of Object.keys( activeExternalAddresses ) ){
-        externalAddressSet[ address ] = activeExternalAddresses[ address ].index
-      }
-
       const internalAddresses :{[address: string]: number}  = {
       }// all internal addresses(till closingIntIndex)
-      const internalAddressSet :{[address: string]: number}= {
-      } // internal address range set
       for ( let itr = 0; itr < closingIntIndex; itr++ ) {
         let address: string
         if( ( account as MultiSigAccount ).is2FA ) address = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, itr, true ).address
@@ -356,10 +344,13 @@ export default class AccountOperations {
         // if( itr >= startingIntIndex ) internalAddressSet[ address ] = itr
       }
 
-      // pick up external addresses to scan from active addresses
+      const activeExternalAddresses = account.activeAddresses.external
       const activeInternalAddresses = account.activeAddresses.internal
-      for( const address of Object.keys( activeInternalAddresses ) ){
-        internalAddressSet[ address ] = activeInternalAddresses[ address ].index
+      if( !Object.keys( activeExternalAddresses ).length && !Object.keys( activeInternalAddresses ).length ){
+        return {
+          synchedAccounts: accounts,
+          txsFound: []
+        }
       }
 
       // garner cached params for bal-tx sync
@@ -381,8 +372,7 @@ export default class AccountOperations {
       }
 
       accountInstances[ account.id ] = {
-        externalAddressSet,
-        internalAddressSet,
+        activeAddresses: account.activeAddresses,
         externalAddresses,
         internalAddresses,
         ownedAddresses,
@@ -392,7 +382,6 @@ export default class AccountOperations {
         cachedAQL,
         lastUsedAddressIndex: account.nextFreeAddressIndex - 1,
         lastUsedChangeAddressIndex: account.nextFreeChangeAddressIndex - 1,
-        activeAddresses: account.activeAddresses,
         accountType: account.type,
         accountName: account.accountName,
       }
@@ -608,6 +597,19 @@ export default class AccountOperations {
           }
         }
     }
+
+    // add internal address used for change utxo to activeAddresses.internal
+    const changeAddress = AccountUtilities.getAddressByIndex(
+      account.xpub,
+      true,
+      account.nextFreeChangeAddressIndex,
+      network
+    )
+    activeInternalAddresses[ changeAddress ] = {
+      index: account.nextFreeChangeAddressIndex,
+      assignedTo: account.type,
+    }
+    account.nextFreeChangeAddressIndex++
   }
 
   static removeConsumedUTXOs= ( account: Account | MultiSigAccount, inputs: InputUTXOs[] ) => {
