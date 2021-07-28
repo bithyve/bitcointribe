@@ -291,6 +291,9 @@ export const WalletSchema: ObjectSchema = {
     secondaryMemonic: {
       type: 'string', optional: true,
     },
+    smShare: {
+      type: 'string', default: '',
+    },
     details2FA: {
       type: Details2FA, optional: true
     },
