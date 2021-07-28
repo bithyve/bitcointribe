@@ -127,7 +127,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       id: uuid(),
       name: `${firstName} ${lastName ? lastName : ''}`
     }
-    setContact( selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
+    setContact( props.navigation.getParam( 'isChangeKeeperType' ) ? Contact : selectedKeeper.data && selectedKeeper.data.id ? selectedKeeper.data : Contact )
   }, [ ] )
 
   const saveInTransitHistory = async () => {
@@ -151,8 +151,8 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
       if( ( keeperQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
-      const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
-      setChannelKey( channelKey )
+      const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
+      setChannelKey( channelKeyTemp )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
@@ -165,7 +165,7 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
         data: {
           ...Contact, index
         },
-        channelKey: channelKey
+        channelKey: channelKeyTemp
       }
 
       dispatch( updatedKeeperInfo( obj ) )
@@ -259,8 +259,10 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
           // dispatch(checkMSharesHealth());
           // ( secondaryDeviceBottomSheet as any ).current.snapTo( 0 )
           setShowQr( false )
-          if ( next ) {
-            props.navigation.goBack()
+          if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+            props.navigation.pop( 2 )
+          } else {
+            props.navigation.pop( 1 )
           }
           setTimeout( () => {
             setIsReshare( true )

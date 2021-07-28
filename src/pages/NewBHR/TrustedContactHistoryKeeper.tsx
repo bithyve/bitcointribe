@@ -202,6 +202,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
               headerText:`Send Recovery Key${'\n'}to contact`,
               subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
               contactText:'Sharing Recovery Key with:',
+              isKeeper: true,
+              existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
             } )
           }
         } )
@@ -236,6 +238,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
                 headerText:`Send Recovery Key${'\n'}to contact`,
                 subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
                 contactText:'Sharing Recovery Key with:',
+                isKeeper: true,
+                existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
               } )
             }
           } )
@@ -438,6 +442,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
       headerText:`Send Recovery Key${'\n'}to contact`,
       subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
       contactText:'Sharing Recovery Key with:',
+      isKeeper: true,
+      existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
     } )
   }, [ selectedTitle, chosenContact, getContacts ] )
 
@@ -479,6 +485,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
                   headerText:`Send Recovery Key${'\n'}to contact`,
                   subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
                   contactText:'Sharing Recovery Key with:',
+                  isKeeper: true,
+                  existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
                 } )
               }
             } )
@@ -640,6 +648,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
         subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
         contactText:'Sharing Recovery Key with:',
         // showDone:true,
+        isKeeper: true,
+        existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
       } )
     }
   }, [ chosenContact ] )
@@ -862,6 +872,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
             headerText:`Send Recovery Key${'\n'}to contact`,
             subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
             contactText:'Sharing Recovery Key with:',
+            isKeeper: true,
+            existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
           } )
         }
       } )
@@ -870,12 +882,14 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ isNavigation ] )
 
   const selectContact = ( type, choosenContact ) => {
+    console.log( 'type, choosenContact', type, choosenContact )
     if ( type === 'AddContact' ) {
       setNavigation( true )
     } else if ( type === 'ExistingContact' ) {
+      setChannelKey( choosenContact.channelKey )
+      console.log( 'choosenContact', choosenContact )
       setChosenContact( choosenContact )
     }
-
   }
 
   return (
@@ -936,6 +950,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
                     headerText:`Send Recovery Key${'\n'}to contact`,
                     subHeaderText:'Send Key to Keeper, you can change your Keeper, or their primary mode of contact',
                     contactText:'Sharing Recovery Key with:',
+                    isKeeper: true,
+                    existingContact: selectedKeeper.shareType == 'existingContact' ? true : false,
                   } )
                 }
               } )
@@ -1040,8 +1056,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
             props.navigation.goBack()
           }}
           onPressDone={() => {
+            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+              props.navigation.pop( 2 )
+            } else {
+              props.navigation.pop( 1 )
+            }
             // ( shareBottomSheet as any ).current.snapTo( 0 )
-            props.navigation.goBack()
           }}
           onPressShare={() => {
             if ( isOTPType ) {

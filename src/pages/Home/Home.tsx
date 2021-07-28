@@ -79,6 +79,7 @@ import {
   AccountType,
   DeepLinkEncryptionType,
   LevelHealthInterface,
+  QRCodeTypes,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import moment from 'moment'
@@ -599,6 +600,19 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         case NotificationType.FNF_REQUEST_ACCEPTED:
         case NotificationType.FNF_REQUEST_REJECTED:
         case NotificationType.FNF_KEEPER_REQUEST:
+          console.log( 'FNF_KEEPER_REQUEST message', message )
+          this.setState( {
+            trustedContactRequest: {
+              ...message.additionalInfo,
+              isExistingContact: true,
+              isQR: true,
+              type: QRCodeTypes.EXISTING_CONTACT,
+              isKeeper: true,
+            }
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
+          } )
+          break
         case NotificationType.FNF_KEEPER_REQUEST_ACCEPTED:
         case NotificationType.FNF_KEEPER_REQUEST_REJECTED:
         case NotificationType.CONTACT:
