@@ -145,9 +145,8 @@ export const getModifiedData = ( keeperInfo:KeeperInfoInterface[], levelHealthVa
       const elementJ = levelHealthVar[ j ]
       for ( let i = 0; i < elementJ.levelInfo.length; i++ ) {
         const element = elementJ.levelInfo[ i ]
-        const channelKey = element.shareType && ( element.shareType == 'contact' || element.shareType == 'device' ) ? keeperInfo.find( value  => value.shareId == element.shareId ).channelKey : null
-
         const selectedKeeperInfo: KeeperInfoInterface = keeperInfo.find( value  => value.shareId == element.shareId )
+        const channelKey = selectedKeeperInfo && selectedKeeperInfo.channelKey ? selectedKeeperInfo.channelKey : null
         const data = channelKey ? {
           index: selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length && selectedKeeperInfo.data.index ? selectedKeeperInfo.data.index : -1, ...makeContactRecipientDescription( channelKey, trustedContact[ channelKey ], ContactTrustKind.KEEPER_OF_USER )
         } : selectedKeeperInfo && Object.keys( selectedKeeperInfo.data ).length ? selectedKeeperInfo.data : {
