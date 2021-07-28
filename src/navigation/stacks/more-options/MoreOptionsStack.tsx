@@ -20,6 +20,7 @@ import ReLogin from '../../../pages/ReLogin'
 import Login from '../../../pages/Login'
 import Intermediate from '../../../pages/Intermediate'
 import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
+import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -93,6 +94,12 @@ const MoreOptionsStack = createStackNavigator(
     },
     QRScanner: {
       screen: QRStack,
+      navigationOptions: {
+        header: null,
+      },
+    },
+    AppInfo: {
+      screen: AppInfo,
       navigationOptions: {
         header: null,
       },

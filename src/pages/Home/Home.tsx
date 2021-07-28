@@ -849,6 +849,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
     switch ( menuItem.kind ) {
         case BuyMenuItemKind.FAST_BITCOINS:
+          this.closeBottomSheet()
           this.props.navigation.navigate( 'VoucherScanner' )
           break
         case BuyMenuItemKind.SWAN:
@@ -1116,7 +1117,17 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     const { custodyRequest, notificationTitle, notificationInfo, notificationNote, notificationAdditionalInfo, notificationProceedText, notificationIgnoreText, isIgnoreButton, notificationLoading, notificationData, releaseNotes } = this.state
     // console.log( 'this.state.currentBottomSheetKind', this.state.currentBottomSheetKind )
     switch ( this.state.currentBottomSheetKind ) {
+        case BottomSheetKind.TAB_BAR_BUY_MENU:
+          return (
+            <>
+              <BottomSheetHeader title="Buy bitcoin" onPress={this.closeBottomSheet} />
 
+              <BuyBitcoinHomeBottomSheet
+                onMenuItemSelected={this.handleBuyBitcoinBottomSheetSelection}
+                // onPress={this.closeBottomSheet}
+              />
+            </>
+          )
         case BottomSheetKind.SWAN_STATUS_INFO:
           return (
             <>
@@ -1126,7 +1137,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.closeBottomSheet}
+                // onPress={this.closeBottomSheet}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -1141,7 +1153,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.closeBottomSheet}
+                // onPress={this.closeBottomSheet}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -1157,7 +1170,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
                 onClickSetting={() => {
                   this.closeBottomSheet()
                 }}
-                onPress={this.closeBottomSheet}
+                // onPress={this.closeBottomSheet}
+                onPress={this.onBackPress}
               />
             </>
           )
@@ -1363,7 +1377,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       >
         <StatusBar backgroundColor={Colors.blue} barStyle="light-content" />
         <ModalContainer
-          visible={this.state.currentBottomSheetKind != null}
+          visible={this.state.currentBottomSheetKind !== null}
           closeBottomSheet={() => {}}
         >
           {this.renderBottomSheetContent()}
