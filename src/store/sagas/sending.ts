@@ -18,6 +18,7 @@ import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
 import { updateAccountShells } from '../actions/accounts'
 import dbManager from '../../storage/realm/dbManager'
 import Relay from '../../bitcoin/utilities/Relay'
+import { getNextFreeAddressWorker } from './accounts'
 
 function* processRecipients( accountShell: AccountShell ){
   const accountsState: AccountsState = yield select(
@@ -51,9 +52,9 @@ function* processRecipients( accountShell: AccountShell ){
         case RecipientKind.ACCOUNT_SHELL:
           const recipientShell = accountShells.find( ( shell ) => shell.id === recipient.id )
           const recipientAccount: Account = accountsState.accounts[ recipientShell.primarySubAccount.id  ]
-
+          const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, accountShell.primarySubAccount.type )
           recipients.push( {
-            address: recipientAccount.receivingAddress,
+            address: recipientAddress,
             amount: recipient.amount,
           } )
 

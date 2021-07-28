@@ -87,7 +87,8 @@ import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
-export function getNextFreeAddress( dispatch:any, account: Account | MultiSigAccount, requester?: AccountType ) {
+// to be used by react components(w/ dispatch)
+export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: AccountType ) {
   const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
   dispatch( updateAccounts( {
     accounts: {
@@ -95,6 +96,18 @@ export function getNextFreeAddress( dispatch:any, account: Account | MultiSigAcc
     }
   } ) )
   dbManager.updateAccount( ( updatedAccount as Account ).id, updatedAccount )
+  return receivingAddress
+}
+
+// to be used by sagas(w/o dispatch)
+export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: AccountType ) {
+  const { updatedAccount, receivingAddress } = yield call( AccountOperations.getNextFreeExternalAddress, account, requester )
+  yield put( updateAccounts( {
+    accounts: {
+      [ updatedAccount.id ]: updatedAccount
+    }
+  } ) )
+  yield call( dbManager.updateAccount, ( updatedAccount as Account ).id, updatedAccount )
   return receivingAddress
 }
 
