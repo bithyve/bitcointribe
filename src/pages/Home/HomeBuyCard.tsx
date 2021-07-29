@@ -94,10 +94,9 @@ const HomeBuyCard = ( {
           <Image
             source={require( '../../assets/images/icons/recurring_buy.png' )}
             style={{
-              width: wp( 8 ),
-              height: wp( 8 ),
-              marginTop: wp( -3 ),
-              marginBottom: wp( -3 ),
+              width: wp( 5.7 ),
+              height: wp( 5.7 ),
+              resizeMode: 'contain'
             }}
           />
         }
@@ -105,7 +104,7 @@ const HomeBuyCard = ( {
           ...ButtonStyles.floatingActionButton,
           borderRadius: wp( 10 ),
           alignSelf:'flex-end',
-          minHeight: hp( 3 )
+          // minHeight: hp( 4 )
         }}
         titleStyle={{
           ...ButtonStyles.floatingActionButtonText,
