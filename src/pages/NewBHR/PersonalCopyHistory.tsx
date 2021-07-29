@@ -219,12 +219,10 @@ const PersonalCopyHistory = ( props ) => {
   }
 
   useEffect( () => {
-    console.log( 'dsfsd pdfCreatedSuccessfully', pdfCreatedSuccessfully )
     if( pdfCreatedSuccessfully ){
       setConfirmDisable( false )
 
       if( props.navigation.getParam( 'selectedKeeper' ).status === 'notSetup' ) {
-        console.log( 'INSIDE IF dsfsd' )
         // ( PersonalCopyShareBottomSheet as any ).current.snapTo( 1 )
         setPersonalCopyShareModal( true )
       }
@@ -233,7 +231,6 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( () => {
     if( pdfInfo.filePath ){
-      console.log( 'INSIDE IF cdf' )
       setConfirmDisable( false )
     }
   }, [ pdfInfo ] )
@@ -423,7 +420,6 @@ const PersonalCopyHistory = ( props ) => {
       setIsGuardianCreationClicked( true )
       const channelKey: string = isChange ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKey )
-      console.log( 'Contact', Contact )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
@@ -438,7 +434,6 @@ const PersonalCopyHistory = ( props ) => {
         },
         channelKey: channelKey
       }
-      console.log( 'obj', obj )
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
@@ -447,7 +442,6 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ){
-      console.log( 'useEffect Contact', Contact )
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: Contact, index, isChange, oldChannelKey
       } ) )
@@ -548,7 +542,6 @@ const PersonalCopyHistory = ( props ) => {
           } else {
             setQRModal( false )
             // setApprovePrimaryKeeperModal( true )
-            console.log( 'ELD' )
             const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Sadads","channelId":"189c1ef57ac3bddb906d3b4767572bf806ac975c9d5d2d1bf83d533e0c08f1c0","streamId":"4d2d8092d","secondaryChannelKey":"itwTFQ3AiIQWqfUlAUCuW03h","version":"1.8.0","walletId":"00cc552934e207d722a197bbb3c71330fc765de9647833e28c14447d010d9810"}'
             dispatch( setApprovalStatus( false ) )
             dispatch( downloadSMShare( qrScannedData ) )

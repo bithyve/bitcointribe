@@ -324,15 +324,11 @@ function* updateSharesHealthWorker( { payload } ) {
     payload.shares
     let currentLevel = yield select( ( state ) => state.health.currentLevel )
     const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
-    console.log( 'UPDATE SHARE levelHealth', [ ...yield select( ( state ) => state.health.levelHealth ) ] )
     for ( let i = 0; i < levelHealth.length; i++ ) {
       const levelInfo = levelHealth[ i ].levelInfo
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
         if( element.shareId === payload.shares.shareId ){
-          console.log( 'UPDATE SHARE payload.shares.shareId', payload.shares.shareId )
-          console.log( 'UPDATE SHARE element.shareId', element.shareId )
-          console.log( 'UPDATE SHARE i, j', i, j )
           levelHealth[ i ].levelInfo[ j ].updatedAt = payload.shares.updatedAt ? moment( new Date() ).valueOf() : levelHealth[ i ].levelInfo[ j ].updatedAt
           levelHealth[ i ].levelInfo[ j ].name = payload.shares.name ? payload.shares.name : levelHealth[ i ].levelInfo[ j ].name ? levelHealth[ i ].levelInfo[ j ].name : ''
           levelHealth[ i ].levelInfo[ j ].reshareVersion = payload.shares.reshareVersion ? payload.shares.reshareVersion : levelHealth[ i ].levelInfo[ j ].reshareVersion ? levelHealth[ i ].levelInfo[ j ].reshareVersion : 0
@@ -340,12 +336,10 @@ function* updateSharesHealthWorker( { payload } ) {
           if( payload.shares.status ){
             levelHealth[ i ].levelInfo[ j ].status = payload.shares.status
           }
-          console.log( 'UPDATE SHARE element.shareId', element.shareId )
           break
         }
       }
     }
-    console.log( 'UPDATE SHARE levelHealth', levelHealth )
     const tempLevelHealth = []
     const levelHealthForCurrentLevel = []
     levelHealthForCurrentLevel[ 0 ] = levelHealth[ 0 ]
@@ -360,7 +354,6 @@ function* updateSharesHealthWorker( { payload } ) {
       else if( levelHealthForCurrentLevel[ 0 ].levelInfo.length == 4 ) currentLevel = 2
       else currentLevel = 1
     }
-    console.log( 'UPDATE_SHARES_HEALTH currentLevel', currentLevel )
 
     yield put(
       updateHealth(
@@ -1597,9 +1590,7 @@ function* updatedKeeperInfoWorker( { payload } ) {
   try {
     const { keeperData } = payload
     const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
-    console.log( 'keeperInfo && keeperInfo.length > 0', keeperInfo && keeperInfo.length > 0 )
     if( keeperInfo && keeperInfo.length > 0 ) {
-      console.log( 'INSIDE IF keeperInfo && keeperInfo.length > 0', keeperInfo && keeperInfo.length > 0 )
       if( keeperInfo.find( value=>value && value.shareId == keeperData.shareId ) && keeperInfo.find( value=>value && value.shareId == keeperData.shareId ).type == 'pdf' && keeperData.type != 'pdf' ) yield put( setPDFInfo( {
         filePath: '', updatedAt: 0, shareId: ''
       } ) )
@@ -1893,7 +1884,6 @@ function* autoShareLevel2KeepersWorker( ) {
         const channelUpdate =  {
           contactInfo, streamUpdates
         }
-        console.log( 'channelUpdate', channelUpdate )
         shareIds.push( obj )
         const { updated, updatedContacts }: {
           updated: boolean;
@@ -1907,12 +1897,6 @@ function* autoShareLevel2KeepersWorker( ) {
             unEncryptedOutstreamUpdates: streamUpdates,
           } ]
         )
-        console.log( 'updated', {
-          channelKey: contactInfo.channelKey,
-          streamId: streamUpdates.streamId,
-          unEncryptedOutstreamUpdates: streamUpdates,
-        } )
-        console.log( 'updated', updated )
         if ( updated ) {
           const shareObj = {
             walletId: walletId,
@@ -1971,7 +1955,6 @@ function* setLevelToNotSetupStatusWorker( ) {
         }
       }
     }
-    console.log( 'shareArray', shareArray )
     if( shareArray.length ) {
       yield put( updateMSharesHealth( shareArray, false ) )
       yield put( setIsLevelToNotSetupStatus( true ) )
@@ -2097,9 +2080,6 @@ function* downloadSMShareWorker( { payload } ) {
       const walletId = s3Service.levelhealth.walletId
       const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
       const qrDataObj = JSON.parse( scannedData )
-      console.log( 'contacts', contacts )
-
-      console.log( 'qrDataObj', qrDataObj )
       let currentContact: TrustedContact
       let channelKey: string
       if( contacts ){
@@ -2116,7 +2096,6 @@ function* downloadSMShareWorker( { payload } ) {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
-      console.log( 'res', res )
       if( res.secondaryData.secondaryMnemonicShard ) {
         console.log( 'res.secondaryData.secondaryMnemonicShard', res.secondaryData.secondaryMnemonicShard )
         yield put( secondaryShareDownloaded( res.secondaryData.secondaryMnemonicShard ) )
@@ -2142,7 +2121,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
-    console.log( 'payload', payload )
     const channelAssets: ChannelAssets = yield select( ( state ) => state.health.channelAssets )
     const s3Service = yield select( ( state ) => state.health.service )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
@@ -2151,9 +2129,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
     const { walletName } = yield select( ( state ) => state.storage.wallet )
     if( MetaShares && MetaShares.length ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-      console.log( 'existingContact', existingContact )
-      console.log( 'channelKey', channelKey )
-      console.log( 'oldChannelKey', oldChannelKey )
       if( existingContact ){
         const contactInfo = {
           channelKey: channelKey,
@@ -2191,7 +2166,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
         const channelUpdate =  {
           contactInfo, streamUpdates
         }
-        console.log( 'channelUpdate', channelUpdate )
         yield put( syncPermanentChannels( {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
@@ -2231,7 +2205,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
           shareId: shareId
         } ) )
       }
-      console.log( 'keeperInfo.find( value=>value.shareId == shareId ).channelKey', keeperInfo.find( value=>value.shareId == shareId ).channelKey )
       if( isChange ) {
         const contactInfo = {
           channelKey: oldChannelKey,
@@ -2260,7 +2233,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
         const channelUpdate =  {
           contactInfo, streamUpdates
         }
-        console.log( 'on CHange channelUpdate', channelUpdate )
         yield put( syncPermanentChannels( {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
@@ -2288,7 +2260,6 @@ function* modifyLevelDataWorker( ) {
     let levelData: LevelData[] = yield select( ( state ) => state.health.levelData )
     const contacts: Trusted_Contacts = yield select( ( state ) => state.trustedContacts.contacts )
     const s3Service = yield select( ( state ) => state.health.service )
-    console.log( 'contacts', contacts )
     let isError = false
     const abc = JSON.stringify( levelHealth )
     const levelHealthVar: LevelHealthInterface[] = [ ...getModifiedData( keeperInfo, JSON.parse( abc ), contacts ) ]
@@ -2298,7 +2269,6 @@ function* modifyLevelDataWorker( ) {
       for ( let j = 0; j < levelInfo.length; j++ ) {
         const element = levelInfo[ j ]
         const currentContact: TrustedContact = contacts[ element.channelKey ]
-        console.log( 'currentContact', currentContact )
         if ( currentContact ) {
           const instream: StreamData = useStreamFromContact( currentContact, s3Service.levelhealth.walletId, true )
           console.log( 'instream', instream )
@@ -2370,7 +2340,6 @@ export const downloadBackupDataWatcher = createWatcher(
 function* setupHealthWorker( { payload } ) {
   const levelHealth: LevelHealthInterface[] = yield select( ( state ) => state.health.levelHealth )
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
-  console.log( 'setupHealthWorker s3Service', s3Service )
   if ( levelHealth && levelHealth.length ) return
   const downloadedBackupData: {
     primaryData?: PrimaryStreamData;
@@ -2385,7 +2354,6 @@ function* setupHealthWorker( { payload } ) {
   const { security } = wallet
   if( initLoader ) return
   const { level }: { level: number } = payload
-  console.log( 'level', level )
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
 
   const randomIdForSecurityQ = generateRandomString( 8 )
@@ -2413,7 +2381,6 @@ function* setupHealthWorker( { payload } ) {
       level: 1,
       levelInfo: levelInfo,
     } ], level, 'setupHealthWatcher' ) )
-    console.log( 'setupHealthWorker levelInfo', levelInfo )
   } else {
     const metaShares: MetaShare[] = s3Service.levelhealth.metaSharesKeeper
     let isLevelInitialized = yield select(
@@ -2595,7 +2562,6 @@ export const updateKeeperInfoToChannelWatcher = createWatcher(
 
 function* acceptExistingContactRequestWorker( { payload } ) {
   try {
-    console.log( 'UPDATE KEEPER INFO' )
     yield put( switchS3LoaderKeeper( 'updateKIToChStatus' ) )
     const { channelKey, contactsSecondaryChannelKey } = payload
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
@@ -2656,7 +2622,6 @@ export const acceptExistingContactRequestWatcher = createWatcher(
 
 function* setupPasswordWorker( { payload } ) {
   try {
-    console.log( 'UPDATE KEEPER INFO' )
     yield put( switchS3LoaderKeeper( 'setupPasswordStatus' ) )
     const { security } = payload
     const s3Service: S3Service = yield select( ( state ) => state.health.service )
@@ -2669,8 +2634,6 @@ function* setupPasswordWorker( { payload } ) {
       },
     }
     yield put( updateWallet( updatedWallet ) )
-    console.log( 'security', security )
-    console.log( 'updatedWallet', updatedWallet )
     if( security ) {
       // initialize health-check schema on relay
       yield put( initializeHealthSetup() )

@@ -16,7 +16,6 @@ const iCloud = NativeModules.iCloud
 
 const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[] ) => {
 
-  console.log( 'cloudBackupHistory', cloudBackupHistory )
   const obj ={
     title,
     confirmed: Date.now(),
@@ -24,7 +23,6 @@ const saveConfirmationHistory = async ( title: string, cloudBackupHistory: any[]
   }
   const updatedCloudBackupHistory = cloudBackupHistory
   updatedCloudBackupHistory.push( obj )
-  console.log( 'updatedCloudBackupHistory', updatedCloudBackupHistory )
   return updatedCloudBackupHistory
 }
 
@@ -41,7 +39,6 @@ function* cloudWorker( { payload } ) {
       const { kpInfo, level, share }: {kpInfo:any, level: any, share: LevelInfo} = payload
       console.log( 'CLOUD CALL PAYLOAD', payload )
       const index: number = MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== null || MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) !== undefined ? MetaShares.findIndex( value=> share ? value.shareId == share.shareId : value.shareId == levelHealth[ 0 ].levelInfo[ 1 ].shareId ) : null
-      console.log( 'CLOUD CALL PAYLOAD', index )
       const RK: MetaShare = index != null && MetaShares.length ? MetaShares[ index ] : null
 
       const obj: KeeperInfoInterface = {
@@ -55,7 +52,6 @@ function* cloudWorker( { payload } ) {
         data: {
         }
       }
-      console.log( 'CLOUD obj', obj )
       const keeperInfo: KeeperInfoInterface[] = [ ...yield select( ( state ) => state.health.keeperInfo ) ]
       for ( let i = 0; i < keeperInfo.length; i++ ) {
         if( level == 1 && keeperInfo[ i ].scheme == '1of1' ) keeperInfo[ i ].currentLevel = level
@@ -65,7 +61,6 @@ function* cloudWorker( { payload } ) {
       if ( !keeperInfo.find( value=>value.shareId == obj.shareId ) ) {
         keeperInfo.push( obj )
       }
-      console.log( 'CLOUD keeperInfo', keeperInfo )
       yield put( putKeeperInfo( keeperInfo ) )
       const regularAccount = yield select( ( state ) => state.accounts[ REGULAR_ACCOUNT ].service )
       const database = yield select( ( state ) => state.storage.database )
@@ -88,7 +83,6 @@ function* cloudWorker( { payload } ) {
         versionHistory,
         trustedContactsInfo
       )
-      console.log( 'CLOUD shares', shares )
       // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
       const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
 
@@ -120,7 +114,6 @@ function* cloudWorker( { payload } ) {
         } )
         const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
-        console.log( 'updatedCloudBackupHistory******', updatedCloudBackupHistory )
 
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
       } else {
@@ -144,7 +137,6 @@ export const cloudWatcher = createWatcher(
 )
 
 function* updateHealthForCloudStatusWorker( { payload } ) {
-  console.log( 'updateHealthForCloudStatusWorker', payload )
   try {
     const currentLevel = yield select( ( state ) => state.health.currentLevel )
 
@@ -177,7 +169,6 @@ export const updateHealthForCloudStatusWatcher = createWatcher(
 function* updateHealthForCloudWorker( { payload } ) {
   try {
     const { share } = payload
-    console.log( 'updateHealthForCloudWorker payload', payload )
     const levelHealth = yield select( ( state ) => state.health.levelHealth )
     const isLevel2Initialized = yield select( ( state ) => state.health.isLevel2Initialized )
     const s3Service = yield select( ( state ) => state.health.service )
@@ -210,7 +201,6 @@ function* updateHealthForCloudWorker( { payload } ) {
       shareType: 'cloud',
       name: levelHealthVar.name
     }
-    console.log( 'updateHealthForCloudStatusWorker shareObj', shareObj )
     yield put( updateMSharesHealth( shareObj ) )
     // }
   }
@@ -230,7 +220,6 @@ function* getCloudBackupRecoveryWorker () {
   try {
     if ( Platform.OS == 'ios' ) {
       const backedJson = yield call( iCloud.downloadBackup )
-      console.log( 'backedJson getCloudBackupRecoveryWorker', backedJson )
       if( backedJson === 'failure' ) {
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
         return false

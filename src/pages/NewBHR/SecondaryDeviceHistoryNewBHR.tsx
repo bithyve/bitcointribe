@@ -6,10 +6,6 @@ import {
   Platform,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import { createChannelAssets, createOrChangeGuardian, downloadSMShare, ErrorSending, setApprovalStatus, setChannelAssets, updatedKeeperInfo } from '../../store/actions/health'
 import { updateMSharesHealth } from '../../store/actions/health'
@@ -227,15 +223,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       }
     }
   }, [ Contact, trustedContacts ] )
-
-  useEffect( () => {
-    ( async () => {
-      const contactName = props.navigation.getParam( 'selectedKeeper' ).name.toLowerCase().trim()
-      const trustedData = trustedContacts[ contactName ]
-      return () => console.log( 'unmounting...' )
-    } )()
-  }, [] )
-
 
   const renderSecondaryDeviceContents = useCallback( () => {
     console.log( keeperQR )
@@ -470,7 +457,6 @@ const SecondaryDeviceHistoryNewBHR = ( props ) => {
       setChangeModal( true )
     }
     if ( type == 'pdf' ) {
-      console.log( 'type', type )
       props.navigation.navigate( 'PersonalCopyHistoryNewBHR', {
         ...props.navigation.state.params,
         selectedTitle: name,

@@ -174,7 +174,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         } )
       }
     }
-    console.log( 'c', c )
     setContacts( c )
   }, [] )
 
@@ -228,7 +227,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
           props.navigation.navigate( 'TrustedContactNewBHR', {
             LoadContacts: true,
             onPressContinue:async ( selectedContacts ) => {
-              console.log( 'useEffect TrustedContactNewBHR', selectedContacts )
               Keyboard.dismiss()
               createGuardian( {
                 chosenContactTmp: getContacts( selectedContacts )
@@ -426,7 +424,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   const onPressReshare = useCallback( async () => {
-    console.log( 'onPressReshare >>>>>>>>>', chosenContact )
     setReshareModal( false )
     createGuardian( {
       chosenContactTmp: getContacts( chosenContact )
@@ -563,15 +560,12 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const createGuardian = useCallback(
     async ( payload?: {isChangeTemp?: any, chosenContactTmp?: any} ) => {
       const isChangeKeeper = isChange ? isChange : payload && payload.isChangeTemp ? payload.isChangeTemp : false
-      console.log( 'chosenContact', chosenContact )
       const Contact = props.navigation.getParam( 'isChangeKeeperType' ) || isChangeKeeper ? payload.chosenContactTmp : ( chosenContact && !Object.keys( chosenContact ).length ) || chosenContact == null ? payload && payload.chosenContactTmp ? payload.chosenContactTmp : chosenContact : chosenContact
       setChosenContact( Contact )
-      console.log( 'Contact', Contact )
       if( selectedKeeper.shareType != 'existingContact' && ( trustedQR || isReshare ) && !isChangeKeeper ) return
       setIsGuardianCreationClicked( true )
       const channelKeyTemp: string = selectedKeeper.shareType == 'existingContact' ? channelKey : isChangeKeeper ? SSS.generateKey( config.CIPHER_SPEC.keyLength ) : selectedKeeper.channelKey ? selectedKeeper.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
       setChannelKey( channelKeyTemp )
-      console.log( 'channelKeyTemp', channelKeyTemp )
 
       const obj: KeeperInfoInterface = {
         shareId: selectedKeeper.shareId,
@@ -586,7 +580,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
         },
         channelKey: channelKeyTemp
       }
-      console.log( 'obj', obj )
       dispatch( updatedKeeperInfo( obj ) )
       dispatch( createChannelAssets( selectedKeeper.shareId ) )
     },
@@ -595,7 +588,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   useEffect( ()=> {
     if( isGuardianCreationClicked && !createChannelAssetsStatus && channelAssets.shareId == selectedKeeper.shareId ) {
-      console.log( 'useEffect chosenContact', chosenContact )
       dispatch( createOrChangeGuardian( {
         channelKey, shareId: selectedKeeper.shareId, contact: chosenContact, index, isChange, oldChannelKey, existingContact: selectedKeeper.shareType == 'existingContact' ? true : false
       } ) )
@@ -762,9 +754,6 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }
 
   useEffect( ()=>{
-    console.log( 'approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId', approvalStatus && channelAssets.shareId && channelAssets.shareId == selectedKeeper.shareId )
-    console.log( 'channelAssets', channelAssets )
-    console.log( 'selectedKeeper', selectedKeeper )
     if( approvalStatus && isChangeClicked ){
       setApprovePrimaryKeeperModal( true )
       setQRModal( false )
@@ -801,12 +790,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
   }, [ isNavigation ] )
 
   const selectContact = ( type, choosenContact ) => {
-    console.log( 'type, choosenContact', type, choosenContact )
     if ( type === 'AddContact' ) {
       setNavigation( true )
     } else if ( type === 'ExistingContact' ) {
       setChannelKey( choosenContact.channelKey )
-      console.log( 'choosenContact', choosenContact )
       setChosenContact( choosenContact )
     }
   }
