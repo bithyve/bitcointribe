@@ -50,11 +50,14 @@ import {
   Accounts,
   AccountType,
   ActiveAddressAssignee,
+  ActiveAddresses,
+  ContactInfo,
   DonationAccount,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
   Trusted_Contacts,
+  UnecryptedStreamData,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -87,6 +90,9 @@ import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import { syncPermanentChannelsWorker } from './trustedContacts'
+import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -112,6 +118,53 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   return receivingAddress
 }
 
+function* updatePaymentAddressesToChannels( activeAddressesWithNewTxsMap: {
+  [accountId: string]: ActiveAddresses
+}, synchedAccounts ){
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  const channelUpdates = []
+  for( const accountId of Object.keys( activeAddressesWithNewTxsMap ) ){
+    const newTxActiveAddresses: ActiveAddresses = activeAddressesWithNewTxsMap[ accountId ]
+
+    for( const address of Object.keys( newTxActiveAddresses.external ) ) {
+      const { assignee } = newTxActiveAddresses.external[ address ]
+      if( assignee.type === AccountType.FNF_ACCOUNT ){
+        const channelKey = assignee.id
+        const streamUpdates: UnecryptedStreamData = {
+          streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+          primaryData: {
+            paymentAddresses: {
+              [ ( synchedAccounts[ accountId ] as Account ).type ]: yield call( getNextFreeAddressWorker, synchedAccounts[ accountId ], assignee )
+            }
+          },
+          metaData: {
+            flags:{
+              active: true,
+              newData: true,
+              lastSeen: Date.now(),
+            },
+          }
+        }
+
+        const contactInfo: ContactInfo = {
+          channelKey: channelKey,
+        }
+        channelUpdates.push( {
+          contactInfo, streamUpdates
+        } )
+      }
+    }
+  }
+
+  if( Object.keys( channelUpdates ).length )
+    yield call ( syncPermanentChannelsWorker, {
+      payload: {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates
+      }
+    } )
+}
+
 function* syncAccountsWorker( { payload }: {payload: {
   accounts: Accounts,
   options: {
@@ -135,16 +188,17 @@ function* syncAccountsWorker( { payload }: {payload: {
       [ synchedAccount.id ]: synchedAccount
     }
     return {
-      synchedAccounts, txsFound
+      synchedAccounts, txsFound, activeAddressesWithNewTxsMap: {
+      }
     }
   } else {
-    const { synchedAccounts, txsFound } = yield call(
+    const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call(
       AccountOperations.syncAccountsByActiveAddresses,
       accounts,
       network )
 
     return {
-      synchedAccounts, txsFound
+      synchedAccounts, txsFound, activeAddressesWithNewTxsMap
     }
   }
 
@@ -339,7 +393,7 @@ function* refreshAccountShellWorker( { payload } ) {
   const accountsToSync: Accounts = {
     [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
   }
-  const { synchedAccounts, txsFound } = yield call( syncAccountsWorker, {
+  const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
     payload: {
       accounts: accountsToSync,
       options,
@@ -361,6 +415,9 @@ function* refreshAccountShellWorker( { payload } ) {
   //   } )
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
+
+  // update F&F channels if any new txs found on an assigned address
+  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
 export const refreshAccountShellWatcher = createWatcher(
