@@ -784,17 +784,21 @@ export interface UTXO {
   status?: any;
 }
 
+export interface ActiveAddressAssignee{
+    type: AccountType;
+    id: string;
+}
 export interface ActiveAddresses {
   external: {
     [address: string]: {
       index: number,
-      assignedTo: AccountType,
+      assignee: ActiveAddressAssignee
     }
   }
   internal: {
     [address: string]: {
       index: number,
-      assignedTo: AccountType,
+      assignee: ActiveAddressAssignee
     }
   }
 }

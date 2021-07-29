@@ -49,6 +49,7 @@ import {
   Account,
   Accounts,
   AccountType,
+  ActiveAddressAssignee,
   DonationAccount,
   MultiSigAccount,
   NetworkType,
@@ -88,7 +89,7 @@ import Relay from '../../bitcoin/utilities/Relay'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
 
 // to be used by react components(w/ dispatch)
-export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: AccountType ) {
+export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
   const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
   dispatch( updateAccounts( {
     accounts: {
@@ -100,7 +101,7 @@ export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAc
 }
 
 // to be used by sagas(w/o dispatch)
-export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: AccountType ) {
+export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
   const { updatedAccount, receivingAddress } = yield call( AccountOperations.getNextFreeExternalAddress, account, requester )
   yield put( updateAccounts( {
     accounts: {
