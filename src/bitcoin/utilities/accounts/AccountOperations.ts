@@ -14,12 +14,13 @@ import {
   AccountType,
   DonationAccount,
   ActiveAddresses,
+  ActiveAddressAssignee,
 } from '../Interface'
 import AccountUtilities from './AccountUtilities'
 import config from '../../HexaConfig'
 export default class AccountOperations {
 
-  static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: AccountType ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
+  static getNextFreeExternalAddress = ( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ): { updatedAccount: Account | MultiSigAccount, receivingAddress: string} => {
     let receivingAddress
     const network = AccountUtilities.getNetworkByType( account.networkType )
     if( ( account as MultiSigAccount ).is2FA ) receivingAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeAddressIndex, false ).address
@@ -27,7 +28,10 @@ export default class AccountOperations {
 
     account.activeAddresses.external[ receivingAddress ] = {
       index: account.nextFreeAddressIndex,
-      assignedTo: requester? requester: account.type
+      assignee: requester? requester: {
+        type: account.type,
+        id: account.id
+      }
     }
     account.nextFreeAddressIndex++
     account.receivingAddress = receivingAddress
@@ -268,7 +272,10 @@ export default class AccountOperations {
 
   static syncAccountsByActiveAddresses = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
-    txsFound: Transaction[]
+    txsFound: Transaction[],
+    activeAddressesWithNewTxsMap: {
+      [accountId: string]: ActiveAddresses
+    }
   }> => {
     const accountInstances: {
       [id: string]: {
@@ -350,7 +357,9 @@ export default class AccountOperations {
       if( !Object.keys( activeExternalAddresses ).length && !Object.keys( activeInternalAddresses ).length ){
         return {
           synchedAccounts: accounts,
-          txsFound: []
+          txsFound: [],
+          activeAddressesWithNewTxsMap: {
+          }
         }
       }
 
@@ -395,6 +404,8 @@ export default class AccountOperations {
     const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
 
     const txsFound: Transaction[] = []
+    const activeAddressesWithNewTxsMap: {[accountId: string]: ActiveAddresses} = {
+    }
     for( const account of Object.values( accounts ) ) {
       const  {
         UTXOs,
@@ -404,7 +415,8 @@ export default class AccountOperations {
         addressQueryList,
         nextFreeAddressIndex,
         nextFreeChangeAddressIndex,
-        activeAddresses
+        activeAddresses,
+        activeAddressesWithNewTxs
       } = synchedAccounts[ account.id ]
       const { internalAddresses } = accountsInternals[ account.id ]
 
@@ -458,11 +470,13 @@ export default class AccountOperations {
       account.txIdMap = txIdMap
       account.newTransactions = newTransactions
       account.lastSynched = lastSynched
+      activeAddressesWithNewTxsMap[ account.id ] = activeAddressesWithNewTxs
     }
 
     return {
       synchedAccounts: accounts,
-      txsFound
+      txsFound,
+      activeAddressesWithNewTxsMap
     }
   };
 
@@ -573,7 +587,10 @@ export default class AccountOperations {
           if( !activeExternalAddresses[ address ] )
             activeExternalAddresses[ address ] = {
               index: itr,
-              assignedTo: account.type,
+              assignee: {
+                type: account.type,
+                id: account.id
+              },
             } // include out of bound(soft-refresh range) ext address
           found = true
           break
@@ -591,7 +608,10 @@ export default class AccountOperations {
             if( !activeInternalAddresses[ address ] )
               activeInternalAddresses[ address ] = {
                 index: itr,
-                assignedTo: account.type,
+                assignee: {
+                  type: account.type,
+                  id: account.id
+                },
               } // include out of bound(soft-refresh range) int address
             found = true
             break
@@ -608,7 +628,10 @@ export default class AccountOperations {
     )
     activeInternalAddresses[ changeAddress ] = {
       index: account.nextFreeChangeAddressIndex,
-      assignedTo: account.type,
+      assignee: {
+        type: account.type,
+        id: account.id
+      },
     }
     account.nextFreeChangeAddressIndex++
   }

@@ -407,6 +407,7 @@ export default class AccountUtilities {
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       activeAddresses: ActiveAddresses;
+      activeAddressesWithNewTxs: ActiveAddresses,
     }
    }
   }> => {
@@ -663,6 +664,20 @@ export default class AccountUtilities {
 
         const transactions: Transaction[] = [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
 
+        const activeAddressesWithNewTxs: ActiveAddresses = {
+          external: {
+          },
+          internal: {
+          }
+        }
+        newTxs.forEach( tx => {
+          const addresses = txIdMap[ tx.txid ]
+          addresses.forEach( address => {
+            if( activeAddresses.external[ address ] ) activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
+            else if( activeAddresses.internal[ address ] ) activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
+          } )
+        } )
+
         // pop addresses from the query list if tx-conf > 6
         txsToUpdate.forEach( tx => {
           if( tx.confirmations > 6 ){
@@ -690,6 +705,7 @@ export default class AccountUtilities {
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
           activeAddresses,
+          activeAddressesWithNewTxs,
         }
       }
 

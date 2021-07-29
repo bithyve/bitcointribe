@@ -30,6 +30,7 @@ import {
   Wallet,
   Accounts,
   AccountType,
+  ActiveAddressAssignee,
 } from '../../bitcoin/utilities/Interface'
 import RegularAccount from '../../bitcoin/services/accounts/RegularAccount'
 //import { calculateOverallHealth, downloadMShare } from '../actions/sss'
@@ -49,8 +50,9 @@ import dbManager from '../../storage/realm/dbManager'
 import { ImageSourcePropType } from 'react-native'
 import Relay from '../../bitcoin/utilities/Relay'
 import { updateWalletImageHealth } from '../actions/health'
+import { getNextFreeAddressWorker } from './accounts'
 
-function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
+export function* syncPermanentChannelsWorker( { payload }: {payload: { permanentChannelsSyncKind: PermanentChannelsSyncKind, channelUpdates?: { contactInfo: ContactInfo, streamUpdates?: UnecryptedStreamData }[], metaSync?: boolean, hardSync?: boolean, skipDatabaseUpdate?: boolean }} ) {
   const trustedContacts: Trusted_Contacts = yield select(
     ( state ) => state.trustedContacts.contacts,
   )
@@ -276,6 +278,7 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     channelKey,
     contactsSecondaryChannelKey
   }
+  contactInfo.channelKey = contactInfo.channelKey?  contactInfo.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength ) // channel-key is available during init at approvers end
 
   if( isKeeper ) {
     const channelAssets: ChannelAssets = yield select(
@@ -287,23 +290,26 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   }
 
   let testReceivingAddress, checkingReceivingAddress
-  accountsState.accountShells.forEach( ( shell ) => {
+  const recipientAddressAssignee: ActiveAddressAssignee = {
+    type: AccountType.FNF_ACCOUNT,
+    id: contactInfo.channelKey,
+  }
+  for( const shell of accountsState.accountShells ){
     const { primarySubAccount } = shell
-
     if( primarySubAccount.instanceNumber === 0 ){
+      const account = accounts[ primarySubAccount.id ]
       switch( primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
-            testReceivingAddress = accounts[ primarySubAccount.id ].receivingAddress
+            testReceivingAddress = yield call( getNextFreeAddressWorker, account, recipientAddressAssignee )
             break
 
           case AccountType.CHECKING_ACCOUNT:
-            checkingReceivingAddress = accounts[ primarySubAccount.id ].receivingAddress
+            checkingReceivingAddress = yield call( getNextFreeAddressWorker, account, recipientAddressAssignee )
             break
       }
     }
-  } )
+  }
 
-  // TODO: might want to use different range of addresses for contacts?
   const paymentAddresses = {
     [ AccountType.TEST_ACCOUNT ]: testReceivingAddress,
     [ AccountType.CHECKING_ACCOUNT ]: checkingReceivingAddress,
@@ -334,7 +340,6 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     const secondaryChannelKey = SSS.generateKey( config.CIPHER_SPEC.keyLength )
     contactInfo.secondaryChannelKey = secondaryChannelKey
   }
-  contactInfo.channelKey = contactInfo.channelKey?  contactInfo.channelKey : SSS.generateKey( config.CIPHER_SPEC.keyLength )
 
   const streamUpdates: UnecryptedStreamData = {
     streamId: TrustedContactsOperations.getStreamId( walletId ),
