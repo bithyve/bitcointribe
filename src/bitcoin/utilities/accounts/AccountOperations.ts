@@ -272,7 +272,10 @@ export default class AccountOperations {
 
   static syncAccountsByActiveAddresses = async ( accounts: Accounts, network: bitcoinJS.networks.Network, hardRefresh?: boolean ): Promise<{
     synchedAccounts: Accounts,
-    txsFound: Transaction[]
+    txsFound: Transaction[],
+    activeAddressesWithNewTxsMap: {
+      [accountId: string]: ActiveAddresses
+    }
   }> => {
     const accountInstances: {
       [id: string]: {
@@ -354,7 +357,9 @@ export default class AccountOperations {
       if( !Object.keys( activeExternalAddresses ).length && !Object.keys( activeInternalAddresses ).length ){
         return {
           synchedAccounts: accounts,
-          txsFound: []
+          txsFound: [],
+          activeAddressesWithNewTxsMap: {
+          }
         }
       }
 
@@ -399,6 +404,8 @@ export default class AccountOperations {
     const { synchedAccounts } = await AccountUtilities.fetchBalanceTransactionsByAccounts( accountInstances, network )
 
     const txsFound: Transaction[] = []
+    const activeAddressesWithNewTxsMap: {[accountId: string]: ActiveAddresses} = {
+    }
     for( const account of Object.values( accounts ) ) {
       const  {
         UTXOs,
@@ -408,7 +415,8 @@ export default class AccountOperations {
         addressQueryList,
         nextFreeAddressIndex,
         nextFreeChangeAddressIndex,
-        activeAddresses
+        activeAddresses,
+        activeAddressesWithNewTxs
       } = synchedAccounts[ account.id ]
       const { internalAddresses } = accountsInternals[ account.id ]
 
@@ -462,11 +470,13 @@ export default class AccountOperations {
       account.txIdMap = txIdMap
       account.newTransactions = newTransactions
       account.lastSynched = lastSynched
+      activeAddressesWithNewTxsMap[ account.id ] = activeAddressesWithNewTxs
     }
 
     return {
       synchedAccounts: accounts,
-      txsFound
+      txsFound,
+      activeAddressesWithNewTxsMap
     }
   };
 

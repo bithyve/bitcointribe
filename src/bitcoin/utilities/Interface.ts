@@ -792,13 +792,13 @@ export interface ActiveAddresses {
   external: {
     [address: string]: {
       index: number,
-      assignee: ActiveAddressAssignee
+      assignee: ActiveAddressAssignee,
     }
   }
   internal: {
     [address: string]: {
       index: number,
-      assignee: ActiveAddressAssignee
+      assignee: ActiveAddressAssignee,
     }
   }
 }
