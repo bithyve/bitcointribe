@@ -136,6 +136,8 @@ import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { syncPermanentChannelsWorker } from '../sagas/trustedContacts'
+
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -2136,13 +2138,25 @@ export const downloadSMShareWatcher = createWatcher(
   DOWNLOAD_SM_SHARE
 )
 
-function* createOrChangeGuardianWorker( { payload } ) {
+function* createOrChangeGuardianWorker( { payload: data } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = payload
+    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = data
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
-    console.log( 'payload', payload )
+    const contactInfo = {
+      channelKey,
+    }
+    const channelUpdate =  {
+      contactInfo
+    }
+    const payload = {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      channelUpdates: [ channelUpdate ],
+    }
+    yield call( syncPermanentChannelsWorker, {
+      payload
+    } )
     const channelAssets: ChannelAssets = yield select( ( state ) => state.health.channelAssets )
     const s3Service = yield select( ( state ) => state.health.service )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
@@ -2151,9 +2165,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
     const { walletName } = yield select( ( state ) => state.storage.wallet )
     if( MetaShares && MetaShares.length ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
-      console.log( 'existingContact', existingContact )
-      console.log( 'channelKey', channelKey )
-      console.log( 'oldChannelKey', oldChannelKey )
       if( existingContact ){
         const contactInfo = {
           channelKey: channelKey,
@@ -2191,14 +2202,12 @@ function* createOrChangeGuardianWorker( { payload } ) {
         const channelUpdate =  {
           contactInfo, streamUpdates
         }
-        console.log( 'channelUpdate', channelUpdate )
         yield put( syncPermanentChannels( {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
         } ) )
         const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
-        console.log( 'EXISTING CONTACT instream', instream )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,
@@ -2231,7 +2240,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
           shareId: shareId
         } ) )
       }
-      console.log( 'keeperInfo.find( value=>value.shareId == shareId ).channelKey', keeperInfo.find( value=>value.shareId == shareId ).channelKey )
       if( isChange ) {
         const contactInfo = {
           channelKey: oldChannelKey,
@@ -2260,7 +2268,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
         const channelUpdate =  {
           contactInfo, streamUpdates
         }
-        console.log( 'on CHange channelUpdate', channelUpdate )
         yield put( syncPermanentChannels( {
           permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
           channelUpdates: [ channelUpdate ],
