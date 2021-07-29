@@ -8,9 +8,12 @@ import {
   TouchableOpacity,
   Platform,
   ImageSourcePropType,
-  Image
+  Image,
+  FlatList
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import { connect } from 'react-redux'
+import idx from 'idx'
 
 import {
   widthPercentageToDP as wp,
@@ -23,6 +26,7 @@ import Fonts from '../../../common/Fonts'
 import Colors from '../../../common/Colors'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
+import { getVersions } from '../../../common/utilities'
 
 interface MenuOption {
     title: string;
@@ -34,24 +38,39 @@ interface MenuOption {
   }
 const menuOptions: MenuOption[] = [
   {
-    title: 'Wallet Settings',
-    imageSource: require( '../../../assets/images/icons/settings.png' ),
-    subtitle: 'Your wallet settings & preferences',
+    title: 'Wallet Name',
+    imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
+    subtitle: 'Lorem Ipsum dolor amet cons',
     screenName: 'WalletSettings',
   },
   {
-    title: 'App Info',
-    imageSource: require( '../../../assets/images/icons/icon_info.png' ),
-    subtitle: 'Lorem Ipsum dolor amet cons',
+    title: 'Version History',
+    imageSource: require( '../../../assets/images/icons/icon_versionhistory_tilt.png' ),
+    subtitle: 'App version progression',
     screenName: 'AppInfo',
   },
 ]
 
-export default function AppInfo( props ) {
-  const [ isOTPType, setIsOTPType ] = useState( false )
+const AppInfo = ( props ) => {
+  const walletName = useSelector(
+    ( state ) => state.storage.wallet.walletName,
+  )
+  const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
+  const restoreVersions = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) )
 
 
+  const listItemKeyExtractor = ( item: MenuOption ) => item.title
+  const [ data, setData ] = useState( [] )
 
+  useEffect( () => {
+    const versions = getVersions( versionHistory, restoreVersions )
+    if( versions.length ){
+      setData( versions )
+
+    // setIsDataSet(!isDataSet);
+    // SelectOption( versions.length )
+    }
+  }, [] )
 
   return (
     <SafeAreaView style={{
@@ -101,21 +120,28 @@ export default function AppInfo( props ) {
             style={styles.addModalView}
           >
             <View style={styles.modalElementInfoView}>
-              <View style={{
-                justifyContent: 'center',
-              }}>
-                <Image
-                  source={menuOption.imageSource}
-                  style={{
-                    width: 25, height: 25, resizeMode: 'contain'
-                  }}
-                />
-              </View>
+
               <View style={{
                 justifyContent: 'center', marginLeft: 10
               }}>
                 <Text style={styles.addModalTitleText}>{menuOption.title}</Text>
                 <Text style={styles.addModalInfoText}>{menuOption.subtitle}</Text>
+              </View>
+              <View style={{
+                justifyContent: 'flex-start', marginVertical: 20,
+                marginHorizontal: 10, flexDirection: 'row',
+              }}>
+                <Image
+                  source={menuOption.imageSource}
+                  style={{
+                    width: 36, height: 36, resizeMode: 'contain'
+                  }}
+                />
+                {menuOption.title === 'Wallet Name' ?
+                  <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
+                  :
+                  <Text style={styles.headerTitleText}>{`Hexa ${data[ 0 ].version}`}</Text>
+                }
               </View>
               {/* {menuOption.isSwitch &&
                 <View style={{
@@ -143,6 +169,14 @@ export default function AppInfo( props ) {
 }
 
 const styles = StyleSheet.create( {
+  headerTitleText: {
+    color: Colors.black,
+    fontFamily: Fonts.FiraSansRegular,
+    fontSize: RFValue( 15 ),
+    // marginBottom: wp( '1%' ),
+    alignSelf: 'center',
+    marginHorizontal: wp( 2 )
+  },
   accountCardsSectionContainer: {
     height: hp( '70.83%' ),
     // marginTop: 30,
@@ -179,7 +213,6 @@ const styles = StyleSheet.create( {
     width: '90%',
     alignSelf: 'center',
     borderRadius: wp( '2' ),
-
     marginBottom: hp( '1' )
   },
 
@@ -199,10 +232,10 @@ const styles = StyleSheet.create( {
   modalElementInfoView: {
     flex: 1,
     marginVertical: 10,
-    height: hp( '5%' ),
-    flexDirection: 'row',
+    height: hp( '13%' ),
+    // flexDirection: 'row',
     // justifyContent: 'center',
-    alignItems: 'center',
+    // alignItems: 'center',
   },
 
   webLinkBarContainer: {
@@ -222,3 +255,11 @@ const styles = StyleSheet.create( {
   },
 } )
 
+const mapStateToProps = ( state ) => {
+  return {
+    walletName:
+      idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
+  }
+}
+
+export default connect( mapStateToProps, null )( AppInfo )

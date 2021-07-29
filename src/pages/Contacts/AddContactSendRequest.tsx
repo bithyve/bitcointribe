@@ -372,7 +372,7 @@ export default function AddContactSendRequest( props ) {
         <TouchableOpacity
           style={CommonStyles.headerLeftIconContainer}
           onPress={() => {
-            props.navigation.goBack()
+            props.navigation.popToTop()
           }}
         >
           <View style={CommonStyles.headerLeftIconInnerContainer}>

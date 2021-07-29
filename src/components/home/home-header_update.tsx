@@ -155,29 +155,29 @@ const HomeHeader = ( {
       }
       if( currentLevel == 0 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: '', isError: true
+          isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: '', isError: true
         }
       } else if( currentLevel === 1 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Cloud Backup complete, upgrade the backup to Level 2', messageTwo: '', isError: false
+          isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade the backup to Level 2', messageTwo: '', isError: false
         }
       } else if( currentLevel === 2 ){
         return {
-          isFirstMessageBold: false, messageOne: 'Double Backup complete, upgrade the backup to Level 3', messageTwo: '', isError: false
+          isFirstMessageBold: false, messageOne: 'Double backup complete, upgrade the backup to Level 3', messageTwo: '', isError: false
         }
       } else if( currentLevel == 3 ){
         return {
-          isFirstMessageBold: true, messageOne: 'Multi-key Backup complete', messageTwo: '', isError: false
+          isFirstMessageBold: true, messageOne: 'Multi-key backup complete', messageTwo: '', isError: false
         }
       }
     }
     if( currentLevel === 1 ){
       return {
-        isFirstMessageBold: false, messageOne: 'Cloud Backup complete, upgrade the backup to Level 2', messageTwo: '', isError: false
+        isFirstMessageBold: false, messageOne: 'Cloud backup complete, upgrade the backup to Level 2', messageTwo: '', isError: false
       }
     } else {
       return {
-        isFirstMessageBold: false, messageOne: 'Cloud Backup incomplete, please complete Level 1', messageTwo: '', isError: true
+        isFirstMessageBold: false, messageOne: 'Cloud backup incomplete, please complete Level 1', messageTwo: '', isError: true
       }
     }
   }
