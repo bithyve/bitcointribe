@@ -8,19 +8,13 @@ import {
   PermissionsAndroid,
 } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  widthPercentageToDP as wp,
-  heightPercentageToDP as hp,
-} from 'react-native-responsive-screen'
 import { useDispatch, useSelector } from 'react-redux'
 import Colors from '../../common/Colors'
 import BottomSheet from 'reanimated-bottom-sheet'
-import ModalHeader from '../../components/ModalHeader'
 import HistoryPageComponent from './HistoryPageComponent'
 import PersonalCopyShareModal from './PersonalCopyShareModal'
 import moment from 'moment'
 import _ from 'underscore'
-import DeviceInfo from 'react-native-device-info'
 import ErrorModalContents from '../../components/ErrorModalContents'
 import SmallHeaderModal from '../../components/SmallHeaderModal'
 import PersonalCopyHelpContents from '../../components/Helper/PersonalCopyHelpContents'
@@ -41,7 +35,6 @@ import KeeperTypeModalContents from './KeeperTypeModalContent'
 import {
   ChannelAssets,
   KeeperInfoInterface,
-  LevelHealthInterface,
   MetaShare,
   Trusted_Contacts,
 } from '../../bitcoin/utilities/Interface'
@@ -53,8 +46,6 @@ import { setIsPermissionGiven } from '../../store/actions/preferences'
 import { v4 as uuid } from 'uuid'
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import config from '../../bitcoin/HexaConfig'
-import { initializeTrustedContact, InitTrustedContactFlowKind } from '../../store/actions/trustedContacts'
-import TrustedContactsService from '../../bitcoin/services/TrustedContactsService'
 import { getTime } from '../../common/CommonFunctions/timeFormatter'
 import { historyArray } from '../../common/CommonVars/commonVars'
 import ModalContainer from '../../components/home/ModalContainer'
@@ -63,31 +54,22 @@ import { getIndex } from '../../common/utilities'
 const PersonalCopyHistory = ( props ) => {
   const dispatch = useDispatch()
   // const [ ErrorBottomSheet, setErrorBottomSheet ] = useState( React.createRef() )
-
   const [ errorModal, setErrorModal ] = useState( false )
-
-  const [ HelpBottomSheet, setHelpBottomSheet ] = useState( React.createRef() )
-  const [ keeperTypeBottomSheet, setkeeperTypeBottomSheet ] = useState(
-    React.createRef()
-  )
-
   const [ keeperTypeModal, setKeeperTypeModal ] = useState( false )
   const storagePermissionBottomSheet = useRef<BottomSheet>()
   const [ hasStoragePermission, setHasStoragePermission ] = useState( false )
-
   const [ storagePermissionModal, setStoragePermissionModal ] = useState( false )
   const [ selectedKeeperType, setSelectedKeeperType ] = useState( '' )
   const [ selectedKeeperName, setSelectedKeeperName ] = useState( '' )
   const [ errorMessage, setErrorMessage ] = useState( '' )
   const [ errorMessageHeader, setErrorMessageHeader ] = useState( '' )
   const [ QrBottomSheet, setQrBottomSheet ] = useState( React.useRef() )
+  const [ HelpModal, setHelpModal ] = useState( false )
 
   const [ qrModal, setQRModal ] = useState( false )
   const [ QrBottomSheetsFlag, setQrBottomSheetsFlag ] = useState( false )
-  const [ blockReshare, setBlockReshare ] = useState( '' )
   const [ approvePrimaryKeeperModal, setApprovePrimaryKeeperModal ] = useState( false )
   const [ isChangeClicked, setIsChangeClicked ] = useState( false )
-  const [ ApprovePrimaryKeeperBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ personalCopyHistory, setPersonalCopyHistory ] = useState( historyArray )
   // const [
   //   PersonalCopyShareBottomSheet,
@@ -333,26 +315,12 @@ const PersonalCopyHistory = ( props ) => {
     )
   }, [ selectedPersonalCopy, personalCopyDetails ] )
 
-  const renderHelpHeader = () => {
-    return (
-      <SmallHeaderModal
-        borderColor={Colors.blue}
-        backgroundColor={Colors.blue}
-        onPressHeader={() => {
-          if ( HelpBottomSheet.current )
-            ( HelpBottomSheet as any ).current.snapTo( 0 )
-        }}
-      />
-    )
-  }
+
 
   const renderHelpContent = () => {
     return (
       <PersonalCopyHelpContents
-        titleClicked={() => {
-          if ( HelpBottomSheet.current )
-            ( HelpBottomSheet as any ).current.snapTo( 0 )
-        }}
+        titleClicked={() => setHelpModal( false )}
       />
     )
   }
@@ -578,7 +546,6 @@ const PersonalCopyHistory = ( props ) => {
             } )
             props.navigation.dispatch( popAction )
           } else {
-            // ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
             setQRModal( false )
             // setApprovePrimaryKeeperModal( true )
             console.log( 'ELD' )
@@ -595,10 +562,8 @@ const PersonalCopyHistory = ( props ) => {
 
   useEffect( ()=>{
     if( approvalStatus && isChangeClicked ){
-      console.log( 'APPROVe' );
-      ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 1 )
-      // setApprovePrimaryKeeperModal( true )
-      // ( QrBottomSheet as any ).current.snapTo( 0 )
+      console.log( 'APPROVe' )
+      setApprovePrimaryKeeperModal( true )
       setQRModal( false )
     }
   }, [ approvalStatus ] )
@@ -676,16 +641,9 @@ const PersonalCopyHistory = ( props ) => {
         {renderErrorModalContent()}
       </ModalContainer>
 
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={HelpBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '87%' ) : hp( '89%' ),
-        ]}
-        renderContent={renderHelpContent}
-        renderHeader={renderHelpHeader}
-      />
+      <ModalContainer visible={HelpModal} closeBottomSheet={() => setHelpModal( false )} >
+        {renderHelpContent()}
+      </ModalContainer>
       <ModalContainer visible={keeperTypeModal} closeBottomSheet={() => {}} >
         <KeeperTypeModalContents
           headerText={'Change backup method'}
@@ -704,44 +662,18 @@ const PersonalCopyHistory = ( props ) => {
       <ModalContainer visible={qrModal} closeBottomSheet={() => {}} >
         {renderQrContent()}
       </ModalContainer>
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={ApprovePrimaryKeeperBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '60%' ) : hp( '70' ),
-        ]}
-        renderContent={() => (
-          <ApproveSetup
-            isContinueDisabled={false}
-            onPressContinue={() => {
-              onPressChangeKeeperType( selectedKeeperType, selectedKeeperName );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-              // setApprovePrimaryKeeperModal( false )
-            }}
-          /> )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => {
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 );
-              ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
-            }}
-          />
-        )}
-      />
+      <ModalContainer visible={approvePrimaryKeeperModal} closeBottomSheet={()=>{setApprovePrimaryKeeperModal( false )}} >
+        {<ApproveSetup
+          isContinueDisabled={false}
+          onPressContinue={() => {
+            onPressChangeKeeperType( selectedKeeperType, selectedKeeperName )
+            setApprovePrimaryKeeperModal( false )
+          }}
+        />}
+      </ModalContainer>
       <ModalContainer visible={storagePermissionModal} closeBottomSheet={()=>{}} >
         {renderStoragePermissionModalContent()}
       </ModalContainer>
-      {/* <BottomSheet
-        enabledInnerScrolling={true}
-        ref={storagePermissionBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '55%' ) : hp( '60%' ),
-        ]}
-        renderContent={renderStoragePermissionModalContent}
-        renderHeader={renderStoragePermissionModalHeader}
-      /> */}
     </View>
   )
 }
