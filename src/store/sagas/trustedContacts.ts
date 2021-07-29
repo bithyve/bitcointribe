@@ -371,12 +371,8 @@ export const initializeTrustedContactWatcher = createWatcher(
 )
 
 function* rejectTrustedContactWorker( { payload }: { payload: { channelKey: string }} ) {
-  const accountsState: AccountsState = yield select( state => state.accounts )
-  const regularAccount: RegularAccount = accountsState[ REGULAR_ACCOUNT ].service
-  const { walletId } = regularAccount.hdWallet.getWalletId()
-
+  const { walletId } = yield select( state => state.storage.wallet )
   const { channelKey } = payload
-
   const streamUpdates: UnecryptedStreamData = {
     streamId: TrustedContactsOperations.getStreamId( walletId ),
     metaData: {
