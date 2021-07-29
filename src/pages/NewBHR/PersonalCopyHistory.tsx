@@ -319,6 +319,11 @@ const PersonalCopyHistory = ( props ) => {
               )
             }
             setIsReshare( true )
+            if( props.navigation.getParam( 'isChangeKeeperType' ) ){
+              props.navigation.pop( 2 )
+            } else {
+              props.navigation.pop( 1 )
+            }
           } catch ( err ) {
             dispatch( keeperProcessStatus( '' ) )
             console.log( 'error', err )
@@ -564,8 +569,8 @@ const PersonalCopyHistory = ( props ) => {
           setQRModal( false )
         }}
         onPressContinue={async() => {
-          if( isConfirm ){
-            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"Tdfr","channelId":"5df0b46f32f67b3799a53754e4c64b87541842d231365e100ef3764d026342e8","streamId":"627398d36","channelKey":"A0nnrYGB1JMuBwE5ioNkbs6q","secondaryChannelKey":"zH2r23uf0HjAn0CNz82Vb9yL","version":"1.8.0","walletId":"5901c6f52244708653425e87155e20ded9f93f0382b36306ac60e46a2dc648c8","encryptedKey":"2a658026da48159cc698a1630acb696e79b8eaa7f0e25ddbd6ea4baa012df4c947dfc344c9a586a83d2261f149a8492294eca22af9f38e2ce18a947fe6fd4f79bb2b64c86b3a740dff4a702716577e38"}'
+          if( isConfirm ) {
+            const qrScannedData = '{"type":"RECOVERY_REQUEST","walletName":"sas","channelId":"acd93b9dc1ed80ad0e0b0dc997e3375efff3e943d2f7b16fab314d40cd8908fa","streamId":"9ac2d678e","channelKey":"LkidfBLLgY5sWG272zqVvXrW","secondaryChannelKey":"pcYV5kMTFM3VDvCJevWlb25c","version":"1.8.5","walletId":"41b18c3f78b9b5e43ac200f47baef8f2613dcb1674f6407de196adc8da914bdb","encryptedKey":"68a2110634e053657687cc06e4dfe456142e34cdb2469145a398ceff9573f3cece4b7fd53b935c0c05d41ddac8e17653f0744ae3a5da10b38d553e18bf653c5e5646e5ab3e1e460b6c3beb632cac2ab1"}'
             dispatch( confirmPDFShared( selectedKeeper.shareId, qrScannedData ) )
             setQrBottomSheetsFlag( false )
             const popAction = StackActions.pop( {

@@ -584,7 +584,7 @@ class ManageBackupNewBHR extends Component<
       if( selectedKeeper.shareType == 'contact' || selectedKeeper.shareType == 'existingContact' ) {
         if ( count == 1 && isSetup ) index = 2
         else if ( count == 0 && isSetup ) index = 1
-        else index = selectedKeeper.data.index
+        else index = selectedKeeper.data && selectedKeeper.data.index ? selectedKeeper.data.index : 1
       }
       if( selectedKeeper.shareType == 'device' ) {
         if( selectedKeeper.data && ( selectedKeeper.data.index == 0 || selectedKeeper.data.index > 0 ) ) index = selectedKeeper.data.index
@@ -649,14 +649,14 @@ class ManageBackupNewBHR extends Component<
     const { levelHealth, cloudBackupStatus } = this.props
     if( levelHealth[ 0 ] && levelHealth[ 1 ] ){
       if( levelHealth[ 1 ].levelInfo.length == 4 &&
-        levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
         cloudBackupStatus !== CloudBackupStatus.IN_PROGRESS ){
         this.props.deletePrivateData()
         this.props.updateCloudData()
       } else if( levelHealth[ 1 ].levelInfo.length == 6 &&
-        levelHealth[ 1 ].levelInfo[ 0 ].updatedAt == 0 &&
+        levelHealth[ 1 ].levelInfo[ 1 ].updatedAt == 0 &&
         levelHealth[ 1 ].levelInfo[ 2 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 3 ].updatedAt > 0 &&
         levelHealth[ 1 ].levelInfo[ 4 ].updatedAt > 0 &&

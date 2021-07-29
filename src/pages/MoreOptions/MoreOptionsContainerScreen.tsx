@@ -96,12 +96,12 @@ const menuOptions: MenuOption[] = [
     subtitle: 'Your wallet settings & preferences',
     screenName: 'WalletSettings',
   },
-  // {
-  //   title: 'App Info',
-  //   imageSource: require( '../../assets/images/icons/icon_info.png' ),
-  //   subtitle: 'Lorem Ipsum dolor amet cons',
-  //   screenName: 'AppInfo',
-  // },
+  {
+    title: 'App Info',
+    imageSource: require( '../../assets/images/icons/icon_info.png' ),
+    subtitle: 'Lorem Ipsum dolor amet cons',
+    screenName: 'AppInfo',
+  },
 ]
 
 const listItemKeyExtractor = ( item: MenuOption ) => item.title

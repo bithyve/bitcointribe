@@ -1245,7 +1245,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             />
             <CardWithRadioBtn
               icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
-              mainText={'Answer to a Security Question'}
+              mainText={'Answer a Security Question'}
               subText={'Easier to remember. Recommended'}
               isSelected={activeIndex === 0}
               setActiveIndex={setActiveIndex}
@@ -1254,7 +1254,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <CardWithRadioBtn
               icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
               mainText={'Use your own encryption password'}
-              subText={'Create a password. Make sure to remember it'}
+              subText={'Create a password'}
               isSelected={activeIndex === 1}
               setActiveIndex={setActiveIndex}
               index={1}
