@@ -120,7 +120,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             <ToggleContainer />
           </View>
 
-          <View style={{
+          {/* <View style={{
             backgroundColor: 'white',
             marginHorizontal: wp( 4 ),
             height: hp( '15%' ),
@@ -134,7 +134,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               marginBottom: 'auto',
               width: '100%', height: '100%', flex: 1, resizeMode: 'contain'
             }} />
-          </View>
+          </View> */}
           <HomeAccountCardsList
             // containerStyle={containerView}
             contentContainerStyle={{
