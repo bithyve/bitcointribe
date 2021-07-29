@@ -13,7 +13,7 @@ export default function BottomInfoBox( props ) {
         backgroundColor: props.backgroundColor
           ? props.backgroundColor
           : Colors.backgroundColor,
-        marginLeft: 20,
+        marginLeft: 12,
         marginRight: 20,
         borderRadius: 10,
         justifyContent: 'center',
