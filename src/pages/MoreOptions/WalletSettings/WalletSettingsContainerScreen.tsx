@@ -50,12 +50,12 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
     //   imageSource: require( '../../../assets/images/icons/icon_checking_blue.png' ),
     //   onOptionPressed: handleRescanListItemSelection,
     // },
-    {
-      title: 'Version History',
-      subtitle: 'Version History',
-      imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
-      screenName: 'VersionHistory',
-    },
+    // {
+    //   title: 'Version History',
+    //   subtitle: 'Version History',
+    //   imageSource: require( '../../../assets/images/icons/icon_versionhistory.png' ),
+    //   screenName: 'VersionHistory',
+    // },
     // {
     //   title: 'Hexa Release',
     //   subtitle: versionString,

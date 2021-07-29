@@ -21,6 +21,7 @@ import Login from '../../../pages/Login'
 import Intermediate from '../../../pages/Intermediate'
 import PasscodeChangeSuccessPage from '../../../pages/PasscodeChangeSuccessPage'
 import AppInfo from '../../../pages/MoreOptions/AppInfo/Appinfo'
+import VersionHistoryScreen from '../../../pages/VersionHistoryScreen'
 
 const MoreOptionsStack = createStackNavigator(
   {
@@ -38,6 +39,7 @@ const MoreOptionsStack = createStackNavigator(
       screen: ReLogin,
       navigationOptions: {
         gesturesEnabled: false,
+        header: null,
       },
     },
     AccountManagement: {
@@ -104,6 +106,12 @@ const MoreOptionsStack = createStackNavigator(
         header: null,
       },
     },
+    VersionHistory: {
+      screen: VersionHistoryScreen,
+      navigationOptions: {
+        title: 'Version History',
+      },
+    },
   },
   {
     initialRouteName: 'Home',
@@ -120,14 +128,14 @@ const MoreOptionsStack = createStackNavigator(
         tabBarVisible,
       }
     },
-    // defaultNavigationOptions: ( { navigation } ) => {
-    //   return {
-    //     ...defaultStackScreenNavigationOptions,
-    //     headerLeft: () => {
-    //       return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
-    //     },
-    //   }
-    // },
+    defaultNavigationOptions: ( { navigation } ) => {
+      return {
+        ...defaultStackScreenNavigationOptions,
+        headerLeft: () => {
+          return <SmallNavHeaderBackButton onPress={() => { navigation.pop() }} />
+        },
+      }
+    },
   },
 )
 
