@@ -209,31 +209,19 @@ export const syncAccountsWatcher = createWatcher(
   SYNC_ACCOUNTS
 )
 
-function* generateSecondaryXprivWorker( { payload } ) {
-  const service = yield select(
-    ( state ) => state.accounts[ payload.serviceType ].service
-  )
-  console.log( 'service', service )
+function* generateSecondaryXprivWorker( { payload }: { payload: { secondaryMnemonic: string } } ) {
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const { secondaryMnemonic } = payload
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
 
-  const { generated } = service.generateSecondaryXpriv(
-    payload.secondaryMnemonic
+  const { secondaryXpriv } = yield call( AccountUtilities.generateSecondaryXpriv,
+    secondaryMnemonic,
+    wallet.details2FA.secondaryXpub,
+    network,
   )
-  console.log( 'generated', generated )
-  if ( generated ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ payload.serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
-      }
-    } )
-    yield put( secondaryXprivGenerated( true ) )
-  } else {
-    yield put( secondaryXprivGenerated( false ) )
-  }
+
+  if ( secondaryXpriv ) yield put( secondaryXprivGenerated( true ) )
+  else yield put( secondaryXprivGenerated( false ) )
 }
 
 export const generateSecondaryXprivWatcher = createWatcher(
@@ -317,9 +305,13 @@ function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string 
         twoFAKey
       }
     }
+    yield put( twoFAResetted( true ) )
     yield put( updateWallet( updatedWallet ) )
   }
-  else throw new Error( 'Failed to reset twoFA' )
+  else {
+    yield put( twoFAResetted( false ) )
+    throw new Error( 'Failed to reset twoFA' )
+  }
 }
 
 export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
@@ -853,7 +845,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
     } else if ( QRModalHeader === 'Sweep Funds' ) {
-      yield put( generateSecondaryXpriv( SECURE_ACCOUNT, secondaryMnemonic.mnemonic ) )
+      yield put( generateSecondaryXpriv( secondaryMnemonic.mnemonic ) )
     }
   } catch ( error ) {
     console.log( 'error', error )

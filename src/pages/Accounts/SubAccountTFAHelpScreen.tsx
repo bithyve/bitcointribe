@@ -139,7 +139,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
         dispatch( resetTwoFA( qrData ) )
       } else if ( actionType === 'Sweep Funds' ) {
-        dispatch( generateSecondaryXpriv( SECURE_ACCOUNT, qrData ) )
+        dispatch( generateSecondaryXpriv( qrData ) )
       }
     }
   }

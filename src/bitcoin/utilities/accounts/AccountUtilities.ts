@@ -975,6 +975,23 @@ export default class AccountUtilities {
     }
   };
 
+  static generateSecondaryXpriv = (
+    secondaryMnemonic: string,
+    secondaryXpub: string,
+    network: bitcoinJS.networks.Network
+  ): {
+    secondaryXpriv: string
+  } => {
+    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
+
+    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, rootDerivationPath )
+    return {
+      secondaryXpriv
+    }
+  };
+
   static getSecondSignature = async (
     walletId: string,
     token: number,
