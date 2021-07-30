@@ -34,16 +34,15 @@ import {
   getSMAndReSetTFAOrGenerateSXpriv,
   setResetTwoFALoader,
 } from '../../store/actions/accounts'
-import { SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { resetStackToAccountDetails } from '../../navigation/actions/NavigationActions'
-import useSourceAccountShellForSending from '../../utils/hooks/state-selectors/sending/UseSourceAccountShellForSending'
 import idx from 'idx'
 import { AccountsState } from '../../store/reducers/accounts'
 import useAccountsState from '../../utils/hooks/state-selectors/accounts/UseAccountsState'
 import { resetSendState } from '../../store/actions/sending'
-import SecureAccount from '../../bitcoin/services/accounts/SecureAccount'
 import SecurityQuestion from '../../pages/NewBHR/SecurityQuestion'
 import Loader from '../../components/loader'
+import useAccountShellForID from '../../utils/hooks/state-selectors/accounts/UseAccountShellForID'
+import { Wallet } from '../../bitcoin/utilities/Interface'
 
 export type Props = {
   navigation: any;
@@ -66,12 +65,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   ] = useState( React.createRef<BottomSheet>() )
 
   const accountsState: AccountsState = useAccountsState()
-  const sourceAccountShell = useSourceAccountShellForSending()
+  const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
   const dispatch = useDispatch()
-  const twoFASetupDetails = useSelector( ( state ) => state.accounts[ SECURE_ACCOUNT ].service.secureHDWallet.twoFASetup )
-  const s3ServiceSecure: SecureAccount = useSelector(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service
-  )
+  const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
   const resetTwoFALoader: boolean = accountsState.resetTwoFALoader
   const [ showLoader, setShowLoader ] = useState( true )
 
@@ -80,7 +76,9 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     if ( resettedTwoFA ) {
       dispatch( setResetTwoFALoader( false ) )
       navigation.navigate( 'TwoFASetup', {
-        twoFASetup: twoFASetupDetails,
+        twoFASetup: {
+          twoFAKey: wallet.details2FA.twoFAKey
+        },
         onPressBack: () => {
           navigation.dispatch(
             resetStackToAccountDetails( {
@@ -100,7 +98,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
       ( ResetTwoFASuccessBottomSheet as any ).current.snapTo( 1 )
       dispatch( twoFAResetted( null ) )
     }
-  }, [ accountsState.twoFAHelpFlags ] )
+  }, [ accountsState.twoFAHelpFlags, wallet ] )
 
   useEffect( ()=>{
     if( resetTwoFALoader ) setShowLoader( true )
@@ -133,13 +131,13 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
     }, 2 )
     if( qrData.includes( '{' ) ) {
       if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
-      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, SECURE_ACCOUNT ) )
+      dispatch( getSMAndReSetTFAOrGenerateSXpriv( qrData, actionType, sourceAccountShell ) )
     } else {
       if ( actionType === 'Reset 2FA' ) {
         if( actionType === 'Reset 2FA' ) dispatch( setResetTwoFALoader( true ) )
         dispatch( resetTwoFA( qrData ) )
       } else if ( actionType === 'Sweep Funds' ) {
-        dispatch( generateSecondaryXpriv( SECURE_ACCOUNT, qrData ) )
+        dispatch( generateSecondaryXpriv( sourceAccountShell, qrData ) )
       }
     }
   }
@@ -263,8 +261,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           if ( Platform.OS == 'ios' )
             ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
         }}
-        onPressConfirm={async () => {
-          getQrCodeData( s3ServiceSecure.secureHDWallet.secondaryMnemonic, 'Reset 2FA' );
+        onPressConfirm={() => {
+          getQrCodeData( wallet.secondaryMnemonic, 'Reset 2FA' );
           ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
           Keyboard.dismiss()
         }}
@@ -322,7 +320,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              if( s3ServiceSecure.secureHDWallet.secondaryMnemonic ) {
+              if( wallet.secondaryMnemonic ) {
                 if ( SecurityQuestionBottomSheet.current ) {
                   ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
                 }

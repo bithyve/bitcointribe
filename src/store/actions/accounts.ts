@@ -189,11 +189,12 @@ export const fetchFeeAndExchangeRates = () => {
   }
 }
 
-export const generateSecondaryXpriv = ( serviceType, secondaryMnemonic ) => {
+export const generateSecondaryXpriv = ( accountShell, secondaryMnemonic ) => {
   return {
     type: GENERATE_SECONDARY_XPRIV,
     payload: {
-      serviceType, secondaryMnemonic
+      accountShell,
+      secondaryMnemonic
     },
   }
 }
@@ -542,6 +543,7 @@ export const secondaryXprivGenerated = ( generated ) => {
     }
   }
 }
+
 export const twoFAValid = ( isValid: boolean ) => {
   return {
     type: TWO_FA_VALID,
@@ -550,6 +552,7 @@ export const twoFAValid = ( isValid: boolean ) => {
     }
   }
 }
+
 export const twoFAResetted = ( resetted ) => {
   return {
     type: TWO_FA_RESETTED, payload: {
@@ -698,13 +701,13 @@ export const clearReceiveAddress = ( ) => {
   }
 }
 
-export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, serviceType ) => {
+export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, accountShell ) => {
   return {
     type: CREATE_SM_N_RESETTFA_OR_XPRIV,
     payload: {
       qrdata,
       QRModalHeader,
-      serviceType
+      accountShell
     },
   }
 }

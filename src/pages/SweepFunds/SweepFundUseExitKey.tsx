@@ -185,7 +185,7 @@ SweepFundUseExitKeyPropsTypes,
 
     if( prevProps.mnemonic != this.props.mnemonic ){
       // console.log("mnemonic",this.props.mnemonic);
-      if( this.props.mnemonic ) this.props.generateSecondaryXpriv( SECURE_ACCOUNT, this.props.mnemonic.split( '_' )[ 0 ] )
+      if( this.props.mnemonic ) this.props.generateSecondaryXpriv( this.props.mnemonic.split( '_' )[ 0 ] )
     }
 
     if( this.props.twoFAHelpFlags && prevProps.twoFAHelpFlags.xprivGenerated != this.props.twoFAHelpFlags.xprivGenerated ){

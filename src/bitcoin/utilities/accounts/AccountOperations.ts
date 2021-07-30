@@ -620,12 +620,15 @@ export default class AccountOperations {
     }
 
     // add internal address used for change utxo to activeAddresses.internal
-    const changeAddress = AccountUtilities.getAddressByIndex(
+    let changeAddress: string
+    if( ( account as MultiSigAccount ).is2FA ) changeAddress = AccountUtilities.createMultiSig(  ( account as MultiSigAccount ).xpubs, 2, network, account.nextFreeChangeAddressIndex, true ).address
+    else changeAddress = AccountUtilities.getAddressByIndex(
       account.xpub,
       true,
       account.nextFreeChangeAddressIndex,
       network
     )
+
     activeInternalAddresses[ changeAddress ] = {
       index: account.nextFreeChangeAddressIndex,
       assignee: {

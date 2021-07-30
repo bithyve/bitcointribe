@@ -233,6 +233,7 @@ export default ( state: AccountsState = initialState, action ): AccountsState =>
           twoFAHelpFlags: {
             ...state.twoFAHelpFlags,
             twoFAResetted: action.payload.resetted,
+            twoFAValid: false,
           },
         }
 

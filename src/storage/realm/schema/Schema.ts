@@ -288,7 +288,7 @@ export const WalletSchema: ObjectSchema = {
     primaryMnemonic: {
       type: 'string', optional: true,
     },
-    secondaryMemonic: {
+    secondaryMnemonic: {
       type: 'string', optional: true,
     },
     smShare: {
