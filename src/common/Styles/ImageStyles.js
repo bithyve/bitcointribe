@@ -15,8 +15,8 @@ const ListStyles = StyleSheet.create( {
   },
 
   thumbnailImageMedium: {
-    width: wp( 13 ),
-    height: wp( 13 ),
+    width: wp( 9 ),
+    height: wp( 9 ),
   },
 
   thumbnailImageLarge: {

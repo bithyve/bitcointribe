@@ -5,6 +5,9 @@ const UTXOStatus = 'UTXOStatus'
 const Wallet = 'Wallet'
 const WalletSecurity = 'WalletSecurity'
 const Account = 'Account'
+const ActiveAddresses = 'ActiveAddresses'
+const ActiveAddress = 'ActiveAddress'
+const ActiveAddressAssignee = 'ActiveAddressAssignee'
 const Transaction = 'Transaction'
 const Details2FA = 'Details2FA'
 const Balances = 'Balances'
@@ -45,7 +48,7 @@ export const AccountSchema: ObjectSchema = {
       type: 'string', optional: true
     },
     activeAddresses: {
-      type: 'string?[]', optional: true
+      type: ActiveAddresses, optional: true
     },
     receivingAddress: {
       type: 'string', optional: true
@@ -101,6 +104,45 @@ export const AccountSchema: ObjectSchema = {
     lastSynched: {
       type: 'int', optional: true
     }
+  },
+}
+
+export const ActiveAddressAssigneeSchema: ObjectSchema = {
+  name: ActiveAddressAssignee,
+  properties: {
+    id: {
+      type: 'string', optional: true
+    },
+    type: {
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const ActiveAddressSchema: ObjectSchema = {
+  name: ActiveAddress,
+  properties: {
+    address: {
+      type: 'string', optional: true
+    },
+    index: {
+      type: 'int', optional: true
+    },
+    assignee: {
+      type: ActiveAddressAssignee, optional: true
+    },
+  },
+}
+
+export const ActiveAddressesSchema: ObjectSchema = {
+  name: ActiveAddresses,
+  properties: {
+    external: {
+      type: ActiveAddress, optional: true
+    },
+    internal: {
+      type: ActiveAddress, optional: true
+    },
   },
 }
 
@@ -219,7 +261,19 @@ export const TransactionSchema: ObjectSchema = {
     address: {
       type: 'string', optional: true
     },
+    type: {
+      type: 'string', optional: true
+    },
+    sender: {
+      type: 'string', optional: true
+    },
+    receiver: {
+      type: 'string', optional: true
+    },
     notes: {
+      type: 'string', optional: true
+    },
+    tags: {
       type: 'string?[]', default: []
     }
   },
@@ -289,6 +343,9 @@ export const WalletSchema: ObjectSchema = {
       type: 'string', optional: true,
     },
     secondaryMnemonic: {
+      type: 'string', optional: true,
+    },
+    secondaryWalletId: {
       type: 'string', optional: true,
     },
     smShare: {
