@@ -52,11 +52,12 @@ function* processRecipients( accountShell: AccountShell ){
         case RecipientKind.ACCOUNT_SHELL:
           const recipientShell = accountShells.find( ( shell ) => shell.id === recipient.id )
           const recipientAccount: Account = accountsState.accounts[ recipientShell.primarySubAccount.id  ]
-          const recipientAddressAssignee: ActiveAddressAssignee = {
+          const assigneeInfo: ActiveAddressAssignee = {
             type: accountShell.primarySubAccount.type,
             id: accountShell.primarySubAccount.id,
+            sender: accountShell.primarySubAccount.customDisplayName,
           }
-          const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, recipientAddressAssignee )
+          const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, assigneeInfo )
           recipients.push( {
             address: recipientAddress,
             amount: recipient.amount,

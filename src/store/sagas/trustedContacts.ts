@@ -290,9 +290,10 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   }
 
   let testReceivingAddress, checkingReceivingAddress
-  const recipientAddressAssignee: ActiveAddressAssignee = {
+  const assigneeInfo: ActiveAddressAssignee = {
     type: AccountType.FNF_ACCOUNT,
     id: contactInfo.channelKey,
+    sender: contactInfo.contactDetails.contactName,
   }
   for( const shell of accountsState.accountShells ){
     const { primarySubAccount } = shell
@@ -300,11 +301,11 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
       const account = accounts[ primarySubAccount.id ]
       switch( primarySubAccount.type ){
           case AccountType.TEST_ACCOUNT:
-            testReceivingAddress = yield call( getNextFreeAddressWorker, account, recipientAddressAssignee )
+            testReceivingAddress = yield call( getNextFreeAddressWorker, account, assigneeInfo )
             break
 
           case AccountType.CHECKING_ACCOUNT:
-            checkingReceivingAddress = yield call( getNextFreeAddressWorker, account, recipientAddressAssignee )
+            checkingReceivingAddress = yield call( getNextFreeAddressWorker, account, assigneeInfo )
             break
       }
     }
