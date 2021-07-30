@@ -189,10 +189,11 @@ export const fetchFeeAndExchangeRates = () => {
   }
 }
 
-export const generateSecondaryXpriv = ( secondaryMnemonic ) => {
+export const generateSecondaryXpriv = ( accountShell, secondaryMnemonic ) => {
   return {
     type: GENERATE_SECONDARY_XPRIV,
     payload: {
+      accountShell,
       secondaryMnemonic
     },
   }
@@ -700,13 +701,13 @@ export const clearReceiveAddress = ( ) => {
   }
 }
 
-export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, serviceType ) => {
+export const getSMAndReSetTFAOrGenerateSXpriv = ( qrdata, QRModalHeader, accountShell ) => {
   return {
     type: CREATE_SM_N_RESETTFA_OR_XPRIV,
     payload: {
       qrdata,
       QRModalHeader,
-      serviceType
+      accountShell
     },
   }
 }

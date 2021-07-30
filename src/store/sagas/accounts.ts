@@ -209,9 +209,11 @@ export const syncAccountsWatcher = createWatcher(
   SYNC_ACCOUNTS
 )
 
-function* generateSecondaryXprivWorker( { payload }: { payload: { secondaryMnemonic: string } } ) {
+function* generateSecondaryXprivWorker( { payload }: { payload: { accountShell: AccountShell, secondaryMnemonic: string } } ) {
+  const { secondaryMnemonic, accountShell } = payload
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
-  const { secondaryMnemonic } = payload
+  const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+  const account = ( accountsState.accounts[ accountShell.primarySubAccount.id ] as MultiSigAccount )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
 
   const { secondaryXpriv } = yield call( AccountUtilities.generateSecondaryXpriv,
@@ -220,7 +222,16 @@ function* generateSecondaryXprivWorker( { payload }: { payload: { secondaryMnemo
     network,
   )
 
-  if ( secondaryXpriv ) yield put( secondaryXprivGenerated( true ) )
+  if ( secondaryXpriv ){
+    account.xprivs.secondary = secondaryXpriv
+    yield put( updateAccounts( {
+      accounts: {
+        [ account.id ]: account
+      }
+    } ) )
+    yield call( dbManager.updateAccount, account.id, account )
+    yield put( secondaryXprivGenerated( true ) )
+  }
   else yield put( secondaryXprivGenerated( false ) )
 }
 
@@ -809,9 +820,9 @@ export const mergeAccountShellsWatcher = createWatcher(
   MERGE_ACCOUNT_SHELLS
 )
 
-function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, serviceType: string } } ) {
+function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
-    const { qrdata, QRModalHeader } = payload
+    const { qrdata, QRModalHeader, accountShell } = payload
     const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const s3Service = yield select( ( state ) => state.health.service )
@@ -845,7 +856,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
     } else if ( QRModalHeader === 'Sweep Funds' ) {
-      yield put( generateSecondaryXpriv( secondaryMnemonic.mnemonic ) )
+      yield put( generateSecondaryXpriv( accountShell, secondaryMnemonic.mnemonic ) )
     }
   } catch ( error ) {
     console.log( 'error', error )
