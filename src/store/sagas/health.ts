@@ -212,7 +212,7 @@ function* generateMetaSharesWorker( { payload } ) {
   const wallet: Wallet = yield select(
     ( state ) => state.storage.wallet
   )
-  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMemonic ? wallet.secondaryMemonic : ''
+  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
 
   const secureAssets = {
     secondaryMnemonic: secondaryMnemonic,
@@ -1756,7 +1756,7 @@ function* generateSMMetaSharesWorker( { payload } ) {
   const wallet: Wallet = yield select(
     ( state ) => state.storage.wallet
   )
-  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMemonic ? wallet.secondaryMemonic : ''
+  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
   const res = yield call(
     s3Service.generateSMShares,
     secondaryMnemonic,

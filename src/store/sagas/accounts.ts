@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, requestTimedout } from '../utils/utilities'
+import { createWatcher } from '../utils/utilities'
 import {
   GET_TESTCOINS,
   GENERATE_SECONDARY_XPRIV,
@@ -316,8 +316,9 @@ function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string 
         twoFAKey
       }
     }
-    yield put( twoFAResetted( true ) )
     yield put( updateWallet( updatedWallet ) )
+    yield call ( dbManager.updateWallet, updatedWallet )
+    yield put( twoFAResetted( true ) )
   }
   else {
     yield put( twoFAResetted( false ) )
@@ -332,17 +333,8 @@ function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
   const { token } = payload
   const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
 
-  if ( valid ) {
-    yield put( twoFAValid( true ) )
-    delete wallet.details2FA
-    // TODO: save udpated wallet into realm
-    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-    yield call( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-      ...tempDB,
-      wallet
-    } ) )
-    yield put( updateWallet( wallet ) )
-  } else yield put( twoFAValid( false ) )
+  if ( valid ) yield put( twoFAValid( true ) )
+  else yield put( twoFAValid( false ) )
 }
 
 export const validateTwoFAWatcher = createWatcher(
@@ -446,20 +438,20 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* setup2FADetails( wallet: Wallet ) {
-  const secondaryMemonic = bip39.generateMnemonic( 256 )
-  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
+  const secondaryMnemonic = bip39.generateMnemonic( 256 )
+  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMnemonic )
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
   const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
   const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, network, rootDerivationPath )
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
 
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
-    secondaryMemonic,
+    secondaryMnemonic,
     secondaryWalletId,
     details2FA: {
       secondaryXpub,

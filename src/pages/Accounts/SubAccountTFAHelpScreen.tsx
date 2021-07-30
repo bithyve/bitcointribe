@@ -68,9 +68,6 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
   const sourceAccountShell = useAccountShellForID( navigation.getParam( 'accountShellID' ) )
   const dispatch = useDispatch()
   const wallet: Wallet = useSelector( ( state ) => state.storage.wallet )
-  // const s3ServiceSecure: SecureAccount = useSelector(
-  //   ( state ) => state.accounts[ SECURE_ACCOUNT ].service
-  // )
   const resetTwoFALoader: boolean = accountsState.resetTwoFALoader
   const [ showLoader, setShowLoader ] = useState( true )
 
@@ -264,8 +261,8 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
           if ( Platform.OS == 'ios' )
             ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
         }}
-        onPressConfirm={async () => {
-          getQrCodeData( s3ServiceSecure.secureHDWallet.secondaryMnemonic, 'Reset 2FA' );
+        onPressConfirm={() => {
+          getQrCodeData( wallet.secondaryMnemonic, 'Reset 2FA' );
           ( SecurityQuestionBottomSheet as any ).current.snapTo( 0 )
           Keyboard.dismiss()
         }}
@@ -323,7 +320,7 @@ const SubAccountTFAHelpScreen = ( { navigation, }: Props ) => {
         }}>
           <AppBottomSheetTouchableWrapper
             onPress={() => {
-              if( s3ServiceSecure.secureHDWallet.secondaryMnemonic ) {
+              if( wallet.secondaryMnemonic ) {
                 if ( SecurityQuestionBottomSheet.current ) {
                   ( SecurityQuestionBottomSheet as any ).current.snapTo( 1 )
                 }
