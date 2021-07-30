@@ -96,6 +96,11 @@ export interface Transaction {
    * Address corresponding to which this tx has been fetched
    */
   address?: string
+  type?: string
+  sender?: string
+  receiver?: string
+  tags?: string[]
+  notes?: string
 }
 
 export type TransactionDetails = Transaction

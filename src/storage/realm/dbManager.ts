@@ -1,5 +1,6 @@
 import db from './realm'
 import schema from './schema/Schema'
+//import { Account } from '../../bitcoin/utilities/Interface'
 
 const initDb = ( key ) => {
   db.init( key )
@@ -62,9 +63,52 @@ const updateWallet = async ( newWalletProps ) => {
 }
 
 const createAccount = async ( account ) => {
+  console.log( account )
   try {
+    const data = {
+      ...account,
+    }
+    if( account.activeAddresses ) {
+      const aa = {
+        internal: {
+        },
+        external: {
+        }
+      }
+      if( Object.keys( account.activeAddresses.external ).length > 0 ) {
+        for ( const [ key, value ] of Object.entries( account.activeAddresses.external ) ) {
+          aa.external.address = key
+          aa.external ={
+            ...value, ...aa
+          }
+        }
+      }
+      if( Object.keys( account.activeAddresses.internal ).length > 0 ) {
+        for ( const [ key, value ] of Object.entries( account.activeAddresses.external ) ) {
+          aa.internal.address = key
+          aa.internal ={
+            ...value, ...aa
+          }
+        }
+      }
+      data.activeAddresses = aa
+    }
+    if( data.txIdMap ){
+      if( Object.keys( data.txIdMap ).length === 0 ) {
+        delete data.txIdMap
+      } else {
+        const map = []
+        for ( const [ key, value ] of Object.entries( data.txIdMap ) ) {
+          map.push( {
+            id: key,
+            txIds: value
+          } )
+        }
+        data.txIdMap = map
+      }
+    }
     db.create( schema.Account, {
-      ...account, addressQueryList: []
+      ...data, addressQueryList: []
     }, true )
   } catch ( error ) {
     console.log( error )
@@ -72,12 +116,38 @@ const createAccount = async ( account ) => {
 }
 
 const updateAccount = async ( accountId, account ) => {
+  console.log( account )
+
   try {
     let acccountRef = db.objects( schema.Account ).filtered( `id = "${accountId}"` )
     const data = {
       ...account,
     }
-
+    if( account.activeAddresses ) {
+      const aa = {
+        internal: {
+        },
+        external: {
+        }
+      }
+      if( Object.keys( account.activeAddresses.external ).length > 0 ) {
+        for ( const [ key, value ] of Object.entries( account.activeAddresses.external ) ) {
+          aa.external.address = key
+          aa.external ={
+            ...aa, ...value
+          }
+        }
+      }
+      if( Object.keys( account.activeAddresses.internal ).length > 0 ) {
+        for ( const [ key, value ] of Object.entries( account.activeAddresses.internal ) ) {
+          aa.internal.address = key
+          aa.internal ={
+            ...aa, ...value
+          }
+        }
+      }
+      data.activeAddresses = aa
+    }
     if( data.txIdMap ){
       if( Object.keys( data.txIdMap ).length === 0 ) {
         delete data.txIdMap
