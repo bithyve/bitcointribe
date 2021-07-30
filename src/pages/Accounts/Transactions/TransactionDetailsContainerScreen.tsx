@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import { displayNameForBitcoinUnit } from '../../../common/data/enums/BitcoinUnit'
 import SubAccountKind from '../../../common/data/enums/SubAccountKind'
@@ -14,6 +14,8 @@ import TransactionDetailsHeader from './TransactionDetailsHeader'
 import openLink from '../../../utils/OpenLink'
 import config from '../../../bitcoin/HexaConfig'
 import SourceAccountKind from '../../../common/data/enums/SourceAccountKind'
+import Colors from '../../../common/Colors'
+import Fonts from '../../../common/Fonts'
 
 export type Props = {
   navigation: any;
@@ -71,7 +73,8 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
   }, [ transaction.transactionType ] )
 
   return (
-    <View style={styles.rootContainer}>
+    <ScrollView contentContainerStyle={styles.rootContainer} overScrollMode="never" bounces={false}>
+      <Text style={styles.textHeader}>Transaction Details</Text>
 
       <TransactionDetailsHeader
         transaction={transaction}
@@ -80,8 +83,8 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
 
       <View style={styles.bodySection}>
 
-        <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitle}>Amount</Text>
+        {/* <View style={styles.lineItem}>
+          <Text style={ListStyles.listItemTitleTransaction}>Amount</Text>
 
           <LabeledBalanceDisplay
             balance={transaction.amount}
@@ -96,20 +99,10 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
               marginBottom: -3
             }}
           />
-        </View>
+        </View> */}
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitle}>{destinationHeadingText}</Text>
-          <Text style={ListStyles.listItemSubtitle}>{destinationAddressText}</Text>
-        </View>
-
-        <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitle}>Fees</Text>
-          <Text style={ListStyles.listItemSubtitle}>{feeText}</Text>
-        </View>
-
-        <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitle}>Transaction ID</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>Transaction ID</Text>
           <Text style={ListStyles.listItemSubtitle} onPress={() =>
             openLink(
               `https://blockstream.info${
@@ -119,27 +112,50 @@ const TransactionDetailsContainerScreen: React.FC<Props> = ( { navigation, }: Pr
         </View>
 
         <View style={styles.lineItem}>
-          <Text style={ListStyles.listItemTitle}>Confirmations</Text>
+          <Text style={ListStyles.listItemTitleTransaction}>{destinationHeadingText}</Text>
+          <Text style={ListStyles.listItemSubtitle}>{destinationAddressText}</Text>
+        </View>
+
+        <View style={styles.lineItem}>
+          <Text style={ListStyles.listItemTitleTransaction}>Fees</Text>
+          <Text style={ListStyles.listItemSubtitle}>{feeText}</Text>
+        </View>
+
+        <View style={styles.lineItem}>
+          <Text style={ListStyles.listItemTitleTransaction}>Confirmations</Text>
           <Text style={ListStyles.listItemSubtitle}>{confirmationsText}</Text>
         </View>
 
       </View>
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create( {
   rootContainer: {
     flex: 1,
+    backgroundColor: Colors.backgroundColor,
+  },
+  textHeader: {
+    fontSize: 24,
+    color: Colors.blue,
+    marginHorizontal: 20,
+    marginVertical: 20,
+    fontFamily: Fonts.FiraSansRegular,
   },
 
   bodySection: {
     marginTop: 24,
-    paddingHorizontal: 24,
+    paddingHorizontal: 10,
   },
 
   lineItem: {
     marginBottom: RFValue( 16 ),
+    backgroundColor: 'white',
+    padding: 10,
+    paddingHorizontal: 10,
+    elevation: 4,
+    borderRadius: 8,
   },
 } )
 
