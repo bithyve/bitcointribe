@@ -303,37 +303,28 @@ export const feeAndExchangeRatesWatcher = createWatcher(
   FETCH_FEE_AND_EXCHANGE_RATES
 )
 
-function* resetTwoFAWorker( { payload } ) {
-  const service: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
+function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string }} ) {
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const { secondaryMnemonic } = payload
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
+  const { secret: twoFAKey } = yield call( AccountUtilities.resetTwoFA, wallet.walletId, wallet.secondaryWalletId, secondaryMnemonic, wallet.details2FA.secondaryXpub, network )
 
-  const res = yield call( service.resetTwoFA, payload.secondaryMnemonic )
-
-  if ( res.status == 200 ) {
-    yield put( twoFAResetted( true ) )
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ SECURE_ACCOUNT ]: JSON.stringify( service ),
-    }
-    console.log( 'updatedSERVICES', updatedSERVICES )
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
+  if( twoFAKey ){
+    const updatedWallet = {
+      ...wallet,
+      details2FA: {
+        ...wallet.details2FA,
+        twoFAKey
       }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    console.log( 'Failed to reset twoFA', res.err )
-    yield put( twoFAResetted( false ) )
+    }
+    yield put( updateWallet( updatedWallet ) )
   }
+  else throw new Error( 'Failed to reset twoFA' )
 }
 
 export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
 
 function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
-  // TODO: read wallet from realm
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { token } = payload
   const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
@@ -457,16 +448,16 @@ function* setup2FADetails( wallet: Wallet ) {
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
-  console.log( {
-    setupData
-  } )
   const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, network, rootDerivationPath )
+
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
     secondaryMemonic,
+    secondaryWalletId,
     details2FA: {
       secondaryXpub,
       bithyveXpub,

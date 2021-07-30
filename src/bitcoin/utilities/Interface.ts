@@ -814,6 +814,7 @@ export interface Wallet {
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
   secondaryMemonic?: string,
+  secondaryWalletId?: string,
   details2FA? : {
     secondaryXpub: string,
     bithyveXpub: string,
