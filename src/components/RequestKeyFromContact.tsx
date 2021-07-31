@@ -35,7 +35,7 @@ export default function RequestKeyFromContact( props ) {
   } )
 
   useEffect( () => {
-    setShareLink( props.link )
+    setShareLink( props.link.replace( /\s+/g, '' ) )
     // if ( props.infoText ) setInfoText( props.infoText )
   }, [ props.link ] )
 
@@ -77,8 +77,6 @@ export default function RequestKeyFromContact( props ) {
 
     }
   }
-  console.log( 'props.QR', props.QR )
-
   return (
     <View style={styles.modalContainer}>
       <ScrollView>
@@ -167,19 +165,6 @@ export default function RequestKeyFromContact( props ) {
           width={'22%'}
           height={'22%'}
         />
-
-        <View style={{
-          marginVertical: hp( 2 )
-        }}>
-          <BottomInfoBox
-            title={'Secure with 2FA'}
-            infoText={
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid'
-            }
-            backgroundColor={Colors.white}
-          />
-        </View>
-
       </ScrollView>
 
     </View>

@@ -1,8 +1,8 @@
 import React, { ReactElement, useCallback } from 'react'
 import {
   FlatList,
+  TouchableOpacity
 } from 'react-native'
-import { TouchableOpacity } from '@gorhom/bottom-sheet'
 import _ from 'lodash'
 import TransactionDescribing from '../../common/data/models/Transactions/Interfaces'
 import TransactionsListItem from './AccountDetailsTransactionsListItem'
