@@ -163,6 +163,11 @@ export const CloudData = async ( database, accountShells, activePersonalNode, ve
   }
 }
 
+export const WIEncryption = async ( image, answer ) => {
+  console.log( 'image', image )
+  return await encrypt( image, answer )
+}
+
 export const getCurrencyImageByRegion = (
   currencyCode: string,
   type: 'light' | 'dark' | 'gray' | 'light_blue',

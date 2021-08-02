@@ -874,6 +874,7 @@ const asyncDataToBackup = async () => {
 
 function* updateWalletImageWorker() {
   //console.log( 'Update Wallet Image' )
+  yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
   const s3Service: S3Service = yield select( ( state ) => state.health.service )
   const wallet = yield call( dbManager.getWallet )
   const contacts = yield call( dbManager.getTrustedContacts )
@@ -1002,11 +1003,13 @@ function* updateWalletImageWorker() {
   //const getWI = yield call( s3Service.fetchWalletImage )
   if ( res.status === 200 ) {
     if ( res.data ) console.log( 'Wallet Image updated' )
+    yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
     //yield call( AsyncStorage.setItem, 'WI_HASHES', JSON.stringify( hashesWI ) )
   } else {
     console.log( {
       err: res.err
     } )
+    yield put( switchS3LoadingStatus( 'updateWIStatus' ) )
     throw new Error( 'Failed to update Wallet Image' )
   }
 }

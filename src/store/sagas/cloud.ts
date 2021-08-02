@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { NativeModules, Platform } from 'react-native'
 import { call, put, select } from 'redux-saga/effects'
-import { CloudData, getLevelInfo } from '../../common/CommonFunctions'
+import { WIEncryption, getLevelInfo } from '../../common/CommonFunctions'
 import { REGULAR_ACCOUNT, SECURE_ACCOUNT } from '../../common/constants/wallet-service-types'
 import { UPDATE_HEALTH_FOR_CLOUD, SET_CLOUD_DATA, UPDATE_CLOUD_HEALTH, CHECK_CLOUD_BACKUP, UPDATE_DATA, CREATE_FILE, CHECK_IF_FILE_AVAILABLE, READ_FILE, UPLOAD_FILE, GOOGLE_DRIVE_LOGIN, setGoogleCloudLoginSuccess, GET_CLOUD_DATA_RECOVERY, setCloudDataRecovery, setIsCloudBackupUpdated, setIsCloudBackupSuccess, GOOGLE_LOGIN, setIsFileReading, setGoogleCloudLoginFailure, setCloudBackupStatus, setCloudBackupHistory, UPDATE_CLOUD_BACKUP } from '../actions/cloud'
 import { putKeeperInfo, updatedKeeperInfo, updateMSharesHealth } from '../actions/health'
@@ -63,66 +63,67 @@ function* cloudWorker( { payload } ) {
       }
       yield put( putKeeperInfo( keeperInfo ) )
       const regularAccount = yield select( ( state ) => state.accounts[ REGULAR_ACCOUNT ].service )
-      const database = yield select( ( state ) => state.storage.database )
-      const accountShells = yield select( ( state ) => state.accounts.accountShells )
-      const activePersonalNode = yield select( ( state ) => state.nodeSettings.activePersonalNode )
-      const versionHistory = yield select( ( state ) => state.versionHistory.versions )
-      const trustedContactsInfo = yield select( ( state ) => state.trustedContacts.trustedContactsInfo )
       const cloudBackupHistory = yield select( ( state ) => state.cloud.cloudBackupHistory )
       const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
       const wallet: Wallet = yield select(
         ( state ) => state.storage.wallet
       )
 
-      let encryptedCloudDataJson
+      // Create Updated Wallet Image
       const shares = RK ? JSON.stringify( RK ) : ''
-      encryptedCloudDataJson = yield call( CloudData,
-        database,
-        accountShells,
-        activePersonalNode,
-        versionHistory,
-        trustedContactsInfo
-      )
-      // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
-      const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
+      let encryptedCloudDataJson
+      const getWI = yield call( s3Service.fetchWalletImage )
+      if( getWI.status == 200 ){
+        console.log( 'getWI.data.walletImage', JSON.stringify( getWI.data.walletImage ) )
+        encryptedCloudDataJson = yield call( WIEncryption,
+          getWI.data.walletImage,
+          wallet.security.answer
+        )
+        // console.log("encryptedCloudDataJson cloudWorker", encryptedCloudDataJson)
+        const bhXpub = wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : ''
 
-      const data = {
-        levelStatus: level ? level : 1,
-        shares: shares,
-        secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
-        encryptedCloudDataJson: encryptedCloudDataJson,
-        walletName: wallet.walletName,
-        questionId: wallet.security.questionId,
-        question: wallet.security.questionId === '0' ? wallet.security.question: '',
-        regularAccount: regularAccount,
-        keeperData: JSON.stringify( keeperInfo ),
-        bhXpub,
-      }
-
-      const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
-        payload: {
-          data, share
+        const data = {
+          levelStatus: level ? level : 1,
+          shares: shares,
+          secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
+          encryptedCloudDataJson: encryptedCloudDataJson,
+          walletName: wallet.walletName,
+          questionId: wallet.security.questionId,
+          question: wallet.security.questionId === '0' ? wallet.security.question: '',
+          regularAccount: regularAccount,
+          keeperData: JSON.stringify( keeperInfo ),
+          bhXpub,
         }
-      } )
 
-      if( isCloudBackupCompleted ) {
-        yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
-        yield call( updateHealthForCloudStatusWorker, {
-          payload : {
-            share
+        const isCloudBackupCompleted = yield call ( checkCloudBackupWorker, {
+          payload: {
+            data, share
           }
         } )
-        const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
-        const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
 
-        yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+        if( isCloudBackupCompleted ) {
+          yield put( setCloudBackupStatus( CloudBackupStatus.COMPLETED ) )
+          yield call( updateHealthForCloudStatusWorker, {
+            payload : {
+              share
+            }
+          } )
+          const title = Platform.OS == 'ios' ? 'iCloud backup confirmed' : 'GoogleDrive backup confirmed'
+          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+
+          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+        } else {
+          const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
+          const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
+          yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
+          yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
+        }
       } else {
         const title = Platform.OS == 'ios' ? 'iCloud backup failed' : 'GoogleDrive backup failed'
         const updatedCloudBackupHistory = yield call ( saveConfirmationHistory, title, cloudBackupHistory )
         yield put( setCloudBackupHistory( updatedCloudBackupHistory ) )
         yield put( setCloudBackupStatus( CloudBackupStatus.FAILED ) )
       }
-
     }
   }
   catch ( error ) {
