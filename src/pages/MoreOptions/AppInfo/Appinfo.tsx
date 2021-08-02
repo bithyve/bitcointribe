@@ -6,13 +6,12 @@ import {
   SafeAreaView,
   StatusBar,
   TouchableOpacity,
-  Platform,
   ImageSourcePropType,
   Image,
-  FlatList
+  FlatList,
+  Keyboard
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { connect } from 'react-redux'
 import idx from 'idx'
 
 import {
@@ -27,7 +26,14 @@ import Colors from '../../../common/Colors'
 import HeaderTitle from '../../../components/HeaderTitle'
 import { AppBottomSheetTouchableWrapper } from '../../../components/AppBottomSheetTouchableWrapper'
 import { getVersions } from '../../../common/utilities'
-
+import ModalContainer from '../../../components/home/ModalContainer'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { updateShareHistory } from '../../../store/actions/sss'
+import SecurityQuestion from './SecurityQuestion'
+import EnterPasscodeScreen from './EnterPasscodeScreen'
+import EditWalletName from './EditWalletName'
+import EditWalletSuccess from './EditWalletSuccess'
+import { setupWallet } from '../../../store/actions/setupAndAuth'
 interface MenuOption {
     title: string;
     subtitle: string;
@@ -36,29 +42,38 @@ interface MenuOption {
     onOptionPressed?: () => void;
     // isSwitch: boolean;
   }
-const menuOptions: MenuOption[] = [
-  {
-    title: 'Wallet Name',
-    imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
-    subtitle: 'Lorem Ipsum dolor amet cons',
-    screenName: 'WalletSettings',
-  },
-  {
-    title: 'Version History',
-    imageSource: require( '../../../assets/images/icons/icon_versionhistory_tilt.png' ),
-    subtitle: 'App version progression',
-    screenName: 'AppInfo',
-  },
-]
+
 
 const AppInfo = ( props ) => {
+  const [ securityQue, showSecurityQuestion ] = useState( false )
+  const [ securityPin, showSecurityPin ] = useState( false )
+  const [ editName, showEditName ] = useState( false )
+  const [ success, setSuccess ] = useState( false )
   const walletName = useSelector(
     ( state ) => state.storage.wallet.walletName,
   )
+  const { security } = useSelector(
+    ( state ) => state.storage.wallet,
+  )
+  const dispatch = useDispatch()
+
   const versionHistory = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.versions ) )
   const restoreVersions = useSelector( ( state ) => idx( state, ( _ ) => _.versionHistory.restoreVersions ) )
 
-
+  const menuOptions: MenuOption[] = [
+    {
+      title: 'Wallet Name',
+      imageSource: require( '../../../assets/images/icons/icon_wallet_setting.png' ),
+      subtitle: 'Lorem Ipsum dolor amet cons',
+      onOptionPressed: () => showModal()
+    },
+    {
+      title: 'Version History',
+      imageSource: require( '../../../assets/images/icons/icon_versionhistory_tilt.png' ),
+      subtitle: 'App version progression',
+      screenName: 'VersionHistory',
+    },
+  ]
   const listItemKeyExtractor = ( item: MenuOption ) => item.title
   const [ data, setData ] = useState( [] )
 
@@ -66,10 +81,51 @@ const AppInfo = ( props ) => {
     const versions = getVersions( versionHistory, restoreVersions )
     if( versions.length ){
       setData( versions )
-
-    // setIsDataSet(!isDataSet);
-    // SelectOption( versions.length )
     }
+  }, [] )
+
+  const showModal = () => {
+    showSecurityQuestion( true )
+
+  }
+
+  const handleOptionSelection = ( menuOption: MenuOption ) => {
+    if ( typeof menuOption.onOptionPressed === 'function' ) {
+      menuOption.onOptionPressed()
+    } else if ( menuOption.screenName !== undefined ) {
+      props.navigation.navigate( menuOption.screenName )
+    }
+  }
+
+  const saveConfirmationHistory = async () => {
+    const securityQuestionHistory = JSON.parse(
+      await AsyncStorage.getItem( 'securityQuestionHistory' ),
+    )
+    if ( securityQuestionHistory ) {
+      const updatedSecurityQuestionsHistory = {
+        ...securityQuestionHistory,
+        confirmed: Date.now(),
+      }
+      updateShareHistory( updatedSecurityQuestionsHistory )
+      await AsyncStorage.setItem(
+        'securityQuestionHistory',
+        JSON.stringify( updatedSecurityQuestionsHistory ),
+      )
+    }
+  }
+
+  const requestSecurityQuestionModal = useCallback( () => {
+    return (
+      <SecurityQuestion
+        onClose={() => showSecurityQuestion( false )}
+        onPressConfirm={async () => {
+          Keyboard.dismiss()
+          saveConfirmationHistory()
+          showSecurityQuestion( false )
+          showSecurityPin( true )
+        }}
+      />
+    )
   }, [] )
 
   return (
@@ -77,7 +133,39 @@ const AppInfo = ( props ) => {
       flex: 1, backgroundColor: Colors.backgroundColor
     }}>
       <StatusBar backgroundColor={Colors.backgroundColor} barStyle="dark-content" />
-      {/* <View style={NavStyles.modalContainer}> */}
+      <ModalContainer visible={securityQue} closeBottomSheet={() => {}}>
+        {requestSecurityQuestionModal()}
+      </ModalContainer>
+      <ModalContainer visible={securityPin} closeBottomSheet={() => {}}>
+        <EnterPasscodeScreen
+          closeBottomSheet={() => showSecurityPin( false )}
+          onPressConfirm={async () => {
+            Keyboard.dismiss()
+            showSecurityPin( false )
+            showEditName( true )
+          }}
+        />
+      </ModalContainer>
+      <ModalContainer visible={editName} closeBottomSheet={() => {}}>
+        <EditWalletName
+          closeBottomSheet={() => showEditName( false )}
+          onPressConfirm={async ( newName ) => {
+            dispatch( setupWallet( newName, security ) )
+            showEditName( false )
+            setSuccess( true )
+          }}
+        />
+      </ModalContainer>
+      <ModalContainer visible={success} closeBottomSheet={() => {}}>
+        <EditWalletSuccess
+          closeBottomSheet={() => setSuccess( false )}
+          onPressConfirm={() => {
+            setSuccess( false )
+            props.navigation.navigate( 'Home' )
+          }}
+        />
+      </ModalContainer>
+
       <View style={[ CommonStyles.headerContainer, {
         backgroundColor: Colors.backgroundColor
       } ]}>
@@ -107,16 +195,9 @@ const AppInfo = ( props ) => {
       <FlatList
         data={menuOptions}
         keyExtractor={listItemKeyExtractor}
-        // ItemSeparatorComponent={() => (
-        //   <View style={{
-        //     backgroundColor: Colors.white
-        //   }}>
-        //     <View style={styles.separatorView} />
-        //   </View>
-        // )}
         renderItem={( { item: menuOption }: { item: MenuOption } ) => {
           return <AppBottomSheetTouchableWrapper
-            onPress={() => {}}
+            onPress={() => handleOptionSelection( menuOption )}
             style={styles.addModalView}
           >
             <View style={styles.modalElementInfoView}>
@@ -140,25 +221,9 @@ const AppInfo = ( props ) => {
                 {menuOption.title === 'Wallet Name' ?
                   <Text style={styles.headerTitleText}>{`${walletName}’s Wallet`}</Text>
                   :
-                  <Text style={styles.headerTitleText}>{`Hexa ${data[ 0 ].version}`}</Text>
+                  <Text style={styles.headerTitleText}>{`Hexa ${data && data.length && data[ 0 ].version}`}</Text>
                 }
               </View>
-              {/* {menuOption.isSwitch &&
-                <View style={{
-                  alignItems: 'flex-end',
-                  marginLeft: 'auto'
-                }}>
-                  <Switch
-                    value={isEnabled}
-                    onValueChange={toggleSwitch}
-                    thumbColor={isEnabled ? Colors.blue : Colors.white}
-                    trackColor={{
-                      false: Colors.borderColor, true: Colors.lightBlue
-                    }}
-                    onTintColor={Colors.blue}
-                  />
-                </View>
-                  } */}
             </View>
 
           </AppBottomSheetTouchableWrapper>
@@ -177,32 +242,6 @@ const styles = StyleSheet.create( {
     alignSelf: 'center',
     marginHorizontal: wp( 2 )
   },
-  accountCardsSectionContainer: {
-    height: hp( '70.83%' ),
-    // marginTop: 30,
-    backgroundColor: Colors.backgroundColor,
-    borderTopLeftRadius: 25,
-    shadowColor: 'black',
-    shadowOpacity: 0.4,
-    shadowOffset: {
-      width: 2,
-      height: -1,
-    },
-    flexDirection: 'column',
-    justifyContent: 'space-around'
-  },
-  modalContentContainer: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-
-  separatorView: {
-    marginLeft: 15,
-    marginRight: 15,
-    height: 2,
-    backgroundColor: Colors.backgroundColor,
-  },
-
   addModalView: {
     backgroundColor: Colors.white,
     paddingVertical: 4,
@@ -237,29 +276,6 @@ const styles = StyleSheet.create( {
     // justifyContent: 'center',
     // alignItems: 'center',
   },
-
-  webLinkBarContainer: {
-    flexDirection: 'row',
-    elevation: 10,
-    shadowColor: '#00000017',
-    shadowOpacity: 1,
-    shadowRadius: 10,
-    backgroundColor: Colors.white,
-    justifyContent: 'space-around',
-    height: 40,
-    alignItems: 'center',
-    marginHorizontal: 16,
-    paddingHorizontal: 10,
-    marginBottom: hp( 2 ),
-    borderRadius: 10,
-  },
 } )
 
-const mapStateToProps = ( state ) => {
-  return {
-    walletName:
-      idx( state, ( _ ) => _.storage.wallet.walletName ) || '',
-  }
-}
-
-export default connect( mapStateToProps, null )( AppInfo )
+export default AppInfo

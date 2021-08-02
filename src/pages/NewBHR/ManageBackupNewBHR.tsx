@@ -1062,7 +1062,7 @@ Wallet Backup
                 )
               } )}
             </View>
-            <View style={styles.modalElementInfoView}>
+            {/* <View style={styles.modalElementInfoView}>
               <View style={{
                 justifyContent: 'center',
               }}>
@@ -1083,7 +1083,7 @@ Wallet Backup
                   onTintColor={Colors.blue}
                 />
               </View>
-            </View>
+            </View> */}
             <View style={{
               marginTop: wp( '5%' ), backgroundColor: Colors.white, height: '100%',
               borderTopLeftRadius: wp( 4 ),

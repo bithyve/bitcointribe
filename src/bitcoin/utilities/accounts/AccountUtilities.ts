@@ -407,6 +407,7 @@ export default class AccountUtilities {
       nextFreeAddressIndex: number;
       nextFreeChangeAddressIndex: number;
       activeAddresses: ActiveAddresses;
+      activeAddressesWithNewTxs: ActiveAddresses,
     }
    }
   }> => {
@@ -663,6 +664,20 @@ export default class AccountUtilities {
 
         const transactions: Transaction[] = [ ...newTxs, ...txsToUpdate, ...upToDateTxs ]
 
+        const activeAddressesWithNewTxs: ActiveAddresses = {
+          external: {
+          },
+          internal: {
+          }
+        }
+        newTxs.forEach( tx => {
+          const addresses = txIdMap[ tx.txid ]
+          addresses.forEach( address => {
+            if( activeAddresses.external[ address ] ) activeAddressesWithNewTxs.external[ address ] = activeAddresses.external[ address ]
+            else if( activeAddresses.internal[ address ] ) activeAddressesWithNewTxs.internal[ address ]  = activeAddresses.internal[ address ]
+          } )
+        } )
+
         // pop addresses from the query list if tx-conf > 6
         txsToUpdate.forEach( tx => {
           if( tx.confirmations > 6 ){
@@ -690,6 +705,7 @@ export default class AccountUtilities {
           nextFreeAddressIndex: lastUsedAddressIndex + 1,
           nextFreeChangeAddressIndex: lastUsedChangeAddressIndex + 1,
           activeAddresses,
+          activeAddressesWithNewTxs,
         }
       }
 
@@ -928,6 +944,53 @@ export default class AccountUtilities {
     }
   }
 
+  static resetTwoFA = async (
+    walletID: string,
+    secondaryID: string,
+    secondaryMnemonic: string,
+    secondaryXpub: string,
+    network: bitcoinJS.networks.Network
+  ): Promise<{
+    qrData: any;
+    secret: any;
+  }> => {
+    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
+
+    let res: AxiosResponse
+    try {
+      res = await SIGNING_AXIOS.post( 'resetTwoFA', {
+        HEXA_ID: config.HEXA_ID,
+        walletID: walletID,
+        secondaryID,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+    const { qrData, secret } = res.data
+    return {
+      qrData, secret
+    }
+  };
+
+  static generateSecondaryXpriv = (
+    secondaryMnemonic: string,
+    secondaryXpub: string,
+    network: bitcoinJS.networks.Network
+  ): {
+    secondaryXpriv: string
+  } => {
+    const rootDerivationPath = AccountUtilities.getDerivationPath( NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
+    const derivedSecondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+    if ( derivedSecondaryXpub !== secondaryXpub ) throw new Error( 'Invaild secondary mnemonic' )
+
+    const secondaryXpriv = AccountUtilities.generateExtendedKey( secondaryMnemonic, true, network, rootDerivationPath )
+    return {
+      secondaryXpriv
+    }
+  };
 
   static getSecondSignature = async (
     walletId: string,

@@ -167,6 +167,12 @@ export default class TrustedContactsOperations {
       }
 
       if ( primaryData ) {
+        if( primaryData.paymentAddresses ){
+          primaryData.paymentAddresses = {
+            ...unencryptedOutstream.primaryData.paymentAddresses,
+            ...primaryData.paymentAddresses
+          }
+        }
         unencryptedOutstream.primaryData = {
           ...unencryptedOutstream.primaryData,
           ...primaryData,

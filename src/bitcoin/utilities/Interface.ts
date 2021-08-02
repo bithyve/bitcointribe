@@ -96,6 +96,11 @@ export interface Transaction {
    * Address corresponding to which this tx has been fetched
    */
   address?: string
+  type?: string
+  sender?: string
+  receiver?: string
+  tags?: string[]
+  notes?: string
 }
 
 export type TransactionDetails = Transaction
@@ -784,17 +789,22 @@ export interface UTXO {
   status?: any;
 }
 
+export interface ActiveAddressAssignee{
+    type: AccountType;
+    id?: string;
+    sender?: string;
+}
 export interface ActiveAddresses {
   external: {
     [address: string]: {
       index: number,
-      assignedTo: AccountType,
+      assignee: ActiveAddressAssignee,
     }
   }
   internal: {
     [address: string]: {
       index: number,
-      assignedTo: AccountType,
+      assignee: ActiveAddressAssignee,
     }
   }
 }
@@ -809,7 +819,8 @@ export interface Wallet {
   walletName: string,
   security: { questionId: string, question: string, answer: string },
   primaryMnemonic: string,
-  secondaryMemonic?: string,
+  secondaryMnemonic?: string,
+  secondaryWalletId?: string,
   details2FA? : {
     secondaryXpub: string,
     bithyveXpub: string,

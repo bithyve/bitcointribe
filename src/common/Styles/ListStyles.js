@@ -22,10 +22,14 @@ const ListStyles = StyleSheet.create( {
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
   },
-
+  listItemTitleTransaction: {
+    color: Colors.blue,
+    fontSize: RFValue( 15 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
   listItemTitle: {
     color: Colors.black,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 15 ),
     fontFamily: Fonts.FiraSansRegular,
   },
 
@@ -37,9 +41,14 @@ const ListStyles = StyleSheet.create( {
 
   listItemSubtitle: {
     color: Colors.textColorGrey,
-    fontSize: RFValue( 11 ),
+    fontSize: RFValue( 13 ),
     fontFamily: Fonts.FiraSansRegular,
     marginTop: 3,
+  },
+  textAmt: {
+    fontSize: RFValue( 18 ),
+    fontFamily: Fonts.FiraSansRegular,
+    color: Colors.textColorGrey,
   },
   listItemContentContainer: {
     // paddingVertical: 10,

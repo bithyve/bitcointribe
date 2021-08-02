@@ -136,6 +136,8 @@ import TrustedContacts from '../../bitcoin/utilities/TrustedContacts'
 import { ChannelAssets } from '../../bitcoin/utilities/Interface'
 import useStreamFromContact from '../../utils/hooks/trusted-contacts/UseStreamFromContact'
 import { initializeTrustedContact, InitTrustedContactFlowKind, PermanentChannelsSyncKind, syncPermanentChannels } from '../actions/trustedContacts'
+import { syncPermanentChannelsWorker } from '../sagas/trustedContacts'
+
 import SSS from '../../bitcoin/utilities/sss/SSS'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Relay from '../../bitcoin/utilities/Relay'
@@ -210,7 +212,7 @@ function* generateMetaSharesWorker( { payload } ) {
   const wallet: Wallet = yield select(
     ( state ) => state.storage.wallet
   )
-  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMemonic ? wallet.secondaryMemonic : ''
+  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
 
   const secureAssets = {
     secondaryMnemonic: secondaryMnemonic,
@@ -1745,7 +1747,7 @@ function* generateSMMetaSharesWorker( { payload } ) {
   const wallet: Wallet = yield select(
     ( state ) => state.storage.wallet
   )
-  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMemonic ? wallet.secondaryMemonic : ''
+  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMnemonic ? wallet.secondaryMnemonic : ''
   const res = yield call(
     s3Service.generateSMShares,
     secondaryMnemonic,
@@ -2115,12 +2117,25 @@ export const downloadSMShareWatcher = createWatcher(
   DOWNLOAD_SM_SHARE
 )
 
-function* createOrChangeGuardianWorker( { payload } ) {
+function* createOrChangeGuardianWorker( { payload: data } ) {
   try {
-    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = payload
+    const { channelKey, shareId, contact, index, isChange, oldChannelKey, existingContact } = data
     const MetaShares: MetaShare[] = yield select(
       ( state ) => state.health.service.levelhealth.metaSharesKeeper,
     )
+    const contactInfo = {
+      channelKey,
+    }
+    const channelUpdate =  {
+      contactInfo
+    }
+    const payload = {
+      permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+      channelUpdates: [ channelUpdate ],
+    }
+    yield call( syncPermanentChannelsWorker, {
+      payload
+    } )
     const channelAssets: ChannelAssets = yield select( ( state ) => state.health.channelAssets )
     const s3Service = yield select( ( state ) => state.health.service )
     const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
@@ -2172,7 +2187,6 @@ function* createOrChangeGuardianWorker( { payload } ) {
         } ) )
         const temporaryContact: TrustedContact = contacts[ channelKey ] // temporary trusted contact object
         const instream = useStreamFromContact( temporaryContact, walletId, true )
-        console.log( 'EXISTING CONTACT instream', instream )
         const fcmToken: string = idx( instream, ( _ ) => _.primaryData.FCM )
         const notification: INotification = {
           notificationType: notificationType.FNF_KEEPER_REQUEST,

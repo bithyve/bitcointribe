@@ -131,7 +131,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     'Getting the latest details'
   ]
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ height, setHeight ] = useState( 65 )
+  const [ height, setHeight ] = useState( 72 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -198,13 +198,13 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     const keyboardDidShowListener = Keyboard.addListener(
       'keyboardDidShow',
       () => {
-        setHeight( 82 )
+        setHeight( 85 )
       }
     )
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 65 )
+        setHeight( 72 )
       }
     )
 
@@ -751,15 +751,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View> */}
         </View> : null}
         <View style={{
-          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+          marginTop: showNote ? hp( '0%' ) :'auto',
           marginBottom: hp( 1 )
         }}>
+          {pswd.length === 0 && confirmPswd.length === 0 &&
           <BottomInfoBox
             title={'Note'}
             infoText={'Make sure you remember the encryption password and keep it safe'}
             italicText={''}
             backgroundColor={Colors.white}
           />
+          }
         </View>
       </KeyboardAwareScrollView>
       // </ScrollView>
@@ -1114,15 +1116,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           </View> */}
           </View> : null}
           <View style={{
-            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+            marginTop: showNote ? hp( '0%' ) : hp( '2%' ),
             marginBottom: hp( 1 )
           }}>
+            {answer.length === 0 && confirmAnswer.length === 0 &&
             <BottomInfoBox
               title={'Note'}
               infoText={'The Answer is used to encrypt the backup. The Security Question acts as a hint to remember the same'}
               italicText={''}
               backgroundColor={Colors.white}
             />
+            }
           </View>
         </View>
       </KeyboardAwareScrollView>

@@ -1,5 +1,5 @@
 import { call, put, select } from 'redux-saga/effects'
-import { createWatcher, requestTimedout } from '../utils/utilities'
+import { createWatcher } from '../utils/utilities'
 import {
   GET_TESTCOINS,
   GENERATE_SECONDARY_XPRIV,
@@ -49,11 +49,15 @@ import {
   Account,
   Accounts,
   AccountType,
+  ActiveAddressAssignee,
+  ActiveAddresses,
+  ContactInfo,
   DonationAccount,
   MultiSigAccount,
   NetworkType,
   TrustedContact,
   Trusted_Contacts,
+  UnecryptedStreamData,
   Wallet,
 } from '../../bitcoin/utilities/Interface'
 import SubAccountDescribing from '../../common/data/models/SubAccountInfo/Interfaces'
@@ -86,9 +90,12 @@ import dbManager from '../../storage/realm/dbManager'
 import _ from 'lodash'
 import Relay from '../../bitcoin/utilities/Relay'
 import AccountVisibility from '../../common/data/enums/AccountVisibility'
+import { syncPermanentChannelsWorker } from './trustedContacts'
+import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
+import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 
 // to be used by react components(w/ dispatch)
-export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: AccountType ) {
+export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
   const { updatedAccount, receivingAddress } = AccountOperations.getNextFreeExternalAddress( account, requester )
   dispatch( updateAccounts( {
     accounts: {
@@ -100,7 +107,7 @@ export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAc
 }
 
 // to be used by sagas(w/o dispatch)
-export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: AccountType ) {
+export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
   const { updatedAccount, receivingAddress } = yield call( AccountOperations.getNextFreeExternalAddress, account, requester )
   yield put( updateAccounts( {
     accounts: {
@@ -109,6 +116,53 @@ export function* getNextFreeAddressWorker( account: Account | MultiSigAccount, r
   } ) )
   yield call( dbManager.updateAccount, ( updatedAccount as Account ).id, updatedAccount )
   return receivingAddress
+}
+
+function* updatePaymentAddressesToChannels( activeAddressesWithNewTxsMap: {
+  [accountId: string]: ActiveAddresses
+}, synchedAccounts ){
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  const channelUpdates = []
+  for( const accountId of Object.keys( activeAddressesWithNewTxsMap ) ){
+    const newTxActiveAddresses: ActiveAddresses = activeAddressesWithNewTxsMap[ accountId ]
+
+    for( const address of Object.keys( newTxActiveAddresses.external ) ) {
+      const { assignee } = newTxActiveAddresses.external[ address ]
+      if( assignee.type === AccountType.FNF_ACCOUNT ){
+        const channelKey = assignee.id
+        const streamUpdates: UnecryptedStreamData = {
+          streamId: TrustedContactsOperations.getStreamId( wallet.walletId ),
+          primaryData: {
+            paymentAddresses: {
+              [ ( synchedAccounts[ accountId ] as Account ).type ]: yield call( getNextFreeAddressWorker, synchedAccounts[ accountId ], assignee )
+            }
+          },
+          metaData: {
+            flags:{
+              active: true,
+              newData: true,
+              lastSeen: Date.now(),
+            },
+          }
+        }
+
+        const contactInfo: ContactInfo = {
+          channelKey: channelKey,
+        }
+        channelUpdates.push( {
+          contactInfo, streamUpdates
+        } )
+      }
+    }
+  }
+
+  if( Object.keys( channelUpdates ).length )
+    yield call ( syncPermanentChannelsWorker, {
+      payload: {
+        permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
+        channelUpdates
+      }
+    } )
 }
 
 function* syncAccountsWorker( { payload }: {payload: {
@@ -134,16 +188,17 @@ function* syncAccountsWorker( { payload }: {payload: {
       [ synchedAccount.id ]: synchedAccount
     }
     return {
-      synchedAccounts, txsFound
+      synchedAccounts, txsFound, activeAddressesWithNewTxsMap: {
+      }
     }
   } else {
-    const { synchedAccounts, txsFound } = yield call(
+    const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call(
       AccountOperations.syncAccountsByActiveAddresses,
       accounts,
       network )
 
     return {
-      synchedAccounts, txsFound
+      synchedAccounts, txsFound, activeAddressesWithNewTxsMap
     }
   }
 
@@ -154,31 +209,30 @@ export const syncAccountsWatcher = createWatcher(
   SYNC_ACCOUNTS
 )
 
-function* generateSecondaryXprivWorker( { payload } ) {
-  const service = yield select(
-    ( state ) => state.accounts[ payload.serviceType ].service
-  )
-  console.log( 'service', service )
+function* generateSecondaryXprivWorker( { payload }: { payload: { accountShell: AccountShell, secondaryMnemonic: string } } ) {
+  const { secondaryMnemonic, accountShell } = payload
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const accountsState: AccountsState = yield select( ( state ) => state.accounts )
+  const account = ( accountsState.accounts[ accountShell.primarySubAccount.id ] as MultiSigAccount )
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
 
-  const { generated } = service.generateSecondaryXpriv(
-    payload.secondaryMnemonic
+  const { secondaryXpriv } = yield call( AccountUtilities.generateSecondaryXpriv,
+    secondaryMnemonic,
+    wallet.details2FA.secondaryXpub,
+    network,
   )
-  console.log( 'generated', generated )
-  if ( generated ) {
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ payload.serviceType ]: JSON.stringify( service ),
-    }
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
+
+  if ( secondaryXpriv ){
+    account.xprivs.secondary = secondaryXpriv
+    yield put( updateAccounts( {
+      accounts: {
+        [ account.id ]: account
       }
-    } )
+    } ) )
+    yield call( dbManager.updateAccount, account.id, account )
     yield put( secondaryXprivGenerated( true ) )
-  } else {
-    yield put( secondaryXprivGenerated( false ) )
   }
+  else yield put( secondaryXprivGenerated( false ) )
 }
 
 export const generateSecondaryXprivWatcher = createWatcher(
@@ -248,52 +302,39 @@ export const feeAndExchangeRatesWatcher = createWatcher(
   FETCH_FEE_AND_EXCHANGE_RATES
 )
 
-function* resetTwoFAWorker( { payload } ) {
-  const service: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
+function* resetTwoFAWorker( { payload }: { payload: { secondaryMnemonic: string }} ) {
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const { secondaryMnemonic } = payload
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
+  const { secret: twoFAKey } = yield call( AccountUtilities.resetTwoFA, wallet.walletId, wallet.secondaryWalletId, secondaryMnemonic, wallet.details2FA.secondaryXpub, network )
 
-  const res = yield call( service.resetTwoFA, payload.secondaryMnemonic )
-
-  if ( res.status == 200 ) {
-    yield put( twoFAResetted( true ) )
-    const { SERVICES } = yield select( ( state ) => state.storage.database )
-    const updatedSERVICES = {
-      ...SERVICES,
-      [ SECURE_ACCOUNT ]: JSON.stringify( service ),
-    }
-    console.log( 'updatedSERVICES', updatedSERVICES )
-    yield call( insertDBWorker, {
-      payload: {
-        SERVICES: updatedSERVICES
+  if( twoFAKey ){
+    const updatedWallet = {
+      ...wallet,
+      details2FA: {
+        ...wallet.details2FA,
+        twoFAKey
       }
-    } )
-  } else {
-    if ( res.err === 'ECONNABORTED' ) requestTimedout()
-    console.log( 'Failed to reset twoFA', res.err )
+    }
+    yield put( updateWallet( updatedWallet ) )
+    yield call ( dbManager.updateWallet, updatedWallet )
+    yield put( twoFAResetted( true ) )
+  }
+  else {
     yield put( twoFAResetted( false ) )
+    throw new Error( 'Failed to reset twoFA' )
   }
 }
 
 export const resetTwoFAWatcher = createWatcher( resetTwoFAWorker, RESET_TWO_FA )
 
 function* validateTwoFAWorker( { payload }: {payload: { token: number }} ) {
-  // TODO: read wallet from realm
   const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { token } = payload
   const { valid } = yield call( AccountUtilities.validateTwoFA, wallet.walletId, token )
 
-  if ( valid ) {
-    yield put( twoFAValid( true ) )
-    delete wallet.details2FA
-    // TODO: save udpated wallet into realm
-    const tempDB = JSON.parse( yield call ( AsyncStorage.getItem, 'tempDB' ) )
-    yield call( AsyncStorage.setItem, 'tempDB', JSON.stringify( {
-      ...tempDB,
-      wallet
-    } ) )
-    yield put( updateWallet( wallet ) )
-  } else yield put( twoFAValid( false ) )
+  if ( valid ) yield put( twoFAValid( true ) )
+  else yield put( twoFAValid( false ) )
 }
 
 export const validateTwoFAWatcher = createWatcher(
@@ -338,7 +379,7 @@ function* refreshAccountShellWorker( { payload } ) {
   const accountsToSync: Accounts = {
     [ accountShell.primarySubAccount.id ]: accounts[ accountShell.primarySubAccount.id ]
   }
-  const { synchedAccounts, txsFound } = yield call( syncAccountsWorker, {
+  const { synchedAccounts, txsFound, activeAddressesWithNewTxsMap } = yield call( syncAccountsWorker, {
     payload: {
       accounts: accountsToSync,
       options,
@@ -360,6 +401,9 @@ function* refreshAccountShellWorker( { payload } ) {
   //   } )
   // } )
   // yield put( rescanSucceeded( rescanTxs ) )
+
+  // update F&F channels if any new txs found on an assigned address
+  yield call( updatePaymentAddressesToChannels, activeAddressesWithNewTxsMap, synchedAccounts )
 }
 
 export const refreshAccountShellWatcher = createWatcher(
@@ -394,21 +438,21 @@ export const autoSyncShellsWatcher = createWatcher(
 )
 
 function* setup2FADetails( wallet: Wallet ) {
-  const secondaryMemonic = bip39.generateMnemonic( 256 )
-  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMemonic )
+  const secondaryMnemonic = bip39.generateMnemonic( 256 )
+  const secondarySeed = bip39.mnemonicToSeedSync( secondaryMnemonic )
   const secondaryWalletId = crypto.createHash( 'sha256' ).update( secondarySeed ).digest( 'hex' )
 
   const { setupData } = yield call( AccountUtilities.registerTwoFA, wallet.walletId, secondaryWalletId )
-  console.log( {
-    setupData
-  } )
   const rootDerivationPath = yield call( AccountUtilities.getDerivationPath, NetworkType.MAINNET, AccountType.CHECKING_ACCOUNT, 0 )
-  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMemonic, false, bitcoinJS.networks.testnet, rootDerivationPath )
+  const network = config.APP_STAGE === APP_STAGE.DEVELOPMENT? bitcoinJS.networks.testnet: bitcoinJS.networks.bitcoin
+  const secondaryXpub = AccountUtilities.generateExtendedKey( secondaryMnemonic, false, network, rootDerivationPath )
+
   const bithyveXpub = setupData.bhXpub
   const twoFAKey = setupData.secret
   const updatedWallet = {
     ...wallet,
-    secondaryMemonic,
+    secondaryMnemonic,
+    secondaryWalletId,
     details2FA: {
       secondaryXpub,
       bithyveXpub,
@@ -768,9 +812,9 @@ export const mergeAccountShellsWatcher = createWatcher(
   MERGE_ACCOUNT_SHELLS
 )
 
-function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, serviceType: string } } ) {
+function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: string, QRModalHeader: string, accountShell: AccountShell } } ) {
   try {
-    const { qrdata, QRModalHeader } = payload
+    const { qrdata, QRModalHeader, accountShell } = payload
     const { DECENTRALIZED_BACKUP } = yield select( ( state ) => state.storage.database )
     const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
     const s3Service = yield select( ( state ) => state.health.service )
@@ -804,7 +848,7 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
     if ( QRModalHeader === 'Reset 2FA' ) {
       yield put( resetTwoFA( secondaryMnemonic.mnemonic ) )
     } else if ( QRModalHeader === 'Sweep Funds' ) {
-      yield put( generateSecondaryXpriv( SECURE_ACCOUNT, secondaryMnemonic.mnemonic ) )
+      yield put( generateSecondaryXpriv( accountShell, secondaryMnemonic.mnemonic ) )
     }
   } catch ( error ) {
     console.log( 'error', error )

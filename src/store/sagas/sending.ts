@@ -5,7 +5,7 @@ import {  CALCULATE_CUSTOM_FEE, CALCULATE_SEND_MAX_FEE, customFeeCalculated, cus
 import AccountShell from '../../common/data/models/AccountShell'
 import { AccountsState } from '../reducers/accounts'
 import SubAccountKind from '../../common/data/enums/SubAccountKind'
-import { Account, AccountType, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
+import { Account, AccountType, ActiveAddressAssignee, INotification, notificationTag, notificationType, Trusted_Contacts, TxPriority } from '../../bitcoin/utilities/Interface'
 import SourceAccountKind from '../../common/data/enums/SourceAccountKind'
 import { ContactRecipientDescribing, RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 import RecipientKind from '../../common/data/enums/RecipientKind'
@@ -52,7 +52,12 @@ function* processRecipients( accountShell: AccountShell ){
         case RecipientKind.ACCOUNT_SHELL:
           const recipientShell = accountShells.find( ( shell ) => shell.id === recipient.id )
           const recipientAccount: Account = accountsState.accounts[ recipientShell.primarySubAccount.id  ]
-          const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, accountShell.primarySubAccount.type )
+          const assigneeInfo: ActiveAddressAssignee = {
+            type: accountShell.primarySubAccount.type,
+            id: accountShell.primarySubAccount.id,
+            sender: accountShell.primarySubAccount.customDisplayName,
+          }
+          const recipientAddress = yield call( getNextFreeAddressWorker, recipientAccount, assigneeInfo )
           recipients.push( {
             address: recipientAddress,
             amount: recipient.amount,

@@ -38,12 +38,12 @@ const WalletSettingsStack = createStackNavigator(
         gesturesEnabled: false,
       },
     },
-    VersionHistory: {
-      screen: VersionHistoryScreen,
-      navigationOptions: {
-        title: 'Version History',
-      },
-    },
+    // VersionHistory: {
+    //   screen: VersionHistoryScreen,
+    //   navigationOptions: {
+    //     title: 'Version History',
+    //   },
+    // },
     TransactionDetails: {
       screen: TransactionDetailsContainerScreen,
       navigationOptions: {
