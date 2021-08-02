@@ -306,27 +306,33 @@ const Bottomtab = createBottomTabNavigator(
               // marginVertical: hp( '2%' )
             }}>
               {focused ?
-                <Svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={21.471}
-                  height={23.731}
-                  viewBox="0 0 21.471 23.731"
-                >
-                  <Path
-                    d="M10.734 22.75a.767.767 0 01-.44-.14c-8.15-5.67-7.94-6.67-9.52-15.56a.752.752 0 01.37-.79l9.19-5.39c.04-.03.067-.016.077-.045l.075-.045.028-.03h.22a.06.06 0 01.04.01.663.663 0 01.36.11l9.2 5.39a.768.768 0 01.37.79c-1.58 8.89-1.38 9.89-9.52 15.56a.8.8 0 01-.45.14l-.015.006"
-                    opacity={0.7}
-                    fill="none"
-                    stroke="#fafafa"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                  />
-                  <Path
-                    d="M13.194 9.357l-3.348 3.344-1.286-1.29a.79.79 0 00-1.116 1.116l1.842 1.846a.781.781 0 001.112 0l3.9-3.9a.785.785 0 10-1.108-1.112z"
-                    fill="#fafafa"
-                    opacity={0.7}
-                  />
-                </Svg>
+                <Image source={require( '../assets/images/tabs/security_active.png' )} style={{
+                  marginBottom: 'auto',
+                  width: 23, height: 23, alignSelf: 'center',
+                  resizeMode: 'contain'
+                // backgroundColor: focused ? 'white': 'gray'
+                }} />
+                // <Svg
+                //   xmlns="http://www.w3.org/2000/svg"
+                //   width={21.471}
+                //   height={23.731}
+                //   viewBox="0 0 21.471 23.731"
+                // >
+                //   <Path
+                //     d="M10.734 22.75a.767.767 0 01-.44-.14c-8.15-5.67-7.94-6.67-9.52-15.56a.752.752 0 01.37-.79l9.19-5.39c.04-.03.067-.016.077-.045l.075-.045.028-.03h.22a.06.06 0 01.04.01.663.663 0 01.36.11l9.2 5.39a.768.768 0 01.37.79c-1.58 8.89-1.38 9.89-9.52 15.56a.8.8 0 01-.45.14l-.015.006"
+                //     opacity={0.7}
+                //     fill="none"
+                //     stroke="#fafafa"
+                //     strokeLinecap="round"
+                //     strokeLinejoin="round"
+                //     strokeWidth={1.5}
+                //   />
+                //   <Path
+                //     d="M13.194 9.357l-3.348 3.344-1.286-1.29a.79.79 0 00-1.116 1.116l1.842 1.846a.781.781 0 001.112 0l3.9-3.9a.785.785 0 10-1.108-1.112z"
+                //     fill="#fafafa"
+                //     opacity={0.7}
+                //   />
+                // </Svg>
                 :
                 <Svg
                   xmlns="http://www.w3.org/2000/svg"
