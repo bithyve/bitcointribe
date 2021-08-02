@@ -69,7 +69,7 @@ export default function EditWalletSuccess( props ) {
           marginHorizontal: 10, flexDirection: 'row', alignItems: 'center'
         }}>
           <Image
-            source={require( '../../../assets/images/icons/icon_wallet_setting.png' )}
+            source={require( '../../../assets/images/icons/wallet.png' )}
             style={{
               width: 73, height: 73, resizeMode: 'contain'
             }}

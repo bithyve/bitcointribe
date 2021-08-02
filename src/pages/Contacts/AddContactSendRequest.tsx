@@ -36,6 +36,7 @@ import idx from 'idx'
 import Toast from '../../components/Toast'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import ModalContainer from '../../components/home/ModalContainer'
+import BottomInfoBox from '../../components/BottomInfoBox'
 
 export default function AddContactSendRequest( props ) {
   const [ isOTPType, setIsOTPType ] = useState( false )
@@ -384,102 +385,6 @@ export default function AddContactSendRequest( props ) {
           </View>
         </TouchableOpacity>
       </View>
-      {/* <View
-          style={{
-            alignItems: 'center',
-            flexDirection: 'row',
-            paddingRight: 10,
-            paddingBottom: hp( '1.5%' ),
-            paddingTop: hp( '1%' ),
-            marginLeft: 10,
-            marginRight: 10,
-            marginBottom: hp( '1.5%' ),
-          }}
-        >
-          <View style={{
-            flex: 1, flexDirection: 'row', alignItems: 'center'
-          }}>
-            <TouchableOpacity
-              onPress={() => {
-                props.navigation.popToTop()
-              }}
-              hitSlop={{
-                top: 20, left: 20, bottom: 20, right: 20
-              }}
-              style={{
-                height: 30, width: 30, justifyContent: 'center'
-              }}
-            >
-              <FontAwesome
-                name="long-arrow-left"
-                color={Colors.blue}
-                size={17}
-              />
-            </TouchableOpacity>
-            <View style={{
-              flex: 1
-            }}>
-              <Text
-                style={{
-                  ...NavStyles.modalHeaderTitleText,
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                {headerText}
-              </Text>
-              <Text
-                style={{
-                  color: Colors.textColorGrey,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                  paddingTop: 5,
-                }}
-              >
-                {subHeaderText}
-              </Text>
-            </View>
-            {showDone  &&
-            <TouchableOpacity
-              onPress={() => {
-                if( selectedContactsCHKey ){
-                  const channelUpdate = {
-                    contactInfo: {
-                      channelKey: selectedContactsCHKey
-                    }
-                  }
-
-                  dispatch( syncPermanentChannels( {
-                    permanentChannelsSyncKind: PermanentChannelsSyncKind.SUPPLIED_CONTACTS,
-                    metaSync: true,
-                    channelUpdates: [ channelUpdate ]
-                  } ) )
-                }
-                props.navigation.popToTop()
-              }}
-              style={{
-                height: wp( '8%' ),
-                width: wp( '18%' ),
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: Colors.blue,
-                justifyContent: 'center',
-                borderRadius: 8,
-                alignSelf: 'center',
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.white,
-                  fontSize: RFValue( 12 ),
-                  fontFamily: Fonts.FiraSansRegular,
-                }}
-              >
-                Done
-              </Text>
-            </TouchableOpacity>
-            }
-          </View>
-        </View> */}
       <RequestKeyFromContact
         isModal={false}
         // headerText={'Request Recovery Secret from trusted contact'}
@@ -506,6 +411,17 @@ export default function AddContactSendRequest( props ) {
           }
         }}
       />
+      <View style={{
+        marginVertical: hp( 2 )
+      }}>
+        <BottomInfoBox
+          title={'Secure with 2FA'}
+          infoText={
+            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incidid'
+          }
+          backgroundColor={Colors.white}
+        />
+      </View>
       {/* <View style={{
           marginTop: 'auto'
         }}>
