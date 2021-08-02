@@ -259,7 +259,6 @@ export default BuyMenu
 //     swanDeepLinkContent: string | null;
 //     isBalanceLoading: boolean;
 //     addContactModalOpened: boolean;
-//     encryptedCloudDataJson: any;
 //     wyreDeepLinkContent: string | null;
 //     rampDeepLinkContent: string | null;
 //     rampFromBuyMenu: boolean | null;
@@ -397,7 +396,6 @@ export default BuyMenu
 //             swanDeepLinkContent: null,
 //             isBalanceLoading: true,
 //             addContactModalOpened: false,
-//             encryptedCloudDataJson: [],
 //             wyreDeepLinkContent: null,
 //             rampDeepLinkContent: null,
 //             rampFromBuyMenu: null,

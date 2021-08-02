@@ -87,6 +87,7 @@ function* cloudWorker( { payload } ) {
           shares: shares,
           secondaryShare: DECENTRALIZED_BACKUP && DECENTRALIZED_BACKUP.SM_SHARE ? DECENTRALIZED_BACKUP.SM_SHARE : '',
           encryptedCloudDataJson: encryptedCloudDataJson,
+          seed: shares ? '' : wallet.primaryMnemonic,
           walletName: wallet.walletName,
           questionId: wallet.security.questionId,
           question: wallet.security.questionId === '0' ? wallet.security.question: '',
@@ -448,6 +449,7 @@ function* createFileWorker( { payload } ) {
       question: data.question,
       walletId: walletId,
       data: data.encryptedCloudDataJson,
+      seed: data.seed,
       shares: data.shares,
       keeperData: data.keeperData,
       dateTime: moment( new Date() ),
@@ -621,6 +623,7 @@ function* uplaodFileWorker( { payload } ) {
           question: data.question,
           walletId: walletId,
           data: data.encryptedCloudDataJson,
+          seed: data.seed,
           shares: data.shares,
           keeperData: data.keeperData,
           dateTime: moment( new Date() ),
@@ -629,10 +632,11 @@ function* uplaodFileWorker( { payload } ) {
         }
         newArray.push( tempData )
       } else {
-        newArray[ index ].questionId = data.questionId,
-        newArray[ index ].question = data.question,
+        newArray[ index ].questionId = data.questionId
+        newArray[ index ].question = data.question
         newArray[ index ].levelStatus = data.levelStatus
         newArray[ index ].data = data.encryptedCloudDataJson
+        newArray[ index ].seed = data.seed
         newArray[ index ].shares = data.shares ? data.shares : newArray[ index ].shares
         newArray[ index ].keeperData = data.keeperData
         newArray[ index ].dateTime = moment( new Date() )

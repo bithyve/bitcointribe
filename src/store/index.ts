@@ -161,7 +161,8 @@ import {
   setupHealthWatcher,
   updateKeeperInfoToChannelWatcher,
   acceptExistingContactRequestWatcher,
-  setupPasswordWatcher
+  setupPasswordWatcher,
+  setupLevelHealthWatcher
 } from './sagas/health'
 
 import {
@@ -304,6 +305,7 @@ const rootSaga = function* () {
     updateKeeperInfoToChannelWatcher,
     acceptExistingContactRequestWatcher,
     setupPasswordWatcher,
+    setupLevelHealthWatcher,
 
     // Swan Integration
     fetchSwanAuthenticationUrlWatcher,

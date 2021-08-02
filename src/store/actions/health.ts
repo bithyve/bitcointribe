@@ -72,6 +72,7 @@ export const UPDATE_KEEPER_INFO_TO_CHANNEL = 'UPDATE_KEEPER_INFO_TO_CHANNEL'
 export const SET_IS_KEEPER_INFO_UPDATED = 'SET_IS_KEEPER_INFO_UPDATED'
 export const ACCEPT_EC_REQUEST = 'ACCEPT_EC_REQUEST'
 export const SETUP_PASSWORD = 'SETUP_PASSWORD'
+export const SETUP_LEVEL_HEALTH = 'SETUP_LEVEL_HEALTH'
 
 export const initNewBHRFlow = ( newBHRFlowStarted ) => {
   return {
@@ -107,10 +108,10 @@ export const healthInitialize = () => {
   }
 }
 
-export const recoverWalletUsingIcloud = ( icloudData ) => {
+export const recoverWalletUsingIcloud = ( icloudData, answer, selectedBackup? ) => {
   return {
     type: RECOVER_WALLET_USING_ICLOUD, payload: {
-      icloudData
+      icloudData, selectedBackup, answer
     }
   }
 }
