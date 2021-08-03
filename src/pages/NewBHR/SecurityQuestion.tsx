@@ -49,6 +49,7 @@ function SecurityQuestion( props ) {
         props.navigation.navigate( 'ReLogin', {
           isPasscodeCheck: true
         } )
+        props.onClose()
         setShowAnswer( true )
         setErrorText( '' )
         return
@@ -151,7 +152,7 @@ function SecurityQuestion( props ) {
                 }}
                 onBlur={() => {
                   if ( validateAllowedCharacters( answer ) == false ) {
-                    setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
+                    setErrorText( 'Answer must contain lowercase characters(a-z) and digits (0-9)' )
                   }
                 }}
                 keyboardType={
