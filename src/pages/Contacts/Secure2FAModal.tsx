@@ -14,16 +14,28 @@ import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import idx from 'idx'
+import * as ExpoContacts from 'expo-contacts'
 
 export default function Secure2FA( props ) {
 
   const [ activeType, setActiveType ] = useState( DeepLinkEncryptionType.NUMBER )
-  console.log( 'props.contactprops.contactprops.contact', props.Contact )
+  // const [ contactData, setContactData ] = useState( null )
+  const [ phoneNumbers, setPhoneumber ] = useState( props.Contact.phoneNumbers )
+  const [ emails, setEmails ] = useState( props.Contact.emails )
 
-  const { phoneNumbers } = props.Contact
-  const { emails } = props.Contact
-  console.log( 'idx( Contact, ( _ ) => _.phoneNumbers[ 0 ].number )', idx( props.Contact, ( _ ) => _.phoneNumbers[ 0 ].number ) )
-
+  useEffect( ()=>{
+    getContact()
+  }, [] )
+  const getContact = () => {
+    if ( !phoneNumbers || !emails ) {
+      ExpoContacts.getContactsAsync().then( async ( { data } ) => {
+        const filteredData = data.find( item => item.id === props.Contact.id )
+        setPhoneumber( filteredData.phoneNumbers )
+        setEmails( filteredData.emails )
+      // await AsyncStorage.setItem( 'ContactData', JSON.stringify( data ) )
+      } )
+    }
+  }
   return (
     <SafeAreaView style={{
       backgroundColor: Colors.backgroundColor

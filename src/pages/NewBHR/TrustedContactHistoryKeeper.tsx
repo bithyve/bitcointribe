@@ -87,10 +87,10 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const [ ChangeBottomSheet, setChangeBottomSheet ] = useState( React.createRef() )
   const [ SendViaLinkBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ SendViaQRBottomSheet ] = useState( React.createRef<BottomSheet>() )
-  const [ keeperTypeBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ shareOtpWithTrustedContactBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ QrBottomSheet ] = useState( React.createRef<BottomSheet>() )
   const [ ApprovePrimaryKeeperBottomSheet ] = useState( React.createRef<BottomSheet>() )
+  const [ keeperTypeModel, setKeeperTypeModel ] = useState( false )
 
   const [ oldChannelKey, setOldChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
   const [ channelKey, setChannelKey ] = useState( props.navigation.getParam( 'selectedKeeper' ).channelKey ? props.navigation.getParam( 'selectedKeeper' ).channelKey : '' )
@@ -795,8 +795,8 @@ const TrustedContactHistoryKeeper = ( props ) => {
 
   const sendApprovalRequestToPK = ( ) => {
     setQrBottomSheetsFlag( true );
-    ( QrBottomSheet as any ).current.snapTo( 1 );
-    ( keeperTypeBottomSheet as any ).current.snapTo( 0 )
+    ( QrBottomSheet as any ).current.snapTo( 1 )
+    setKeeperTypeModel( false )
   }
 
   const renderQrContent = () => {
@@ -921,7 +921,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
           data={sortedHistory( trustedContactHistory )}
           confirmButtonText={'Share Now'}
           onPressChange={() => {
-            ( keeperTypeBottomSheet as any ).current.snapTo( 1 )
+            setKeeperTypeModel( true )
           }}
           onPressConfirm={() => {
             setTimeout( () => {
@@ -1193,36 +1193,21 @@ const TrustedContactHistoryKeeper = ( props ) => {
           />
         )}
       />
-      <BottomSheet
-        enabledInnerScrolling={true}
-        ref={keeperTypeBottomSheet as any}
-        snapPoints={[
-          -50,
-          Platform.OS == 'ios' && DeviceInfo.hasNotch() ? hp( '75%' ) : hp( '75%' ),
-        ]}
-        renderContent={() => (
-          <KeeperTypeModalContents
-            headerText={'Change backup method'}
-            subHeader={'Share your Recovery Key with a new contact or a different device'}
-            onPressSetup={async ( type, name ) =>{
-              setSelectedKeeperType( type )
-              setSelectedKeeperName( name )
-              sendApprovalRequestToPK( )
-              setIsChangeClicked( true )
-              // onPressChangeKeeperType(type, name);
-              // (keeperTypeBottomSheet as any).current.snapTo(0);
-            }}
-            onPressBack={() => ( keeperTypeBottomSheet as any ).current.snapTo( 0 )}
-            selectedLevelId={selectedLevelId}
-            keeper={selectedKeeper}
-          />
-        )}
-        renderHeader={() => (
-          <SmallHeaderModal
-            onPressHeader={() => ( keeperTypeBottomSheet as any ).current.snapTo( 0 )}
-          />
-        )}
-      />
+      <ModalContainer visible={keeperTypeModel} closeBottomSheet={() => {}} >
+        <KeeperTypeModalContents
+          headerText={'Change backup method'}
+          subHeader={'Share your Recovery Key with a new contact or a different device'}
+          onPressSetup={async ( type, name ) =>{
+            setSelectedKeeperType( type )
+            setSelectedKeeperName( name )
+            sendApprovalRequestToPK( )
+            setIsChangeClicked( true )
+          }}
+          onPressBack={() => setKeeperTypeModel( false )}
+          selectedLevelId={selectedLevelId}
+          keeper={selectedKeeper}
+        />
+      </ModalContainer>
       <BottomSheet
         enabledInnerScrolling={true}
         ref={ApprovePrimaryKeeperBottomSheet as any}
@@ -1242,7 +1227,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         renderHeader={() => (
           <SmallHeaderModal
             onPressHeader={() => {
-              ( keeperTypeBottomSheet as any ).current.snapTo( 1 );
+              setKeeperTypeModel( true );
               ( ApprovePrimaryKeeperBottomSheet as any ).current.snapTo( 0 )
             }}
           />
