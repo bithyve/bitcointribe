@@ -38,6 +38,7 @@ import {
   accountSettingsUpdated,
   accountSettingsUpdateFailed,
   updateAccounts,
+  RESTORE_ACCOUNT_SHELLS,
 } from '../actions/accounts'
 import {
   updateWalletImageHealth
@@ -858,4 +859,47 @@ function* createSmNResetTFAOrXPrivWorker( { payload }: { payload: { qrdata: stri
 export const createSmNResetTFAOrXPrivWatcher = createWatcher(
   createSmNResetTFAOrXPrivWorker,
   CREATE_SM_N_RESETTFA_OR_XPRIV
+)
+
+export function* restoreAccountShellsWorker( { payload: restoredAccounts }: {payload: Account[]} ) {
+  const newAccountShells: AccountShell[] = []
+  const accounts: Accounts = {
+  }
+  for ( const account of restoredAccounts ){
+    const accountShell = yield call( generateShellFromAccount, account )
+    newAccountShells.push( accountShell )
+    accounts [ account.id ] = account
+    // yield put( accountShellOrderedToFront( accountShell ) )
+  }
+
+  const wallet: Wallet = yield select( state => state.storage.wallet )
+  let presentAccounts = {
+  }
+  Object.values( ( accounts as Accounts ) ).forEach( account => {
+    if( presentAccounts[ account.type ] ) presentAccounts[ account.type ].push( account.id )
+    else presentAccounts = {
+      ...presentAccounts,
+      [ account.type ]: [ account.id ]
+    }
+  } )
+  const updatedWallet: Wallet = {
+    ...wallet,
+    accounts: presentAccounts,
+  }
+  yield put( updateWallet( updatedWallet ) )
+
+  yield put( newAccountShellsAdded( {
+    accountShells: newAccountShells,
+    accounts,
+  } ) )
+  yield call( dbManager.createAccounts, accounts )
+
+  // TODO: we need an updateWallet call on the dbManager
+  yield call( dbManager.createWallet, updatedWallet )
+  yield put( updateWalletImageHealth() )
+}
+
+export const restoreAccountShellsWatcher = createWatcher(
+  restoreAccountShellsWorker,
+  RESTORE_ACCOUNT_SHELLS,
 )

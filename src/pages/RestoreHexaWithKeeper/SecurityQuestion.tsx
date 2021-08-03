@@ -41,7 +41,7 @@ function SecurityQuestion( props ) {
   }
 
   useEffect( () => {
-    if ( ( !errorText && !answer && answer ) || answer ) setIsDisabled( false )
+    if ( !errorText && answer && validateAllowedCharacters( answer ) ) setIsDisabled( false )
     else setIsDisabled( true )
   }, [ answer, errorText ] )
 
@@ -103,11 +103,11 @@ function SecurityQuestion( props ) {
                   Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'
                 }
                 // onFocus={() => props.onFocus()}
-                // onBlur={() => {
-                //   if ( validateAllowedCharacters( answer ) == false ) {
-                //     setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
-                //   }
-                // }}
+                onBlur={() => {
+                  if ( validateAllowedCharacters( answer ) == false ) {
+                    setErrorText( 'Answer must contain lowercase characters(a-z) and digits (0-9)' )
+                  }
+                }}
               />
               {errorText ? (
                 <Text
@@ -163,8 +163,8 @@ function SecurityQuestion( props ) {
                 ).then( () => {
                   props.onPressConfirm( answer )
                 } )
-              // } else if ( validateAllowedCharacters( answer ) == false ) {
-              //   setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
+              } else if ( validateAllowedCharacters( answer ) == false ) {
+                setErrorText( 'Answers must contain lowercase characters(a-z) and digits (0-9)' )
               } else {
                 setErrorText( 'Answer is incorrect' )
               }
