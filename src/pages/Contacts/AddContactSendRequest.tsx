@@ -149,7 +149,6 @@ export default function AddContactSendRequest( props ) {
         }
       }
     if ( !currentContact ) return
-    console.log( 'currentContact', currentContact )
 
     // generate deep link & QR for the contact
     let encryption_key: string
@@ -521,7 +520,7 @@ export default function AddContactSendRequest( props ) {
         <ModalContainer visible={secure2FAModal} closeBottomSheet={() => {}} >
           <Secure2FA
             closeBottomSheet={()=> setSecure2FAModal( false )}
-            onConfirm={( type ) => {setEncryptLinkWith( type ); console.log( 'type',  type ); setSecure2FAModal( false )
+            onConfirm={( type ) => {setEncryptLinkWith( type ); setSecure2FAModal( false )
             }}
             Contact={Contact}
           />
