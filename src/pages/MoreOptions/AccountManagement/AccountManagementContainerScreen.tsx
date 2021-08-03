@@ -128,6 +128,10 @@ const AccountManagementContainerScreen: React.FC<Props> = ( { navigation, }: Pro
           if( primarySubAccount && ( primarySubAccount.visibility == AccountVisibility.ARCHIVED || primarySubAccount.visibility == AccountVisibility.HIDDEN ) )
             setAccountVisibility( primarySubAccount.visibility )
           changeVisisbility( accounShell, AccountVisibility.DEFAULT )
+          navigation.navigate( 'AccountDetails', {
+            accountShellID: accounShell.id,
+            swanDeepLinkContent: null
+          } )
           showUnHideArchiveModal( false )
         }
         }

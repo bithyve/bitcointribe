@@ -24,7 +24,6 @@ import HeaderTitle from './HeaderTitle'
 
 export default function RequestKeyFromContact( props ) {
   const [ shareLink, setShareLink ] = useState( '' )
-  // console.log('props.QR RequestKeyFromContact > ', props.QR);
 
   const contact = props.contact
   const [ serviceType, setServiceType ] = useState(
