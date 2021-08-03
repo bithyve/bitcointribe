@@ -83,63 +83,6 @@ export default class BHROperations {
     }
   };
 
-
-  static encryptStaticNonPMDD = (
-    mnemonic: string,
-    staticNonPMDD: SocialStaticNonPMDD | BuddyStaticNonPMDD,
-  ): {
-    encryptedStaticNonPMDD: string;
-  } => {
-    const key = BHROperations.getDerivedKey(
-      bip39.mnemonicToSeedSync( mnemonic ).toString( 'hex' ),
-    )
-    // const key = crypto.scryptSync(
-    //   intermediateKey,
-    //   BHROperations.cipherSpec.salt,
-    //   BHROperations.cipherSpec.keyLength,
-    // );
-    const cipher = crypto.createCipheriv(
-      BHROperations.cipherSpec.algorithm,
-      key,
-      BHROperations.cipherSpec.iv,
-    )
-
-    let encrypted = cipher.update( JSON.stringify( staticNonPMDD ), 'utf8', 'hex' )
-    encrypted += cipher.final( 'hex' )
-    return {
-      encryptedStaticNonPMDD: encrypted
-    }
-  };
-
-  static decryptStaticNonPMDD = (
-    mnemonic: string,
-    encryptStaticNonPMDD: string,
-  ): {
-    decryptedStaticNonPMDD;
-  } => {
-    const key = BHROperations.getDerivedKey(
-      bip39.mnemonicToSeedSync( mnemonic ).toString( 'hex' ),
-    )
-    // const key = crypto.scryptSync(
-    //   intermediateKey,
-    //   BHROperations.cipherSpec.salt,
-    //   BHROperations.cipherSpec.keyLength,
-    // );
-
-    const decipher = crypto.createDecipheriv(
-      BHROperations.cipherSpec.algorithm,
-      key,
-      BHROperations.cipherSpec.iv,
-    )
-    let decrypted = decipher.update( encryptStaticNonPMDD, 'hex', 'utf8' )
-    decrypted += decipher.final( 'utf8' )
-
-    const decryptedStaticNonPMDD = JSON.parse( decrypted )
-    return {
-      decryptedStaticNonPMDD
-    }
-  };
-
   static encryptDynamicNonPMDD = (
     mnemonic: string,
     dynamicNonPMDD: MetaShare[],
@@ -767,17 +710,13 @@ export default class BHROperations {
     return temp.slice( 0, 8 )
   };
 
-  //   public walletId: string;
   //   public shareIDsKeeper: string[];
   //   public encryptedSecretsKeeper: string[];
-  //   public encryptedSMSecretsKeeper: string[];
-  //   public metaSharesKeeper: MetaShare[];
+  //   public encryptedSecondarySecrets: string[];
   //   public oldMetaSharesKeeper: MetaShare[];
   //   public SMMetaSharesKeeper: MetaShare[];
   //   public healthCheckInitializedKeeper: boolean;
   //   public pdfHealthKeeper: {};
-  //   public healthCheckStatusKeeper: {};
-  //   private mnemonic: string;
 
   static generateMessageID = (): string =>
     BHROperations.generateRandomString( config.MSG_ID_LENGTH );
@@ -892,7 +831,7 @@ export default class BHROperations {
     }
   };
 
-  static initializeHealthKeeper = async ( walletID: string ): Promise<{
+  static initializeHealthKeeper = async ( walletId: string ): Promise<{
     success: boolean;
     levelInfo: any[];
   }> => {
@@ -923,7 +862,7 @@ export default class BHROperations {
     try {
       res = await BH_AXIOS.post( 'sharesHealthCheckInit2', {
         HEXA_ID,
-        walletID,
+        walletID: walletId,
         levelInfo,
       } )
     } catch ( err ) {
@@ -931,10 +870,461 @@ export default class BHROperations {
       if ( err.code ) throw new Error( err.code )
     }
 
+    //   if( res.data.initSuccessful ){
+    //     this.healthCheckInitializedKeeper = true
+    //   }
+
     return {
       success: res.data.initSuccessful,
       levelInfo: levelInfo,
     }
   };
 
+  static checkHealth = async (
+    walletId: string,
+    keeperMetaShares: MetaShare[],
+  ): Promise<{
+    shareGuardianMapping: {
+      [index: number]: { shareId: string; updatedAt: number; guardian: string };
+    };
+  }> => {
+    let res: AxiosResponse
+
+    if ( !keeperMetaShares.length )
+      throw new Error( 'Can not initialize health check; missing MetaShares' )
+
+    const metaShares = keeperMetaShares.slice( 0, 3 )
+    try {
+      res = await BH_AXIOS.post( 'checkSharesHealth2', {
+        HEXA_ID,
+        walletID: walletId,
+      } )
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+    }
+
+    const updates: Array<{ shareId: string; updatedAt: number }> =
+      res.data.lastUpdateds
+
+    const shareGuardianMapping = {
+    }
+    for ( const { shareId, updatedAt } of updates ) {
+      for ( let index = 0; index < metaShares.length; index++ ) {
+        if ( metaShares[ index ] && metaShares[ index ].shareId === shareId ) {
+          shareGuardianMapping[ index ] = {
+            shareId,
+            updatedAt,
+            guardian: metaShares[ index ].meta.guardian,
+          }
+        }
+      }
+    }
+
+    return {
+      shareGuardianMapping,
+    }
+  };
+
+  static checkHealthKeeper = async ( walletId: string ): Promise<{
+    data: {};
+  }> => {
+    let response = {
+    }
+    let res: AxiosResponse
+    try {
+      res = await BH_AXIOS.post( 'checkSharesHealth2', {
+        HEXA_ID,
+        walletID: walletId,
+      } )
+      response = res
+    } catch ( err ) {
+      if ( err.response ) throw new Error( err.response.data.err )
+      if ( err.code ) throw new Error( err.code )
+      response = err
+    }
+    if( res.data ){
+      return {
+        data: res.data
+      }
+    }
+    else return {
+      data: response
+    }
+
+  };
+
+  static updateHealthLevel2 = async ( walletId: string, keeperMetaShares: MetaShare[], SecurityQuestionHealth, _level ): Promise<{
+    success: boolean;
+    message: string;
+  }> => {
+    const levelInfo = []
+    if ( keeperMetaShares.length ) {
+      levelInfo[ 0 ] = {
+        shareType: 'cloud',
+        updatedAt: 0,
+        status: 'notAccessible',
+        shareId: keeperMetaShares[ 0 ].shareId,
+        reshareVersion: 0,
+      }
+      levelInfo[ 1 ] = SecurityQuestionHealth
+      for ( let i = 1; i < keeperMetaShares.length; i++ ) {
+        const element = keeperMetaShares[ i ]
+        let shareType = ''
+        if ( i == 0 ) shareType = 'cloud'
+        if ( i == 1 ) shareType = 'primaryKeeper'
+        const obj = {
+          shareType: shareType,
+          updatedAt: 0,
+          status: 'notAccessible',
+          shareId: element.shareId,
+          reshareVersion: 0,
+        }
+        levelInfo.push( obj )
+      }
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'updateHealthLevel2', {
+          HEXA_ID,
+          walletID: walletId,
+          level: _level,
+          levelInfo,
+        } )
+        console.log( 'updateHealthLevel2 res', res )
+      } catch ( err ) {
+        console.log( 'updateHealthLevel2 err', err )
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      return {
+        success: res.data.updateSuccessful,
+        message: '',
+      }
+    }
+    return {
+      success: false,
+      message: 'Something went wrong!',
+    }
+  };
+
+  static initLevels = async ( walletId: string, keeperMetaShares: MetaShare[], SecurityQuestionHealth, _level ): Promise<{
+    success: boolean;
+    message: string;
+  }> => {
+    const levelInfo = []
+    if ( keeperMetaShares.length ) {
+      levelInfo[ 0 ] = {
+        shareType: 'cloud',
+        updatedAt: 0,
+        status: 'notAccessible',
+        shareId: keeperMetaShares[ 0 ].shareId,
+        reshareVersion: 0,
+      }
+      levelInfo[ 1 ] = SecurityQuestionHealth
+      for ( let i = 1; i < keeperMetaShares.length; i++ ) {
+        const element = keeperMetaShares[ i ]
+        let shareType = ''
+        if ( i == 0 ) shareType = 'cloud'
+        if ( i == 1 ) shareType = 'primaryKeeper'
+        const obj = {
+          shareType: shareType,
+          updatedAt: 0,
+          status: 'notAccessible',
+          shareId: element.shareId,
+          reshareVersion: 0,
+        }
+        levelInfo.push( obj )
+      }
+      let res: AxiosResponse
+      try {
+        res = await BH_AXIOS.post( 'initLevels', {
+          HEXA_ID,
+          walletID: walletId,
+          level: _level,
+          levelInfo,
+        } )
+        console.log( 'initLevels res', res )
+      } catch ( err ) {
+        console.log( 'initLevels err', err )
+        if ( err.response ) throw new Error( err.response.data.err )
+        if ( err.code ) throw new Error( err.code )
+      }
+      //   if( res.data.updateSuccessful ){
+      //     this.healthCheckInitializedKeeper = true
+      //   }
+      return {
+        success: res.data.updateSuccessful,
+        message: '',
+      }
+    }
+    return {
+      success: false,
+      message: 'Something went wrong!',
+    }
+  };
+
+  static createMetaShares = (
+    walletId: string,
+    encryptedPrimarySecrets: string[],
+    tag: string,
+    questionId: string,
+    version?: string,
+  ): {
+    metaShares: MetaShare[];
+  } => {
+    if ( !encryptedPrimarySecrets.length ) {
+      throw new Error( 'Can not create MetaShares; missing encryptedPrimarySecrets' )
+    }
+
+    const timestamp = new Date().toLocaleString( undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    } )
+
+    let keeperMetaShares: MetaShare[] = []
+    let index = 0
+    for ( const encryptedSecret of encryptedPrimarySecrets ) {
+      let metaShare: MetaShare
+      if ( index === 0 ) {
+        metaShare = {
+          encryptedSecret,
+          shareId: BHROperations.getShareId( encryptedSecret ),
+          meta: {
+            version: version ? version : '0',
+            validator: 'HEXA',
+            index,
+            walletId,
+            tag,
+            timestamp,
+            reshareVersion: 0,
+            questionId
+          },
+        }
+      } else {
+        metaShare = {
+          encryptedSecret,
+          shareId: BHROperations.getShareId( encryptedSecret ),
+          meta: {
+            version: version ? version : '0',
+            validator: 'HEXA',
+            index,
+            walletId,
+            tag,
+            timestamp,
+            reshareVersion: 0,
+            questionId
+          },
+        }
+      }
+
+      keeperMetaShares.push( metaShare )
+      index++
+    }
+
+    if ( keeperMetaShares.length !== config.SSS_LEVEL1_TOTAL ) {
+      keeperMetaShares = []
+      throw new Error( 'Something went wrong while generating metaShares' )
+    }
+
+    return {
+      metaShares: keeperMetaShares
+    }
+  };
+
+  static createMetaSharesKeeper = (
+    walletId: string,
+    encryptedPrimarySecrets: string[],
+    encryptedSecondarySecrets: string[],
+    exisitngKeeperMetaShares: MetaShare[],
+    answer: string,
+    bhXpub: string,
+    tag: string,
+    questionId: string,
+    version: string,
+    question: string,
+    level: number,
+  ): {
+    metaShares: MetaShare[];
+    oldMetaShares: MetaShare[];
+  } => {
+    if ( !encryptedPrimarySecrets.length ) throw new Error( 'Can not create MetaShares; missing encryptedPrimarySecrets' )
+
+    const timestamp = new Date().toLocaleString( undefined, {
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    } )
+
+    const encryptedXpub = BHROperations.encryptWithAnswer( bhXpub, answer )
+
+    let keeperMetaShares = []
+    let metaShare: MetaShare
+    for ( let index = 0; index < encryptedPrimarySecrets.length; index++ ) {
+      const element = encryptedPrimarySecrets[ index ]
+      metaShare = {
+        shareId: BHROperations.getShareId( element ),
+        encryptedShare: {
+          pmShare: element,
+          smShare: encryptedSecondarySecrets.length ? encryptedSecondarySecrets[ 1 ] : '',
+          bhXpub: encryptedXpub.encryptedString
+        },
+        meta: {
+          version: version ? version : '0',
+          validator: 'HEXA',
+          index,
+          walletId: walletId,
+          tag,
+          timestamp,
+          reshareVersion: 0,
+          questionId,
+          question,
+          scheme: level == 2 ? '2of3' : '3of5',
+        },
+      }
+      keeperMetaShares.push( metaShare )
+    }
+
+    if ( level == 2 && keeperMetaShares.length !== config.SSS_LEVEL1_TOTAL ) {
+      keeperMetaShares = []
+      throw new Error( 'Something went wrong while generating metaShares' )
+    }
+
+    if ( level == 3 && keeperMetaShares.length !== config.SSS_LEVEL2_TOTAL ) {
+      keeperMetaShares = []
+      throw new Error( 'Something went wrong while generating metaShares' )
+    }
+
+    return {
+      metaShares: keeperMetaShares,
+      oldMetaShares: exisitngKeeperMetaShares,
+    }
+  };
+
+  static reshareMetaShareKeeper = ( index: number, keeperMetaShares: MetaShare[] ) => {
+    keeperMetaShares[ index ].meta.reshareVersion =
+    keeperMetaShares[ index ].meta.reshareVersion + 1
+    return keeperMetaShares[ index ]
+  };
+
+  //   public restoreMetaSharesKeeper = (
+  //     keeperMetaShares: MetaShare[],
+  //   ): {
+  //     restored: boolean;
+  //   } => {
+  //     if ( !Object.keys( metaShares ).length ) {
+  //       throw new Error( 'Restoration requires metaShares' )
+  //     }
+
+  //     this.metaSharesKeeper = metaShares
+
+  //     // restoring other assets
+
+  //     // restoring healthCheckInit variable
+  //     this.healthCheckInitializedKeeper = true
+
+  //     // enriching pdf health variable if restoration is done via Personal Copy
+  //     // if (this.metaSharesKeeper[3]) {
+  //     //   this.createQR(3);
+  //     // }
+  //     // if (this.metaSharesKeeper[4]) {
+  //     //   this.createQR(4);
+  //     // }
+
+  //     // replenishing shareIDs from any of the available shares
+  //     // for ( const share of metaShares ) {
+  //     //   if ( share ) {
+  //     //     const { decryptedStaticNonPMDD } = this.decryptStaticNonPMDD(
+  //     //       share.encryptedStaticNonPMDD,
+  //     //     )
+  //     //     const { shareIDs } = decryptedStaticNonPMDD
+  //     //     this.shareIDsKeeper = shareIDs
+  //     //     break
+  //     //   }
+  //     // }
+
+  //     return {
+  //       restored: true
+  //     }
+  //   };
+
+  static createQR = ( index: number, keeperMetaShares: MetaShare[], keeperPDFHealth ): { qrData: string[], keeperPDFHealth } => {
+    const splits: number = config.SSS_METASHARE_SPLITS
+    const metaString = JSON.stringify( keeperMetaShares[ index ] )
+    const slice = Math.trunc( metaString.length / splits )
+    const qrData: string[] = []
+
+    let start = 0
+    let end = slice
+    for ( let itr = 0; itr < splits; itr++ ) {
+      if ( itr !== splits - 1 ) {
+        qrData[ itr ] = metaString.slice( start, end )
+      } else {
+        qrData[ itr ] = metaString.slice( start )
+      }
+      start = end
+      end = end + slice
+      if ( index === 3 ) {
+        qrData[ itr ] = 'e0' + ( itr + 1 ) + qrData[ itr ]
+      } else if ( index === 4 ) {
+        qrData[ itr ] = 'c0' + ( itr + 1 ) + qrData[ itr ]
+      }
+      if ( itr === 0 ) {
+        keeperPDFHealth = {
+          ...keeperPDFHealth,
+          [ index ]: {
+            shareId: keeperMetaShares[ index ].shareId,
+            qrData: qrData[ itr ],
+          },
+        }
+      }
+    }
+    return {
+      qrData,
+      keeperPDFHealth
+    }
+  };
+
+  static encryptSecrets = (
+    secretsToEncrypt: string[],
+    answer: string,
+    areSecondaryShares?: boolean,
+  ): {
+        encryptedSecondarySecrets: any[];
+        encryptedPrimarySecrets?: undefined;
+        keeperShareIDs?: undefined;
+    } | {
+        encryptedPrimarySecrets: any[];
+        keeperShareIDs: any[];
+        encryptedSecondarySecrets?: undefined;
+    } => {
+    const key = BHROperations.getDerivedKey( answer )
+    const shareIDs = []
+    const encryptedSecretsArr = []
+    for ( const secret of secretsToEncrypt ) {
+      const cipher = crypto.createCipheriv(
+        BHROperations.cipherSpec.algorithm,
+        key,
+        BHROperations.cipherSpec.iv,
+      )
+      let encrypted = cipher.update( secret, 'utf8', 'hex' )
+      encrypted += cipher.final( 'hex' )
+      encryptedSecretsArr.push( encrypted )
+      shareIDs.push( BHROperations.getShareId( encrypted ) )
+    }
+    if( areSecondaryShares ){
+      return {
+        encryptedSecondarySecrets: encryptedSecretsArr,
+      }
+    } else{
+      return {
+        encryptedPrimarySecrets: encryptedSecretsArr,
+        keeperShareIDs: shareIDs
+      }
+    }
+  };
 }
