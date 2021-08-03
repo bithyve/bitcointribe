@@ -167,6 +167,13 @@ export default function AddContactSendRequest( props ) {
             } else { Toast( 'F&F contact number missing' ); return }
             break
 
+          case DeepLinkEncryptionType.EMAIL:
+            const email = idx( Contact, ( _ ) => _.emails[ 0 ].email )
+            if( email ){
+              encryption_key = email // last 10 digits only
+            } else { Toast( 'F&F contact email missing' ); return }
+            break
+
           case DeepLinkEncryptionType.OTP:
             openTimer()
             encryption_key = TrustedContactsOperations.generateKey( 6 )

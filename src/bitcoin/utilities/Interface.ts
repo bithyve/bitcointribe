@@ -915,5 +915,6 @@ export enum DeepLinkKind {
 export enum DeepLinkEncryptionType {
   DEFAULT = 'DEFAULT',
   NUMBER = 'NUM',
+  EMAIL = 'EMAIL',
   OTP = 'OTP'
 }
