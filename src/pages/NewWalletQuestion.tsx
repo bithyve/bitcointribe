@@ -1122,7 +1122,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             {answer.length === 0 && confirmAnswer.length === 0 &&
             <BottomInfoBox
               title={'Note'}
-              infoText={'The Answer is used to encrypt the backup. The Security Question acts as a hint to remember the same'}
+              infoText={'The Answer is used to encrypt the backup. The Security Question acts as a hint to remember'}
               italicText={''}
               backgroundColor={Colors.white}
             />
@@ -1240,7 +1240,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             disabled={isDisabled}
           >
             <HeaderTitle
-              firstLineTitle={'Initial Cloud Backup'}
+              firstLineTitle={'Step 2\nChoose an encryption option'}
               secondLineTitle={'Select how you want to encrypt the backup'}
               infoTextNormal={''}
               infoTextBold={''}

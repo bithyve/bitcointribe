@@ -183,8 +183,8 @@ export default function NewWalletName( props ) {
         >
           <ScrollView>
             <HeaderTitle
-              firstLineTitle={'Provide a Display Name'}
-              secondLineTitle={'This is used for communication with your contacts'}
+              firstLineTitle={'Step 1\nPlease name your wallet'}
+              secondLineTitle={'New Wallet creation'}
               infoTextNormal={''}
               infoTextBold={''}
               infoTextNormal1={''}

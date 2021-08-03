@@ -79,11 +79,11 @@ export default function RequestKeyFromContact( props ) {
   }
   return (
     <View style={styles.modalContainer}>
-      <ScrollView>
-        {/* <View
+      {/* <ScrollView> */}
+      {/* <View
           style={styles.mainView}
         > */}
-        {/* {props.isModal &&
+      {/* {props.isModal &&
           <View style={styles.topSubView}>
             <AppBottomSheetTouchableWrapper
               onPress={() => {
@@ -111,8 +111,8 @@ export default function RequestKeyFromContact( props ) {
             </View>
           </View>
         } */}
-        {/* </View> */}
-        {/* <View style={[ styles.topContainer, {
+      {/* </View> */}
+      {/* <View style={[ styles.topContainer, {
         marginTop: !props.isModal ? 0 : hp( '1.7%' ),
         marginBottom: !props.isModal ? 0 : hp( '1.7%' ),
       } ]}>
@@ -121,51 +121,51 @@ export default function RequestKeyFromContact( props ) {
           contactText={props.contactText}
           Contact={Contact} />
       </View> */}
-        <HeaderTitle
-          firstLineTitle={'Scan QR'}
-          secondLineTitle={'With your contacts Hexa app'}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
-        <View
-          style={[ styles.mainContainer,
-            {
-              marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-              marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
-            } ]}
-        >
-          <View style={[ styles.qrContainer, {
-            marginVertical: hp( '4%' )
-          } ]}>
-            {!props.QR ? (
-              <ActivityIndicator size="large" color={Colors.babyGray} />
-            ) : (
-              <QRCode
-                title="F&F Request"
-                value={props.QR}
-                size={hp( '27%' )} />
-            )}
-          </View>
-
+      <HeaderTitle
+        firstLineTitle={'Scan QR'}
+        secondLineTitle={'With your contacts Hexa app'}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <View
+        style={[ styles.mainContainer,
+          {
+            marginTop: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+            marginBottom: !props.isModal ? hp( '2%' ) : hp( '1.7%' ),
+          } ]}
+      >
+        <View style={[ styles.qrContainer, {
+          marginVertical: hp( '4%' )
+        } ]}>
+          {!props.QR ? (
+            <ActivityIndicator size="large" color={Colors.babyGray} />
+          ) : (
+            <QRCode
+              title="F&F Request"
+              value={props.QR}
+              size={hp( '27%' )} />
+          )}
         </View>
-        <HeaderTitle
-          firstLineTitle={'or Share link'}
-          secondLineTitle={'With the contact'}
-          infoTextNormal={''}
-          infoTextBold={''}
-          infoTextNormal1={''}
-          step={''}
-        />
-        <CopyThisText
-          openLink={shareLink ? shareOption : () => { }}
-          backgroundColor={Colors.white}
-          text={shareLink ? shareLink : 'Creating Link....'}
-          width={'22%'}
-          height={'22%'}
-        />
-      </ScrollView>
+
+      </View>
+      <HeaderTitle
+        firstLineTitle={'or Share link'}
+        secondLineTitle={'With the contact'}
+        infoTextNormal={''}
+        infoTextBold={''}
+        infoTextNormal1={''}
+        step={''}
+      />
+      <CopyThisText
+        openLink={shareLink ? shareOption : () => { }}
+        backgroundColor={Colors.white}
+        text={shareLink ? shareLink : 'Creating Link....'}
+        width={'22%'}
+        height={'22%'}
+      />
+      {/* </ScrollView> */}
 
     </View>
   )
@@ -183,7 +183,6 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansRegular,
   },
   modalContainer: {
-    height: '100%',
     backgroundColor: Colors.backgroundColor,
     alignSelf: 'center',
     width: '100%',

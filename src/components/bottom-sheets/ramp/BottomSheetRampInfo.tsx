@@ -110,7 +110,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
         marginBottom: wp( 3 ),
       }}>{rampMessage}</Text>
     </View>
-    <TouchableOpacity
+    {/* <TouchableOpacity
       onPress={() => showDropdown( true )}
       style={styles.containerStyle}>
       <View style={styles.headerImageView}>
@@ -146,7 +146,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
       <DropDown onClose={( value ) => { setPickReceiveAddressFrom( value.type )
         showDropdown( false ) }}
       dropdownBoxList={dropdownBoxList} />
-    ) : null}
+    ) : null} */}
     <View style={styles.containerStyle}>
       <View style={styles.headerImageView}>
         <View style={styles.headerImageInitials}>
@@ -172,7 +172,7 @@ const BottomSheetRampInfo: React.FC<Props> = ( { rampDeepLinkContent, rampFromDe
           style={styles.destinationTitleText}
           numberOfLines={1}
         >
-              Ramp Account
+              Checking Account
         </ListItem.Title>
         <ListItem.Subtitle
           style={[ ListStyles.infoHeaderSubtitleText, {
